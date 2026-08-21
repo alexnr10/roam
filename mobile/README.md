@@ -47,6 +47,10 @@ Deux différences avec l'app :
 - **Collections** par thème, label et géographie, avec pourcentage et prochain palier
 - **Niveaux** : le niveau 2 reste verrouillé tant que le niveau 1 n'est pas terminé,
   mais reste visible — on doit voir ce qu'on va gagner
+- **Célébration à la validation** : une onde part du médaillon, et les barres des
+  collections concernées montent de leur ancien pourcentage au nouveau — c'est le
+  mouvement qui récompense, pas le chiffre. Retour haptique sur téléphone, et
+  `AccessibilityInfo` respecté si l'utilisateur a réduit les animations
 - **Badges** aux paliers 25 / 50 / 75 / 100 % et à chaque niveau terminé
 - **Persistance locale** via AsyncStorage
 

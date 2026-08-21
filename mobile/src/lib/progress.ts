@@ -1,4 +1,4 @@
-import type { Collection, Tier, Visit } from '../types';
+import type { Collection, Place, Tier, Visit } from '../types';
 
 /**
  * Progression, niveaux et badges.
@@ -150,4 +150,62 @@ export function nextMilestone(
 
   const needed = Math.ceil((threshold / 100) * progress.total) - progress.visited;
   return { label: `${threshold} %`, remaining: Math.max(needed, 1) };
+}
+
+
+/**
+ * Ce qu'une validation vient de faire bouger.
+ *
+ * Calculé en comparant l'avant et l'après, pour que l'écran de célébration
+ * montre le mouvement plutôt qu'un état. Voir progresser une barre de 18 % à
+ * 25 % vaut mieux que lire « 25 % » : c'est le mouvement qui récompense.
+ */
+export type CollectionAdvance = {
+  collection: Collection;
+  before: CollectionProgress;
+  after: CollectionProgress;
+};
+
+export type CheckInReward = {
+  advances: CollectionAdvance[];
+  /** Badges décrochés par cette validation, et pas avant. */
+  newBadges: Badge[];
+  /** Niveaux terminés par cette validation. */
+  tierUps: Array<{ collection: Collection; tier: Tier }>;
+};
+
+export function describeCheckIn(
+  collections: Collection[],
+  place: Place,
+  visitsBefore: Visit[],
+  visitsAfter: Visit[],
+): CheckInReward {
+  const advances: CollectionAdvance[] = [];
+  const newBadges: Badge[] = [];
+  const tierUps: Array<{ collection: Collection; tier: Tier }> = [];
+
+  for (const collection of collections) {
+    if (!collection.places.some((member) => member.placeId === place.id)) continue;
+
+    const before = computeProgress(collection, visitsBefore);
+    const after = computeProgress(collection, visitsAfter);
+    if (after.visited === before.visited) continue;
+
+    advances.push({ collection, before, after });
+
+    const had = new Set(earnedBadges(collection, before).map((badge) => badge.id));
+    for (const badge of earnedBadges(collection, after)) {
+      if (!had.has(badge.id)) newBadges.push(badge);
+    }
+
+    for (const tier of after.tiers) {
+      if (tier.complete && !before.tiers[tier.tier - 1].complete) {
+        tierUps.push({ collection, tier: tier.tier });
+      }
+    }
+  }
+
+  // La collection la plus proche du but en premier : c'est celle qui parle.
+  advances.sort((a, b) => b.after.pct - a.after.pct);
+  return { advances, newBadges, tierUps };
 }

@@ -3,9 +3,11 @@ import { APPROACH_FACTOR, evaluateCheckIn, suggestCheckIn } from './checkin';
 import {
   BADGE_THRESHOLDS,
   computeProgress,
+  describeCheckIn,
   earnedBadges,
   nextMilestone,
 } from './progress';
+import { makeVisit } from './visit';
 import type { Collection, Place, Tier, Visit } from '../types';
 
 const place = (over: Partial<Place> = {}): Place => ({
@@ -241,6 +243,55 @@ describe('badges', () => {
     for (const threshold of BADGE_THRESHOLDS) {
       expect(badges.some((badge) => badge.value === threshold && badge.kind === 'threshold')).toBe(true);
     }
+  });
+});
+
+describe('récompense de validation', () => {
+  const sample = collection([
+    ['a', 1], ['b', 1], ['c', 2], ['d', 2],
+  ]);
+  const other = { ...collection([['x', 1], ['y', 1]]), slug: 'theme-cascades', name: 'Cascades' };
+  const target = place({ id: 'b' });
+
+  const run = (before: Visit[]) =>
+    describeCheckIn([sample, other], target, before, [...before, makeVisit(target, 'gps')]);
+
+  it('ne retient que les collections où le lieu compte', () => {
+    expect(run([]).advances.map((a) => a.collection.slug)).toEqual(['theme-chateaux']);
+  });
+
+  it('expose l’avant et l’après pour animer le mouvement', () => {
+    const [advance] = run([visit('a')]).advances;
+    expect(advance.before.pct).toBe(25);
+    expect(advance.after.pct).toBe(50);
+  });
+
+  it('signale les badges décrochés par cette validation, pas les précédents', () => {
+    const reward = run([visit('a')]);
+    const labels = reward.newBadges.map((badge) => badge.label);
+    expect(labels).toContain('50 %');
+    // Le palier 25 % était déjà acquis avant.
+    expect(labels).not.toContain('25 %');
+  });
+
+  it('signale un niveau terminé', () => {
+    const reward = run([visit('a')]);
+    expect(reward.tierUps).toEqual([{ collection: sample, tier: 1 }]);
+  });
+
+  it('ne signale aucun niveau quand il en reste', () => {
+    expect(run([]).tierUps).toEqual([]);
+  });
+
+  it('classe la collection la plus avancée en premier', () => {
+    const wide = { ...collection([['b', 1], ['p', 1], ['q', 2], ['r', 3]]), slug: 'geo-country-fr' };
+    const reward = describeCheckIn(
+      [sample, wide],
+      target,
+      [visit('a')],
+      [visit('a'), makeVisit(target, 'gps')],
+    );
+    expect(reward.advances[0].collection.slug).toBe('theme-chateaux');
   });
 });
 

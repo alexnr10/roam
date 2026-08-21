@@ -8,6 +8,7 @@ import React, {
   useState,
 } from 'react';
 
+import { makeVisit } from '../lib/visit';
 import type { Place, Visit, VisitMethod } from '../types';
 
 const STORAGE_KEY = 'roam.visits.v1';
@@ -74,16 +75,7 @@ export function VisitsProvider({ children }: { children: React.ReactNode }) {
       setVisits((current) => {
         // Un lieu ne compte qu'une fois ; revenir sur place ne double pas le score.
         if (current.some((visit) => visit.placeId === place.id)) return current;
-        return [
-          ...current,
-          {
-            placeId: place.id,
-            method,
-            verified: method === 'gps',
-            visitedAt: new Date().toISOString(),
-            distanceM,
-          },
-        ];
+        return [...current, makeVisit(place, method, distanceM)];
       });
     },
     [],

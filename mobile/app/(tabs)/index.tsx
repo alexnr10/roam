@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { places as allPlaces, themeLabel } from '../../src/data/catalog';
 import { evaluateCheckIn, suggestCheckIn } from '../../src/lib/checkin';
 import { distanceToPlace, formatDistance } from '../../src/lib/geo';
+import { useCheckIn } from '../../src/lib/useCheckIn';
 import { useLocation } from '../../src/lib/useLocation';
 import { useVisits } from '../../src/store/visits';
 import { colors, spacing, radius, type, themeEmoji } from '../../src/theme';
@@ -18,7 +19,8 @@ type Filter = 'all' | 'todo' | 'done';
 export default function MapScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { visitedIds, addVisit } = useVisits();
+  const { visitedIds } = useVisits();
+  const checkIn = useCheckIn();
   const { position, granted, simulated } = useLocation();
   const [filter, setFilter] = useState<Filter>('all');
 
@@ -92,7 +94,7 @@ export default function MapScreen() {
             label="Valider"
             onPress={() => {
               const evaluation = evaluateCheckIn(suggestion, position);
-              addVisit(suggestion, 'gps', evaluation.distanceM ?? undefined);
+              checkIn(suggestion, 'gps', evaluation.distanceM ?? undefined);
             }}
           />
         </View>

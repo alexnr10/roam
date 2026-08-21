@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { CelebrationProvider } from '../src/store/celebration';
 import { VisitsProvider } from '../src/store/visits';
 import { colors } from '../src/theme';
 
@@ -10,6 +11,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <VisitsProvider>
+        <CelebrationProvider>
         <StatusBar style="dark" />
         <Stack
           screenOptions={{
@@ -23,6 +25,7 @@ export default function RootLayout() {
           <Stack.Screen name="place/[id]" options={{ title: '' }} />
           <Stack.Screen name="collection/[slug]" options={{ title: '' }} />
         </Stack>
+        </CelebrationProvider>
       </VisitsProvider>
     </SafeAreaProvider>
   );

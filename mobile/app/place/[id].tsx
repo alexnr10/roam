@@ -12,6 +12,7 @@ import { evaluateCheckIn } from '../../src/lib/checkin';
 import { formatDistance } from '../../src/lib/geo';
 import { setSimulatedPosition } from '../../src/lib/simulation';
 import { computeProgress } from '../../src/lib/progress';
+import { useCheckIn } from '../../src/lib/useCheckIn';
 import { useLocation } from '../../src/lib/useLocation';
 import { useVisits } from '../../src/store/visits';
 import { colors, radius, spacing, themeEmoji, type } from '../../src/theme';
@@ -20,7 +21,8 @@ import { Button, Card, Pill, ProgressBar, TierDot } from '../../src/ui/component
 export default function PlaceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { visits, visitedIds, addVisit, removeVisit } = useVisits();
+  const { visits, visitedIds, removeVisit } = useVisits();
+  const checkIn = useCheckIn();
   const { position } = useLocation();
 
   const place = id ? getPlace(id) : undefined;
@@ -88,14 +90,14 @@ export default function PlaceScreen() {
             <Button
               label={evaluation.canCheckIn ? 'Je suis sur place' : 'Trop loin pour valider'}
               disabled={!evaluation.canCheckIn}
-              onPress={() => addVisit(place, 'gps', evaluation.distanceM ?? undefined)}
+              onPress={() => checkIn(place, 'gps', evaluation.distanceM ?? undefined)}
             />
 
             {/* Sans ça, l'utilisateur démarre à 0 % partout et décroche. */}
             <Button
               label="J'y suis déjà allé"
               tone="secondary"
-              onPress={() => addVisit(place, 'declared')}
+              onPress={() => checkIn(place, 'declared')}
             />
             <Text style={[type.small, { textAlign: 'center' }]}>
               Une visite déclarée compte dans tes pourcentages, mais n'est pas
