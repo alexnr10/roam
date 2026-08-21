@@ -18,8 +18,8 @@ valent le déplacement. Une collection doit rester finissable, sinon il n'y a pl
 | Schéma de base (Postgres + PostGIS) | ✅ validé en local |
 | Pipeline de curation (Wikidata + labels) | ✅ écrit, **collecte réelle à lancer** |
 | Revue éditoriale du catalogue | ⏳ à faire |
-| Application Expo (carte, check-in) | ⏳ à venir |
-| Badges et progression | ⏳ à venir |
+| Application Expo (carte, check-in) | ✅ prototype, sur catalogue de démonstration |
+| Badges et progression | ✅ prototype |
 | Contribution communautaire | ⏳ à venir |
 | Social | ⏳ v2 |
 
@@ -29,6 +29,7 @@ valent le déplacement. Une collection doit rester finissable, sinon il n'y a pl
 docs/       concept.md, curation-charter.md — lire en premier
 db/         schema.sql, bouchons Supabase et script de validation locale
 pipeline/   collecte Wikidata, scoring, construction des collections
+mobile/     application Expo — carte, validation GPS, collections, badges
 ```
 
 ## Démarrage
@@ -46,6 +47,9 @@ python -m roam_pipeline apply-review --strict
 
 # 3. Charger dans une base locale (Postgres + PostGIS requis)
 cd .. && ./db/local/validate.sh
+
+# 4. Lancer l'application (Expo Go sur le téléphone)
+cd mobile && npm install && npx expo start
 ```
 
 ## Les trois idées qui structurent le projet

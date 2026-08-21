@@ -1,0 +1,1497 @@
+{
+  "_note": "DONNÉES DE DÉMONSTRATION — coordonnées approximatives, notoriété appréciée à la main. Généré par mobile/scripts/build-demo-catalog.py. À remplacer par la sortie du pipeline de curation.",
+  "themes": [
+    {
+      "id": "chateaux",
+      "name": "Châteaux",
+      "nameSingular": "Château",
+      "icon": "castle"
+    },
+    {
+      "id": "abbayes",
+      "name": "Abbayes et monastères",
+      "nameSingular": "Abbaye",
+      "icon": "abbey"
+    },
+    {
+      "id": "cathedrales",
+      "name": "Cathédrales et basiliques",
+      "nameSingular": "Cathédrale",
+      "icon": "cathedral"
+    },
+    {
+      "id": "villages",
+      "name": "Villages de caractère",
+      "nameSingular": "Village",
+      "icon": "village"
+    },
+    {
+      "id": "sommets",
+      "name": "Sommets",
+      "nameSingular": "Sommet",
+      "icon": "mountain"
+    },
+    {
+      "id": "cascades",
+      "name": "Cascades",
+      "nameSingular": "Cascade",
+      "icon": "waterfall"
+    },
+    {
+      "id": "gorges",
+      "name": "Gorges et canyons",
+      "nameSingular": "Gorges",
+      "icon": "canyon"
+    },
+    {
+      "id": "plages",
+      "name": "Littoral et plages",
+      "nameSingular": "Site",
+      "icon": "beach"
+    },
+    {
+      "id": "grottes",
+      "name": "Grottes et gouffres",
+      "nameSingular": "Grotte",
+      "icon": "cave"
+    },
+    {
+      "id": "lacs",
+      "name": "Lacs",
+      "nameSingular": "Lac",
+      "icon": "lake"
+    },
+    {
+      "id": "ponts",
+      "name": "Ponts et viaducs",
+      "nameSingular": "Pont",
+      "icon": "bridge"
+    },
+    {
+      "id": "phares",
+      "name": "Phares",
+      "nameSingular": "Phare",
+      "icon": "lighthouse"
+    }
+  ],
+  "places": [
+    {
+      "id": "DEMO-mont-saint-michel",
+      "slug": "mont-saint-michel",
+      "name": "Mont-Saint-Michel",
+      "themeId": "abbayes",
+      "lat": 48.636,
+      "lon": -1.5115,
+      "radiusM": 150,
+      "score": 120,
+      "departement": "Manche",
+      "regionCode": "28",
+      "summary": "Une abbaye posée sur un rocher que la marée isole encore deux fois par jour."
+    },
+    {
+      "id": "DEMO-chateau-de-chambord",
+      "slug": "chateau-de-chambord",
+      "name": "Château de Chambord",
+      "themeId": "chateaux",
+      "lat": 47.6161,
+      "lon": 1.517,
+      "radiusM": 200,
+      "score": 120,
+      "departement": "Loir-et-Cher",
+      "regionCode": "24",
+      "summary": "Le plus démesuré des châteaux de la Loire, et son escalier à double révolution."
+    },
+    {
+      "id": "DEMO-chateau-de-chenonceau",
+      "slug": "chateau-de-chenonceau",
+      "name": "Château de Chenonceau",
+      "themeId": "chateaux",
+      "lat": 47.3249,
+      "lon": 1.0705,
+      "radiusM": 200,
+      "score": 90,
+      "departement": "Indre-et-Loire",
+      "regionCode": "24",
+      "summary": "Le château-pont jeté sur le Cher, le plus gracieux de tous."
+    },
+    {
+      "id": "DEMO-chateau-de-versailles",
+      "slug": "chateau-de-versailles",
+      "name": "Château de Versailles",
+      "themeId": "chateaux",
+      "lat": 48.8049,
+      "lon": 2.1204,
+      "radiusM": 200,
+      "score": 120,
+      "departement": "Yvelines",
+      "regionCode": "11",
+      "summary": "L'étalon de la démesure royale, jardins compris."
+    },
+    {
+      "id": "DEMO-chateau-de-fontainebleau",
+      "slug": "chateau-de-fontainebleau",
+      "name": "Château de Fontainebleau",
+      "themeId": "chateaux",
+      "lat": 48.4021,
+      "lon": 2.7003,
+      "radiusM": 200,
+      "score": 100,
+      "departement": "Seine-et-Marne",
+      "regionCode": "11",
+      "summary": "Huit siècles de souverains ont ajouté leur aile ; le résultat tient debout."
+    },
+    {
+      "id": "DEMO-chateau-du-haut-knigsbourg",
+      "slug": "chateau-du-haut-knigsbourg",
+      "name": "Château du Haut-Kœnigsbourg",
+      "themeId": "chateaux",
+      "lat": 48.2494,
+      "lon": 7.3444,
+      "radiusM": 200,
+      "score": 80,
+      "departement": "Bas-Rhin",
+      "regionCode": "44",
+      "summary": "Une forteresse rose reconstruite sur son éperon, avec toute la plaine d'Alsace en contrebas."
+    },
+    {
+      "id": "DEMO-chateau-de-peyrepertuse",
+      "slug": "chateau-de-peyrepertuse",
+      "name": "Château de Peyrepertuse",
+      "themeId": "chateaux",
+      "lat": 42.8697,
+      "lon": 2.5561,
+      "radiusM": 200,
+      "score": 70,
+      "departement": "Aude",
+      "regionCode": "76",
+      "summary": "Une citadelle cathare accrochée à une crête calcaire, à 800 mètres."
+    },
+    {
+      "id": "DEMO-palais-des-papes",
+      "slug": "palais-des-papes",
+      "name": "Palais des Papes",
+      "themeId": "chateaux",
+      "lat": 43.9509,
+      "lon": 4.8076,
+      "radiusM": 200,
+      "score": 110,
+      "departement": "Vaucluse",
+      "regionCode": "93",
+      "summary": "Le plus grand palais gothique du monde, bâti quand Avignon était Rome."
+    },
+    {
+      "id": "DEMO-cite-de-carcassonne",
+      "slug": "cite-de-carcassonne",
+      "name": "Cité de Carcassonne",
+      "themeId": "chateaux",
+      "lat": 43.2061,
+      "lon": 2.3639,
+      "radiusM": 200,
+      "score": 110,
+      "departement": "Aude",
+      "regionCode": "76",
+      "summary": "Cinquante-deux tours et une double enceinte, restaurées par Viollet-le-Duc."
+    },
+    {
+      "id": "DEMO-abbaye-de-fontenay",
+      "slug": "abbaye-de-fontenay",
+      "name": "Abbaye de Fontenay",
+      "themeId": "abbayes",
+      "lat": 47.6403,
+      "lon": 4.3903,
+      "radiusM": 150,
+      "score": 90,
+      "departement": "Côte-d'Or",
+      "regionCode": "27",
+      "summary": "L'abbaye cistercienne la mieux conservée d'Europe, dans un vallon isolé."
+    },
+    {
+      "id": "DEMO-abbaye-du-thoronet",
+      "slug": "abbaye-du-thoronet",
+      "name": "Abbaye du Thoronet",
+      "themeId": "abbayes",
+      "lat": 43.4603,
+      "lon": 6.2639,
+      "radiusM": 150,
+      "score": 60,
+      "departement": "Var",
+      "regionCode": "93",
+      "summary": "L'austérité cistercienne poussée à la perfection acoustique."
+    },
+    {
+      "id": "DEMO-abbaye-de-senanque",
+      "slug": "abbaye-de-senanque",
+      "name": "Abbaye de Sénanque",
+      "themeId": "abbayes",
+      "lat": 43.9281,
+      "lon": 5.1908,
+      "radiusM": 150,
+      "score": 70,
+      "departement": "Vaucluse",
+      "regionCode": "93",
+      "summary": "Une abbaye romane et son champ de lavande, photographiée mille fois et pourtant."
+    },
+    {
+      "id": "DEMO-cathedrale-de-chartres",
+      "slug": "cathedrale-de-chartres",
+      "name": "Cathédrale de Chartres",
+      "themeId": "cathedrales",
+      "lat": 48.4475,
+      "lon": 1.4878,
+      "radiusM": 120,
+      "score": 110,
+      "departement": "Eure-et-Loir",
+      "regionCode": "24",
+      "summary": "Les vitraux du XIIIe siècle les plus complets qui nous soient parvenus."
+    },
+    {
+      "id": "DEMO-cathedrale-d-amiens",
+      "slug": "cathedrale-d-amiens",
+      "name": "Cathédrale d'Amiens",
+      "themeId": "cathedrales",
+      "lat": 49.8947,
+      "lon": 2.3022,
+      "radiusM": 120,
+      "score": 100,
+      "departement": "Somme",
+      "regionCode": "32",
+      "summary": "La plus vaste cathédrale gothique de France ; deux Notre-Dame de Paris tiendraient dedans."
+    },
+    {
+      "id": "DEMO-basilique-sainte-marie-madeleine-de-vezelay",
+      "slug": "basilique-sainte-marie-madeleine-de-vezelay",
+      "name": "Basilique Sainte-Marie-Madeleine de Vézelay",
+      "themeId": "cathedrales",
+      "lat": 47.4661,
+      "lon": 3.7481,
+      "radiusM": 120,
+      "score": 100,
+      "departement": "Yonne",
+      "regionCode": "27",
+      "summary": "Le départ historique d'un chemin de Compostelle, sur sa colline éternelle."
+    },
+    {
+      "id": "DEMO-rocamadour",
+      "slug": "rocamadour",
+      "name": "Rocamadour",
+      "themeId": "villages",
+      "lat": 44.7994,
+      "lon": 1.6181,
+      "radiusM": 600,
+      "score": 90,
+      "departement": "Lot",
+      "regionCode": "76",
+      "summary": "Un village empilé à la verticale d'une falaise, sanctuaire compris."
+    },
+    {
+      "id": "DEMO-conques",
+      "slug": "conques",
+      "name": "Conques",
+      "themeId": "villages",
+      "lat": 44.5981,
+      "lon": 2.3986,
+      "radiusM": 600,
+      "score": 112,
+      "departement": "Aveyron",
+      "regionCode": "76",
+      "summary": "Un village médiéval intact, et le trésor d'orfèvrerie le plus complet de France."
+    },
+    {
+      "id": "DEMO-saint-cirq-lapopie",
+      "slug": "saint-cirq-lapopie",
+      "name": "Saint-Cirq-Lapopie",
+      "themeId": "villages",
+      "lat": 44.4658,
+      "lon": 1.6714,
+      "radiusM": 600,
+      "score": 92,
+      "departement": "Lot",
+      "regionCode": "76",
+      "summary": "Perché cent mètres au-dessus du Lot, sans une maison qui dépasse."
+    },
+    {
+      "id": "DEMO-gordes",
+      "slug": "gordes",
+      "name": "Gordes",
+      "themeId": "villages",
+      "lat": 43.9114,
+      "lon": 5.2003,
+      "radiusM": 600,
+      "score": 92,
+      "departement": "Vaucluse",
+      "regionCode": "93",
+      "summary": "Des maisons de pierre sèche en cascade sur un piton du Luberon."
+    },
+    {
+      "id": "DEMO-eguisheim",
+      "slug": "eguisheim",
+      "name": "Eguisheim",
+      "themeId": "villages",
+      "lat": 48.0433,
+      "lon": 7.3061,
+      "radiusM": 600,
+      "score": 82,
+      "departement": "Haut-Rhin",
+      "regionCode": "44",
+      "summary": "Un village concentrique, construit en cercles autour de son château."
+    },
+    {
+      "id": "DEMO-riquewihr",
+      "slug": "riquewihr",
+      "name": "Riquewihr",
+      "themeId": "villages",
+      "lat": 48.1667,
+      "lon": 7.2978,
+      "radiusM": 600,
+      "score": 82,
+      "departement": "Haut-Rhin",
+      "regionCode": "44",
+      "summary": "Des remparts, des colombages, et des vignes qui montent jusqu'aux portes."
+    },
+    {
+      "id": "DEMO-locronan",
+      "slug": "locronan",
+      "name": "Locronan",
+      "themeId": "villages",
+      "lat": 48.0972,
+      "lon": -4.2089,
+      "radiusM": 600,
+      "score": 82,
+      "departement": "Finistère",
+      "regionCode": "53",
+      "summary": "Une place de granit sans un fil électrique apparent."
+    },
+    {
+      "id": "DEMO-mont-blanc",
+      "slug": "mont-blanc",
+      "name": "Mont Blanc",
+      "themeId": "sommets",
+      "lat": 45.8326,
+      "lon": 6.8652,
+      "radiusM": 1000,
+      "score": 100,
+      "departement": "Haute-Savoie",
+      "regionCode": "84",
+      "summary": "Le toit de l'Europe occidentale, 4 806 mètres."
+    },
+    {
+      "id": "DEMO-aiguille-du-midi",
+      "slug": "aiguille-du-midi",
+      "name": "Aiguille du Midi",
+      "themeId": "sommets",
+      "lat": 45.8789,
+      "lon": 6.8873,
+      "radiusM": 1000,
+      "score": 80,
+      "departement": "Haute-Savoie",
+      "regionCode": "84",
+      "summary": "3 842 mètres atteints en vingt minutes de téléphérique, face aux glaciers."
+    },
+    {
+      "id": "DEMO-puy-de-dome",
+      "slug": "puy-de-dome",
+      "name": "Puy de Dôme",
+      "themeId": "sommets",
+      "lat": 45.7722,
+      "lon": 2.9644,
+      "radiusM": 1000,
+      "score": 100,
+      "departement": "Puy-de-Dôme",
+      "regionCode": "84",
+      "summary": "Le volcan qui domine la chaîne des Puys, et son temple de Mercure au sommet."
+    },
+    {
+      "id": "DEMO-pic-du-midi-de-bigorre",
+      "slug": "pic-du-midi-de-bigorre",
+      "name": "Pic du Midi de Bigorre",
+      "themeId": "sommets",
+      "lat": 42.9369,
+      "lon": 0.1411,
+      "radiusM": 1000,
+      "score": 70,
+      "departement": "Hautes-Pyrénées",
+      "regionCode": "76",
+      "summary": "Un observatoire à 2 877 mètres, et l'un des ciels nocturnes les plus purs d'Europe."
+    },
+    {
+      "id": "DEMO-cirque-de-gavarnie",
+      "slug": "cirque-de-gavarnie",
+      "name": "Cirque de Gavarnie",
+      "themeId": "sommets",
+      "lat": 42.6975,
+      "lon": -0.0089,
+      "radiusM": 1000,
+      "score": 100,
+      "departement": "Hautes-Pyrénées",
+      "regionCode": "76",
+      "summary": "Un amphithéâtre de 1 500 mètres de haut, et la plus grande cascade de France."
+    },
+    {
+      "id": "DEMO-cascade-du-herisson",
+      "slug": "cascade-du-herisson",
+      "name": "Cascade du Hérisson",
+      "themeId": "cascades",
+      "lat": 46.61,
+      "lon": 5.87,
+      "radiusM": 300,
+      "score": 70,
+      "departement": "Jura",
+      "regionCode": "27",
+      "summary": "Sept cascades enchaînées sur trois kilomètres de sentier forestier."
+    },
+    {
+      "id": "DEMO-cascades-des-tufs",
+      "slug": "cascades-des-tufs",
+      "name": "Cascades des Tufs",
+      "themeId": "cascades",
+      "lat": 46.705,
+      "lon": 5.64,
+      "radiusM": 300,
+      "score": 60,
+      "departement": "Jura",
+      "regionCode": "27",
+      "summary": "L'eau sort de la roche en éventail, au fond d'une reculée jurassienne."
+    },
+    {
+      "id": "DEMO-cascade-de-gavarnie",
+      "slug": "cascade-de-gavarnie",
+      "name": "Cascade de Gavarnie",
+      "themeId": "cascades",
+      "lat": 42.6944,
+      "lon": -0.0075,
+      "radiusM": 300,
+      "score": 70,
+      "departement": "Hautes-Pyrénées",
+      "regionCode": "76",
+      "summary": "423 mètres de chute libre depuis le cirque."
+    },
+    {
+      "id": "DEMO-gorges-du-verdon",
+      "slug": "gorges-du-verdon",
+      "name": "Gorges du Verdon",
+      "themeId": "gorges",
+      "lat": 43.75,
+      "lon": 6.33,
+      "radiusM": 2000,
+      "score": 90,
+      "departement": "Alpes-de-Haute-Provence",
+      "regionCode": "93",
+      "summary": "Sept cents mètres de calcaire vertical et une eau turquoise ; le point d'entrée est La Palud."
+    },
+    {
+      "id": "DEMO-gorges-du-tarn",
+      "slug": "gorges-du-tarn",
+      "name": "Gorges du Tarn",
+      "themeId": "gorges",
+      "lat": 44.32,
+      "lon": 3.32,
+      "radiusM": 2000,
+      "score": 100,
+      "departement": "Lozère",
+      "regionCode": "76",
+      "summary": "Cinquante kilomètres de canyon entre deux causses."
+    },
+    {
+      "id": "DEMO-cirque-de-navacelles",
+      "slug": "cirque-de-navacelles",
+      "name": "Cirque de Navacelles",
+      "themeId": "gorges",
+      "lat": 43.8917,
+      "lon": 3.5083,
+      "radiusM": 2000,
+      "score": 90,
+      "departement": "Hérault",
+      "regionCode": "76",
+      "summary": "Un méandre abandonné par sa rivière, creusé de 300 mètres."
+    },
+    {
+      "id": "DEMO-dune-du-pilat",
+      "slug": "dune-du-pilat",
+      "name": "Dune du Pilat",
+      "themeId": "plages",
+      "lat": 44.5883,
+      "lon": -1.2119,
+      "radiusM": 500,
+      "score": 90,
+      "departement": "Gironde",
+      "regionCode": "75",
+      "summary": "La plus haute dune d'Europe, océan d'un côté, forêt de l'autre."
+    },
+    {
+      "id": "DEMO-falaises-d-etretat",
+      "slug": "falaises-d-etretat",
+      "name": "Falaises d'Étretat",
+      "themeId": "plages",
+      "lat": 49.7069,
+      "lon": 0.205,
+      "radiusM": 500,
+      "score": 90,
+      "departement": "Seine-Maritime",
+      "regionCode": "28",
+      "summary": "Trois arches de craie que tous les peintres impressionnistes ont tenté."
+    },
+    {
+      "id": "DEMO-pointe-du-raz",
+      "slug": "pointe-du-raz",
+      "name": "Pointe du Raz",
+      "themeId": "plages",
+      "lat": 48.0383,
+      "lon": -4.7375,
+      "radiusM": 500,
+      "score": 80,
+      "departement": "Finistère",
+      "regionCode": "53",
+      "summary": "L'extrémité ouest de la Bretagne, et la mer qui s'y comporte en conséquence."
+    },
+    {
+      "id": "DEMO-cap-frehel",
+      "slug": "cap-frehel",
+      "name": "Cap Fréhel",
+      "themeId": "plages",
+      "lat": 48.6853,
+      "lon": -2.3181,
+      "radiusM": 500,
+      "score": 70,
+      "departement": "Côtes-d'Armor",
+      "regionCode": "53",
+      "summary": "Des falaises de grès rose de 70 mètres, et des colonies d'oiseaux marins."
+    },
+    {
+      "id": "DEMO-calanque-d-en-vau",
+      "slug": "calanque-d-en-vau",
+      "name": "Calanque d'En-Vau",
+      "themeId": "plages",
+      "lat": 43.2,
+      "lon": 5.51,
+      "radiusM": 500,
+      "score": 80,
+      "departement": "Bouches-du-Rhône",
+      "regionCode": "93",
+      "summary": "Une crique d'eau claire au fond d'une faille calcaire, uniquement à pied ou en bateau."
+    },
+    {
+      "id": "DEMO-gouffre-de-padirac",
+      "slug": "gouffre-de-padirac",
+      "name": "Gouffre de Padirac",
+      "themeId": "grottes",
+      "lat": 44.8567,
+      "lon": 1.75,
+      "radiusM": 200,
+      "score": 80,
+      "departement": "Lot",
+      "regionCode": "76",
+      "summary": "Un puits de 75 mètres, puis une rivière souterraine qu'on descend en barque."
+    },
+    {
+      "id": "DEMO-grotte-de-lascaux-iv",
+      "slug": "grotte-de-lascaux-iv",
+      "name": "Grotte de Lascaux IV",
+      "themeId": "grottes",
+      "lat": 45.0533,
+      "lon": 1.1667,
+      "radiusM": 200,
+      "score": 100,
+      "departement": "Dordogne",
+      "regionCode": "75",
+      "summary": "Le fac-similé intégral de la chapelle Sixtine de la préhistoire."
+    },
+    {
+      "id": "DEMO-grotte-chauvet-2",
+      "slug": "grotte-chauvet-2",
+      "name": "Grotte Chauvet 2",
+      "themeId": "grottes",
+      "lat": 44.3833,
+      "lon": 4.4167,
+      "radiusM": 200,
+      "score": 90,
+      "departement": "Ardèche",
+      "regionCode": "84",
+      "summary": "Les plus anciennes peintures connues, restituées à l'identique."
+    },
+    {
+      "id": "DEMO-lac-d-annecy",
+      "slug": "lac-d-annecy",
+      "name": "Lac d'Annecy",
+      "themeId": "lacs",
+      "lat": 45.85,
+      "lon": 6.17,
+      "radiusM": 1500,
+      "score": 80,
+      "departement": "Haute-Savoie",
+      "regionCode": "84",
+      "summary": "Le lac le plus transparent d'Europe, cerné de sommets."
+    },
+    {
+      "id": "DEMO-lac-de-sainte-croix",
+      "slug": "lac-de-sainte-croix",
+      "name": "Lac de Sainte-Croix",
+      "themeId": "lacs",
+      "lat": 43.76,
+      "lon": 6.22,
+      "radiusM": 1500,
+      "score": 70,
+      "departement": "Alpes-de-Haute-Provence",
+      "regionCode": "93",
+      "summary": "L'eau turquoise qui prolonge le Verdon, en pédalo si on veut."
+    },
+    {
+      "id": "DEMO-pont-du-gard",
+      "slug": "pont-du-gard",
+      "name": "Pont du Gard",
+      "themeId": "ponts",
+      "lat": 43.9475,
+      "lon": 4.5353,
+      "radiusM": 300,
+      "score": 110,
+      "departement": "Gard",
+      "regionCode": "76",
+      "summary": "Trois étages d'aqueduc romain intacts depuis deux mille ans."
+    },
+    {
+      "id": "DEMO-viaduc-de-millau",
+      "slug": "viaduc-de-millau",
+      "name": "Viaduc de Millau",
+      "themeId": "ponts",
+      "lat": 44.0797,
+      "lon": 3.0225,
+      "radiusM": 300,
+      "score": 80,
+      "departement": "Aveyron",
+      "regionCode": "76",
+      "summary": "343 mètres de haut : le pont le plus élevé du monde, et il est autoroutier."
+    },
+    {
+      "id": "DEMO-phare-de-cordouan",
+      "slug": "phare-de-cordouan",
+      "name": "Phare de Cordouan",
+      "themeId": "phares",
+      "lat": 45.5853,
+      "lon": -1.1753,
+      "radiusM": 200,
+      "score": 90,
+      "departement": "Gironde",
+      "regionCode": "75",
+      "summary": "Le « Versailles des mers », en pleine embouchure de la Gironde."
+    }
+  ],
+  "collections": [
+    {
+      "slug": "theme-chateaux",
+      "name": "Châteaux",
+      "kind": "theme",
+      "themeId": "chateaux",
+      "places": [
+        {
+          "placeId": "DEMO-chateau-de-chambord",
+          "tier": 1,
+          "rank": 1
+        },
+        {
+          "placeId": "DEMO-chateau-de-versailles",
+          "tier": 1,
+          "rank": 2
+        },
+        {
+          "placeId": "DEMO-cite-de-carcassonne",
+          "tier": 1,
+          "rank": 3
+        },
+        {
+          "placeId": "DEMO-palais-des-papes",
+          "tier": 2,
+          "rank": 4
+        },
+        {
+          "placeId": "DEMO-chateau-de-fontainebleau",
+          "tier": 2,
+          "rank": 5
+        },
+        {
+          "placeId": "DEMO-chateau-de-chenonceau",
+          "tier": 2,
+          "rank": 6
+        },
+        {
+          "placeId": "DEMO-chateau-du-haut-knigsbourg",
+          "tier": 2,
+          "rank": 7
+        },
+        {
+          "placeId": "DEMO-chateau-de-peyrepertuse",
+          "tier": 2,
+          "rank": 8
+        }
+      ],
+      "placeCount": 8,
+      "tierCounts": [
+        3,
+        5,
+        0
+      ]
+    },
+    {
+      "slug": "theme-abbayes",
+      "name": "Abbayes et monastères",
+      "kind": "theme",
+      "themeId": "abbayes",
+      "places": [
+        {
+          "placeId": "DEMO-mont-saint-michel",
+          "tier": 1,
+          "rank": 1
+        },
+        {
+          "placeId": "DEMO-abbaye-de-fontenay",
+          "tier": 1,
+          "rank": 2
+        },
+        {
+          "placeId": "DEMO-abbaye-de-senanque",
+          "tier": 1,
+          "rank": 3
+        },
+        {
+          "placeId": "DEMO-abbaye-du-thoronet",
+          "tier": 2,
+          "rank": 4
+        }
+      ],
+      "placeCount": 4,
+      "tierCounts": [
+        3,
+        1,
+        0
+      ]
+    },
+    {
+      "slug": "theme-villages",
+      "name": "Villages de caractère",
+      "kind": "theme",
+      "themeId": "villages",
+      "places": [
+        {
+          "placeId": "DEMO-conques",
+          "tier": 1,
+          "rank": 1
+        },
+        {
+          "placeId": "DEMO-gordes",
+          "tier": 1,
+          "rank": 2
+        },
+        {
+          "placeId": "DEMO-saint-cirq-lapopie",
+          "tier": 1,
+          "rank": 3
+        },
+        {
+          "placeId": "DEMO-rocamadour",
+          "tier": 2,
+          "rank": 4
+        },
+        {
+          "placeId": "DEMO-eguisheim",
+          "tier": 2,
+          "rank": 5
+        },
+        {
+          "placeId": "DEMO-locronan",
+          "tier": 2,
+          "rank": 6
+        },
+        {
+          "placeId": "DEMO-riquewihr",
+          "tier": 2,
+          "rank": 7
+        }
+      ],
+      "placeCount": 7,
+      "tierCounts": [
+        3,
+        4,
+        0
+      ]
+    },
+    {
+      "slug": "theme-sommets",
+      "name": "Sommets",
+      "kind": "theme",
+      "themeId": "sommets",
+      "places": [
+        {
+          "placeId": "DEMO-cirque-de-gavarnie",
+          "tier": 1,
+          "rank": 1
+        },
+        {
+          "placeId": "DEMO-mont-blanc",
+          "tier": 1,
+          "rank": 2
+        },
+        {
+          "placeId": "DEMO-puy-de-dome",
+          "tier": 1,
+          "rank": 3
+        },
+        {
+          "placeId": "DEMO-aiguille-du-midi",
+          "tier": 2,
+          "rank": 4
+        },
+        {
+          "placeId": "DEMO-pic-du-midi-de-bigorre",
+          "tier": 2,
+          "rank": 5
+        }
+      ],
+      "placeCount": 5,
+      "tierCounts": [
+        3,
+        2,
+        0
+      ]
+    },
+    {
+      "slug": "theme-plages",
+      "name": "Littoral et plages",
+      "kind": "theme",
+      "themeId": "plages",
+      "places": [
+        {
+          "placeId": "DEMO-dune-du-pilat",
+          "tier": 1,
+          "rank": 1
+        },
+        {
+          "placeId": "DEMO-falaises-d-etretat",
+          "tier": 1,
+          "rank": 2
+        },
+        {
+          "placeId": "DEMO-calanque-d-en-vau",
+          "tier": 1,
+          "rank": 3
+        },
+        {
+          "placeId": "DEMO-pointe-du-raz",
+          "tier": 2,
+          "rank": 4
+        },
+        {
+          "placeId": "DEMO-cap-frehel",
+          "tier": 2,
+          "rank": 5
+        }
+      ],
+      "placeCount": 5,
+      "tierCounts": [
+        3,
+        2,
+        0
+      ]
+    },
+    {
+      "slug": "label-unesco",
+      "name": "Patrimoine mondial de l'UNESCO",
+      "kind": "label",
+      "labelId": "unesco",
+      "places": [
+        {
+          "placeId": "DEMO-chateau-de-chambord",
+          "tier": 1,
+          "rank": 1
+        },
+        {
+          "placeId": "DEMO-chateau-de-versailles",
+          "tier": 1,
+          "rank": 2
+        },
+        {
+          "placeId": "DEMO-mont-saint-michel",
+          "tier": 1,
+          "rank": 3
+        },
+        {
+          "placeId": "DEMO-conques",
+          "tier": 2,
+          "rank": 4
+        },
+        {
+          "placeId": "DEMO-cathedrale-de-chartres",
+          "tier": 2,
+          "rank": 5
+        },
+        {
+          "placeId": "DEMO-cite-de-carcassonne",
+          "tier": 2,
+          "rank": 6
+        },
+        {
+          "placeId": "DEMO-palais-des-papes",
+          "tier": 2,
+          "rank": 7
+        },
+        {
+          "placeId": "DEMO-pont-du-gard",
+          "tier": 2,
+          "rank": 8
+        },
+        {
+          "placeId": "DEMO-basilique-sainte-marie-madeleine-de-vezelay",
+          "tier": 3,
+          "rank": 9
+        },
+        {
+          "placeId": "DEMO-cathedrale-d-amiens",
+          "tier": 3,
+          "rank": 10
+        },
+        {
+          "placeId": "DEMO-chateau-de-fontainebleau",
+          "tier": 3,
+          "rank": 11
+        },
+        {
+          "placeId": "DEMO-cirque-de-gavarnie",
+          "tier": 3,
+          "rank": 12
+        },
+        {
+          "placeId": "DEMO-gorges-du-tarn",
+          "tier": 3,
+          "rank": 13
+        },
+        {
+          "placeId": "DEMO-grotte-de-lascaux-iv",
+          "tier": 3,
+          "rank": 14
+        },
+        {
+          "placeId": "DEMO-puy-de-dome",
+          "tier": 3,
+          "rank": 15
+        },
+        {
+          "placeId": "DEMO-abbaye-de-fontenay",
+          "tier": 3,
+          "rank": 16
+        },
+        {
+          "placeId": "DEMO-cirque-de-navacelles",
+          "tier": 3,
+          "rank": 17
+        },
+        {
+          "placeId": "DEMO-grotte-chauvet-2",
+          "tier": 3,
+          "rank": 18
+        },
+        {
+          "placeId": "DEMO-phare-de-cordouan",
+          "tier": 3,
+          "rank": 19
+        }
+      ],
+      "placeCount": 19,
+      "tierCounts": [
+        3,
+        5,
+        11
+      ]
+    },
+    {
+      "slug": "label-plus-beaux-villages",
+      "name": "Les Plus Beaux Villages de France",
+      "kind": "label",
+      "labelId": "plus-beaux-villages",
+      "places": [
+        {
+          "placeId": "DEMO-conques",
+          "tier": 1,
+          "rank": 1
+        },
+        {
+          "placeId": "DEMO-gordes",
+          "tier": 1,
+          "rank": 2
+        },
+        {
+          "placeId": "DEMO-saint-cirq-lapopie",
+          "tier": 1,
+          "rank": 3
+        },
+        {
+          "placeId": "DEMO-eguisheim",
+          "tier": 2,
+          "rank": 4
+        },
+        {
+          "placeId": "DEMO-locronan",
+          "tier": 2,
+          "rank": 5
+        },
+        {
+          "placeId": "DEMO-riquewihr",
+          "tier": 2,
+          "rank": 6
+        }
+      ],
+      "placeCount": 6,
+      "tierCounts": [
+        3,
+        3,
+        0
+      ]
+    },
+    {
+      "slug": "geo-region-76",
+      "name": "Le meilleur d'Occitanie",
+      "kind": "geo",
+      "geoLevel": "region",
+      "geoCode": "76",
+      "places": [
+        {
+          "placeId": "DEMO-conques",
+          "tier": 1,
+          "rank": 1
+        },
+        {
+          "placeId": "DEMO-cite-de-carcassonne",
+          "tier": 1,
+          "rank": 2
+        },
+        {
+          "placeId": "DEMO-pont-du-gard",
+          "tier": 1,
+          "rank": 3
+        },
+        {
+          "placeId": "DEMO-cirque-de-gavarnie",
+          "tier": 2,
+          "rank": 4
+        },
+        {
+          "placeId": "DEMO-gorges-du-tarn",
+          "tier": 2,
+          "rank": 5
+        },
+        {
+          "placeId": "DEMO-saint-cirq-lapopie",
+          "tier": 2,
+          "rank": 6
+        },
+        {
+          "placeId": "DEMO-cirque-de-navacelles",
+          "tier": 2,
+          "rank": 7
+        },
+        {
+          "placeId": "DEMO-rocamadour",
+          "tier": 2,
+          "rank": 8
+        },
+        {
+          "placeId": "DEMO-gouffre-de-padirac",
+          "tier": 3,
+          "rank": 9
+        },
+        {
+          "placeId": "DEMO-viaduc-de-millau",
+          "tier": 3,
+          "rank": 10
+        },
+        {
+          "placeId": "DEMO-cascade-de-gavarnie",
+          "tier": 3,
+          "rank": 11
+        },
+        {
+          "placeId": "DEMO-chateau-de-peyrepertuse",
+          "tier": 3,
+          "rank": 12
+        },
+        {
+          "placeId": "DEMO-pic-du-midi-de-bigorre",
+          "tier": 3,
+          "rank": 13
+        }
+      ],
+      "placeCount": 13,
+      "tierCounts": [
+        3,
+        5,
+        5
+      ]
+    },
+    {
+      "slug": "geo-region-93",
+      "name": "Le meilleur de Provence-Alpes-Côte d'Azur",
+      "kind": "geo",
+      "geoLevel": "region",
+      "geoCode": "93",
+      "places": [
+        {
+          "placeId": "DEMO-palais-des-papes",
+          "tier": 1,
+          "rank": 1
+        },
+        {
+          "placeId": "DEMO-gordes",
+          "tier": 1,
+          "rank": 2
+        },
+        {
+          "placeId": "DEMO-gorges-du-verdon",
+          "tier": 1,
+          "rank": 3
+        },
+        {
+          "placeId": "DEMO-calanque-d-en-vau",
+          "tier": 2,
+          "rank": 4
+        },
+        {
+          "placeId": "DEMO-abbaye-de-senanque",
+          "tier": 2,
+          "rank": 5
+        },
+        {
+          "placeId": "DEMO-lac-de-sainte-croix",
+          "tier": 2,
+          "rank": 6
+        },
+        {
+          "placeId": "DEMO-abbaye-du-thoronet",
+          "tier": 2,
+          "rank": 7
+        }
+      ],
+      "placeCount": 7,
+      "tierCounts": [
+        3,
+        4,
+        0
+      ]
+    },
+    {
+      "slug": "geo-region-27",
+      "name": "Le meilleur de Bourgogne-Franche-Comté",
+      "kind": "geo",
+      "geoLevel": "region",
+      "geoCode": "27",
+      "places": [
+        {
+          "placeId": "DEMO-basilique-sainte-marie-madeleine-de-vezelay",
+          "tier": 1,
+          "rank": 1
+        },
+        {
+          "placeId": "DEMO-abbaye-de-fontenay",
+          "tier": 1,
+          "rank": 2
+        },
+        {
+          "placeId": "DEMO-cascade-du-herisson",
+          "tier": 1,
+          "rank": 3
+        },
+        {
+          "placeId": "DEMO-cascades-des-tufs",
+          "tier": 2,
+          "rank": 4
+        }
+      ],
+      "placeCount": 4,
+      "tierCounts": [
+        3,
+        1,
+        0
+      ]
+    },
+    {
+      "slug": "geo-region-84",
+      "name": "Le meilleur d'Auvergne-Rhône-Alpes",
+      "kind": "geo",
+      "geoLevel": "region",
+      "geoCode": "84",
+      "places": [
+        {
+          "placeId": "DEMO-mont-blanc",
+          "tier": 1,
+          "rank": 1
+        },
+        {
+          "placeId": "DEMO-puy-de-dome",
+          "tier": 1,
+          "rank": 2
+        },
+        {
+          "placeId": "DEMO-grotte-chauvet-2",
+          "tier": 1,
+          "rank": 3
+        },
+        {
+          "placeId": "DEMO-aiguille-du-midi",
+          "tier": 2,
+          "rank": 4
+        },
+        {
+          "placeId": "DEMO-lac-d-annecy",
+          "tier": 2,
+          "rank": 5
+        }
+      ],
+      "placeCount": 5,
+      "tierCounts": [
+        3,
+        2,
+        0
+      ]
+    },
+    {
+      "slug": "geo-country-fr",
+      "name": "Le meilleur de France",
+      "kind": "geo",
+      "geoLevel": "country",
+      "geoCode": "FR",
+      "places": [
+        {
+          "placeId": "DEMO-chateau-de-chambord",
+          "tier": 1,
+          "rank": 1
+        },
+        {
+          "placeId": "DEMO-chateau-de-versailles",
+          "tier": 1,
+          "rank": 2
+        },
+        {
+          "placeId": "DEMO-mont-saint-michel",
+          "tier": 1,
+          "rank": 3
+        },
+        {
+          "placeId": "DEMO-conques",
+          "tier": 2,
+          "rank": 4
+        },
+        {
+          "placeId": "DEMO-cathedrale-de-chartres",
+          "tier": 2,
+          "rank": 5
+        },
+        {
+          "placeId": "DEMO-cite-de-carcassonne",
+          "tier": 2,
+          "rank": 6
+        },
+        {
+          "placeId": "DEMO-palais-des-papes",
+          "tier": 2,
+          "rank": 7
+        },
+        {
+          "placeId": "DEMO-pont-du-gard",
+          "tier": 2,
+          "rank": 8
+        },
+        {
+          "placeId": "DEMO-basilique-sainte-marie-madeleine-de-vezelay",
+          "tier": 3,
+          "rank": 9
+        },
+        {
+          "placeId": "DEMO-cathedrale-d-amiens",
+          "tier": 3,
+          "rank": 10
+        },
+        {
+          "placeId": "DEMO-chateau-de-fontainebleau",
+          "tier": 3,
+          "rank": 11
+        },
+        {
+          "placeId": "DEMO-cirque-de-gavarnie",
+          "tier": 3,
+          "rank": 12
+        },
+        {
+          "placeId": "DEMO-gorges-du-tarn",
+          "tier": 3,
+          "rank": 13
+        },
+        {
+          "placeId": "DEMO-grotte-de-lascaux-iv",
+          "tier": 3,
+          "rank": 14
+        },
+        {
+          "placeId": "DEMO-mont-blanc",
+          "tier": 3,
+          "rank": 15
+        },
+        {
+          "placeId": "DEMO-puy-de-dome",
+          "tier": 3,
+          "rank": 16
+        },
+        {
+          "placeId": "DEMO-gordes",
+          "tier": 3,
+          "rank": 17
+        },
+        {
+          "placeId": "DEMO-saint-cirq-lapopie",
+          "tier": 3,
+          "rank": 18
+        },
+        {
+          "placeId": "DEMO-abbaye-de-fontenay",
+          "tier": 3,
+          "rank": 19
+        },
+        {
+          "placeId": "DEMO-chateau-de-chenonceau",
+          "tier": 3,
+          "rank": 20
+        },
+        {
+          "placeId": "DEMO-cirque-de-navacelles",
+          "tier": 3,
+          "rank": 21
+        },
+        {
+          "placeId": "DEMO-dune-du-pilat",
+          "tier": 3,
+          "rank": 22
+        },
+        {
+          "placeId": "DEMO-falaises-d-etretat",
+          "tier": 3,
+          "rank": 23
+        },
+        {
+          "placeId": "DEMO-gorges-du-verdon",
+          "tier": 3,
+          "rank": 24
+        },
+        {
+          "placeId": "DEMO-grotte-chauvet-2",
+          "tier": 3,
+          "rank": 25
+        },
+        {
+          "placeId": "DEMO-phare-de-cordouan",
+          "tier": 3,
+          "rank": 26
+        },
+        {
+          "placeId": "DEMO-rocamadour",
+          "tier": 3,
+          "rank": 27
+        },
+        {
+          "placeId": "DEMO-eguisheim",
+          "tier": 3,
+          "rank": 28
+        },
+        {
+          "placeId": "DEMO-locronan",
+          "tier": 3,
+          "rank": 29
+        },
+        {
+          "placeId": "DEMO-riquewihr",
+          "tier": 3,
+          "rank": 30
+        },
+        {
+          "placeId": "DEMO-aiguille-du-midi",
+          "tier": 3,
+          "rank": 31
+        },
+        {
+          "placeId": "DEMO-calanque-d-en-vau",
+          "tier": 3,
+          "rank": 32
+        },
+        {
+          "placeId": "DEMO-chateau-du-haut-knigsbourg",
+          "tier": 3,
+          "rank": 33
+        },
+        {
+          "placeId": "DEMO-gouffre-de-padirac",
+          "tier": 3,
+          "rank": 34
+        },
+        {
+          "placeId": "DEMO-lac-d-annecy",
+          "tier": 3,
+          "rank": 35
+        },
+        {
+          "placeId": "DEMO-pointe-du-raz",
+          "tier": 3,
+          "rank": 36
+        },
+        {
+          "placeId": "DEMO-viaduc-de-millau",
+          "tier": 3,
+          "rank": 37
+        },
+        {
+          "placeId": "DEMO-abbaye-de-senanque",
+          "tier": 3,
+          "rank": 38
+        },
+        {
+          "placeId": "DEMO-cap-frehel",
+          "tier": 3,
+          "rank": 39
+        },
+        {
+          "placeId": "DEMO-cascade-de-gavarnie",
+          "tier": 3,
+          "rank": 40
+        },
+        {
+          "placeId": "DEMO-cascade-du-herisson",
+          "tier": 3,
+          "rank": 41
+        },
+        {
+          "placeId": "DEMO-chateau-de-peyrepertuse",
+          "tier": 3,
+          "rank": 42
+        },
+        {
+          "placeId": "DEMO-lac-de-sainte-croix",
+          "tier": 3,
+          "rank": 43
+        },
+        {
+          "placeId": "DEMO-pic-du-midi-de-bigorre",
+          "tier": 3,
+          "rank": 44
+        },
+        {
+          "placeId": "DEMO-abbaye-du-thoronet",
+          "tier": 3,
+          "rank": 45
+        },
+        {
+          "placeId": "DEMO-cascades-des-tufs",
+          "tier": 3,
+          "rank": 46
+        }
+      ],
+      "placeCount": 46,
+      "tierCounts": [
+        3,
+        5,
+        38
+      ]
+    }
+  ]
+}

@@ -69,7 +69,9 @@ Développeur seul, **budget zéro**. La pile est choisie pour tenir sur des offr
 
 - **App** — Expo / React Native (une base de code iOS + Android)
 - **Backend** — Supabase (Postgres + PostGIS + Auth + Storage), palier gratuit
-- **Carte** — MapLibre GL, fonds de carte à héberger soi-même (PMTiles) ou palier gratuit
+- **Carte** — `react-native-maps` pour le prototype (fonctionne dans Expo Go, donc
+  testable sur téléphone sans build natif) ; MapLibre GL + PMTiles quand il faudra un
+  fond de carte personnalisé et disponible hors ligne
 - **Pipeline de curation** — scripts Python hors ligne, sortie versionnée dans le dépôt
 
 La seule ressource réellement coûteuse est **le temps éditorial** de validation du
