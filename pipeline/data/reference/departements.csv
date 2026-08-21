@@ -1,0 +1,102 @@
+code,name,de_form,region_code
+01,Ain,de l'Ain,84
+02,Aisne,de l'Aisne,32
+03,Allier,de l'Allier,84
+04,Alpes-de-Haute-Provence,des Alpes-de-Haute-Provence,93
+05,Hautes-Alpes,des Hautes-Alpes,93
+06,Alpes-Maritimes,des Alpes-Maritimes,93
+07,Ardèche,de l'Ardèche,84
+08,Ardennes,des Ardennes,44
+09,Ariège,de l'Ariège,76
+10,Aube,de l'Aube,44
+11,Aude,de l'Aude,76
+12,Aveyron,de l'Aveyron,76
+13,Bouches-du-Rhône,des Bouches-du-Rhône,93
+14,Calvados,du Calvados,28
+15,Cantal,du Cantal,84
+16,Charente,de la Charente,75
+17,Charente-Maritime,de la Charente-Maritime,75
+18,Cher,du Cher,24
+19,Corrèze,de la Corrèze,75
+21,Côte-d'Or,de la Côte-d'Or,27
+22,Côtes-d'Armor,des Côtes-d'Armor,53
+23,Creuse,de la Creuse,75
+24,Dordogne,de la Dordogne,75
+25,Doubs,du Doubs,27
+26,Drôme,de la Drôme,84
+27,Eure,de l'Eure,28
+28,Eure-et-Loir,d'Eure-et-Loir,24
+29,Finistère,du Finistère,53
+2A,Corse-du-Sud,de Corse-du-Sud,94
+2B,Haute-Corse,de Haute-Corse,94
+30,Gard,du Gard,76
+31,Haute-Garonne,de Haute-Garonne,76
+32,Gers,du Gers,76
+33,Gironde,de la Gironde,75
+34,Hérault,de l'Hérault,76
+35,Ille-et-Vilaine,d'Ille-et-Vilaine,53
+36,Indre,de l'Indre,24
+37,Indre-et-Loire,d'Indre-et-Loire,24
+38,Isère,de l'Isère,84
+39,Jura,du Jura,27
+40,Landes,des Landes,75
+41,Loir-et-Cher,de Loir-et-Cher,24
+42,Loire,de la Loire,84
+43,Haute-Loire,de Haute-Loire,84
+44,Loire-Atlantique,de Loire-Atlantique,52
+45,Loiret,du Loiret,24
+46,Lot,du Lot,76
+47,Lot-et-Garonne,de Lot-et-Garonne,75
+48,Lozère,de la Lozère,76
+49,Maine-et-Loire,de Maine-et-Loire,52
+50,Manche,de la Manche,28
+51,Marne,de la Marne,44
+52,Haute-Marne,de Haute-Marne,44
+53,Mayenne,de la Mayenne,52
+54,Meurthe-et-Moselle,de Meurthe-et-Moselle,44
+55,Meuse,de la Meuse,44
+56,Morbihan,du Morbihan,53
+57,Moselle,de la Moselle,44
+58,Nièvre,de la Nièvre,27
+59,Nord,du Nord,32
+60,Oise,de l'Oise,32
+61,Orne,de l'Orne,28
+62,Pas-de-Calais,du Pas-de-Calais,32
+63,Puy-de-Dôme,du Puy-de-Dôme,84
+64,Pyrénées-Atlantiques,des Pyrénées-Atlantiques,75
+65,Hautes-Pyrénées,des Hautes-Pyrénées,76
+66,Pyrénées-Orientales,des Pyrénées-Orientales,76
+67,Bas-Rhin,du Bas-Rhin,44
+68,Haut-Rhin,du Haut-Rhin,44
+69,Rhône,du Rhône,84
+70,Haute-Saône,de Haute-Saône,27
+71,Saône-et-Loire,de Saône-et-Loire,27
+72,Sarthe,de la Sarthe,52
+73,Savoie,de Savoie,84
+74,Haute-Savoie,de Haute-Savoie,84
+75,Paris,de Paris,11
+76,Seine-Maritime,de Seine-Maritime,28
+77,Seine-et-Marne,de Seine-et-Marne,11
+78,Yvelines,des Yvelines,11
+79,Deux-Sèvres,des Deux-Sèvres,75
+80,Somme,de la Somme,32
+81,Tarn,du Tarn,76
+82,Tarn-et-Garonne,de Tarn-et-Garonne,76
+83,Var,du Var,93
+84,Vaucluse,du Vaucluse,93
+85,Vendée,de Vendée,52
+86,Vienne,de la Vienne,75
+87,Haute-Vienne,de Haute-Vienne,75
+88,Vosges,des Vosges,44
+89,Yonne,de l'Yonne,27
+90,Territoire de Belfort,du Territoire de Belfort,27
+91,Essonne,de l'Essonne,11
+92,Hauts-de-Seine,des Hauts-de-Seine,11
+93,Seine-Saint-Denis,de Seine-Saint-Denis,11
+94,Val-de-Marne,du Val-de-Marne,11
+95,Val-d'Oise,du Val-d'Oise,11
+971,Guadeloupe,de Guadeloupe,01
+972,Martinique,de Martinique,02
+973,Guyane,de Guyane,03
+974,La Réunion,de La Réunion,04
+976,Mayotte,de Mayotte,06

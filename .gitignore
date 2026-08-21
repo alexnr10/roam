@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Sorties du pipeline : volumineuses et régénérables.
+# `review.csv` est en revanche versionné dès qu'il contient des décisions
+# éditoriales — c'est du travail humain, pas une sortie de machine.
+pipeline/data/out/places_raw.json
+pipeline/data/out/places.json
+pipeline/data/out/collections.json
+pipeline/data/out/seed.sql
+
+# Node / Expo (à venir)
+node_modules/
+.expo/
+dist/
+
+# Environnement
+.env
+.env.local
+.DS_Store

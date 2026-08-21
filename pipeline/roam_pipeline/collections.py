@@ -1,0 +1,203 @@
+"""Construction des collections et attribution des niveaux.
+
+Règle cardinale : une collection n'existe que si elle a assez de lieux pour être
+une collection. Sans ce garde-fou, croiser N thèmes par M échelons géographiques
+produit des milliers de collections vides du type « Cascades de la Creuse :
+2 lieux » — ce qui casse le jeu au lieu de l'enrichir.
+"""
+
+from __future__ import annotations
+
+import logging
+import math
+from collections import defaultdict
+
+from .config import Config
+from .geo import FRANCE, area, departements, regions
+from .models import Collection, CollectionPlace, Place
+from .score import assign_tiers
+
+LOG = logging.getLogger(__name__)
+
+EARTH_RADIUS_M = 6_371_000.0
+# Deux lieux du même thème à moins de cette distance sont presque toujours deux
+# entrées Wikidata pour le même site (le château et sa chapelle, par exemple).
+DUPLICATE_DISTANCE_M = 150.0
+
+
+def haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dp = p2 - p1
+    dl = math.radians(lon2 - lon1)
+    a = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
+    return 2 * EARTH_RADIUS_M * math.asin(math.sqrt(a))
+
+
+def dedupe(places: list[Place]) -> list[Place]:
+    """Écarte les doublons de proximité, en gardant le mieux scoré."""
+    kept: list[Place] = []
+    by_theme: dict[str, list[Place]] = defaultdict(list)
+
+    for place in sorted(places, key=lambda p: -p.score):
+        neighbours = by_theme[place.theme_id]
+        if any(
+            haversine_m(place.lat, place.lon, other.lat, other.lon) < DUPLICATE_DISTANCE_M
+            for other in neighbours
+        ):
+            LOG.debug("doublon écarté : %s (%s)", place.name, place.wikidata_id)
+            continue
+        neighbours.append(place)
+        kept.append(place)
+
+    LOG.info("déduplication : %s lieux gardés sur %s", len(kept), len(places))
+    return kept
+
+
+def _finalize(
+    collection: Collection, members: list[Place], config: Config, cap: int | None = None
+) -> Collection | None:
+    """Applique plancher, plafond et niveaux. Renvoie None si la collection n'existe pas."""
+    rules = config.collections
+    if len(members) < rules.min_places:
+        return None
+
+    limit = cap or rules.max_places
+    ordered = sorted(members, key=lambda p: (-p.score, p.name))[:limit]
+
+    collection.places = [
+        CollectionPlace(place_id=place.wikidata_id, tier=tier, rank=rank)
+        for place, tier, rank in assign_tiers(ordered, config.tiers)
+    ]
+    return collection
+
+
+def build_theme_collections(places: list[Place], config: Config) -> list[Collection]:
+    by_theme: dict[str, list[Place]] = defaultdict(list)
+    for place in places:
+        by_theme[place.theme_id].append(place)
+
+    out = []
+    for theme in config.themes:
+        collection = Collection(
+            slug=f"theme-{theme.id}",
+            name=theme.name,
+            kind="theme",
+            theme_id=theme.id,
+        )
+        built = _finalize(collection, by_theme.get(theme.id, []), config, cap=theme.cap)
+        if built:
+            out.append(built)
+    return out
+
+
+def build_label_collections(places: list[Place], config: Config) -> list[Collection]:
+    out = []
+    for label in config.labels:
+        if not label.makes_collection:
+            continue
+        members = [p for p in places if label.id in p.labels]
+        collection = Collection(
+            slug=f"label-{label.id}",
+            name=label.name,
+            kind="label",
+            label_id=label.id,
+        )
+        # Un label est une liste officielle et finie : on ne la tronque pas,
+        # sinon la collection ne correspond plus au label qu'elle affiche.
+        built = _finalize(collection, members, config, cap=len(members) or 1)
+        if built:
+            out.append(built)
+    return out
+
+
+def build_geo_collections(places: list[Place], config: Config) -> list[Collection]:
+    """Collections « le meilleur de X », tous thèmes confondus."""
+    out: list[Collection] = []
+
+    for level in config.collections.geo_levels:
+        buckets: dict[str, list[Place]] = defaultdict(list)
+        for place in places:
+            code = _geo_code(place, level)
+            if code:
+                buckets[code].append(place)
+
+        for code, members in buckets.items():
+            zone = area(level, code)
+            if zone is None:
+                continue
+            collection = Collection(
+                slug=f"geo-{level}-{code.lower()}",
+                name=f"Le meilleur {zone.de_form}",
+                kind="geo",
+                geo_level=level,
+                geo_code=code,
+            )
+            built = _finalize(collection, members, config)
+            if built:
+                out.append(built)
+    return out
+
+
+def build_cross_collections(places: list[Place], config: Config) -> list[Collection]:
+    """Croisements thème × géographie (« Châteaux du Cantal »).
+
+    Soumis aux mêmes règles : la grande majorité des croisements est écartée
+    faute de lieux, et c'est exactement l'effet recherché.
+    """
+    out: list[Collection] = []
+
+    for level in config.collections.cross_theme_levels:
+        buckets: dict[tuple[str, str], list[Place]] = defaultdict(list)
+        for place in places:
+            code = _geo_code(place, level)
+            if code:
+                buckets[(place.theme_id, code)].append(place)
+
+        for (theme_id, code), members in buckets.items():
+            zone = area(level, code)
+            if zone is None:
+                continue
+            theme = config.theme(theme_id)
+            collection = Collection(
+                slug=f"{theme_id}-{level}-{code.lower()}",
+                name=f"{theme.name} {zone.de_form}",
+                kind="geo",
+                theme_id=theme_id,
+                geo_level=level,
+                geo_code=code,
+            )
+            built = _finalize(collection, members, config)
+            if built:
+                out.append(built)
+    return out
+
+
+def _geo_code(place: Place, level: str) -> str | None:
+    if level == "departement":
+        return place.departement_code
+    if level == "region":
+        return place.region_code
+    if level == "country":
+        return FRANCE.code
+    return None
+
+
+def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Collection]]:
+    kept = dedupe(places)
+    collections = (
+        build_theme_collections(kept, config)
+        + build_label_collections(kept, config)
+        + build_geo_collections(kept, config)
+        + build_cross_collections(kept, config)
+    )
+
+    # Un lieu qui n'entre dans aucune collection ne sert à rien : on le sort.
+    used = {cp.place_id for c in collections for cp in c.places}
+    retained = [p for p in kept if p.wikidata_id in used]
+    LOG.info(
+        "%s collections, %s lieux retenus (%s écartés faute de collection)",
+        len(collections),
+        len(retained),
+        len(kept) - len(retained),
+    )
+    return retained, collections

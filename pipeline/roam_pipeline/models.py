@@ -1,0 +1,88 @@
+"""Structures de données du pipeline."""
+
+from __future__ import annotations
+
+import re
+import unicodedata
+from dataclasses import dataclass, field, asdict
+from typing import Any
+
+
+def slugify(value: str) -> str:
+    normalized = unicodedata.normalize("NFKD", value)
+    ascii_only = normalized.encode("ascii", "ignore").decode("ascii").lower()
+    ascii_only = re.sub(r"[^a-z0-9]+", "-", ascii_only).strip("-")
+    return re.sub(r"-{2,}", "-", ascii_only)
+
+
+@dataclass
+class Place:
+    wikidata_id: str
+    name: str
+    theme_id: str
+    lat: float
+    lon: float
+
+    sitelinks: int = 0
+    has_frwiki: bool = False
+    wikipedia_url: str | None = None
+    image_url: str | None = None
+    commons_category: str | None = None
+    elevation_m: int | None = None
+
+    departement_code: str | None = None
+    region_code: str | None = None
+
+    labels: list[str] = field(default_factory=list)
+    validation_radius_m: int = 150
+    score: float = 0.0
+    inclusion_criteria: list[str] = field(default_factory=list)
+
+    @property
+    def slug(self) -> str:
+        return slugify(self.name)
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["slug"] = self.slug
+        return payload
+
+
+@dataclass
+class CollectionPlace:
+    place_id: str          # wikidata_id
+    tier: int
+    rank: int
+
+
+@dataclass
+class Collection:
+    slug: str
+    name: str
+    kind: str              # 'theme' | 'geo' | 'label'
+    theme_id: str | None = None
+    label_id: str | None = None
+    geo_level: str | None = None
+    geo_code: str | None = None
+    places: list[CollectionPlace] = field(default_factory=list)
+
+    @property
+    def tier_counts(self) -> list[int]:
+        counts = [0, 0, 0]
+        for cp in self.places:
+            counts[cp.tier - 1] += 1
+        return counts
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "slug": self.slug,
+            "name": self.name,
+            "kind": self.kind,
+            "theme_id": self.theme_id,
+            "label_id": self.label_id,
+            "geo_level": self.geo_level,
+            "geo_code": self.geo_code,
+            "place_count": len(self.places),
+            "tier_counts": self.tier_counts,
+            "places": [asdict(cp) for cp in self.places],
+        }
