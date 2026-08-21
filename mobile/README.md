@@ -15,9 +15,26 @@ fonctionne dans Expo Go ; si la carte native n'y est pas disponible, l'app le di
 reste utilisable — liste, validation et progression continuent de marcher.
 
 ```bash
-npm test          # logique métier (distances, validation, progression, badges)
-npm run typecheck # TypeScript strict
+npm test           # logique métier (distances, validation, progression, badges)
+npm run typecheck  # TypeScript strict
+npm run export:web # build web autonome dans dist/
 ```
+
+## Aperçu web
+
+`npm run export:web` produit une version web utilisable sans installer quoi que ce
+soit — pratique pour montrer la boucle à quelqu'un, ou pour se faire une idée depuis
+un téléphone sans serveur de développement.
+
+Deux différences avec l'app :
+
+- **la carte est une projection à plat** des lieux sur l'emprise de la France, sans
+  fond de carte (`react-native-maps` ne fonctionne pas sur le web, et des tuiles
+  demanderaient un service externe) ;
+- **un bouton « me téléporter ici »** apparaît sur chaque fiche lieu, pour éprouver le
+  moment de validation sans faire la route. Il est strictement réservé au web
+  (`Platform.OS === 'web'`) : sur téléphone, seul le vrai GPS fait foi, sans quoi le
+  jeu n'a plus de sens.
 
 ## Ce que fait le prototype
 

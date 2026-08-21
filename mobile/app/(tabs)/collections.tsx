@@ -73,7 +73,7 @@ export default function CollectionsScreen() {
                         <Pill label="Terminée" tone="verified" />
                       ) : milestone ? (
                         <Text style={type.small}>
-                          {milestone.label} dans {milestone.remaining} lieu
+                          {milestone.label} — encore {milestone.remaining} lieu
                           {milestone.remaining > 1 ? 'x' : ''}
                         </Text>
                       ) : null}

@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { places as allPlaces, themeLabel } from '../../src/data/catalog';
@@ -19,7 +19,7 @@ export default function MapScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { visitedIds, addVisit } = useVisits();
-  const { position, granted } = useLocation();
+  const { position, granted, simulated } = useLocation();
   const [filter, setFilter] = useState<Filter>('all');
 
   const visible = useMemo(() => {
@@ -98,7 +98,17 @@ export default function MapScreen() {
         </View>
       ) : null}
 
-      {granted === false ? (
+      {Platform.OS === 'web' ? (
+        <View style={styles.notice}>
+          <Text style={type.small}>
+            {simulated
+              ? 'Mode démo : ta position est simulée. Ouvre un autre lieu pour t’y téléporter.'
+              : 'Aperçu web. Ouvre un lieu et utilise « me téléporter ici » pour éprouver la validation sans faire la route.'}
+          </Text>
+        </View>
+      ) : null}
+
+      {granted === false && Platform.OS !== 'web' ? (
         <View style={styles.notice}>
           <Text style={type.small}>
             Localisation refusée — tu peux quand même parcourir la carte et cocher

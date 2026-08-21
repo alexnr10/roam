@@ -1,6 +1,7 @@
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
 
+import { useSimulatedPosition } from './simulation';
 import type { Coordinates } from '../types';
 
 export type LocationState = {
@@ -8,6 +9,8 @@ export type LocationState = {
   /** null tant que l'utilisateur n'a pas répondu à la demande d'autorisation. */
   granted: boolean | null;
   error: string | null;
+  /** Vrai quand la position vient du mode démo et non du GPS. */
+  simulated: boolean;
 };
 
 /**
@@ -18,10 +21,12 @@ export type LocationState = {
  * toute une journée.
  */
 export function useLocation(active = true): LocationState {
+  const simulatedPosition = useSimulatedPosition();
   const [state, setState] = useState<LocationState>({
     position: null,
     granted: null,
     error: null,
+    simulated: false,
   });
   const subscription = useRef<Location.LocationSubscription | null>(null);
 
@@ -35,7 +40,7 @@ export function useLocation(active = true): LocationState {
         if (cancelled) return;
 
         if (status !== 'granted') {
-          setState({ position: null, granted: false, error: null });
+          setState({ position: null, granted: false, error: null, simulated: false });
           return;
         }
         setState((current) => ({ ...current, granted: true }));
@@ -56,6 +61,7 @@ export function useLocation(active = true): LocationState {
               },
               granted: true,
               error: null,
+              simulated: false,
             });
           },
         );
@@ -65,6 +71,7 @@ export function useLocation(active = true): LocationState {
           position: null,
           granted: null,
           error: error instanceof Error ? error.message : 'Localisation indisponible',
+          simulated: false,
         });
       }
     })();
@@ -76,5 +83,9 @@ export function useLocation(active = true): LocationState {
     };
   }, [active]);
 
+  // Le mode démo prime sur le GPS quand il est actif.
+  if (simulatedPosition) {
+    return { position: simulatedPosition, granted: true, error: null, simulated: true };
+  }
   return state;
 }

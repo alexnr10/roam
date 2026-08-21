@@ -25,13 +25,24 @@ type VisitsContextValue = {
 
 const VisitsContext = createContext<VisitsContextValue | null>(null);
 
+async function readStored(): Promise<string | null> {
+  try {
+    return await AsyncStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
 export function VisitsProvider({ children }: { children: React.ReactNode }) {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    AsyncStorage.getItem(STORAGE_KEY)
+    // Certains environnements (iframe restreinte, navigation privée) font lever
+    // l'accès au stockage de façon synchrone : `Promise.resolve().then` seul ne
+    // suffirait pas à l'attraper.
+    readStored()
       .then((stored) => {
         if (cancelled || !stored) return;
         const parsed = JSON.parse(stored);
@@ -51,7 +62,11 @@ export function VisitsProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(visits)).catch(() => {});
+    try {
+      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(visits)).catch(() => {});
+    } catch {
+      // Stockage indisponible : la session reste utilisable, sans persistance.
+    }
   }, [visits, ready]);
 
   const addVisit = useCallback(

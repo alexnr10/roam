@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {
   getCollectionsForPlace,
@@ -10,6 +10,7 @@ import {
 } from '../../src/data/catalog';
 import { evaluateCheckIn } from '../../src/lib/checkin';
 import { formatDistance } from '../../src/lib/geo';
+import { setSimulatedPosition } from '../../src/lib/simulation';
 import { computeProgress } from '../../src/lib/progress';
 import { useLocation } from '../../src/lib/useLocation';
 import { useVisits } from '../../src/store/visits';
@@ -100,6 +101,22 @@ export default function PlaceScreen() {
               Une visite déclarée compte dans tes pourcentages, mais n'est pas
               marquée « vérifiée ».
             </Text>
+
+            {/* Mode démo, web uniquement : éprouver le moment de validation
+                sans faire la route. Jamais embarqué sur téléphone. */}
+            {Platform.OS === 'web' ? (
+              <Button
+                label="Démo : me téléporter ici"
+                tone="secondary"
+                onPress={() =>
+                  setSimulatedPosition({
+                    latitude: place.lat,
+                    longitude: place.lon,
+                    accuracy: 8,
+                  })
+                }
+              />
+            ) : null}
           </>
         )}
       </Card>

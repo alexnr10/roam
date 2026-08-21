@@ -56,7 +56,7 @@ export default function CollectionScreen() {
           <Pill label="Collection terminée" tone="verified" />
         ) : milestone ? (
           <Text style={type.small}>
-            Prochain palier : {milestone.label}, dans {milestone.remaining} lieu
+            Prochain palier : {milestone.label} — encore {milestone.remaining} lieu
             {milestone.remaining > 1 ? 'x' : ''}.
           </Text>
         ) : null}
