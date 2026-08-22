@@ -38,18 +38,28 @@ def _known(label_id: str, config: Config) -> bool:
     return True
 
 
-def compute_score(place: Place, config: Config) -> float:
+def score_breakdown(place: Place, config: Config) -> dict[str, float]:
+    """Détail du score, poste par poste.
+
+    Un classement qu'on ne peut pas auditer ne peut pas être corrigé : le
+    relecteur doit voir POURQUOI un lieu est devant un autre, sinon il ne peut
+    que constater le résultat.
+    """
     s: Scoring = config.scoring
-
     # log1p : le passage de 2 à 6 langues est bien plus significatif que de 40 à 44.
-    notoriety = s.sitelinks_weight * math.log1p(max(place.sitelinks, 0))
+    parts = {
+        "notoriete": round(s.sitelinks_weight * math.log1p(max(place.sitelinks, 0)), 1),
+        "labels": round(label_bonus(place.labels, config), 1),
+        "image": s.has_image_bonus if (place.image_url or place.commons_category) else 0.0,
+        "frwiki": s.has_frwiki_bonus if place.has_frwiki else 0.0,
+        "ajustement": round(place.curator_adjustment, 1),
+    }
+    parts["total"] = round(sum(parts.values()), 1)
+    return parts
 
-    score = notoriety + label_bonus(place.labels, config)
-    if place.image_url or place.commons_category:
-        score += s.has_image_bonus
-    if place.has_frwiki:
-        score += s.has_frwiki_bonus
-    return round(score, 3)
+
+def compute_score(place: Place, config: Config) -> float:
+    return score_breakdown(place, config)["total"]
 
 
 def score_all(places: list[Place], config: Config) -> list[Place]:

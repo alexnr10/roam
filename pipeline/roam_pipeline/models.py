@@ -38,6 +38,10 @@ class Place:
     labels: list[str] = field(default_factory=list)
     validation_radius_m: int = 150
     score: float = 0.0
+    # Correction manuelle issue de la feuille de revue. Doit peser plus lourd
+    # qu'un bonus de label, sans quoi une décision humaine ne pourrait pas
+    # rattraper un lieu que Wikidata documente mal.
+    curator_adjustment: float = 0.0
     inclusion_criteria: list[str] = field(default_factory=list)
 
     @property

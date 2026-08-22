@@ -30,9 +30,11 @@ python -m roam_pipeline fetch --only chateaux abbayes
 # 3. Scorer, construire les collections, exporter
 python -m roam_pipeline build
 
-# 4. Relire data/out/review.csv à la main, remplir la colonne `decision`,
-#    puis réinjecter les décisions
-python -m roam_pipeline apply-review
+# 4. Relire le catalogue dans le navigateur, avec les photos
+python -m roam_pipeline review
+
+#    puis réinjecter le fichier de décisions téléchargé
+python -m roam_pipeline apply-review --review ~/Downloads/review-decisions.csv
 
 # statistiques du catalogue courant
 python -m roam_pipeline stats
@@ -45,13 +47,30 @@ python -m roam_pipeline stats
 | `places_raw.json` | candidats bruts issus de Wikidata, avant scoring |
 | `places.json` | lieux retenus, scorés |
 | `collections.json` | collections construites, avec niveaux et rangs |
-| `review.csv` | **la feuille de revue éditoriale** — le vrai livrable |
+| `review.html` | **la page de revue** — avec vignettes, c'est par là qu'on relit |
+| `review.csv` | la même chose en tableur, pour qui préfère |
 | `seed.sql` | seed idempotent pour la base |
 
-## La feuille de revue
+## La revue
 
-C'est le cœur du travail. Le pipeline trie et propose ; quelqu'un relit ligne à ligne et
-remplit la colonne `decision` :
+C'est le cœur du travail, et il se fait dans le navigateur : `python -m roam_pipeline
+review` ouvre une page avec **une vignette par lieu**. Un nom seul ne permet pas de juger
+deux cents abbayes qu'on ne connaît pas ; une photo, si.
+
+La page se sert en local plutôt que par un double-clic, et ce n'est pas un détail :
+ouverte en `file://`, elle ne peut pas mémoriser les décisions, et un travail de plusieurs
+soirées se perdrait à la fermeture de l'onglet.
+
+Les lieux sont classés par **priorité de revue**, c'est-à-dire leur niveau dans la
+collection nationale de leur thème. Relire les 160 premiers — dix par thème — suffit à
+obtenir un catalogue jouable.
+
+Chaque carte affiche le détail du score : `151 pts = 94 notoriété (70 langues) + 44
+labels + 8 image + 5 fr`. Un classement qu'on ne peut pas auditer ne peut pas être
+corrigé.
+
+Le bouton « Télécharger les décisions » produit un CSV que `apply-review` relit. Les
+mêmes décisions peuvent aussi être saisies directement dans `review.csv` :
 
 | Valeur | Effet |
 |---|---|

@@ -12,7 +12,13 @@ from pathlib import Path
 from . import wikidata as wd
 from .collections import build_all
 from .config import CONFIG_DIR, Config, load_config
-from .export import read_review_csv, write_json, write_review_csv, write_seed_sql
+from .export import (
+    read_review_csv,
+    write_json,
+    write_review_csv,
+    write_review_html,
+    write_seed_sql,
+)
 from .fetch import run_fetch
 from .models import Place
 from .score import score_all
@@ -143,7 +149,8 @@ def cmd_build(args: argparse.Namespace, config: Config) -> int:
     retained, collections = build_all(scored, config)
 
     write_json(retained, collections, args.out)
-    write_review_csv(retained, collections, args.out / "review.csv")
+    write_review_csv(retained, collections, args.out / "review.csv", config)
+    write_review_html(retained, collections, config, args.out / "review.html")
     write_seed_sql(retained, collections, config, args.out / "seed.sql")
     # La distribution porte sur les candidats BRUTS : calculée sur les lieux
     # déjà filtrés, elle répéterait le même nombre sous le plancher courant et
@@ -159,7 +166,7 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
         print("Aucune décision renseignée dans la feuille de revue.", file=sys.stderr)
         return 1
 
-    places = score_all(_load_places(args.out / "places_raw.json"), config)
+    places = _load_places(args.out / "places_raw.json")
     kept: list[Place] = []
     counts: Counter[str] = Counter()
 
@@ -169,20 +176,61 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
         if decision == "drop":
             continue
         if decision == "promote":
-            place.score += args.adjust
+            place.curator_adjustment = args.adjust
         elif decision == "demote":
-            place.score -= args.adjust
+            place.curator_adjustment = -args.adjust
         if decision in ("", "pending") and args.strict:
             # En mode strict, seul ce qui a été explicitement relu est conservé.
             continue
         kept.append(place)
 
+    # Rescoré après ajustement : la correction du relecteur fait partie du score,
+    # elle n'est pas plaquée par-dessus.
+    score_all(kept, config)
     retained, collections = build_all(kept, config)
     write_json(retained, collections, args.out)
+    write_review_csv(retained, collections, args.out / "review.csv", config)
+    write_review_html(retained, collections, config, args.out / "review.html")
     write_seed_sql(retained, collections, config, args.out / "seed.sql")
 
     print("Décisions :", ", ".join(f"{k}={v}" for k, v in sorted(counts.items())))
     _print_stats(retained, collections)
+    return 0
+
+
+def cmd_review(args: argparse.Namespace, config: Config) -> int:
+    """Sert la page de revue en local et l'ouvre.
+
+    Passer par un serveur plutôt que par un double-clic n'est pas un détail :
+    ouverte en `file://`, la page ne peut pas mémoriser les décisions, et un
+    travail de plusieurs soirées se perdrait à la première fermeture d'onglet.
+    """
+    import functools
+    import http.server
+    import threading
+    import webbrowser
+
+    page = args.out / "review.html"
+    if not page.exists():
+        print(f"{page} absent — lance d'abord `build`.", file=sys.stderr)
+        return 1
+
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(args.out)
+    )
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", args.port), handler)
+    url = f"http://127.0.0.1:{args.port}/review.html"
+
+    print(f"Revue ouverte sur {url}")
+    print("Les décisions sont mémorisées dans le navigateur.")
+    print("Ctrl+C pour arrêter, après avoir téléchargé le fichier de décisions.")
+    threading.Timer(0.5, lambda: webbrowser.open(url)).start()
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nArrêté.")
+    finally:
+        server.server_close()
     return 0
 
 
@@ -311,7 +359,13 @@ def build_parser() -> argparse.ArgumentParser:
     review = sub.add_parser("apply-review", help="applique les décisions de la feuille de revue")
     review.add_argument("--review", type=Path, help="chemin de review.csv")
     review.add_argument(
-        "--adjust", type=float, default=15.0, help="ajustement de score pour promote/demote"
+        "--adjust",
+        type=float,
+        default=60.0,
+        # Doit dépasser le plus gros bonus de label (UNESCO, 40 points) : sans
+        # cela, une décision humaine ne pourrait pas rattraper un lieu que
+        # Wikidata documente mal.
+        help="ajustement de score pour promote/demote",
     )
     review.add_argument(
         "--strict",
@@ -320,6 +374,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     sub.add_parser("stats", help="statistiques du catalogue construit")
+
+    serve = sub.add_parser("review", help="ouvre la page de revue dans le navigateur")
+    serve.add_argument("--port", type=int, default=8765)
     return parser
 
 
@@ -340,5 +397,6 @@ def main(argv: list[str] | None = None) -> int:
         "build": cmd_build,
         "apply-review": cmd_apply_review,
         "stats": cmd_stats,
+        "review": cmd_review,
     }
     return handlers[args.command](args, config)
