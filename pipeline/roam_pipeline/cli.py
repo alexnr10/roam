@@ -19,7 +19,7 @@ from .export import (
     write_review_html,
     write_seed_sql,
 )
-from .fetch import enrich_article_sizes, enrich_flags, run_fetch
+from .fetch import enrich_article_sizes, enrich_departements, enrich_flags, run_fetch
 from .models import Place
 from .score import score_all
 
@@ -153,6 +153,7 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     places = _load_places(raw_path)
     found = enrich_article_sizes(places)
     enrich_flags(wd.SparqlClient(), places)
+    enrich_departements(places)
     raw_path.write_text(
         json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),
         encoding="utf-8",

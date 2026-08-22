@@ -27,7 +27,8 @@ python -m roam_pipeline fetch
 #    Un thème en échec se reprend seul, sans tout recollecter :
 python -m roam_pipeline fetch --only chateaux abbayes
 
-# 3. Compléter : taille des articles francophones et signaux d'alerte (~1 min)
+# 3. Compléter : taille des articles, signaux d'alerte, rattachement
+#    administratif par coordonnées (~2 min)
 python -m roam_pipeline enrich
 
 python -m roam_pipeline build
@@ -104,6 +105,21 @@ constituer le premier catalogue publiable.
 
 Les labels sans propriété Wikidata fiable (`kind: manual`) se saisissent dans
 `data/manual/<label>.csv`, colonnes `name,wikidata_id,note`.
+
+### Le rattachement administratif ne vient pas de Wikidata
+
+Wikidata omet souvent `P131` sur les sites naturels : une cascade n'a que ses
+coordonnées. S'appuyer dessus laissait huit cent vingt lieux de métropole sans
+département, donc hors de toute collection géographique — et le filtre de périmètre les
+écartait comme s'ils étaient à l'étranger.
+
+`enrich` part donc des coordonnées, qui elles sont toujours là, et interroge l'API Adresse
+de l'État — gratuite, sans clé, faite pour ça. Elle rend le code INSEE de la commune, dont
+le code de département se déduit exactement : deux chiffres en métropole, une lettre en
+Corse (`2A004`), trois chiffres outre-mer (`97411`).
+
+Un point hors de France ne renvoie rien : le filtre de périmètre redevient ce qu'il devait
+être, une frontière et non un symptôme de données manquantes.
 
 ### Deux signaux de notoriété, et pourquoi
 

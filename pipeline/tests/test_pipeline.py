@@ -23,6 +23,7 @@ from roam_pipeline.config import load_config
 from roam_pipeline.export import _sql_str, write_seed_sql
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
 from roam_pipeline.models import Place, slugify
+from roam_pipeline.geocode import AddressClient, departement_from_insee
 from roam_pipeline.wikipedia import title_from_url
 from roam_pipeline.score import assign_tiers, compute_score, label_bonus, score_all
 
@@ -270,6 +271,81 @@ class TestDedupe(unittest.TestCase):
         b = make_place("Site naturel", theme="cascades", lat=45.0, lon=2.0)
         score_all([a, b], CONFIG)
         self.assertEqual(len(dedupe([a, b])), 2)
+
+
+class TestInseeDepartement(unittest.TestCase):
+    """Le code de commune porte celui du département — mais pas au même endroit."""
+
+    def test_metropole(self):
+        self.assertEqual(departement_from_insee("63113"), "63")
+        self.assertEqual(departement_from_insee("75056"), "75")
+
+    def test_corse_uses_a_letter(self):
+        self.assertEqual(departement_from_insee("2A004"), "2A")
+        self.assertEqual(departement_from_insee("2B033"), "2B")
+
+    def test_outre_mer_uses_three_digits(self):
+        self.assertEqual(departement_from_insee("97411"), "974")
+        self.assertEqual(departement_from_insee("97105"), "971")
+
+    def test_garbage_is_rejected(self):
+        for value in (None, "", "x", "12", "abcde"):
+            self.assertIsNone(departement_from_insee(value), value)
+
+    def test_every_result_is_a_known_departement(self):
+        # Le code déduit doit exister dans le référentiel, sinon le lieu
+        # serait rattaché à un département fantôme.
+        from roam_pipeline.geo import departements
+
+        for citycode in ("63113", "2A004", "2B033", "97411", "01001", "95001"):
+            self.assertIn(departement_from_insee(citycode), departements(), citycode)
+
+
+class TestReverseGeocoding(unittest.TestCase):
+    """Analyse de la réponse de l'API Adresse, sans réseau."""
+
+    class _Response:
+        def __init__(self, text: str):
+            self.text = text
+
+        def raise_for_status(self):
+            return None
+
+    class _Session:
+        def __init__(self, text: str):
+            self.text = text
+            self.sent = None
+            self.headers = {}
+
+        def post(self, url, files=None, timeout=None):
+            self.sent = files["data"][1]
+            return TestReverseGeocoding._Response(self.text)
+
+    def _client(self, text: str) -> tuple[AddressClient, "_Session"]:
+        client = AddressClient(min_interval_s=0)
+        session = self._Session(text)
+        client._session = session
+        return client, session
+
+    def test_reads_the_city_code_back_by_identifier(self):
+        client, session = self._client(
+            "id,latitude,longitude,result_citycode,result_city\n"
+            "Q1,45.5,2.5,63113,Orcival\n"
+            "Q2,42.1,9.1,2B033,Corte\n"
+        )
+        codes = client.reverse([("Q1", 45.5, 2.5), ("Q2", 42.1, 9.1)])
+        self.assertEqual(codes, {"Q1": "63113", "Q2": "2B033"})
+        # Les coordonnées partent bien dans le corps de la requête.
+        self.assertIn("45.500000", session.sent)
+
+    def test_a_point_outside_france_returns_nothing(self):
+        client, _ = self._client("id,latitude,longitude,result_citycode\nQ9,51.5,-0.1,\n")
+        self.assertEqual(client.reverse([("Q9", 51.5, -0.1)]), {})
+
+    def test_no_points_no_request(self):
+        client, session = self._client("")
+        self.assertEqual(client.reverse([]), {})
+        self.assertIsNone(session.sent)
 
 
 class TestGeographicScope(unittest.TestCase):

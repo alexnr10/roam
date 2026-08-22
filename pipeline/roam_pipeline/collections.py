@@ -196,8 +196,10 @@ def apply_geographic_scope(places: list[Place], config: Config) -> list[Place]:
     kept = [place for place in places if place.departement_code]
     dropped = [place for place in places if not place.departement_code]
     if dropped:
-        LOG.info(
-            "hors périmètre : %s lieux sans département français écartés (ex. %s)",
+        LOG.warning(
+            "hors périmètre : %s lieux sans département écartés (ex. %s). "
+            "Si des lieux de métropole s'y trouvent, c'est que Wikidata ne les "
+            "situe pas — lance `enrich` pour les rattacher par coordonnées.",
             len(dropped),
             ", ".join(place.name for place in dropped[:3]),
         )

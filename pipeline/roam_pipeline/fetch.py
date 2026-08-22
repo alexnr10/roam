@@ -12,6 +12,7 @@ from . import wikidata as wd
 from .wikipedia import WikipediaClient, title_from_url
 from .config import Config, Label, Theme
 from .geo import normalize_dept_code, region_of
+from .geocode import AddressClient, departement_from_insee
 from .models import Place
 
 LOG = logging.getLogger(__name__)
@@ -208,6 +209,45 @@ def enrich_article_sizes(places: list[Place], client: WikipediaClient | None = N
 
     LOG.info("taille d'article renseignée pour %s/%s articles", found, len(titles))
     return found
+
+
+def enrich_departements(places: list[Place], client: AddressClient | None = None) -> int:
+    """Rattache par coordonnées les lieux que Wikidata ne situe pas.
+
+    Wikidata omet souvent `P131` sur les sites naturels : une cascade n'a que
+    ses coordonnées. Elles suffisent — le géocodage inverse de l'API Adresse
+    rend le code INSEE de la commune, dont le département se déduit exactement.
+    """
+    missing = [p for p in places if not p.departement_code]
+    if not missing:
+        LOG.info("rattachement : tous les lieux ont déjà un département")
+        return 0
+
+    client = client or AddressClient()
+    resolved = 0
+
+    for batch in wd.chunked(missing, 500):
+        points = [(place.wikidata_id, place.lat, place.lon) for place in batch]
+        try:
+            codes = client.reverse(points)
+        except Exception as exc:
+            LOG.error("géocodage inverse : lot échoué (%s)", exc)
+            continue
+        for place in batch:
+            dept = normalize_dept_code(departement_from_insee(codes.get(place.wikidata_id)))
+            if not dept:
+                continue
+            place.departement_code = dept
+            region = region_of(dept)
+            place.region_code = region.code if region else place.region_code
+            resolved += 1
+
+    LOG.info(
+        "rattachement par coordonnées : %s/%s lieux situés (les autres sont hors de France)",
+        resolved,
+        len(missing),
+    )
+    return resolved
 
 
 def enrich_flags(client: wd.SparqlClient, places: list[Place]) -> int:
