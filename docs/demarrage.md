@@ -138,6 +138,48 @@ après avoir changé la version d'`expo` dans `mobile/package.json`.
 En attendant, `npx expo start` puis la touche **`w`** ouvre l'application dans le
 navigateur du Mac : tout fonctionne sauf la carte native et le GPS réel.
 
+## Installer l'application sur un téléphone Android
+
+Expo Go a besoin d'un serveur de développement, et sa version en magasin peut être en
+retard sur le SDK du projet. Pour avoir Roam installé comme une vraie application, la voie
+est **EAS Build** : la compilation se fait dans le cloud d'Expo, gratuitement, et rend un
+fichier `.apk` qu'Android sait installer directement.
+
+```bash
+npm install -g eas-cli
+eas login                    # compte Expo gratuit, à créer si besoin
+cd mobile
+eas build --platform android --profile preview
+```
+
+Le profil `preview` est déjà configuré dans `eas.json` pour produire un APK plutôt qu'un
+paquet destiné au Play Store. La compilation part en file d'attente — compte dix à trente
+minutes sur l'offre gratuite — puis la commande affiche un lien de téléchargement, avec un
+QR code à scanner depuis le téléphone.
+
+Android demandera d'autoriser l'installation depuis une source inconnue : c'est normal
+pour une application qui ne vient pas du Play Store.
+
+### ⚠️ La carte sera grise sans clé Google Maps
+
+Dans Expo Go, `react-native-maps` utilise la clé de Google fournie par Expo. Une
+application autonome doit avoir la sienne, sans quoi la carte s'affiche vide — le reste
+de l'application fonctionne normalement.
+
+Trois options, par ordre de coût :
+
+| Option | Ce que ça demande | Résultat |
+|---|---|---|
+| Vivre avec la carte grise | rien | liste, validation, collections et badges marchent ; la carte est vide |
+| Clé Google Maps | un compte Google Cloud avec facturation activée — gratuit sous quota, mais carte bancaire exigée | carte complète |
+| Migrer vers MapLibre | du travail de développement | carte complète, sans clé ni compte, et c'est de toute façon nécessaire pour la carte de conquête |
+
+La clé se pose dans `app.json`, sous `expo.android.config.googleMaps.apiKey`.
+
+**La troisième option est la bonne à terme.** MapLibre ne demande ni clé ni compte, et le
+coloriage des territoires (`docs/carte-de-conquete.md`) l'exigera de toute façon. Ce n'est
+pas la peine de payer un détour par Google si c'est pour le défaire ensuite.
+
 ## Ce qu'il faut regarder
 
 Le catalogue de démonstration contient 46 lieux répartis dans toute la France, donc tu

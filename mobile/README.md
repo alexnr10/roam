@@ -54,6 +54,16 @@ Deux différences avec l'app :
 - **Badges** aux paliers 25 / 50 / 75 / 100 % et à chaque niveau terminé
 - **Persistance locale** via AsyncStorage
 
+## Installer sur un téléphone Android
+
+```bash
+npm install -g eas-cli && eas login
+eas build --platform android --profile preview
+```
+
+Rend un APK installable directement. La carte restera grise tant qu'aucune clé Google
+Maps n'est configurée — voir `../docs/demarrage.md`, qui détaille les options.
+
 ## Organisation
 
 ```
