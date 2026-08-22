@@ -113,6 +113,7 @@ validation GPS ne peut pas fonctionner.
 | Le QR code scanne mais rien ne charge | Téléphone et ordinateur sur des réseaux différents, ou Wi-Fi d'entreprise qui isole les appareils | `npx expo start --tunnel` (plus lent, mais passe partout) |
 | `command not found: npx` | Node.js absent ou mal installé | Réinstaller Node.js LTS, rouvrir le terminal |
 | `xcrun: error: invalid active developer path` | Outils en ligne de commande cassés par une mise à jour de macOS | `sudo xcode-select --reset`, cf. section Git ci-dessus |
+| `zsh: command not found: python` | Environnement virtuel non activé dans ce terminal | `source .venv/bin/activate` depuis `pipeline/` |
 | Erreurs pendant `npm install` | Cache abîmé | `rm -rf node_modules package-lock.json && npm install` |
 | L'app se lance mais la carte est vide | Permission de localisation refusée | Réglages du téléphone → Expo Go → Localisation |
 
@@ -159,6 +160,16 @@ pip install -r requirements.txt
 
 python -m roam_pipeline verify-qids   # ⚠️ à faire avant tout le reste
 ```
+
+> **À chaque nouveau terminal, réactive l'environnement.** `python` (sans le `3`)
+> n'existe qu'à l'intérieur : un onglet neuf répond `command not found: python`.
+>
+> ```bash
+> cd ~/Documents/Roam/roam/pipeline
+> source .venv/bin/activate
+> ```
+>
+> L'invite affiche alors `(.venv)` en tête de ligne. C'est le seul signe fiable.
 
 `verify-qids` affiche le libellé réel de chaque identifiant Wikidata de la
 configuration. Un identifiant erroné ne provoque aucune erreur : il renvoie zéro
