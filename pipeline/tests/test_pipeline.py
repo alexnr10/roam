@@ -43,10 +43,13 @@ class TestConfig(unittest.TestCase):
         self.assertTrue(CONFIG.labels)
         self.assertEqual(CONFIG.theme("chateaux").name, "Châteaux")
 
-    def test_every_theme_has_a_source(self):
-        # Soit une classe Wikidata, soit des listes officielles — jamais rien.
+    def test_every_theme_has_a_source_or_is_pending(self):
+        # Classe Wikidata, listes officielles, ou termes en attente de
+        # résolution — mais jamais rien du tout.
         for theme in CONFIG.themes:
-            self.assertTrue(theme.wikidata_classes or theme.from_labels, theme.id)
+            self.assertTrue(
+                theme.wikidata_classes or theme.from_labels or theme.search, theme.id
+            )
 
     def test_label_sourced_themes_reference_known_labels(self):
         known = {label.id for label in CONFIG.labels}

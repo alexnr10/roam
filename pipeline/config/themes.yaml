@@ -183,6 +183,26 @@ themes:
     wikidata_classes: [Q839954, Q164240, Q101659, Q193475]
     # site archéologique, mégalithe, dolmen, menhir
 
+  # Trou constaté à la relecture : ni la tour Eiffel ni l'arc de triomphe
+  # n'entraient dans aucun thème. Les Q-ids restent à résoudre — ne rien
+  # écrire de mémoire, c'est la règle depuis la première collecte.
+  - id: monuments
+    name: Monuments et édifices remarquables
+    name_singular: Monument
+    icon: monument
+    radius_m: 150
+    min_sitelinks: 10
+    fetch_min_sitelinks: 4
+    cap: 60
+    wikidata_classes: []
+    search:
+      - "tour (structure)"
+      - "arc de triomphe"
+      - "obélisque"
+      - "amphithéâtre romain"
+      - "théâtre romain"
+      - "palais"
+
   - id: iles
     name: Îles
     name_singular: Île

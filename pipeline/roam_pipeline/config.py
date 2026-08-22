@@ -68,6 +68,11 @@ class Tiers:
 
 
 @dataclass(frozen=True)
+class Alerts:
+    alpine_elevation_m: int
+
+
+@dataclass(frozen=True)
 class CollectionRules:
     min_places: int
     max_places: int
@@ -82,6 +87,7 @@ class Config:
     scoring: Scoring
     tiers: Tiers
     collections: CollectionRules
+    alerts: Alerts
 
     def theme(self, theme_id: str) -> Theme:
         for t in self.themes:
@@ -147,8 +153,17 @@ def load_config(config_dir: Path | None = None) -> Config:
         cross_theme_levels=list(raw["geo"]["cross_theme_levels"]),
     )
 
+    alerts = Alerts(**raw.get("alerts", {"alpine_elevation_m": 2500}))
+
     _validate(themes, labels)
-    return Config(themes=themes, labels=labels, scoring=scoring, tiers=tiers, collections=rules)
+    return Config(
+        themes=themes,
+        labels=labels,
+        scoring=scoring,
+        tiers=tiers,
+        collections=rules,
+        alerts=alerts,
+    )
 
 
 def _validate(themes: list[Theme], labels: list[Label]) -> None:
@@ -158,7 +173,10 @@ def _validate(themes: list[Theme], labels: list[Label]) -> None:
         if t.id in seen:
             raise ValueError(f"identifiant de thème dupliqué : {t.id}")
         seen.add(t.id)
-        if not t.wikidata_classes and not t.from_labels:
+        # Un thème sans source est admis s'il porte des termes de recherche : il
+        # est en attente de résolution par `suggest-qids`, et la collecte
+        # l'ignorera bruyamment plutôt que de le taire.
+        if not t.wikidata_classes and not t.from_labels and not t.search:
             raise ValueError(f"le thème {t.id} n'a ni classe Wikidata ni label source")
         for label_id in t.from_labels:
             if label_id not in label_ids:

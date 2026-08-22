@@ -29,6 +29,15 @@ def fetch_theme(
     """
     by_qid: dict[str, Place] = {}
 
+    if not theme.wikidata_classes and not theme.from_labels:
+        LOG.warning(
+            "thème %s : aucune classe résolue (termes en attente : %s) — ignoré. "
+            "Lance `suggest-qids` puis renseigne wikidata_classes.",
+            theme.id,
+            ", ".join(theme.search),
+        )
+        return []
+
     # Thème alimenté par des listes officielles : on part des membres des labels
     # plutôt que d'une classe Wikidata.
     if theme.from_labels:
@@ -198,6 +207,34 @@ def enrich_article_sizes(places: list[Place], client: WikipediaClient | None = N
             found += 1
 
     LOG.info("taille d'article renseignée pour %s/%s articles", found, len(titles))
+    return found
+
+
+def enrich_flags(client: wd.SparqlClient, places: list[Place]) -> int:
+    """Complète date de disparition et altitude sur les lieux déjà collectés."""
+    by_qid = {place.wikidata_id: place for place in places}
+    found = 0
+
+    for batch in wd.chunked(sorted(by_qid), 200):
+        try:
+            rows = client.query(wd.entity_flags_query(batch))
+        except Exception as exc:
+            LOG.error("signaux : lot échoué (%s)", exc)
+            continue
+        for row in rows:
+            place = by_qid.get(wd.qid_from_uri(row.get("item")) or "")
+            if place is None:
+                continue
+            if row.get("dissolved"):
+                place.dissolved = row["dissolved"]
+                found += 1
+            if row.get("elevation") and place.elevation_m is None:
+                try:
+                    place.elevation_m = int(float(row["elevation"]))
+                except ValueError:
+                    pass
+
+    LOG.info("signaux : %s lieux portent une date de disparition", found)
     return found
 
 

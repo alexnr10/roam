@@ -27,7 +27,7 @@ python -m roam_pipeline fetch
 #    Un thème en échec se reprend seul, sans tout recollecter :
 python -m roam_pipeline fetch --only chateaux abbayes
 
-# 3. Compléter avec la taille des articles francophones (rapide, ~1 min)
+# 3. Compléter : taille des articles francophones et signaux d'alerte (~1 min)
 python -m roam_pipeline enrich
 
 python -m roam_pipeline build
@@ -64,6 +64,11 @@ deux cents abbayes qu'on ne connaît pas ; une photo, si.
 La page se sert en local plutôt que par un double-clic, et ce n'est pas un détail :
 ouverte en `file://`, elle ne peut pas mémoriser les décisions, et un travail de plusieurs
 soirées se perdrait à la fermeture de l'onglet.
+
+Le filtre **« à vérifier »** regroupe les lieux portant un signal : date de démolition,
+altitude qui suggère un accès alpin, absence de photo. Aucun n'est concluant à lui seul —
+une ruine se visite, un sommet de 3 800 m peut avoir un téléphérique — mais ils font
+remonter en quelques clics des cas qui se noieraient autrement.
 
 Les lieux sont classés par **priorité de revue**, c'est-à-dire leur niveau dans la
 collection nationale de leur thème. Relire les 160 premiers — dix par thème — suffit à

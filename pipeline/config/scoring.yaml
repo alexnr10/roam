@@ -51,3 +51,8 @@ geo:
   # seront donc écartés, et c'est voulu — sinon on génère des milliers de
   # collections vides du type « Cascades de la Creuse : 2 lieux ».
   cross_theme_levels: [departement, region]
+
+alerts:
+  # Au-dessus, un sommet demande souvent bien plus qu'une randonnée. Certains
+  # ont pourtant un téléphérique : c'est un signal de revue, pas une exclusion.
+  alpine_elevation_m: 2500

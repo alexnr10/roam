@@ -42,6 +42,11 @@ Un lieu est refusé, même s'il coche un critère d'inclusion, si :
   habitat d'espèce protégée) — Roam envoie des gens sur place, c'est une responsabilité ;
 - **il est éphémère** (exposition, festival, installation temporaire).
 
+Ces trois derniers cas se noient dans une liste de mille six cents lieux. Le pipeline les
+fait donc remonter comme **signaux d'alerte**, sans jamais trancher lui-même : une date de
+démolition ne condamne pas un château dont les ruines se visitent, et un sommet à 3 800 m
+peut avoir un téléphérique. Le filtre « à vérifier » de la page de revue les regroupe.
+
 ## 4. Le score
 
 Le pipeline calcule un score indicatif pour **classer**, pas pour décider :

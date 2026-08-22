@@ -32,6 +32,9 @@ class Place:
     image_url: str | None = None
     commons_category: str | None = None
     elevation_m: int | None = None
+    # Date de démolition ou de disparition (P576). Sa seule présence ne suffit
+    # pas à écarter : beaucoup de ruines se visitent. C'est un signal de revue.
+    dissolved: str | None = None
 
     departement_code: str | None = None
     region_code: str | None = None

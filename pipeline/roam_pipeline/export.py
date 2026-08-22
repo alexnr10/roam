@@ -10,6 +10,7 @@ from pathlib import Path
 
 from .config import Config
 from .geo import departements, regions
+from .alerts import alerts_for
 from .score import score_breakdown
 from .models import Collection, Place
 
@@ -32,6 +33,8 @@ REVIEW_HEADER = [
     "sitelinks",
     "labels",
     "collections",
+    # Points à vérifier : disparu, accès alpin, aucune photo.
+    "alertes",
     "lat",
     "lon",
     "wikidata_id",
@@ -134,6 +137,7 @@ def write_review_csv(
                     place.sitelinks,
                     "|".join(place.labels),
                     len(membership.get(place.wikidata_id, [])),
+                    " ; ".join(alerts_for(place, config)) if config else "",
                     f"{place.lat:.6f}",
                     f"{place.lon:.6f}",
                     place.wikidata_id,
@@ -336,6 +340,7 @@ def write_review_html(
                 "collections": len(membership.get(place.wikidata_id, [])),
                 "wikipedia": place.wikipedia_url or "",
                 "image": _thumbnail(place.image_url),
+                "alerts": alerts_for(place, config),
             }
         )
 
@@ -392,6 +397,9 @@ _REVIEW_TEMPLATE = """<!doctype html>
   .parts { font-variant-numeric: tabular-nums; }
   .tags { display: flex; flex-wrap: wrap; gap: 4px; }
   .tag { background: var(--alt); border-radius: 999px; padding: 2px 8px; font-size: 11px; }
+  .alert { background: #FBEEE6; color: #9A4520; border: 1px solid #E4C3B0;
+           border-radius: 6px; padding: 4px 8px; font-size: 12px; }
+  .alerts { display: flex; flex-direction: column; gap: 4px; }
   .tier { font-size: 11px; font-weight: 700; letter-spacing: .5px; color: var(--primary); }
   .actions { display: flex; gap: 6px; padding: 0 14px 12px; }
   .actions button { flex: 1; padding: 7px 0; font-size: 13px; }
@@ -416,6 +424,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
     <select id="state">
       <option value="todo">À décider</option>
       <option value="">Tout</option>
+      <option value="alert">À vérifier — disparu, accès, photo</option>
       <option value="keep">Gardés</option>
       <option value="drop">Écartés</option>
     </select>
@@ -466,6 +475,7 @@ function visible() {
     if (tier && String(p.tier) !== tier) return false;
     const d = decisions[p.id] || "";
     if (state === "todo") return !d;
+    if (state === "alert") return p.alerts.length > 0;
     if (state && d !== state) return false;
     return true;
   });
@@ -492,6 +502,7 @@ function card(p) {
         ${parts.labels ? " + " + parts.labels + " labels" : ""}
         ${parts.image ? " + " + parts.image + " image" : ""}
         ${parts.frwiki ? " + " + parts.frwiki + " fr" : ""}</div>
+      ${p.alerts.length ? `<div class="alerts">${p.alerts.map(a => `<div class="alert">⚠︎ ${a}</div>`).join("")}</div>` : ""}
       <div class="tags">${p.labels.map(l => `<span class="tag">${l}</span>`).join("")}</div>
       ${p.wikipedia ? `<a href="${p.wikipedia}" target="_blank" rel="noopener">Voir sur Wikipédia →</a>` : ""}
     </div>

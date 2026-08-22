@@ -33,6 +33,7 @@ P_INSEE_DEPT = "P2586"
 P_INSEE_REGION = "P2585"
 P_ELEVATION = "P2044"
 P_COMMONS_CATEGORY = "P373"
+P_DISSOLVED = "P576"   # date de dissolution, démolition ou disparition
 
 
 class SparqlError(RuntimeError):
@@ -248,6 +249,24 @@ WHERE {{
   OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY} ?admin. }}
   OPTIONAL {{ ?frwiki schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> . }}
   SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+}}
+"""
+
+
+def entity_flags_query(qids: list[str]) -> str:
+    """Signaux d'alerte pour des lieux déjà collectés.
+
+    `P576` marque ce qui a été démoli ou a disparu ; l'altitude sert à repérer
+    les sommets qu'on n'atteint pas en marchant. Ni l'un ni l'autre n'exclut
+    automatiquement — un château en ruine se visite très bien, un sommet de
+    3 800 m peut avoir un téléphérique. Ce sont des signaux pour le relecteur.
+    """
+    values = " ".join(f"wd:{q}" for q in qids)
+    return f"""
+SELECT ?item ?dissolved ?elevation WHERE {{
+  VALUES ?item {{ {values} }}
+  OPTIONAL {{ ?item wdt:{P_DISSOLVED} ?dissolved. }}
+  OPTIONAL {{ ?item wdt:{P_ELEVATION} ?elevation. }}
 }}
 """
 
