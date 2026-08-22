@@ -55,6 +55,7 @@ class Scoring:
     sitelinks_weight: float
     has_image_bonus: float
     has_frwiki_bonus: float
+    article_weight: float
     label_stacking: str
 
 

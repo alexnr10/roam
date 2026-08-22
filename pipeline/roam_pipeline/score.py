@@ -50,6 +50,9 @@ def score_breakdown(place: Place, config: Config) -> dict[str, float]:
     parts = {
         "notoriete": round(s.sitelinks_weight * math.log1p(max(place.sitelinks, 0)), 1),
         "labels": round(label_bonus(place.labels, config), 1),
+        # Taille rapportée au millier d'octets, atténuée : un article deux fois
+        # plus long n'est pas deux fois plus remarquable.
+        "article": round(s.article_weight * math.log1p(max(place.article_bytes, 0) / 1000), 1),
         "image": s.has_image_bonus if (place.image_url or place.commons_category) else 0.0,
         "frwiki": s.has_frwiki_bonus if place.has_frwiki else 0.0,
         "ajustement": round(place.curator_adjustment, 1),

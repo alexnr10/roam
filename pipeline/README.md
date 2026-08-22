@@ -27,8 +27,12 @@ python -m roam_pipeline fetch
 #    Un thème en échec se reprend seul, sans tout recollecter :
 python -m roam_pipeline fetch --only chateaux abbayes
 
-# 3. Scorer, construire les collections, exporter
+# 3. Compléter avec la taille des articles francophones (rapide, ~1 min)
+python -m roam_pipeline enrich
+
 python -m roam_pipeline build
+
+# 4. Relire le catalogue
 
 # 4. Relire le catalogue dans le navigateur, avec les photos
 python -m roam_pipeline review
@@ -44,7 +48,7 @@ python -m roam_pipeline stats
 
 | Fichier | Rôle |
 |---|---|
-| `places_raw.json` | candidats bruts issus de Wikidata, avant scoring |
+| `places_raw.json` | candidats bruts, avant scoring — c'est aussi ce que `enrich` complète |
 | `places.json` | lieux retenus, scorés |
 | `collections.json` | collections construites, avec niveaux et rangs |
 | `review.html` | **la page de revue** — avec vignettes, c'est par là qu'on relit |
@@ -91,6 +95,18 @@ constituer le premier catalogue publiable.
 
 Les labels sans propriété Wikidata fiable (`kind: manual`) se saisissent dans
 `data/manual/<label>.csv`, colonnes `name,wikidata_id,note`.
+
+### Deux signaux de notoriété, et pourquoi
+
+Le **nombre de versions linguistiques** classe bien le patrimoine bâti : un château de la
+Loire est documenté en dix langues, une gentilhommière en une. Il ne classe rien du tout
+pour les sites naturels — 79 cascades françaises passent le seuil de deux langues, 12
+seulement celui de quatre. À l'intérieur du thème, tout le monde est à égalité.
+
+La **taille de l'article francophone** rattrape exactement ce cas : une cascade documentée
+sur vingt mille caractères n'est pas une ébauche de trois lignes. Elle se récupère par
+`enrich`, qui travaille sur le fichier déjà collecté — ajouter ce signal ne coûte pas une
+nouvelle collecte.
 
 ### Deux planchers de notoriété, et pourquoi
 

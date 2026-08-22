@@ -26,6 +26,9 @@ class Place:
     sitelinks: int = 0
     has_frwiki: bool = False
     wikipedia_url: str | None = None
+    # Taille de l'article francophone, en octets. Complète le décompte de langues
+    # là où celui-ci ne discrimine rien — typiquement les sites naturels.
+    article_bytes: int = 0
     image_url: str | None = None
     commons_category: str | None = None
     elevation_m: int | None = None

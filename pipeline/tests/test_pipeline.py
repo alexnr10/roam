@@ -16,6 +16,7 @@ from roam_pipeline.config import load_config
 from roam_pipeline.export import _sql_str, write_seed_sql
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
 from roam_pipeline.models import Place, slugify
+from roam_pipeline.wikipedia import title_from_url
 from roam_pipeline.score import assign_tiers, compute_score, label_bonus, score_all
 
 CONFIG = load_config()
@@ -155,6 +156,54 @@ class TestScoring(unittest.TestCase):
         self.assertAlmostEqual(
             rich - bare, CONFIG.scoring.has_image_bonus + CONFIG.scoring.has_frwiki_bonus
         )
+
+
+class TestArticleSignal(unittest.TestCase):
+    """La taille d'article doit classer là où le décompte de langues est plat."""
+
+    def _cascade(self, article_bytes: int) -> Place:
+        return make_place(
+            f"cascade-{article_bytes}", theme="cascades", sitelinks=2,
+            has_frwiki=True, article_bytes=article_bytes,
+        )
+
+    def test_a_longer_article_scores_higher(self):
+        stub = compute_score(self._cascade(1500), CONFIG)
+        full = compute_score(self._cascade(30000), CONFIG)
+        self.assertGreater(full, stub)
+
+    def test_it_separates_places_with_identical_notoriety(self):
+        # Deux cascades à deux langues : sans ce signal, elles seraient à égalité
+        # et leur ordre dans la collection serait arbitraire.
+        a, b = self._cascade(2000), self._cascade(40000)
+        self.assertNotEqual(compute_score(a, CONFIG), compute_score(b, CONFIG))
+
+    def test_growth_is_sublinear(self):
+        # Quatre mille octets de plus valent beaucoup au départ et presque rien
+        # ensuite : un article deux fois plus long n'est pas deux fois plus
+        # remarquable, sinon les articles fleuves écraseraient tout.
+        early = compute_score(self._cascade(5000), CONFIG) - compute_score(self._cascade(1000), CONFIG)
+        late = compute_score(self._cascade(24000), CONFIG) - compute_score(self._cascade(20000), CONFIG)
+        self.assertGreater(early, late * 3)
+
+    def test_a_missing_article_costs_nothing_extra(self):
+        self.assertEqual(
+            compute_score(self._cascade(0), CONFIG),
+            compute_score(make_place("sans", theme="cascades", sitelinks=2, has_frwiki=True), CONFIG),
+        )
+
+
+class TestWikipediaTitles(unittest.TestCase):
+    def test_decodes_and_unslugs(self):
+        self.assertEqual(
+            title_from_url("https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Chambord"),
+            "Château de Chambord",
+        )
+
+    def test_ignores_anything_that_is_not_an_article(self):
+        self.assertIsNone(title_from_url(None))
+        self.assertIsNone(title_from_url("https://example.org/page"))
+        self.assertIsNone(title_from_url("https://fr.wikipedia.org/wiki/"))
 
 
 class TestTiers(unittest.TestCase):

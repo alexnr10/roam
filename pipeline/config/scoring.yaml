@@ -16,6 +16,12 @@ scoring:
   # Bonus si le lieu a un article sur la Wikipédia francophone.
   has_frwiki_bonus: 5.0
 
+  # Taille de l'article francophone. Indispensable pour les sites naturels :
+  # une cascade n'a presque jamais d'article hors du français, donc le décompte
+  # de langues y est plat et ne classe rien. La longueur de l'article, elle,
+  # sépare la cascade documentée de l'ébauche de trois lignes.
+  article_weight: 8.0
+
   # Les bonus de label sont définis dans labels.yaml (`score_bonus`).
   # Seul le plus élevé s'applique, plus la moitié du deuxième — pour éviter
   # qu'un empilement de petits labels dépasse un site UNESCO.

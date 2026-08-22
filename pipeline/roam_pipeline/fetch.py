@@ -5,9 +5,11 @@ from __future__ import annotations
 import csv
 import json
 import logging
+from collections import defaultdict
 from pathlib import Path
 
 from . import wikidata as wd
+from .wikipedia import WikipediaClient, title_from_url
 from .config import Config, Label, Theme
 from .geo import normalize_dept_code, region_of
 from .models import Place
@@ -163,6 +165,40 @@ def resolve_admin(client: wd.SparqlClient, places: list[Place]) -> None:
         len(places),
         len(admin_qids),
     )
+
+
+def enrich_article_sizes(places: list[Place], client: WikipediaClient | None = None) -> int:
+    """Complète la taille de l'article francophone de chaque lieu.
+
+    Séparé de la collecte : il travaille sur le fichier brut existant, donc
+    ajouter ce signal ne coûte pas une nouvelle demi-heure sur Wikidata.
+    """
+    client = client or WikipediaClient()
+    by_title: dict[str, list[Place]] = defaultdict(list)
+    for place in places:
+        title = title_from_url(place.wikipedia_url)
+        if title:
+            by_title[title].append(place)
+
+    if not by_title:
+        LOG.warning("aucun article francophone à interroger")
+        return 0
+
+    titles = sorted(by_title)
+    found = 0
+    for index, batch in enumerate(wd.chunked(titles, 50), start=1):
+        try:
+            sizes = client.article_sizes(batch)
+        except Exception as exc:
+            LOG.error("tailles d'articles : lot %s échoué (%s)", index, exc)
+            continue
+        for title, size in sizes.items():
+            for place in by_title[title]:
+                place.article_bytes = size
+            found += 1
+
+    LOG.info("taille d'article renseignée pour %s/%s articles", found, len(titles))
+    return found
 
 
 def fetch_label_members(client: wd.SparqlClient, label: Label, manual_dir: Path) -> set[str]:

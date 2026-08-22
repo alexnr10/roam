@@ -19,7 +19,7 @@ from .export import (
     write_review_html,
     write_seed_sql,
 )
-from .fetch import run_fetch
+from .fetch import enrich_article_sizes, run_fetch
 from .models import Place
 from .score import score_all
 
@@ -139,6 +139,28 @@ def cmd_fetch(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
+    """Ajoute la taille de l'article francophone aux candidats déjà collectés.
+
+    Travaille sur `places_raw.json` : ajouter ce signal ne demande pas de
+    repasser une demi-heure sur Wikidata.
+    """
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
+        return 1
+
+    places = _load_places(raw_path)
+    found = enrich_article_sizes(places)
+    raw_path.write_text(
+        json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    print(f"{found} tailles d'articles ajoutées → {raw_path}")
+    print("Relance `build` pour en tenir compte dans le classement.")
+    return 0
+
+
 def cmd_build(args: argparse.Namespace, config: Config) -> int:
     raw_path = args.out / "places_raw.json"
     if not raw_path.exists():
@@ -166,7 +188,9 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
         print("Aucune décision renseignée dans la feuille de revue.", file=sys.stderr)
         return 1
 
-    places = _load_places(args.out / "places_raw.json")
+    from .collections import apply_notoriety_floor
+
+    places = apply_notoriety_floor(_load_places(args.out / "places_raw.json"), config)
     kept: list[Place] = []
     counts: Counter[str] = Counter()
 
@@ -354,6 +378,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="ne recollecter que ces thèmes ; les autres sont conservés",
     )
 
+    sub.add_parser(
+        "enrich", help="ajoute la taille des articles francophones (réseau requis)"
+    )
+
     sub.add_parser("build", help="score, construit les collections et exporte")
 
     review = sub.add_parser("apply-review", help="applique les décisions de la feuille de revue")
@@ -394,6 +422,7 @@ def main(argv: list[str] | None = None) -> int:
         "verify-qids": cmd_verify_qids,
         "suggest-qids": cmd_suggest_qids,
         "fetch": cmd_fetch,
+        "enrich": cmd_enrich,
         "build": cmd_build,
         "apply-review": cmd_apply_review,
         "stats": cmd_stats,
