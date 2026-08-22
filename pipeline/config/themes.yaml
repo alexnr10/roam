@@ -86,13 +86,17 @@ themes:
     min_sitelinks: 10
     fetch_min_sitelinks: 4
     cap: 60
-    wikidata_classes: [Q143912, Q170980, Q7362268, Q19757, Q16560]
-    # arc de triomphe, obélisque, amphithéâtre romain, théâtre romain, palais
+    wikidata_classes: [Q143912, Q170980, Q7362268, Q19757, Q16560, Q12518, Q815448]
+    # arc de triomphe, obélisque, amphithéâtre romain, théâtre romain, palais,
+    # tour, beffroi
     #
-    # « tour (structure) » n'a rien renvoyé : la parenthèse a fait échouer la
-    # recherche. Repris sans elle au prochain tour — c'est la classe qui manque
-    # pour la tour Eiffel.
-    search: ["tour", "beffroi"]
+    # Q12518 (« bâtiment de forme verticale ») est la classe qui manquait pour
+    # la tour Eiffel. Elle est large : elle ramènera aussi des châteaux d'eau et
+    # des tours de télévision. Le plancher à dix langues en écarte l'essentiel,
+    # le reste se traite en revue.
+    #
+    # Écartés : Q99026497, qui est la charpente supportant les cloches et non
+    # l'édifice, et Q750675, qui est le bien UNESCO lui-même et non une classe.
 
   - id: megalithes
     name: Mégalithes et sites antiques
