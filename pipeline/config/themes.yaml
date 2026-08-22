@@ -1,13 +1,17 @@
 # Thèmes du catalogue Roam.
 #
-# `wikidata_classes` : Q-ids utilisés dans la requête SPARQL (P31/P279* → classe).
-#   ⚠️  Ces identifiants doivent être vérifiés avant la première collecte :
-#       `python -m roam_pipeline verify-qids`
-#       affiche le libellé réel de chaque Q-id pour contrôle.
-#
-# `radius_m`     : rayon de validation par défaut des lieux du thème (mètres).
-# `min_sitelinks`: plancher de notoriété — en dessous, le lieu n'est même pas proposé.
-# `cap`          : nombre maximum de lieux retenus pour la collection nationale.
+# `wikidata_classes` : Q-ids vérifiés avec `python -m roam_pipeline verify-qids`,
+#                      qui affiche le libellé réel de chacun. Ne jamais écrire un
+#                      Q-id de mémoire : une erreur ne lève aucune exception, elle
+#                      fait rater un thème entier en silence.
+# `search`           : termes encore à résoudre. `suggest-qids` propose des
+#                      candidats ; le Q-id retenu rejoint `wikidata_classes` et le
+#                      terme disparaît d'ici.
+# `from_labels`      : thème alimenté par des listes officielles plutôt que par une
+#                      classe Wikidata.
+# `radius_m`         : rayon de validation par défaut des lieux du thème (mètres).
+# `min_sitelinks`    : plancher de notoriété — en dessous, le lieu n'est pas proposé.
+# `cap`              : nombre maximum de lieux retenus pour la collection nationale.
 
 themes:
   - id: chateaux
@@ -17,7 +21,7 @@ themes:
     radius_m: 200
     min_sitelinks: 4
     cap: 80
-    wikidata_classes: [Q23413, Q751876, Q1785071]   # castle, château, fort
+    wikidata_classes: [Q23413, Q751876, Q1785071]   # château fort, château, fort
 
   - id: cascades
     name: Cascades
@@ -26,7 +30,7 @@ themes:
     radius_m: 300
     min_sitelinks: 2
     cap: 60
-    wikidata_classes: [Q34038]                       # waterfall
+    wikidata_classes: [Q34038]                       # chute d'eau
 
   - id: sommets
     name: Sommets
@@ -35,16 +39,18 @@ themes:
     radius_m: 1000
     min_sitelinks: 4
     cap: 60
-    wikidata_classes: [Q8502]                        # mountain
+    wikidata_classes: [Q8502]                        # montagne
+    search: ["col de montagne"]
 
   - id: plages
-    name: Plages
-    name_singular: Plage
+    name: Littoral et plages
+    name_singular: Site
     icon: beach
     radius_m: 500
     min_sitelinks: 2
     cap: 60
-    wikidata_classes: [Q40080]                       # beach
+    wikidata_classes: [Q40080]                       # plage
+    search: ["falaise", "cap géographique"]
 
   - id: abbayes
     name: Abbayes et monastères
@@ -53,7 +59,7 @@ themes:
     radius_m: 150
     min_sitelinks: 4
     cap: 60
-    wikidata_classes: [Q160742, Q44613]              # abbey, monastery
+    wikidata_classes: [Q160742, Q44613]              # abbaye, monastère
 
   - id: cathedrales
     name: Cathédrales et basiliques
@@ -62,8 +68,10 @@ themes:
     radius_m: 120
     min_sitelinks: 5
     cap: 60
-    wikidata_classes: [Q2977, Q163687]               # cathedral, basilica
+    wikidata_classes: [Q2977, Q163687]               # cathédrale, basilique
 
+  # Pas de classe Wikidata : « commune française » ramènerait les 35 000 communes.
+  # Les labels sont ici la seule sélection défendable — et ils sont déjà finis.
   - id: villages
     name: Villages de caractère
     name_singular: Village
@@ -71,7 +79,8 @@ themes:
     radius_m: 600
     min_sitelinks: 3
     cap: 80
-    wikidata_classes: [Q3336843, Q484170]            # village de France, commune of France
+    wikidata_classes: []
+    from_labels: [plus-beaux-villages, plus-beaux-detours]
 
   - id: grottes
     name: Grottes et gouffres
@@ -80,7 +89,7 @@ themes:
     radius_m: 200
     min_sitelinks: 3
     cap: 40
-    wikidata_classes: [Q35509]                       # cave
+    wikidata_classes: [Q35509]                       # grotte
 
   - id: lacs
     name: Lacs
@@ -89,7 +98,7 @@ themes:
     radius_m: 1500
     min_sitelinks: 3
     cap: 50
-    wikidata_classes: [Q23397]                       # lake
+    wikidata_classes: [Q23397]                       # lac
 
   - id: phares
     name: Phares
@@ -98,7 +107,7 @@ themes:
     radius_m: 200
     min_sitelinks: 3
     cap: 40
-    wikidata_classes: [Q39715]                       # lighthouse
+    wikidata_classes: [Q39715]                       # phare
 
   - id: gorges
     name: Gorges et canyons
@@ -108,7 +117,8 @@ themes:
     radius_m: 2000
     min_sitelinks: 3
     cap: 40
-    wikidata_classes: [Q188025, Q150784]             # gorge, canyon
+    wikidata_classes: [Q150784]                      # gorge
+    search: ["canyon"]
 
   - id: jardins
     name: Jardins remarquables
@@ -117,7 +127,8 @@ themes:
     radius_m: 200
     min_sitelinks: 3
     cap: 50
-    wikidata_classes: [Q1107656, Q19317]             # garden, botanical garden
+    wikidata_classes: [Q1107656]                     # jardin
+    search: ["jardin botanique", "parc urbain"]
 
   - id: musees
     name: Musées
@@ -126,7 +137,7 @@ themes:
     radius_m: 120
     min_sitelinks: 5
     cap: 50
-    wikidata_classes: [Q33506]                       # museum
+    wikidata_classes: [Q33506]                       # musée
 
   - id: ponts
     name: Ponts et viaducs
@@ -135,7 +146,8 @@ themes:
     radius_m: 300
     min_sitelinks: 4
     cap: 40
-    wikidata_classes: [Q12280, Q1524]                # bridge, viaduct
+    wikidata_classes: [Q12280]                       # pont
+    search: ["viaduc", "aqueduc"]
 
   - id: megalithes
     name: Mégalithes et sites antiques
@@ -144,7 +156,8 @@ themes:
     radius_m: 200
     min_sitelinks: 3
     cap: 50
-    wikidata_classes: [Q1440476, Q11774381, Q839954] # megalith, dolmen, archaeological site
+    wikidata_classes: [Q839954]                      # site archéologique
+    search: ["dolmen", "menhir", "mégalithe"]
 
   - id: iles
     name: Îles
@@ -153,4 +166,4 @@ themes:
     radius_m: 2000
     min_sitelinks: 4
     cap: 40
-    wikidata_classes: [Q23442]                       # island
+    wikidata_classes: [Q23442]                       # île

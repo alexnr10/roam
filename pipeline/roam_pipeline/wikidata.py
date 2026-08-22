@@ -16,6 +16,7 @@ import requests
 LOG = logging.getLogger(__name__)
 
 ENDPOINT = "https://query.wikidata.org/sparql"
+SEARCH_ENDPOINT = "https://www.wikidata.org/w/api.php"
 USER_AGENT = "RoamCatalogBot/0.1 (https://github.com/alexnr10/roam) python-requests"
 
 # France, et propriétés utilisées par les requêtes
@@ -95,6 +96,38 @@ class SparqlClient:
         raise SparqlError(f"échec après {self.max_retries} tentatives") from last_error
 
 
+    def search(self, term: str, limit: int = 6) -> list[dict[str, str]]:
+        """Recherche d'entités par libellé (wbsearchentities).
+
+        Sert à trouver un Q-id à partir d'un mot plutôt que de l'écrire de
+        mémoire — c'est ainsi qu'on évite de reproduire une erreur d'identifiant,
+        qui ne lève aucune exception et fait juste rater un thème en silence.
+        """
+        self._throttle()
+        response = self._session.get(
+            SEARCH_ENDPOINT,
+            params={
+                "action": "wbsearchentities",
+                "search": term,
+                "language": "fr",
+                "uselang": "fr",
+                "type": "item",
+                "limit": limit,
+                "format": "json",
+            },
+            timeout=self.timeout_s,
+        )
+        response.raise_for_status()
+        return [
+            {
+                "id": hit.get("id", ""),
+                "label": hit.get("label", ""),
+                "description": hit.get("description", ""),
+            }
+            for hit in response.json().get("search", [])
+        ]
+
+
 def _flatten(payload: dict[str, Any]) -> list[dict[str, Any]]:
     rows = []
     for binding in payload.get("results", {}).get("bindings", []):
@@ -166,6 +199,37 @@ WHERE {{
   ?item wdt:{P_COORDINATE} ?coord .
   ?item wikibase:sitelinks ?sitelinks .
   FILTER(?sitelinks >= {min_sitelinks})
+  OPTIONAL {{ ?item wdt:{P_IMAGE} ?image. }}
+  OPTIONAL {{ ?item wdt:{P_COMMONS_CATEGORY} ?commons. }}
+  OPTIONAL {{ ?item wdt:{P_ELEVATION} ?elevation. }}
+  OPTIONAL {{ ?frwiki schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> . }}{admin_block}
+  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+}}
+"""
+
+
+def items_query(qids: list[str], with_admin: bool = True) -> str:
+    """Mêmes attributs que `theme_query`, pour une liste d'entités connues.
+
+    Utilisé par les thèmes alimentés par des labels plutôt que par une classe :
+    les listes officielles sont déjà une curation humaine, finie et fiable.
+    """
+    values = " ".join(f"wd:{q}" for q in qids)
+    admin_block = (
+        f"""
+  OPTIONAL {{ ?item wdt:{P_INSEE_DEPT} ?directDept. }}
+  OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY}+ ?deptEntity. ?deptEntity wdt:{P_INSEE_DEPT} ?parentDept. }}
+  OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY}+ ?regEntity. ?regEntity wdt:{P_INSEE_REGION} ?parentRegion. }}"""
+        if with_admin
+        else ""
+    )
+    return f"""
+SELECT DISTINCT ?item ?itemLabel ?coord ?sitelinks ?image ?commons ?elevation
+                ?directDept ?parentDept ?parentRegion ?frwiki
+WHERE {{
+  VALUES ?item {{ {values} }}
+  ?item wdt:{P_COORDINATE} ?coord .
+  ?item wikibase:sitelinks ?sitelinks .
   OPTIONAL {{ ?item wdt:{P_IMAGE} ?image. }}
   OPTIONAL {{ ?item wdt:{P_COMMONS_CATEGORY} ?commons. }}
   OPTIONAL {{ ?item wdt:{P_ELEVATION} ?elevation. }}

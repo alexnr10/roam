@@ -21,6 +21,12 @@ class Theme:
     min_sitelinks: int
     cap: int
     wikidata_classes: list[str]
+    # Thème alimenté par des listes officielles plutôt que par une classe
+    # Wikidata : les labels sont déjà une curation humaine, finie et fiable.
+    from_labels: list[str] = field(default_factory=list)
+    # Termes à résoudre avec `suggest-qids` — présents tant qu'un identifiant
+    # reste à confirmer.
+    search: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -32,6 +38,7 @@ class Label:
     makes_collection: bool
     query_kind: str
     qid: str | None
+    search: str | None = None
 
     @property
     def is_manual(self) -> bool:
@@ -100,7 +107,9 @@ def load_config(config_dir: Path | None = None) -> Config:
             radius_m=int(t["radius_m"]),
             min_sitelinks=int(t["min_sitelinks"]),
             cap=int(t["cap"]),
-            wikidata_classes=list(t["wikidata_classes"]),
+            wikidata_classes=list(t.get("wikidata_classes") or []),
+            from_labels=list(t.get("from_labels") or []),
+            search=list(t.get("search") or []),
         )
         for t in _read_yaml(d / "themes.yaml")["themes"]
     ]
@@ -117,6 +126,7 @@ def load_config(config_dir: Path | None = None) -> Config:
                 makes_collection=bool(lbl.get("makes_collection", False)),
                 query_kind=q["kind"],
                 qid=q.get("qid"),
+                search=q.get("search"),
             )
         )
 
@@ -135,11 +145,17 @@ def load_config(config_dir: Path | None = None) -> Config:
 
 
 def _validate(themes: list[Theme], labels: list[Label]) -> None:
+    label_ids = {lbl.id for lbl in labels}
     seen: set[str] = set()
     for t in themes:
         if t.id in seen:
             raise ValueError(f"identifiant de thème dupliqué : {t.id}")
         seen.add(t.id)
+        if not t.wikidata_classes and not t.from_labels:
+            raise ValueError(f"le thème {t.id} n'a ni classe Wikidata ni label source")
+        for label_id in t.from_labels:
+            if label_id not in label_ids:
+                raise ValueError(f"le thème {t.id} référence un label inconnu : {label_id}")
         for qid in t.wikidata_classes:
             if not qid.startswith("Q") or not qid[1:].isdigit():
                 raise ValueError(f"Q-id invalide dans le thème {t.id} : {qid}")
@@ -149,5 +165,10 @@ def _validate(themes: list[Theme], labels: list[Label]) -> None:
         if lbl.id in seen:
             raise ValueError(f"identifiant de label dupliqué : {lbl.id}")
         seen.add(lbl.id)
-        if not lbl.is_manual and not lbl.qid:
-            raise ValueError(f"le label {lbl.id} n'est pas 'manual' mais n'a pas de qid")
+        # Un label sans qid est admis s'il porte un terme de recherche : il est
+        # en attente de résolution par `suggest-qids`, et sera simplement ignoré
+        # par la collecte avec un avertissement.
+        if not lbl.is_manual and not lbl.qid and not lbl.search:
+            raise ValueError(
+                f"le label {lbl.id} n'est pas 'manual' et n'a ni qid ni terme de recherche"
+            )

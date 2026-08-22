@@ -15,13 +15,31 @@ from .models import Place
 LOG = logging.getLogger(__name__)
 
 
-def fetch_theme(client: wd.SparqlClient, theme: Theme) -> list[Place]:
+def fetch_theme(
+    client: wd.SparqlClient,
+    theme: Theme,
+    label_members: dict[str, set[str]] | None = None,
+) -> list[Place]:
     """Lieux candidats pour un thème.
 
     Les classes sont interrogées par lots : une requête sur toutes les classes
     d'un coup dépasse régulièrement le timeout de WDQS.
     """
     by_qid: dict[str, Place] = {}
+
+    # Thème alimenté par des listes officielles : on part des membres des labels
+    # plutôt que d'une classe Wikidata.
+    if theme.from_labels:
+        members: set[str] = set()
+        for label_id in theme.from_labels:
+            members |= (label_members or {}).get(label_id, set())
+        if not members:
+            LOG.warning("thème %s : aucun membre de label disponible", theme.id)
+        for batch in wd.chunked(sorted(members), 150):
+            for row in client.query(wd.items_query(batch)):
+                place = _row_to_place(row, theme)
+                if place is not None:
+                    by_qid[place.wikidata_id] = place
 
     for batch in wd.chunked(theme.wikidata_classes, 2):
         LOG.info("thème %s : classes %s", theme.id, ", ".join(batch))
@@ -97,6 +115,17 @@ def fetch_label_members(client: wd.SparqlClient, label: Label, manual_dir: Path)
     if label.is_manual:
         return _read_manual_label(label, manual_dir)
 
+    if not label.qid:
+        # Label en attente de résolution : mieux vaut l'ignorer bruyamment que
+        # produire un catalogue amputé sans le dire.
+        LOG.warning(
+            "label %s : identifiant non résolu (terme « %s ») — ignoré. "
+            "Lance `suggest-qids` pour le résoudre.",
+            label.id,
+            label.search,
+        )
+        return set()
+
     rows = client.query(wd.label_members_query(label.query_kind, label.qid or ""))
     qids = {qid for qid in (wd.qid_from_uri(r.get("item")) for r in rows) if qid}
     LOG.info("label %s : %s membres", label.id, len(qids))
@@ -140,7 +169,7 @@ def run_fetch(client: wd.SparqlClient, config: Config, out_dir: Path, manual_dir
     places: list[Place] = []
     for theme in config.themes:
         try:
-            places.extend(fetch_theme(client, theme))
+            places.extend(fetch_theme(client, theme, label_members))
         except Exception as exc:
             LOG.error("thème %s : collecte échouée (%s)", theme.id, exc)
 

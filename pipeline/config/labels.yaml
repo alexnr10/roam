@@ -1,17 +1,18 @@
 # Labels et référencements existants.
 #
-# Ils servent à la fois de SIGNAL DE QUALITÉ (bonus de score) et de COLLECTION DÉDIÉE.
-# C'est de la curation humaine, officielle, et surtout FINIE : ce sont les meilleures
-# amorces de catalogue disponibles gratuitement.
+# Ils servent à la fois de SIGNAL DE QUALITÉ (bonus de score) et de COLLECTION
+# DÉDIÉE. C'est de la curation humaine, officielle, et surtout FINIE : les
+# meilleures amorces de catalogue disponibles gratuitement.
 #
 # `wikidata_query` décrit comment récupérer les membres :
 #   - kind: heritage  → ?place wdt:P1435 wd:<qid>   (désignation patrimoniale)
 #   - kind: member_of → ?place wdt:P463  wd:<qid>   (membre d'une organisation)
 #   - kind: instance  → ?place wdt:P31/wdt:P279* wd:<qid>
-#   - kind: manual    → pas de source Wikidata fiable, liste à saisir à la main
+#   - kind: manual    → pas de source Wikidata fiable, liste saisie à la main
 #
-# ⚠️  Vérifier les Q-ids avant la première collecte :
-#     `python -m roam_pipeline verify-qids`
+# Un `search` sans `qid` signale un label EN ATTENTE DE RÉSOLUTION : la collecte
+# l'ignore avec un avertissement. `suggest-qids` propose des candidats, `verify-qids`
+# confirme le choix.
 
 labels:
   - id: unesco
@@ -19,52 +20,54 @@ labels:
     authority: UNESCO
     score_bonus: 40
     makes_collection: true
-    wikidata_query: { kind: heritage, qid: Q9259 }
+    wikidata_query: { kind: heritage, qid: Q9259 }   # patrimoine mondial ✓
 
   - id: plus-beaux-villages
     name: Les Plus Beaux Villages de France
     authority: Association Les Plus Beaux Villages de France
     score_bonus: 30
     makes_collection: true
-    wikidata_query: { kind: member_of, qid: Q1010851 }
+    wikidata_query: { kind: member_of, search: "Les Plus Beaux Villages de France" }
 
   - id: grand-site-de-france
     name: Grand Site de France
     authority: Ministère de la Transition écologique
     score_bonus: 30
     makes_collection: true
-    wikidata_query: { kind: heritage, qid: Q3115675 }
+    wikidata_query: { kind: heritage, search: "Grand Site de France" }
 
+  # ⚠️ Ces deux-là étaient inversés : Q10387684 est « classé », Q10387575 est
+  # « inscrit ». Corrigé d'après la sortie de verify-qids.
   - id: monument-historique-classe
     name: Monument historique classé
     authority: Ministère de la Culture
     score_bonus: 12
     makes_collection: false
-    wikidata_query: { kind: heritage, qid: Q10387575 }
+    wikidata_query: { kind: heritage, qid: Q10387684 }   # monument historique classé ✓
 
   - id: monument-historique-inscrit
     name: Monument historique inscrit
     authority: Ministère de la Culture
     score_bonus: 6
     makes_collection: false
-    wikidata_query: { kind: heritage, qid: Q10387684 }
+    wikidata_query: { kind: heritage, qid: Q10387575 }   # monument historique inscrit ✓
 
   - id: jardin-remarquable
     name: Jardin remarquable
     authority: Ministère de la Culture
     score_bonus: 18
     makes_collection: true
-    wikidata_query: { kind: heritage, qid: Q3162009 }
+    wikidata_query: { kind: heritage, search: "jardin remarquable" }
 
   - id: parc-national
     name: Parc national
     authority: Office français de la biodiversité
     score_bonus: 10
     makes_collection: false
-    wikidata_query: { kind: instance, qid: Q1237299 }
+    wikidata_query: { kind: instance, search: "parc national de France" }
 
-  # Pas de propriété Wikidata fiable pour ces labels : listes à saisir à la main
-  # dans data/manual/<id>.csv (colonnes : name,wikidata_id,note).
+  # Pas de propriété Wikidata fiable : listes à saisir à la main dans
+  # data/manual/<id>.csv (colonnes : name,wikidata_id,note).
   - id: plus-beaux-detours
     name: Les Plus Beaux Détours de France
     authority: Association Les Plus Beaux Détours de France

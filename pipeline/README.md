@@ -15,10 +15,11 @@ pip install -r requirements.txt
 ## Utilisation
 
 ```bash
-# 1. Vérifier la configuration AVANT toute collecte (réseau requis).
+# 1. Résoudre puis vérifier la configuration AVANT toute collecte (réseau requis).
 #    Un Q-id erroné ne lève aucune erreur : il renvoie zéro résultat.
 #    C'est le bug le plus silencieux et le plus coûteux du pipeline.
-python -m roam_pipeline verify-qids
+python -m roam_pipeline suggest-qids   # propose des Q-ids pour les termes en attente
+python -m roam_pipeline verify-qids    # affiche le libellé réel de chaque Q-id retenu
 
 # 2. Collecter les candidats (long : ~15-30 min, WDQS est throttlé)
 python -m roam_pipeline fetch
@@ -68,6 +69,17 @@ constituer le premier catalogue publiable.
 
 Les labels sans propriété Wikidata fiable (`kind: manual`) se saisissent dans
 `data/manual/<label>.csv`, colonnes `name,wikidata_id,note`.
+
+### Ne jamais écrire un Q-id de mémoire
+
+C'est la leçon la plus chère du pipeline : un identifiant erroné ne provoque aucune
+erreur, il renvoie zéro résultat et fait disparaître un thème entier en silence. Sur les
+33 identifiants de la première version, 12 étaient faux — dont deux inversés entre
+monuments classés et inscrits, ce qui aurait faussé tous les scores.
+
+Le cycle est donc : `search` dans la configuration → `suggest-qids` propose des candidats
+réels → on choisit → `verify-qids` confirme le libellé. Le choix entre deux entités
+proches (« château » et « château fort ») reste une décision éditoriale.
 
 ## Tests
 

@@ -66,10 +66,64 @@ def cmd_verify_qids(args: argparse.Namespace, config: Config) -> int:
         else:
             print(f"  · {qid:<12} {label:<38} {description[:60]:<60} ({used_by})")
 
-    print(f"\n{len(qids)} Q-ids, {problems} introuvable(s).")
-    if problems:
-        print("Corrige-les dans pipeline/config/ avant de lancer la collecte.")
+    pending = _pending_terms(config)
+    if pending:
+        print("\nEn attente de résolution :")
+        for owner, term in pending:
+            print(f"  ? {term:<38} ({owner})")
+
+    print(f"\n{len(qids)} Q-ids vérifiés, {problems} introuvable(s), "
+          f"{len(pending)} terme(s) à résoudre.")
+    if problems or pending:
+        print("Lance `python -m roam_pipeline suggest-qids` pour trouver les bons Q-ids.")
     return 1 if problems else 0
+
+
+def _pending_terms(config: Config) -> list[tuple[str, str]]:
+    """Termes déclarés dans la configuration mais pas encore résolus en Q-id."""
+    pending: list[tuple[str, str]] = []
+    for theme in config.themes:
+        for term in theme.search:
+            pending.append((f"thème {theme.id}", term))
+    for label in config.labels:
+        if not label.is_manual and not label.qid and label.search:
+            pending.append((f"label {label.id}", label.search))
+    return pending
+
+
+def cmd_suggest_qids(args: argparse.Namespace, config: Config) -> int:
+    """Propose des Q-ids pour chaque terme en attente.
+
+    Écrire un Q-id de mémoire ne marche pas : une erreur ne lève aucune
+    exception, elle fait rater un thème en silence. On part donc toujours du
+    libellé, et on choisit parmi ce que Wikidata renvoie réellement.
+    """
+    terms = [("recherche", term) for term in args.terms] or _pending_terms(config)
+    if not terms:
+        print("Aucun terme en attente : la configuration est complète.")
+        return 0
+
+    client = wd.SparqlClient()
+    for owner, term in terms:
+        print(f"\n« {term} »  →  {owner}")
+        try:
+            hits = client.search(term, limit=args.limit)
+        except Exception as exc:
+            print(f"    recherche impossible : {exc}")
+            continue
+        if not hits:
+            print("    aucun résultat")
+            continue
+        for hit in hits:
+            description = (hit["description"] or "")[:62]
+            print(f"    {hit['id']:<11} {hit['label']:<34} {description}")
+
+    print(
+        "\nColle cette sortie dans la conversation : le choix entre deux entités "
+        "proches (« château » et « château fort », par exemple) est une décision "
+        "éditoriale, pas une correspondance automatique."
+    )
+    return 0
 
 
 def cmd_fetch(args: argparse.Namespace, config: Config) -> int:
@@ -181,6 +235,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("verify-qids", help="vérifie les Q-ids de la configuration (réseau requis)")
 
+    suggest = sub.add_parser(
+        "suggest-qids", help="propose des Q-ids pour les termes en attente (réseau requis)"
+    )
+    suggest.add_argument("terms", nargs="*", help="termes à chercher (défaut : ceux de la config)")
+    suggest.add_argument("--limit", type=int, default=6, help="candidats par terme")
+
     fetch = sub.add_parser("fetch", help="collecte les lieux candidats depuis Wikidata")
     fetch.add_argument(
         "--min-interval", type=float, default=1.5, help="délai minimum entre deux requêtes (s)"
@@ -215,6 +275,7 @@ def main(argv: list[str] | None = None) -> int:
     config = load_config(args.config)
     handlers = {
         "verify-qids": cmd_verify_qids,
+        "suggest-qids": cmd_suggest_qids,
         "fetch": cmd_fetch,
         "build": cmd_build,
         "apply-review": cmd_apply_review,

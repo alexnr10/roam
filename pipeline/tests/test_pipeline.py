@@ -42,14 +42,44 @@ class TestConfig(unittest.TestCase):
         self.assertTrue(CONFIG.labels)
         self.assertEqual(CONFIG.theme("chateaux").name, "Châteaux")
 
-    def test_every_theme_has_classes(self):
+    def test_every_theme_has_a_source(self):
+        # Soit une classe Wikidata, soit des listes officielles — jamais rien.
         for theme in CONFIG.themes:
-            self.assertTrue(theme.wikidata_classes, theme.id)
+            self.assertTrue(theme.wikidata_classes or theme.from_labels, theme.id)
 
-    def test_non_manual_labels_have_qid(self):
+    def test_label_sourced_themes_reference_known_labels(self):
+        known = {label.id for label in CONFIG.labels}
+        for theme in CONFIG.themes:
+            for label_id in theme.from_labels:
+                self.assertIn(label_id, known, theme.id)
+
+    def test_non_manual_labels_are_resolved_or_pending(self):
+        # Un label sans qid doit porter un terme de recherche : il est en attente
+        # de résolution, pas silencieusement cassé.
         for label in CONFIG.labels:
             if not label.is_manual:
-                self.assertTrue(label.qid, label.id)
+                self.assertTrue(label.qid or label.search, label.id)
+
+    def test_a_theme_without_source_is_rejected(self):
+        from roam_pipeline.config import Theme, _validate
+
+        orphan = Theme(
+            id="orphelin", name="Orphelin", name_singular="Orphelin", icon="",
+            radius_m=100, min_sitelinks=1, cap=10, wikidata_classes=[],
+        )
+        with self.assertRaises(ValueError):
+            _validate([orphan], CONFIG.labels)
+
+    def test_a_theme_pointing_at_an_unknown_label_is_rejected(self):
+        from roam_pipeline.config import Theme, _validate
+
+        broken = Theme(
+            id="casse", name="Cassé", name_singular="Cassé", icon="",
+            radius_m=100, min_sitelinks=1, cap=10, wikidata_classes=[],
+            from_labels=["label-inexistant"],
+        )
+        with self.assertRaises(ValueError):
+            _validate([broken], CONFIG.labels)
 
 
 class TestGeo(unittest.TestCase):
