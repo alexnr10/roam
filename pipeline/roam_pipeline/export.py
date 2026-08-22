@@ -51,6 +51,9 @@ def write_review_csv(places: list[Place], collections: list[Collection], out_pat
     C'est le vrai livrable du pipeline : la liste triée que quelqu'un doit relire
     ligne à ligne. Le pipeline propose, l'humain décide. La colonne `decision`
     est relue par `apply-review`.
+
+    Triée par niveau puis par thème : le travail est trop long pour être fait
+    d'un bloc, il doit pouvoir être fait par tranches utiles.
     """
     membership: dict[str, list[str]] = defaultdict(list)
     best_tier: dict[str, int] = {}
@@ -60,7 +63,14 @@ def write_review_csv(places: list[Place], collections: list[Collection], out_pat
             best_tier[cp.place_id] = min(best_tier.get(cp.place_id, 9), cp.tier)
 
     depts = departements()
-    ordered = sorted(places, key=lambda p: (p.theme_id, -p.score, p.name))
+    # Les niveaux 1 en tête, groupés par thème. Relire 1 900 lignes d'un bloc
+    # est décourageant ; relire d'abord les 200 incontournables donne déjà un
+    # catalogue jouable, et comparer des châteaux entre eux va plus vite que
+    # de sauter d'un thème à l'autre.
+    ordered = sorted(
+        places,
+        key=lambda p: (best_tier.get(p.wikidata_id, 9), p.theme_id, -p.score, p.name),
+    )
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8", newline="") as fh:

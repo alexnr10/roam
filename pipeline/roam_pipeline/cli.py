@@ -139,13 +139,16 @@ def cmd_build(args: argparse.Namespace, config: Config) -> int:
         print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
         return 1
 
-    places = score_all(_load_places(raw_path), config)
-    retained, collections = build_all(places, config)
+    scored = score_all(_load_places(raw_path), config)
+    retained, collections = build_all(scored, config)
 
     write_json(retained, collections, args.out)
     write_review_csv(retained, collections, args.out / "review.csv")
     write_seed_sql(retained, collections, config, args.out / "seed.sql")
-    _print_stats(retained, collections)
+    # La distribution porte sur les candidats BRUTS : calculée sur les lieux
+    # déjà filtrés, elle répéterait le même nombre sous le plancher courant et
+    # ne permettrait pas de le régler.
+    _print_stats(retained, collections, raw=scored)
     return 0
 
 
@@ -194,7 +197,7 @@ def cmd_stats(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
-def _print_stats(places, collections) -> None:
+def _print_stats(places, collections, raw=None) -> None:
     def count(collection) -> int:
         return collection["place_count"] if isinstance(collection, dict) else len(collection.places)
 
@@ -219,14 +222,24 @@ def _print_stats(places, collections) -> None:
     for theme_id, n in themes.most_common():
         print(f"      {theme_id:<16} : {n}")
 
-    _print_sitelink_distribution(places)
+    _print_sitelink_distribution(raw if raw is not None else places, config_floors())
     print()
+
+
+def config_floors() -> dict[str, int]:
+    """Plancher éditorial courant de chaque thème, pour repérer la colonne active."""
+    from .config import load_config
+
+    try:
+        return {theme.id: theme.min_sitelinks for theme in load_config().themes}
+    except Exception:
+        return {}
 
 
 SITELINK_STEPS = (2, 4, 6, 8, 10, 15, 20, 30)
 
 
-def _print_sitelink_distribution(places) -> None:
+def _print_sitelink_distribution(places, floors: dict[str, int] | None = None) -> None:
     """Combien de lieux resteraient par thème selon le plancher de notoriété.
 
     C'est le tableau qui permet de régler `min_sitelinks` sur des chiffres réels
@@ -242,15 +255,24 @@ def _print_sitelink_distribution(places) -> None:
     if not by_theme:
         return
 
+    floors = floors or {}
     header = "  ".join(f"≥{step:<4}" for step in SITELINK_STEPS)
-    print(f"\n  Lieux restants selon le plancher de notoriété (versions Wikipédia) :")
-    print(f"      {'thème':<16} {header}")
+    print("\n  Candidats bruts restants selon le plancher de notoriété :")
+    print(f"      {'thème':<16} {header}  (× = plancher actuel)")
     for theme_id in sorted(by_theme, key=lambda t: -len(by_theme[t])):
         counts = by_theme[theme_id]
-        cells = "  ".join(
-            f"{sum(1 for c in counts if c >= step):<5}" for step in SITELINK_STEPS
-        )
-        print(f"      {theme_id:<16} {cells}")
+        floor = floors.get(theme_id)
+        cells = []
+        for step in SITELINK_STEPS:
+            n = sum(1 for c in counts if c >= step)
+            # Marque la colonne qui correspond au réglage en vigueur.
+            active = floor is not None and step <= floor < (
+                SITELINK_STEPS[SITELINK_STEPS.index(step) + 1]
+                if step != SITELINK_STEPS[-1]
+                else 10**9
+            )
+            cells.append(f"{n}{'×' if active else ' '}".ljust(7))
+        print(f"      {theme_id:<16} {''.join(cells)}")
 
 
 def build_parser() -> argparse.ArgumentParser:

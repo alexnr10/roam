@@ -100,12 +100,24 @@ que ça ne valait pas le déplacement. C'est aussi ce qui rend le brigading coû
 
 ## 8. Volumes visés (France, v1)
 
-| | Objectif |
-|---|---|
-| Lieux publiés | 3 000 – 6 000 |
-| Collections thématiques | 25 – 40 |
-| Lieux par collection | 8 (plancher) – 80 (plafond) |
-| Collections géographiques | dérivées, seulement si ≥ 8 lieux |
+Chiffres révisés après la première collecte réelle. L'estimation initiale de 3 000 à
+6 000 lieux était trop haute : à ce niveau d'exigence, la France en compte moins, et c'est
+une bonne nouvelle — moins de lieux, mais qui valent tous le déplacement.
+
+| | Objectif | Constaté |
+|---|---|---|
+| Candidats bruts collectés | — | ~8 000 |
+| Lieux retenus après plancher | 1 500 – 2 500 | ~1 800 |
+| Collections thématiques | 16 | 16 |
+| Lieux par collection | 8 (plancher) – 80 (plafond) | médiane 19 |
+| Collections géographiques | dérivées, seulement si ≥ 8 lieux | ~200 |
+
+Le plancher de notoriété se règle par thème, sur les chiffres affichés par `build` et non
+à l'estime. Deux réglages méritent d'être expliqués : les **cascades** et le **littoral**
+restent à deux ou trois versions linguistiques, parce qu'une cascade remarquable n'a
+souvent d'article qu'en français — appliquer le seuil des châteaux les ferait disparaître.
+À l'inverse, **sommets** et **musées** montent à douze : là, la notoriété discrimine bien,
+et un sommet documenté dans quatre langues reste un sommet parmi mille.
 
 En dessous de 8 lieux, une collection géographique est absorbée par l'échelon supérieur :
 « Cascades de la Creuse : 2 lieux » n'est pas une collection.

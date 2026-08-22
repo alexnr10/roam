@@ -23,7 +23,7 @@ themes:
     name_singular: Château
     icon: castle
     radius_m: 200
-    min_sitelinks: 6
+    min_sitelinks: 8
     fetch_min_sitelinks: 3
     cap: 80
     wikidata_classes: [Q23413, Q751876, Q1785071]   # château fort, château, fort
@@ -33,7 +33,7 @@ themes:
     name_singular: Cascade
     icon: waterfall
     radius_m: 300
-    min_sitelinks: 3
+    min_sitelinks: 2
     fetch_min_sitelinks: 2
     cap: 60
     wikidata_classes: [Q34038]                       # chute d'eau
@@ -53,7 +53,7 @@ themes:
     name_singular: Site
     icon: beach
     radius_m: 500
-    min_sitelinks: 5
+    min_sitelinks: 3
     fetch_min_sitelinks: 2
     cap: 60
     wikidata_classes: [Q40080, Q107679]              # plage, falaise
@@ -67,7 +67,7 @@ themes:
     name_singular: Abbaye
     icon: abbey
     radius_m: 150
-    min_sitelinks: 6
+    min_sitelinks: 8
     fetch_min_sitelinks: 3
     cap: 60
     wikidata_classes: [Q160742, Q44613]              # abbaye, monastère
@@ -77,7 +77,7 @@ themes:
     name_singular: Cathédrale
     icon: cathedral
     radius_m: 120
-    min_sitelinks: 8
+    min_sitelinks: 10
     fetch_min_sitelinks: 4
     cap: 60
     wikidata_classes: [Q2977, Q163687]               # cathédrale, basilique
@@ -177,7 +177,7 @@ themes:
     name_singular: Site
     icon: megalith
     radius_m: 200
-    min_sitelinks: 5
+    min_sitelinks: 6
     fetch_min_sitelinks: 3
     cap: 50
     wikidata_classes: [Q839954, Q164240, Q101659, Q193475]
