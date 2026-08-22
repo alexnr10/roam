@@ -182,6 +182,43 @@ def _geo_code(place: Place, level: str) -> str | None:
     return None
 
 
+def dedupe_across_themes(places: list[Place], config: Config) -> list[Place]:
+    """Un lieu n'appartient qu'à un seul thème.
+
+    Le château de Versailles est aussi un palais, le Louvre est un palais et un
+    musée : sans ce filtre, ils entreraient deux fois au catalogue, gonfleraient
+    les compteurs et se retrouveraient à relire en double.
+
+    Le thème retenu est le premier déclaré dans `themes.yaml`, dont l'ordre va
+    du plus spécifique au plus générique — un lieu à la fois cathédrale et
+    monument est une cathédrale.
+    """
+    rank = {theme.id: index for index, theme in enumerate(config.themes)}
+    best: dict[str, Place] = {}
+    collisions: list[tuple[str, str, str]] = []
+
+    for place in places:
+        current = best.get(place.wikidata_id)
+        if current is None:
+            best[place.wikidata_id] = place
+            continue
+        winner, loser = (
+            (place, current)
+            if rank.get(place.theme_id, 99) < rank.get(current.theme_id, 99)
+            else (current, place)
+        )
+        best[place.wikidata_id] = winner
+        collisions.append((winner.name, winner.theme_id, loser.theme_id))
+
+    if collisions:
+        LOG.info(
+            "thèmes croisés : %s lieux rattachés à un seul thème (ex. %s)",
+            len(collisions),
+            ", ".join(f"{n} → {w} plutôt que {l}" for n, w, l in collisions[:3]),
+        )
+    return list(best.values())
+
+
 def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
     """Écarte les lieux sous le plancher éditorial de leur thème.
 
@@ -211,7 +248,9 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
 
 
 def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Collection]]:
-    kept = dedupe(apply_notoriety_floor(places, config))
+    # L'ordre compte : on fixe d'abord le thème de chaque lieu, puis on lui
+    # applique le plancher de CE thème, puis on écarte les doublons de lieu.
+    kept = dedupe(apply_notoriety_floor(dedupe_across_themes(places, config), config))
     collections = (
         build_theme_collections(kept, config)
         + build_label_collections(kept, config)

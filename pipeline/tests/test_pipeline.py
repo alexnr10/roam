@@ -11,7 +11,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from roam_pipeline.collections import apply_notoriety_floor, build_all, dedupe, haversine_m
+from roam_pipeline.collections import (
+    apply_notoriety_floor,
+    build_all,
+    dedupe,
+    dedupe_across_themes,
+    haversine_m,
+)
 from roam_pipeline.config import load_config
 from roam_pipeline.export import _sql_str, write_seed_sql
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
@@ -263,6 +269,37 @@ class TestDedupe(unittest.TestCase):
         b = make_place("Site naturel", theme="cascades", lat=45.0, lon=2.0)
         score_all([a, b], CONFIG)
         self.assertEqual(len(dedupe([a, b])), 2)
+
+
+class TestCrossThemeDedupe(unittest.TestCase):
+    """Un lieu ne doit exister qu'une fois, sous son thème le plus spécifique."""
+
+    def _same_place_as(self, *themes: str) -> list[Place]:
+        return [
+            make_place("Château de Versailles", theme=t, wikidata_id="Q2946")
+            for t in themes
+        ]
+
+    def test_the_more_specific_theme_wins(self):
+        # Versailles est un palais, mais c'est d'abord un château.
+        kept = dedupe_across_themes(self._same_place_as("monuments", "chateaux"), CONFIG)
+        self.assertEqual([p.theme_id for p in kept], ["chateaux"])
+
+    def test_order_of_arrival_does_not_matter(self):
+        forward = dedupe_across_themes(self._same_place_as("chateaux", "monuments"), CONFIG)
+        backward = dedupe_across_themes(self._same_place_as("monuments", "chateaux"), CONFIG)
+        self.assertEqual(forward[0].theme_id, backward[0].theme_id)
+
+    def test_a_museum_in_a_palace_stays_a_museum(self):
+        kept = dedupe_across_themes(self._same_place_as("monuments", "musees"), CONFIG)
+        self.assertEqual([p.theme_id for p in kept], ["musees"])
+
+    def test_distinct_places_are_untouched(self):
+        places = [
+            make_place("A", theme="chateaux", wikidata_id="Q1"),
+            make_place("B", theme="monuments", wikidata_id="Q2"),
+        ]
+        self.assertEqual(len(dedupe_across_themes(places, CONFIG)), 2)
 
 
 class TestNotorietyFloor(unittest.TestCase):

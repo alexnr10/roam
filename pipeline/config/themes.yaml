@@ -9,6 +9,12 @@
 #                      terme disparaît d'ici.
 # `from_labels`      : thème alimenté par des listes officielles plutôt que par une
 #                      classe Wikidata.
+#
+# ⚠️  L'ORDRE DE DÉCLARATION EST SIGNIFIANT. Un même lieu peut relever de
+#     plusieurs thèmes — le château de Versailles est aussi un palais, le Louvre
+#     est un palais et un musée. Il n'appartient au catalogue qu'une fois, sous
+#     le PREMIER thème déclaré ici. Les thèmes vont donc du plus spécifique au
+#     plus générique.
 # `radius_m`         : rayon de validation par défaut des lieux du thème (mètres).
 # `min_sitelinks`      : plancher ÉDITORIAL, appliqué à la construction. Se règle
 #                        instantanément, sans recollecter.
@@ -18,6 +24,50 @@
 # `cap`              : nombre maximum de lieux retenus pour la collection nationale.
 
 themes:
+  - id: villages
+    name: Villages de caractère
+    name_singular: Village
+    icon: village
+    radius_m: 600
+    min_sitelinks: 3
+    fetch_min_sitelinks: 2
+    cap: 80
+    wikidata_classes: []
+    from_labels: [plus-beaux-villages, plus-beaux-detours]
+
+  - id: cathedrales
+    name: Cathédrales et basiliques
+    name_singular: Cathédrale
+    icon: cathedral
+    radius_m: 120
+    min_sitelinks: 10
+    fetch_min_sitelinks: 4
+    cap: 60
+    wikidata_classes: [Q2977, Q163687]               # cathédrale, basilique
+
+  # Pas de classe Wikidata : « commune française » ramènerait les 35 000 communes.
+  # Les labels sont ici la seule sélection défendable — et ils sont déjà finis.
+
+  - id: abbayes
+    name: Abbayes et monastères
+    name_singular: Abbaye
+    icon: abbey
+    radius_m: 150
+    min_sitelinks: 8
+    fetch_min_sitelinks: 3
+    cap: 60
+    wikidata_classes: [Q160742, Q44613]              # abbaye, monastère
+
+  - id: musees
+    name: Musées
+    name_singular: Musée
+    icon: museum
+    radius_m: 120
+    min_sitelinks: 12
+    fetch_min_sitelinks: 4
+    cap: 50
+    wikidata_classes: [Q33506]                       # musée
+
   - id: chateaux
     name: Châteaux
     name_singular: Château
@@ -28,6 +78,94 @@ themes:
     cap: 80
     wikidata_classes: [Q23413, Q751876, Q1785071]   # château fort, château, fort
 
+  - id: monuments
+    name: Monuments et édifices remarquables
+    name_singular: Monument
+    icon: monument
+    radius_m: 150
+    min_sitelinks: 10
+    fetch_min_sitelinks: 4
+    cap: 60
+    wikidata_classes: [Q143912, Q170980, Q7362268, Q19757, Q16560]
+    # arc de triomphe, obélisque, amphithéâtre romain, théâtre romain, palais
+    #
+    # « tour (structure) » n'a rien renvoyé : la parenthèse a fait échouer la
+    # recherche. Repris sans elle au prochain tour — c'est la classe qui manque
+    # pour la tour Eiffel.
+    search: ["tour", "beffroi"]
+
+  - id: megalithes
+    name: Mégalithes et sites antiques
+    name_singular: Site
+    icon: megalith
+    radius_m: 200
+    min_sitelinks: 6
+    fetch_min_sitelinks: 3
+    cap: 50
+    wikidata_classes: [Q839954, Q164240, Q101659, Q193475]
+    # site archéologique, mégalithe, dolmen, menhir
+
+  # Trou constaté à la relecture : ni la tour Eiffel ni l'arc de triomphe
+  # n'entraient dans aucun thème. Les Q-ids restent à résoudre — ne rien
+  # écrire de mémoire, c'est la règle depuis la première collecte.
+
+  - id: jardins
+    name: Jardins remarquables
+    name_singular: Jardin
+    icon: garden
+    radius_m: 200
+    min_sitelinks: 5
+    fetch_min_sitelinks: 3
+    cap: 50
+    wikidata_classes: [Q1107656, Q167346]            # jardin, jardin botanique
+    # « jardin public » (Q22746) écarté volontairement : il ramènerait tous les
+    # squares municipaux de France. Le label Jardin remarquable est le filtre.
+
+  - id: phares
+    name: Phares
+    name_singular: Phare
+    icon: lighthouse
+    radius_m: 200
+    min_sitelinks: 5
+    fetch_min_sitelinks: 3
+    cap: 40
+    wikidata_classes: [Q39715]                       # phare
+
+  - id: ponts
+    name: Ponts et viaducs
+    name_singular: Pont
+    icon: bridge
+    radius_m: 300
+    min_sitelinks: 8
+    fetch_min_sitelinks: 3
+    cap: 40
+    wikidata_classes: [Q12280, Q181348, Q13218676]   # pont, viaduc, aqueduc romain
+    # « aqueduc » au sens large (Q474) écarté : c'est l'ouvrage d'adduction
+    # d'eau, y compris les canalisations modernes. L'aqueduc romain, lui, se
+    # visite — c'est la classe du Pont du Gard.
+
+  - id: grottes
+    name: Grottes et gouffres
+    name_singular: Grotte
+    icon: cave
+    radius_m: 200
+    min_sitelinks: 5
+    fetch_min_sitelinks: 3
+    cap: 40
+    wikidata_classes: [Q35509]                       # grotte
+
+  - id: gorges
+    name: Gorges et canyons
+    name_singular: Gorges
+    icon: canyon
+    # Site étendu : le point est celui de l'entrée, le rayon porte la taille.
+    radius_m: 2000
+    min_sitelinks: 3
+    fetch_min_sitelinks: 2
+    cap: 40
+    # « canyon » ne désigne aucune classe distincte sur Wikidata : gorge suffit.
+    wikidata_classes: [Q150784]                      # gorge
+
   - id: cascades
     name: Cascades
     name_singular: Cascade
@@ -37,6 +175,26 @@ themes:
     fetch_min_sitelinks: 2
     cap: 60
     wikidata_classes: [Q34038]                       # chute d'eau
+
+  - id: lacs
+    name: Lacs
+    name_singular: Lac
+    icon: lake
+    radius_m: 1500
+    min_sitelinks: 8
+    fetch_min_sitelinks: 3
+    cap: 50
+    wikidata_classes: [Q23397]                       # lac
+
+  - id: iles
+    name: Îles
+    name_singular: Île
+    icon: island
+    radius_m: 2000
+    min_sitelinks: 10
+    fetch_min_sitelinks: 4
+    cap: 40
+    wikidata_classes: [Q23442]                       # île
 
   - id: sommets
     name: Sommets
@@ -56,159 +214,18 @@ themes:
     min_sitelinks: 3
     fetch_min_sitelinks: 2
     cap: 60
-    wikidata_classes: [Q40080, Q107679]              # plage, falaise
+    wikidata_classes: [Q40080, Q107679, Q185113, Q191992, Q34763]
+    # plage, falaise, cap, cap (promontoire marin), péninsule
+    #
     # Q107679 porte en français le libellé « rempart montagneux », mais sa
     # définition est bien l'escarpement rocheux — c'est la classe d'Étretat.
     # À surveiller en revue : elle ramènera aussi des escarpements de montagne.
-    search: ["cap", "promontoire"]
-
-  - id: abbayes
-    name: Abbayes et monastères
-    name_singular: Abbaye
-    icon: abbey
-    radius_m: 150
-    min_sitelinks: 8
-    fetch_min_sitelinks: 3
-    cap: 60
-    wikidata_classes: [Q160742, Q44613]              # abbaye, monastère
-
-  - id: cathedrales
-    name: Cathédrales et basiliques
-    name_singular: Cathédrale
-    icon: cathedral
-    radius_m: 120
-    min_sitelinks: 10
-    fetch_min_sitelinks: 4
-    cap: 60
-    wikidata_classes: [Q2977, Q163687]               # cathédrale, basilique
-
-  # Pas de classe Wikidata : « commune française » ramènerait les 35 000 communes.
-  # Les labels sont ici la seule sélection défendable — et ils sont déjà finis.
-  - id: villages
-    name: Villages de caractère
-    name_singular: Village
-    icon: village
-    radius_m: 600
-    min_sitelinks: 3
-    fetch_min_sitelinks: 2
-    cap: 80
-    wikidata_classes: []
-    from_labels: [plus-beaux-villages, plus-beaux-detours]
-
-  - id: grottes
-    name: Grottes et gouffres
-    name_singular: Grotte
-    icon: cave
-    radius_m: 200
-    min_sitelinks: 5
-    fetch_min_sitelinks: 3
-    cap: 40
-    wikidata_classes: [Q35509]                       # grotte
-
-  - id: lacs
-    name: Lacs
-    name_singular: Lac
-    icon: lake
-    radius_m: 1500
-    min_sitelinks: 8
-    fetch_min_sitelinks: 3
-    cap: 50
-    wikidata_classes: [Q23397]                       # lac
-
-  - id: phares
-    name: Phares
-    name_singular: Phare
-    icon: lighthouse
-    radius_m: 200
-    min_sitelinks: 5
-    fetch_min_sitelinks: 3
-    cap: 40
-    wikidata_classes: [Q39715]                       # phare
-
-  - id: gorges
-    name: Gorges et canyons
-    name_singular: Gorges
-    icon: canyon
-    # Site étendu : le point est celui de l'entrée, le rayon porte la taille.
-    radius_m: 2000
-    min_sitelinks: 3
-    fetch_min_sitelinks: 2
-    cap: 40
-    # « canyon » ne désigne aucune classe distincte sur Wikidata : gorge suffit.
-    wikidata_classes: [Q150784]                      # gorge
-
-  - id: jardins
-    name: Jardins remarquables
-    name_singular: Jardin
-    icon: garden
-    radius_m: 200
-    min_sitelinks: 5
-    fetch_min_sitelinks: 3
-    cap: 50
-    wikidata_classes: [Q1107656, Q167346]            # jardin, jardin botanique
-    # « jardin public » (Q22746) écarté volontairement : il ramènerait tous les
-    # squares municipaux de France. Le label Jardin remarquable est le filtre.
-
-  - id: musees
-    name: Musées
-    name_singular: Musée
-    icon: museum
-    radius_m: 120
-    min_sitelinks: 12
-    fetch_min_sitelinks: 4
-    cap: 50
-    wikidata_classes: [Q33506]                       # musée
-
-  - id: ponts
-    name: Ponts et viaducs
-    name_singular: Pont
-    icon: bridge
-    radius_m: 300
-    min_sitelinks: 8
-    fetch_min_sitelinks: 3
-    cap: 40
-    wikidata_classes: [Q12280, Q181348, Q13218676]   # pont, viaduc, aqueduc romain
-    # « aqueduc » au sens large (Q474) écarté : c'est l'ouvrage d'adduction
-    # d'eau, y compris les canalisations modernes. L'aqueduc romain, lui, se
-    # visite — c'est la classe du Pont du Gard.
-
-  - id: megalithes
-    name: Mégalithes et sites antiques
-    name_singular: Site
-    icon: megalith
-    radius_m: 200
-    min_sitelinks: 6
-    fetch_min_sitelinks: 3
-    cap: 50
-    wikidata_classes: [Q839954, Q164240, Q101659, Q193475]
-    # site archéologique, mégalithe, dolmen, menhir
-
-  # Trou constaté à la relecture : ni la tour Eiffel ni l'arc de triomphe
-  # n'entraient dans aucun thème. Les Q-ids restent à résoudre — ne rien
-  # écrire de mémoire, c'est la règle depuis la première collecte.
-  - id: monuments
-    name: Monuments et édifices remarquables
-    name_singular: Monument
-    icon: monument
-    radius_m: 150
-    min_sitelinks: 10
-    fetch_min_sitelinks: 4
-    cap: 60
-    wikidata_classes: []
-    search:
-      - "tour (structure)"
-      - "arc de triomphe"
-      - "obélisque"
-      - "amphithéâtre romain"
-      - "théâtre romain"
-      - "palais"
-
-  - id: iles
-    name: Îles
-    name_singular: Île
-    icon: island
-    radius_m: 2000
-    min_sitelinks: 10
-    fetch_min_sitelinks: 4
-    cap: 40
-    wikidata_classes: [Q23442]                       # île
+    #
+    # Deux entités « cap » coexistent sur Wikidata, aux définitions presque
+    # identiques. Les deux sont retenues : si l'une dérive de l'autre, la
+    # requête la couvre déjà, et sinon aucune n'est perdue. La déduplication
+    # par identifiant fait le ménage.
+    #
+    # « promontoire » (Q1245089) écarté : il désigne un éperon rocheux dominant
+    # une étendue quelconque, pas une formation littorale. Il aurait rempli le
+    # thème d'affleurements de l'intérieur des terres.

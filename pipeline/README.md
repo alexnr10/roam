@@ -94,7 +94,11 @@ constituer le premier catalogue publiable.
 
 ## Configuration (`config/`)
 
-- `themes.yaml` — thèmes, classes Wikidata, rayon de validation, plafonds, seuils
+- `themes.yaml` — thèmes, classes Wikidata, rayon de validation, plafonds, seuils.
+  **L'ordre de déclaration est signifiant** : un lieu qui relève de plusieurs thèmes
+  n'entre au catalogue que sous le premier. Les thèmes vont du plus spécifique au plus
+  générique — le château de Versailles est aussi un palais, mais c'est d'abord un
+  château ; le Louvre est un palais, mais c'est d'abord un musée.
 - `labels.yaml` — labels officiels : bonus de score **et** collections dédiées
 - `scoring.yaml` — poids, seuils de niveau, règles de taille des collections
 
