@@ -52,6 +52,17 @@ geo:
   # collections vides du type « Cascades de la Creuse : 2 lieux ».
   cross_theme_levels: [departement, region]
 
+  # Un lieu qu'on ne sait pas rattacher à un département français reste hors de
+  # toute collection géographique : il ne peut apparaître que dans « Le meilleur
+  # de France », où il concurrence le Mont Blanc. C'est le cas des collectivités
+  # d'outre-mer — Polynésie, Nouvelle-Calédonie, Wallis-et-Futuna — qui n'ont pas
+  # de code de département.
+  #
+  # Les DÉPARTEMENTS d'outre-mer (Guadeloupe, Martinique, Guyane, La Réunion,
+  # Mayotte) ont un code et restent au catalogue : la ligne passe entre les DOM
+  # et les COM, pas entre métropole et outre-mer.
+  require_departement: true
+
 alerts:
   # Au-dessus, un sommet demande souvent bien plus qu'une randonnée. Certains
   # ont pourtant un téléphérique : c'est un signal de revue, pas une exclusion.

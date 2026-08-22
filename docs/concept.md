@@ -53,7 +53,7 @@ compétitif à enjeu, ce n'est pas un problème — ne pas sur-ingénierer.
 
 | Sujet | Décision |
 |---|---|
-| Périmètre | France uniquement en v1. Le modèle reste multi-pays (`country_code`). |
+| Périmètre | France uniquement en v1, **départements d'outre-mer compris**. Les collectivités d'outre-mer — Polynésie, Nouvelle-Calédonie, Wallis-et-Futuna — sortent du périmètre : sans code de département, leurs lieux n'entrent dans aucune collection géographique. Le modèle reste multi-pays (`country_code`). |
 | Géométrie d'un lieu | **Toujours un point.** Pour un site étendu (gorges, massif), on prend le point d'entrée ou le point de vue emblématique ; c'est le rayon de validation qui porte la taille. |
 | Cible | Les deux profils — l'habitant qui fait des week-ends près de chez lui, et le voyageur. Départage par le profil utilisateur, pas par le catalogue. |
 | Social | Prévu, mais **v2**. Le modèle de données le réserve (pas de refonte plus tard). |

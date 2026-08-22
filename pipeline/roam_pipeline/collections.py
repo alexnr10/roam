@@ -182,6 +182,28 @@ def _geo_code(place: Place, level: str) -> str | None:
     return None
 
 
+def apply_geographic_scope(places: list[Place], config: Config) -> list[Place]:
+    """Écarte les lieux qu'on ne sait pas rattacher à un département français.
+
+    Sans département, un lieu n'entre dans aucune collection géographique : il
+    ne peut apparaître que dans « Le meilleur de France », où il se retrouve à
+    concurrencer le Mont Blanc. C'est le cas des collectivités d'outre-mer, qui
+    n'ont pas de code de département — les DOM, eux, en ont un et restent.
+    """
+    if not config.collections.require_departement:
+        return places
+
+    kept = [place for place in places if place.departement_code]
+    dropped = [place for place in places if not place.departement_code]
+    if dropped:
+        LOG.info(
+            "hors périmètre : %s lieux sans département français écartés (ex. %s)",
+            len(dropped),
+            ", ".join(place.name for place in dropped[:3]),
+        )
+    return kept
+
+
 def dedupe_across_themes(places: list[Place], config: Config) -> list[Place]:
     """Un lieu n'appartient qu'à un seul thème.
 
@@ -250,7 +272,11 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
 def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Collection]]:
     # L'ordre compte : on fixe d'abord le thème de chaque lieu, puis on lui
     # applique le plancher de CE thème, puis on écarte les doublons de lieu.
-    kept = dedupe(apply_notoriety_floor(dedupe_across_themes(places, config), config))
+    kept = dedupe(
+        apply_notoriety_floor(
+            dedupe_across_themes(apply_geographic_scope(places, config), config), config
+        )
+    )
     collections = (
         build_theme_collections(kept, config)
         + build_label_collections(kept, config)

@@ -78,6 +78,7 @@ class CollectionRules:
     max_places: int
     geo_levels: list[str]
     cross_theme_levels: list[str]
+    require_departement: bool
 
 
 @dataclass(frozen=True)
@@ -151,6 +152,7 @@ def load_config(config_dir: Path | None = None) -> Config:
         max_places=int(raw["collections"]["max_places"]),
         geo_levels=list(raw["geo"]["levels"]),
         cross_theme_levels=list(raw["geo"]["cross_theme_levels"]),
+        require_departement=bool(raw["geo"].get("require_departement", True)),
     )
 
     alerts = Alerts(**raw.get("alerts", {"alpine_elevation_m": 2500}))

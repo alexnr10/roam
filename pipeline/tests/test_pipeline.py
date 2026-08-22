@@ -12,6 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from roam_pipeline.collections import (
+    apply_geographic_scope,
     apply_notoriety_floor,
     build_all,
     dedupe,
@@ -269,6 +270,48 @@ class TestDedupe(unittest.TestCase):
         b = make_place("Site naturel", theme="cascades", lat=45.0, lon=2.0)
         score_all([a, b], CONFIG)
         self.assertEqual(len(dedupe([a, b])), 2)
+
+
+class TestGeographicScope(unittest.TestCase):
+    def test_a_place_without_a_departement_is_dropped(self):
+        # Sans département, un lieu n'entre dans aucune collection
+        # géographique : il ne resterait que dans « Le meilleur de France ».
+        places = [
+            make_place("Mehetia", departement_code=None),
+            make_place("Puy de Dôme", departement_code="63"),
+        ]
+        kept = apply_geographic_scope(places, CONFIG)
+        self.assertEqual([p.name for p in kept], ["Puy de Dôme"])
+
+    def test_overseas_departements_are_kept(self):
+        # La ligne passe entre DOM et COM, pas entre métropole et outre-mer.
+        for code in ("971", "972", "973", "974", "976"):
+            kept = apply_geographic_scope([make_place("outre-mer", departement_code=code)], CONFIG)
+            self.assertEqual(len(kept), 1, code)
+
+
+class TestThemePriority(unittest.TestCase):
+    """L'ordre des thèmes encode des arbitrages constatés sur de vrais lieux."""
+
+    def _wins(self, *themes: str) -> str:
+        places = [make_place("X", theme=t, wikidata_id="Q1") for t in themes]
+        return dedupe_across_themes(places, CONFIG)[0].theme_id
+
+    def test_a_waterfall_in_a_gorge_is_a_waterfall(self):
+        # Le Trou de Fer était classé en gorges.
+        self.assertEqual(self._wins("gorges", "cascades"), "cascades")
+
+    def test_a_painted_cave_is_a_cave(self):
+        # Lascaux est un site archéologique, mais on y va pour la grotte.
+        self.assertEqual(self._wins("megalithes", "grottes"), "grottes")
+
+    def test_a_castle_housing_a_museum_is_a_castle(self):
+        # Castelnaud était classé en musées.
+        self.assertEqual(self._wins("musees", "chateaux"), "chateaux")
+
+    def test_a_museum_in_a_palace_is_a_museum(self):
+        # Le Louvre est un palais, mais c'est d'abord un musée.
+        self.assertEqual(self._wins("monuments", "musees"), "musees")
 
 
 class TestCrossThemeDedupe(unittest.TestCase):

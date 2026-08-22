@@ -191,7 +191,10 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
 
     from .collections import apply_notoriety_floor
 
-    places = apply_notoriety_floor(_load_places(args.out / "places_raw.json"), config)
+    # `scored` garde TOUS les candidats : c'est lui qui alimente la distribution,
+    # qui ne sert à régler le plancher que si elle porte sur l'avant-filtre.
+    scored = score_all(_load_places(args.out / "places_raw.json"), config)
+    places = apply_notoriety_floor(scored, config)
     kept: list[Place] = []
     counts: Counter[str] = Counter()
 
@@ -219,7 +222,7 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
     write_seed_sql(retained, collections, config, args.out / "seed.sql")
 
     print("Décisions :", ", ".join(f"{k}={v}" for k, v in sorted(counts.items())))
-    _print_stats(retained, collections)
+    _print_stats(retained, collections, raw=scored)
     return 0
 
 

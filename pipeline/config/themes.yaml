@@ -58,16 +58,6 @@ themes:
     cap: 60
     wikidata_classes: [Q160742, Q44613]              # abbaye, monastère
 
-  - id: musees
-    name: Musées
-    name_singular: Musée
-    icon: museum
-    radius_m: 120
-    min_sitelinks: 12
-    fetch_min_sitelinks: 4
-    cap: 50
-    wikidata_classes: [Q33506]                       # musée
-
   - id: chateaux
     name: Châteaux
     name_singular: Château
@@ -78,12 +68,22 @@ themes:
     cap: 80
     wikidata_classes: [Q23413, Q751876, Q1785071]   # château fort, château, fort
 
+  - id: musees
+    name: Musées
+    name_singular: Musée
+    icon: museum
+    radius_m: 120
+    min_sitelinks: 12
+    fetch_min_sitelinks: 4
+    cap: 50
+    wikidata_classes: [Q33506]                       # musée
+
   - id: monuments
     name: Monuments et édifices remarquables
     name_singular: Monument
     icon: monument
     radius_m: 150
-    min_sitelinks: 10
+    min_sitelinks: 8
     fetch_min_sitelinks: 4
     cap: 60
     wikidata_classes: [Q143912, Q170980, Q7362268, Q19757, Q16560, Q12518, Q815448]
@@ -97,6 +97,16 @@ themes:
     #
     # Écartés : Q99026497, qui est la charpente supportant les cloches et non
     # l'édifice, et Q750675, qui est le bien UNESCO lui-même et non une classe.
+
+  - id: grottes
+    name: Grottes et gouffres
+    name_singular: Grotte
+    icon: cave
+    radius_m: 200
+    min_sitelinks: 5
+    fetch_min_sitelinks: 3
+    cap: 40
+    wikidata_classes: [Q35509]                       # grotte
 
   - id: megalithes
     name: Mégalithes et sites antiques
@@ -148,15 +158,15 @@ themes:
     # d'eau, y compris les canalisations modernes. L'aqueduc romain, lui, se
     # visite — c'est la classe du Pont du Gard.
 
-  - id: grottes
-    name: Grottes et gouffres
-    name_singular: Grotte
-    icon: cave
-    radius_m: 200
-    min_sitelinks: 5
-    fetch_min_sitelinks: 3
-    cap: 40
-    wikidata_classes: [Q35509]                       # grotte
+  - id: cascades
+    name: Cascades
+    name_singular: Cascade
+    icon: waterfall
+    radius_m: 300
+    min_sitelinks: 2
+    fetch_min_sitelinks: 2
+    cap: 60
+    wikidata_classes: [Q34038]                       # chute d'eau
 
   - id: gorges
     name: Gorges et canyons
@@ -169,16 +179,6 @@ themes:
     cap: 40
     # « canyon » ne désigne aucune classe distincte sur Wikidata : gorge suffit.
     wikidata_classes: [Q150784]                      # gorge
-
-  - id: cascades
-    name: Cascades
-    name_singular: Cascade
-    icon: waterfall
-    radius_m: 300
-    min_sitelinks: 2
-    fetch_min_sitelinks: 2
-    cap: 60
-    wikidata_classes: [Q34038]                       # chute d'eau
 
   - id: lacs
     name: Lacs
