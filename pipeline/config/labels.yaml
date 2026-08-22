@@ -27,14 +27,16 @@ labels:
     authority: Association Les Plus Beaux Villages de France
     score_bonus: 30
     makes_collection: true
-    wikidata_query: { kind: member_of, search: "Les Plus Beaux Villages de France" }
+    wikidata_query: { kind: member_of, qid: Q1010307 }   # l'association ✓
 
   - id: grand-site-de-france
     name: Grand Site de France
     authority: Ministère de la Transition écologique
     score_bonus: 30
     makes_collection: true
-    wikidata_query: { kind: heritage, search: "Grand Site de France" }
+    # Q1154112 est le LABEL ; Q3456789 est le réseau d'associations qui le porte.
+    # Une désignation patrimoniale se rattache au label, pas à l'organisme.
+    wikidata_query: { kind: heritage, qid: Q1154112 }    # le label ✓
 
   # ⚠️ Ces deux-là étaient inversés : Q10387684 est « classé », Q10387575 est
   # « inscrit ». Corrigé d'après la sortie de verify-qids.
@@ -57,14 +59,20 @@ labels:
     authority: Ministère de la Culture
     score_bonus: 18
     makes_collection: true
-    wikidata_query: { kind: heritage, search: "jardin remarquable" }
+    wikidata_query: { kind: heritage, qid: Q498842 }     # le label ✓
 
+  # ⚠️ Mis en attente volontairement. La requête prévue (`instance`) ramènerait
+  # les parcs eux-mêmes, pas les lieux qui s'y trouvent — or le critère C4 de la
+  # charte porte sur l'APPARTENANCE d'un site à un parc, ce qui demande une
+  # propriété de contenance, pas une classe. Plutôt que d'expédier une requête
+  # qui ne fait pas ce qu'elle annonce, le label est neutralisé jusqu'à ce que
+  # la bonne propriété soit vérifiée.
   - id: parc-national
     name: Parc national
     authority: Office français de la biodiversité
     score_bonus: 10
     makes_collection: false
-    wikidata_query: { kind: instance, search: "parc national de France" }
+    wikidata_query: { kind: manual }
 
   # Pas de propriété Wikidata fiable : listes à saisir à la main dans
   # data/manual/<id>.csv (colonnes : name,wikidata_id,note).

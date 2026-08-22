@@ -39,8 +39,7 @@ themes:
     radius_m: 1000
     min_sitelinks: 4
     cap: 60
-    wikidata_classes: [Q8502]                        # montagne
-    search: ["col de montagne"]
+    wikidata_classes: [Q8502, Q2231510]              # montagne, col
 
   - id: plages
     name: Littoral et plages
@@ -49,8 +48,11 @@ themes:
     radius_m: 500
     min_sitelinks: 2
     cap: 60
-    wikidata_classes: [Q40080]                       # plage
-    search: ["falaise", "cap géographique"]
+    wikidata_classes: [Q40080, Q107679]              # plage, falaise
+    # Q107679 porte en français le libellé « rempart montagneux », mais sa
+    # définition est bien l'escarpement rocheux — c'est la classe d'Étretat.
+    # À surveiller en revue : elle ramènera aussi des escarpements de montagne.
+    search: ["cap", "promontoire"]
 
   - id: abbayes
     name: Abbayes et monastères
@@ -117,8 +119,8 @@ themes:
     radius_m: 2000
     min_sitelinks: 3
     cap: 40
+    # « canyon » ne désigne aucune classe distincte sur Wikidata : gorge suffit.
     wikidata_classes: [Q150784]                      # gorge
-    search: ["canyon"]
 
   - id: jardins
     name: Jardins remarquables
@@ -127,8 +129,9 @@ themes:
     radius_m: 200
     min_sitelinks: 3
     cap: 50
-    wikidata_classes: [Q1107656]                     # jardin
-    search: ["jardin botanique", "parc urbain"]
+    wikidata_classes: [Q1107656, Q167346]            # jardin, jardin botanique
+    # « jardin public » (Q22746) écarté volontairement : il ramènerait tous les
+    # squares municipaux de France. Le label Jardin remarquable est le filtre.
 
   - id: musees
     name: Musées
@@ -146,8 +149,10 @@ themes:
     radius_m: 300
     min_sitelinks: 4
     cap: 40
-    wikidata_classes: [Q12280]                       # pont
-    search: ["viaduc", "aqueduc"]
+    wikidata_classes: [Q12280, Q181348, Q13218676]   # pont, viaduc, aqueduc romain
+    # « aqueduc » au sens large (Q474) écarté : c'est l'ouvrage d'adduction
+    # d'eau, y compris les canalisations modernes. L'aqueduc romain, lui, se
+    # visite — c'est la classe du Pont du Gard.
 
   - id: megalithes
     name: Mégalithes et sites antiques
@@ -156,8 +161,8 @@ themes:
     radius_m: 200
     min_sitelinks: 3
     cap: 50
-    wikidata_classes: [Q839954]                      # site archéologique
-    search: ["dolmen", "menhir", "mégalithe"]
+    wikidata_classes: [Q839954, Q164240, Q101659, Q193475]
+    # site archéologique, mégalithe, dolmen, menhir
 
   - id: iles
     name: Îles
