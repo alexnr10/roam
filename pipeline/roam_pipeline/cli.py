@@ -16,11 +16,18 @@ from .export import (
     read_review_csv,
     write_json,
     write_review_csv,
+    write_app_catalog,
     write_review_html,
     write_seed_sql,
 )
-from .fetch import enrich_article_sizes, enrich_departements, enrich_flags, run_fetch
-from .models import Place
+from .fetch import (
+    enrich_article_sizes,
+    enrich_departements,
+    enrich_flags,
+    enrich_summaries,
+    run_fetch,
+)
+from .models import Collection, CollectionPlace, Place
 from .score import score_all
 
 LOG = logging.getLogger("roam")
@@ -154,6 +161,8 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     found = enrich_article_sizes(places)
     enrich_flags(wd.SparqlClient(), places)
     enrich_departements(places)
+    if not args.skip_summaries:
+        enrich_summaries(places)
     raw_path.write_text(
         json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),
         encoding="utf-8",
@@ -224,6 +233,42 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
 
     print("Décisions :", ", ".join(f"{k}={v}" for k, v in sorted(counts.items())))
     _print_stats(retained, collections, raw=scored)
+    return 0
+
+
+APP_CATALOG = BASE_DIR.parent / "mobile" / "src" / "data" / "catalog.json"
+
+
+def cmd_export_app(args: argparse.Namespace, config: Config) -> int:
+    """Remplace le catalogue de l'application par celui qui vient d'être construit."""
+    places_path = args.out / "places.json"
+    collections_path = args.out / "collections.json"
+    if not places_path.exists():
+        print(f"{places_path} absent — lance d'abord `build`.", file=sys.stderr)
+        return 1
+
+    places = _load_places(places_path)
+    raw_collections = json.loads(collections_path.read_text(encoding="utf-8"))
+    collections = [
+        Collection(
+            slug=c["slug"],
+            name=c["name"],
+            kind=c["kind"],
+            theme_id=c.get("theme_id"),
+            label_id=c.get("label_id"),
+            geo_level=c.get("geo_level"),
+            geo_code=c.get("geo_code"),
+            places=[
+                CollectionPlace(placeId["place_id"], placeId["tier"], placeId["rank"])
+                for placeId in c["places"]
+            ],
+        )
+        for c in raw_collections
+    ]
+
+    write_app_catalog(places, collections, config, args.to)
+    print(f"Catalogue écrit dans {args.to}")
+    print("Relance l'application : elle le lira au prochain démarrage.")
     return 0
 
 
@@ -383,8 +428,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="ne recollecter que ces thèmes ; les autres sont conservés",
     )
 
-    sub.add_parser(
-        "enrich", help="ajoute la taille des articles francophones (réseau requis)"
+    enrich = sub.add_parser(
+        "enrich",
+        help="complète tailles d'articles, descriptions, signaux et départements",
+    )
+    enrich.add_argument(
+        "--skip-summaries",
+        action="store_true",
+        help="ne pas récupérer les descriptions (la passe la plus longue)",
     )
 
     sub.add_parser("build", help="score, construit les collections et exporte")
@@ -407,6 +458,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     sub.add_parser("stats", help="statistiques du catalogue construit")
+
+    app = sub.add_parser("export-app", help="écrit le catalogue dans l'application")
+    app.add_argument("--to", type=Path, default=APP_CATALOG, help="fichier de destination")
 
     serve = sub.add_parser("review", help="ouvre la page de revue dans le navigateur")
     serve.add_argument("--port", type=int, default=8765)
@@ -432,5 +486,6 @@ def main(argv: list[str] | None = None) -> int:
         "apply-review": cmd_apply_review,
         "stats": cmd_stats,
         "review": cmd_review,
+        "export-app": cmd_export_app,
     }
     return handlers[args.command](args, config)

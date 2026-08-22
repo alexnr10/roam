@@ -49,4 +49,5 @@ export const themeEmoji: Record<string, string> = {
   lacs: '🏔️',
   ponts: '🌉',
   phares: '🗼',
+  monuments: '🗿',
 };

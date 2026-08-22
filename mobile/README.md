@@ -71,10 +71,13 @@ src/ui/                 composants et carte
 
 ## Limites connues
 
-- **Le catalogue est une démonstration** : 46 lieux saisis à la main, coordonnées
-  approximatives, notoriété appréciée à l'œil. Il a exactement la forme produite par le
-  pipeline de curation, donc le remplacer ne touchera que `src/data/catalog.ts`.
-  Régénération : `python3 mobile/scripts/build-demo-catalog.py`.
+- **Le catalogue** est `src/data/catalog.json`, produit par
+  `python -m roam_pipeline export-app`. Tant que le pipeline n'a pas tourné, le dépôt
+  embarque un jeu de démonstration de la même forme — 46 lieux saisis à la main, aux
+  coordonnées approximatives (`python3 mobile/scripts/build-demo-catalog.py`).
+- **Descriptions et images viennent de Wikipédia et Wikimedia Commons** (CC BY-SA). La
+  fiche d'un lieu cite la source et renvoie vers l'article : c'est une obligation de la
+  licence, pas une politesse.
 - **Pas de compte utilisateur** : tout est local à l'appareil. Le branchement Supabase
   viendra avec le vrai catalogue.
 - **Carte via `react-native-maps`**, choisi pour fonctionner dans Expo Go sans build

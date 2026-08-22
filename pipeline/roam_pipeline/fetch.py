@@ -9,7 +9,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from . import wikidata as wd
-from .wikipedia import WikipediaClient, title_from_url
+from .wikipedia import EXTRACT_BATCH, WikipediaClient, title_from_url
 from .config import Config, Label, Theme
 from .geo import normalize_dept_code, region_of
 from .geocode import AddressClient, CommuneClient, departement_from_insee
@@ -208,6 +208,48 @@ def enrich_article_sizes(places: list[Place], client: WikipediaClient | None = N
             found += 1
 
     LOG.info("taille d'article renseignée pour %s/%s articles", found, len(titles))
+    return found
+
+
+def enrich_summaries(places: list[Place], client: WikipediaClient | None = None) -> int:
+    """Récupère une description courte pour chaque lieu.
+
+    Sans elle, la fiche d'un lieu n'affiche qu'un nom et un thème — ce qui ne
+    donne aucune raison d'y aller. Le texte vient de Wikipédia (CC BY-SA), et
+    la fiche cite déjà sa source.
+    """
+    client = client or WikipediaClient()
+    by_title: dict[str, list[Place]] = defaultdict(list)
+    for place in places:
+        title = title_from_url(place.wikipedia_url)
+        if title and not place.summary:
+            by_title[title].append(place)
+
+    titles = sorted(by_title)
+    if not titles:
+        LOG.info("descriptions : rien à récupérer")
+        return 0
+
+    # `prop=extracts` est plafonné à vingt titres : la collecte est plus longue
+    # que celle des tailles d'articles, d'où l'annonce préalable.
+    batches = (len(titles) + EXTRACT_BATCH - 1) // EXTRACT_BATCH
+    LOG.info("descriptions : %s articles, %s requêtes (~%s s)", len(titles), batches, batches)
+
+    found = 0
+    for index, batch in enumerate(wd.chunked(titles, EXTRACT_BATCH), start=1):
+        try:
+            summaries = client.intros(batch)
+        except Exception as exc:
+            LOG.error("descriptions : lot %s/%s échoué (%s)", index, batches, exc)
+            continue
+        for title, text in summaries.items():
+            for place in by_title[title]:
+                place.summary = text
+            found += 1
+        if index % 50 == 0:
+            LOG.info("descriptions : %s/%s requêtes", index, batches)
+
+    LOG.info("descriptions récupérées pour %s/%s articles", found, len(titles))
     return found
 
 

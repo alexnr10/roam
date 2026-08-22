@@ -558,3 +558,98 @@ render();
 </body>
 </html>
 """
+
+
+# ---------------------------------------------------------------------------
+# Catalogue de l'application
+# ---------------------------------------------------------------------------
+
+def write_app_catalog(
+    places: list[Place],
+    collections: list[Collection],
+    config: Config,
+    out_path: Path,
+) -> None:
+    """Écrit le catalogue dans la forme attendue par l'application.
+
+    Le pipeline nomme ses champs en `snake_case`, l'application en `camelCase` :
+    la conversion vit ici plutôt que dans l'application, pour que celle-ci n'ait
+    jamais à connaître les conventions du pipeline.
+
+    Seuls les lieux effectivement rattachés à une collection sortent — un lieu
+    que l'application ne pourrait afficher nulle part n'a rien à y faire.
+    """
+    depts = departements()
+    used = {cp.place_id for c in collections for cp in c.places}
+
+    app_places = []
+    for place in places:
+        if place.wikidata_id not in used:
+            continue
+        dept = depts.get(place.departement_code or "")
+        app_places.append(
+            {
+                "id": place.wikidata_id,
+                "slug": place.slug,
+                "name": place.name,
+                "themeId": place.theme_id,
+                "lat": round(place.lat, 6),
+                "lon": round(place.lon, 6),
+                "radiusM": place.validation_radius_m,
+                "score": place.score,
+                "departement": dept.name if dept else None,
+                "regionCode": place.region_code,
+                "summary": place.summary,
+                "imageUrl": _thumbnail(place.image_url, 800) or None,
+                "wikipediaUrl": place.wikipedia_url,
+            }
+        )
+
+    app_collections = [
+        {
+            "slug": collection.slug,
+            "name": collection.name,
+            "kind": collection.kind,
+            "themeId": collection.theme_id,
+            "labelId": collection.label_id,
+            "geoLevel": collection.geo_level,
+            "geoCode": collection.geo_code,
+            "placeCount": len(collection.places),
+            "tierCounts": collection.tier_counts,
+            "places": [
+                {"placeId": cp.place_id, "tier": cp.tier, "rank": cp.rank}
+                for cp in collection.places
+            ],
+        }
+        for collection in collections
+    ]
+
+    payload = {
+        "_note": (
+            "Généré par `roam_pipeline export-app`. Ne pas éditer à la main. "
+            "Descriptions et images issues de Wikipédia et Wikimedia Commons "
+            "(CC BY-SA) — l'application doit citer la source."
+        ),
+        "themes": [
+            {
+                "id": theme.id,
+                "name": theme.name,
+                "nameSingular": theme.name_singular,
+                "icon": theme.icon,
+            }
+            for theme in config.themes
+        ],
+        "places": app_places,
+        "collections": app_collections,
+    }
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=1) + "\n", encoding="utf-8"
+    )
+    LOG.info(
+        "catalogue de l'application : %s (%s lieux, %s collections)",
+        out_path,
+        len(app_places),
+        len(app_collections),
+    )

@@ -24,6 +24,8 @@ API = "https://fr.wikipedia.org/w/api.php"
 USER_AGENT = "RoamCatalogBot/0.1 (https://github.com/alexnr10/roam) python-requests"
 # L'API MediaWiki accepte cinquante titres par appel pour les clients anonymes.
 BATCH = 50
+# `prop=extracts` est plus coûteux et plafonné à vingt titres par requête.
+EXTRACT_BATCH = 20
 
 
 def title_from_url(url: str | None) -> str | None:
@@ -93,3 +95,54 @@ class WikipediaClient:
             if resolved in by_title:
                 sizes[title] = by_title[resolved]
         return sizes
+
+    def intros(self, titles: list[str], sentences: int = 2) -> dict[str, str]:
+        """Deux premières phrases de l'article, en texte brut.
+
+        Sert de description dans l'application. Le contenu vient de Wikipédia,
+        sous licence CC BY-SA : l'écran du lieu doit citer la source et pointer
+        vers l'article, ce que fait déjà la fiche.
+        """
+        summaries: dict[str, str] = {}
+        if not titles:
+            return summaries
+
+        self._throttle()
+        response = self._session.get(
+            API,
+            params={
+                "action": "query",
+                "format": "json",
+                "formatversion": "2",
+                "prop": "extracts",
+                "exintro": "1",
+                "explaintext": "1",
+                "exsentences": str(sentences),
+                "titles": "|".join(titles),
+                "redirects": "1",
+            },
+            timeout=self.timeout_s,
+        )
+        response.raise_for_status()
+        payload = response.json().get("query", {})
+
+        alias: dict[str, str] = {}
+        for entry in payload.get("normalized", []):
+            alias[entry["from"]] = entry["to"]
+        for entry in payload.get("redirects", []):
+            alias[entry["from"]] = entry["to"]
+
+        by_title = {
+            page["title"]: (page.get("extract") or "").strip()
+            for page in payload.get("pages", [])
+            if not page.get("missing")
+        }
+
+        for title in titles:
+            resolved = title
+            for _ in range(3):
+                resolved = alias.get(resolved, resolved)
+            text = by_title.get(resolved)
+            if text:
+                summaries[title] = text
+        return summaries

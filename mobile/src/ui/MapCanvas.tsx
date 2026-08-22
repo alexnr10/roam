@@ -85,7 +85,7 @@ export function MapCanvas({
             key={place.id}
             coordinate={{ latitude: place.lat, longitude: place.lon }}
             title={place.name}
-            description={place.summary}
+            description={place.summary ?? undefined}
             onCalloutPress={() => onSelectPlace(place)}
             onPress={() => onSelectPlace(place)}
           >

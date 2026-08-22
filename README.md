@@ -46,8 +46,12 @@ python -m roam_pipeline verify-qids     # ⚠️ à faire en premier
 python -m roam_pipeline fetch
 python -m roam_pipeline build
 
-# 2. Relire data/out/review.csv à la main, puis
-python -m roam_pipeline apply-review --strict
+# 2. Relire dans le navigateur, puis réinjecter les décisions
+python -m roam_pipeline review
+python -m roam_pipeline apply-review --review ~/Downloads/review-decisions.csv
+
+#    et brancher le catalogue dans l'application
+python -m roam_pipeline export-app
 
 # 3. Charger dans une base locale (Postgres + PostGIS requis)
 cd .. && ./db/local/validate.sh

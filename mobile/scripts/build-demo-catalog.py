@@ -6,8 +6,8 @@ main, précision de l'ordre de la centaine de mètres) et la notoriété est une
 appréciation, pas une mesure. Ce fichier existe uniquement pour faire tourner le
 prototype avant que le pipeline de curation n'ait produit le vrai catalogue.
 
-À remplacer par `pipeline/data/out/places.json` + `collections.json`, dont il
-reproduit exactement la forme.
+Il occupe la place du vrai catalogue en attendant : `roam_pipeline export-app`
+écrase ce fichier avec la sortie du pipeline de curation.
 
     python3 mobile/scripts/build-demo-catalog.py
 """
@@ -21,7 +21,7 @@ from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "mobile" / "src" / "data" / "demo-catalog.json"
+OUT = ROOT / "mobile" / "src" / "data" / "catalog.json"
 
 THEMES = [
     ("chateaux", "Châteaux", "Château", "castle", 200),

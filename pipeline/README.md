@@ -41,6 +41,9 @@ python -m roam_pipeline review
 #    puis réinjecter le fichier de décisions téléchargé
 python -m roam_pipeline apply-review --review ~/Downloads/review-decisions.csv
 
+# 5. Brancher le catalogue dans l'application
+python -m roam_pipeline export-app
+
 # statistiques du catalogue courant
 python -m roam_pipeline stats
 ```
@@ -55,6 +58,10 @@ python -m roam_pipeline stats
 | `review.html` | **la page de revue** — avec vignettes, c'est par là qu'on relit |
 | `review.csv` | la même chose en tableur, pour qui préfère |
 | `seed.sql` | seed idempotent pour la base |
+
+`export-app` écrit en plus `mobile/src/data/catalog.json`, le fichier que lit
+l'application. Il ne contient que les lieux effectivement rattachés à une collection : un
+lieu que l'application ne pourrait afficher nulle part n'a rien à y faire.
 
 ## La revue
 

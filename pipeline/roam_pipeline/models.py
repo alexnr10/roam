@@ -29,6 +29,9 @@ class Place:
     # Taille de l'article francophone, en octets. Complète le décompte de langues
     # là où celui-ci ne discrimine rien — typiquement les sites naturels.
     article_bytes: int = 0
+    # Deux premières phrases de l'article francophone (CC BY-SA), affichées
+    # comme description dans l'application.
+    summary: str | None = None
     image_url: str | None = None
     commons_category: str | None = None
     elevation_m: int | None = None

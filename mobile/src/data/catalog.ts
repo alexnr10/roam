@@ -1,13 +1,13 @@
-import raw from './demo-catalog.json';
+import raw from './catalog.json';
 import type { Catalog, Collection, Place, Theme } from '../types';
 
 /**
  * Accès au catalogue.
  *
- * Le catalogue est aujourd'hui un fichier de démonstration embarqué. Il a
- * exactement la forme produite par le pipeline de curation, donc le
- * remplacement par les vraies données — puis par un appel réseau borné à
- * l'emprise de la carte — ne touchera que ce module.
+ * `catalog.json` est produit par `roam_pipeline export-app`. Tant que le
+ * pipeline n'a pas tourné, il contient un jeu de démonstration de la même
+ * forme. Le passage à un appel réseau borné à l'emprise de la carte ne
+ * touchera que ce module.
  */
 
 const catalog = raw as unknown as Catalog;

@@ -1,6 +1,14 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Linking,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 import {
   getCollectionsForPlace,
@@ -57,7 +65,23 @@ export default function PlaceScreen() {
       </Text>
 
       {place.summary ? (
-        <Text style={[type.body, styles.summary]}>{place.summary}</Text>
+        <>
+          <Text style={[type.body, styles.summary]}>{place.summary}</Text>
+          <Text style={[type.small, { marginTop: spacing.sm }]}>
+            D'après{' '}
+            {place.wikipediaUrl ? (
+              <Text
+                style={{ color: colors.primary }}
+                onPress={() => Linking.openURL(place.wikipediaUrl as string)}
+              >
+                Wikipédia
+              </Text>
+            ) : (
+              'Wikipédia'
+            )}{' '}
+            · CC BY-SA
+          </Text>
+        </>
       ) : null}
 
       <Card style={{ marginTop: spacing.lg, gap: spacing.md }}>

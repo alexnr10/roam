@@ -22,8 +22,10 @@ export type Place = {
   score: number;
   departement: string | null;
   regionCode: string | null;
-  summary?: string;
+  summary?: string | null;
   imageUrl?: string | null;
+  /** Source de la description : l'écran du lieu doit y renvoyer (CC BY-SA). */
+  wikipediaUrl?: string | null;
 };
 
 export type CollectionKind = 'theme' | 'geo' | 'label';
