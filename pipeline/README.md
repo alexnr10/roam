@@ -113,13 +113,23 @@ coordonnées. S'appuyer dessus laissait huit cent vingt lieux de métropole sans
 département, donc hors de toute collection géographique — et le filtre de périmètre les
 écartait comme s'ils étaient à l'étranger.
 
-`enrich` part donc des coordonnées, qui elles sont toujours là, et interroge l'API Adresse
-de l'État — gratuite, sans clé, faite pour ça. Elle rend le code INSEE de la commune, dont
-le code de département se déduit exactement : deux chiffres en métropole, une lettre en
-Corse (`2A004`), trois chiffres outre-mer (`97411`).
+`enrich` part donc des coordonnées, qui elles sont toujours là, en deux passes :
 
-Un point hors de France ne renvoie rien : le filtre de périmètre redevient ce qu'il devait
-être, une frontière et non un symptôme de données manquantes.
+1. **API Adresse**, par lots de cinq cents. Rapide, mais elle cherche l'*adresse* la plus
+   proche — et une cascade au fond d'une forêt vosgienne n'en a aucune à portée. Elle
+   revient vide sur exactement les lieux qui posaient problème.
+2. **API Géo**, point par point, pour le reste. Elle répond par appartenance au polygone
+   communal : c'est la bonne question pour un lieu qui n'est pas une adresse. Plus lente,
+   mais elle ne traite que les cas restants.
+
+Le code INSEE de commune donne le département, à condition de connaître ses trois formes :
+deux chiffres en métropole, une lettre en Corse (`2A004`), trois chiffres outre-mer
+(`97411`). Le code de région, lui, est déduit du référentiel local plutôt que repris de la
+réponse — il rate les communes mal rattachées.
+
+Ce qui reste sans commune après les deux passes est hors de France ou en mer : un îlot, un
+phare isolé. Le filtre de périmètre redevient alors une frontière, et non un symptôme de
+données manquantes.
 
 ### Deux signaux de notoriété, et pourquoi
 

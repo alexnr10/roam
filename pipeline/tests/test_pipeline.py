@@ -23,7 +23,8 @@ from roam_pipeline.config import load_config
 from roam_pipeline.export import _sql_str, write_seed_sql
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
 from roam_pipeline.models import Place, slugify
-from roam_pipeline.geocode import AddressClient, departement_from_insee
+from roam_pipeline.fetch import enrich_departements
+from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from_insee
 from roam_pipeline.wikipedia import title_from_url
 from roam_pipeline.score import assign_tiers, compute_score, label_bonus, score_all
 
@@ -346,6 +347,59 @@ class TestReverseGeocoding(unittest.TestCase):
         client, session = self._client("")
         self.assertEqual(client.reverse([]), {})
         self.assertIsNone(session.sent)
+
+
+class TestTwoTierGeocoding(unittest.TestCase):
+    """L'API Géo doit rattraper ce que l'API Adresse ne trouve pas."""
+
+    class _Address:
+        def __init__(self, codes: dict[str, str]):
+            self.codes = codes
+            self.calls = 0
+
+        def reverse(self, points):
+            self.calls += 1
+            return {i: self.codes[i] for i, _, _ in points if i in self.codes}
+
+    class _Commune:
+        def __init__(self, answer):
+            self.answer = answer
+            self.calls = 0
+
+        def locate(self, lat, lon):
+            self.calls += 1
+            return self.answer
+
+    def test_the_second_pass_only_sees_what_the_first_missed(self):
+        trouve = make_place("Château", wikidata_id="Q1", departement_code=None)
+        isole = make_place("Cascade du Rudlin", wikidata_id="Q2", departement_code=None)
+        address = self._Address({"Q1": "63113"})
+        commune = self._Commune(("88", "44"))
+
+        resolved = enrich_departements([trouve, isole], address, commune)
+
+        self.assertEqual(resolved, 2)
+        self.assertEqual(trouve.departement_code, "63")
+        self.assertEqual(isole.departement_code, "88")
+        # Un seul appel unitaire : celui du lieu que la première passe a raté.
+        self.assertEqual(commune.calls, 1)
+
+    def test_the_region_follows_from_the_departement(self):
+        place = make_place("Cascade", wikidata_id="Q2", departement_code=None, region_code=None)
+        enrich_departements([place], self._Address({}), self._Commune(("88", "99")))
+        # Le référentiel local fait foi sur le code de région, pas la réponse.
+        self.assertEqual(place.region_code, "44")
+
+    def test_a_point_at_sea_stays_unresolved(self):
+        place = make_place("Îlot", wikidata_id="Q3", departement_code=None)
+        self.assertEqual(enrich_departements([place], self._Address({}), self._Commune(None)), 0)
+        self.assertIsNone(place.departement_code)
+
+    def test_places_already_located_are_left_alone(self):
+        place = make_place("Connu", departement_code="15")
+        address = self._Address({})
+        self.assertEqual(enrich_departements([place], address, self._Commune(None)), 0)
+        self.assertEqual(address.calls, 0)
 
 
 class TestGeographicScope(unittest.TestCase):

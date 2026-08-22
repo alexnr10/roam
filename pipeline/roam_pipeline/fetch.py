@@ -12,7 +12,7 @@ from . import wikidata as wd
 from .wikipedia import WikipediaClient, title_from_url
 from .config import Config, Label, Theme
 from .geo import normalize_dept_code, region_of
-from .geocode import AddressClient, departement_from_insee
+from .geocode import AddressClient, CommuneClient, departement_from_insee
 from .models import Place
 
 LOG = logging.getLogger(__name__)
@@ -211,42 +211,74 @@ def enrich_article_sizes(places: list[Place], client: WikipediaClient | None = N
     return found
 
 
-def enrich_departements(places: list[Place], client: AddressClient | None = None) -> int:
+def enrich_departements(
+    places: list[Place],
+    address_client: AddressClient | None = None,
+    commune_client: CommuneClient | None = None,
+) -> int:
     """Rattache par coordonnées les lieux que Wikidata ne situe pas.
 
-    Wikidata omet souvent `P131` sur les sites naturels : une cascade n'a que
-    ses coordonnées. Elles suffisent — le géocodage inverse de l'API Adresse
-    rend le code INSEE de la commune, dont le département se déduit exactement.
+    Deux passes, dans cet ordre :
+
+    1. **API Adresse**, par lots de cinq cents. Rapide, mais elle cherche
+       l'adresse la plus proche : un lieu isolé n'en a aucune à portée.
+    2. **API Géo**, point par point, pour le reste. Elle répond par
+       appartenance au polygone communal — la bonne question pour une cascade
+       au fond d'une forêt. Plus lente, mais elle ne sert qu'aux cas restants.
     """
     missing = [p for p in places if not p.departement_code]
     if not missing:
         LOG.info("rattachement : tous les lieux ont déjà un département")
         return 0
 
-    client = client or AddressClient()
+    LOG.info("rattachement : %s lieux sans département", len(missing))
     resolved = 0
 
+    def assign(place: Place, dept: str | None, region: str | None = None) -> bool:
+        dept = normalize_dept_code(dept)
+        if not dept:
+            return False
+        place.departement_code = dept
+        known = region_of(dept)
+        place.region_code = known.code if known else region or place.region_code
+        return True
+
+    address_client = address_client or AddressClient()
     for batch in wd.chunked(missing, 500):
-        points = [(place.wikidata_id, place.lat, place.lon) for place in batch]
         try:
-            codes = client.reverse(points)
+            codes = address_client.reverse(
+                [(place.wikidata_id, place.lat, place.lon) for place in batch]
+            )
         except Exception as exc:
-            LOG.error("géocodage inverse : lot échoué (%s)", exc)
+            LOG.error("API Adresse : lot échoué (%s)", exc)
             continue
         for place in batch:
-            dept = normalize_dept_code(departement_from_insee(codes.get(place.wikidata_id)))
-            if not dept:
-                continue
-            place.departement_code = dept
-            region = region_of(dept)
-            place.region_code = region.code if region else place.region_code
-            resolved += 1
+            if assign(place, departement_from_insee(codes.get(place.wikidata_id))):
+                resolved += 1
 
-    LOG.info(
-        "rattachement par coordonnées : %s/%s lieux situés (les autres sont hors de France)",
-        resolved,
-        len(missing),
-    )
+    still_missing = [p for p in missing if not p.departement_code]
+    if still_missing:
+        LOG.info(
+            "API Géo : %s lieux restants, interrogés un par un (~%s s)",
+            len(still_missing),
+            int(len(still_missing) * 0.06),
+        )
+        commune_client = commune_client or CommuneClient()
+        for place in still_missing:
+            found = commune_client.locate(place.lat, place.lon)
+            if found and assign(place, found[0], found[1]):
+                resolved += 1
+
+    unresolved = [p for p in missing if not p.departement_code]
+    LOG.info("rattachement par coordonnées : %s/%s lieux situés", resolved, len(missing))
+    if unresolved:
+        # Ceux-là sont soit hors de France, soit en mer — un phare isolé, un
+        # îlot. Les nommer évite de conclure trop vite à une panne.
+        LOG.info(
+            "%s lieux restent sans commune (hors de France ou en mer) : %s",
+            len(unresolved),
+            ", ".join(p.name for p in unresolved[:5]),
+        )
     return resolved
 
 

@@ -23,6 +23,7 @@ import requests
 LOG = logging.getLogger(__name__)
 
 REVERSE_CSV = "https://api-adresse.data.gouv.fr/reverse/csv/"
+COMMUNES = "https://geo.api.gouv.fr/communes"
 USER_AGENT = "RoamCatalogBot/0.1 (https://github.com/alexnr10/roam) python-requests"
 # L'API accepte de gros lots ; on reste modeste pour rester poli et pouvoir
 # reprendre sans tout perdre en cas d'échec.
@@ -87,3 +88,70 @@ class AddressClient:
             if identifier and citycode:
                 out[identifier] = citycode
         return out
+
+
+class CommuneClient:
+    """Commune contenant un point, par l'API Géo.
+
+    L'API Adresse cherche l'ADRESSE la plus proche : une cascade au fond d'une
+    forêt vosgienne n'en a aucune à portée, et la requête revient vide. C'est ce
+    qui laissait des centaines de sites naturels sans département alors qu'ils
+    sont en pleine métropole.
+
+    L'API Géo, elle, répond par appartenance au polygone communal. C'est la
+    bonne question à poser pour un lieu qui n'est pas une adresse — au prix d'un
+    appel par point, là où l'API Adresse traite un lot entier.
+    """
+
+    def __init__(self, min_interval_s: float = 0.05, timeout_s: int = 20,
+                 max_retries: int = 3) -> None:
+        self.min_interval_s = min_interval_s
+        self.timeout_s = timeout_s
+        self.max_retries = max_retries
+        self._last_call = 0.0
+        self._session = requests.Session()
+        self._session.headers.update({"User-Agent": USER_AGENT})
+
+    def _throttle(self) -> None:
+        elapsed = time.monotonic() - self._last_call
+        if elapsed < self.min_interval_s:
+            time.sleep(self.min_interval_s - elapsed)
+        self._last_call = time.monotonic()
+
+    def locate(self, lat: float, lon: float) -> tuple[str, str] | None:
+        """`(code de département, code de région)`, ou None hors de France."""
+        delay = 1.0
+        for attempt in range(1, self.max_retries + 1):
+            self._throttle()
+            try:
+                response = self._session.get(
+                    COMMUNES,
+                    params={
+                        "lat": f"{lat:.6f}",
+                        "lon": f"{lon:.6f}",
+                        "fields": "codeDepartement,codeRegion",
+                        "format": "json",
+                    },
+                    timeout=self.timeout_s,
+                )
+            except requests.RequestException:
+                time.sleep(delay)
+                delay *= 2
+                continue
+
+            if response.status_code == 429:
+                time.sleep(delay)
+                delay *= 2
+                continue
+            if response.status_code != 200:
+                return None
+
+            payload = response.json()
+            if not payload:
+                return None
+            first = payload[0]
+            dept = first.get("codeDepartement")
+            return (dept, first.get("codeRegion")) if dept else None
+
+        LOG.debug("API Géo : abandon après %s tentatives", self.max_retries)
+        return None
