@@ -37,6 +37,34 @@ xcode-select --install
 Si la fenêtre indique que les outils sont déjà installés, c'est que Git est là — vérifier
 avec `git --version`.
 
+#### Erreur `xcrun: error: invalid active developer path`
+
+Message typique après une mise à jour de macOS : le chemin vers les outils est enregistré,
+mais le dossier est vide ou incomplet. D'abord la solution douce :
+
+```bash
+sudo xcode-select --reset
+git --version
+```
+
+Si l'erreur persiste, il faut réinstaller. La suppression ne touche que les outils en
+ligne de commande, qui sont réinstallés juste après — ni le projet, ni les autres
+applications ne sont concernés :
+
+```bash
+sudo rm -rf /Library/Developer/CommandLineTools
+xcode-select --install
+```
+
+Si l'installateur répond que le logiciel *n'est pas disponible sur le serveur de mise à
+jour* — panne connue chez Apple —, télécharger le paquet « Command Line Tools for Xcode »
+à la main sur [developer.apple.com/download/all](https://developer.apple.com/download/all)
+(identifiant Apple gratuit requis), en prenant la version correspondant à ton macOS.
+
+**Cette erreur ne bloque que Git.** Node et npm sont installés séparément et ne dépendent
+pas des outils Xcode : tu peux lancer l'app tout de suite par le ZIP ci-dessous pendant
+que l'installation se règle.
+
 ### Se passer de Git
 
 Git n'est pas indispensable pour lancer l'app une première fois. Sur la page du dépôt :
@@ -83,6 +111,7 @@ validation GPS ne peut pas fonctionner.
 |---|---|---|
 | Le QR code scanne mais rien ne charge | Téléphone et ordinateur sur des réseaux différents, ou Wi-Fi d'entreprise qui isole les appareils | `npx expo start --tunnel` (plus lent, mais passe partout) |
 | `command not found: npx` | Node.js absent ou mal installé | Réinstaller Node.js LTS, rouvrir le terminal |
+| `xcrun: error: invalid active developer path` | Outils en ligne de commande cassés par une mise à jour de macOS | `sudo xcode-select --reset`, cf. section Git ci-dessus |
 | Erreurs pendant `npm install` | Cache abîmé | `rm -rf node_modules package-lock.json && npm install` |
 | L'app se lance mais la carte est vide | Permission de localisation refusée | Réglages du téléphone → Expo Go → Localisation |
 
