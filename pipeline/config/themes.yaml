@@ -10,7 +10,11 @@
 # `from_labels`      : thème alimenté par des listes officielles plutôt que par une
 #                      classe Wikidata.
 # `radius_m`         : rayon de validation par défaut des lieux du thème (mètres).
-# `min_sitelinks`    : plancher de notoriété — en dessous, le lieu n'est pas proposé.
+# `min_sitelinks`      : plancher ÉDITORIAL, appliqué à la construction. Se règle
+#                        instantanément, sans recollecter.
+# `fetch_min_sitelinks`: plancher de COLLECTE, appliqué dans la requête SPARQL.
+#                        Il ne sert qu'à garder les requêtes tenables : le laisser
+#                        bas permet de régler le plancher éditorial librement.
 # `cap`              : nombre maximum de lieux retenus pour la collection nationale.
 
 themes:
@@ -19,7 +23,8 @@ themes:
     name_singular: Château
     icon: castle
     radius_m: 200
-    min_sitelinks: 4
+    min_sitelinks: 6
+    fetch_min_sitelinks: 3
     cap: 80
     wikidata_classes: [Q23413, Q751876, Q1785071]   # château fort, château, fort
 
@@ -28,7 +33,8 @@ themes:
     name_singular: Cascade
     icon: waterfall
     radius_m: 300
-    min_sitelinks: 2
+    min_sitelinks: 3
+    fetch_min_sitelinks: 2
     cap: 60
     wikidata_classes: [Q34038]                       # chute d'eau
 
@@ -37,7 +43,8 @@ themes:
     name_singular: Sommet
     icon: mountain
     radius_m: 1000
-    min_sitelinks: 4
+    min_sitelinks: 12
+    fetch_min_sitelinks: 4
     cap: 60
     wikidata_classes: [Q8502, Q2231510]              # montagne, col
 
@@ -46,7 +53,8 @@ themes:
     name_singular: Site
     icon: beach
     radius_m: 500
-    min_sitelinks: 2
+    min_sitelinks: 5
+    fetch_min_sitelinks: 2
     cap: 60
     wikidata_classes: [Q40080, Q107679]              # plage, falaise
     # Q107679 porte en français le libellé « rempart montagneux », mais sa
@@ -59,7 +67,8 @@ themes:
     name_singular: Abbaye
     icon: abbey
     radius_m: 150
-    min_sitelinks: 4
+    min_sitelinks: 6
+    fetch_min_sitelinks: 3
     cap: 60
     wikidata_classes: [Q160742, Q44613]              # abbaye, monastère
 
@@ -68,7 +77,8 @@ themes:
     name_singular: Cathédrale
     icon: cathedral
     radius_m: 120
-    min_sitelinks: 5
+    min_sitelinks: 8
+    fetch_min_sitelinks: 4
     cap: 60
     wikidata_classes: [Q2977, Q163687]               # cathédrale, basilique
 
@@ -80,6 +90,7 @@ themes:
     icon: village
     radius_m: 600
     min_sitelinks: 3
+    fetch_min_sitelinks: 2
     cap: 80
     wikidata_classes: []
     from_labels: [plus-beaux-villages, plus-beaux-detours]
@@ -89,7 +100,8 @@ themes:
     name_singular: Grotte
     icon: cave
     radius_m: 200
-    min_sitelinks: 3
+    min_sitelinks: 5
+    fetch_min_sitelinks: 3
     cap: 40
     wikidata_classes: [Q35509]                       # grotte
 
@@ -98,7 +110,8 @@ themes:
     name_singular: Lac
     icon: lake
     radius_m: 1500
-    min_sitelinks: 3
+    min_sitelinks: 8
+    fetch_min_sitelinks: 3
     cap: 50
     wikidata_classes: [Q23397]                       # lac
 
@@ -107,7 +120,8 @@ themes:
     name_singular: Phare
     icon: lighthouse
     radius_m: 200
-    min_sitelinks: 3
+    min_sitelinks: 5
+    fetch_min_sitelinks: 3
     cap: 40
     wikidata_classes: [Q39715]                       # phare
 
@@ -118,6 +132,7 @@ themes:
     # Site étendu : le point est celui de l'entrée, le rayon porte la taille.
     radius_m: 2000
     min_sitelinks: 3
+    fetch_min_sitelinks: 2
     cap: 40
     # « canyon » ne désigne aucune classe distincte sur Wikidata : gorge suffit.
     wikidata_classes: [Q150784]                      # gorge
@@ -127,7 +142,8 @@ themes:
     name_singular: Jardin
     icon: garden
     radius_m: 200
-    min_sitelinks: 3
+    min_sitelinks: 5
+    fetch_min_sitelinks: 3
     cap: 50
     wikidata_classes: [Q1107656, Q167346]            # jardin, jardin botanique
     # « jardin public » (Q22746) écarté volontairement : il ramènerait tous les
@@ -138,7 +154,8 @@ themes:
     name_singular: Musée
     icon: museum
     radius_m: 120
-    min_sitelinks: 5
+    min_sitelinks: 12
+    fetch_min_sitelinks: 4
     cap: 50
     wikidata_classes: [Q33506]                       # musée
 
@@ -147,7 +164,8 @@ themes:
     name_singular: Pont
     icon: bridge
     radius_m: 300
-    min_sitelinks: 4
+    min_sitelinks: 8
+    fetch_min_sitelinks: 3
     cap: 40
     wikidata_classes: [Q12280, Q181348, Q13218676]   # pont, viaduc, aqueduc romain
     # « aqueduc » au sens large (Q474) écarté : c'est l'ouvrage d'adduction
@@ -159,7 +177,8 @@ themes:
     name_singular: Site
     icon: megalith
     radius_m: 200
-    min_sitelinks: 3
+    min_sitelinks: 5
+    fetch_min_sitelinks: 3
     cap: 50
     wikidata_classes: [Q839954, Q164240, Q101659, Q193475]
     # site archéologique, mégalithe, dolmen, menhir
@@ -169,6 +188,7 @@ themes:
     name_singular: Île
     icon: island
     radius_m: 2000
-    min_sitelinks: 4
+    min_sitelinks: 10
+    fetch_min_sitelinks: 4
     cap: 40
     wikidata_classes: [Q23442]                       # île

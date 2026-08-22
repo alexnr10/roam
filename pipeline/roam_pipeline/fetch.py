@@ -41,10 +41,13 @@ def fetch_theme(
                 if place is not None:
                     by_qid[place.wikidata_id] = place
 
-    for batch in wd.chunked(theme.wikidata_classes, 2):
-        LOG.info("thème %s : classes %s", theme.id, ", ".join(batch))
-        rows = client.query(wd.theme_query(batch, theme.min_sitelinks))
-        for row in rows:
+    # Une classe à la fois, et par pages : les classes volumineuses (châteaux,
+    # abbayes, cathédrales) dépassaient le délai de WDQS en une seule requête.
+    for class_qid in theme.wikidata_classes:
+        LOG.info("thème %s : classe %s", theme.id, class_qid)
+        for row in _paged(client, lambda limit, offset, q=class_qid: wd.theme_query(
+            [q], theme.fetch_min_sitelinks, limit=limit, offset=offset
+        )):
             place = _row_to_place(row, theme)
             if place is None:
                 continue
@@ -56,6 +59,20 @@ def fetch_theme(
 
     LOG.info("thème %s : %s lieux candidats", theme.id, len(by_qid))
     return list(by_qid.values())
+
+
+PAGE_SIZE = 800
+
+
+def _paged(client: wd.SparqlClient, build_query, page_size: int = PAGE_SIZE):
+    """Parcourt une requête page par page jusqu'à épuisement."""
+    offset = 0
+    while True:
+        rows = client.query(build_query(page_size, offset))
+        yield from rows
+        if len(rows) < page_size:
+            return
+        offset += page_size
 
 
 def _completeness(place: Place) -> int:
@@ -77,12 +94,6 @@ def _row_to_place(row: dict[str, str], theme: Theme) -> Place | None:
     if name == qid:
         return None
 
-    dept = normalize_dept_code(row.get("directDept") or row.get("parentDept"))
-    region_code = row.get("parentRegion")
-    if not region_code and dept:
-        region = region_of(dept)
-        region_code = region.code if region else None
-
     return Place(
         wikidata_id=qid,
         name=name,
@@ -95,8 +106,7 @@ def _row_to_place(row: dict[str, str], theme: Theme) -> Place | None:
         image_url=row.get("image"),
         commons_category=row.get("commons"),
         elevation_m=_as_int(row.get("elevation")),
-        departement_code=dept,
-        region_code=region_code,
+        admin_qid=wd.qid_from_uri(row.get("admin")),
         validation_radius_m=theme.radius_m,
     )
 
@@ -108,6 +118,51 @@ def _as_int(value: str | None) -> int | None:
         return int(float(value))
     except ValueError:
         return None
+
+
+def resolve_admin(client: wd.SparqlClient, places: list[Place]) -> None:
+    """Complète département et région à partir de la commune de rattachement.
+
+    Seconde passe volontaire : bornée par les communes réellement rencontrées,
+    elle coûte quelques requêtes, là où le même chemin transitif intégré à la
+    requête de thème faisait échouer les classes volumineuses.
+    """
+    admin_qids = sorted({p.admin_qid for p in places if p.admin_qid})
+    if not admin_qids:
+        return
+
+    codes: dict[str, tuple[str | None, str | None]] = {}
+    for batch in wd.chunked(admin_qids, 200):
+        try:
+            rows = client.query(wd.admin_codes_query(batch))
+        except Exception as exc:
+            LOG.error("résolution administrative : lot échoué (%s)", exc)
+            continue
+        for row in rows:
+            qid = wd.qid_from_uri(row.get("admin"))
+            if qid:
+                codes[qid] = (row.get("deptCode"), row.get("regionCode"))
+
+    resolved = 0
+    for place in places:
+        if not place.admin_qid:
+            continue
+        dept_raw, region_raw = codes.get(place.admin_qid, (None, None))
+        dept = normalize_dept_code(dept_raw)
+        place.departement_code = dept
+        # Le code de région se déduit du département : plus fiable que la
+        # remontée Wikidata, qui rate les communes mal rattachées.
+        region = region_of(dept) if dept else None
+        place.region_code = region.code if region else region_raw
+        if dept:
+            resolved += 1
+
+    LOG.info(
+        "rattachement administratif : %s/%s lieux localisés (%s communes)",
+        resolved,
+        len(places),
+        len(admin_qids),
+    )
 
 
 def fetch_label_members(client: wd.SparqlClient, label: Label, manual_dir: Path) -> set[str]:
@@ -155,8 +210,27 @@ def apply_labels(places: list[Place], label_members: dict[str, set[str]]) -> Non
         )
 
 
-def run_fetch(client: wd.SparqlClient, config: Config, out_dir: Path, manual_dir: Path) -> list[Place]:
+def run_fetch(
+    client: wd.SparqlClient,
+    config: Config,
+    out_dir: Path,
+    manual_dir: Path,
+    only: list[str] | None = None,
+) -> list[Place]:
+    """Collecte les candidats. `only` limite aux thèmes nommés.
+
+    Une collecte complète dure une demi-heure ; quand un thème échoue, on doit
+    pouvoir le reprendre seul plutôt que tout refaire. Les thèmes non demandés
+    sont donc conservés depuis la collecte précédente.
+    """
     out_dir.mkdir(parents=True, exist_ok=True)
+    raw_path = out_dir / "places_raw.json"
+
+    themes = [t for t in config.themes if not only or t.id in only]
+    if only:
+        unknown = set(only) - {t.id for t in config.themes}
+        if unknown:
+            raise KeyError(f"thème(s) inconnu(s) : {', '.join(sorted(unknown))}")
 
     label_members: dict[str, set[str]] = {}
     for label in config.labels:
@@ -167,18 +241,41 @@ def run_fetch(client: wd.SparqlClient, config: Config, out_dir: Path, manual_dir
             label_members[label.id] = set()
 
     places: list[Place] = []
-    for theme in config.themes:
+    failed: list[str] = []
+    for theme in themes:
         try:
             places.extend(fetch_theme(client, theme, label_members))
         except Exception as exc:
             LOG.error("thème %s : collecte échouée (%s)", theme.id, exc)
+            failed.append(theme.id)
 
+    resolve_admin(client, places)
     apply_labels(places, label_members)
 
-    raw_path = out_dir / "places_raw.json"
+    # Reprise partielle : on réinjecte les thèmes qu'on n'a pas recollectés.
+    if only and raw_path.exists():
+        kept = [
+            Place(**{k: v for k, v in item.items() if k != "slug"})
+            for item in json.loads(raw_path.read_text(encoding="utf-8"))
+            if item.get("theme_id") not in {t.id for t in themes}
+        ]
+        LOG.info("%s lieux conservés des thèmes non recollectés", len(kept))
+        places = kept + places
+
     raw_path.write_text(
         json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
     LOG.info("%s lieux écrits dans %s", len(places), raw_path)
+
+    if failed:
+        # Le message doit être actionnable : une demi-heure de collecte ne se
+        # relance pas en entier pour deux thèmes.
+        LOG.error(
+            "%s thème(s) en échec : %s — reprends-les seuls avec "
+            "`python -m roam_pipeline fetch --only %s`",
+            len(failed),
+            ", ".join(failed),
+            " ".join(failed),
+        )
     return places

@@ -24,6 +24,9 @@ python -m roam_pipeline verify-qids    # affiche le libellé réel de chaque Q-i
 # 2. Collecter les candidats (long : ~15-30 min, WDQS est throttlé)
 python -m roam_pipeline fetch
 
+#    Un thème en échec se reprend seul, sans tout recollecter :
+python -m roam_pipeline fetch --only chateaux abbayes
+
 # 3. Scorer, construire les collections, exporter
 python -m roam_pipeline build
 
@@ -63,12 +66,22 @@ constituer le premier catalogue publiable.
 
 ## Configuration (`config/`)
 
-- `themes.yaml` — thèmes, classes Wikidata, rayon de validation, plafonds
+- `themes.yaml` — thèmes, classes Wikidata, rayon de validation, plafonds, seuils
 - `labels.yaml` — labels officiels : bonus de score **et** collections dédiées
 - `scoring.yaml` — poids, seuils de niveau, règles de taille des collections
 
 Les labels sans propriété Wikidata fiable (`kind: manual`) se saisissent dans
 `data/manual/<label>.csv`, colonnes `name,wikidata_id,note`.
+
+### Deux planchers de notoriété, et pourquoi
+
+`fetch_min_sitelinks` s'applique dans la requête Wikidata ; `min_sitelinks` à la
+construction. La distinction n'est pas cosmétique : un seuil appliqué côté serveur ne se
+règle qu'en relançant une demi-heure de collecte. En collectant large et en filtrant à la
+construction, ajuster un thème coûte une seconde.
+
+`build` affiche d'ailleurs, pour chaque thème, combien de lieux resteraient à chaque
+plancher — de quoi régler sur des chiffres réels plutôt qu'à l'estime.
 
 ### Ne jamais écrire un Q-id de mémoire
 

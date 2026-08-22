@@ -18,7 +18,12 @@ class Theme:
     name_singular: str
     icon: str
     radius_m: int
+    # Plancher ÉDITORIAL, appliqué à la construction : se règle sans recollecter.
     min_sitelinks: int
+    # Plancher de COLLECTE, appliqué dans la requête SPARQL. Il ne sert qu'à
+    # garder les requêtes tenables ; le laisser bas permet de régler le plancher
+    # éditorial librement, sans repasser une demi-heure sur Wikidata.
+    fetch_min_sitelinks: int
     cap: int
     wikidata_classes: list[str]
     # Thème alimenté par des listes officielles plutôt que par une classe
@@ -106,6 +111,7 @@ def load_config(config_dir: Path | None = None) -> Config:
             icon=t.get("icon", ""),
             radius_m=int(t["radius_m"]),
             min_sitelinks=int(t["min_sitelinks"]),
+            fetch_min_sitelinks=int(t.get("fetch_min_sitelinks", 3)),
             cap=int(t["cap"]),
             wikidata_classes=list(t.get("wikidata_classes") or []),
             from_labels=list(t.get("from_labels") or []),

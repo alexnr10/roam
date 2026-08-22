@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from roam_pipeline.collections import build_all, dedupe, haversine_m
+from roam_pipeline.collections import apply_notoriety_floor, build_all, dedupe, haversine_m
 from roam_pipeline.config import load_config
 from roam_pipeline.export import _sql_str, write_seed_sql
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
@@ -53,6 +53,12 @@ class TestConfig(unittest.TestCase):
             for label_id in theme.from_labels:
                 self.assertIn(label_id, known, theme.id)
 
+    def test_fetch_floor_is_never_above_editorial_floor(self):
+        # Collecter plus strictement que le plancher éditorial rendrait ce
+        # dernier inopérant, et il faudrait recollecter pour l'assouplir.
+        for theme in CONFIG.themes:
+            self.assertLessEqual(theme.fetch_min_sitelinks, theme.min_sitelinks, theme.id)
+
     def test_non_manual_labels_are_resolved_or_pending(self):
         # Un label sans qid doit porter un terme de recherche : il est en attente
         # de résolution, pas silencieusement cassé.
@@ -65,7 +71,7 @@ class TestConfig(unittest.TestCase):
 
         orphan = Theme(
             id="orphelin", name="Orphelin", name_singular="Orphelin", icon="",
-            radius_m=100, min_sitelinks=1, cap=10, wikidata_classes=[],
+            radius_m=100, min_sitelinks=1, fetch_min_sitelinks=1, cap=10, wikidata_classes=[],
         )
         with self.assertRaises(ValueError):
             _validate([orphan], CONFIG.labels)
@@ -75,7 +81,7 @@ class TestConfig(unittest.TestCase):
 
         broken = Theme(
             id="casse", name="Cassé", name_singular="Cassé", icon="",
-            radius_m=100, min_sitelinks=1, cap=10, wikidata_classes=[],
+            radius_m=100, min_sitelinks=1, fetch_min_sitelinks=1, cap=10, wikidata_classes=[],
             from_labels=["label-inexistant"],
         )
         with self.assertRaises(ValueError):
@@ -205,6 +211,28 @@ class TestDedupe(unittest.TestCase):
         b = make_place("Site naturel", theme="cascades", lat=45.0, lon=2.0)
         score_all([a, b], CONFIG)
         self.assertEqual(len(dedupe([a, b])), 2)
+
+
+class TestNotorietyFloor(unittest.TestCase):
+    def test_places_below_their_theme_floor_are_dropped(self):
+        floor = CONFIG.theme("sommets").min_sitelinks
+        places = [
+            make_place("obscur", theme="sommets", sitelinks=floor - 1),
+            make_place("connu", theme="sommets", sitelinks=floor + 5),
+        ]
+        kept = apply_notoriety_floor(places, CONFIG)
+        self.assertEqual([p.name for p in kept], ["connu"])
+
+    def test_floor_is_per_theme(self):
+        # Une cascade à 3 langues reste ; un sommet à 3 langues part.
+        places = [
+            make_place("cascade", theme="cascades", sitelinks=3),
+            make_place("sommet", theme="sommets", sitelinks=3),
+        ]
+        self.assertEqual([p.name for p in apply_notoriety_floor(places, CONFIG)], ["cascade"])
+
+    def test_unknown_theme_is_dropped(self):
+        self.assertEqual(apply_notoriety_floor([make_place("x", theme="inconnu")], CONFIG), [])
 
 
 class TestCollections(unittest.TestCase):

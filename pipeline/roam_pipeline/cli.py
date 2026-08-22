@@ -6,7 +6,7 @@ import argparse
 import json
 import logging
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 
 from . import wikidata as wd
@@ -128,7 +128,7 @@ def cmd_suggest_qids(args: argparse.Namespace, config: Config) -> int:
 
 def cmd_fetch(args: argparse.Namespace, config: Config) -> int:
     client = wd.SparqlClient(min_interval_s=args.min_interval)
-    places = run_fetch(client, config, args.out, args.manual)
+    places = run_fetch(client, config, args.out, args.manual, only=args.only or None)
     print(f"{len(places)} lieux candidats collectés → {args.out / 'places_raw.json'}")
     return 0
 
@@ -218,7 +218,39 @@ def _print_stats(places, collections) -> None:
     print("  Lieux par thème      :")
     for theme_id, n in themes.most_common():
         print(f"      {theme_id:<16} : {n}")
+
+    _print_sitelink_distribution(places)
     print()
+
+
+SITELINK_STEPS = (2, 4, 6, 8, 10, 15, 20, 30)
+
+
+def _print_sitelink_distribution(places) -> None:
+    """Combien de lieux resteraient par thème selon le plancher de notoriété.
+
+    C'est le tableau qui permet de régler `min_sitelinks` sur des chiffres réels
+    plutôt qu'à l'estime : un thème qui garde 700 lieux à 4 langues et 90 à 10
+    n'a pas le même problème qu'un thème qui passe de 40 à 35.
+    """
+    by_theme: dict[str, list[int]] = defaultdict(list)
+    for place in places:
+        theme_id = place.theme_id if hasattr(place, "theme_id") else place["theme_id"]
+        sitelinks = place.sitelinks if hasattr(place, "sitelinks") else place["sitelinks"]
+        by_theme[theme_id].append(int(sitelinks or 0))
+
+    if not by_theme:
+        return
+
+    header = "  ".join(f"≥{step:<4}" for step in SITELINK_STEPS)
+    print(f"\n  Lieux restants selon le plancher de notoriété (versions Wikipédia) :")
+    print(f"      {'thème':<16} {header}")
+    for theme_id in sorted(by_theme, key=lambda t: -len(by_theme[t])):
+        counts = by_theme[theme_id]
+        cells = "  ".join(
+            f"{sum(1 for c in counts if c >= step):<5}" for step in SITELINK_STEPS
+        )
+        print(f"      {theme_id:<16} {cells}")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -244,6 +276,12 @@ def build_parser() -> argparse.ArgumentParser:
     fetch = sub.add_parser("fetch", help="collecte les lieux candidats depuis Wikidata")
     fetch.add_argument(
         "--min-interval", type=float, default=1.5, help="délai minimum entre deux requêtes (s)"
+    )
+    fetch.add_argument(
+        "--only",
+        nargs="+",
+        metavar="THÈME",
+        help="ne recollecter que ces thèmes ; les autres sont conservés",
     )
 
     sub.add_parser("build", help="score, construit les collections et exporte")

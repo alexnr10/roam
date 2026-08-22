@@ -182,8 +182,36 @@ def _geo_code(place: Place, level: str) -> str | None:
     return None
 
 
+def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
+    """Écarte les lieux sous le plancher éditorial de leur thème.
+
+    Ce filtre vit ici, et non dans la requête Wikidata, pour qu'ajuster un seuil
+    coûte une seconde plutôt qu'une nouvelle collecte.
+    """
+    kept: list[Place] = []
+    dropped: dict[str, int] = defaultdict(int)
+
+    for place in places:
+        try:
+            floor = config.theme(place.theme_id).min_sitelinks
+        except KeyError:
+            continue
+        if place.sitelinks >= floor:
+            kept.append(place)
+        else:
+            dropped[place.theme_id] += 1
+
+    if dropped:
+        LOG.info(
+            "plancher de notoriété : %s lieux écartés (%s)",
+            sum(dropped.values()),
+            ", ".join(f"{k} {v}" for k, v in sorted(dropped.items(), key=lambda x: -x[1])),
+        )
+    return kept
+
+
 def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Collection]]:
-    kept = dedupe(places)
+    kept = dedupe(apply_notoriety_floor(places, config))
     collections = (
         build_theme_collections(kept, config)
         + build_label_collections(kept, config)

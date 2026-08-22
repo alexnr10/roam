@@ -45,8 +45,9 @@ class SparqlClient:
         endpoint: str = ENDPOINT,
         user_agent: str = USER_AGENT,
         min_interval_s: float = 1.5,
-        timeout_s: int = 180,
-        max_retries: int = 4,
+        # WDQS coupe lui-même à 60 s : attendre plus longtemps n'apporte rien.
+        timeout_s: int = 90,
+        max_retries: int = 6,
     ) -> None:
         self.endpoint = endpoint
         self.timeout_s = timeout_s
@@ -174,24 +175,27 @@ def chunked(items: Iterable[Any], size: int) -> Iterator[list[Any]]:
 # Requêtes
 # ---------------------------------------------------------------------------
 
-def theme_query(class_qids: list[str], min_sitelinks: int, with_admin: bool = True) -> str:
-    """Lieux français d'un thème, avec notoriété et rattachement administratif.
+def theme_query(
+    class_qids: list[str],
+    min_sitelinks: int,
+    limit: int | None = None,
+    offset: int = 0,
+) -> str:
+    """Lieux français d'un thème, avec notoriété et commune de rattachement.
 
     Le filtre sur `wikibase:sitelinks` est appliqué tôt : c'est lui qui rend la
     requête tenable, et c'est aussi le premier filtre de qualité.
+
+    La remontée département / région se faisait ici, par un chemin transitif
+    `P131+/P2586`. C'était la cause des délais dépassés sur les classes
+    volumineuses (châteaux, abbayes, cathédrales). On ne récupère plus que la
+    commune, en lien direct, et la hiérarchie est résolue ensuite par
+    `admin_codes_query` sur l'ensemble borné des communes rencontrées.
     """
     values = " ".join(f"wd:{q}" for q in class_qids)
-    admin_block = (
-        f"""
-  OPTIONAL {{ ?item wdt:{P_INSEE_DEPT} ?directDept. }}
-  OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY}+ ?deptEntity. ?deptEntity wdt:{P_INSEE_DEPT} ?parentDept. }}
-  OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY}+ ?regEntity. ?regEntity wdt:{P_INSEE_REGION} ?parentRegion. }}"""
-        if with_admin
-        else ""
-    )
+    page = f"\nORDER BY ?item\nLIMIT {limit} OFFSET {offset}" if limit else ""
     return f"""
-SELECT DISTINCT ?item ?itemLabel ?coord ?sitelinks ?image ?commons ?elevation
-                ?directDept ?parentDept ?parentRegion ?frwiki
+SELECT DISTINCT ?item ?itemLabel ?coord ?sitelinks ?image ?commons ?elevation ?admin ?frwiki
 WHERE {{
   VALUES ?class {{ {values} }}
   ?item wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* ?class .
@@ -202,30 +206,38 @@ WHERE {{
   OPTIONAL {{ ?item wdt:{P_IMAGE} ?image. }}
   OPTIONAL {{ ?item wdt:{P_COMMONS_CATEGORY} ?commons. }}
   OPTIONAL {{ ?item wdt:{P_ELEVATION} ?elevation. }}
-  OPTIONAL {{ ?frwiki schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> . }}{admin_block}
+  OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY} ?admin. }}
+  OPTIONAL {{ ?frwiki schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> . }}
   SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+}}{page}
+"""
+
+
+def admin_codes_query(admin_qids: list[str]) -> str:
+    """Codes INSEE de département et de région pour des entités administratives.
+
+    Bornée par `VALUES`, donc rapide, là où le même chemin transitif appliqué à
+    tous les lieux d'une classe faisait dépasser le délai.
+    """
+    values = " ".join(f"wd:{q}" for q in admin_qids)
+    return f"""
+SELECT ?admin ?deptCode ?regionCode WHERE {{
+  VALUES ?admin {{ {values} }}
+  OPTIONAL {{ ?admin wdt:{P_ADMIN_ENTITY}*/wdt:{P_INSEE_DEPT} ?deptCode. }}
+  OPTIONAL {{ ?admin wdt:{P_ADMIN_ENTITY}*/wdt:{P_INSEE_REGION} ?regionCode. }}
 }}
 """
 
 
-def items_query(qids: list[str], with_admin: bool = True) -> str:
+def items_query(qids: list[str]) -> str:
     """Mêmes attributs que `theme_query`, pour une liste d'entités connues.
 
     Utilisé par les thèmes alimentés par des labels plutôt que par une classe :
     les listes officielles sont déjà une curation humaine, finie et fiable.
     """
     values = " ".join(f"wd:{q}" for q in qids)
-    admin_block = (
-        f"""
-  OPTIONAL {{ ?item wdt:{P_INSEE_DEPT} ?directDept. }}
-  OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY}+ ?deptEntity. ?deptEntity wdt:{P_INSEE_DEPT} ?parentDept. }}
-  OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY}+ ?regEntity. ?regEntity wdt:{P_INSEE_REGION} ?parentRegion. }}"""
-        if with_admin
-        else ""
-    )
     return f"""
-SELECT DISTINCT ?item ?itemLabel ?coord ?sitelinks ?image ?commons ?elevation
-                ?directDept ?parentDept ?parentRegion ?frwiki
+SELECT DISTINCT ?item ?itemLabel ?coord ?sitelinks ?image ?commons ?elevation ?admin ?frwiki
 WHERE {{
   VALUES ?item {{ {values} }}
   ?item wdt:{P_COORDINATE} ?coord .
@@ -233,7 +245,8 @@ WHERE {{
   OPTIONAL {{ ?item wdt:{P_IMAGE} ?image. }}
   OPTIONAL {{ ?item wdt:{P_COMMONS_CATEGORY} ?commons. }}
   OPTIONAL {{ ?item wdt:{P_ELEVATION} ?elevation. }}
-  OPTIONAL {{ ?frwiki schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> . }}{admin_block}
+  OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY} ?admin. }}
+  OPTIONAL {{ ?frwiki schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> . }}
   SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
 }}
 """
@@ -248,14 +261,13 @@ def label_members_query(kind: str, qid: str) -> str:
     }
     if kind not in predicate:
         raise ValueError(f"type de requête de label non géré : {kind}")
+    # Seul l'identifiant est exploité : demander les libellés et les coordonnées
+    # multipliait le volume par dix, jusqu'à tronquer la réponse sur les gros
+    # labels (30 000 monuments historiques inscrits).
     return f"""
-SELECT DISTINCT ?item ?itemLabel ?coord ?sitelinks ?image WHERE {{
+SELECT DISTINCT ?item WHERE {{
   ?item {predicate[kind]} wd:{qid} .
   ?item wdt:{P_COUNTRY} wd:{Q_FRANCE} .
-  OPTIONAL {{ ?item wdt:{P_COORDINATE} ?coord. }}
-  OPTIONAL {{ ?item wikibase:sitelinks ?sitelinks. }}
-  OPTIONAL {{ ?item wdt:{P_IMAGE} ?image. }}
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
 }}
 """
 
