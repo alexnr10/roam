@@ -109,11 +109,33 @@ validation GPS ne peut pas fonctionner.
 
 | Symptôme | Cause probable | Solution |
 |---|---|---|
+| « Project is incompatible with this version of Expo Go » | Expo Go en retard : il ne prend en charge que le SDK le plus récent | Mettre Expo Go à jour depuis l'App Store / Play Store, cf. ci-dessous |
 | Le QR code scanne mais rien ne charge | Téléphone et ordinateur sur des réseaux différents, ou Wi-Fi d'entreprise qui isole les appareils | `npx expo start --tunnel` (plus lent, mais passe partout) |
 | `command not found: npx` | Node.js absent ou mal installé | Réinstaller Node.js LTS, rouvrir le terminal |
 | `xcrun: error: invalid active developer path` | Outils en ligne de commande cassés par une mise à jour de macOS | `sudo xcode-select --reset`, cf. section Git ci-dessus |
 | Erreurs pendant `npm install` | Cache abîmé | `rm -rf node_modules package-lock.json && npm install` |
 | L'app se lance mais la carte est vide | Permission de localisation refusée | Réglages du téléphone → Expo Go → Localisation |
+
+## Expo Go dit que le projet est incompatible
+
+Expo Go ne sait faire tourner que **le SDK le plus récent**. Le projet est sur le SDK 57 ;
+si l'app installée est plus ancienne, elle refuse de l'ouvrir. Le message nomme les deux
+versions — c'est lui qui dit laquelle Expo Go accepte.
+
+1. **Mettre Expo Go à jour.** App Store (icône de profil → liste des mises à jour) ou
+   Play Store (profil → Gérer les applications). Si le bouton affiche « Ouvrir » et non
+   « Mettre à jour », désinstaller puis réinstaller force la dernière version.
+2. Relancer ensuite le serveur proprement : `npx expo start -c` (le `-c` vide le cache,
+   qui garde parfois l'ancienne version en mémoire).
+
+Si Expo Go est déjà à jour et refuse toujours, c'est que le téléphone est trop ancien
+pour la dernière version de l'app : l'App Store installe alors la dernière version
+compatible avec le système, qui peut être bloquée sur un SDK antérieur. Dans ce cas c'est
+**le projet** qu'il faut ramener au SDK pris en charge, avec `npx expo install --fix`
+après avoir changé la version d'`expo` dans `mobile/package.json`.
+
+En attendant, `npx expo start` puis la touche **`w`** ouvre l'application dans le
+navigateur du Mac : tout fonctionne sauf la carte native et le GPS réel.
 
 ## Ce qu'il faut regarder
 
