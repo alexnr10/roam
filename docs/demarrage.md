@@ -12,9 +12,49 @@ Compte 15 minutes la première fois, dont l'essentiel en téléchargement.
 | **Node.js 20 ou plus** — [nodejs.org](https://nodejs.org), version LTS | **Expo Go** — App Store ou Play Store |
 | **Git** | |
 
-Vérifier Node : `node --version` doit afficher `v20.x` ou plus.
+Vérifier ce qui est déjà là, dans le Terminal :
+
+```bash
+node --version    # doit afficher v20.x ou plus
+git --version     # doit afficher une version, cf. ci-dessous si ce n'est pas le cas
+```
 
 L'ordinateur et le téléphone doivent être **sur le même réseau Wi-Fi**.
+
+### Installer Git sur macOS
+
+macOS ne livre pas Git, mais il sait l'installer seul. Tape `git --version` dans le
+Terminal : une fenêtre propose alors d'installer les **outils de développement en ligne
+de commande**. Accepter, patienter (~5 min, environ 1 Go), et c'est fini. Aucun compte,
+aucun téléchargement à chercher.
+
+En ligne de commande directement, c'est la même chose :
+
+```bash
+xcode-select --install
+```
+
+Si la fenêtre indique que les outils sont déjà installés, c'est que Git est là — vérifier
+avec `git --version`.
+
+### Se passer de Git
+
+Git n'est pas indispensable pour lancer l'app une première fois. Sur la page du dépôt :
+
+1. cliquer sur le sélecteur de branche (il affiche `main`) et choisir
+   `claude/roam-location-collection-app-uq63os` ;
+2. bouton vert **Code** → **Download ZIP** ;
+3. double-cliquer le ZIP téléchargé, puis dans le Terminal :
+
+```bash
+cd ~/Downloads/roam-claude-roam-location-collection-app-uq63os/mobile
+npm install
+npx expo start
+```
+
+⚠️ **Sans Git, il faudra retélécharger le ZIP à chaque nouvelle version.** Comme on va
+itérer, autant installer Git tout de suite : un `git pull` suffira ensuite à récupérer
+les modifications, sans rien perdre de ce que tu auras testé.
 
 ## Les commandes, dans l'ordre
 
