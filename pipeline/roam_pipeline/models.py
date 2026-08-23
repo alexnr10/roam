@@ -39,6 +39,13 @@ class Place:
     # pas à écarter : beaucoup de ruines se visitent. C'est un signal de revue.
     dissolved: str | None = None
 
+    # Ouverture au public, d'après OpenStreetMap. `None` signifie inconnu, ce
+    # qui n'est pas la même chose que fermé — l'absence de balise ne prouve rien.
+    visitable: bool | None = None
+    opening_hours: str | None = None
+    website: str | None = None
+    osm_id: str | None = None
+
     departement_code: str | None = None
     region_code: str | None = None
     # Commune de rattachement (Q-id), résolue en codes INSEE par une seconde passe.

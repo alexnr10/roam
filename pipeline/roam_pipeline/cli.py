@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import logging
 import sys
@@ -169,6 +170,74 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     )
     print(f"{found} tailles d'articles ajoutées → {raw_path}")
     print("Relance `build` pour en tenir compte dans le classement.")
+    return 0
+
+
+def cmd_discover(args: argparse.Namespace, config: Config) -> int:
+    """Confronte le catalogue aux sites de visite d'OpenStreetMap.
+
+    Répond aux deux questions que Wikidata ne sait pas trancher : ce lieu
+    se visite-t-il, et que manque-t-il au catalogue.
+    """
+    from .discover import apply_visit_info, find_candidates, guess_theme
+    from .overpass import OverpassClient, cells
+
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
+        return 1
+
+    grid = list(cells())
+    print(f"Interrogation d'OpenStreetMap : {len(grid)} cellules, compte ~{len(grid) // 4} min.")
+    client = OverpassClient()
+    osm = []
+    for index, cell in enumerate(grid, start=1):
+        found = client.fetch_cell(cell)
+        osm.extend(found)
+        LOG.info("cellule %s/%s : %s sites (%s au total)", index, len(grid), len(found), len(osm))
+
+    if not osm:
+        print("Aucun site récupéré — service indisponible ?", file=sys.stderr)
+        return 1
+
+    places = _load_places(raw_path)
+    apply_visit_info(places, osm)
+    raw_path.write_text(
+        json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+    candidates = find_candidates(places, osm)
+    out_path = args.out / "candidates.csv"
+    with out_path.open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.writer(fh)
+        # Les trois premières colonnes se recopient telles quelles dans
+        # data/manual/places.csv ; les suivantes servent à décider.
+        writer.writerow(
+            ["wikidata_id", "theme_id", "note", "nom", "osm_id",
+             "horaires", "tarif", "site_web", "lat", "lon"]
+        )
+        for site in candidates[: args.limit]:
+            writer.writerow([
+                site.wikidata_id or "",
+                guess_theme(site.tags) or "",
+                site.name,
+                site.name,
+                site.osm_id,
+                site.opening_hours or "",
+                site.fee or "",
+                site.website or "",
+                f"{site.lat:.6f}",
+                f"{site.lon:.6f}",
+            ])
+
+    ready = sum(1 for s in candidates[: args.limit] if s.wikidata_id)
+    print(f"\n{len(osm)} sites de visite lus sur OpenStreetMap.")
+    print(f"{len(candidates)} absents du catalogue, {min(len(candidates), args.limit)} écrits "
+          f"dans {out_path}")
+    print(f"dont {ready} avec un identifiant Wikidata, directement recopiables "
+          f"dans data/manual/places.csv.")
+    print("Relance `build` pour tenir compte de l'ouverture au public.")
     return 0
 
 
@@ -438,6 +507,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="ne pas récupérer les descriptions (la passe la plus longue)",
     )
 
+    discover = sub.add_parser(
+        "discover",
+        help="confronte le catalogue aux sites de visite d'OpenStreetMap (réseau requis)",
+    )
+    discover.add_argument(
+        "--limit", type=int, default=1500, help="nombre maximum de candidats écrits"
+    )
+
     sub.add_parser("build", help="score, construit les collections et exporte")
 
     review = sub.add_parser("apply-review", help="applique les décisions de la feuille de revue")
@@ -482,6 +559,7 @@ def main(argv: list[str] | None = None) -> int:
         "suggest-qids": cmd_suggest_qids,
         "fetch": cmd_fetch,
         "enrich": cmd_enrich,
+        "discover": cmd_discover,
         "build": cmd_build,
         "apply-review": cmd_apply_review,
         "stats": cmd_stats,

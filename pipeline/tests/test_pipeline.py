@@ -475,6 +475,101 @@ class TestCrossThemeDedupe(unittest.TestCase):
         self.assertEqual(len(dedupe_across_themes(places, CONFIG)), 2)
 
 
+class TestOpenStreetMap(unittest.TestCase):
+    """Ouverture au public et découverte de lieux manquants."""
+
+    def _site(self, **over):
+        from roam_pipeline.overpass import OsmPlace
+
+        base = dict(osm_id="way/1", name="Site", lat=45.0, lon=2.0, tags={"tourism": "museum"})
+        base.update(over)
+        return OsmPlace(**base)
+
+    def test_managed_needs_a_sign_of_public_access(self):
+        # Ni horaires, ni site, ni tarif : rien ne dit que ça accueille du public.
+        self.assertFalse(self._site().managed)
+        self.assertTrue(self._site(opening_hours="Mo-Su 10:00-18:00").managed)
+        self.assertTrue(self._site(fee="yes").managed)
+
+    def test_parsing_uses_the_centre_of_ways(self):
+        from roam_pipeline.overpass import parse_elements
+
+        parsed = parse_elements([
+            {"type": "way", "id": 7, "center": {"lat": 49.1, "lon": 1.5},
+             "tags": {"name": "Giverny", "leisure": "garden", "opening_hours": "Mo-Su"}},
+            {"type": "node", "id": 8, "lat": 48.0, "lon": 2.0, "tags": {"historic": "castle"}},
+        ])
+        # Le second est écarté : sans nom, il n'est pas exploitable.
+        self.assertEqual([(p.name, p.lat) for p in parsed], [("Giverny", 49.1)])
+
+    def test_visit_info_matches_by_wikidata_then_by_proximity(self):
+        from roam_pipeline.discover import apply_visit_info
+
+        par_id = make_place("Par identifiant", wikidata_id="Q1", lat=10.0, lon=10.0)
+        par_distance = make_place("Par proximité", wikidata_id="Q2", lat=45.0, lon=2.0)
+        apply_visit_info(
+            [par_id, par_distance],
+            [
+                self._site(wikidata_id="Q1", lat=0.0, lon=0.0, opening_hours="Mo-Su"),
+                self._site(osm_id="way/2", lat=45.0005, lon=2.0, fee="yes"),
+            ],
+        )
+        # L'identifiant prime sur la distance : le premier est apparié malgré
+        # mille kilomètres d'écart.
+        self.assertTrue(par_id.visitable)
+        self.assertTrue(par_distance.visitable)
+
+    def test_an_unmatched_place_stays_unknown_not_closed(self):
+        from roam_pipeline.discover import apply_visit_info
+
+        isole = make_place("Isolé", lat=0.0, lon=0.0)
+        apply_visit_info([isole], [self._site(opening_hours="Mo-Su")])
+        self.assertIsNone(isole.visitable)
+
+    def test_candidates_exclude_what_the_catalogue_already_has(self):
+        from roam_pipeline.discover import find_candidates
+
+        connu = make_place("Connu", wikidata_id="Q1", lat=45.0, lon=2.0)
+        found = find_candidates(
+            [connu],
+            [
+                self._site(wikidata_id="Q1", opening_hours="Mo-Su"),
+                self._site(osm_id="way/3", lat=45.0002, lon=2.0, opening_hours="Mo-Su"),
+                self._site(osm_id="way/4", lat=47.0, lon=3.0, opening_hours="Mo-Su", name="Neuf"),
+            ],
+        )
+        # Le premier est connu par identifiant, le deuxième par proximité.
+        self.assertEqual([s.name for s in found], ["Neuf"])
+
+    def test_candidates_ignore_sites_without_a_sign_of_access(self):
+        from roam_pipeline.discover import find_candidates
+
+        self.assertEqual(find_candidates([], [self._site(lat=47.0, lon=3.0)]), [])
+
+    def test_best_documented_candidates_come_first(self):
+        from roam_pipeline.discover import find_candidates
+
+        maigre = self._site(osm_id="way/5", lat=47.0, lon=3.0, name="Maigre", website="https://a")
+        riche = self._site(
+            osm_id="way/6", lat=48.0, lon=4.0, name="Riche",
+            wikidata_id="Q9", opening_hours="Mo-Su", fee="yes",
+        )
+        self.assertEqual([s.name for s in find_candidates([], [maigre, riche])], ["Riche", "Maigre"])
+
+    def test_closed_place_is_flagged_only_once_matched(self):
+        from roam_pipeline.alerts import alerts_for
+
+        # Le cas du château d'Hérouville : rapproché, mais rien n'indique
+        # qu'il accueille du public.
+        ferme = make_place("Hérouville", image_url="x")
+        ferme.osm_id = "way/9"
+        self.assertIn("aucun signe d'ouverture au public", alerts_for(ferme, CONFIG))
+
+        # Sans rapprochement, on ne sait rien : on ne dit rien.
+        inconnu = make_place("Inconnu", image_url="x")
+        self.assertEqual(alerts_for(inconnu, CONFIG), [])
+
+
 class TestPinnedPlaces(unittest.TestCase):
     """Le curateur doit pouvoir imposer un lieu que les seuils écarteraient."""
 

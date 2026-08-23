@@ -160,6 +160,26 @@ construction, ajuster un thème coûte une seconde.
 `build` affiche d'ailleurs, pour chaque thème, combien de lieux resteraient à chaque
 plancher — de quoi régler sur des chiffres réels plutôt qu'à l'estime.
 
+### Ce que Wikidata ne sait pas : l'ouverture au public
+
+Wikidata dit si un lieu est **documenté**. Il ne dit pas s'il se **visite**. Cette
+confusion produit deux erreurs symétriques : le château d'Hérouville est au catalogue alors
+qu'il est fermé, les jardins de Giverny en sont absents alors qu'on y vient du monde
+entier.
+
+OpenStreetMap répond à l'autre question. Un lieu qui porte des `opening_hours`, un
+`website` ou un `fee` accueille du public — c'est un fait de terrain, posé par des gens qui
+sont passés devant, sans rapport avec la notoriété encyclopédique.
+
+`discover` interroge donc OpenStreetMap sur toute la France et en tire deux choses :
+
+- **l'ouverture au public** des lieux déjà au catalogue. Un lieu rapproché d'OSM mais sans
+  aucun signe d'accueil est signalé dans la revue. L'absence de rapprochement ne dit rien :
+  le champ reste à « inconnu », qui n'est pas « fermé ».
+- **`data/out/candidates.csv`** : les sites de visite qu'OpenStreetMap connaît et que le
+  catalogue ignore, les mieux documentés en tête. Les trois premières colonnes se
+  recopient telles quelles dans `data/manual/places.csv`.
+
 ### Ajouter un lieu à la main
 
 Le pipeline ratera toujours des lieux : ceux que Wikidata classe mal, et ceux qu'il
