@@ -11,6 +11,8 @@ Deux questions, une même source :
 from __future__ import annotations
 
 import logging
+import re
+import unicodedata
 
 from .collections import haversine_m
 from .models import Place
@@ -18,8 +20,36 @@ from .overpass import OsmPlace
 
 LOG = logging.getLogger(__name__)
 
-# En deçà, on considère qu'OpenStreetMap et Wikidata décrivent le même site.
+# En deçà, on considère qu'OpenStreetMap et Wikidata décrivent le même site —
+# à condition que les noms concordent.
 SAME_PLACE_M = 350.0
+
+# En deçà de cette distance, deux objets sont le même site quoi qu'en disent
+# leurs noms : Wikidata place souvent son point au centre de l'édifice là où
+# OpenStreetMap le pose sur l'entrée.
+IDENTICAL_M = 80.0
+
+# Mots vides des toponymes français : les garder ferait concorder « château de
+# la Roche » avec « moulin de la Roche ».
+STOPWORDS = {
+    "de", "du", "des", "la", "le", "les", "l", "d", "au", "aux", "et", "en",
+    "sur", "sous", "parc", "site", "ancien", "ancienne", "saint", "sainte",
+    "notre", "dame",
+}
+
+# Le mot qui dit la NATURE du lieu. Il ne sert pas à rapprocher — « Roche » se
+# retrouve dans tous les toponymes — mais à écarter : « château de la Roche »
+# et « moulin de la Roche » partagent leur partie distinctive et désignent
+# pourtant deux bâtiments différents.
+#
+# « mont » en est volontairement absent : l'abbaye du Mont-Saint-Michel et le
+# Mont-Saint-Michel sont bien le même lieu.
+TYPES = {
+    "chateau", "moulin", "eglise", "cathedrale", "basilique", "abbaye",
+    "prieure", "chapelle", "musee", "jardin", "grotte", "gouffre", "cascade",
+    "pont", "viaduc", "aqueduc", "phare", "fort", "manoir", "tour", "ferme",
+    "dolmen", "menhir", "villa", "maison",
+}
 
 # Catégories OpenStreetMap → thèmes Roam. Une proposition, pas un verdict :
 # la colonne reste modifiable dans la feuille de candidats.
@@ -31,23 +61,47 @@ THEME_BY_TAG: list[tuple[str, str, str]] = [
     ("historic", "aqueduct", "ponts"),
     ("historic", "city_gate", "monuments"),
     ("historic", "monument", "monuments"),
-    ("historic", "memorial", "monuments"),
     ("historic", "ruins", "monuments"),
     ("tourism", "museum", "musees"),
     ("tourism", "gallery", "musees"),
     ("tourism", "zoo", "musees"),
     ("tourism", "aquarium", "musees"),
     ("tourism", "theme_park", "musees"),
-    ("tourism", "viewpoint", "monuments"),
-    ("tourism", "artwork", "monuments"),
     ("tourism", "attraction", "monuments"),
     ("leisure", "garden", "jardins"),
     ("leisure", "nature_reserve", "plages"),
     ("natural", "cave_entrance", "grottes"),
     ("natural", "waterfall", "cascades"),
-    ("natural", "peak", "sommets"),
-    ("natural", "beach", "plages"),
 ]
+
+
+def _tokens(name: str) -> set[str]:
+    plain = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode().lower()
+    return {
+        word
+        for word in re.split(r"[^a-z0-9]+", plain)
+        if len(word) >= 4 and word not in STOPWORDS
+    }
+
+
+def names_match(left: str, right: str) -> bool:
+    """Deux noms désignent-ils vraisemblablement le même lieu ?
+
+    Le rapprochement par simple distance apparie n'importe quoi dès que la
+    densité augmente : un château et le point de vue d'en face sont à deux cents
+    mètres l'un de l'autre. Le nom tranche, en deux temps — une nature de lieu
+    qui diffère suffit à écarter, puis une partie distinctive commune à
+    rapprocher.
+    """
+    a, b = _tokens(left), _tokens(right)
+    left_type, right_type = a & TYPES, b & TYPES
+    if left_type and right_type and not (left_type & right_type):
+        return False
+
+    distinctive_a, distinctive_b = a - TYPES, b - TYPES
+    if not distinctive_a or not distinctive_b:
+        return False
+    return bool(distinctive_a & distinctive_b)
 
 
 def guess_theme(tags: dict[str, str]) -> str | None:
@@ -82,7 +136,9 @@ class _Index:
             lat, lon = position(item)
             self._cells.setdefault(_key(lat, lon), []).append(item)
 
-    def near(self, lat: float, lon: float, radius_m: float):
+    def near(self, lat: float, lon: float, radius_m: float, name: str | None = None):
+        """Voisin le plus proche. Avec un `name`, le nom doit concorder au-delà
+        de la distance d'identité."""
         cx, cy = _key(lat, lon)
         best, best_distance = None, radius_m
         for dx in (-1, 0, 1):
@@ -90,8 +146,15 @@ class _Index:
                 for item in self._cells.get((cx + dx, cy + dy), ()):
                     ilat, ilon = self._position(item)
                     distance = haversine_m(lat, lon, ilat, ilon)
-                    if distance < best_distance:
-                        best, best_distance = item, distance
+                    if distance >= best_distance:
+                        continue
+                    if (
+                        name is not None
+                        and distance > IDENTICAL_M
+                        and not names_match(name, getattr(item, "name", ""))
+                    ):
+                        continue
+                    best, best_distance = item, distance
         return best
 
 
@@ -109,7 +172,7 @@ def apply_visit_info(places: list[Place], osm: list[OsmPlace]) -> int:
     for place in places:
         found = by_qid.get(place.wikidata_id)
         if found is None:
-            found = index.near(place.lat, place.lon, SAME_PLACE_M)
+            found = index.near(place.lat, place.lon, SAME_PLACE_M, place.name)
         if found is None:
             continue
 
@@ -140,23 +203,39 @@ def find_candidates(places: list[Place], osm: list[OsmPlace]) -> list[OsmPlace]:
     known_qids = {p.wikidata_id for p in places}
     index = _Index(places, lambda p: (p.lat, p.lon))
     candidates: list[OsmPlace] = []
+    funnel = {"lus": len(osm), "gérés": 0, "absents": 0, "thème reconnu": 0}
 
     for site in osm:
         if not site.managed:
             continue
+        funnel["gérés"] += 1
         if site.wikidata_id and site.wikidata_id in known_qids:
             continue
-        if index.near(site.lat, site.lon, SAME_PLACE_M) is not None:
+        if index.near(site.lat, site.lon, SAME_PLACE_M, site.name) is not None:
             continue
+        funnel["absents"] += 1
         if guess_theme(site.tags) is None:
             continue
+        funnel["thème reconnu"] += 1
         candidates.append(site)
 
     # Les mieux documentés d'abord : un site avec horaires, tarif et lien
     # encyclopédique est un candidat plus sûr qu'un simple site web.
     candidates.sort(key=_confidence, reverse=True)
-    LOG.info("candidats : %s sites de visite absents du catalogue", len(candidates))
+    LOG.info("entonnoir des candidats : %s", ", ".join(f"{k} {v}" for k, v in funnel.items()))
     return candidates
+
+
+def is_confident(site: OsmPlace) -> bool:
+    """Candidat assez solide pour être proposé sans réserve.
+
+    Un site web ne prouve pas grand-chose — beaucoup de lieux privés en ont un.
+    Des horaires ou un tarif disent l'accueil du public, et un lien
+    encyclopédique dit qu'il y a quelque chose à voir. Les deux ensemble
+    décrivent exactement ce qui manquait au catalogue : très visité, peu
+    documenté par les classes Wikidata.
+    """
+    return bool((site.opening_hours or site.fee) and (site.wikidata_id or site.wikipedia))
 
 
 def _confidence(site: OsmPlace) -> tuple[int, str]:

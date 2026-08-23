@@ -526,6 +526,60 @@ class TestOpenStreetMap(unittest.TestCase):
         apply_visit_info([isole], [self._site(opening_hours="Mo-Su")])
         self.assertIsNone(isole.visitable)
 
+    def test_names_agree_on_the_same_place(self):
+        from roam_pipeline.discover import names_match
+
+        self.assertTrue(names_match("Château de Chambord", "Chambord"))
+        self.assertTrue(names_match("Abbaye du Mont-Saint-Michel", "Mont-Saint-Michel"))
+        self.assertTrue(names_match("Jardins de Claude Monet", "Fondation Claude Monet"))
+
+    def test_a_differing_place_type_breaks_the_match(self):
+        from roam_pipeline.discover import names_match
+
+        # Ils partagent leur partie distinctive et désignent pourtant deux
+        # bâtiments différents : c'est la nature du lieu qui tranche.
+        self.assertFalse(names_match("Château de la Roche", "Moulin de la Roche"))
+        self.assertFalse(names_match("Église Saint-Pierre", "Château Saint-Pierre"))
+
+    def test_unrelated_names_do_not_match(self):
+        from roam_pipeline.discover import names_match
+
+        self.assertFalse(names_match("Cascade du Hérisson", "Belvédère des Tufs"))
+        self.assertFalse(names_match("", "Chambord"))
+
+    def test_proximity_alone_does_not_match_a_different_place(self):
+        from roam_pipeline.discover import apply_visit_info
+
+        # Deux cents mètres séparent le château du moulin voisin : sans le
+        # contrôle du nom, le château hériterait des horaires du moulin.
+        chateau = make_place("Château de la Roche", lat=45.0, lon=2.0)
+        apply_visit_info(
+            [chateau],
+            [self._site(name="Moulin de la Roche", lat=45.0018, lon=2.0, opening_hours="Mo-Su")],
+        )
+        self.assertIsNone(chateau.visitable)
+
+    def test_a_very_close_object_matches_whatever_its_name(self):
+        from roam_pipeline.discover import apply_visit_info
+
+        # À cinquante mètres, c'est le même site : Wikidata pointe le centre de
+        # l'édifice, OpenStreetMap son entrée.
+        place = make_place("Château de la Roche", lat=45.0, lon=2.0)
+        apply_visit_info(
+            [place],
+            [self._site(name="Entrée visiteurs", lat=45.00045, lon=2.0, fee="yes")],
+        )
+        self.assertTrue(place.visitable)
+
+    def test_confident_candidates_need_access_and_documentation(self):
+        from roam_pipeline.discover import is_confident
+
+        self.assertTrue(is_confident(self._site(opening_hours="Mo-Su", wikidata_id="Q1")))
+        # Un site web seul ne prouve rien : beaucoup de lieux privés en ont un.
+        self.assertFalse(is_confident(self._site(website="https://a", wikidata_id="Q1")))
+        # Des horaires sans rien à voir ne suffisent pas non plus.
+        self.assertFalse(is_confident(self._site(opening_hours="Mo-Su")))
+
     def test_candidates_exclude_what_the_catalogue_already_has(self):
         from roam_pipeline.discover import find_candidates
 

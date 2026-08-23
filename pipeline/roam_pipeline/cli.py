@@ -179,7 +179,7 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     Répond aux deux questions que Wikidata ne sait pas trancher : ce lieu
     se visite-t-il, et que manque-t-il au catalogue.
     """
-    from .discover import apply_visit_info, find_candidates, guess_theme
+    from .discover import apply_visit_info, find_candidates, guess_theme, is_confident
     from .overpass import OverpassClient, cells
 
     raw_path = args.out / "places_raw.json"
@@ -208,6 +208,8 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     )
 
     candidates = find_candidates(places, osm)
+    confident = [site for site in candidates if is_confident(site)]
+    retained = candidates if args.all else confident
     out_path = args.out / "candidates.csv"
     with out_path.open("w", encoding="utf-8", newline="") as fh:
         writer = csv.writer(fh)
@@ -217,7 +219,7 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
             ["wikidata_id", "theme_id", "note", "nom", "osm_id",
              "horaires", "tarif", "site_web", "lat", "lon"]
         )
-        for site in candidates[: args.limit]:
+        for site in retained[: args.limit]:
             writer.writerow([
                 site.wikidata_id or "",
                 guess_theme(site.tags) or "",
@@ -231,12 +233,14 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
                 f"{site.lon:.6f}",
             ])
 
-    ready = sum(1 for s in candidates[: args.limit] if s.wikidata_id)
-    print(f"\n{len(osm)} sites de visite lus sur OpenStreetMap.")
-    print(f"{len(candidates)} absents du catalogue, {min(len(candidates), args.limit)} écrits "
-          f"dans {out_path}")
-    print(f"dont {ready} avec un identifiant Wikidata, directement recopiables "
-          f"dans data/manual/places.csv.")
+    ready = sum(1 for s in retained[: args.limit] if s.wikidata_id)
+    print(f"\n{len(osm)} sites lus sur OpenStreetMap.")
+    print(f"{len(candidates)} absents du catalogue, dont {len(confident)} avec un signe "
+          f"d'accueil du public ET un lien encyclopédique.")
+    print(f"{min(len(retained), args.limit)} écrits dans {out_path}, "
+          f"dont {ready} directement recopiables dans data/manual/places.csv.")
+    if not args.all and len(candidates) > len(confident):
+        print(f"Ajoute --all pour voir les {len(candidates) - len(confident)} autres.")
     print("Relance `build` pour tenir compte de l'ouverture au public.")
     return 0
 
@@ -413,6 +417,15 @@ def _print_stats(places, collections, raw=None) -> None:
     for theme_id, n in themes.most_common():
         print(f"      {theme_id:<16} : {n}")
 
+    ouverts = sum(1 for p in places if getattr(p, "visitable", None))
+    rapproches = sum(1 for p in places if getattr(p, "osm_id", None))
+    if rapproches:
+        print(
+            f"  Ouverture au public  : {ouverts} ouverts, "
+            f"{rapproches - ouverts} sans signe, "
+            f"{len(places) - rapproches} inconnus"
+        )
+
     _print_sitelink_distribution(raw if raw is not None else places, config_floors())
     print()
 
@@ -513,6 +526,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     discover.add_argument(
         "--limit", type=int, default=1500, help="nombre maximum de candidats écrits"
+    )
+    discover.add_argument(
+        "--all",
+        action="store_true",
+        help="inclure les candidats moins sûrs (sans lien encyclopédique)",
     )
 
     sub.add_parser("build", help="score, construit les collections et exporte")

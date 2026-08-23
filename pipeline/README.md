@@ -177,8 +177,15 @@ sont passés devant, sans rapport avec la notoriété encyclopédique.
   aucun signe d'accueil est signalé dans la revue. L'absence de rapprochement ne dit rien :
   le champ reste à « inconnu », qui n'est pas « fermé ».
 - **`data/out/candidates.csv`** : les sites de visite qu'OpenStreetMap connaît et que le
-  catalogue ignore, les mieux documentés en tête. Les trois premières colonnes se
-  recopient telles quelles dans `data/manual/places.csv`.
+  catalogue ignore. Par défaut, seuls les candidats sûrs — un signe d'accueil du public
+  (horaires ou tarif) **et** un lien encyclopédique. `--all` donne les autres. Les trois
+  premières colonnes se recopient telles quelles dans `data/manual/places.csv`.
+
+Le rapprochement se fait par identifiant Wikidata, puis par proximité **conditionnée au
+nom**. Sans ce contrôle, la densité fait tout apparier : « château de la Roche » et
+« moulin de la Roche » sont à deux cents mètres l'un de l'autre et ne sont pas le même
+bâtiment. Le mot qui dit la nature du lieu tranche ; en deçà de quatre-vingts mètres, on
+considère qu'il s'agit du même site quoi qu'en disent les noms.
 
 ### Ajouter un lieu à la main
 

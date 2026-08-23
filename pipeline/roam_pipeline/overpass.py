@@ -37,13 +37,21 @@ USER_AGENT = "RoamCatalogBot/0.1 (https://github.com/alexnr10/roam) python-reque
 FRANCE_BBOX = (41.3, -5.2, 51.2, 9.6)
 CELL_DEGREES = 2.0
 
-# Catégories susceptibles de porter un lieu de visite. Le tri fin vient ensuite
-# des balises de gestion, pas de cette liste.
+# Catégories susceptibles de porter un lieu de visite.
+#
+# La première version en ramenait 290 000 sur la France. Quatre catégories
+# faisaient l'essentiel du volume sans jamais désigner un lieu de collection :
+# `historic=memorial` (chaque monument aux morts communal), `tourism=artwork`
+# (chaque statue de square), `tourism=viewpoint` (chaque banc panoramique) et
+# `natural=peak` (chaque cote de l'IGN dans les Alpes). Elles sont retirées.
+#
+# `natural=peak` et `natural=beach` restent par ailleurs mieux servis par
+# Wikidata, qui distingue le sommet remarquable de la simple altitude nommée.
 TAG_FILTERS = [
-    'tourism~"^(attraction|museum|gallery|viewpoint|artwork|zoo|aquarium|theme_park)$"',
-    'historic~"^(castle|fort|monument|memorial|ruins|archaeological_site|manor|city_gate|aqueduct)$"',
+    'tourism~"^(museum|gallery|zoo|aquarium|theme_park|attraction)$"',
+    'historic~"^(castle|fort|manor|monument|ruins|archaeological_site|city_gate|aqueduct)$"',
     'leisure~"^(garden|nature_reserve)$"',
-    'natural~"^(cave_entrance|waterfall|peak|beach)$"',
+    'natural~"^(cave_entrance|waterfall)$"',
 ]
 
 
