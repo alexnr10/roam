@@ -447,7 +447,8 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
     suivre un lieu à travers elles et de dire laquelle l'arrête.
     """
     from .collections import (
-        apply_geographic_scope, apply_notoriety_floor, dedupe, dedupe_across_themes,
+        apply_access_filter, apply_geographic_scope, apply_notoriety_floor, dedupe,
+        dedupe_across_themes,
     )
     from .score import notoriety_floor
 
@@ -482,6 +483,7 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
         stages = [("décision du curateur", kept)]
         stages.append(("périmètre français", apply_geographic_scope(stages[-1][1], config)))
         stages.append(("thème unique", dedupe_across_themes(stages[-1][1], config)))
+        stages.append(("accès refusé", apply_access_filter(stages[-1][1], config)))
         stages.append(("plancher de notoriété", apply_notoriety_floor(stages[-1][1], config)))
         stages.append(("doublon de proximité", dedupe(stages[-1][1])))
         _retained, collections = build_all(kept, config)

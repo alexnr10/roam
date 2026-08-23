@@ -51,6 +51,22 @@ scoring:
   # 1.0 annule la remise, 0.7 la rend franche, 0.5 la rend permissive.
   visitable_floor_ratio: 0.7
 
+  # Repêchage : un lieu sous le plancher de son thème est conservé si son score
+  # global atteint ce seuil.
+  #
+  # Le plancher ne regarde QU'UN signal, le nombre de versions linguistiques.
+  # Le score les regarde tous — longueur de l'article francophone, photo,
+  # labels, accueil du public. Laisser le premier écarter ce que le second
+  # classe très haut, c'est préférer une mesure grossière à une mesure fine.
+  #
+  # Le cas d'école est le musée des impressionnismes de Giverny : 5 langues
+  # seulement — les étrangers y viennent sans écrire dessus dans leur langue —
+  # mais un long article français, une photo, des horaires. Score 88, très
+  # au-dessus du seuil de niveau 1, et pourtant écarté par un plancher à 12.
+  #
+  # À monter si le repêchage fait entrer trop de monde ; 0 le désactive.
+  rescue_score: 70.0
+
   # Les bonus de label sont définis dans labels.yaml (`score_bonus`).
   # Seul le plus élevé s'applique, plus la moitié du deuxième — pour éviter
   # qu'un empilement de petits labels dépasse un site UNESCO.

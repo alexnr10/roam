@@ -539,6 +539,54 @@ class TestPublicAccessInScore(unittest.TestCase):
         self.assertEqual(notoriety_floor(inconnu, 12, CONFIG), 12)
 
 
+class TestAccessAndRescue(unittest.TestCase):
+    """Deux règles nées de deux lieux précis."""
+
+    def test_a_place_with_refused_access_leaves_the_catalogue(self):
+        from roam_pipeline.collections import apply_access_filter
+
+        # Le château d'Hérouville a une histoire passionnante et ne se visite
+        # pas. L'application se joue sur place : il n'est pas collectionnable.
+        ferme = make_place("Château d'Hérouville", sitelinks=10)
+        ferme.visitable = False
+        ouvert = make_place("Château voisin", sitelinks=10)
+        kept = apply_access_filter([ferme, ouvert], CONFIG)
+        self.assertEqual([p.name for p in kept], ["Château voisin"])
+
+    def test_the_curator_can_keep_a_place_with_refused_access(self):
+        from roam_pipeline.collections import apply_access_filter
+
+        force = make_place("Château vu de la route", sitelinks=10)
+        force.visitable, force.pinned = False, True
+        self.assertEqual(len(apply_access_filter([force], CONFIG)), 1)
+
+    def test_an_unknown_access_is_never_excluded(self):
+        from roam_pipeline.collections import apply_access_filter
+
+        # Les deux tiers du catalogue sont dans ce cas : les exclure viderait tout.
+        inconnu = make_place("Sans balise", sitelinks=10)
+        self.assertIsNone(inconnu.visitable)
+        self.assertEqual(len(apply_access_filter([inconnu], CONFIG)), 1)
+
+    def test_a_high_score_is_rescued_from_the_floor(self):
+        from roam_pipeline.collections import apply_notoriety_floor
+
+        # Le musée des impressionnismes de Giverny : 5 langues seulement, mais
+        # un long article français, une photo, des horaires — score 88.
+        floor = CONFIG.theme("musees").min_sitelinks
+        giverny = make_place("Musée des impressionnismes", theme_id="musees", sitelinks=5)
+        giverny.score = CONFIG.scoring.rescue_score + 1
+        self.assertLess(giverny.sitelinks, floor)
+        self.assertEqual(len(apply_notoriety_floor([giverny], CONFIG)), 1)
+
+    def test_a_low_score_under_the_floor_stays_out(self):
+        from roam_pipeline.collections import apply_notoriety_floor
+
+        obscur = make_place("Musée municipal", theme_id="musees", sitelinks=5)
+        obscur.score = CONFIG.scoring.rescue_score - 1
+        self.assertEqual(apply_notoriety_floor([obscur], CONFIG), [])
+
+
 class TestFloorReliefIsVisible(unittest.TestCase):
     """Un lieu conservé par la remise doit se relire à part."""
 

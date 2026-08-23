@@ -70,9 +70,9 @@ def write_json(places: list[Place], collections: list[Collection], out_dir: Path
 def under_floor(place: Place, config: Config) -> bool:
     """Ce lieu est-il sous le plancher éditorial de son thème ?
 
-    Il n'y est alors que par la remise accordée à l'accueil du public attesté.
-    C'est un pari sur un signal de terrain contre un signal encyclopédique : le
-    relecteur doit pouvoir le voir, et le relire à part.
+    Il n'y est alors que par la remise accordée à l'accueil du public attesté,
+    ou repêché par son score. Dans les deux cas c'est un pari contre le signal
+    le plus simple : le relecteur doit pouvoir le voir, et le relire à part.
     """
     try:
         return place.sitelinks < config.theme(place.theme_id).min_sitelinks
@@ -388,6 +388,7 @@ def write_review_html(
     out_path.write_text(
         _REVIEW_TEMPLATE.replace("__DATA__", payload)
         .replace("__THEMES__", json.dumps(themes, ensure_ascii=False))
+        .replace("__RESCUE__", json.dumps(config.scoring.rescue_score))
         .replace("__TITLE__", REVIEW_PAGE_TITLE),
         encoding="utf-8",
     )
@@ -482,6 +483,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
 <script>
 const DATA = __DATA__;
 const THEMES = __THEMES__;
+const RESCUE = __RESCUE__;
 const KEY = "roam.review.v1";
 
 let decisions = {};
@@ -549,7 +551,8 @@ function card(p) {
         : ""}
       ${p.underFloor
         ? `<div class="found">Sous le plancher de son thème (${p.sitelinks} langues) —
-             conservé parce qu'il accueille du public</div>`
+             conservé ${p.visitable === true ? "parce qu'il accueille du public" : ""}
+             ${p.score >= RESCUE ? "par son score" : ""}</div>`
         : ""}
       <div class="parts">${p.score.toFixed(0)} pts =
         ${parts.notoriete} notoriété (${p.sitelinks} langues)

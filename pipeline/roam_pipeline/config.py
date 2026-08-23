@@ -67,6 +67,10 @@ class Scoring:
     # thème, et non un nombre fixe : retirer trois langues à un plancher de
     # douze est une remise, à un plancher de cinq c'est une amnistie.
     visitable_floor_ratio: float = 1.0
+    # Score à partir duquel un lieu est repêché malgré un plancher qu'il ne
+    # franchit pas. Le plancher ne regarde qu'un signal ; le score les regarde
+    # tous. 0 désactive le repêchage.
+    rescue_score: float = 0.0
 
 
 @dataclass(frozen=True)

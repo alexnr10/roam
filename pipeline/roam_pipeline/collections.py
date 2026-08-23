@@ -256,6 +256,8 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
     kept: list[Place] = []
     dropped: dict[str, int] = defaultdict(int)
     saved: dict[str, int] = defaultdict(int)
+    rescued: dict[str, int] = defaultdict(int)
+    rescue = config.scoring.rescue_score
 
     for place in places:
         try:
@@ -271,6 +273,12 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
             kept.append(place)
             if floor < theme_floor and place.sitelinks < theme_floor:
                 saved[place.theme_id] += 1
+        elif rescue and place.score >= rescue:
+            # Le plancher ne regarde qu'un signal ; le score les regarde tous.
+            # Laisser le premier écarter ce que le second classe très haut
+            # reviendrait à préférer la mesure grossière à la mesure fine.
+            kept.append(place)
+            rescued[place.theme_id] += 1
         else:
             dropped[place.theme_id] += 1
 
@@ -279,6 +287,14 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
             "plancher de notoriété : %s lieux écartés (%s)",
             sum(dropped.values()),
             ", ".join(f"{k} {v}" for k, v in sorted(dropped.items(), key=lambda x: -x[1])),
+        )
+    if rescued:
+        LOG.info(
+            "%s lieux repêchés par leur score malgré le plancher "
+            "(scoring.rescue_score = %s) : %s",
+            sum(rescued.values()),
+            rescue,
+            ", ".join(f"{k} {v}" for k, v in sorted(rescued.items(), key=lambda x: -x[1])),
         )
     if saved:
         # Le réglage doit être visible pour être réglable : sans ce compte, la
@@ -293,12 +309,42 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
     return kept
 
 
+def apply_access_filter(places: list[Place], config: Config) -> list[Place]:
+    """Écarte les lieux dont OpenStreetMap dit l'accès explicitement refusé.
+
+    L'application se joue sur place : on valide un lieu en s'y rendant. Un lieu
+    où l'on ne peut pas entrer n'est donc pas collectionnable, si intéressante
+    que soit son histoire — le château d'Hérouville en est l'exemple.
+
+    Le signal est rare et délibéré : `access=private` ou `access=no` est posé à
+    la main par un contributeur, et ne concerne qu'une vingtaine de lieux sur
+    près de deux mille. Il ne s'agit donc pas d'une heuristique mais d'un fait,
+    et un malus de score ne suffisait pas à s'en débarrasser.
+
+    Un lieu épinglé y échappe : le curateur reste le dernier mot, et un lieu
+    qu'il valide explicitement peut se voir depuis la route.
+    """
+    refused = [p for p in places if p.visitable is False and not p.pinned]
+    excluded = {id(p) for p in refused}
+    kept = [p for p in places if id(p) not in excluded]
+    if refused:
+        LOG.info(
+            "accès refusé : %s lieux écartés (%s)",
+            len(refused),
+            ", ".join(p.name for p in refused[:5]),
+        )
+    return kept
+
+
 def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Collection]]:
     # L'ordre compte : on fixe d'abord le thème de chaque lieu, puis on lui
     # applique le plancher de CE thème, puis on écarte les doublons de lieu.
     kept = dedupe(
         apply_notoriety_floor(
-            dedupe_across_themes(apply_geographic_scope(places, config), config), config
+            apply_access_filter(
+                dedupe_across_themes(apply_geographic_scope(places, config), config), config
+            ),
+            config,
         )
     )
     collections = (

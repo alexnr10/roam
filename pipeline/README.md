@@ -271,6 +271,34 @@ donc rester relisible. Le nombre de lieux qu'elle sauve est journalisé par thè
 filtre dédié — de quoi juger ces lieux comme un lot, et remonter le seuil s'ils ne
 tiennent pas.
 
+### Le plancher ne décide pas seul
+
+Le plancher de notoriété ne regarde **qu'un** signal : le nombre de versions
+linguistiques. Le score les regarde tous — longueur de l'article francophone, photo,
+labels, accueil du public. Laisser le premier écarter ce que le second classe très haut,
+c'est préférer une mesure grossière à une mesure fine.
+
+Le cas d'école est le musée des impressionnismes de Giverny : **5 langues** seulement — on
+y vient du monde entier sans écrire dessus dans sa langue — mais un long article français,
+une photo et des horaires. Score 88, très au-dessus du seuil de niveau 1 (45), et pourtant
+écarté par un plancher fixé à 12.
+
+Un lieu sous son plancher est donc repêché si son score atteint `rescue_score`. Les
+repêchés sont comptés par thème à chaque `build` et se relisent à part dans la page de
+revue, comme les lieux entrés par la remise.
+
+### Un lieu où l'on ne peut pas entrer n'est pas collectionnable
+
+L'application se joue sur place : on valide en s'y rendant. Les lieux dont OpenStreetMap
+dit l'accès explicitement refusé (`access=private|no`) sont donc écartés, et non plus
+seulement pénalisés — un malus de 20 points ne suffisait pas à sortir le château
+d'Hérouville, qui restait au niveau 2 des châteaux d'Île-de-France.
+
+Le signal est rare et délibéré : posé à la main par un contributeur, il ne concerne qu'une
+vingtaine de lieux sur près de deux mille. Ce n'est donc pas une heuristique mais un fait.
+Un lieu épinglé par le curateur y échappe : ce qui se voit très bien depuis la route reste
+son choix.
+
 ### Pourquoi ce lieu est-il là, ou pourquoi n'y est-il pas ?
 
 La question revient à chaque revue. Chaque étape du pipeline étant un filtre nommé, il
