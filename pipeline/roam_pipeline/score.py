@@ -80,10 +80,16 @@ def notoriety_floor(place: Place, floor: int, config: Config) -> int:
     attesté ET qui a un article francophone apporte une preuve d'un autre
     ordre : on y va vraiment, et quelqu'un a pris la peine d'écrire dessus. Il
     a droit à une remise — pas à une dispense.
+
+    La remise est une PROPORTION, pas un nombre de langues. Un rabais fixe de
+    trois est modeste sur le plancher des musées (12 → 9) et dévastateur sur
+    celui des mégalithes (6 → 3) : les thèmes les moins exigeants se
+    retrouvaient sans plancher du tout, et c'est là que la remise servait le
+    plus — 82 mégalithes et 73 jardins repêchés d'un coup.
     """
-    relief = config.scoring.visitable_floor_relief
-    if relief and place.visitable is True and place.has_frwiki:
-        return max(1, floor - relief)
+    ratio = config.scoring.visitable_floor_ratio
+    if ratio < 1.0 and place.visitable is True and place.has_frwiki:
+        return max(1, math.ceil(floor * ratio))
     return floor
 
 

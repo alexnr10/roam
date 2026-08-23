@@ -42,9 +42,14 @@ scoring:
   # Remise sur le plancher de notoriété (`min_sitelinks`) quand l'accueil du
   # public est attesté ET qu'un article francophone existe. Le plancher mesure
   # la documentation ; ces deux signaux réunis disent qu'on y va vraiment.
-  # C'est le réglage à bouger si les découvertes OpenStreetMap meurent toutes
-  # au plancher — ou si elles inondent le catalogue.
-  visitable_floor_relief: 3
+  #
+  # Une PROPORTION du plancher du thème, arrondie au supérieur. Un rabais fixe
+  # de trois langues serait modeste sur les musées (12 → 9) et dévastateur sur
+  # les mégalithes (6 → 3) : les thèmes les moins exigeants se retrouveraient
+  # sans plancher du tout, et c'est justement là que la remise sert le plus.
+  #
+  # 1.0 annule la remise, 0.7 la rend franche, 0.5 la rend permissive.
+  visitable_floor_ratio: 0.7
 
   # Les bonus de label sont définis dans labels.yaml (`score_bonus`).
   # Seul le plus élevé s'applique, plus la moitié du deuxième — pour éviter

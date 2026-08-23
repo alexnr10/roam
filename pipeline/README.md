@@ -255,9 +255,15 @@ Le malus fait reculer, il n'exclut pas : un château qu'on ne visite pas peut se
 photographier depuis la route, et une alerte prévient déjà le relecteur.
 
 Enfin, l'accueil du public attesté **et** un article francophone donnent droit à une
-remise sur le plancher de notoriété (`visitable_floor_relief`). Le plancher mesure la
+remise sur le plancher de notoriété (`visitable_floor_ratio`). Le plancher mesure la
 documentation ; ces deux signaux réunis disent qu'on y va vraiment. C'est le réglage à
 bouger si les découvertes OpenStreetMap meurent toutes au plancher — ou l'inondent.
+
+C'est une **proportion** du plancher du thème, et non un nombre de langues. Un rabais
+fixe de trois est modeste sur les musées (12 → 9) et dévastateur sur les mégalithes
+(6 → 3) : les thèmes les moins exigeants se retrouvent sans plancher du tout, et c'est
+justement là que la remise sert le plus. Sur le premier passage, elle repêchait d'un coup
+82 mégalithes et 73 jardins — une amnistie, pas une remise.
 
 Une remise est un pari : un signal de terrain contre un signal encyclopédique. Elle doit
 donc rester relisible. Le nombre de lieux qu'elle sauve est journalisé par thème à chaque

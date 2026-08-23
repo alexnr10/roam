@@ -285,9 +285,9 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
         # remise agirait sans qu'on sache jamais sur combien de lieux.
         LOG.info(
             "%s lieux conservés par la remise « ouvert au public » "
-            "(scoring.visitable_floor_relief = %s) : %s",
+            "(scoring.visitable_floor_ratio = %s) : %s",
             sum(saved.values()),
-            config.scoring.visitable_floor_relief,
+            config.scoring.visitable_floor_ratio,
             ", ".join(f"{k} {v}" for k, v in sorted(saved.items(), key=lambda x: -x[1])),
         )
     return kept

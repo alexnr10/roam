@@ -63,8 +63,10 @@ class Scoring:
     visitable_bonus: float = 0.0
     not_visitable_malus: float = 0.0
     # Remise sur le plancher de notoriété pour un lieu dont l'accueil du public
-    # est attesté ET qui a un article francophone.
-    visitable_floor_relief: int = 0
+    # est attesté ET qui a un article francophone. Une PROPORTION du plancher du
+    # thème, et non un nombre fixe : retirer trois langues à un plancher de
+    # douze est une remise, à un plancher de cinq c'est une amnistie.
+    visitable_floor_ratio: float = 1.0
 
 
 @dataclass(frozen=True)

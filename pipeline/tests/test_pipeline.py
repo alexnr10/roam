@@ -511,6 +511,10 @@ class TestPublicAccessInScore(unittest.TestCase):
         ouvert = make_place("Musée ouvert", sitelinks=10)
         ouvert.visitable, ouvert.has_frwiki = True, True
         self.assertLess(notoriety_floor(ouvert, 12, CONFIG), 12)
+        # Mais proportionnelle : un plancher bas ne doit pas disparaître.
+        # Un rabais fixe de 3 aurait ramené celui des mégalithes de 6 à 3.
+        self.assertGreater(notoriety_floor(ouvert, 6, CONFIG), 3)
+        self.assertGreaterEqual(notoriety_floor(ouvert, 2, CONFIG), 1)
 
         # Ouvert mais sans article : le plancher tient.
         sans_article = make_place("Boutique-musée", sitelinks=10)
