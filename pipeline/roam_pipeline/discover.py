@@ -13,6 +13,7 @@ from __future__ import annotations
 import logging
 import re
 import unicodedata
+from collections.abc import Callable
 
 from .collections import haversine_m
 from .models import Place
@@ -230,6 +231,44 @@ def find_candidates(places: list[Place], osm: list[OsmPlace]) -> list[OsmPlace]:
     candidates.sort(key=_confidence, reverse=True)
     LOG.info("entonnoir des candidats : %s", ", ".join(f"{k} {v}" for k, v in funnel.items()))
     return candidates
+
+
+def keep_in_france(
+    sites: list[OsmPlace], locate: Callable[[list[tuple[str, float, float]]], dict[str, str]]
+) -> list[OsmPlace]:
+    """Écarte les candidats situés hors de France, et situe les autres.
+
+    La collecte OpenStreetMap part d'un rectangle, et un rectangle autour de la
+    France déborde sur six pays. Rien en aval ne le rattrapait : les lieux du
+    catalogue viennent de Wikidata, où la nationalité est filtrée à la source,
+    si bien que le contrôle de périmètre ne s'appliquait qu'à eux. Les candidats
+    y échappaient entièrement.
+
+    Le contrôle porte donc ici, sur les coordonnées, seule information dont on
+    dispose à coup sûr. Il rapporte au passage le département, qui rend la
+    feuille de candidats lisible : savoir où est un lieu aide à juger s'il vaut
+    le détour.
+    """
+    if not sites:
+        return []
+
+    found = locate([(site.osm_id, site.lat, site.lon) for site in sites])
+    kept: list[OsmPlace] = []
+    for site in sites:
+        departement = found.get(site.osm_id)
+        if not departement:
+            continue
+        site.departement = departement
+        kept.append(site)
+
+    rejected = len(sites) - len(kept)
+    if rejected:
+        LOG.info(
+            "périmètre : %s candidats hors de France écartés (%s)",
+            rejected,
+            ", ".join(s.name for s in sites if s.departement is None)[:120],
+        )
+    return kept
 
 
 def is_confident(site: OsmPlace) -> bool:

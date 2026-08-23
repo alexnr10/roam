@@ -179,17 +179,28 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     Répond aux deux questions que Wikidata ne sait pas trancher : ce lieu
     se visite-t-il, et que manque-t-il au catalogue.
     """
-    from .discover import apply_visit_info, find_candidates, guess_theme, is_confident
-    from .overpass import OverpassClient, cells
+    from .discover import (
+        apply_visit_info, find_candidates, guess_theme, is_confident, keep_in_france,
+    )
+    from .geocode import departements_for
+    from .overpass import PROBE_CELL, OverpassClient, cells
 
     raw_path = args.out / "places_raw.json"
     if not raw_path.exists():
         print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
         return 1
 
+    client = OverpassClient()
+    # Un aller-retour de contrôle avant d'en lancer quarante : la requête
+    # délimite la France par une zone, et une zone qui ne se résout pas ne
+    # provoque aucune erreur — elle renvoie simplement zéro objet, partout.
+    if not client.fetch_cell(PROBE_CELL):
+        print("Le contrôle sur le centre de Paris ne renvoie rien : la zone France "
+              "n'a pas été résolue par Overpass. Collecte interrompue.", file=sys.stderr)
+        return 1
+
     grid = list(cells())
     print(f"Interrogation d'OpenStreetMap : {len(grid)} cellules, compte ~{len(grid) // 4} min.")
-    client = OverpassClient()
     osm = []
     for index, cell in enumerate(grid, start=1):
         found = client.fetch_cell(cell)
@@ -208,6 +219,10 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     )
 
     candidates = find_candidates(places, osm)
+    # Deuxième garde-fou, indépendant de la requête Overpass : le rectangle de
+    # collecte déborde sur les pays voisins, et une zone mal résolue par un
+    # miroir Overpass repeuplerait la feuille de musées bâlois ou milanais.
+    candidates = keep_in_france(candidates, departements_for)
     confident = [site for site in candidates if is_confident(site)]
     retained = candidates if args.all else confident
     out_path = args.out / "candidates.csv"
@@ -216,7 +231,7 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
         # Les trois premières colonnes se recopient telles quelles dans
         # data/manual/places.csv ; les suivantes servent à décider.
         writer.writerow(
-            ["wikidata_id", "theme_id", "note", "nom", "osm_id",
+            ["wikidata_id", "theme_id", "note", "nom", "departement", "osm_id",
              "horaires", "tarif", "site_web", "lat", "lon"]
         )
         for site in retained[: args.limit]:
@@ -225,6 +240,7 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
                 guess_theme(site.tags) or "",
                 site.name,
                 site.name,
+                site.departement or "",
                 site.osm_id,
                 site.opening_hours or "",
                 site.fee or "",
@@ -235,7 +251,7 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
 
     ready = sum(1 for s in retained[: args.limit] if s.wikidata_id)
     print(f"\n{len(osm)} sites lus sur OpenStreetMap.")
-    print(f"{len(candidates)} absents du catalogue, dont {len(confident)} avec un signe "
+    print(f"{len(candidates)} en France et absents du catalogue, dont {len(confident)} avec un signe "
           f"d'accueil du public ET un lien encyclopédique.")
     print(f"{min(len(retained), args.limit)} écrits dans {out_path}, "
           f"dont {ready} directement recopiables dans data/manual/places.csv.")

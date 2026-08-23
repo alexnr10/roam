@@ -194,6 +194,22 @@ nom**. Sans ce contrôle, la densité fait tout apparier : « château de la Roc
 bâtiment. Le mot qui dit la nature du lieu tranche ; en deçà de quatre-vingts mètres, on
 considère qu'il s'agit du même site quoi qu'en disent les noms.
 
+La collecte se découpe en cellules rectangulaires pour tenir dans le temps imparti par
+Overpass — et un rectangle autour de la France couvre l'Allemagne rhénane, la Suisse, le
+nord de l'Italie, la Catalogne, la Belgique et le sud de l'Angleterre. Le premier jet de
+candidats en était plein : Zoo Basel, Pinacoteca di Brera, Museu Picasso. Les lieux du
+catalogue, eux, viennent de Wikidata où la nationalité est filtrée à la source, si bien
+que le contrôle de périmètre ne s'appliquait qu'à eux.
+
+Le périmètre est donc tenu deux fois, et à deux endroits indépendants : la requête
+Overpass est bornée par la frontière française telle qu'OpenStreetMap la trace
+(`area["ISO3166-1"="FR"]`), et chaque candidat est ensuite situé par ses coordonnées via
+l'API Adresse puis l'API Géo. Sans commune française, il est écarté ; avec, son
+département alimente la colonne correspondante de la feuille. Une zone qui ne se résout
+pas ne lève aucune erreur chez Overpass — elle renvoie zéro objet, partout — donc une
+requête de contrôle sur le centre de Paris précède la collecte et l'interrompt aussitôt
+si elle revient vide.
+
 ### Ajouter un lieu à la main
 
 Le pipeline ratera toujours des lieux : ceux que Wikidata classe mal, et ceux qu'il

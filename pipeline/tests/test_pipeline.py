@@ -610,6 +610,29 @@ class TestOpenStreetMap(unittest.TestCase):
         )
         self.assertEqual([s.name for s in find_candidates([], [maigre, riche])], ["Riche", "Maigre"])
 
+    def test_the_overpass_query_is_bounded_by_the_french_border(self):
+        from roam_pipeline.overpass import cell_query
+
+        query = cell_query((48.0, 2.0, 50.0, 4.0))
+        # L'emprise découpe le travail ; c'est la zone qui dit où est la France.
+        self.assertIn('area["ISO3166-1"="FR"]', query)
+        for line in query.splitlines():
+            if line.strip().startswith("nwr"):
+                self.assertIn("(area.fr)", line)
+
+    def test_candidates_outside_france_are_dropped(self):
+        from roam_pipeline.discover import keep_in_france
+
+        # Le rectangle de collecte couvre Bâle et Milan autant que Colmar.
+        colmar = self._site(osm_id="way/1", name="Musée Unterlinden", lat=48.08, lon=7.36)
+        bale = self._site(osm_id="way/2", name="Zoo Basel", lat=47.54, lon=7.57)
+        milan = self._site(osm_id="way/3", name="Pinacoteca di Brera", lat=45.47, lon=9.19)
+
+        kept = keep_in_france([colmar, bale, milan], lambda points: {"way/1": "68"})
+        self.assertEqual([s.name for s in kept], ["Musée Unterlinden"])
+        # Le contrôle rapporte le département : la feuille de revue devient lisible.
+        self.assertEqual(colmar.departement, "68")
+
     def test_only_an_explicit_refusal_is_flagged(self):
         from roam_pipeline.alerts import alerts_for
 

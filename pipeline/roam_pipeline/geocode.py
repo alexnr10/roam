@@ -155,3 +155,55 @@ class CommuneClient:
 
         LOG.debug("API Géo : abandon après %s tentatives", self.max_retries)
         return None
+
+
+def departements_for(
+    points: list[tuple[str, float, float]],
+    address_client: "AddressClient | None" = None,
+    commune_client: "CommuneClient | None" = None,
+) -> dict[str, str]:
+    """`[(identifiant, lat, lon)]` → `{identifiant: code de département}`.
+
+    Un identifiant absent du résultat n'est pas en France. C'est la seule
+    manière fiable de le savoir à partir de coordonnées : une emprise
+    rectangulaire déborde forcément sur les pays voisins, alors que
+    l'appartenance à une commune française, elle, ne se discute pas.
+
+    Deux passes, comme pour le rattachement du catalogue : l'API Adresse en
+    masse d'abord, puis l'API Géo point par point sur ce qu'elle n'a pas su
+    situer — un lieu sans adresse à proximité, ou un lieu à l'étranger.
+    """
+    from .geo import normalize_dept_code
+
+    if not points:
+        return {}
+
+    out: dict[str, str] = {}
+    address_client = address_client or AddressClient()
+    for start in range(0, len(points), BATCH):
+        batch = points[start : start + BATCH]
+        try:
+            codes = address_client.reverse(batch)
+        except Exception as exc:  # pragma: no cover - dépend du réseau
+            LOG.error("API Adresse : lot échoué (%s)", exc)
+            continue
+        for identifier, _lat, _lon in batch:
+            dept = normalize_dept_code(departement_from_insee(codes.get(identifier)))
+            if dept:
+                out[identifier] = dept
+
+    remaining = [point for point in points if point[0] not in out]
+    if remaining:
+        LOG.info(
+            "API Géo : %s points restants, interrogés un par un (~%s s)",
+            len(remaining),
+            int(len(remaining) * 0.06),
+        )
+        commune_client = commune_client or CommuneClient()
+        for identifier, lat, lon in remaining:
+            found = commune_client.locate(lat, lon)
+            dept = normalize_dept_code(found[0]) if found else None
+            if dept:
+                out[identifier] = dept
+
+    return out

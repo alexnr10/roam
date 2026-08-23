@@ -34,8 +34,27 @@ USER_AGENT = "RoamCatalogBot/0.1 (https://github.com/alexnr10/roam) python-reque
 
 # Emprise de la France métropolitaine, découpée en cellules : une requête
 # unique sur tout le pays dépasse le temps imparti par Overpass.
+#
+# Une emprise est un RECTANGLE, et celui de la France en couvre six voisins :
+# l'Allemagne rhénane, la Suisse, le nord de l'Italie, la Catalogne, la
+# Belgique et le sud de l'Angleterre. La première version des candidats en
+# était pleine — Zoo Basel, Pinacoteca di Brera, Museu Picasso. Le rectangle
+# sert à découper le travail, il ne dit pas où est la France : c'est
+# `FRANCE_AREA` ci-dessous qui la délimite.
 FRANCE_BBOX = (41.3, -5.2, 51.2, 9.6)
 CELL_DEGREES = 2.0
+
+# Frontière de la France telle qu'OpenStreetMap la trace, départements
+# d'outre-mer compris. Overpass la résout en zone et l'applique à chaque
+# clause : aucun objet situé hors du territoire ne peut plus remonter.
+FRANCE_AREA = 'area["ISO3166-1"="FR"][admin_level=2]->.fr;'
+
+# Emprise minuscule au centre de Paris — le Louvre, l'Orangerie, les Tuileries.
+# Toute requête correcte y trouve quelque chose. Une réponse vide ne peut donc
+# vouloir dire qu'une chose : la zone France n'a pas été résolue. Sans ce
+# contrôle, la collecte entière reviendrait vide au bout de vingt minutes sans
+# qu'aucune erreur ne soit levée.
+PROBE_CELL = (48.855, 2.32, 48.87, 2.35)
 
 # Catégories susceptibles de porter un lieu de visite.
 #
@@ -70,6 +89,7 @@ class OsmPlace:
     wikipedia: str | None = None
     access: str | None = None
     tags: dict[str, str] = field(default_factory=dict)
+    departement: str | None = None
 
     @property
     def closed(self) -> bool:
@@ -108,13 +128,15 @@ def cell_query(cell: tuple[float, float, float, float], timeout_s: int = 180) ->
     """Requête Overpass pour une cellule.
 
     Seuls les objets NOMMÉS sont demandés : un site de visite sans nom n'est
-    pas exploitable, et l'écarter tôt divise le volume par plusieurs.
+    pas exploitable, et l'écarter tôt divise le volume par plusieurs. Et seuls
+    ceux qui tombent en France : la cellule découpe, la zone délimite.
     """
     box = f"{cell[0]},{cell[1]},{cell[2]},{cell[3]}"
     clauses = "\n  ".join(
-        f'nwr[{tag}]["name"]({box});' for tag in TAG_FILTERS
+        f'nwr[{tag}]["name"](area.fr)({box});' for tag in TAG_FILTERS
     )
     return f"""[out:json][timeout:{timeout_s}];
+{FRANCE_AREA}
 (
   {clauses}
 );
