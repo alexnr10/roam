@@ -28,9 +28,9 @@ un téléphone sans serveur de développement.
 
 Deux différences avec l'app :
 
-- **la carte est une projection à plat** des lieux sur l'emprise de la France, sans
-  fond de carte (`react-native-maps` ne fonctionne pas sur le web, et des tuiles
-  demanderaient un service externe) ;
+- **la carte tourne sur MapLibre**, avec les tuiles d'OpenFreeMap — un fond de carte
+  complet, gratuit, sans clé ni compte. Le natif utilise encore `react-native-maps`, qui
+  lui exige une clé Google dans une application autonome ;
 - **un bouton « me téléporter ici »** apparaît sur chaque fiche lieu, pour éprouver le
   moment de validation sans faire la route. Il est strictement réservé au web
   (`Platform.OS === 'web'`) : sur téléphone, seul le vrai GPS fait foi, sans quoi le

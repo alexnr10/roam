@@ -1,51 +1,46 @@
-import React, { useState } from 'react';
-import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native';
+// La feuille de style de MapLibre porte les contrôles et la mention
+// d'attribution d'OpenStreetMap, qui est une obligation de la licence ODbL.
+import 'maplibre-gl/dist/maplibre-gl.css';
+import * as maplibregl from 'maplibre-gl';
+import type { GeoJSONSource, MapLayerMouseEvent, Map as MapLibreMap } from 'maplibre-gl';
+import React, { useEffect, useRef } from 'react';
+import { StyleSheet, View } from 'react-native';
 
-import { colors, radius, spacing, type } from '../theme';
+import { colors } from '../theme';
+import type { Place } from '../types';
 import type { MapCanvasProps } from './MapCanvas';
+import { BASEMAP_STYLE, CLUSTER_MAX_ZOOM, FRANCE_VIEW, mapColors } from './mapStyle';
 
 /**
- * Carte du build web.
+ * Carte du build web, sur MapLibre.
  *
- * `react-native-maps` ne fonctionne pas sur le web, et un fond de carte en
- * tuiles demanderait un service externe. On projette donc les lieux à plat sur
- * l'emprise de la France métropolitaine : c'est suffisant pour juger la
- * répartition, l'état visité / à visiter, et la boucle de validation — qui est
- * ce qu'on cherche à éprouver ici.
+ * Les lieux ne sont pas des marqueurs HTML mais une source GeoJSON dessinée par
+ * le moteur : à mille six cents points, un nœud du DOM par lieu rendrait le
+ * défilement poussif, là où le rendu vectoriel reste fluide et permet le
+ * regroupement au dézoom.
  */
-
-// Emprise de la France métropolitaine.
-const BOUNDS = { minLat: 41.3, maxLat: 51.2, minLon: -5.2, maxLon: 9.6 };
-
-const toRad = (deg: number) => (deg * Math.PI) / 180;
-
-/**
- * Projection plate à rapport d'aspect conservé.
- *
- * Un degré de longitude ne vaut pas un degré de latitude : au milieu de la
- * France, il vaut environ 0,69 fois moins en distance. Étirer l'emprise pour
- * remplir le cadre écrasait donc le pays du nord au sud. On calcule ici une
- * échelle unique, et on centre ce qui reste.
- */
-function projector(width: number, height: number) {
-  const midLat = (BOUNDS.minLat + BOUNDS.maxLat) / 2;
-  const lonScale = Math.cos(toRad(midLat));
-
-  const spanX = (BOUNDS.maxLon - BOUNDS.minLon) * lonScale;
-  const spanY = BOUNDS.maxLat - BOUNDS.minLat;
-  // Une seule échelle pour les deux axes : c'est elle qui garde les proportions.
-  const scale = Math.min(width / spanX, height / spanY);
-  const offsetX = (width - spanX * scale) / 2;
-  const offsetY = (height - spanY * scale) / 2;
-
-  return (lat: number, lon: number) => ({
-    left: offsetX + (lon - BOUNDS.minLon) * lonScale * scale,
-    // La latitude croît vers le nord, l'axe des ordonnées vers le bas.
-    top: offsetY + (BOUNDS.maxLat - lat) * scale,
-  });
-}
 
 export const mapAvailable = true;
+
+const SOURCE = 'places';
+
+function toFeatureCollection(
+  places: Place[],
+  visitedIds: ReadonlySet<string>,
+): GeoJSON.FeatureCollection<GeoJSON.Point> {
+  return {
+    type: 'FeatureCollection',
+    features: places.map((place) => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [place.lon, place.lat] },
+      properties: {
+        id: place.id,
+        name: place.name,
+        visited: visitedIds.has(place.id) ? 1 : 0,
+      },
+    })),
+  };
+}
 
 export function MapCanvas({
   places,
@@ -54,114 +49,188 @@ export function MapCanvas({
   onSelectPlace,
   highlightedId,
 }: MapCanvasProps) {
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  const container = useRef<HTMLDivElement | null>(null);
+  const map = useRef<MapLibreMap | null>(null);
+  const marker = useRef<maplibregl.Marker | null>(null);
+  // Gardé dans une référence : le gestionnaire de clic est posé une seule fois,
+  // mais doit toujours voir la liste courante.
+  const byId = useRef(new Map<string, Place>());
+  const onSelect = useRef(onSelectPlace);
 
-  const onLayout = (event: LayoutChangeEvent) => {
-    const { width, height } = event.nativeEvent.layout;
-    setSize({ width, height });
-  };
+  byId.current = new Map(places.map((place) => [place.id, place]));
+  onSelect.current = onSelectPlace;
 
-  const ready = size.width > 0 && size.height > 0;
-  const project = ready ? projector(size.width, size.height) : null;
+  useEffect(() => {
+    if (!container.current || map.current) return;
+
+    const instance = new maplibregl.Map({
+      container: container.current,
+      style: BASEMAP_STYLE,
+      center: [FRANCE_VIEW.longitude, FRANCE_VIEW.latitude],
+      zoom: FRANCE_VIEW.zoom,
+      attributionControl: { compact: true },
+    });
+    map.current = instance;
+    instance.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+
+    instance.on('load', () => {
+      instance.addSource(SOURCE, {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] },
+        cluster: true,
+        clusterRadius: 46,
+        clusterMaxZoom: CLUSTER_MAX_ZOOM,
+      });
+
+      // Paquets : la taille dit le nombre, sans jamais devenir envahissante.
+      instance.addLayer({
+        id: 'clusters',
+        type: 'circle',
+        source: SOURCE,
+        filter: ['has', 'point_count'],
+        paint: {
+          'circle-color': mapColors.cluster,
+          'circle-opacity': 0.9,
+          'circle-radius': ['step', ['get', 'point_count'], 15, 10, 20, 50, 26],
+          'circle-stroke-width': 2,
+          'circle-stroke-color': mapColors.halo,
+        },
+      });
+      // Une couche de texte exige que le style fournisse des polices ; sans
+      // elles, MapLibre tente de construire une URL vide et échoue. Le nombre
+      // est alors omis — la taille du cercle dit déjà l'ordre de grandeur.
+      if (instance.getStyle()?.glyphs) {
+        instance.addLayer({
+          id: 'cluster-count',
+          type: 'symbol',
+          source: SOURCE,
+          filter: ['has', 'point_count'],
+          layout: {
+            'text-field': ['get', 'point_count_abbreviated'],
+            'text-font': ['Noto Sans Bold'],
+            'text-size': 12,
+            'text-allow-overlap': true,
+          },
+          paint: { 'text-color': mapColors.clusterText },
+        });
+      }
+
+      // Lieux : plein et vert quand c'est validé, creux et terracotta sinon.
+      instance.addLayer({
+        id: 'place',
+        type: 'circle',
+        source: SOURCE,
+        filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-color': [
+            'case',
+            ['==', ['get', 'visited'], 1],
+            mapColors.visited,
+            mapColors.todo,
+          ],
+          'circle-opacity': ['case', ['==', ['get', 'visited'], 1], 1, 0.65],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 4, 10, 7, 14, 10],
+          'circle-stroke-width': 1.5,
+          'circle-stroke-color': mapColors.halo,
+        },
+      });
+
+      // Le lieu proposé à la validation, par-dessus tout le reste.
+      instance.addLayer({
+        id: 'place-highlight',
+        type: 'circle',
+        source: SOURCE,
+        filter: ['==', ['get', 'id'], '__none__'],
+        paint: {
+          'circle-color': mapColors.todo,
+          'circle-radius': 13,
+          'circle-stroke-width': 4,
+          'circle-stroke-color': mapColors.halo,
+        },
+      });
+
+      instance.on('click', 'place', (event: MapLayerMouseEvent) => {
+        const id = event.features?.[0]?.properties?.id as string | undefined;
+        const place = id ? byId.current.get(id) : undefined;
+        if (place) onSelect.current(place);
+      });
+
+      // Taper un paquet le déplie plutôt que de ne rien faire.
+      instance.on('click', 'clusters', async (event: MapLayerMouseEvent) => {
+        const feature = event.features?.[0];
+        const clusterId = feature?.properties?.cluster_id;
+        if (clusterId === undefined) return;
+        const source = instance.getSource(SOURCE) as GeoJSONSource;
+        const zoom = await source.getClusterExpansionZoom(clusterId as number);
+        instance.easeTo({
+          center: (feature!.geometry as GeoJSON.Point).coordinates as [number, number],
+          zoom,
+          duration: 500,
+        });
+      });
+
+      for (const layer of ['place', 'clusters']) {
+        instance.on('mouseenter', layer, () => {
+          instance.getCanvas().style.cursor = 'pointer';
+        });
+        instance.on('mouseleave', layer, () => {
+          instance.getCanvas().style.cursor = '';
+        });
+      }
+    });
+
+    return () => {
+      instance.remove();
+      map.current = null;
+    };
+  }, []);
+
+  // Données : rejouées à chaque changement de filtre ou de validation.
+  useEffect(() => {
+    const instance = map.current;
+    if (!instance) return;
+
+    const push = () => {
+      const source = instance.getSource(SOURCE) as GeoJSONSource | undefined;
+      source?.setData(toFeatureCollection(places, visitedIds));
+    };
+    if (instance.isStyleLoaded()) push();
+    else instance.once('load', push);
+  }, [places, visitedIds]);
+
+  useEffect(() => {
+    const instance = map.current;
+    if (!instance) return;
+    const apply = () => {
+      if (instance.getLayer('place-highlight')) {
+        instance.setFilter('place-highlight', ['==', ['get', 'id'], highlightedId ?? '__none__']);
+      }
+    };
+    if (instance.isStyleLoaded()) apply();
+    else instance.once('load', apply);
+  }, [highlightedId]);
+
+  // Position de l'utilisateur : un marqueur distinct, pas un point du catalogue.
+  useEffect(() => {
+    const instance = map.current;
+    if (!instance) return;
+    if (!position) {
+      marker.current?.remove();
+      marker.current = null;
+      return;
+    }
+    const dot = marker.current ?? new maplibregl.Marker({ color: '#2563EB' });
+    dot.setLngLat([position.longitude, position.latitude]).addTo(instance);
+    marker.current = dot;
+  }, [position]);
 
   return (
-    <View style={styles.canvas} onLayout={onLayout}>
-      <View style={styles.grid} pointerEvents="none">
-        {[0.25, 0.5, 0.75].map((ratio) => (
-          <View key={`h${ratio}`} style={[styles.gridLine, { top: `${ratio * 100}%` }]} />
-        ))}
-        {[0.25, 0.5, 0.75].map((ratio) => (
-          <View
-            key={`v${ratio}`}
-            style={[styles.gridLineVertical, { left: `${ratio * 100}%` }]}
-          />
-        ))}
-      </View>
-
-      {project
-        ? places.map((place) => {
-            const { left, top } = project(place.lat, place.lon);
-            const visited = visitedIds.has(place.id);
-            const highlighted = place.id === highlightedId;
-            return (
-              <Pressable
-                key={place.id}
-                onPress={() => onSelectPlace(place)}
-                style={[styles.hit, { left: left - 13, top: top - 13 }]}
-                accessibilityRole="button"
-                accessibilityLabel={place.name}
-              >
-                <View
-                  style={[
-                    styles.dot,
-                    visited ? styles.dotVisited : styles.dotTodo,
-                    highlighted && styles.dotHighlighted,
-                  ]}
-                />
-              </Pressable>
-            );
-          })
-        : null}
-
-      {project && position ? (
-        (() => {
-          const { left, top } = project(position.latitude, position.longitude);
-          return <View style={[styles.me, { left: left - 7, top: top - 7 }]} />;
-        })()
-      ) : null}
-
-      <View style={styles.legend} pointerEvents="none">
-        <Text style={type.tiny}>● visité   ○ à visiter   ◆ moi</Text>
-      </View>
+    <View style={styles.canvas}>
+      <div ref={container} style={{ position: 'absolute', inset: 0 }} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   canvas: { flex: 1, backgroundColor: colors.surfaceAlt, overflow: 'hidden' },
-  grid: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
-  gridLine: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.border,
-  },
-  gridLineVertical: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: StyleSheet.hairlineWidth,
-    backgroundColor: colors.border,
-  },
-  hit: {
-    position: 'absolute',
-    // La zone tactile reste large même si la pastille est fine.
-    width: 26,
-    height: 26,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dot: { width: 8, height: 8, borderRadius: 4, borderWidth: 1.5, borderColor: '#FFFFFF' },
-  dotVisited: { backgroundColor: colors.verified },
-  dotTodo: { backgroundColor: colors.primary, opacity: 0.5 },
-  dotHighlighted: { width: 18, height: 18, borderRadius: 9, opacity: 1 },
-  me: {
-    position: 'absolute',
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: '#2563EB',
-    borderWidth: 3,
-    borderColor: '#FFFFFF',
-  },
-  legend: {
-    position: 'absolute',
-    left: spacing.sm,
-    bottom: spacing.sm,
-    backgroundColor: colors.surface,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-    borderRadius: radius.sm,
-  },
 });
