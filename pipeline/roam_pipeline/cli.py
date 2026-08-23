@@ -417,13 +417,16 @@ def _print_stats(places, collections, raw=None) -> None:
     for theme_id, n in themes.most_common():
         print(f"      {theme_id:<16} : {n}")
 
-    ouverts = sum(1 for p in places if getattr(p, "visitable", None))
+    ouverts = sum(1 for p in places if getattr(p, "visitable", None) is True)
+    fermes = sum(1 for p in places if getattr(p, "visitable", None) is False)
     rapproches = sum(1 for p in places if getattr(p, "osm_id", None))
     if rapproches:
+        # « Non renseigné » n'est pas « fermé » : OpenStreetMap ne porte des
+        # horaires que sur une minorité d'objets, y compris visitables.
         print(
-            f"  Ouverture au public  : {ouverts} ouverts, "
-            f"{rapproches - ouverts} sans signe, "
-            f"{len(places) - rapproches} inconnus"
+            f"  Ouverture au public  : {ouverts} confirmés ouverts, "
+            f"{fermes} accès refusé, "
+            f"{len(places) - ouverts - fermes} non renseignés"
         )
 
     _print_sitelink_distribution(raw if raw is not None else places, config_floors())

@@ -179,9 +179,15 @@ def apply_visit_info(places: list[Place], osm: list[OsmPlace]) -> int:
         place.osm_id = found.osm_id
         place.opening_hours = found.opening_hours
         place.website = found.website
-        # Un site géré est ouvert au public. L'absence de balise ne prouve rien :
-        # on laisse alors `None`, qui n'est pas « fermé ».
-        if found.managed:
+        # Trois états, et pas deux. Un site géré est ouvert ; un accès
+        # explicitement refusé est fermé ; tout le reste reste inconnu.
+        #
+        # L'absence d'horaires ne dit rien : 62 % des objets rapprochés n'en
+        # portent pas, y compris des lieux qui se visitent parfaitement. En
+        # faire un signal de fermeture aurait signalé la moitié du catalogue.
+        if found.closed:
+            place.visitable = False
+        elif found.managed:
             place.visitable = True
         matched += 1
 

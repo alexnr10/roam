@@ -31,11 +31,11 @@ def alerts_for(place: Place, config: Config) -> list[str]:
     ):
         found.append(f"{place.elevation_m} m — accès alpin ?")
 
-    # Le cas du château d'Hérouville : documenté, remarquable, et fermé.
-    # L'alerte ne se déclenche que si le lieu A ÉTÉ rapproché d'OpenStreetMap :
-    # sans rapprochement, on ne sait rien, et on ne dit rien.
-    if place.osm_id and not place.visitable:
-        found.append("aucun signe d'ouverture au public")
+    # Seul l'accès explicitement refusé est signalé. L'absence d'horaires ne
+    # l'est pas : elle concerne 62 % des lieux rapprochés, et signalerait donc
+    # la moitié du catalogue sans rien apprendre à personne.
+    if place.visitable is False:
+        found.append("accès privé ou interdit")
 
     if not place.image_url and not place.commons_category:
         found.append("aucune photo")

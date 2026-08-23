@@ -35,6 +35,8 @@ REVIEW_HEADER = [
     "collections",
     # Points à vérifier : disparu, accès alpin, aucune photo.
     "alertes",
+    "ouvert_au_public",
+    "horaires",
     "lat",
     "lon",
     "wikidata_id",
@@ -138,6 +140,8 @@ def write_review_csv(
                     "|".join(place.labels),
                     len(membership.get(place.wikidata_id, [])),
                     " ; ".join(alerts_for(place, config)) if config else "",
+                    {True: "oui", False: "non"}.get(place.visitable, "inconnu"),
+                    place.opening_hours or "",
                     f"{place.lat:.6f}",
                     f"{place.lon:.6f}",
                     place.wikidata_id,
@@ -341,6 +345,8 @@ def write_review_html(
                 "wikipedia": place.wikipedia_url or "",
                 "image": _thumbnail(place.image_url),
                 "alerts": alerts_for(place, config),
+                "visitable": place.visitable,
+                "hours": place.opening_hours,
             }
         )
 
@@ -399,6 +405,8 @@ _REVIEW_TEMPLATE = """<!doctype html>
   .tag { background: var(--alt); border-radius: 999px; padding: 2px 8px; font-size: 11px; }
   .alert { background: #FBEEE6; color: #9A4520; border: 1px solid #E4C3B0;
            border-radius: 6px; padding: 4px 8px; font-size: 12px; }
+  .open { background: #E3F0E8; color: #2F6F4E; border-radius: 6px;
+          padding: 4px 8px; font-size: 12px; }
   .alerts { display: flex; flex-direction: column; gap: 4px; }
   .tier { font-size: 11px; font-weight: 700; letter-spacing: .5px; color: var(--primary); }
   .actions { display: flex; gap: 6px; padding: 0 14px 12px; }
@@ -425,6 +433,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
       <option value="todo">À décider</option>
       <option value="">Tout</option>
       <option value="alert">À vérifier — disparu, accès, photo</option>
+      <option value="open">Ouverts au public</option>
       <option value="keep">Gardés</option>
       <option value="drop">Écartés</option>
     </select>
@@ -476,6 +485,7 @@ function visible() {
     const d = decisions[p.id] || "";
     if (state === "todo") return !d;
     if (state === "alert") return p.alerts.length > 0;
+    if (state === "open") return p.visitable === true;
     if (state && d !== state) return false;
     return true;
   });
@@ -502,6 +512,9 @@ function card(p) {
         ${parts.labels ? " + " + parts.labels + " labels" : ""}
         ${parts.image ? " + " + parts.image + " image" : ""}
         ${parts.frwiki ? " + " + parts.frwiki + " fr" : ""}</div>
+      ${p.visitable === true
+        ? `<div class="open">✓ ouvert au public${p.hours ? ` · ${p.hours}` : ""}</div>`
+        : ""}
       ${p.alerts.length ? `<div class="alerts">${p.alerts.map(a => `<div class="alert">⚠︎ ${a}</div>`).join("")}</div>` : ""}
       <div class="tags">${p.labels.map(l => `<span class="tag">${l}</span>`).join("")}</div>
       ${p.wikipedia ? `<a href="${p.wikipedia}" target="_blank" rel="noopener">Voir sur Wikipédia →</a>` : ""}

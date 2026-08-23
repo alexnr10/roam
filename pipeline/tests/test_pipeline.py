@@ -610,18 +610,31 @@ class TestOpenStreetMap(unittest.TestCase):
         )
         self.assertEqual([s.name for s in find_candidates([], [maigre, riche])], ["Riche", "Maigre"])
 
-    def test_closed_place_is_flagged_only_once_matched(self):
+    def test_only_an_explicit_refusal_is_flagged(self):
         from roam_pipeline.alerts import alerts_for
 
-        # Le cas du château d'Hérouville : rapproché, mais rien n'indique
-        # qu'il accueille du public.
-        ferme = make_place("Hérouville", image_url="x")
-        ferme.osm_id = "way/9"
-        self.assertIn("aucun signe d'ouverture au public", alerts_for(ferme, CONFIG))
+        ferme = make_place("Domaine privé", image_url="x")
+        ferme.visitable = False
+        self.assertIn("accès privé ou interdit", alerts_for(ferme, CONFIG))
 
-        # Sans rapprochement, on ne sait rien : on ne dit rien.
-        inconnu = make_place("Inconnu", image_url="x")
-        self.assertEqual(alerts_for(inconnu, CONFIG), [])
+        # Rapproché mais sans horaires : c'est le cas de 62 % des lieux, et ça
+        # n'apprend rien. Le signaler noierait la revue.
+        muet = make_place("Sans horaires", image_url="x")
+        muet.osm_id = "way/9"
+        self.assertEqual(alerts_for(muet, CONFIG), [])
+
+    def test_access_tags_mark_a_place_as_closed(self):
+        from roam_pipeline.discover import apply_visit_info
+
+        prive = make_place("Château privé", lat=45.0, lon=2.0)
+        apply_visit_info(
+            [prive],
+            [self._site(name="Château privé", lat=45.0, lon=2.0,
+                        opening_hours="Mo-Su", access="private")],
+        )
+        # L'accès refusé prime sur les horaires : un parc peut afficher ses
+        # horaires et rester fermé au public.
+        self.assertIs(prive.visitable, False)
 
 
 class TestPinnedPlaces(unittest.TestCase):

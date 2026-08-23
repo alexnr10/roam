@@ -68,7 +68,18 @@ class OsmPlace:
     website: str | None = None
     fee: str | None = None
     wikipedia: str | None = None
+    access: str | None = None
     tags: dict[str, str] = field(default_factory=dict)
+
+    @property
+    def closed(self) -> bool:
+        """Accès explicitement refusé au public.
+
+        C'est le seul signal négatif fiable d'OpenStreetMap. L'absence
+        d'horaires n'en est pas un : la plupart des objets n'en portent pas,
+        même quand le lieu se visite.
+        """
+        return self.access in {"private", "no"}
 
     @property
     def managed(self) -> bool:
@@ -181,6 +192,7 @@ def parse_elements(elements: list[dict]) -> list[OsmPlace]:
                 website=tags.get("website") or tags.get("contact:website"),
                 fee=tags.get("fee"),
                 wikipedia=tags.get("wikipedia"),
+                access=tags.get("access"),
                 tags=tags,
             )
         )

@@ -173,9 +173,16 @@ sont passés devant, sans rapport avec la notoriété encyclopédique.
 
 `discover` interroge donc OpenStreetMap sur toute la France et en tire deux choses :
 
-- **l'ouverture au public** des lieux déjà au catalogue. Un lieu rapproché d'OSM mais sans
-  aucun signe d'accueil est signalé dans la revue. L'absence de rapprochement ne dit rien :
-  le champ reste à « inconnu », qui n'est pas « fermé ».
+- **l'ouverture au public** des lieux déjà au catalogue, en trois états et non deux.
+  Confirmé ouvert quand des horaires, un tarif ou un site web l'attestent ; fermé quand
+  l'accès est explicitement refusé (`access=private`) ; non renseigné pour tout le reste.
+
+  Cette troisième valeur n'est pas un détail. Sur le premier passage, 62 % des lieux
+  rapprochés ne portaient aucun horaire — non parce qu'ils sont fermés, mais parce que
+  peu de contributeurs renseignent ce champ. En faire un signal de fermeture aurait signalé
+  la moitié du catalogue sans rien apprendre à personne. Seule l'interdiction explicite
+  est donc remontée en alerte ; l'ouverture confirmée, elle, s'affiche en positif avec
+  ses horaires.
 - **`data/out/candidates.csv`** : les sites de visite qu'OpenStreetMap connaît et que le
   catalogue ignore. Par défaut, seuls les candidats sûrs — un signe d'accueil du public
   (horaires ou tarif) **et** un lien encyclopédique. `--all` donne les autres. Les trois
