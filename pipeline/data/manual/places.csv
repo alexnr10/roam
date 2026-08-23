@@ -1,0 +1,8 @@
+# Lieux ajoutés à la main.
+#
+# Le pipeline rate ce que Wikidata classe mal, et ce qu'il documente peu alors
+# qu'on vient de loin le visiter. Ces lieux passent outre le plancher de
+# notoriété et prennent le thème indiqué ici.
+#
+# Pour trouver un identifiant : python -m roam_pipeline suggest-qids "jardins de Giverny"
+wikidata_id,theme_id,note

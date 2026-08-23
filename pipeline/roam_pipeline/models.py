@@ -51,6 +51,9 @@ class Place:
     # qu'un bonus de label, sans quoi une décision humaine ne pourrait pas
     # rattraper un lieu que Wikidata documente mal.
     curator_adjustment: float = 0.0
+    # Ajouté à la main par le curateur : échappe au plancher de notoriété et
+    # l'emporte sur le rattachement automatique à un thème.
+    pinned: bool = False
     inclusion_criteria: list[str] = field(default_factory=list)
 
     @property

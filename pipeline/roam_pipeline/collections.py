@@ -226,11 +226,15 @@ def dedupe_across_themes(places: list[Place], config: Config) -> list[Place]:
         if current is None:
             best[place.wikidata_id] = place
             continue
-        winner, loser = (
-            (place, current)
-            if rank.get(place.theme_id, 99) < rank.get(current.theme_id, 99)
-            else (current, place)
-        )
+        # Un lieu épinglé impose son thème : c'est un choix explicite.
+        if place.pinned != current.pinned:
+            winner, loser = (place, current) if place.pinned else (current, place)
+        else:
+            winner, loser = (
+                (place, current)
+                if rank.get(place.theme_id, 99) < rank.get(current.theme_id, 99)
+                else (current, place)
+            )
         best[place.wikidata_id] = winner
         collisions.append((winner.name, winner.theme_id, loser.theme_id))
 
@@ -257,7 +261,11 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
             floor = config.theme(place.theme_id).min_sitelinks
         except KeyError:
             continue
-        if place.sitelinks >= floor:
+        # Un lieu épinglé par le curateur passe outre : le plancher mesure la
+        # documentation d'un lieu, pas son intérêt. Giverny et le château
+        # d'Auvers-sur-Oise attirent le monde entier sans être documentés en
+        # dix langues.
+        if place.pinned or place.sitelinks >= floor:
             kept.append(place)
         else:
             dropped[place.theme_id] += 1

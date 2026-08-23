@@ -160,6 +160,30 @@ construction, ajuster un thème coûte une seconde.
 `build` affiche d'ailleurs, pour chaque thème, combien de lieux resteraient à chaque
 plancher — de quoi régler sur des chiffres réels plutôt qu'à l'estime.
 
+### Ajouter un lieu à la main
+
+Le pipeline ratera toujours des lieux : ceux que Wikidata classe mal, et ceux qu'il
+documente peu alors qu'on vient de loin les visiter. Le château d'Auvers-sur-Oise et les
+jardins de Giverny reçoivent des visiteurs du monde entier sans être documentés en dix
+langues — le plancher de notoriété les écarte, et il a tort.
+
+`data/manual/places.csv` est l'échappatoire du curateur. Ces lieux passent outre le
+plancher et imposent le thème indiqué :
+
+```csv
+wikidata_id,theme_id,note
+Q151952,jardins,jardins de Claude Monet à Giverny
+```
+
+Pour trouver un identifiant sans l'inventer :
+
+```bash
+python -m roam_pipeline suggest-qids "jardins de Giverny"
+```
+
+Ces lieux sont recollectés à chaque `fetch`, y compris en reprise partielle : ils ne
+dépendent d'aucun thème.
+
 ### Ne jamais écrire un Q-id de mémoire
 
 C'est la leçon la plus chère du pipeline : un identifiant erroné ne provoque aucune

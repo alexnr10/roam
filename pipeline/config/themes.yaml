@@ -78,6 +78,23 @@ themes:
     cap: 50
     wikidata_classes: [Q33506]                       # musée
 
+  # Trou constaté à la relecture : Giverny, l'auberge Ravoux où mourut Van Gogh
+  # et les maisons d'écrivains n'entraient dans aucun thème. Ce sont pourtant
+  # des lieux pour lesquels on vient du monde entier.
+  - id: maisons
+    name: Maisons d'artistes et d'écrivains
+    name_singular: Maison
+    icon: house
+    radius_m: 150
+    min_sitelinks: 4
+    fetch_min_sitelinks: 2
+    cap: 50
+    wikidata_classes: []
+    search:
+      - "maison-musée"
+      - "maison d'écrivain"
+      - "atelier d'artiste"
+
   - id: monuments
     name: Monuments et édifices remarquables
     name_singular: Monument

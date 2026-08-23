@@ -32,8 +32,17 @@ export const FRANCE_BOUNDS: [[number, number], [number, number]] = [
   [9.6, 51.2],
 ];
 
-/** Au-delà, on montre les lieux un par un plutôt que des paquets. */
-export const CLUSTER_MAX_ZOOM = 10;
+/**
+ * Au-delà, on montre les lieux un par un plutôt que des paquets.
+ *
+ * Dix était trop tardif : on restait devant des paquets à l'échelle d'un
+ * département, alors que c'est précisément l'échelle à laquelle on cherche un
+ * lieu où aller.
+ */
+export const CLUSTER_MAX_ZOOM = 8;
+
+/** Rayon de regroupement, en pixels. Plus il est petit, plus tôt ça se sépare. */
+export const CLUSTER_RADIUS = 38;
 
 export const mapColors = {
   visited: colors.verified,

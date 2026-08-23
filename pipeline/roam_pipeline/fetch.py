@@ -76,6 +76,21 @@ def fetch_theme(
 PAGE_SIZE = 800
 
 
+def _read_csv_rows(path: Path) -> list[dict[str, str]]:
+    """Lit un CSV en ignorant les lignes de commentaire.
+
+    Les fichiers saisis à la main portent des explications en tête ; sans ce
+    filtre, `csv` prendrait la première ligne de commentaire pour l'en-tête et
+    lirait des colonnes qui n'existent pas.
+    """
+    lines = [
+        line
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    return list(csv.DictReader(lines))
+
+
 def _paged(client: wd.SparqlClient, build_query, page_size: int = PAGE_SIZE):
     """Parcourt une requête page par page jusqu'à épuisement."""
     offset = 0
@@ -130,6 +145,64 @@ def _as_int(value: str | None) -> int | None:
         return int(float(value))
     except ValueError:
         return None
+
+
+def fetch_manual_places(
+    client: wd.SparqlClient, config: Config, manual_dir: Path
+) -> list[Place]:
+    """Lieux ajoutés à la main, dans `data/manual/places.csv`.
+
+    Le pipeline ratera toujours des lieux : ceux que Wikidata classe mal, et
+    ceux qu'il documente peu alors qu'on vient du monde entier les visiter.
+    Cette liste est l'échappatoire du curateur — elle passe outre le plancher de
+    notoriété et impose le thème indiqué.
+
+    Colonnes : `wikidata_id,theme_id,note`.
+    """
+    path = manual_dir / "places.csv"
+    if not path.exists():
+        return []
+
+    wanted: dict[str, str] = {}
+    for row in _read_csv_rows(path):
+        qid = (row.get("wikidata_id") or "").strip()
+        theme_id = (row.get("theme_id") or "").strip()
+        if not qid or not theme_id:
+            continue
+        try:
+            config.theme(theme_id)
+        except KeyError:
+            LOG.error("ajout manuel %s : thème inconnu « %s » — ignoré", qid, theme_id)
+            continue
+        wanted[qid] = theme_id
+
+    if not wanted:
+        return []
+
+    places: list[Place] = []
+    for batch in wd.chunked(sorted(wanted), 150):
+        try:
+            rows = client.query(wd.items_query(batch))
+        except Exception as exc:
+            LOG.error("ajouts manuels : lot échoué (%s)", exc)
+            continue
+        for row in rows:
+            qid = wd.qid_from_uri(row.get("item"))
+            if not qid or qid not in wanted:
+                continue
+            theme = config.theme(wanted[qid])
+            place = _row_to_place(row, theme)
+            if place is None:
+                LOG.warning("ajout manuel %s : sans coordonnées ou sans nom — ignoré", qid)
+                continue
+            place.pinned = True
+            places.append(place)
+
+    missing = set(wanted) - {p.wikidata_id for p in places}
+    if missing:
+        LOG.warning("ajouts manuels introuvables sur Wikidata : %s", ", ".join(sorted(missing)))
+    LOG.info("ajouts manuels : %s lieux épinglés", len(places))
+    return places
 
 
 def resolve_admin(client: wd.SparqlClient, places: list[Place]) -> None:
@@ -383,8 +456,11 @@ def _read_manual_label(label: Label, manual_dir: Path) -> set[str]:
             path,
         )
         return set()
-    with path.open(encoding="utf-8") as fh:
-        qids = {row["wikidata_id"].strip() for row in csv.DictReader(fh) if row.get("wikidata_id")}
+    qids = {
+        row["wikidata_id"].strip()
+        for row in _read_csv_rows(path)
+        if row.get("wikidata_id")
+    }
     LOG.info("label %s : %s membres (liste manuelle)", label.id, len(qids))
     return qids
 
@@ -436,6 +512,12 @@ def run_fetch(
             LOG.error("thème %s : collecte échouée (%s)", theme.id, exc)
             failed.append(theme.id)
 
+    # Les ajouts manuels sont toujours recollectés, même en reprise partielle :
+    # ils ne dépendent d'aucun thème en particulier.
+    manual = fetch_manual_places(client, config, manual_dir)
+    pinned_ids = {place.wikidata_id for place in manual}
+    places = [p for p in places if p.wikidata_id not in pinned_ids] + manual
+
     resolve_admin(client, places)
     apply_labels(places, label_members)
 
@@ -445,6 +527,7 @@ def run_fetch(
             Place(**{k: v for k, v in item.items() if k != "slug"})
             for item in json.loads(raw_path.read_text(encoding="utf-8"))
             if item.get("theme_id") not in {t.id for t in themes}
+            and not item.get("pinned")
         ]
         LOG.info("%s lieux conservés des thèmes non recollectés", len(kept))
         places = kept + places

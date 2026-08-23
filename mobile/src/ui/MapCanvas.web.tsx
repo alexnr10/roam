@@ -12,6 +12,7 @@ import type { MapCanvasProps } from './MapCanvas';
 import {
   BASEMAP_STYLES,
   CLUSTER_MAX_ZOOM,
+  CLUSTER_RADIUS,
   FALLBACK_STYLE,
   FRANCE_BOUNDS,
   mapColors,
@@ -127,7 +128,7 @@ export function MapCanvas({
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] },
         cluster: true,
-        clusterRadius: 46,
+        clusterRadius: CLUSTER_RADIUS,
         clusterMaxZoom: CLUSTER_MAX_ZOOM,
       });
 
@@ -214,12 +215,32 @@ export function MapCanvas({
         if (place) onSelect.current(place);
       });
 
-      // Taper un paquet le déplie plutôt que de ne rien faire.
+      // Taper un paquet cadre sur ce qu'il contient réellement.
+      //
+      // Se contenter de zoomer sur le centre du paquet au niveau d'éclatement
+      // laissait la moitié des lieux hors du cadre : le centre d'un groupe
+      // n'est pas le centre de son emprise, et le zoom d'éclatement ne dit rien
+      // de son étendue. On récupère donc les lieux du paquet et on cadre dessus.
       instance.on('click', 'clusters', async (event: MapLayerMouseEvent) => {
         const feature = event.features?.[0];
         const clusterId = feature?.properties?.cluster_id;
         if (clusterId === undefined) return;
         const source = instance.getSource(SOURCE) as GeoJSONSource;
+
+        try {
+          const leaves = await source.getClusterLeaves(clusterId as number, 500, 0);
+          const bounds = new maplibregl.LngLatBounds();
+          for (const leaf of leaves) {
+            bounds.extend((leaf.geometry as GeoJSON.Point).coordinates as [number, number]);
+          }
+          if (!bounds.isEmpty()) {
+            instance.fitBounds(bounds, { padding: 60, maxZoom: 13, duration: 600 });
+            return;
+          }
+        } catch {
+          // On retombe sur le zoom d'éclatement ci-dessous.
+        }
+
         const zoom = await source.getClusterExpansionZoom(clusterId as number);
         instance.easeTo({
           center: (feature!.geometry as GeoJSON.Point).coordinates as [number, number],

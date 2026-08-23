@@ -475,6 +475,51 @@ class TestCrossThemeDedupe(unittest.TestCase):
         self.assertEqual(len(dedupe_across_themes(places, CONFIG)), 2)
 
 
+class TestPinnedPlaces(unittest.TestCase):
+    """Le curateur doit pouvoir imposer un lieu que les seuils écarteraient."""
+
+    def test_a_pinned_place_ignores_the_notoriety_floor(self):
+        # Le château d'Auvers-sur-Oise reçoit le monde entier sans être
+        # documenté en dix langues.
+        floor = CONFIG.theme("chateaux").min_sitelinks
+        obscur = make_place("Château d'Auvers", theme="chateaux", sitelinks=floor - 5)
+        self.assertEqual(apply_notoriety_floor([obscur], CONFIG), [])
+        obscur.pinned = True
+        self.assertEqual(len(apply_notoriety_floor([obscur], CONFIG)), 1)
+
+    def test_a_pinned_place_imposes_its_theme(self):
+        # L'ordre des thèmes place `chateaux` avant `jardins` ; l'épinglage
+        # doit primer, parce que c'est une décision explicite.
+        auto = make_place("Giverny", theme="chateaux", wikidata_id="Q1")
+        choisi = make_place("Giverny", theme="jardins", wikidata_id="Q1")
+        choisi.pinned = True
+        kept = dedupe_across_themes([auto, choisi], CONFIG)
+        self.assertEqual([p.theme_id for p in kept], ["jardins"])
+
+    def test_the_theme_order_still_decides_between_two_pinned(self):
+        a = make_place("X", theme="jardins", wikidata_id="Q1")
+        b = make_place("X", theme="chateaux", wikidata_id="Q1")
+        a.pinned = b.pinned = True
+        self.assertEqual(dedupe_across_themes([a, b], CONFIG)[0].theme_id, "chateaux")
+
+
+class TestManualCsv(unittest.TestCase):
+    def test_comment_lines_are_ignored(self):
+        # Les fichiers saisis à la main portent des explications en tête ; sans
+        # ce filtre, la première ligne de commentaire deviendrait l'en-tête.
+        import tempfile
+
+        from roam_pipeline.fetch import _read_csv_rows
+
+        path = Path(tempfile.mkdtemp()) / "places.csv"
+        path.write_text(
+            "# explication\n\nwikidata_id,theme_id,note\nQ42,jardins,Giverny\n",
+            encoding="utf-8",
+        )
+        rows = _read_csv_rows(path)
+        self.assertEqual(rows, [{"wikidata_id": "Q42", "theme_id": "jardins", "note": "Giverny"}])
+
+
 class TestNotorietyFloor(unittest.TestCase):
     def test_places_below_their_theme_floor_are_dropped(self):
         floor = CONFIG.theme("sommets").min_sitelinks
