@@ -257,8 +257,13 @@ photographier depuis la route, et une alerte prévient déjà le relecteur.
 Enfin, l'accueil du public attesté **et** un article francophone donnent droit à une
 remise sur le plancher de notoriété (`visitable_floor_relief`). Le plancher mesure la
 documentation ; ces deux signaux réunis disent qu'on y va vraiment. C'est le réglage à
-bouger si les découvertes OpenStreetMap meurent toutes au plancher — ou l'inondent. Le
-nombre de lieux qu'il sauve est journalisé à chaque `build`.
+bouger si les découvertes OpenStreetMap meurent toutes au plancher — ou l'inondent.
+
+Une remise est un pari : un signal de terrain contre un signal encyclopédique. Elle doit
+donc rester relisible. Le nombre de lieux qu'elle sauve est journalisé par thème à chaque
+`build`, la feuille de revue porte une colonne `entre_par_remise`, et la page de revue un
+filtre dédié — de quoi juger ces lieux comme un lot, et remonter le seuil s'ils ne
+tiennent pas.
 
 ### Les décisions du curateur sont conservées
 

@@ -87,10 +87,16 @@ def apply_decisions(
     """
     kept: list[Place] = []
     counts: Counter[str] = Counter()
+    counted: set[str] = set()
 
     for place in places:
         decision, _note = decisions.get(place.wikidata_id, ("", ""))
-        counts[decision or "pending"] += 1
+        # Compté une fois par LIEU, pas par ligne : un même lieu peut figurer
+        # sous deux thèmes avant le dédoublonnage, et le décompte affiché
+        # dépassait alors le nombre de décisions prises.
+        if place.wikidata_id not in counted:
+            counted.add(place.wikidata_id)
+            counts[decision or "pending"] += 1
         if decision == "drop":
             continue
         if decision == "promote":

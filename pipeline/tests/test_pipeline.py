@@ -523,6 +523,21 @@ class TestPublicAccessInScore(unittest.TestCase):
         self.assertEqual(notoriety_floor(inconnu, 12, CONFIG), 12)
 
 
+class TestFloorReliefIsVisible(unittest.TestCase):
+    """Un lieu conservé par la remise doit se relire à part."""
+
+    def test_a_place_under_its_floor_is_flagged(self):
+        from roam_pipeline.export import under_floor
+
+        # Le plancher des musées est éditorial : un musée sous ce seuil n'est
+        # là que grâce à son accueil du public attesté.
+        floor = CONFIG.theme("musees").min_sitelinks
+        rescape = make_place("Musée ouvert", theme_id="musees", sitelinks=floor - 1)
+        ordinaire = make_place("Musée connu", theme_id="musees", sitelinks=floor)
+        self.assertTrue(under_floor(rescape, CONFIG))
+        self.assertFalse(under_floor(ordinaire, CONFIG))
+
+
 class TestDurableDecisions(unittest.TestCase):
     """Les verdicts du curateur survivent aux reconstructions."""
 

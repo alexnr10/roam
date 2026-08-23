@@ -255,7 +255,7 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
     """
     kept: list[Place] = []
     dropped: dict[str, int] = defaultdict(int)
-    saved = 0
+    saved: dict[str, int] = defaultdict(int)
 
     for place in places:
         try:
@@ -270,7 +270,7 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
         if place.pinned or place.sitelinks >= floor:
             kept.append(place)
             if floor < theme_floor and place.sitelinks < theme_floor:
-                saved += 1
+                saved[place.theme_id] += 1
         else:
             dropped[place.theme_id] += 1
 
@@ -285,9 +285,10 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
         # remise agirait sans qu'on sache jamais sur combien de lieux.
         LOG.info(
             "%s lieux conservés par la remise « ouvert au public » "
-            "(scoring.visitable_floor_relief = %s)",
-            saved,
+            "(scoring.visitable_floor_relief = %s) : %s",
+            sum(saved.values()),
             config.scoring.visitable_floor_relief,
+            ", ".join(f"{k} {v}" for k, v in sorted(saved.items(), key=lambda x: -x[1])),
         )
     return kept
 

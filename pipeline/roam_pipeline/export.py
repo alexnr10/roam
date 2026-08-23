@@ -43,6 +43,9 @@ REVIEW_HEADER = [
     # Points à vérifier : disparu, accès alpin, aucune photo.
     "alertes",
     "ouvert_au_public",
+    # « oui » : le lieu est sous le plancher de son thème et n'a été conservé
+    # que parce que son accueil du public est attesté.
+    "entre_par_remise",
     "horaires",
     "lat",
     "lon",
@@ -62,6 +65,19 @@ def write_json(places: list[Place], collections: list[Collection], out_dir: Path
         encoding="utf-8",
     )
     LOG.info("JSON écrit dans %s", out_dir)
+
+
+def under_floor(place: Place, config: Config) -> bool:
+    """Ce lieu est-il sous le plancher éditorial de son thème ?
+
+    Il n'y est alors que par la remise accordée à l'accueil du public attesté.
+    C'est un pari sur un signal de terrain contre un signal encyclopédique : le
+    relecteur doit pouvoir le voir, et le relire à part.
+    """
+    try:
+        return place.sitelinks < config.theme(place.theme_id).min_sitelinks
+    except KeyError:
+        return False
 
 
 def _membership(collections: list[Collection]) -> tuple[dict[str, list[str]], dict[str, int]]:
@@ -153,6 +169,7 @@ def write_review_csv(
                     len(membership.get(place.wikidata_id, [])),
                     " ; ".join(alerts_for(place, config)) if config else "",
                     {True: "oui", False: "non"}.get(place.visitable, "inconnu"),
+                    "oui" if config and under_floor(place, config) else "",
                     place.opening_hours or "",
                     f"{place.lat:.6f}",
                     f"{place.lon:.6f}",
@@ -360,6 +377,7 @@ def write_review_html(
                 "visitable": place.visitable,
                 "hours": place.opening_hours,
                 "source": place.source,
+                "underFloor": under_floor(place, config),
             }
         )
 
@@ -450,6 +468,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
       <option value="alert">À vérifier — disparu, accès, photo</option>
       <option value="open">Ouverts au public</option>
       <option value="osm">Découverts sur OpenStreetMap</option>
+      <option value="relief">Entrés par la remise « ouvert au public »</option>
       <option value="keep">Gardés</option>
       <option value="drop">Écartés</option>
     </select>
@@ -503,6 +522,7 @@ function visible() {
     if (state === "alert") return p.alerts.length > 0;
     if (state === "open") return p.visitable === true;
     if (state === "osm") return p.source === "osm";
+    if (state === "relief") return p.underFloor;
     if (state && d !== state) return false;
     return true;
   });
@@ -526,6 +546,10 @@ function card(p) {
       <div class="meta">${p.theme}${p.dept ? " · " + p.dept : ""}</div>
       ${p.source === "osm"
         ? `<div class="found">Trouvé sur OpenStreetMap — Wikidata ne le classait nulle part</div>`
+        : ""}
+      ${p.underFloor
+        ? `<div class="found">Sous le plancher de son thème (${p.sitelinks} langues) —
+             conservé parce qu'il accueille du public</div>`
         : ""}
       <div class="parts">${p.score.toFixed(0)} pts =
         ${parts.notoriete} notoriété (${p.sitelinks} langues)
