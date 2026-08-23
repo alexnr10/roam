@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import sys
 import tempfile
+from contextlib import contextmanager
+from io import StringIO
 import unittest
 from pathlib import Path
 
@@ -27,6 +29,16 @@ from roam_pipeline.models import Place, slugify
 from roam_pipeline.fetch import enrich_departements
 from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from_insee
 from roam_pipeline.wikipedia import title_from_url
+
+
+@contextmanager
+def _capture():
+    """Capture ce qu'une commande imprime, pour l'inspecter."""
+    import contextlib
+
+    buffer = StringIO()
+    with contextlib.redirect_stdout(buffer):
+        yield buffer
 from roam_pipeline.score import assign_tiers, compute_score, label_bonus, score_all
 
 CONFIG = load_config()
@@ -540,6 +552,78 @@ class TestFloorReliefIsVisible(unittest.TestCase):
         ordinaire = make_place("Musée connu", theme_id="musees", sitelinks=floor)
         self.assertTrue(under_floor(rescape, CONFIG))
         self.assertFalse(under_floor(ordinaire, CONFIG))
+
+
+class TestExplain(unittest.TestCase):
+    """« Pourquoi ce lieu n'est-il pas là ? » doit avoir une réponse."""
+
+    def _run(self, name, places, decisions=""):
+        import argparse
+        import json
+        import logging
+        from roam_pipeline.cli import cmd_explain
+
+        with tempfile.TemporaryDirectory() as tmp:
+            out, manual = Path(tmp) / "out", Path(tmp) / "manual"
+            out.mkdir()
+            manual.mkdir()
+            (out / "places_raw.json").write_text(
+                json.dumps([p.to_dict() for p in places], ensure_ascii=False), encoding="utf-8"
+            )
+            if decisions:
+                (manual / "decisions.csv").write_text(
+                    "wikidata_id,decision,name,note\n" + decisions, encoding="utf-8"
+                )
+            args = argparse.Namespace(out=out, manual=manual, name=name, limit=5,
+                                      adjust=60.0, strict=False)
+            logging.disable(logging.CRITICAL)
+            try:
+                with _capture() as printed:
+                    cmd_explain(args, CONFIG)
+            finally:
+                logging.disable(logging.NOTSET)
+        return printed.getvalue()
+
+    def _catalogue(self):
+        places = []
+        for index in range(12):
+            place = make_place(f"Château {index}", wikidata_id=f"Q{index}",
+                               theme_id="chateaux", sitelinks=20, lat=45 + index / 40, lon=2.0)
+            place.departement_code, place.region_code, place.image_url = "27", "28", "x"
+            place.has_frwiki = True
+            places.append(place)
+        return places
+
+    def test_a_place_below_its_floor_says_so(self):
+        floor = CONFIG.theme("chateaux").min_sitelinks
+        obscur = make_place("Château d'Hérouville", wikidata_id="Q80", theme_id="chateaux",
+                            sitelinks=floor - 2, lat=49.0, lon=2.1)
+        obscur.departement_code, obscur.region_code = "95", "11"
+        output = self._run("herouville", self._catalogue() + [obscur])
+        self.assertIn("plancher de notoriété", output)
+        self.assertIn("ÉCARTÉ", output)
+
+    def test_a_place_never_collected_says_so_rather_than_nothing(self):
+        output = self._run("maison de van gogh", self._catalogue())
+        self.assertIn("Aucun lieu", output)
+        self.assertIn("places.csv", output)
+
+    def test_a_retained_place_lists_its_collections(self):
+        giverny = make_place("Jardins de Giverny", wikidata_id="Q81", theme_id="jardins",
+                             sitelinks=22, lat=49.07, lon=1.53)
+        giverny.departement_code, giverny.region_code, giverny.image_url = "27", "28", "x"
+        giverny.has_frwiki, giverny.visitable = True, True
+        # Il faut assez de voisins pour qu'une collection existe (min_places).
+        voisins = [
+            make_place(f"Jardin {i}", wikidata_id=f"QJ{i}", theme_id="jardins",
+                       sitelinks=15, lat=49.0 + i / 40, lon=1.5)
+            for i in range(10)
+        ]
+        for place in voisins:
+            place.departement_code, place.region_code = "27", "28"
+        output = self._run("giverny", self._catalogue() + [giverny] + voisins)
+        self.assertIn("dans le catalogue", output)
+        self.assertIn("ouverture au public : confirmée", output)
 
 
 class TestDurableDecisions(unittest.TestCase):

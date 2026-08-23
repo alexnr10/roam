@@ -7,6 +7,7 @@ import csv
 import json
 import logging
 import sys
+import unicodedata
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -41,6 +42,12 @@ LOG = logging.getLogger("roam")
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_OUT = BASE_DIR / "data" / "out"
 DEFAULT_MANUAL = BASE_DIR / "data" / "manual"
+
+
+def _fold(text: str) -> str:
+    """Minuscules sans accents, pour chercher « herouville » et trouver « Hérouville »."""
+    plain = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
+    return plain.lower()
 
 
 def _load_places(path: Path) -> list[Place]:
@@ -431,6 +438,97 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def cmd_explain(args: argparse.Namespace, config: Config) -> int:
+    """Pourquoi ce lieu est-il dans le catalogue, ou pourquoi n'y est-il pas ?
+
+    La question revient à chaque revue — « je ne vois pas Giverny », « le
+    château d'Hérouville est encore là » — et y répondre demandait jusqu'ici de
+    relire le pipeline. Or chaque étape est un filtre nommé : il suffit de
+    suivre un lieu à travers elles et de dire laquelle l'arrête.
+    """
+    from .collections import (
+        apply_geographic_scope, apply_notoriety_floor, dedupe, dedupe_across_themes,
+    )
+    from .score import notoriety_floor
+
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
+        return 1
+
+    needle = _fold(args.name)
+    everything = score_all(_load_places(raw_path), config)
+    found = [p for p in everything if needle in _fold(p.name)]
+
+    if not found:
+        print(f"Aucun lieu dont le nom contient « {args.name} » n'a été collecté.\n")
+        print("Cela veut dire que Wikidata ne le classe dans aucune des classes")
+        print("interrogées, et qu'OpenStreetMap ne l'a pas signalé non plus.")
+        print("Deux recours : `discover` (s'il n'a jamais tourné), ou l'ajouter")
+        print("à data/manual/places.csv, où il échappe à tous les planchers.")
+        return 0
+
+    decisions = read_decisions(args.manual / "decisions.csv")
+    # Chaque étape est rejouée sur le catalogue entier : suivre un lieu isolé
+    # ne dirait rien du dédoublonnage, qui est une comparaison entre lieux.
+    # Rejouer signifie aussi réémettre tous les journaux de construction, deux
+    # fois — ils noieraient la réponse à une question qui tient en dix lignes.
+    pipeline_log = logging.getLogger("roam_pipeline")
+    previous_level = pipeline_log.level
+    pipeline_log.setLevel(logging.ERROR)
+    try:
+        kept, _counts = apply_decisions(everything, decisions, args.adjust, strict=args.strict)
+        score_all(kept, config)
+        stages = [("décision du curateur", kept)]
+        stages.append(("périmètre français", apply_geographic_scope(stages[-1][1], config)))
+        stages.append(("thème unique", dedupe_across_themes(stages[-1][1], config)))
+        stages.append(("plancher de notoriété", apply_notoriety_floor(stages[-1][1], config)))
+        stages.append(("doublon de proximité", dedupe(stages[-1][1])))
+        _retained, collections = build_all(kept, config)
+    finally:
+        pipeline_log.setLevel(previous_level)
+    membership = defaultdict(list)
+    for collection in collections:
+        for cp in collection.places:
+            membership[cp.place_id].append((collection.name, cp.tier))
+
+    for place in sorted(found, key=lambda p: -p.score)[: args.limit]:
+        theme_floor = config.theme(place.theme_id).min_sitelinks
+        floor = notoriety_floor(place, theme_floor, config)
+        decision = decisions.get(place.wikidata_id, ("aucune", ""))[0]
+        print(f"\n{place.name}  ({place.wikidata_id})")
+        print(f"  thème {place.theme_id} · {place.sitelinks} langues · score {place.score:.1f}")
+        print(f"  origine {place.source}"
+              + (f" · département {place.departement_code}" if place.departement_code else ""))
+        print("  ouverture au public : "
+              + {True: "confirmée", False: "refusée"}.get(place.visitable, "non renseignée")
+              + (f" ({place.opening_hours})" if place.opening_hours else ""))
+        print(f"  plancher du thème : {theme_floor}"
+              + (f", ramené à {floor} par la remise" if floor != theme_floor else ""))
+        print(f"  décision enregistrée : {decision}")
+
+        blocked = None
+        for label, survivors in stages:
+            if not any(p is place for p in survivors):
+                blocked = label
+                break
+        if blocked:
+            print(f"  → ÉCARTÉ à l'étape « {blocked} »")
+            continue
+
+        found_in = membership.get(place.wikidata_id, [])
+        if not found_in:
+            print("  → retenu par tous les filtres, mais dans AUCUNE collection")
+            continue
+        print(f"  → dans le catalogue, {len(found_in)} collections :")
+        for name, tier in sorted(found_in, key=lambda x: x[1])[:6]:
+            print(f"       niveau {tier} · {name}")
+
+    if len(found) > args.limit:
+        print(f"\n({len(found) - args.limit} autres correspondances non affichées)")
+    return 0
+
+
 def cmd_build(args: argparse.Namespace, config: Config) -> int:
     return _build_and_write(args, config)
 
@@ -726,6 +824,13 @@ def build_parser() -> argparse.ArgumentParser:
     build = sub.add_parser("build", help="score, construit les collections et exporte")
     add_decision_args(build)
 
+    explain = sub.add_parser(
+        "explain", help="dit pourquoi un lieu est dans le catalogue, ou pourquoi il n'y est pas"
+    )
+    explain.add_argument("name", help="tout ou partie du nom du lieu")
+    explain.add_argument("--limit", type=int, default=5, help="correspondances affichées")
+    add_decision_args(explain)
+
     review = sub.add_parser("apply-review", help="enregistre les décisions d'une revue")
     review.add_argument("--review", type=Path, help="chemin de review.csv")
     add_decision_args(review)
@@ -758,6 +863,7 @@ def main(argv: list[str] | None = None) -> int:
         "discover": cmd_discover,
         "adopt": cmd_adopt,
         "build": cmd_build,
+        "explain": cmd_explain,
         "apply-review": cmd_apply_review,
         "stats": cmd_stats,
         "review": cmd_review,

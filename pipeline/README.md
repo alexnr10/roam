@@ -271,6 +271,21 @@ donc rester relisible. Le nombre de lieux qu'elle sauve est journalisé par thè
 filtre dédié — de quoi juger ces lieux comme un lot, et remonter le seuil s'ils ne
 tiennent pas.
 
+### Pourquoi ce lieu est-il là, ou pourquoi n'y est-il pas ?
+
+La question revient à chaque revue. Chaque étape du pipeline étant un filtre nommé, il
+suffit de suivre un lieu à travers elles :
+
+```bash
+python -m roam_pipeline explain giverny
+python -m roam_pipeline explain "château d'hérouville"
+```
+
+La commande dit le thème, le nombre de langues, le score, l'ouverture au public, le
+plancher applicable et la décision enregistrée — puis **l'étape exacte** qui l'a écarté,
+ou les collections dans lesquelles il est entré. Un nom introuvable est une réponse aussi :
+ni Wikidata ni OpenStreetMap ne l'ont signalé.
+
 ### Les décisions du curateur sont conservées
 
 Elles vivent dans **`data/manual/decisions.csv`**, cumulées d'une revue à l'autre, et
