@@ -10,7 +10,8 @@
     "web": "expo start --web",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "export:web": "EXPO_OFFLINE=1 expo export --platform web --output-dir dist"
+    "export:web": "node scripts/sync-maplibre-worker.mjs && EXPO_OFFLINE=1 expo export --platform web --output-dir dist",
+    "postinstall": "node scripts/sync-maplibre-worker.mjs"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^3.1.1",
