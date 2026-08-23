@@ -185,8 +185,31 @@ sont passés devant, sans rapport avec la notoriété encyclopédique.
   ses horaires.
 - **`data/out/candidates.csv`** : les sites de visite qu'OpenStreetMap connaît et que le
   catalogue ignore. Par défaut, seuls les candidats sûrs — un signe d'accueil du public
-  (horaires ou tarif) **et** un lien encyclopédique. `--all` donne les autres. Les trois
-  premières colonnes se recopient telles quelles dans `data/manual/places.csv`.
+  (horaires ou tarif) **et** un lien encyclopédique. `--all` donne les autres.
+
+### Adopter les candidats
+
+Neuf cents lignes de tableur ne se jugent pas. Il y manque la photo, le score, le nombre
+de langues, et surtout les voisins du même thème — on ne décide pas d'un château sans
+voir les vingt autres châteaux devant lesquels il passerait.
+
+`adopt` fait donc entrer ces candidats dans le catalogue, pour qu'ils soient jugés là où
+tout le reste l'est déjà : dans la page de revue, avec vignette et score.
+
+```bash
+python -m roam_pipeline adopt   # puis build, puis review
+```
+
+Les faire entrer n'est pas les accepter. À la différence des ajouts de `places.csv`, ils
+ne sont **pas épinglés** : le plancher de notoriété leur est appliqué et en écarte une
+bonne part sans qu'on ait à les lire. Ceux qui restent portent la mention « Trouvé sur
+OpenStreetMap » dans la page de revue, où un filtre dédié permet de ne relire qu'eux.
+
+La commande n'exige pas de recollecter : elle ne va chercher sur Wikidata que les Q-ids
+absents du catalogue, les enrichit comme les autres (département, photo, description,
+signaux d'alerte) et les ajoute à `places_raw.json`. La liste adoptée est conservée dans
+`data/manual/candidates.csv` pour qu'un `fetch` complet la retrouve — et pour qu'une
+ligne supprimée à la main le reste.
 
 Le rapprochement se fait par identifiant Wikidata, puis par proximité **conditionnée au
 nom**. Sans ce contrôle, la densité fait tout apparier : « château de la Roche » et

@@ -26,6 +26,9 @@ from .fetch import (
     enrich_departements,
     enrich_flags,
     enrich_summaries,
+    fetch_listed_places,
+    read_place_list,
+    resolve_admin,
     run_fetch,
 )
 from .models import Collection, CollectionPlace, Place
@@ -258,6 +261,111 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     if not args.all and len(candidates) > len(confident):
         print(f"Ajoute --all pour voir les {len(candidates) - len(confident)} autres.")
     print("Relance `build` pour tenir compte de l'ouverture au public.")
+    return 0
+
+
+CANDIDATE_LIST_HEADER = """# Candidats adoptés depuis OpenStreetMap.
+#
+# Trouvés parce qu'un lieu porte des horaires ou un tarif — un fait de terrain
+# — là où Wikidata ne le classait dans aucune des classes interrogées. Ils
+# n'ont aucun privilège : ils sont scorés, soumis au plancher de notoriété et
+# dédoublonnés comme les autres. Ce fichier existe pour que `fetch` les
+# retrouve, et pour qu'une ligne retirée à la main le reste.
+#
+wikidata_id,theme_id,note
+"""
+
+
+def _write_candidate_list(path: Path, wanted: dict[str, str], names: dict[str, str]) -> None:
+    """Réécrit `data/manual/candidates.csv`, un lieu par ligne, trié.
+
+    Le nom n'est là que pour la lecture humaine : c'est le Q-id qui fait foi.
+    Sans lui, retirer une ligne à la main demanderait d'aller vérifier sur
+    Wikidata ce que « Q3578611 » désigne.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as fh:
+        fh.write(CANDIDATE_LIST_HEADER)
+        writer = csv.writer(fh)
+        for qid in sorted(wanted):
+            writer.writerow([qid, wanted[qid], names.get(qid, "")])
+
+
+def cmd_adopt(args: argparse.Namespace, config: Config) -> int:
+    """Fait entrer les candidats d'OpenStreetMap dans le catalogue.
+
+    `discover` produit une feuille de neuf cents lignes. Juger neuf cents noms
+    dans un tableur n'est pas un travail éditorial : il manque la photo, le
+    score, les langues de l'article, les voisins du même thème. Ces candidats
+    doivent donc rejoindre le catalogue pour être jugés là où tout le reste
+    l'est déjà — dans la page de revue.
+
+    Les faire entrer n'est pas les accepter. Ils ne sont pas épinglés : le
+    plancher de notoriété en écartera une bonne part sans qu'on ait à les lire,
+    et ceux qui restent porteront la mention de leur origine.
+    """
+    candidates_path = args.candidates or (args.out / "candidates.csv")
+    if not candidates_path.exists():
+        print(f"{candidates_path} absent — lance d'abord `discover`.", file=sys.stderr)
+        return 1
+
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
+        return 1
+
+    proposed = read_place_list(config, candidates_path)
+    if not proposed:
+        print("Aucun candidat exploitable : il faut un wikidata_id ET un theme_id.",
+              file=sys.stderr)
+        return 1
+
+    list_path = args.manual / "candidates.csv"
+    already_listed = read_place_list(config, list_path)
+    # La liste est cumulative et l'ancienne décision prime : une ligne retirée
+    # ou dont le thème a été corrigé à la main ne doit pas être réécrite au
+    # prochain passage.
+    merged = dict(proposed)
+    merged.update(already_listed)
+
+    places = _load_places(raw_path)
+    names = {place.wikidata_id: place.name for place in places}
+    to_fetch = {qid: theme for qid, theme in merged.items() if qid not in names}
+
+    print(f"{len(proposed)} candidats proposés, {len(merged)} au total dans {list_path.name}.")
+    print(f"{len(merged) - len(to_fetch)} déjà au catalogue, {len(to_fetch)} à collecter.")
+    if not to_fetch:
+        _write_candidate_list(list_path, merged, names)
+        print("Rien de nouveau. Relance `build` si besoin.")
+        return 0
+
+    client = wd.SparqlClient()
+    adopted = fetch_listed_places(client, config, to_fetch, pinned=False, source="osm")
+    if not adopted:
+        print("Aucun candidat récupéré sur Wikidata.", file=sys.stderr)
+        return 1
+
+    # Les mêmes signaux que pour le reste du catalogue, sur les seuls nouveaux :
+    # sans eux, ils arriveraient dans la revue sans photo, sans description et
+    # sans département, donc injugeables.
+    resolve_admin(client, adopted)
+    enrich_flags(client, adopted)
+    enrich_departements(adopted)
+    enrich_article_sizes(adopted)
+    if not args.skip_summaries:
+        enrich_summaries(adopted)
+
+    names.update({place.wikidata_id: place.name for place in adopted})
+    _write_candidate_list(list_path, merged, names)
+
+    places += adopted
+    raw_path.write_text(
+        json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    print(f"\n{len(adopted)} lieux ajoutés à {raw_path.name} ({len(places)} en tout).")
+    print("Ils ne sont pas épinglés : le plancher de notoriété s'y applique.")
+    print("Lance `build` puis `review` — ils y porteront la mention « OpenStreetMap ».")
     return 0
 
 
@@ -552,6 +660,19 @@ def build_parser() -> argparse.ArgumentParser:
         help="inclure les candidats moins sûrs (sans lien encyclopédique)",
     )
 
+    adopt = sub.add_parser(
+        "adopt",
+        help="fait entrer les candidats d'OpenStreetMap dans le catalogue (réseau requis)",
+    )
+    adopt.add_argument(
+        "--candidates", type=Path, help="feuille de candidats (défaut : data/out/candidates.csv)"
+    )
+    adopt.add_argument(
+        "--skip-summaries",
+        action="store_true",
+        help="ne pas récupérer les descriptions (la passe la plus longue)",
+    )
+
     sub.add_parser("build", help="score, construit les collections et exporte")
 
     review = sub.add_parser("apply-review", help="applique les décisions de la feuille de revue")
@@ -597,6 +718,7 @@ def main(argv: list[str] | None = None) -> int:
         "fetch": cmd_fetch,
         "enrich": cmd_enrich,
         "discover": cmd_discover,
+        "adopt": cmd_adopt,
         "build": cmd_build,
         "apply-review": cmd_apply_review,
         "stats": cmd_stats,

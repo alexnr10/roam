@@ -210,7 +210,10 @@ def find_candidates(places: list[Place], osm: list[OsmPlace]) -> list[OsmPlace]:
     known_qids = {p.wikidata_id for p in places}
     index = _Index(places, lambda p: (p.lat, p.lon))
     candidates: list[OsmPlace] = []
-    funnel = {"lus": len(osm), "gérés": 0, "absents": 0, "thème reconnu": 0}
+    # « thème reconnu » ne figure pas dans l'entonnoir : toutes les catégories
+    # demandées à Overpass ont une correspondance, l'étape ne retire jamais
+    # rien. Compter un filtre qui ne filtre pas donne l'illusion d'un contrôle.
+    funnel = {"lus": len(osm), "gérés": 0, "absents": 0, "documentés": 0}
 
     for site in osm:
         if not site.managed:
@@ -223,7 +226,8 @@ def find_candidates(places: list[Place], osm: list[OsmPlace]) -> list[OsmPlace]:
         funnel["absents"] += 1
         if guess_theme(site.tags) is None:
             continue
-        funnel["thème reconnu"] += 1
+        if site.wikidata_id or site.wikipedia:
+            funnel["documentés"] += 1
         candidates.append(site)
 
     # Les mieux documentés d'abord : un site avec horaires, tarif et lien
@@ -263,8 +267,12 @@ def keep_in_france(
 
     rejected = len(sites) - len(kept)
     if rejected:
+        # « sans commune » et non « hors de France » : un point posé en mer —
+        # une réserve de baie, un phare sur son rocher — n'appartient à aucun
+        # polygone communal sans être pour autant à l'étranger.
         LOG.info(
-            "périmètre : %s candidats hors de France écartés (%s)",
+            "périmètre : %s candidats sans commune française écartés (hors de "
+            "France, ou en mer) : %s",
             rejected,
             ", ".join(s.name for s in sites if s.departement is None)[:120],
         )

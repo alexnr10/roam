@@ -6,6 +6,7 @@ Aucune requête réseau — ces tests valident la logique métier, pas Wikidata.
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -473,6 +474,68 @@ class TestCrossThemeDedupe(unittest.TestCase):
             make_place("B", theme="monuments", wikidata_id="Q2"),
         ]
         self.assertEqual(len(dedupe_across_themes(places, CONFIG)), 2)
+
+
+class TestAdoptedCandidates(unittest.TestCase):
+    """Entrée des candidats OpenStreetMap dans le catalogue."""
+
+    class _Client:
+        def __init__(self, rows):
+            self.rows = rows
+
+        def query(self, _query):
+            return self.rows
+
+    def _row(self, qid, name, sitelinks=5):
+        return {
+            "item": f"http://www.wikidata.org/entity/{qid}",
+            "itemLabel": name,
+            "coord": "Point(2.0 45.0)",
+            "sitelinks": str(sitelinks),
+        }
+
+    def test_an_adopted_candidate_is_not_pinned(self):
+        from roam_pipeline.fetch import fetch_listed_places
+
+        client = self._Client([self._row("Q1", "Jardins de Giverny")])
+        places = fetch_listed_places(
+            client, CONFIG, {"Q1": "jardins"}, pinned=False, source="osm"
+        )
+        self.assertEqual(len(places), 1)
+        # Être découvert n'est pas être adoubé : le plancher de notoriété doit
+        # s'appliquer comme au reste du catalogue.
+        self.assertFalse(places[0].pinned)
+        self.assertEqual(places[0].source, "osm")
+
+    def test_a_curator_addition_stays_pinned(self):
+        from roam_pipeline.fetch import fetch_listed_places
+
+        client = self._Client([self._row("Q1", "Château d'Auvers-sur-Oise")])
+        places = fetch_listed_places(
+            client, CONFIG, {"Q1": "chateaux"}, pinned=True, source="wikidata"
+        )
+        self.assertTrue(places[0].pinned)
+
+    def test_the_notoriety_floor_still_applies_to_an_adopted_candidate(self):
+        from roam_pipeline.collections import apply_notoriety_floor
+
+        adopted = make_place("Musée de village", theme_id="musees", sitelinks=0)
+        adopted.source = "osm"
+        self.assertEqual(apply_notoriety_floor([adopted], CONFIG), [])
+
+    def test_an_unknown_theme_is_reported_rather_than_swallowed(self):
+        from roam_pipeline.fetch import read_place_list
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "candidates.csv"
+            path.write_text(
+                "# commentaire\nwikidata_id,theme_id,note\n"
+                "Q1,jardins,Giverny\nQ2,jardin,coquille\nQ3,,sans thème\n",
+                encoding="utf-8",
+            )
+            with self.assertLogs("roam_pipeline.fetch", level="ERROR"):
+                wanted = read_place_list(CONFIG, path)
+        self.assertEqual(wanted, {"Q1": "jardins"})
 
 
 class TestOpenStreetMap(unittest.TestCase):

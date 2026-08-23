@@ -21,6 +21,9 @@ REVIEW_HEADER = [
     "curator_note",
     "name",
     "theme",
+    # « osm » : trouvé parce qu'OpenStreetMap atteste qu'on y accueille du
+    # public, et non parce que Wikidata le classait quelque part.
+    "origine",
     "departement",
     "best_tier",
     "score",
@@ -129,6 +132,7 @@ def write_review_csv(
                     "",
                     place.name,
                     place.theme_id,
+                    place.source,
                     dept.name if dept else "",
                     best_tier.get(place.wikidata_id, ""),
                     f"{place.score:.1f}",
@@ -347,6 +351,7 @@ def write_review_html(
                 "alerts": alerts_for(place, config),
                 "visitable": place.visitable,
                 "hours": place.opening_hours,
+                "source": place.source,
             }
         )
 
@@ -407,6 +412,8 @@ _REVIEW_TEMPLATE = """<!doctype html>
            border-radius: 6px; padding: 4px 8px; font-size: 12px; }
   .open { background: #E3F0E8; color: #2F6F4E; border-radius: 6px;
           padding: 4px 8px; font-size: 12px; }
+  .found { background: #EAEDF4; color: #3B4A6B; border-radius: 6px;
+           padding: 4px 8px; font-size: 12px; }
   .alerts { display: flex; flex-direction: column; gap: 4px; }
   .tier { font-size: 11px; font-weight: 700; letter-spacing: .5px; color: var(--primary); }
   .actions { display: flex; gap: 6px; padding: 0 14px 12px; }
@@ -434,6 +441,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
       <option value="">Tout</option>
       <option value="alert">À vérifier — disparu, accès, photo</option>
       <option value="open">Ouverts au public</option>
+      <option value="osm">Découverts sur OpenStreetMap</option>
       <option value="keep">Gardés</option>
       <option value="drop">Écartés</option>
     </select>
@@ -486,6 +494,7 @@ function visible() {
     if (state === "todo") return !d;
     if (state === "alert") return p.alerts.length > 0;
     if (state === "open") return p.visitable === true;
+    if (state === "osm") return p.source === "osm";
     if (state && d !== state) return false;
     return true;
   });
@@ -507,6 +516,9 @@ function card(p) {
       <div class="tier">NIVEAU ${p.tier} · ${p.collections} collection${p.collections > 1 ? "s" : ""}</div>
       <div class="name">${p.name}</div>
       <div class="meta">${p.theme}${p.dept ? " · " + p.dept : ""}</div>
+      ${p.source === "osm"
+        ? `<div class="found">Trouvé sur OpenStreetMap — Wikidata ne le classait nulle part</div>`
+        : ""}
       <div class="parts">${p.score.toFixed(0)} pts =
         ${parts.notoriete} notoriété (${p.sitelinks} langues)
         ${parts.labels ? " + " + parts.labels + " labels" : ""}

@@ -61,6 +61,11 @@ class Place:
     # Ajouté à la main par le curateur : échappe au plancher de notoriété et
     # l'emporte sur le rattachement automatique à un thème.
     pinned: bool = False
+    # D'où vient ce lieu. « wikidata » : trouvé par sa classe, comme la
+    # majorité. « osm » : trouvé parce qu'OpenStreetMap atteste qu'il accueille
+    # du public, alors que Wikidata ne le classait nulle part. Cette origine ne
+    # change rien au score — elle dit au relecteur pourquoi la ligne est là.
+    source: str = "wikidata"
     inclusion_criteria: list[str] = field(default_factory=list)
 
     @property

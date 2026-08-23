@@ -147,6 +147,72 @@ def _as_int(value: str | None) -> int | None:
         return None
 
 
+def read_place_list(config: Config, path: Path) -> dict[str, str]:
+    """Lit un fichier `wikidata_id,theme_id,note` : `{qid: theme_id}`.
+
+    Les thèmes inconnus sont écartés en le disant : une coquille dans la
+    colonne ferait disparaître le lieu sans un mot.
+    """
+    wanted: dict[str, str] = {}
+    if not path.exists():
+        return wanted
+    for row in _read_csv_rows(path):
+        qid = (row.get("wikidata_id") or "").strip()
+        theme_id = (row.get("theme_id") or "").strip()
+        if not qid or not theme_id:
+            continue
+        try:
+            config.theme(theme_id)
+        except KeyError:
+            LOG.error("%s : thème inconnu « %s » pour %s — ignoré", path.name, theme_id, qid)
+            continue
+        wanted[qid] = theme_id
+    return wanted
+
+
+def fetch_listed_places(
+    client: wd.SparqlClient,
+    config: Config,
+    wanted: dict[str, str],
+    *,
+    pinned: bool,
+    source: str,
+) -> list[Place]:
+    """Récupère sur Wikidata des lieux désignés par leur Q-id.
+
+    Sert aux deux listes tenues hors des requêtes par classe : les ajouts du
+    curateur et les candidats trouvés sur OpenStreetMap. Seuls `pinned` et
+    `source` les distinguent — un ajout du curateur est un verdict, un candidat
+    n'est qu'une proposition qui devra franchir le plancher comme les autres.
+    """
+    if not wanted:
+        return []
+
+    places: list[Place] = []
+    for batch in wd.chunked(sorted(wanted), 150):
+        try:
+            rows = client.query(wd.items_query(batch))
+        except Exception as exc:
+            LOG.error("lieux listés : lot échoué (%s)", exc)
+            continue
+        for row in rows:
+            qid = wd.qid_from_uri(row.get("item"))
+            if not qid or qid not in wanted:
+                continue
+            place = _row_to_place(row, config.theme(wanted[qid]))
+            if place is None:
+                LOG.warning("%s : sans coordonnées ou sans nom — ignoré", qid)
+                continue
+            place.pinned = pinned
+            place.source = source
+            places.append(place)
+
+    missing = set(wanted) - {p.wikidata_id for p in places}
+    if missing:
+        LOG.warning("introuvables sur Wikidata : %s", ", ".join(sorted(missing)))
+    return places
+
+
 def fetch_manual_places(
     client: wd.SparqlClient, config: Config, manual_dir: Path
 ) -> list[Place]:
@@ -159,49 +225,30 @@ def fetch_manual_places(
 
     Colonnes : `wikidata_id,theme_id,note`.
     """
-    path = manual_dir / "places.csv"
-    if not path.exists():
-        return []
-
-    wanted: dict[str, str] = {}
-    for row in _read_csv_rows(path):
-        qid = (row.get("wikidata_id") or "").strip()
-        theme_id = (row.get("theme_id") or "").strip()
-        if not qid or not theme_id:
-            continue
-        try:
-            config.theme(theme_id)
-        except KeyError:
-            LOG.error("ajout manuel %s : thème inconnu « %s » — ignoré", qid, theme_id)
-            continue
-        wanted[qid] = theme_id
-
-    if not wanted:
-        return []
-
-    places: list[Place] = []
-    for batch in wd.chunked(sorted(wanted), 150):
-        try:
-            rows = client.query(wd.items_query(batch))
-        except Exception as exc:
-            LOG.error("ajouts manuels : lot échoué (%s)", exc)
-            continue
-        for row in rows:
-            qid = wd.qid_from_uri(row.get("item"))
-            if not qid or qid not in wanted:
-                continue
-            theme = config.theme(wanted[qid])
-            place = _row_to_place(row, theme)
-            if place is None:
-                LOG.warning("ajout manuel %s : sans coordonnées ou sans nom — ignoré", qid)
-                continue
-            place.pinned = True
-            places.append(place)
-
-    missing = set(wanted) - {p.wikidata_id for p in places}
-    if missing:
-        LOG.warning("ajouts manuels introuvables sur Wikidata : %s", ", ".join(sorted(missing)))
+    places = fetch_listed_places(
+        client, config, read_place_list(config, manual_dir / "places.csv"),
+        pinned=True, source="wikidata",
+    )
     LOG.info("ajouts manuels : %s lieux épinglés", len(places))
+    return places
+
+
+def fetch_adopted_places(
+    client: wd.SparqlClient, config: Config, manual_dir: Path
+) -> list[Place]:
+    """Candidats adoptés depuis OpenStreetMap, dans `data/manual/candidates.csv`.
+
+    Ces lieux entrent dans le catalogue comme n'importe quel autre : ils sont
+    scorés, soumis au plancher de notoriété, dédoublonnés. Rien ne leur est
+    accordé — la découverte n'est pas une caution. Le fichier existe pour que
+    la collecte reste reproductible : sans lui, relancer `fetch` effacerait
+    tout ce que `discover` a trouvé.
+    """
+    places = fetch_listed_places(
+        client, config, read_place_list(config, manual_dir / "candidates.csv"),
+        pinned=False, source="osm",
+    )
+    LOG.info("candidats adoptés : %s lieux", len(places))
     return places
 
 
@@ -518,6 +565,17 @@ def run_fetch(
     pinned_ids = {place.wikidata_id for place in manual}
     places = [p for p in places if p.wikidata_id not in pinned_ids] + manual
 
+    # Les candidats adoptés ne complètent que ce qui manque : quand une requête
+    # par classe a déjà trouvé le lieu, c'est ce rattachement-là qui vaut, pas
+    # le thème deviné depuis une balise OpenStreetMap.
+    known = {place.wikidata_id for place in places}
+    adopted = [
+        place
+        for place in fetch_adopted_places(client, config, manual_dir)
+        if place.wikidata_id not in known
+    ]
+    places += adopted
+
     resolve_admin(client, places)
     apply_labels(places, label_members)
 
@@ -527,7 +585,11 @@ def run_fetch(
             Place(**{k: v for k, v in item.items() if k != "slug"})
             for item in json.loads(raw_path.read_text(encoding="utf-8"))
             if item.get("theme_id") not in {t.id for t in themes}
+            # Ajouts manuels et candidats adoptés sont recollectés à chaque
+            # passage, quels que soient les thèmes demandés : les conserver ici
+            # les compterait deux fois.
             and not item.get("pinned")
+            and item.get("source") != "osm"
         ]
         LOG.info("%s lieux conservés des thèmes non recollectés", len(kept))
         places = kept + places
