@@ -57,6 +57,14 @@ class Scoring:
     has_frwiki_bonus: float
     article_weight: float
     label_stacking: str
+    # Ouverture au public, d'après OpenStreetMap. Trois états et non deux :
+    # « non renseigné » ne vaut ni bonus ni malus, sinon les deux tiers du
+    # catalogue seraient pénalisés par une lacune de balisage.
+    visitable_bonus: float = 0.0
+    not_visitable_malus: float = 0.0
+    # Remise sur le plancher de notoriété pour un lieu dont l'accueil du public
+    # est attesté ET qui a un article francophone.
+    visitable_floor_relief: int = 0
 
 
 @dataclass(frozen=True)

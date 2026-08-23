@@ -76,7 +76,7 @@ def fetch_theme(
 PAGE_SIZE = 800
 
 
-def _read_csv_rows(path: Path) -> list[dict[str, str]]:
+def read_csv_rows(path: Path) -> list[dict[str, str]]:
     """Lit un CSV en ignorant les lignes de commentaire.
 
     Les fichiers saisis à la main portent des explications en tête ; sans ce
@@ -156,7 +156,7 @@ def read_place_list(config: Config, path: Path) -> dict[str, str]:
     wanted: dict[str, str] = {}
     if not path.exists():
         return wanted
-    for row in _read_csv_rows(path):
+    for row in read_csv_rows(path):
         qid = (row.get("wikidata_id") or "").strip()
         theme_id = (row.get("theme_id") or "").strip()
         if not qid or not theme_id:
@@ -250,6 +250,45 @@ def fetch_adopted_places(
     )
     LOG.info("candidats adoptés : %s lieux", len(places))
     return places
+
+
+def carry_osm_signals(places: list[Place], raw_path: Path) -> int:
+    """Reprend l'ouverture au public de la collecte précédente.
+
+    Wikidata ne sait rien de l'accueil du public : ces champs ne viennent que
+    d'OpenStreetMap, et donc que de `discover`, qui coûte vingt minutes. Une
+    nouvelle collecte les écraserait par des valeurs vides, sans erreur et sans
+    trace — le catalogue perdrait silencieusement la seule donnée qui dise si
+    un lieu se visite.
+    """
+    if not raw_path.exists():
+        return 0
+
+    try:
+        previous = json.loads(raw_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        LOG.warning("collecte précédente illisible (%s) — ouverture au public perdue", exc)
+        return 0
+
+    known = {
+        item["wikidata_id"]: item
+        for item in previous
+        if item.get("wikidata_id") and item.get("osm_id")
+    }
+    carried = 0
+    for place in places:
+        item = known.get(place.wikidata_id)
+        if item is None or place.osm_id:
+            continue
+        place.osm_id = item.get("osm_id")
+        place.visitable = item.get("visitable")
+        place.opening_hours = item.get("opening_hours")
+        place.website = item.get("website")
+        carried += 1
+
+    if carried:
+        LOG.info("ouverture au public reprise de la collecte précédente : %s lieux", carried)
+    return carried
 
 
 def resolve_admin(client: wd.SparqlClient, places: list[Place]) -> None:
@@ -505,7 +544,7 @@ def _read_manual_label(label: Label, manual_dir: Path) -> set[str]:
         return set()
     qids = {
         row["wikidata_id"].strip()
-        for row in _read_csv_rows(path)
+        for row in read_csv_rows(path)
         if row.get("wikidata_id")
     }
     LOG.info("label %s : %s membres (liste manuelle)", label.id, len(qids))
@@ -593,6 +632,8 @@ def run_fetch(
         ]
         LOG.info("%s lieux conservés des thèmes non recollectés", len(kept))
         places = kept + places
+
+    carry_osm_signals(places, raw_path)
 
     raw_path.write_text(
         json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),

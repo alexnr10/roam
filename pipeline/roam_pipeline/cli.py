@@ -27,11 +27,13 @@ from .fetch import (
     enrich_flags,
     enrich_summaries,
     fetch_listed_places,
+    read_csv_rows,
     read_place_list,
     resolve_admin,
     run_fetch,
 )
 from .models import Collection, CollectionPlace, Place
+from .review import DECISIONS, apply_decisions, read_decisions, write_decisions
 from .score import score_all
 
 LOG = logging.getLogger("roam")
@@ -291,6 +293,31 @@ def _write_candidate_list(path: Path, wanted: dict[str, str], names: dict[str, s
             writer.writerow([qid, wanted[qid], names.get(qid, "")])
 
 
+def _apply_osm_signals(places: list[Place], candidates_path: Path) -> None:
+    """Reporte sur les lieux adoptés ce qu'OpenStreetMap sait d'eux.
+
+    Sans cela, un candidat arriverait dans la revue sans horaires et sans la
+    mention « ouvert au public » — alors que c'est précisément l'accueil du
+    public qui l'a fait sortir du lot. L'information est déjà dans la feuille
+    de candidats : la reperdre en cours de route serait absurde.
+    """
+    by_qid = {
+        (row.get("wikidata_id") or "").strip(): row
+        for row in read_csv_rows(candidates_path)
+        if (row.get("wikidata_id") or "").strip()
+    }
+    for place in places:
+        row = by_qid.get(place.wikidata_id)
+        if row is None:
+            continue
+        place.osm_id = (row.get("osm_id") or "").strip() or None
+        place.opening_hours = (row.get("horaires") or "").strip() or None
+        place.website = (row.get("site_web") or "").strip() or None
+        # `discover` n'écrit que des sites gérés — horaires, tarif ou site web.
+        # L'accueil du public est donc attesté par construction.
+        place.visitable = True
+
+
 def cmd_adopt(args: argparse.Namespace, config: Config) -> int:
     """Fait entrer les candidats d'OpenStreetMap dans le catalogue.
 
@@ -348,6 +375,7 @@ def cmd_adopt(args: argparse.Namespace, config: Config) -> int:
     # Les mêmes signaux que pour le reste du catalogue, sur les seuls nouveaux :
     # sans eux, ils arriveraient dans la revue sans photo, sans description et
     # sans département, donc injugeables.
+    _apply_osm_signals(adopted, candidates_path)
     resolve_admin(client, adopted)
     enrich_flags(client, adopted)
     enrich_departements(adopted)
@@ -369,68 +397,69 @@ def cmd_adopt(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
-def cmd_build(args: argparse.Namespace, config: Config) -> int:
+def _build_and_write(args: argparse.Namespace, config: Config) -> int:
+    """Score, applique les décisions du curateur, construit et exporte.
+
+    Les décisions sont relues à CHAQUE construction. Elles vivaient jusqu'ici
+    dans la seule mémoire de `apply-review` : un `build` suffisait à les
+    perdre, et un lieu écarté revenait comme si de rien n'était.
+    """
     raw_path = args.out / "places_raw.json"
     if not raw_path.exists():
         print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
         return 1
 
-    scored = score_all(_load_places(raw_path), config)
-    retained, collections = build_all(scored, config)
-
-    write_json(retained, collections, args.out)
-    write_review_csv(retained, collections, args.out / "review.csv", config)
-    write_review_html(retained, collections, config, args.out / "review.html")
-    write_seed_sql(retained, collections, config, args.out / "seed.sql")
-    # La distribution porte sur les candidats BRUTS : calculée sur les lieux
-    # déjà filtrés, elle répéterait le même nombre sous le plancher courant et
-    # ne permettrait pas de le régler.
-    _print_stats(retained, collections, raw=scored)
-    return 0
-
-
-def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
-    """Applique les décisions éditoriales et reconstruit les collections."""
-    decisions = read_review_csv(args.review)
-    if not decisions:
-        print("Aucune décision renseignée dans la feuille de revue.", file=sys.stderr)
-        return 1
-
-    from .collections import apply_notoriety_floor
-
     # `scored` garde TOUS les candidats : c'est lui qui alimente la distribution,
     # qui ne sert à régler le plancher que si elle porte sur l'avant-filtre.
-    scored = score_all(_load_places(args.out / "places_raw.json"), config)
-    places = apply_notoriety_floor(scored, config)
-    kept: list[Place] = []
-    counts: Counter[str] = Counter()
-
-    for place in places:
-        decision, note = decisions.get(place.wikidata_id, ("", ""))
-        counts[decision or "pending"] += 1
-        if decision == "drop":
-            continue
-        if decision == "promote":
-            place.curator_adjustment = args.adjust
-        elif decision == "demote":
-            place.curator_adjustment = -args.adjust
-        if decision in ("", "pending") and args.strict:
-            # En mode strict, seul ce qui a été explicitement relu est conservé.
-            continue
-        kept.append(place)
-
+    scored = score_all(_load_places(raw_path), config)
+    decisions = read_decisions(args.manual / "decisions.csv")
+    kept, counts = apply_decisions(scored, decisions, args.adjust, strict=args.strict)
     # Rescoré après ajustement : la correction du relecteur fait partie du score,
     # elle n'est pas plaquée par-dessus.
     score_all(kept, config)
+
     retained, collections = build_all(kept, config)
     write_json(retained, collections, args.out)
     write_review_csv(retained, collections, args.out / "review.csv", config)
     write_review_html(retained, collections, config, args.out / "review.html")
     write_seed_sql(retained, collections, config, args.out / "seed.sql")
 
-    print("Décisions :", ", ".join(f"{k}={v}" for k, v in sorted(counts.items())))
+    if decisions:
+        print("Décisions reprises :",
+              ", ".join(f"{k}={v}" for k, v in sorted(counts.items())))
     _print_stats(retained, collections, raw=scored)
     return 0
+
+
+def cmd_build(args: argparse.Namespace, config: Config) -> int:
+    return _build_and_write(args, config)
+
+
+def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
+    """Enregistre les décisions d'une revue, puis reconstruit."""
+    fresh = read_review_csv(args.review)
+    unknown = {d for d, _ in fresh.values()} - set(DECISIONS)
+    if unknown:
+        print(f"Décisions inconnues, ignorées : {', '.join(sorted(unknown))}", file=sys.stderr)
+        fresh = {q: v for q, v in fresh.items() if v[0] in DECISIONS}
+    if not fresh:
+        print("Aucune décision renseignée dans la feuille de revue.", file=sys.stderr)
+        return 1
+
+    path = args.manual / "decisions.csv"
+    decisions = read_decisions(path)
+    before = len(decisions)
+    changed = sum(1 for qid, d in fresh.items() if decisions.get(qid, ("", ""))[0] != d[0])
+    # La revue la plus récente l'emporte : revenir sur un verdict doit se faire
+    # en relisant le lieu, pas en éditant un fichier.
+    decisions.update(fresh)
+
+    names = {p.wikidata_id: p.name for p in _load_places(args.out / "places_raw.json")}
+    write_decisions(path, decisions, names)
+    print(f"{len(fresh)} décisions lues, {changed} nouvelles ou modifiées "
+          f"({before} → {len(decisions)} au total dans {path.name}).")
+
+    return _build_and_write(args, config)
 
 
 APP_CATALOG = BASE_DIR.parent / "mobile" / "src" / "data" / "catalog.json"
@@ -673,24 +702,33 @@ def build_parser() -> argparse.ArgumentParser:
         help="ne pas récupérer les descriptions (la passe la plus longue)",
     )
 
-    sub.add_parser("build", help="score, construit les collections et exporte")
+    def add_decision_args(target: argparse.ArgumentParser) -> None:
+        """Options communes aux deux commandes qui construisent le catalogue.
 
-    review = sub.add_parser("apply-review", help="applique les décisions de la feuille de revue")
+        `build` applique les décisions déjà enregistrées, `apply-review` en
+        ajoute d'abord de nouvelles : les deux ont besoin des mêmes réglages.
+        """
+        target.add_argument(
+            "--adjust",
+            type=float,
+            default=60.0,
+            # Doit dépasser le plus gros bonus de label (UNESCO, 40 points) :
+            # sans cela, une décision humaine ne pourrait pas rattraper un lieu
+            # que Wikidata documente mal.
+            help="ajustement de score pour promote/demote",
+        )
+        target.add_argument(
+            "--strict",
+            action="store_true",
+            help="ne garder que les lieux explicitement relus",
+        )
+
+    build = sub.add_parser("build", help="score, construit les collections et exporte")
+    add_decision_args(build)
+
+    review = sub.add_parser("apply-review", help="enregistre les décisions d'une revue")
     review.add_argument("--review", type=Path, help="chemin de review.csv")
-    review.add_argument(
-        "--adjust",
-        type=float,
-        default=60.0,
-        # Doit dépasser le plus gros bonus de label (UNESCO, 40 points) : sans
-        # cela, une décision humaine ne pourrait pas rattraper un lieu que
-        # Wikidata documente mal.
-        help="ajustement de score pour promote/demote",
-    )
-    review.add_argument(
-        "--strict",
-        action="store_true",
-        help="ne garder que les lieux explicitement relus",
-    )
+    add_decision_args(review)
 
     sub.add_parser("stats", help="statistiques du catalogue construit")
 

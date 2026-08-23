@@ -476,6 +476,101 @@ class TestCrossThemeDedupe(unittest.TestCase):
         self.assertEqual(len(dedupe_across_themes(places, CONFIG)), 2)
 
 
+class TestPublicAccessInScore(unittest.TestCase):
+    """L'ouverture au public entre dans le classement, et dans le plancher."""
+
+    def test_a_confirmed_open_place_scores_above_its_twin(self):
+        from roam_pipeline.score import compute_score
+
+        ouvert = make_place("Musée ouvert", sitelinks=10)
+        ouvert.visitable = True
+        inconnu = make_place("Musée jumeau", sitelinks=10)
+        self.assertGreater(compute_score(ouvert, CONFIG), compute_score(inconnu, CONFIG))
+
+    def test_an_unknown_access_costs_nothing(self):
+        from roam_pipeline.score import score_breakdown
+
+        # 62 % des lieux rapprochés n'ont aucune balise d'horaires. Les
+        # pénaliser reviendrait à noter le zèle des contributeurs
+        # d'OpenStreetMap, pas l'intérêt des lieux.
+        inconnu = make_place("Sans balise", sitelinks=10)
+        self.assertIsNone(inconnu.visitable)
+        self.assertEqual(score_breakdown(inconnu, CONFIG)["acces"], 0.0)
+
+    def test_an_explicit_refusal_costs_points(self):
+        from roam_pipeline.score import score_breakdown
+
+        ferme = make_place("Domaine privé", sitelinks=10)
+        ferme.visitable = False
+        self.assertLess(score_breakdown(ferme, CONFIG)["acces"], 0)
+
+    def test_the_floor_relief_needs_both_signals(self):
+        from roam_pipeline.score import notoriety_floor
+
+        # Attesté ouvert ET documenté en français : remise accordée.
+        ouvert = make_place("Musée ouvert", sitelinks=10)
+        ouvert.visitable, ouvert.has_frwiki = True, True
+        self.assertLess(notoriety_floor(ouvert, 12, CONFIG), 12)
+
+        # Ouvert mais sans article : le plancher tient.
+        sans_article = make_place("Boutique-musée", sitelinks=10)
+        sans_article.visitable, sans_article.has_frwiki = True, False
+        self.assertEqual(notoriety_floor(sans_article, 12, CONFIG), 12)
+
+        # Documenté mais accès inconnu : le plancher tient aussi.
+        inconnu = make_place("Musée jumeau", sitelinks=10)
+        inconnu.has_frwiki = True
+        self.assertEqual(notoriety_floor(inconnu, 12, CONFIG), 12)
+
+
+class TestDurableDecisions(unittest.TestCase):
+    """Les verdicts du curateur survivent aux reconstructions."""
+
+    def _round_trip(self, decisions, names=None):
+        from roam_pipeline.review import read_decisions, write_decisions
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "decisions.csv"
+            write_decisions(path, decisions, names or {})
+            return read_decisions(path)
+
+    def test_decisions_survive_a_write_and_a_read(self):
+        original = {"Q1": ("drop", "n'existe plus"), "Q2": ("keep", "")}
+        self.assertEqual(self._round_trip(original, {"Q1": "Château disparu"}), original)
+
+    def test_an_invented_decision_is_ignored(self):
+        self.assertEqual(self._round_trip({"Q1": ("peut-être", "")}), {})
+
+    def test_a_dropped_place_stays_out_and_a_kept_one_is_pinned(self):
+        from roam_pipeline.review import apply_decisions
+
+        ecarte = make_place("Écarté", wikidata_id="Q1")
+        garde = make_place("Gardé", wikidata_id="Q2")
+        ignore = make_place("Non relu", wikidata_id="Q3")
+        kept, counts = apply_decisions(
+            [ecarte, garde, ignore],
+            {"Q1": ("drop", ""), "Q2": ("keep", "")},
+            adjust=60.0,
+        )
+        self.assertEqual([p.name for p in kept], ["Gardé", "Non relu"])
+        # Un lieu validé par un humain ne doit pas disparaître si un plancher bouge.
+        self.assertTrue(garde.pinned)
+        self.assertFalse(ignore.pinned)
+        self.assertEqual(counts["pending"], 1)
+
+    def test_promote_corrects_the_score_without_removing_anything(self):
+        from roam_pipeline.review import apply_decisions
+
+        haut = make_place("Remonté", wikidata_id="Q1")
+        bas = make_place("Descendu", wikidata_id="Q2")
+        kept, _ = apply_decisions(
+            [haut, bas], {"Q1": ("promote", ""), "Q2": ("demote", "")}, adjust=60.0
+        )
+        self.assertEqual(len(kept), 2)
+        self.assertEqual(haut.curator_adjustment, 60.0)
+        self.assertEqual(bas.curator_adjustment, -60.0)
+
+
 class TestAdoptedCandidates(unittest.TestCase):
     """Entrée des candidats OpenStreetMap dans le catalogue."""
 
@@ -757,14 +852,14 @@ class TestManualCsv(unittest.TestCase):
         # ce filtre, la première ligne de commentaire deviendrait l'en-tête.
         import tempfile
 
-        from roam_pipeline.fetch import _read_csv_rows
+        from roam_pipeline.fetch import read_csv_rows
 
         path = Path(tempfile.mkdtemp()) / "places.csv"
         path.write_text(
             "# explication\n\nwikidata_id,theme_id,note\nQ42,jardins,Giverny\n",
             encoding="utf-8",
         )
-        rows = _read_csv_rows(path)
+        rows = read_csv_rows(path)
         self.assertEqual(rows, [{"wikidata_id": "Q42", "theme_id": "jardins", "note": "Giverny"}])
 
 

@@ -15,7 +15,7 @@ from collections import defaultdict
 from .config import Config
 from .geo import FRANCE, area, departements, regions
 from .models import Collection, CollectionPlace, Place
-from .score import assign_tiers
+from .score import assign_tiers, notoriety_floor
 
 LOG = logging.getLogger(__name__)
 
@@ -255,18 +255,22 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
     """
     kept: list[Place] = []
     dropped: dict[str, int] = defaultdict(int)
+    saved = 0
 
     for place in places:
         try:
-            floor = config.theme(place.theme_id).min_sitelinks
+            theme_floor = config.theme(place.theme_id).min_sitelinks
         except KeyError:
             continue
+        floor = notoriety_floor(place, theme_floor, config)
         # Un lieu épinglé par le curateur passe outre : le plancher mesure la
         # documentation d'un lieu, pas son intérêt. Giverny et le château
         # d'Auvers-sur-Oise attirent le monde entier sans être documentés en
         # dix langues.
         if place.pinned or place.sitelinks >= floor:
             kept.append(place)
+            if floor < theme_floor and place.sitelinks < theme_floor:
+                saved += 1
         else:
             dropped[place.theme_id] += 1
 
@@ -275,6 +279,15 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
             "plancher de notoriété : %s lieux écartés (%s)",
             sum(dropped.values()),
             ", ".join(f"{k} {v}" for k, v in sorted(dropped.items(), key=lambda x: -x[1])),
+        )
+    if saved:
+        # Le réglage doit être visible pour être réglable : sans ce compte, la
+        # remise agirait sans qu'on sache jamais sur combien de lieux.
+        LOG.info(
+            "%s lieux conservés par la remise « ouvert au public » "
+            "(scoring.visitable_floor_relief = %s)",
+            saved,
+            config.scoring.visitable_floor_relief,
         )
     return kept
 

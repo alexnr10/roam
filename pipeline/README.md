@@ -233,6 +233,47 @@ pas ne lève aucune erreur chez Overpass — elle renvoie zéro objet, partout �
 requête de contrôle sur le centre de Paris précède la collecte et l'interrompt aussitôt
 si elle revient vide.
 
+### L'ouverture au public compte dans le score
+
+Le score mesurait jusqu'ici la **documentation** d'un lieu : langues de l'article, taille
+du texte, photo, labels. Tous ces signaux disent la même chose sous quatre angles — ce
+lieu est-il écrit quelque part. Aucun ne dit s'il se visite.
+
+Le constat de terrain d'OpenStreetMap est donc un poste de score à part entière :
+
+| État | Effet | Pourquoi |
+| --- | --- | --- |
+| ouvert (`opening_hours`, `fee`, `website`) | `+visitable_bonus` | des gens y accueillent du public |
+| refusé (`access=private\|no`) | `−not_visitable_malus` | on ne peut pas y entrer |
+| non renseigné | **rien** | l'absence de balise ne prouve rien |
+
+Le troisième cas est le plus important. Les deux tiers des lieux rapprochés n'ont aucun
+horaire dans OpenStreetMap ; les pénaliser reviendrait à noter le zèle des contributeurs
+plutôt que l'intérêt des lieux.
+
+Le malus fait reculer, il n'exclut pas : un château qu'on ne visite pas peut se
+photographier depuis la route, et une alerte prévient déjà le relecteur.
+
+Enfin, l'accueil du public attesté **et** un article francophone donnent droit à une
+remise sur le plancher de notoriété (`visitable_floor_relief`). Le plancher mesure la
+documentation ; ces deux signaux réunis disent qu'on y va vraiment. C'est le réglage à
+bouger si les découvertes OpenStreetMap meurent toutes au plancher — ou l'inondent. Le
+nombre de lieux qu'il sauve est journalisé à chaque `build`.
+
+### Les décisions du curateur sont conservées
+
+Elles vivent dans **`data/manual/decisions.csv`**, cumulées d'une revue à l'autre, et
+sont réappliquées à **chaque** `build` — pas seulement par `apply-review`. Un lieu écarté
+reste écarté, un lieu validé est épinglé et ne peut plus tomber sous un plancher qui
+monterait.
+
+```bash
+python -m roam_pipeline apply-review --review ~/Downloads/review-decisions.csv
+python -m roam_pipeline build          # les décisions sont reprises telles quelles
+```
+
+Le fichier est éditable à la main : corriger une ligne suffit à revenir sur un verdict.
+
 ### Ajouter un lieu à la main
 
 Le pipeline ratera toujours des lieux : ceux que Wikidata classe mal, et ceux qu'il

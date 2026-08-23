@@ -31,8 +31,12 @@ REVIEW_HEADER = [
     # corrigé. Le relecteur doit voir pourquoi un lieu passe devant un autre.
     "notoriete",
     "bonus_labels",
+    "bonus_article",
     "bonus_image",
     "bonus_frwiki",
+    # Accueil du public : bonus s'il est attesté, malus s'il est refusé, zéro
+    # s'il n'est pas renseigné.
+    "bonus_acces",
     "sitelinks",
     "labels",
     "collections",
@@ -124,7 +128,9 @@ def write_review_csv(
             parts = (
                 score_breakdown(place, config)
                 if config
-                else {"notoriete": "", "labels": "", "image": "", "frwiki": ""}
+                else dict.fromkeys(
+                    ("notoriete", "labels", "article", "image", "frwiki", "acces"), ""
+                )
             )
             writer.writerow(
                 [
@@ -138,8 +144,10 @@ def write_review_csv(
                     f"{place.score:.1f}",
                     parts["notoriete"],
                     parts["labels"],
+                    parts["article"],
                     parts["image"],
                     parts["frwiki"],
+                    parts["acces"],
                     place.sitelinks,
                     "|".join(place.labels),
                     len(membership.get(place.wikidata_id, [])),
@@ -522,8 +530,12 @@ function card(p) {
       <div class="parts">${p.score.toFixed(0)} pts =
         ${parts.notoriete} notoriété (${p.sitelinks} langues)
         ${parts.labels ? " + " + parts.labels + " labels" : ""}
+        ${parts.article ? " + " + parts.article + " article" : ""}
         ${parts.image ? " + " + parts.image + " image" : ""}
-        ${parts.frwiki ? " + " + parts.frwiki + " fr" : ""}</div>
+        ${parts.frwiki ? " + " + parts.frwiki + " fr" : ""}
+        ${parts.acces ? (parts.acces > 0 ? " + " : " − ") + Math.abs(parts.acces) + " accès" : ""}
+        ${parts.ajustement ? (parts.ajustement > 0 ? " + " : " − ")
+          + Math.abs(parts.ajustement) + " curation" : ""}</div>
       ${p.visitable === true
         ? `<div class="open">✓ ouvert au public${p.hours ? ` · ${p.hours}` : ""}</div>`
         : ""}

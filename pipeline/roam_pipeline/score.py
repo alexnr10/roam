@@ -55,10 +55,36 @@ def score_breakdown(place: Place, config: Config) -> dict[str, float]:
         "article": round(s.article_weight * math.log1p(max(place.article_bytes, 0) / 1000), 1),
         "image": s.has_image_bonus if (place.image_url or place.commons_category) else 0.0,
         "frwiki": s.has_frwiki_bonus if place.has_frwiki else 0.0,
+        # Le seul poste qui ne mesure pas la documentation d'un lieu mais sa
+        # visitabilité. `None` ne vaut rien : l'absence de balise dans
+        # OpenStreetMap ne dit pas qu'un lieu est fermé, elle ne dit rien.
+        "acces": _access_score(place, s),
         "ajustement": round(place.curator_adjustment, 1),
     }
     parts["total"] = round(sum(parts.values()), 1)
     return parts
+
+
+def _access_score(place: Place, s: Scoring) -> float:
+    if place.visitable is True:
+        return s.visitable_bonus
+    if place.visitable is False:
+        return -s.not_visitable_malus
+    return 0.0
+
+
+def notoriety_floor(place: Place, floor: int, config: Config) -> int:
+    """Plancher de notoriété applicable à ce lieu.
+
+    Le plancher mesure la documentation. Un lieu dont l'accueil du public est
+    attesté ET qui a un article francophone apporte une preuve d'un autre
+    ordre : on y va vraiment, et quelqu'un a pris la peine d'écrire dessus. Il
+    a droit à une remise — pas à une dispense.
+    """
+    relief = config.scoring.visitable_floor_relief
+    if relief and place.visitable is True and place.has_frwiki:
+        return max(1, floor - relief)
+    return floor
 
 
 def compute_score(place: Place, config: Config) -> float:

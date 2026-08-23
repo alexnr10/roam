@@ -22,6 +22,30 @@ scoring:
   # sépare la cascade documentée de l'ébauche de trois lignes.
   article_weight: 8.0
 
+  # Accueil du public, constaté sur OpenStreetMap (horaires, tarif, site).
+  # C'est un fait de terrain, posé par des gens passés devant, et c'est la seule
+  # donnée du score qui ne mesure pas la documentation d'un lieu mais sa
+  # visitabilité — exactement ce qui manquait à Wikidata.
+  #
+  # Trois états, et le troisième compte autant que les deux autres : « non
+  # renseigné » ne vaut RIEN, ni bonus ni malus. Les deux tiers des lieux
+  # rapprochés n'ont pas d'horaires dans OpenStreetMap ; les pénaliser
+  # reviendrait à noter le zèle des contributeurs, pas l'intérêt des lieux.
+  visitable_bonus: 10.0
+
+  # Malus quand l'accès est explicitement refusé (`access=private|no`).
+  # Il fait reculer, il n'exclut pas : un château qu'on ne visite pas peut se
+  # photographier depuis la route, et une alerte prévient déjà le relecteur.
+  # La décision reste humaine.
+  not_visitable_malus: 20.0
+
+  # Remise sur le plancher de notoriété (`min_sitelinks`) quand l'accueil du
+  # public est attesté ET qu'un article francophone existe. Le plancher mesure
+  # la documentation ; ces deux signaux réunis disent qu'on y va vraiment.
+  # C'est le réglage à bouger si les découvertes OpenStreetMap meurent toutes
+  # au plancher — ou si elles inondent le catalogue.
+  visitable_floor_relief: 3
+
   # Les bonus de label sont définis dans labels.yaml (`score_bonus`).
   # Seul le plus élevé s'applique, plus la moitié du deuxième — pour éviter
   # qu'un empilement de petits labels dépasse un site UNESCO.
