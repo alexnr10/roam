@@ -39,33 +39,24 @@ scoring:
   # La décision reste humaine.
   not_visitable_malus: 20.0
 
-  # Remise sur le plancher de notoriété (`min_sitelinks`) quand l'accueil du
-  # public est attesté ET qu'un article francophone existe. Le plancher mesure
-  # la documentation ; ces deux signaux réunis disent qu'on y va vraiment.
+  # Repêchage d'un lieu qui ne franchit pas le plancher de son thème.
   #
-  # Une PROPORTION du plancher du thème, arrondie au supérieur. Un rabais fixe
-  # de trois langues serait modeste sur les musées (12 → 9) et dévastateur sur
-  # les mégalithes (6 → 3) : les thèmes les moins exigeants se retrouveraient
-  # sans plancher du tout, et c'est justement là que la remise sert le plus.
+  # DEUX conditions, et la première n'est pas négociable : son accueil du
+  # public doit être ATTESTÉ par OpenStreetMap. Un plancher qui mesure la
+  # documentation d'un lieu ne peut pas être franchi par plus de documentation
+  # — la première version le permettait, avec un seuil de score seul, et
+  # repêchait 2 757 lieux d'un coup. Photo et article francophone valent treize
+  # points d'office, et presque tout monument français en a : dans le bas du
+  # classement le score est presque constant, il ne discrimine rien.
   #
-  # 1.0 annule la remise, 0.7 la rend franche, 0.5 la rend permissive.
-  visitable_floor_ratio: 0.7
-
-  # Repêchage : un lieu sous le plancher de son thème est conservé si son score
-  # global atteint ce seuil.
+  # Les horaires sont une preuve d'une autre nature : un fait de terrain. C'est
+  # ce qui manquait au musée des impressionnismes de Giverny — cinq langues, et
+  # pourtant visité du monde entier.
   #
-  # Le plancher ne regarde QU'UN signal, le nombre de versions linguistiques.
-  # Le score les regarde tous — longueur de l'article francophone, photo,
-  # labels, accueil du public. Laisser le premier écarter ce que le second
-  # classe très haut, c'est préférer une mesure grossière à une mesure fine.
-  #
-  # Le cas d'école est le musée des impressionnismes de Giverny : 5 langues
-  # seulement — les étrangers y viennent sans écrire dessus dans leur langue —
-  # mais un long article français, une photo, des horaires. Score 88, très
-  # au-dessus du seuil de niveau 1, et pourtant écarté par un plancher à 12.
-  #
-  # À monter si le repêchage fait entrer trop de monde ; 0 le désactive.
-  rescue_score: 70.0
+  # Le score sert de second filtre, pour ne pas repêcher tout ce qui ouvre une
+  # billetterie. Le tableau imprimé par `build` donne le nombre de lieux
+  # concernés à chaque seuil : c'est là qu'on choisit ce chiffre, pas ailleurs.
+  rescue_score: 85.0
 
   # Les bonus de label sont définis dans labels.yaml (`score_bonus`).
   # Seul le plus élevé s'applique, plus la moitié du deuxième — pour éviter

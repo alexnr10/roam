@@ -15,7 +15,7 @@ from collections import defaultdict
 from .config import Config
 from .geo import FRANCE, area, departements, regions
 from .models import Collection, CollectionPlace, Place
-from .score import assign_tiers, notoriety_floor
+from .score import assign_tiers, rescued
 
 LOG = logging.getLogger(__name__)
 
@@ -256,29 +256,21 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
     kept: list[Place] = []
     dropped: dict[str, int] = defaultdict(int)
     saved: dict[str, int] = defaultdict(int)
-    rescued: dict[str, int] = defaultdict(int)
-    rescue = config.scoring.rescue_score
 
     for place in places:
         try:
-            theme_floor = config.theme(place.theme_id).min_sitelinks
+            floor = config.theme(place.theme_id).min_sitelinks
         except KeyError:
             continue
-        floor = notoriety_floor(place, theme_floor, config)
         # Un lieu épinglé par le curateur passe outre : le plancher mesure la
         # documentation d'un lieu, pas son intérêt. Giverny et le château
         # d'Auvers-sur-Oise attirent le monde entier sans être documentés en
         # dix langues.
         if place.pinned or place.sitelinks >= floor:
             kept.append(place)
-            if floor < theme_floor and place.sitelinks < theme_floor:
-                saved[place.theme_id] += 1
-        elif rescue and place.score >= rescue:
-            # Le plancher ne regarde qu'un signal ; le score les regarde tous.
-            # Laisser le premier écarter ce que le second classe très haut
-            # reviendrait à préférer la mesure grossière à la mesure fine.
+        elif rescued(place, config):
             kept.append(place)
-            rescued[place.theme_id] += 1
+            saved[place.theme_id] += 1
         else:
             dropped[place.theme_id] += 1
 
@@ -288,22 +280,14 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
             sum(dropped.values()),
             ", ".join(f"{k} {v}" for k, v in sorted(dropped.items(), key=lambda x: -x[1])),
         )
-    if rescued:
-        LOG.info(
-            "%s lieux repêchés par leur score malgré le plancher "
-            "(scoring.rescue_score = %s) : %s",
-            sum(rescued.values()),
-            rescue,
-            ", ".join(f"{k} {v}" for k, v in sorted(rescued.items(), key=lambda x: -x[1])),
-        )
     if saved:
-        # Le réglage doit être visible pour être réglable : sans ce compte, la
-        # remise agirait sans qu'on sache jamais sur combien de lieux.
+        # Le réglage doit être visible pour être réglable : sans ce compte, le
+        # repêchage agirait sans qu'on sache jamais sur combien de lieux.
         LOG.info(
-            "%s lieux conservés par la remise « ouvert au public » "
-            "(scoring.visitable_floor_ratio = %s) : %s",
+            "%s lieux repêchés sous leur plancher — accueil du public attesté "
+            "et score ≥ %s : %s",
             sum(saved.values()),
-            config.scoring.visitable_floor_ratio,
+            config.scoring.rescue_score,
             ", ".join(f"{k} {v}" for k, v in sorted(saved.items(), key=lambda x: -x[1])),
         )
     return kept
@@ -321,10 +305,18 @@ def apply_access_filter(places: list[Place], config: Config) -> list[Place]:
     près de deux mille. Il ne s'agit donc pas d'une heuristique mais d'un fait,
     et un malus de score ne suffisait pas à s'en débarrasser.
 
-    Un lieu épinglé y échappe : le curateur reste le dernier mot, et un lieu
-    qu'il valide explicitement peut se voir depuis la route.
+    Deux échappatoires : un lieu épinglé — le curateur reste le dernier mot, et
+    ce qui se voit très bien depuis la route est son choix — et un lieu qui
+    affiche par ailleurs des horaires ou un site web, car une grotte aménagée
+    porte souvent `access=no` sans cesser de se visiter.
     """
-    refused = [p for p in places if p.visitable is False and not p.pinned]
+    refused = [
+        p for p in places
+        # Un lieu qui affiche des horaires ou un site web accueille du public,
+        # quoi que dise sa balise d'accès : une grotte aménagée porte souvent
+        # `access=no` parce qu'on n'y entre pas seul, et se visite pourtant.
+        if p.visitable is False and not p.pinned and not (p.opening_hours or p.website)
+    ]
     excluded = {id(p) for p in refused}
     kept = [p for p in places if id(p) not in excluded]
     if refused:

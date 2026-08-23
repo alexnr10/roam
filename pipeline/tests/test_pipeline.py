@@ -516,27 +516,28 @@ class TestPublicAccessInScore(unittest.TestCase):
         ferme.visitable = False
         self.assertLess(score_breakdown(ferme, CONFIG)["acces"], 0)
 
-    def test_the_floor_relief_needs_both_signals(self):
-        from roam_pipeline.score import notoriety_floor
+    def test_the_rescue_needs_a_confirmed_welcome(self):
+        from roam_pipeline.score import rescued
 
-        # Attesté ouvert ET documenté en français : remise accordée.
-        ouvert = make_place("Musée ouvert", sitelinks=10)
-        ouvert.visitable, ouvert.has_frwiki = True, True
-        self.assertLess(notoriety_floor(ouvert, 12, CONFIG), 12)
-        # Mais proportionnelle : un plancher bas ne doit pas disparaître.
-        # Un rabais fixe de 3 aurait ramené celui des mégalithes de 6 à 3.
-        self.assertGreater(notoriety_floor(ouvert, 6, CONFIG), 3)
-        self.assertGreaterEqual(notoriety_floor(ouvert, 2, CONFIG), 1)
+        seuil = CONFIG.scoring.rescue_score
 
-        # Ouvert mais sans article : le plancher tient.
-        sans_article = make_place("Boutique-musée", sitelinks=10)
-        sans_article.visitable, sans_article.has_frwiki = True, False
-        self.assertEqual(notoriety_floor(sans_article, 12, CONFIG), 12)
+        # Attesté ouvert ET bien classé : repêché.
+        ouvert = make_place("Musée de Giverny", sitelinks=5)
+        ouvert.visitable, ouvert.score = True, seuil + 1
+        self.assertTrue(rescued(ouvert, CONFIG))
 
-        # Documenté mais accès inconnu : le plancher tient aussi.
-        inconnu = make_place("Musée jumeau", sitelinks=10)
-        inconnu.has_frwiki = True
-        self.assertEqual(notoriety_floor(inconnu, 12, CONFIG), 12)
+        # Très bien classé mais accès inconnu : NON. Un plancher qui mesure la
+        # documentation ne se franchit pas avec plus de documentation — c'est
+        # l'erreur qui avait repêché 2 757 lieux d'un coup.
+        documente = make_place("Château quelconque", sitelinks=5)
+        documente.score = seuil + 100
+        self.assertIsNone(documente.visitable)
+        self.assertFalse(rescued(documente, CONFIG))
+
+        # Ouvert mais mal classé : non plus, sinon toute billetterie entrerait.
+        modeste = make_place("Petite ferme-musée", sitelinks=1)
+        modeste.visitable, modeste.score = True, seuil - 1
+        self.assertFalse(rescued(modeste, CONFIG))
 
 
 class TestAccessAndRescue(unittest.TestCase):
@@ -568,22 +569,24 @@ class TestAccessAndRescue(unittest.TestCase):
         self.assertIsNone(inconnu.visitable)
         self.assertEqual(len(apply_access_filter([inconnu], CONFIG)), 1)
 
-    def test_a_high_score_is_rescued_from_the_floor(self):
+    def test_giverny_is_rescued_from_the_floor(self):
         from roam_pipeline.collections import apply_notoriety_floor
 
         # Le musée des impressionnismes de Giverny : 5 langues seulement, mais
-        # un long article français, une photo, des horaires — score 88.
+        # un long article français, une photo, et des horaires attestés.
         floor = CONFIG.theme("musees").min_sitelinks
         giverny = make_place("Musée des impressionnismes", theme_id="musees", sitelinks=5)
+        giverny.visitable = True
         giverny.score = CONFIG.scoring.rescue_score + 1
         self.assertLess(giverny.sitelinks, floor)
         self.assertEqual(len(apply_notoriety_floor([giverny], CONFIG)), 1)
 
-    def test_a_low_score_under_the_floor_stays_out(self):
+    def test_a_well_documented_place_alone_is_not_rescued(self):
         from roam_pipeline.collections import apply_notoriety_floor
 
-        obscur = make_place("Musée municipal", theme_id="musees", sitelinks=5)
-        obscur.score = CONFIG.scoring.rescue_score - 1
+        # Sans signe d'accueil du public, un bon score ne rachète rien.
+        obscur = make_place("Château quelconque", theme_id="musees", sitelinks=5)
+        obscur.score = CONFIG.scoring.rescue_score + 100
         self.assertEqual(apply_notoriety_floor([obscur], CONFIG), [])
 
 
@@ -955,18 +958,34 @@ class TestOpenStreetMap(unittest.TestCase):
         muet.osm_id = "way/9"
         self.assertEqual(alerts_for(muet, CONFIG), [])
 
-    def test_access_tags_mark_a_place_as_closed(self):
+    def test_a_refusal_without_any_welcome_marks_a_place_as_closed(self):
         from roam_pipeline.discover import apply_visit_info
 
         prive = make_place("Château privé", lat=45.0, lon=2.0)
         apply_visit_info(
             [prive],
-            [self._site(name="Château privé", lat=45.0, lon=2.0,
-                        opening_hours="Mo-Su", access="private")],
+            [self._site(name="Château privé", lat=45.0, lon=2.0, access="private")],
         )
-        # L'accès refusé prime sur les horaires : un parc peut afficher ses
-        # horaires et rester fermé au public.
         self.assertIs(prive.visitable, False)
+
+    def test_opening_hours_outweigh_a_restricted_access(self):
+        from roam_pipeline.discover import apply_visit_info
+
+        # Sur une grotte aménagée, `access=no` dit qu'on n'entre pas SEUL — la
+        # visite est guidée, et les horaires en attestent. Prendre le refus
+        # d'abord écartait la grotte des Planches et celle de Marsoulas, qui se
+        # visitent l'une et l'autre.
+        #
+        # Le compromis est assumé : un parc privé pourrait afficher des
+        # horaires sans ouvrir. Le premier cas s'est produit 108 fois sur un
+        # vrai passage, le second reste théorique.
+        grotte = make_place("Grotte des Planches", lat=46.9, lon=5.8)
+        apply_visit_info(
+            [grotte],
+            [self._site(name="Grotte des Planches", lat=46.9, lon=5.8,
+                        opening_hours="Mo-Su 10:00-18:00", access="no")],
+        )
+        self.assertIs(grotte.visitable, True)
 
 
 class TestPinnedPlaces(unittest.TestCase):

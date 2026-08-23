@@ -186,10 +186,16 @@ def apply_visit_info(places: list[Place], osm: list[OsmPlace]) -> int:
         # L'absence d'horaires ne dit rien : 62 % des objets rapprochés n'en
         # portent pas, y compris des lieux qui se visitent parfaitement. En
         # faire un signal de fermeture aurait signalé la moitié du catalogue.
-        if found.closed:
-            place.visitable = False
-        elif found.managed:
+        #
+        # L'ordre compte, et c'est l'accueil qui l'emporte. Sur une grotte
+        # aménagée, `access=no` dit qu'on n'entre pas seul — pas qu'on n'entre
+        # pas : la visite est guidée, et les horaires en attestent. Prendre le
+        # refus d'abord écartait la grotte des Planches et celle de Marsoulas,
+        # qui se visitent l'une et l'autre.
+        if found.managed:
             place.visitable = True
+        elif found.closed:
+            place.visitable = False
         matched += 1
 
     LOG.info(

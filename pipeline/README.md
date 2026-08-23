@@ -254,38 +254,30 @@ plutôt que l'intérêt des lieux.
 Le malus fait reculer, il n'exclut pas : un château qu'on ne visite pas peut se
 photographier depuis la route, et une alerte prévient déjà le relecteur.
 
-Enfin, l'accueil du public attesté **et** un article francophone donnent droit à une
-remise sur le plancher de notoriété (`visitable_floor_ratio`). Le plancher mesure la
-documentation ; ces deux signaux réunis disent qu'on y va vraiment. C'est le réglage à
-bouger si les découvertes OpenStreetMap meurent toutes au plancher — ou l'inondent.
-
-C'est une **proportion** du plancher du thème, et non un nombre de langues. Un rabais
-fixe de trois est modeste sur les musées (12 → 9) et dévastateur sur les mégalithes
-(6 → 3) : les thèmes les moins exigeants se retrouvent sans plancher du tout, et c'est
-justement là que la remise sert le plus. Sur le premier passage, elle repêchait d'un coup
-82 mégalithes et 73 jardins — une amnistie, pas une remise.
-
-Une remise est un pari : un signal de terrain contre un signal encyclopédique. Elle doit
-donc rester relisible. Le nombre de lieux qu'elle sauve est journalisé par thème à chaque
-`build`, la feuille de revue porte une colonne `entre_par_remise`, et la page de revue un
-filtre dédié — de quoi juger ces lieux comme un lot, et remonter le seuil s'ils ne
-tiennent pas.
-
-### Le plancher ne décide pas seul
+### Le repêchage : sortir du plancher, mais pas avec plus de documentation
 
 Le plancher de notoriété ne regarde **qu'un** signal : le nombre de versions
-linguistiques. Le score les regarde tous — longueur de l'article francophone, photo,
-labels, accueil du public. Laisser le premier écarter ce que le second classe très haut,
-c'est préférer une mesure grossière à une mesure fine.
+linguistiques. Le musée des impressionnismes de Giverny n'en a que cinq — on y vient du
+monde entier sans écrire dessus dans sa langue — et se faisait donc écarter, malgré un
+long article français, une photo et des horaires affichés.
 
-Le cas d'école est le musée des impressionnismes de Giverny : **5 langues** seulement — on
-y vient du monde entier sans écrire dessus dans sa langue — mais un long article français,
-une photo et des horaires. Score 88, très au-dessus du seuil de niveau 1 (45), et pourtant
-écarté par un plancher fixé à 12.
+Un lieu sous son plancher est donc repêché. À **deux** conditions, et la première n'est
+pas négociable :
 
-Un lieu sous son plancher est donc repêché si son score atteint `rescue_score`. Les
-repêchés sont comptés par thème à chaque `build` et se relisent à part dans la page de
-revue, comme les lieux entrés par la remise.
+1. son **accueil du public est attesté** par OpenStreetMap ;
+2. son score atteint `rescue_score`.
+
+La première condition est la leçon d'une erreur : une version antérieure repêchait sur le
+score seul, et a fait entrer **2 757 lieux d'un coup**. Photo et article francophone valent
+treize points d'office, et presque tout monument français en a — dans le bas du classement
+le score est presque constant, il ne discrimine rien. Un plancher qui mesure la
+documentation ne peut pas être franchi par plus de documentation. Les horaires, eux, sont
+une preuve d'une autre nature : un fait de terrain. Le score ne sert que de second filtre,
+pour ne pas repêcher tout ce qui ouvre une billetterie.
+
+Le seuil se choisit sur la table que `build` imprime — combien de lieux seraient repêchés,
+par thème, à 70, 80, 85, 90, 100, 120 — et non sur un exemple. C'est cette table qui
+manquait la première fois.
 
 ### Un lieu où l'on ne peut pas entrer n'est pas collectionnable
 
@@ -294,10 +286,14 @@ dit l'accès explicitement refusé (`access=private|no`) sont donc écartés, et
 seulement pénalisés — un malus de 20 points ne suffisait pas à sortir le château
 d'Hérouville, qui restait au niveau 2 des châteaux d'Île-de-France.
 
-Le signal est rare et délibéré : posé à la main par un contributeur, il ne concerne qu'une
-vingtaine de lieux sur près de deux mille. Ce n'est donc pas une heuristique mais un fait.
-Un lieu épinglé par le curateur y échappe : ce qui se voit très bien depuis la route reste
-son choix.
+Le signal est délibéré : `access=private|no` est posé à la main par un contributeur. Mais
+il ne veut pas toujours dire ce qu'il semble dire — sur une grotte aménagée, il signifie
+qu'on n'y entre pas **seul**, et la visite guidée existe bel et bien. Un lieu qui affiche
+par ailleurs des horaires ou un site web est donc considéré comme ouvert : sans cette
+nuance, la grotte des Planches et celle de Marsoulas disparaissaient, avec cent six autres.
+
+Deux échappatoires, donc : ce signe d'accueil, et l'épinglage par le curateur — ce qui se
+voit très bien depuis la route reste son choix.
 
 ### Pourquoi ce lieu est-il là, ou pourquoi n'y est-il pas ?
 

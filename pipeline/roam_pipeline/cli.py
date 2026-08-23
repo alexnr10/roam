@@ -434,7 +434,7 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     if decisions:
         print("Décisions reprises :",
               ", ".join(f"{k}={v}" for k, v in sorted(counts.items())))
-    _print_stats(retained, collections, raw=scored)
+    _print_stats(retained, collections, raw=scored, config=config)
     return 0
 
 
@@ -450,7 +450,7 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
         apply_access_filter, apply_geographic_scope, apply_notoriety_floor, dedupe,
         dedupe_across_themes,
     )
-    from .score import notoriety_floor
+    from .score import rescued
 
     raw_path = args.out / "places_raw.json"
     if not raw_path.exists():
@@ -495,8 +495,7 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
             membership[cp.place_id].append((collection.name, cp.tier))
 
     for place in sorted(found, key=lambda p: -p.score)[: args.limit]:
-        theme_floor = config.theme(place.theme_id).min_sitelinks
-        floor = notoriety_floor(place, theme_floor, config)
+        floor = config.theme(place.theme_id).min_sitelinks
         decision = decisions.get(place.wikidata_id, ("aucune", ""))[0]
         print(f"\n{place.name}  ({place.wikidata_id})")
         print(f"  thème {place.theme_id} · {place.sitelinks} langues · score {place.score:.1f}")
@@ -505,8 +504,8 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
         print("  ouverture au public : "
               + {True: "confirmée", False: "refusée"}.get(place.visitable, "non renseignée")
               + (f" ({place.opening_hours})" if place.opening_hours else ""))
-        print(f"  plancher du thème : {theme_floor}"
-              + (f", ramené à {floor} par la remise" if floor != theme_floor else ""))
+        print(f"  plancher du thème : {floor} langues"
+              + (" — repêché malgré lui" if rescued(place, config) else ""))
         print(f"  décision enregistrée : {decision}")
 
         blocked = None
@@ -645,7 +644,7 @@ def cmd_stats(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
-def _print_stats(places, collections, raw=None) -> None:
+def _print_stats(places, collections, raw=None, config: Config | None = None) -> None:
     def count(collection) -> int:
         return collection["place_count"] if isinstance(collection, dict) else len(collection.places)
 
@@ -682,7 +681,10 @@ def _print_stats(places, collections, raw=None) -> None:
             f"{len(places) - ouverts - fermes} non renseignés"
         )
 
-    _print_sitelink_distribution(raw if raw is not None else places, config_floors())
+    source = raw if raw is not None else places
+    _print_sitelink_distribution(source, config_floors())
+    if config is not None and hasattr(source[0] if source else None, "theme_id"):
+        _print_rescue_distribution(source, config)
     print()
 
 
@@ -697,6 +699,50 @@ def config_floors() -> dict[str, int]:
 
 
 SITELINK_STEPS = (2, 4, 6, 8, 10, 15, 20, 30)
+RESCUE_STEPS = (70, 80, 85, 90, 100, 120)
+
+
+def _print_rescue_distribution(places, config: Config) -> None:
+    """Combien de lieux le repêchage ferait entrer, selon le seuil de score.
+
+    Ce tableau manquait, et son absence a coûté un catalogue : un seuil choisi
+    sur un seul exemple — le musée de Giverny, à 88 points — s'est révélé
+    repêcher 2 757 lieux. Un réglage se choisit sur une distribution, jamais
+    sur un cas.
+
+    Ne comptent que les lieux sous le plancher de leur thème ET dont l'accueil
+    du public est attesté : ce sont les seuls que le repêchage peut concerner.
+    """
+    eligible: dict[str, list[float]] = defaultdict(list)
+    for place in places:
+        if place.visitable is not True or place.pinned:
+            continue
+        try:
+            floor = config.theme(place.theme_id).min_sitelinks
+        except KeyError:
+            continue
+        if place.sitelinks < floor:
+            eligible[place.theme_id].append(place.score)
+
+    if not eligible:
+        return
+
+    current = config.scoring.rescue_score
+    header = "  ".join(f"≥{step:<4}" for step in RESCUE_STEPS)
+    print("\n  Lieux repêchés selon le seuil de score (accueil du public attesté) :")
+    print(f"      {'thème':<16} {header}   (× = seuil actuel)")
+    for theme_id, scores in sorted(eligible.items(), key=lambda kv: -len(kv[1])):
+        cells = []
+        for step in RESCUE_STEPS:
+            count = sum(1 for score in scores if score >= step)
+            mark = "×" if step == current else " "
+            cells.append(f"{count}{mark}".ljust(7))
+        print(f"      {theme_id:<16} {''.join(cells)}")
+    total = sum(
+        sum(1 for score in scores if score >= current) for scores in eligible.values()
+    )
+    print(f"      seuil actuel ({current:g}) : {total} lieux repêchés sur "
+          f"{sum(len(v) for v in eligible.values())} éligibles.")
 
 
 def _print_sitelink_distribution(places, floors: dict[str, int] | None = None) -> None:

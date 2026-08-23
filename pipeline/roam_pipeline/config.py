@@ -66,10 +66,10 @@ class Scoring:
     # est attesté ET qui a un article francophone. Une PROPORTION du plancher du
     # thème, et non un nombre fixe : retirer trois langues à un plancher de
     # douze est une remise, à un plancher de cinq c'est une amnistie.
-    visitable_floor_ratio: float = 1.0
-    # Score à partir duquel un lieu est repêché malgré un plancher qu'il ne
-    # franchit pas. Le plancher ne regarde qu'un signal ; le score les regarde
-    # tous. 0 désactive le repêchage.
+    # Score à partir duquel un lieu dont l'accueil du public est ATTESTÉ est
+    # repêché malgré un plancher qu'il ne franchit pas. Les deux conditions
+    # comptent : un plancher qui mesure la documentation ne peut pas être
+    # franchi par plus de documentation. 0 désactive le repêchage.
     rescue_score: float = 0.0
 
 

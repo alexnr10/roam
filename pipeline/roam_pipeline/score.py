@@ -73,24 +73,27 @@ def _access_score(place: Place, s: Scoring) -> float:
     return 0.0
 
 
-def notoriety_floor(place: Place, floor: int, config: Config) -> int:
-    """Plancher de notoriété applicable à ce lieu.
+def rescued(place: Place, config: Config) -> bool:
+    """Ce lieu sous son plancher mérite-t-il d'être conservé quand même ?
 
-    Le plancher mesure la documentation. Un lieu dont l'accueil du public est
-    attesté ET qui a un article francophone apporte une preuve d'un autre
-    ordre : on y va vraiment, et quelqu'un a pris la peine d'écrire dessus. Il
-    a droit à une remise — pas à une dispense.
+    Deux conditions, et la première n'est pas négociable : **son accueil du
+    public doit être attesté**. Le plancher mesure la documentation d'un lieu ;
+    le franchir avec plus de documentation n'aurait aucun sens, et c'est
+    l'erreur qu'a produite la première version — un score seuil à 70 repêchait
+    2 757 lieux, parce que photo et article francophone valent treize points
+    d'office et que presque tout monument français en a. Dans le bas du
+    classement, le score est presque constant : il ne discrimine rien.
 
-    La remise est une PROPORTION, pas un nombre de langues. Un rabais fixe de
-    trois est modeste sur le plancher des musées (12 → 9) et dévastateur sur
-    celui des mégalithes (6 → 3) : les thèmes les moins exigeants se
-    retrouvaient sans plancher du tout, et c'est là que la remise servait le
-    plus — 82 mégalithes et 73 jardins repêchés d'un coup.
+    Les horaires d'OpenStreetMap, eux, sont une preuve d'une autre nature — un
+    fait de terrain, posé par quelqu'un passé devant. C'est ce qui manquait au
+    musée des impressionnismes de Giverny, cinq langues et pourtant visité du
+    monde entier.
+
+    Le score sert alors de second filtre, pour ne pas repêcher tout ce qui
+    ouvre une billetterie.
     """
-    ratio = config.scoring.visitable_floor_ratio
-    if ratio < 1.0 and place.visitable is True and place.has_frwiki:
-        return max(1, math.ceil(floor * ratio))
-    return floor
+    threshold = config.scoring.rescue_score
+    return bool(threshold and place.visitable is True and place.score >= threshold)
 
 
 def compute_score(place: Place, config: Config) -> float:
