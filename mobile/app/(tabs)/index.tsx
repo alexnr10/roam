@@ -161,7 +161,9 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: spacing.lg, paddingTop: spacing.sm },
   controls: { paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
   map: {
-    height: 300,
+    // La France, dans cette projection, est presque carrée : un cadre carré la
+    // cadre au plus juste sans marges perdues.
+    aspectRatio: 1,
     marginHorizontal: spacing.lg,
     borderRadius: radius.lg,
     overflow: 'hidden',

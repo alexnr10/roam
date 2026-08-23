@@ -17,16 +17,33 @@ import type { MapCanvasProps } from './MapCanvas';
 // Emprise de la France métropolitaine.
 const BOUNDS = { minLat: 41.3, maxLat: 51.2, minLon: -5.2, maxLon: 9.6 };
 
-const project = (
-  lat: number,
-  lon: number,
-  width: number,
-  height: number,
-): { left: number; top: number } => ({
-  left: ((lon - BOUNDS.minLon) / (BOUNDS.maxLon - BOUNDS.minLon)) * width,
-  // La latitude croît vers le nord, l'axe des ordonnées vers le bas.
-  top: ((BOUNDS.maxLat - lat) / (BOUNDS.maxLat - BOUNDS.minLat)) * height,
-});
+const toRad = (deg: number) => (deg * Math.PI) / 180;
+
+/**
+ * Projection plate à rapport d'aspect conservé.
+ *
+ * Un degré de longitude ne vaut pas un degré de latitude : au milieu de la
+ * France, il vaut environ 0,69 fois moins en distance. Étirer l'emprise pour
+ * remplir le cadre écrasait donc le pays du nord au sud. On calcule ici une
+ * échelle unique, et on centre ce qui reste.
+ */
+function projector(width: number, height: number) {
+  const midLat = (BOUNDS.minLat + BOUNDS.maxLat) / 2;
+  const lonScale = Math.cos(toRad(midLat));
+
+  const spanX = (BOUNDS.maxLon - BOUNDS.minLon) * lonScale;
+  const spanY = BOUNDS.maxLat - BOUNDS.minLat;
+  // Une seule échelle pour les deux axes : c'est elle qui garde les proportions.
+  const scale = Math.min(width / spanX, height / spanY);
+  const offsetX = (width - spanX * scale) / 2;
+  const offsetY = (height - spanY * scale) / 2;
+
+  return (lat: number, lon: number) => ({
+    left: offsetX + (lon - BOUNDS.minLon) * lonScale * scale,
+    // La latitude croît vers le nord, l'axe des ordonnées vers le bas.
+    top: offsetY + (BOUNDS.maxLat - lat) * scale,
+  });
+}
 
 export const mapAvailable = true;
 
@@ -45,6 +62,7 @@ export function MapCanvas({
   };
 
   const ready = size.width > 0 && size.height > 0;
+  const project = ready ? projector(size.width, size.height) : null;
 
   return (
     <View style={styles.canvas} onLayout={onLayout}>
@@ -60,16 +78,16 @@ export function MapCanvas({
         ))}
       </View>
 
-      {ready
+      {project
         ? places.map((place) => {
-            const { left, top } = project(place.lat, place.lon, size.width, size.height);
+            const { left, top } = project(place.lat, place.lon);
             const visited = visitedIds.has(place.id);
             const highlighted = place.id === highlightedId;
             return (
               <Pressable
                 key={place.id}
                 onPress={() => onSelectPlace(place)}
-                style={[styles.hit, { left: left - 14, top: top - 14 }]}
+                style={[styles.hit, { left: left - 13, top: top - 13 }]}
                 accessibilityRole="button"
                 accessibilityLabel={place.name}
               >
@@ -85,14 +103,9 @@ export function MapCanvas({
           })
         : null}
 
-      {ready && position ? (
+      {project && position ? (
         (() => {
-          const { left, top } = project(
-            position.latitude,
-            position.longitude,
-            size.width,
-            size.height,
-          );
+          const { left, top } = project(position.latitude, position.longitude);
           return <View style={[styles.me, { left: left - 7, top: top - 7 }]} />;
         })()
       ) : null}
@@ -123,15 +136,16 @@ const styles = StyleSheet.create({
   },
   hit: {
     position: 'absolute',
-    width: 28,
-    height: 28,
+    // La zone tactile reste large même si la pastille est fine.
+    width: 26,
+    height: 26,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dot: { width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: '#FFFFFF' },
+  dot: { width: 8, height: 8, borderRadius: 4, borderWidth: 1.5, borderColor: '#FFFFFF' },
   dotVisited: { backgroundColor: colors.verified },
   dotTodo: { backgroundColor: colors.primary, opacity: 0.5 },
-  dotHighlighted: { width: 20, height: 20, borderRadius: 10, opacity: 1 },
+  dotHighlighted: { width: 18, height: 18, borderRadius: 9, opacity: 1 },
   me: {
     position: 'absolute',
     width: 14,

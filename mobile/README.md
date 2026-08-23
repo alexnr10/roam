@@ -57,9 +57,11 @@ Deux différences avec l'app :
 ## Installer sur un téléphone Android
 
 ```bash
-npm install -g eas-cli && eas login
-eas build --platform android --profile preview
+npx eas-cli@latest login
+npx eas-cli@latest build --platform android --profile preview
 ```
+
+`npx` évite l'installation globale, qui échoue en `EACCES` sur un Mac.
 
 Rend un APK installable directement. La carte restera grise tant qu'aucune clé Google
 Maps n'est configurée — voir `../docs/demarrage.md`, qui détaille les options.

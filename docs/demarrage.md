@@ -113,6 +113,7 @@ validation GPS ne peut pas fonctionner.
 | Le QR code scanne mais rien ne charge | Téléphone et ordinateur sur des réseaux différents, ou Wi-Fi d'entreprise qui isole les appareils | `npx expo start --tunnel` (plus lent, mais passe partout) |
 | `command not found: npx` | Node.js absent ou mal installé | Réinstaller Node.js LTS, rouvrir le terminal |
 | `xcrun: error: invalid active developer path` | Outils en ligne de commande cassés par une mise à jour de macOS | `sudo xcode-select --reset`, cf. section Git ci-dessus |
+| `EACCES: permission denied` sur `npm install -g` | Installation globale dans un dossier système | Passer par `npx eas-cli@latest …`, jamais `sudo` |
 | `zsh: command not found: python` | Environnement virtuel non activé dans ce terminal | `source .venv/bin/activate` depuis `pipeline/` |
 | Erreurs pendant `npm install` | Cache abîmé | `rm -rf node_modules package-lock.json && npm install` |
 | L'app se lance mais la carte est vide | Permission de localisation refusée | Réglages du téléphone → Expo Go → Localisation |
@@ -146,11 +147,15 @@ est **EAS Build** : la compilation se fait dans le cloud d'Expo, gratuitement, e
 fichier `.apk` qu'Android sait installer directement.
 
 ```bash
-npm install -g eas-cli
-eas login                    # compte Expo gratuit, à créer si besoin
+npx eas-cli@latest login     # compte Expo gratuit, à créer si besoin
 cd mobile
-eas build --platform android --profile preview
+npx eas-cli@latest build --platform android --profile preview
 ```
+
+`npx` exécute l'outil sans l'installer dans les dossiers système : c'est ce qui évite le
+`EACCES: permission denied` que renvoie `npm install -g` sur un Mac. Inutile de passer par
+`sudo` — installer un outil de développement en administrateur crée plus de problèmes
+qu'il n'en règle.
 
 Le profil `preview` est déjà configuré dans `eas.json` pour produire un APK plutôt qu'un
 paquet destiné au Play Store. La compilation part en file d'attente — compte dix à trente
