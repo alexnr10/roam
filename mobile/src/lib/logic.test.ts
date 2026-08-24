@@ -20,6 +20,7 @@ const place = (over: Partial<Place> = {}): Place => ({
   radiusM: 150,
   score: 100,
   departement: 'Cantal',
+  departementCode: '15',
   regionCode: '84',
   ...over,
 });

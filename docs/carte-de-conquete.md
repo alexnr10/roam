@@ -1,8 +1,7 @@
 # La carte de conquête
 
-> Conception. Rien n'est implémenté à ce stade — la fonctionnalité a besoin du vrai
-> catalogue pour avoir un sens : avec 46 lieux de démonstration, aucun département n'est
-> conquérable.
+> Étapes 2 et 3 faites : les règles sont implémentées et testées, et l'écran « Conquête »
+> les montre en liste. Le coloriage géographique (étapes 4 à 6) reste à faire.
 
 ## Le principe
 
@@ -24,6 +23,22 @@ Deux familles de cartes :
 
 C'est ce qui transforme une liste de cases cochées en territoire. Et c'est ce qui donne
 une raison d'aller dans la Creuse.
+
+## Les deux couleurs
+
+Le curateur a tranché : deux états se distinguent à l'œil, à chaque échelle.
+
+| État | Signification | Couleur |
+|---|---|---|
+| **Une collection finie** | tous les lieux d'un thème dans le territoire | or |
+| **Territoire complet** | tous les lieux du territoire, tous thèmes confondus | terracotta pleine |
+
+Le second implique le premier pour chaque thème : c'est une conquête totale, et elle se
+lit comme un aboutissement. Entre les deux, un territoire entamé porte une teinte pâle
+proportionnelle à son avancement — sans quoi la carte serait binaire et ne montrerait
+aucune progression.
+
+Les quatre échelles — commune, département, région, pays — répondent aux mêmes règles.
 
 ## La difficulté centrale : quel niveau pour quel lieu ?
 
@@ -56,30 +71,44 @@ neutres, et la carte resterait vide.
 
 **Proposition : un seuil propre à la conquête, à 3 lieux.**
 
-- moins de 3 lieux du thème dans le territoire → **non jouable**, rendu neutre et hachuré ;
-- à partir de 3 → niveaux calculés localement, sur les mêmes règles que les collections
-  mais avec des paliers réduits (niveau 1 = les 3 meilleurs, niveau 2 = 60 %, niveau 3 = tous).
+- moins de 3 lieux du thème dans le territoire → **non jouable**, rendu neutre ;
+- à partir de 3 → niveaux calculés localement, avec des paliers réduits (niveau 1 = les 3
+  meilleurs, niveau 2 = les 8 meilleurs, niveau 3 = tous).
 
-Le pipeline produirait donc, en plus des collections, une **table de conquête** :
-`(territoire, thème, niveau) → liste de lieux requis`. Ce n'est pas une collection
-navigable, c'est une condition de coloriage.
+**Le seuil ne vaut que pour un thème.** L'unité « tous thèmes confondus » y échappe : une
+commune d'un seul lieu se conquiert en une visite, et c'est exactement l'effet voulu — la
+carte générale se remplit vite, les cartes de thème sont le jeu long.
+
+Un dernier garde-fou est venu de l'implémentation : le niveau atteint plafonne à la
+**profondeur du territoire**. Trois châteaux dans un département, tous validés, c'est le
+niveau 1 et la collection complète — pas le niveau 3. Sinon un territoire pauvre vaudrait
+autant qu'un département de quatre-vingts châteaux.
+
+### Où vit ce calcul
+
+Dans l'application (`mobile/src/lib/conquest.ts`), et non dans le pipeline. Le découpage
+en territoires est une pure fonction de données que l'application a déjà — scores, thèmes,
+codes de territoire — et l'y calculer évite d'embarquer huit mille appartenances dans le
+catalogue. Le pipeline n'a eu qu'à fournir ce qui manquait : les **codes** de territoire,
+dont ceux des communes, qu'il ne connaissait pas.
 
 ## Le code couleur
 
-Piège à éviter : trois couleurs de niveau × seize thèmes donnent un patchwork illisible.
-
-**Une teinte par thème, une intensité par niveau.**
+Piège écarté : trois couleurs de niveau × seize thèmes auraient donné un patchwork
+illisible. Le choix retenu est **deux couleurs, et une seule teinte pâle entre les deux**.
 
 | État | Rendu |
 |---|---|
-| Non jouable | gris neutre, hachuré léger |
-| Entamé | teinte du thème à très faible opacité, proportionnelle au pourcentage |
-| Niveau 1 | teinte du thème, saturation moyenne |
-| Niveau 2 | teinte du thème, saturation forte |
-| Niveau 3 | teinte du thème, saturation maximale + liseré |
+| Vierge | gris neutre |
+| Entamé | terracotta très pâle, opacité proportionnelle au pourcentage |
+| Une collection finie | **or** |
+| Territoire complet | **terracotta pleine** |
 
-Sur la **carte générale**, la teinte n'est plus celle d'un thème mais celle de Roam, et
-l'intensité dit la profondeur d'achèvement du territoire.
+Sur une **carte de thème**, seule cette collection-là décide. Sur la **carte générale**,
+c'est le territoire entier, tous thèmes confondus.
+
+Le niveau atteint (1, 2, 3) ne change pas la teinte mais son intensité : il dit la
+profondeur de la conquête sans ajouter une couleur à lire.
 
 ## Rendu : ce que ça change techniquement
 
@@ -116,27 +145,23 @@ colorié :
 La carte raconte donc la même progression à trois échelles, et le zoom devient un geste
 de lecture, pas seulement de navigation.
 
-## Ordre de réalisation proposé
+## Ordre de réalisation
 
-1. **Animation de validation** ✅ *(faite)*
-2. Table de conquête produite par le pipeline — pur calcul, testable hors carte
-3. Écran « conquête » en liste, sans carte : départements et régions conquis par thème.
-   Permet de valider les règles avant d'investir dans le rendu géographique.
-4. Migration MapLibre + contours des régions et départements
-5. Coloriage des départements et régions, par thème
+1. **Animation de validation** ✅
+2. **Règles de conquête** ✅ — `mobile/src/lib/conquest.ts`, dix-sept tests
+3. **Écran « Conquête » en liste** ✅ — quatre échelles, les deux couleurs, sans carte
+4. Contours des régions et départements (GeoJSON simplifié)
+5. Coloriage des départements et régions sur la carte MapLibre
 6. Communes et carte générale
 
-Les étapes 2 et 3 ne dépendent d'aucune décision technique lourde et se testent
-immédiatement. C'est par là qu'il faut commencer.
+Les étapes 2 et 3 ont validé les règles avant tout investissement dans le rendu
+géographique — et l'écran en liste reste utile après : il dit ce qu'il reste à faire, là
+où un aplat de couleur ne dit que ce qui est fait.
 
 ## À trancher
 
 - **Le seuil de 3 lieux** est-il le bon ? À regarder sur le vrai catalogue : combien de
   couples thème × département deviennent jouables selon qu'on met 3, 4 ou 5.
-- **La commune est-elle la bonne maille** pour la carte générale ? Beaucoup de communes
-  n'ont qu'un seul lieu, donc se conquièrent en une visite. C'est peut-être exactement
-  l'effet voulu — la carte générale se remplit vite, les cartes de thème sont le jeu
-  long — mais ça mérite d'être décidé plutôt que subi.
 - **Que se passe-t-il quand le catalogue s'enrichit ?** Un département conquis qui reçoit
   un nouveau lieu redevient incomplet. Retirer une couleur acquise est une très mauvaise
   sensation. Piste : geler le niveau atteint et signaler le nouveau lieu comme un bonus,

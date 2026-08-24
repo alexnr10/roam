@@ -412,6 +412,89 @@ def enrich_summaries(places: list[Place], client: WikipediaClient | None = None)
     return found
 
 
+def enrich_communes(
+    places: list[Place],
+    address_client: AddressClient | None = None,
+    commune_client: CommuneClient | None = None,
+) -> int:
+    """Rattache chaque lieu à sa commune, par ses coordonnées.
+
+    La commune est la maille la plus fine de la carte de conquête : celle qui
+    se colore en une seule visite, et donc celle qui donne le sentiment
+    d'avancer dès le premier lieu. Wikidata ne la donne pas de façon fiable —
+    `P131` manque sur les sites naturels, et pointe parfois un hameau ou un
+    canton plutôt qu'une commune.
+
+    Les coordonnées, elles, sont toujours là. Mêmes deux passes que pour le
+    rattachement au département : l'API Adresse en masse, puis l'API Géo point
+    par point pour ce qu'elle n'a pas su situer.
+
+    Seuls les lieux sans commune sont interrogés : relancer la passe ne coûte
+    donc rien une fois qu'elle a abouti.
+    """
+    missing = [p for p in places if not p.commune_code]
+    if not missing:
+        LOG.info("communes : tous les lieux sont déjà rattachés")
+        return 0
+
+    LOG.info("communes : %s lieux à rattacher", len(missing))
+    resolved = 0
+
+    def assign(place: Place, commune) -> bool:
+        if commune is None:
+            return False
+        place.commune_code = commune.code
+        place.commune_name = commune.name or place.commune_name
+        # La commune fait autorité sur le département : elle vient du même
+        # appel et ne peut pas le contredire.
+        dept = normalize_dept_code(commune.departement)
+        if dept:
+            place.departement_code = dept
+            known = region_of(dept)
+            if known:
+                place.region_code = known.code
+        return True
+
+    address_client = address_client or AddressClient()
+    for batch in wd.chunked(missing, 500):
+        try:
+            found = address_client.reverse_communes(
+                [(place.wikidata_id, place.lat, place.lon) for place in batch]
+            )
+        except Exception as exc:
+            LOG.error("API Adresse : lot échoué (%s)", exc)
+            continue
+        for place in batch:
+            if assign(place, found.get(place.wikidata_id)):
+                resolved += 1
+
+    still_missing = [p for p in missing if not p.commune_code]
+    if still_missing:
+        LOG.info(
+            "API Géo : %s lieux restants, interrogés un par un (~%s s)",
+            len(still_missing),
+            int(len(still_missing) * 0.06),
+        )
+        commune_client = commune_client or CommuneClient()
+        for place in still_missing:
+            found = commune_client.locate_commune(place.lat, place.lon)
+            if found and assign(place, found[0]):
+                resolved += 1
+
+    unresolved = [p for p in missing if not p.commune_code]
+    LOG.info("communes : %s/%s lieux rattachés", resolved, len(missing))
+    if unresolved:
+        # Hors de France, ou en mer : un phare sur son rocher, une réserve de
+        # baie. Ils resteront hors de la carte de conquête à l'échelle
+        # communale, mais gardent leur département.
+        LOG.info(
+            "%s lieux sans commune (hors de France, ou en mer) : %s",
+            len(unresolved),
+            ", ".join(p.name for p in unresolved[:5]),
+        )
+    return resolved
+
+
 def enrich_departements(
     places: list[Place],
     address_client: AddressClient | None = None,

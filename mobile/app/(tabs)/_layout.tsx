@@ -29,6 +29,10 @@ export default function TabsLayout() {
         name="collections"
         options={{ title: 'Collections', tabBarIcon: icon('🎯') }}
       />
+      <Tabs.Screen
+        name="conquete"
+        options={{ title: 'Conquête', tabBarIcon: icon('🚩') }}
+      />
       <Tabs.Screen name="profil" options={{ title: 'Profil', tabBarIcon: icon('🎖️') }} />
     </Tabs>
   );

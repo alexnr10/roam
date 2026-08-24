@@ -15,6 +15,20 @@ export const colors = {
   tier: ['#B4532B', '#8A7B5C', '#9A958C'] as const,
 };
 
+/**
+ * Les deux couleurs de la carte de conquête.
+ *
+ * Or : une collection du territoire est achevée. Terracotta pleine : le
+ * territoire l'est entièrement, tous thèmes confondus. La seconde ne s'obtient
+ * qu'en passant par la première, et se lit comme un aboutissement.
+ */
+export const conquest = {
+  empty: colors.surfaceAlt,
+  started: colors.primarySoft,
+  theme: '#C89B3C',
+  total: colors.primary,
+};
+
 export const spacing = {
   xs: 4,
   sm: 8,

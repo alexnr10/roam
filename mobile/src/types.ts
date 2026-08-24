@@ -21,7 +21,17 @@ export type Place = {
   radiusM: number;
   score: number;
   departement: string | null;
+  /**
+   * Codes des territoires auxquels le lieu appartient.
+   *
+   * Ce sont des CLÉS, là où `departement` n'est qu'un libellé : la carte de
+   * conquête regroupe par territoire, et deux communes françaises peuvent
+   * porter le même nom.
+   */
+  departementCode: string | null;
   regionCode: string | null;
+  communeCode?: string | null;
+  communeName?: string | null;
   summary?: string | null;
   imageUrl?: string | null;
   /** Source de la description : l'écran du lieu doit y renvoyer (CC BY-SA). */
@@ -57,10 +67,30 @@ export type Theme = {
   icon: string;
 };
 
+/** Les quatre échelles de la carte de conquête. */
+export type AreaLevel = 'commune' | 'departement' | 'region' | 'country';
+
+export type Area = {
+  code: string;
+  name: string;
+  /** « du Cantal », « de l'Eure » — le français ne se dérive pas d'une règle. */
+  deForm?: string;
+  /** Territoire englobant : le département d'une commune, la région d'un département. */
+  parentCode?: string | null;
+};
+
 export type Catalog = {
   places: Place[];
   collections: Collection[];
   themes: Theme[];
+  /**
+   * Répertoire des territoires occupés par le catalogue, par échelle.
+   *
+   * Seulement ceux qui contiennent au moins un lieu : nommer les mille
+   * communes du catalogue ne demande pas d'embarquer les trente-cinq mille
+   * communes de France.
+   */
+  areas: Record<AreaLevel, Area[]>;
 };
 
 /** Comment une visite a été enregistrée. */

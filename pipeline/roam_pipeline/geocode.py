@@ -17,6 +17,7 @@ import csv
 import io
 import logging
 import time
+from dataclasses import dataclass
 
 import requests
 
@@ -28,6 +29,15 @@ USER_AGENT = "RoamCatalogBot/0.1 (https://github.com/alexnr10/roam) python-reque
 # L'API accepte de gros lots ; on reste modeste pour rester poli et pouvoir
 # reprendre sans tout perdre en cas d'échec.
 BATCH = 500
+
+
+@dataclass(frozen=True)
+class Commune:
+    """Commune de rattachement d'un point : code INSEE, nom, et département."""
+
+    code: str
+    name: str
+    departement: str
 
 
 def departement_from_insee(citycode: str | None) -> str | None:
@@ -64,6 +74,17 @@ class AddressClient:
 
     def reverse(self, points: list[tuple[str, float, float]]) -> dict[str, str]:
         """`[(identifiant, lat, lon)]` → `{identifiant: code INSEE de commune}`."""
+        return {key: found.code for key, found in self.reverse_communes(points).items()}
+
+    def reverse_communes(
+        self, points: list[tuple[str, float, float]]
+    ) -> dict[str, Commune]:
+        """`[(identifiant, lat, lon)]` → `{identifiant: Commune}`.
+
+        Le nom de la commune vient du même appel que son code : le demander ne
+        coûte rien de plus, et sans lui la carte de conquête afficherait des
+        codes INSEE là où l'utilisateur attend « Giverny ».
+        """
         if not points:
             return {}
 
@@ -81,12 +102,17 @@ class AddressClient:
         )
         response.raise_for_status()
 
-        out: dict[str, str] = {}
+        out: dict[str, Commune] = {}
         for row in csv.DictReader(io.StringIO(response.text)):
             identifier = row.get("id")
             citycode = row.get("result_citycode")
-            if identifier and citycode:
-                out[identifier] = citycode
+            departement = departement_from_insee(citycode)
+            if identifier and citycode and departement:
+                out[identifier] = Commune(
+                    code=citycode,
+                    name=(row.get("result_city") or "").strip(),
+                    departement=departement,
+                )
         return out
 
 
@@ -120,6 +146,11 @@ class CommuneClient:
 
     def locate(self, lat: float, lon: float) -> tuple[str, str] | None:
         """`(code de département, code de région)`, ou None hors de France."""
+        found = self.locate_commune(lat, lon)
+        return (found[0].departement, found[1]) if found else None
+
+    def locate_commune(self, lat: float, lon: float) -> tuple[Commune, str] | None:
+        """`(Commune, code de région)`, ou None hors de France."""
         delay = 1.0
         for attempt in range(1, self.max_retries + 1):
             self._throttle()
@@ -129,7 +160,10 @@ class CommuneClient:
                     params={
                         "lat": f"{lat:.6f}",
                         "lon": f"{lon:.6f}",
-                        "fields": "codeDepartement,codeRegion",
+                        # `code` est explicite : les champs par défaut de
+                        # l'API dépendent de la version, et sans le code INSEE
+                        # la commune n'est pas identifiable.
+                        "fields": "code,nom,codeDepartement,codeRegion",
                         "format": "json",
                     },
                     timeout=self.timeout_s,
@@ -151,7 +185,11 @@ class CommuneClient:
                 return None
             first = payload[0]
             dept = first.get("codeDepartement")
-            return (dept, first.get("codeRegion")) if dept else None
+            code = first.get("code")
+            if not dept or not code:
+                return None
+            commune = Commune(code=code, name=first.get("nom") or "", departement=dept)
+            return (commune, first.get("codeRegion"))
 
         LOG.debug("API Géo : abandon après %s tentatives", self.max_retries)
         return None

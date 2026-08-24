@@ -48,6 +48,11 @@ class Place:
 
     departement_code: str | None = None
     region_code: str | None = None
+    # Commune de rattachement, en code INSEE. C'est la maille la plus fine de
+    # la carte de conquête — celle qui se colore en une seule visite, et donc
+    # celle qui donne le sentiment d'avancer.
+    commune_code: str | None = None
+    commune_name: str | None = None
     # Commune de rattachement (Q-id), résolue en codes INSEE par une seconde passe.
     admin_qid: str | None = None
 

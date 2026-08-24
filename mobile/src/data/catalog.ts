@@ -1,5 +1,5 @@
 import raw from './catalog.json';
-import type { Catalog, Collection, Place, Theme } from '../types';
+import type { Area, AreaLevel, Catalog, Collection, Place, Theme } from '../types';
 
 /**
  * Accès au catalogue.
@@ -15,6 +15,20 @@ const catalog = raw as unknown as Catalog;
 export const places: Place[] = catalog.places;
 export const collections: Collection[] = catalog.collections;
 export const themes: Theme[] = catalog.themes;
+
+/**
+ * Territoires occupés par le catalogue, par échelle.
+ *
+ * Le repli sur des listes vides couvre un catalogue produit avant que le
+ * pipeline n'exporte ce répertoire : la carte de conquête se montre alors
+ * vide plutôt que de faire planter l'application.
+ */
+export const areas: Record<AreaLevel, Area[]> = {
+  commune: catalog.areas?.commune ?? [],
+  departement: catalog.areas?.departement ?? [],
+  region: catalog.areas?.region ?? [],
+  country: catalog.areas?.country ?? [],
+};
 
 const placeById = new Map(places.map((place) => [place.id, place]));
 const themeById = new Map(themes.map((theme) => [theme.id, theme]));

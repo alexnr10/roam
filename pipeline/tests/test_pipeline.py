@@ -415,6 +415,85 @@ class TestTwoTierGeocoding(unittest.TestCase):
         self.assertEqual(address.calls, 0)
 
 
+class TestCommuneEnrichment(unittest.TestCase):
+    """La commune est la maille la plus fine de la carte de conquête."""
+
+    class _Address:
+        def __init__(self, communes):
+            self.communes = communes
+            self.calls = 0
+
+        def reverse_communes(self, points):
+            self.calls += 1
+            return {i: self.communes[i] for i, _, _ in points if i in self.communes}
+
+    class _Commune:
+        def __init__(self, answer):
+            self.answer = answer
+            self.calls = 0
+
+        def locate_commune(self, lat, lon):
+            self.calls += 1
+            return self.answer
+
+    def _commune(self, code, name, dept):
+        from roam_pipeline.geocode import Commune
+
+        return Commune(code=code, name=name, departement=dept)
+
+    def test_the_two_passes_split_the_work(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        adresse = make_place("Musée", wikidata_id="Q1")
+        isole = make_place("Cascade du Rudlin", wikidata_id="Q2")
+        address = self._Address({"Q1": self._commune("27285", "Giverny", "27")})
+        commune = self._Commune((self._commune("88106", "Chapelle-devant-Bruyères", "88"), "44"))
+
+        resolved = enrich_communes([adresse, isole], address, commune)
+
+        self.assertEqual(resolved, 2)
+        self.assertEqual(adresse.commune_code, "27285")
+        self.assertEqual(adresse.commune_name, "Giverny")
+        self.assertEqual(isole.commune_code, "88106")
+        # Un seul appel unitaire : celui que la passe en masse a raté.
+        self.assertEqual(commune.calls, 1)
+
+    def test_the_commune_corrects_the_departement(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        # La commune et le département viennent du même appel : elle ne peut
+        # pas le contredire, donc elle fait autorité sur un rattachement
+        # Wikidata erroné.
+        place = make_place("Lieu mal rattaché", wikidata_id="Q1", departement_code="75")
+        enrich_communes(
+            [place],
+            self._Address({"Q1": self._commune("15014", "Aurillac", "15")}),
+            self._Commune(None),
+        )
+        self.assertEqual(place.departement_code, "15")
+        self.assertEqual(place.region_code, "84")
+
+    def test_a_place_already_located_costs_no_call(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        place = make_place("Connu", commune_code="15014")
+        address = self._Address({})
+        self.assertEqual(enrich_communes([place], address, self._Commune(None)), 0)
+        self.assertEqual(address.calls, 0)
+
+    def test_a_point_at_sea_keeps_its_departement(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        # Un phare sur son rocher n'appartient à aucun polygone communal. Il
+        # sort de la carte de conquête à l'échelle communale, pas du catalogue.
+        phare = make_place("Phare isolé", wikidata_id="Q9", departement_code="29")
+        self.assertEqual(
+            enrich_communes([phare], self._Address({}), self._Commune(None)), 0
+        )
+        self.assertIsNone(phare.commune_code)
+        self.assertEqual(phare.departement_code, "29")
+
+
 class TestGeographicScope(unittest.TestCase):
     def test_a_place_without_a_departement_is_dropped(self):
         # Sans département, un lieu n'entre dans aucune collection

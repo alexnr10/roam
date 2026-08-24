@@ -24,6 +24,7 @@ from .export import (
 )
 from .fetch import (
     enrich_article_sizes,
+    enrich_communes,
     enrich_departements,
     enrich_flags,
     enrich_summaries,
@@ -174,6 +175,9 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     found = enrich_article_sizes(places)
     enrich_flags(wd.SparqlClient(), places)
     enrich_departements(places)
+    # Après le département : la commune fait autorité sur lui, et la corrige au
+    # passage quand Wikidata l'avait mal rattaché.
+    enrich_communes(places)
     if not args.skip_summaries:
         enrich_summaries(places)
     raw_path.write_text(

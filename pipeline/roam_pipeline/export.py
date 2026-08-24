@@ -9,7 +9,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from .config import Config
-from .geo import departements, regions
+from .geo import FRANCE, departements, regions
 from .alerts import alerts_for
 from .score import score_breakdown
 from .models import Collection, Place
@@ -659,12 +659,56 @@ def write_app_catalog(
                 "radiusM": place.validation_radius_m,
                 "score": place.score,
                 "departement": dept.name if dept else None,
+                # Les CODES, et pas seulement les noms : la carte de conquête
+                # regroupe par territoire, et un nom n'est pas une clé — deux
+                # communes françaises peuvent le partager.
+                "departementCode": place.departement_code,
                 "regionCode": place.region_code,
+                "communeCode": place.commune_code,
+                "communeName": place.commune_name,
                 "summary": place.summary,
                 "imageUrl": _thumbnail(place.image_url, 800) or None,
                 "wikipediaUrl": place.wikipedia_url,
             }
         )
+
+    # Répertoire des territoires effectivement occupés par le catalogue. Sans
+    # lui, l'application afficherait « 15 » au lieu de « Cantal », et devrait
+    # embarquer les 35 000 communes de France pour n'en nommer que mille.
+    used_regions = {p.region_code for p in places if p.wikidata_id in used and p.region_code}
+    used_depts = {
+        p.departement_code for p in places if p.wikidata_id in used and p.departement_code
+    }
+    areas = {
+        "country": [{"code": FRANCE.code, "name": FRANCE.name, "deForm": FRANCE.de_form}],
+        "region": [
+            {"code": code, "name": zone.name, "deForm": zone.de_form}
+            for code, zone in sorted(regions().items())
+            if code in used_regions
+        ],
+        "departement": [
+            {
+                "code": code,
+                "name": zone.name,
+                "deForm": zone.de_form,
+                "parentCode": zone.parent_code,
+            }
+            for code, zone in sorted(departements().items())
+            if code in used_depts
+        ],
+        # Les communes ne viennent d'aucun référentiel embarqué : elles sont
+        # découvertes dans le catalogue lui-même, au fil des lieux.
+        "commune": [
+            {"code": code, "name": name, "parentCode": parent}
+            for code, (name, parent) in sorted(
+                {
+                    p.commune_code: (p.commune_name or p.commune_code, p.departement_code)
+                    for p in places
+                    if p.wikidata_id in used and p.commune_code
+                }.items()
+            )
+        ],
+    }
 
     app_collections = [
         {
@@ -702,6 +746,7 @@ def write_app_catalog(
         ],
         "places": app_places,
         "collections": app_collections,
+        "areas": areas,
     }
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
