@@ -5,9 +5,13 @@
  * une page autonome se publie et s'ouvre n'importe où. Le fragment produit n'a
  * ni `<html>` ni `<head>` — l'hôte les fournit.
  *
- * Ce que la page NE peut pas faire : joindre le serveur de tuiles, ni charger
- * le worker de MapLibre, qui vit dans un fichier voisin. L'onglet Carte reste
- * donc en fond dégradé ; tout le reste fonctionne.
+ * Le worker de MapLibre vit normalement dans un fichier voisin, que la page
+ * repliée n'a pas : elle le reconstitue en blob (voir plus bas). Sans lui,
+ * MapLibre ne traiterait AUCUNE donnée et les cartes resteraient muettes.
+ *
+ * Reste le serveur de tuiles, injoignable derrière certaines politiques de
+ * sécurité. Le fond passe alors en dégradé — mais les contours de la carte de
+ * conquête sont NOS données : la France se dessine et se colorie quand même.
  */
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

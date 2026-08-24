@@ -26,6 +26,7 @@ from roam_pipeline.config import load_config
 from roam_pipeline.export import _sql_str, write_seed_sql
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
 from roam_pipeline.models import Place, slugify
+from roam_pipeline import outlines
 from roam_pipeline.fetch import enrich_departements
 from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from_insee
 from roam_pipeline.wikipedia import title_from_url
@@ -1461,6 +1462,174 @@ class TestSlugify(unittest.TestCase):
         self.assertEqual(slugify("Château d'If"), "chateau-d-if")
         self.assertEqual(slugify("Mont-Saint-Michel"), "mont-saint-michel")
         self.assertEqual(slugify("Gorges du Verdon !"), "gorges-du-verdon")
+
+
+class TestOutlines(unittest.TestCase):
+    """Contours administratifs : ils doivent maigrir sans se décoller.
+
+    Le repère : deux carrés voisins qui partagent une arête, plus un troisième
+    territoire à l'écart. La frontière commune porte un sommet inutile qui doit
+    disparaître — mais des DEUX côtés à la fois.
+    """
+
+    @staticmethod
+    def _square(code, x0, x1, extra=()):
+        ring = [[x0, 0.0], *[list(point) for point in extra], [x1, 0.0], [x1, 1.0], [x0, 1.0], [x0, 0.0]]
+        return {
+            "type": "Feature",
+            "properties": {"code": code, "nom": f"Zone {code}"},
+            "geometry": {"type": "Polygon", "coordinates": [ring]},
+        }
+
+    @staticmethod
+    def _rings(feature):
+        geometry = feature["geometry"]
+        polygons = (
+            [geometry["coordinates"]]
+            if geometry["type"] == "Polygon"
+            else geometry["coordinates"]
+        )
+        return [ring for polygon in polygons for ring in polygon]
+
+    def _shared_frontier(self, features, x):
+        """Les sommets de chaque territoire posés sur la verticale `x`."""
+        out = []
+        for feature in features:
+            points = {
+                tuple(point)
+                for ring in self._rings(feature)
+                for point in ring
+                if abs(point[0] - x) < 1e-9
+            }
+            out.append(points)
+        return out
+
+    def test_simplify_keeps_both_ends(self):
+        arc = [(0, 0), (10, 1), (20, 0)]
+        kept = outlines.simplify(arc, tolerance_km2=1e9)
+        self.assertEqual(kept, [(0, 0), (20, 0)])
+
+    def test_simplify_drops_a_pointless_vertex(self):
+        # Un sommet aligné avec ses voisins ne dit rien : son triangle est nul.
+        arc = [(0, 0), (100, 0), (200, 0), (200, 100)]
+        kept = outlines.simplify(arc, tolerance_km2=0.001)
+        self.assertNotIn((100, 0), kept)
+        self.assertEqual(kept[0], (0, 0))
+        self.assertEqual(kept[-1], (200, 100))
+
+    def test_simplify_keeps_a_vertex_above_the_threshold(self):
+        # Cent pas de grille en latitude valent une dizaine de kilomètres :
+        # le triangle dépasse largement le seuil.
+        arc = [(0, 0), (500, 500), (1000, 0)]
+        kept = outlines.simplify(arc, tolerance_km2=1.0)
+        self.assertEqual(len(kept), 3)
+
+    def test_cut_splits_a_ring_at_its_bounds(self):
+        ring = [(0, 0), (1, 0), (2, 0), (2, 2), (0, 2), (0, 0)]
+        arcs = outlines.cut(ring, {(0, 0), (2, 0)})
+        self.assertEqual(len(arcs), 2)
+        # Les arcs se chaînent : la fin de l'un est le début du suivant.
+        self.assertEqual(arcs[0][-1], arcs[1][0])
+        self.assertEqual(arcs[-1][-1], arcs[0][0])
+
+    def test_cut_leaves_an_island_whole(self):
+        ring = [(0, 0), (1, 0), (1, 1), (0, 0)]
+        self.assertEqual(outlines.cut(ring, set()), [tuple(ring)])
+
+    def test_a_shared_frontier_stays_identical_on_both_sides(self):
+        # LE test de la carte de conquête : un liseré de fond entre deux
+        # départements coloriés se voit à l'œil nu, et vient de là.
+        milieu = [[1.0, 0.4], [1.0, 0.5], [1.0, 0.6]]
+        gauche = self._square("A", 0.0, 1.0)
+        gauche["geometry"]["coordinates"] = [
+            [[0.0, 0.0], [1.0, 0.0], *milieu, [1.0, 1.0], [0.0, 1.0], [0.0, 0.0]]
+        ]
+        droite = self._square("B", 1.0, 2.0)
+        droite["geometry"]["coordinates"] = [
+            [[1.0, 0.0], [2.0, 0.0], [2.0, 1.0], [1.0, 1.0], *milieu[::-1], [1.0, 0.0]]
+        ]
+
+        built = outlines.build_outlines([gauche, droite], tolerance_km2=5.0)
+        self.assertEqual(len(built), 2)
+        cote_a, cote_b = self._shared_frontier(built, 1.0)
+        self.assertEqual(cote_a, cote_b)
+
+    def test_the_frontier_actually_gets_simplified(self):
+        # Sans ce garde-fou, un contour qui ne maigrit jamais passerait aussi
+        # le test précédent.
+        milieu = [[1.0, 0.4], [1.0, 0.5], [1.0, 0.6]]
+        gauche = self._square("A", 0.0, 1.0)
+        gauche["geometry"]["coordinates"] = [
+            [[0.0, 0.0], [1.0, 0.0], *milieu, [1.0, 1.0], [0.0, 1.0], [0.0, 0.0]]
+        ]
+        built = outlines.build_outlines([gauche], tolerance_km2=5.0)
+        self.assertLess(len(self._rings(built[0])[0]), 8)
+
+    def test_an_islet_disappears_but_never_the_territory(self):
+        petit = {
+            "type": "Feature",
+            "properties": {"code": "C", "nom": "Îlot"},
+            "geometry": {
+                "type": "MultiPolygon",
+                "coordinates": [
+                    [[[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0], [0.0, 0.0]]],
+                    [[[5.0, 5.0], [5.002, 5.0], [5.002, 5.002], [5.0, 5.002], [5.0, 5.0]]],
+                ],
+            },
+        }
+        built = outlines.build_outlines([petit], tolerance_km2=0.01, min_polygon_km2=1.0)
+        self.assertEqual(built[0]["geometry"]["type"], "Polygon")
+
+        # Seul au monde, le même îlot survit : un territoire ne s'efface pas.
+        seul = {
+            "type": "Feature",
+            "properties": {"code": "D", "nom": "Rocher"},
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [[5.0, 5.0], [5.002, 5.0], [5.002, 5.002], [5.0, 5.002], [5.0, 5.0]]
+                ],
+            },
+        }
+        self.assertEqual(len(outlines.build_outlines([seul], 0.01, min_polygon_km2=1.0)), 1)
+
+    def test_the_code_travels_as_an_identifier(self):
+        # MapLibre colore par `feature-state`, qui a besoin d'un identifiant.
+        built = outlines.build_outlines([self._square("2A", 0.0, 1.0)], tolerance_km2=0.01)
+        self.assertEqual(built[0]["id"], "2A")
+        self.assertEqual(built[0]["properties"]["code"], "2A")
+
+
+class TestShippedOutlines(unittest.TestCase):
+    """Le fichier embarqué dans l'application, tel quel."""
+
+    PATH = Path(__file__).resolve().parents[2] / "mobile" / "src" / "data" / "outlines.json"
+
+    @classmethod
+    def setUpClass(cls):
+        if not cls.PATH.exists():  # pragma: no cover
+            raise unittest.SkipTest("contours non générés")
+        import json
+
+        cls.data = json.loads(cls.PATH.read_text(encoding="utf-8"))
+
+    def test_every_area_of_the_catalogue_has_an_outline(self):
+        # Un département sans contour est un trou blanc au milieu de la carte.
+        for level, expected in (("region", regions()), ("departement", departements())):
+            drawn = {f["properties"]["code"] for f in self.data[level]["features"]}
+            self.assertEqual(set(expected) - drawn, set(), f"{level} sans contour")
+
+    def test_the_overseas_departments_are_there(self):
+        drawn = {f["properties"]["code"] for f in self.data["departement"]["features"]}
+        for code in ("971", "972", "973", "974", "976"):
+            self.assertIn(code, drawn)
+
+    def test_the_licence_travels_with_the_data(self):
+        # Licence ouverte : la mention de source est une obligation, pas un ornement.
+        self.assertIn("Etalab", self.data["attribution"])
+
+    def test_the_file_stays_light_enough_to_embed(self):
+        self.assertLess(self.PATH.stat().st_size, 900 * 1024)
 
 
 if __name__ == "__main__":

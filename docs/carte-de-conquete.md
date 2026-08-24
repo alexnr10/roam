@@ -1,7 +1,8 @@
 # La carte de conquête
 
-> Étapes 2 et 3 faites : les règles sont implémentées et testées, et l'écran « Conquête »
-> les montre en liste. Le coloriage géographique (étapes 4 à 6) reste à faire.
+> Étapes 2 à 5 faites : les règles sont implémentées et testées, et l'écran « Conquête »
+> montre **la carte coloriée** des départements et des régions, avec la liste dessous.
+> Restent les communes et la carte par thème (étape 6).
 
 ## Le principe
 
@@ -150,13 +151,26 @@ de lecture, pas seulement de navigation.
 1. **Animation de validation** ✅
 2. **Règles de conquête** ✅ — `mobile/src/lib/conquest.ts`, dix-sept tests
 3. **Écran « Conquête » en liste** ✅ — quatre échelles, les deux couleurs, sans carte
-4. Contours des régions et départements (GeoJSON simplifié)
-5. Coloriage des départements et régions sur la carte MapLibre
-6. Communes et carte générale
+4. **Contours des régions et départements** ✅ — `roam_pipeline export-outlines`, arcs
+   partagés, 460 Ko pour 119 territoires
+5. **Coloriage sur la carte MapLibre** ✅ — carte au-dessus, liste dessous ; taper un
+   territoire y réduit la liste
+6. Communes, et une carte par thème
 
 Les étapes 2 et 3 ont validé les règles avant tout investissement dans le rendu
 géographique — et l'écran en liste reste utile après : il dit ce qu'il reste à faire, là
 où un aplat de couleur ne dit que ce qui est fait.
+
+## Ce qui manque encore
+
+- **Les communes.** Le fichier de contours n'en contient pas : trente-cinq mille
+  polygones ne s'embarquent pas. Il faudra n'exporter que celles qui portent un lieu du
+  catalogue — quelques milliers, soit un volume comparable aux départements.
+- **L'outre-mer sort du cadre.** La vue initiale se cale sur l'emprise de la métropole ;
+  un département des Antilles conquis se colorie, mais hors champ. La liste, elle, les
+  montre. À traiter par un cartouche ou un raccourci de cadrage.
+- **La carte par thème** — « où ai-je conquis les châteaux ? ». Les règles la permettent
+  déjà (le niveau est calculé par thème × territoire), il ne manque que le sélecteur.
 
 ## À trancher
 

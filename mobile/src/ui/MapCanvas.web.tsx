@@ -6,17 +6,17 @@ import type { GeoJSONSource, MapLayerMouseEvent, Map as MapLibreMap } from 'mapl
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors } from '../theme';
+import { colors, spacing, type } from '../theme';
 import type { Place } from '../types';
 import type { MapCanvasProps } from './MapCanvas';
 import {
-  BASEMAP_STYLES,
   CLUSTER_MAX_ZOOM,
   CLUSTER_RADIUS,
-  FALLBACK_STYLE,
   FRANCE_BOUNDS,
   mapColors,
+  resolveBasemap,
 } from './mapStyle';
+import { prepareMapLibre } from './maplibreSetup';
 
 /**
  * Carte du build web, sur MapLibre.
@@ -29,49 +29,7 @@ import {
 
 export const mapAvailable = true;
 
-// Metro n'émet pas le worker de MapLibre : il est copié dans `public/maplibre/`
-// par `scripts/sync-maplibre-worker.mjs`, et c'est là qu'on l'envoie chercher.
-// Sans cela le worker répond 404 et la carte reste muette, sans erreur — ni
-// fond de tuiles, ni lieux.
-//
-// Une page repliée en un seul fichier n'a pas ce voisin. Elle peut alors
-// fabriquer le worker elle-même et en déposer l'adresse ici : voir
-// `scripts/inline-web-build.mjs`.
-declare global {
-  interface Window {
-    __ROAM_MAPLIBRE_WORKER__?: string;
-  }
-}
-
-maplibregl.setWorkerUrl(
-  (typeof window !== 'undefined' && window.__ROAM_MAPLIBRE_WORKER__) ||
-    '/maplibre/maplibre-gl-worker.mjs',
-);
-
 const SOURCE = 'places';
-
-/**
- * Résout le premier fond de carte disponible.
- *
- * Le style est chargé ici plutôt que confié à MapLibre : quand MapLibre échoue
- * à le charger, il n'émet jamais `load`, et les couches de lieux ne sont donc
- * jamais posées. Une panne du serveur de tuiles effaçait ainsi le catalogue
- * en même temps que la carte.
- */
-async function resolveStyle(): Promise<{ style: unknown; degraded: boolean }> {
-  for (const url of BASEMAP_STYLES) {
-    try {
-      // Sans délai maximal, un serveur qui ne répond pas laisserait la carte
-      // vide indéfiniment au lieu de basculer sur le fond suivant.
-      const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
-      if (!response.ok) continue;
-      return { style: await response.json(), degraded: false };
-    } catch {
-      // Fond suivant.
-    }
-  }
-  return { style: FALLBACK_STYLE, degraded: true };
-}
 
 function toFeatureCollection(
   places: Place[],
@@ -110,6 +68,10 @@ export function MapCanvas({
   onSelect.current = onSelectPlace;
 
   const [degraded, setDegraded] = useState(false);
+  // WebGL2 manque encore sur quelques WebViews Android et sur les machines
+  // sans accélération : MapLibre lève à la construction, et sans ce garde-fou
+  // l'écran restait un rectangle gris sans un mot d'explication.
+  const [failed, setFailed] = useState(false);
   // Les couches ne peuvent être alimentées qu'une fois le style chargé. Sans cet
   // état, les effets de données s'exécutaient avant que la carte n'existe et ne
   // repassaient jamais : la carte restait vide.
@@ -120,19 +82,30 @@ export function MapCanvas({
     let cancelled = false;
     let created: MapLibreMap | null = null;
 
+    prepareMapLibre();
+
     (async () => {
-      const { style, degraded: noBasemap } = await resolveStyle();
+      const { style, degraded: noBasemap } = await resolveBasemap();
       if (cancelled || !container.current) return;
       setDegraded(noBasemap);
 
-    const instance = new maplibregl.Map({
-      container: container.current,
-      style: style as maplibregl.StyleSpecification,
-      bounds: FRANCE_BOUNDS,
-      fitBoundsOptions: { padding: 12 },
-      attributionControl: { compact: true },
-    });
-    map.current = instance;
+      let instance: MapLibreMap;
+      try {
+        instance = new maplibregl.Map({
+          container: container.current,
+          style: style as maplibregl.StyleSpecification,
+          bounds: FRANCE_BOUNDS,
+          fitBoundsOptions: { padding: 12 },
+          attributionControl: { compact: true },
+        });
+      } catch (error) {
+        // WebGL2 absent : MapLibre lève ici même. Sans ce filet, l'exception
+        // partait dans une promesse orpheline et l'écran restait gris, muet.
+        console.warn('Roam : carte indisponible', error);
+        setFailed(true);
+        return;
+      }
+      map.current = instance;
     created = instance;
     instance.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
@@ -314,6 +287,18 @@ export function MapCanvas({
     marker.current = dot;
   }, [ready, position]);
 
+  if (failed) {
+    return (
+      <View style={styles.fallback}>
+        <Text style={type.subheading}>Carte impossible à afficher ici</Text>
+        <Text style={[type.small, styles.fallbackBody]}>
+          Ce navigateur ne fournit pas WebGL 2. La liste des lieux, la validation et la
+          progression restent utilisables.
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.canvas}>
       <div ref={container} style={{ position: 'absolute', inset: 0 }} />
@@ -330,6 +315,14 @@ export function MapCanvas({
 
 const styles = StyleSheet.create({
   canvas: { flex: 1, backgroundColor: colors.surfaceAlt, overflow: 'hidden' },
+  fallback: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.xl,
+    backgroundColor: colors.surfaceAlt,
+  },
+  fallbackBody: { textAlign: 'center', marginTop: spacing.sm },
   notice: {
     position: 'absolute',
     top: 8,

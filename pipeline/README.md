@@ -46,6 +46,9 @@ python -m roam_pipeline export-app
 
 # statistiques du catalogue courant
 python -m roam_pipeline stats
+
+# une fois pour toutes : les contours de la carte de conquête
+python -m roam_pipeline export-outlines
 ```
 
 ## Sorties (`data/out/`)
@@ -62,6 +65,31 @@ python -m roam_pipeline stats
 `export-app` écrit en plus `mobile/src/data/catalog.json`, le fichier que lit
 l'application. Il ne contient que les lieux effectivement rattachés à une collection : un
 lieu que l'application ne pourrait afficher nulle part n'a rien à y faire.
+
+### Les contours de la carte de conquête
+
+`export-outlines` écrit `mobile/src/data/outlines.json` : les tracés des régions et des
+départements, DROM compris, qui permettent à la carte de **colorier** un territoire
+conquis. Il ne dépend pas du catalogue et **n'a pas à être relancé après un `build`** —
+les frontières administratives ne bougent qu'à la faveur d'une loi. Le fichier est
+versionné : l'application n'a rien à télécharger.
+
+Deux exigences le gouvernent, et la seconde n'est pas évidente :
+
+- **la légèreté** — les tracés de l'IGN pèsent 3,6 Mo pour les seuls départements,
+  contre 460 Ko une fois simplifiés, pour un détail invisible à l'échelle où on les
+  regarde ;
+- **la jointivité** — deux départements limitrophes doivent garder *exactement* le même
+  tracé de frontière commune. Simplifier chaque polygone dans son coin fait diverger les
+  deux versions de quelques mètres, et la carte se fend d'un liseré de fond entre chaque
+  aplat de couleur. Invisible sur un fond blanc, criant dès que c'est colorié.
+
+D'où la méthode, empruntée à TopoJSON : reconstruire la topologie (le découpage des
+contours en **arcs** partagés), simplifier chaque arc **une seule fois**, puis recoudre
+les polygones. Un test vérifie qu'une frontière partagée reste identique des deux côtés.
+
+Source : IGN Admin Express, sous [Licence ouverte](https://www.etalab.gouv.fr/licence-ouverte-open-licence/) — la
+mention de source voyage avec les données et s'affiche sur la carte.
 
 ## La revue
 

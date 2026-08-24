@@ -1,22 +1,22 @@
-import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { areas, places, themeLabel } from '../../src/data/catalog';
 import { conquestByZone, shadeOf } from '../../src/lib/conquest';
 import type { ZoneConquest, ZoneShade } from '../../src/lib/conquest';
 import { useVisits } from '../../src/store/visits';
 import { colors, conquest, radius, spacing, type } from '../../src/theme';
+import { ConquestMap, conquestOutlinesExist } from '../../src/ui/ConquestMap';
 import { EmptyState, Pill, ProgressBar } from '../../src/ui/components';
 import { SegmentedControl } from '../../src/ui/components';
 import type { AreaLevel } from '../../src/types';
 
 /**
- * L'écran de conquête, en liste.
+ * L'écran de conquête : la carte coloriée, et ce qu'il reste à faire dessous.
  *
- * La carte coloriée viendra ensuite ; les règles, elles, se valident ici. Voir
- * « Cantal — châteaux terminés » écrit noir sur blanc dit tout de suite si le
- * seuil de jouabilité et les niveaux tombent juste, ce qu'un aplat de couleur
- * ne dirait pas.
+ * Les deux se répondent. Un aplat de couleur ne dit que ce qui est fait ; la
+ * liste dit ce qui manque, et nomme les thèmes. Taper un territoire sur la
+ * carte y réduit la liste — c'est le geste qui relie les deux.
  */
 
 type LevelCopy = {
@@ -60,11 +60,16 @@ function shadeColor(shade: ZoneShade): string {
 export default function ConquestScreen() {
   const { visits } = useVisits();
   const [level, setLevel] = useState<AreaLevel>('departement');
+  const [selected, setSelected] = useState<string | null>(null);
+  const { height } = useWindowDimensions();
 
   const zones = useMemo(
     () => conquestByZone(places, areas[level], level, visits),
     [level, visits],
   );
+
+  // Un code de département n'a aucun sens à l'échelle des régions.
+  useEffect(() => setSelected(null), [level]);
 
   const current = LEVELS.find((entry) => entry.value === level)!;
   const totals = useMemo(() => {
@@ -78,19 +83,42 @@ export default function ConquestScreen() {
     return { conquered, partial, started };
   }, [zones]);
 
-  return (
-    <ScrollView
-      style={{ backgroundColor: colors.bg }}
-      contentContainerStyle={{ padding: spacing.lg, paddingBottom: spacing.xxl }}
-    >
-      <SegmentedControl
-        options={LEVELS.map(({ value, label }) => ({ value, label }))}
-        value={level}
-        onChange={setLevel}
-      />
+  const drawn = conquestOutlinesExist(level);
+  // Assez haut pour que la France tienne en entier, assez bas pour qu'il reste
+  // de la liste sous le pouce.
+  const mapHeight = Math.max(220, Math.min(360, height * 0.42));
 
-      {zones.length === 0 ? (
-        <View style={{ marginTop: spacing.xl }}>
+  const focused = selected ? zones.filter((zone) => zone.area.code === selected) : zones;
+  const focusedName = selected
+    ? zones.find((zone) => zone.area.code === selected)?.area.name
+    : null;
+
+  return (
+    <View style={styles.screen}>
+      <View style={styles.controls}>
+        <SegmentedControl
+          options={LEVELS.map(({ value, label }) => ({ value, label }))}
+          value={level}
+          onChange={setLevel}
+        />
+      </View>
+
+      {drawn && zones.length > 0 ? (
+        <View style={[styles.map, { height: mapHeight }]}>
+          <ConquestMap
+            zones={zones}
+            level={level}
+            selectedCode={selected}
+            onSelectZone={setSelected}
+          />
+        </View>
+      ) : null}
+
+      <ScrollView
+        style={{ backgroundColor: colors.bg }}
+        contentContainerStyle={styles.list}
+      >
+        {zones.length === 0 ? (
           <EmptyState
             title={`Aucune ${current.one} au catalogue`}
             body={
@@ -99,28 +127,40 @@ export default function ConquestScreen() {
                 : 'Le catalogue ne contient encore aucun lieu à cette échelle.'
             }
           />
-        </View>
-      ) : (
-        <>
-          <View style={styles.summary}>
-            <Text style={type.small}>
-              {plural(totals.conquered, current.one, current.many)} au complet ·{' '}
-              {totals.partial} avec une collection finie · {totals.started}{' '}
-              {`entamé${current.feminine ? 'e' : ''}${totals.started > 1 ? 's' : ''}`} sur{' '}
-              {zones.length}
-            </Text>
-            <View style={styles.legend}>
-              <Legend color={conquest.theme} label="une collection finie" />
-              <Legend color={conquest.total} label="territoire complet" />
+        ) : (
+          <>
+            <View style={styles.summary}>
+              {selected ? (
+                <Pressable onPress={() => setSelected(null)} style={styles.clear}>
+                  <Text style={type.small}>{focusedName} — tout voir ✕</Text>
+                </Pressable>
+              ) : (
+                <Text style={type.small}>
+                  {plural(totals.conquered, current.one, current.many)} au complet ·{' '}
+                  {totals.partial} avec une collection finie · {totals.started}{' '}
+                  {`entamé${current.feminine ? 'e' : ''}${totals.started > 1 ? 's' : ''}`} sur{' '}
+                  {zones.length}
+                </Text>
+              )}
+              <View style={styles.legend}>
+                <Legend color={conquest.theme} label="une collection finie" />
+                <Legend color={conquest.total} label="territoire complet" />
+              </View>
             </View>
-          </View>
 
-          {zones.map((zone) => (
-            <ZoneCard key={`${level}:${zone.area.code}`} zone={zone} />
-          ))}
-        </>
-      )}
-    </ScrollView>
+            {focused.map((zone) => (
+              <ZoneCard
+                key={`${level}:${zone.area.code}`}
+                zone={zone}
+                onPress={() =>
+                  setSelected(selected === zone.area.code ? null : zone.area.code)
+                }
+              />
+            ))}
+          </>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -133,7 +173,7 @@ function Legend({ color, label }: { color: string; label: string }) {
   );
 }
 
-function ZoneCard({ zone }: { zone: ZoneConquest }) {
+function ZoneCard({ zone, onPress }: { zone: ZoneConquest; onPress: () => void }) {
   const shade = shadeOf(zone);
   const color = shadeColor(shade);
   const done = zone.themes.filter((entry) => entry.state.complete);
@@ -142,10 +182,13 @@ function ZoneCard({ zone }: { zone: ZoneConquest }) {
   );
 
   return (
-    <View style={[styles.card, shade.kind !== 'empty' && { borderColor: color }]}>
+    <Pressable
+      onPress={onPress}
+      style={[styles.card, shade.kind !== 'empty' && { borderColor: color }]}
+    >
       <View style={styles.head}>
-        {/* Le bandeau porte la couleur du territoire : c'est ce que la carte
-            montrera, en aplat, au même endroit du même vocabulaire. */}
+        {/* Le bandeau porte la couleur du territoire : c'est exactement ce que
+            la carte montre, en aplat, au même endroit du même vocabulaire. */}
         <View style={[styles.marker, { backgroundColor: color }]} />
         <Text style={type.subheading} numberOfLines={1}>
           {zone.area.name}
@@ -202,12 +245,22 @@ function ZoneCard({ zone }: { zone: ZoneConquest }) {
           Aucun thème jouable ici — il faut au moins trois lieux d'un même thème.
         </Text>
       )}
-    </View>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  summary: { marginTop: spacing.lg, marginBottom: spacing.md, gap: spacing.sm },
+  screen: { flex: 1, backgroundColor: colors.bg },
+  controls: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg },
+  map: {
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.md,
+    borderRadius: radius.lg,
+    overflow: 'hidden',
+  },
+  list: { padding: spacing.lg, paddingBottom: spacing.xxl },
+  summary: { marginBottom: spacing.md, gap: spacing.sm },
+  clear: { alignSelf: 'flex-start' },
   legend: { flexDirection: 'row', gap: spacing.lg },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   swatch: { width: 12, height: 12, borderRadius: 3 },

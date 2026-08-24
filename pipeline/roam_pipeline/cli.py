@@ -35,6 +35,8 @@ from .fetch import (
     run_fetch,
 )
 from .models import Collection, CollectionPlace, Place
+from .outlines import ATTRIBUTION as OUTLINE_ATTRIBUTION, DEFAULT_TOLERANCE_KM2
+from .outlines import export as export_outlines
 from .review import DECISIONS, apply_decisions, read_decisions, write_decisions
 from .score import score_all
 
@@ -602,6 +604,29 @@ def cmd_export_app(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+APP_OUTLINES = BASE_DIR.parent / "mobile" / "src" / "data" / "outlines.json"
+
+
+def cmd_export_outlines(args: argparse.Namespace, config: Config) -> int:
+    """Fabrique les contours administratifs de la carte de conquête.
+
+    À lancer une fois pour toutes : les frontières administratives ne bougent
+    qu'à la faveur d'une loi, et le fichier produit est versionné avec
+    l'application. Rien à relancer après un `build`.
+    """
+    tolerances = dict(DEFAULT_TOLERANCE_KM2)
+    if args.tolerance is not None:
+        tolerances = {level: args.tolerance for level in tolerances}
+
+    counts = export_outlines(args.to, tolerances, source_dir=args.from_dir)
+    size = args.to.stat().st_size / 1024
+    print(f"Contours écrits dans {args.to} ({size:.0f} Ko)")
+    for level, count in counts.items():
+        print(f"  {level:<12} {count:>3} territoires")
+    print(OUTLINE_ATTRIBUTION)
+    return 0
+
+
 def cmd_review(args: argparse.Namespace, config: Config) -> int:
     """Sert la page de revue en local et l'ouvre.
 
@@ -910,6 +935,23 @@ def build_parser() -> argparse.ArgumentParser:
     app = sub.add_parser("export-app", help="écrit le catalogue dans l'application")
     app.add_argument("--to", type=Path, default=APP_CATALOG, help="fichier de destination")
 
+    contours = sub.add_parser(
+        "export-outlines",
+        help="fabrique les contours des régions et départements (réseau requis)",
+    )
+    contours.add_argument("--to", type=Path, default=APP_OUTLINES, help="fichier de destination")
+    contours.add_argument(
+        "--tolerance",
+        type=float,
+        help="aire minimale d'un sommet, en km² (défaut : par échelle)",
+    )
+    contours.add_argument(
+        "--from-dir",
+        type=Path,
+        dest="from_dir",
+        help="dossier de GeoJSON déjà téléchargés (region.geojson, departement.geojson)",
+    )
+
     serve = sub.add_parser("review", help="ouvre la page de revue dans le navigateur")
     serve.add_argument("--port", type=int, default=8765)
     return parser
@@ -938,5 +980,6 @@ def main(argv: list[str] | None = None) -> int:
         "stats": cmd_stats,
         "review": cmd_review,
         "export-app": cmd_export_app,
+        "export-outlines": cmd_export_outlines,
     }
     return handlers[args.command](args, config)

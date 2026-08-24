@@ -73,3 +73,32 @@ export const FALLBACK_STYLE = {
     },
   ],
 };
+
+/**
+ * Résout le premier fond de carte disponible.
+ *
+ * Le style est chargé ici plutôt que confié à MapLibre : quand MapLibre échoue
+ * à le charger, il n'émet jamais `load`, et les couches posées à ce moment-là
+ * ne le sont donc jamais. Une panne du serveur de tuiles effaçait ainsi le
+ * catalogue en même temps que la carte.
+ *
+ * Le repli n'est pas un pis-aller pour la carte de conquête : les contours
+ * administratifs sont NOS données. Sans tuiles, la France se dessine quand
+ * même, coloriée, sur fond uni.
+ */
+export async function resolveBasemap(
+  timeoutMs = 5000,
+): Promise<{ style: unknown; degraded: boolean }> {
+  for (const url of BASEMAP_STYLES) {
+    try {
+      // Sans délai maximal, un serveur qui ne répond pas laisserait la carte
+      // vide indéfiniment au lieu de basculer sur le fond suivant.
+      const response = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+      if (!response.ok) continue;
+      return { style: await response.json(), degraded: false };
+    } catch {
+      // Fond suivant.
+    }
+  }
+  return { style: FALLBACK_STYLE, degraded: true };
+}
