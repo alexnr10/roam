@@ -654,6 +654,28 @@ class TestThemeKind(unittest.TestCase):
             _validate([bancal], [])
 
 
+class TestNatureFloors(unittest.TestCase):
+    """Un paysage n'est pas documenté comme un monument."""
+
+    def test_no_natural_theme_is_as_demanding_as_the_strictest_built_one(self):
+        # Le plancher compte les versions linguistiques, c'est-à-dire la
+        # DOCUMENTATION. Wikidata documente bien moins la nature que le bâti :
+        # donner à une montagne le seuil d'un musée écartait 458 sommets sur
+        # 497, plus que le filtre alpin lui-même. C'est la même erreur que le
+        # score a corrigée avec `article_weight`, restée dans les planchers.
+        plafond_culture = max(
+            theme.min_sitelinks for theme in CONFIG.themes if theme.kind == "culture"
+        )
+        for theme in CONFIG.themes:
+            if theme.kind != "nature":
+                continue
+            self.assertLess(
+                theme.min_sitelinks,
+                plafond_culture,
+                f"le thème naturel {theme.id} est aussi exigeant que le bâti le plus strict",
+            )
+
+
 class TestBuildFunnel(unittest.TestCase):
     """Suivre les mêmes lieux d'un bout à l'autre, sans soustraire des lignes."""
 

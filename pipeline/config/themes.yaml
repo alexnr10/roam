@@ -241,7 +241,11 @@ themes:
     icon: lake
     kind: nature
     radius_m: 1500
-    min_sitelinks: 8
+    # Abaissé de 8 à 6 : ce plancher compte les versions
+    # linguistiques, c'est-à-dire la DOCUMENTATION d'un lieu. Wikidata
+    # documente bien moins la nature que le bâti, et ce thème se retrouvait
+    # avec le même seuil que les châteaux — 349 lacs entraient, 44 sortaient. Le vivier double à 6.
+    min_sitelinks: 6
     fetch_min_sitelinks: 3
     cap: 50
     wikidata_classes: [Q23397]                       # lac
@@ -252,7 +256,12 @@ themes:
     icon: island
     kind: nature
     radius_m: 2000
-    min_sitelinks: 10
+    # Abaissé de 10 à 8 : ce plancher compte les versions
+    # linguistiques, c'est-à-dire la DOCUMENTATION d'un lieu. Wikidata
+    # documente bien moins la nature que le bâti, et ce thème se retrouvait
+    # avec le même seuil que les cathédrales — l'essentiel de la perte est ailleurs (216 îles sur 416 sont
+    # outre-mer, sans département), mais le seuil restait celui du bâti.
+    min_sitelinks: 8
     fetch_min_sitelinks: 4
     cap: 40
     wikidata_classes: [Q23442]                       # île
@@ -279,7 +288,12 @@ themes:
     icon: mountain
     kind: nature
     radius_m: 1000
-    min_sitelinks: 12
+    # Abaissé de 12 à 8 : ce plancher compte les versions
+    # linguistiques, c'est-à-dire la DOCUMENTATION d'un lieu. Wikidata
+    # documente bien moins la nature que le bâti, et ce thème se retrouvait
+    # avec le même seuil que les musées — sur 497 sommets non alpins, 458 étaient écartés ici, bien plus
+    # que par le filtre alpin (369).
+    min_sitelinks: 8
     fetch_min_sitelinks: 4
     cap: 60
     wikidata_classes: [Q8502, Q2231510]              # montagne, col
