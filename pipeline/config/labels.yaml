@@ -61,6 +61,54 @@ labels:
     makes_collection: true
     wikidata_query: { kind: heritage, qid: Q498842 }     # le label ✓
 
+  # LES PAYSAGES ONT AUSSI LEUR LISTE OFFICIELLE.
+  #
+  # Le site classé au titre des paysages (loi de 1930) est au paysage ce que le
+  # monument historique est au bâti : une désignation d'État, motivée, finie —
+  # environ deux mille sept cents en France. Gorges, cirques, caps, forêts,
+  # points de vue y figurent, et c'est exactement le vivier qui manquait au
+  # catalogue.
+  #
+  # C'est aussi la seule réponse solide au problème des panoramas : un point de
+  # vue n'a presque jamais d'article Wikipédia, mais un site classé a été jugé
+  # remarquable par quelqu'un dont c'est le métier.
+  - id: site-classe
+    name: Site classé au titre des paysages
+    authority: Ministère de la Transition écologique
+    score_bonus: 25
+    makes_collection: true
+    wikidata_query: { kind: heritage, search: site classé }
+
+  - id: site-inscrit
+    name: Site inscrit au titre des paysages
+    authority: Ministère de la Transition écologique
+    score_bonus: 12
+    makes_collection: false
+    wikidata_query: { kind: heritage, search: site inscrit }
+
+  # Label de l'Office national des forêts, attribué à une vingtaine de forêts
+  # domaniales : la curation officielle des forêts remarquables.
+  - id: foret-exception
+    name: Forêt d'Exception
+    authority: Office national des forêts
+    score_bonus: 15
+    makes_collection: true
+    wikidata_query: { kind: heritage, search: forêt d'exception }
+
+  - id: reserve-naturelle
+    name: Réserve naturelle nationale
+    authority: Office français de la biodiversité
+    score_bonus: 10
+    makes_collection: false
+    wikidata_query: { kind: heritage, search: réserve naturelle nationale }
+
+  - id: parc-naturel-regional
+    name: Parc naturel régional
+    authority: Fédération des parcs naturels régionaux
+    score_bonus: 8
+    makes_collection: false
+    wikidata_query: { kind: heritage, search: parc naturel régional }
+
   # ⚠️ Mis en attente volontairement. La requête prévue (`instance`) ramènerait
   # les parcs eux-mêmes, pas les lieux qui s'y trouvent — or le critère C4 de la
   # charte porte sur l'APPARTENANCE d'un site à un parc, ce qui demande une

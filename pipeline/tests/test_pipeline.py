@@ -638,8 +638,9 @@ class TestThemeKind(unittest.TestCase):
             nature,
             # Les jardins comptent en nature : dessinés de main d'homme, mais
             # on y va pour le paysage.
-            {"cascades", "gorges", "grottes", "iles", "jardins", "lacs",
-             "plages", "sommets"},
+            {"cascades", "cirques", "dunes-marais", "forets", "gorges", "grottes",
+             "iles", "jardins", "lacs", "littoral", "plages", "rochers",
+             "sommets", "sources", "volcans"},
         )
 
     def test_an_unknown_kind_is_refused(self):

@@ -211,6 +211,18 @@ themes:
     cap: 60
     wikidata_classes: [Q34038]                       # chute d'eau
 
+  - id: cirques
+    name: Cirques naturels
+    name_singular: Cirque
+    icon: cirque
+    kind: nature
+    radius_m: 500
+    min_sitelinks: 3
+    fetch_min_sitelinks: 2
+    cap: 40
+    wikidata_classes: []
+    search: [cirque glaciaire, cirque naturel, reculée]
+
   - id: gorges
     name: Gorges et canyons
     name_singular: Gorges
@@ -246,6 +258,19 @@ themes:
     cap: 40
     wikidata_classes: [Q23442]                       # île
 
+  # Avant `sommets` : un puy est un sommet, mais c'est d'abord un volcan.
+  - id: volcans
+    name: Volcans et sites volcaniques
+    name_singular: Volcan
+    icon: volcan
+    kind: nature
+    radius_m: 400
+    min_sitelinks: 4
+    fetch_min_sitelinks: 2
+    cap: 50
+    wikidata_classes: []
+    search: [volcan, puy, cratère volcanique, maar, cheminée volcanique]
+
   - id: sommets
     name: Sommets
     name_singular: Sommet
@@ -256,6 +281,19 @@ themes:
     fetch_min_sitelinks: 4
     cap: 60
     wikidata_classes: [Q8502, Q2231510]              # montagne, col
+
+  # Avant `plages` : une calanque a une plage, mais on y va pour la calanque.
+  - id: littoral
+    name: Littoral remarquable
+    name_singular: Site du littoral
+    icon: falaise
+    kind: nature
+    radius_m: 400
+    min_sitelinks: 4
+    fetch_min_sitelinks: 2
+    cap: 60
+    wikidata_classes: []
+    search: [calanque, cap, pointe côtière, falaise côtière, presqu'île]
 
   - id: plages
     name: Littoral et plages
@@ -281,3 +319,51 @@ themes:
     # « promontoire » (Q1245089) écarté : il désigne un éperon rocheux dominant
     # une étendue quelconque, pas une formation littorale. Il aurait rempli le
     # thème d'affleurements de l'intérieur des terres.
+
+  - id: forets
+    name: Forêts remarquables
+    name_singular: Forêt
+    icon: foret
+    kind: nature
+    radius_m: 800
+    min_sitelinks: 4
+    fetch_min_sitelinks: 2
+    cap: 40
+    wikidata_classes: []
+    search: [forêt domaniale, forêt remarquable, futaie]
+
+  - id: dunes-marais
+    name: Dunes et marais
+    name_singular: Site
+    icon: dune
+    kind: nature
+    radius_m: 600
+    min_sitelinks: 4
+    fetch_min_sitelinks: 2
+    cap: 40
+    wikidata_classes: []
+    search: [dune, marais salant, marais littoral, étang côtier]
+
+  - id: rochers
+    name: Rochers et curiosités géologiques
+    name_singular: Site
+    icon: rocher
+    kind: nature
+    radius_m: 300
+    min_sitelinks: 4
+    fetch_min_sitelinks: 2
+    cap: 50
+    wikidata_classes: []
+    search: [arche naturelle, chaos rocheux, aiguille rocheuse, site géologique remarquable]
+
+  - id: sources
+    name: Sources et résurgences
+    name_singular: Source
+    icon: source
+    kind: nature
+    radius_m: 250
+    min_sitelinks: 4
+    fetch_min_sitelinks: 2
+    cap: 40
+    wikidata_classes: []
+    search: [résurgence, source karstique, exsurgence]
