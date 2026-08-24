@@ -590,6 +590,50 @@ class TestAccessAndRescue(unittest.TestCase):
         self.assertEqual(apply_notoriety_floor([obscur], CONFIG), [])
 
 
+class TestAlpineFilter(unittest.TestCase):
+    """Un sommet sans preuve d'accès est écarté, faute de mieux."""
+
+    def test_a_high_summit_without_any_signal_is_dropped(self):
+        from roam_pipeline.collections import apply_alpine_filter
+
+        sommet = make_place("Pointe sans nom", theme_id="sommets",
+                            elevation_m=CONFIG.alerts.alpine_elevation_m + 200)
+        self.assertEqual(apply_alpine_filter([sommet], CONFIG), [])
+
+    def test_a_summit_below_the_threshold_is_kept(self):
+        from roam_pipeline.collections import apply_alpine_filter
+
+        colline = make_place("Colline accessible", theme_id="sommets",
+                             elevation_m=CONFIG.alerts.alpine_elevation_m - 500)
+        self.assertEqual(len(apply_alpine_filter([colline], CONFIG)), 1)
+
+    def test_a_summit_without_elevation_data_is_kept(self):
+        from roam_pipeline.collections import apply_alpine_filter
+
+        # Pas de preuve du contraire non plus : l'absence de donnée n'est pas
+        # un signal, contrairement à l'altitude elle-même.
+        inconnu = make_place("Sommet sans altitude connue", theme_id="sommets")
+        self.assertEqual(len(apply_alpine_filter([inconnu], CONFIG)), 1)
+
+    def test_a_pinned_summit_survives_its_altitude(self):
+        from roam_pipeline.collections import apply_alpine_filter
+
+        # L'Aiguille du Midi : alpine par nature, mais un téléphérique y monte.
+        # Le pipeline ne peut pas le savoir ; le curateur, si.
+        aiguille = make_place("Aiguille du Midi", theme_id="sommets",
+                              elevation_m=3842, pinned=True)
+        self.assertEqual(len(apply_alpine_filter([aiguille], CONFIG)), 1)
+
+    def test_the_threshold_only_applies_to_the_summits_theme(self):
+        from roam_pipeline.collections import apply_alpine_filter
+
+        # Un col ou un belvédère à haute altitude n'a pas le même problème
+        # d'accès qu'un sommet : le filtre ne doit viser que « sommets ».
+        col = make_place("Col perché", theme_id="monuments",
+                         elevation_m=CONFIG.alerts.alpine_elevation_m + 500)
+        self.assertEqual(len(apply_alpine_filter([col], CONFIG)), 1)
+
+
 class TestFloorReliefIsVisible(unittest.TestCase):
     """Un lieu conservé par la remise doit se relire à part."""
 

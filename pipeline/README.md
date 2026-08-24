@@ -295,6 +295,20 @@ nuance, la grotte des Planches et celle de Marsoulas disparaissaient, avec cent 
 Deux échappatoires, donc : ce signe d'accueil, et l'épinglage par le curateur — ce qui se
 voit très bien depuis la route reste son choix.
 
+### Un sommet sans preuve d'accès est écarté
+
+Le château d'Hérouville avait un signal explicite pour l'exclure : `access=private`. Un
+sommet à 3 000 m n'en a aucun — les sommets ne sont collectés que sur Wikidata, qui ne dit
+rien d'un chemin de randonnée ou d'un accès équipé. Il n'y a donc ni preuve qu'on s'y rend
+à pied, ni preuve du contraire.
+
+Faute de ce signal positif, l'ambiguïté se résout par un principe assumé : **au moindre
+doute, on écarte**. Un sommet du thème « sommets » au-dessus de `alerts.alpine_elevation_m`
+(2 500 m) est retiré du catalogue, sauf s'il est épinglé à la main — le cas des sommets
+réellement accessibles malgré leur altitude, comme l'Aiguille du Midi et son téléphérique.
+Ce que le pipeline ne peut pas prouver, il ne le devine pas : ces lieux reviendront par un
+épinglage manuel ou une proposition de la communauté, pas par une supposition.
+
 ### Pourquoi ce lieu est-il là, ou pourquoi n'y est-il pas ?
 
 La question revient à chaque revue. Chaque étape du pipeline étant un filtre nommé, il

@@ -328,13 +328,58 @@ def apply_access_filter(places: list[Place], config: Config) -> list[Place]:
     return kept
 
 
+def apply_alpine_filter(places: list[Place], config: Config) -> list[Place]:
+    """Écarte les sommets qui, faute de preuve du contraire, ne se rejoignent
+    qu'en alpinisme.
+
+    Le château d'Hérouville avait un signal explicite — `access=private` — qui
+    permet de l'écarter avec certitude. Un sommet à 3 000 m n'en a aucun : le
+    pipeline ne collecte les sommets que sur Wikidata, qui ne dit rien d'un
+    chemin de randonnée ou d'un accès équipé. Il n'y a donc ni preuve qu'on
+    s'y rend à pied, ni preuve du contraire.
+
+    Faute de ce signal positif, l'ambiguïté se résout par le principe que le
+    curateur a posé pour ce cas précis : au moindre doute, on écarte. Un
+    sommet réellement accessible malgré son altitude — l'Aiguille du Midi, le
+    Pic du Midi — revient par un épinglage manuel ou une proposition de la
+    communauté, jamais par une supposition du pipeline.
+    """
+    threshold = config.alerts.alpine_elevation_m
+    kept: list[Place] = []
+    dropped: list[Place] = []
+
+    for place in places:
+        suspect = (
+            place.theme_id == "sommets"
+            and place.elevation_m is not None
+            and place.elevation_m >= threshold
+        )
+        if suspect and not place.pinned:
+            dropped.append(place)
+        else:
+            kept.append(place)
+
+    if dropped:
+        LOG.info(
+            "accès alpin : %s sommets écartés au-dessus de %s m, faute d'un "
+            "signal d'accès prouvé (%s)",
+            len(dropped),
+            threshold,
+            ", ".join(p.name for p in dropped[:5]),
+        )
+    return kept
+
+
 def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Collection]]:
     # L'ordre compte : on fixe d'abord le thème de chaque lieu, puis on lui
     # applique le plancher de CE thème, puis on écarte les doublons de lieu.
     kept = dedupe(
         apply_notoriety_floor(
-            apply_access_filter(
-                dedupe_across_themes(apply_geographic_scope(places, config), config), config
+            apply_alpine_filter(
+                apply_access_filter(
+                    dedupe_across_themes(apply_geographic_scope(places, config), config), config
+                ),
+                config,
             ),
             config,
         )
