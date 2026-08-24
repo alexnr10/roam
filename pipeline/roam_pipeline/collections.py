@@ -307,15 +307,21 @@ def apply_access_filter(places: list[Place], config: Config) -> list[Place]:
 
     Deux échappatoires : un lieu épinglé — le curateur reste le dernier mot, et
     ce qui se voit très bien depuis la route est son choix — et un lieu qui
-    affiche par ailleurs des horaires ou un site web, car une grotte aménagée
-    porte souvent `access=no` sans cesser de se visiter.
+    affiche par ailleurs des HORAIRES, car une grotte aménagée porte souvent
+    `access=no` parce qu'on n'y entre pas seul, la visite y étant guidée.
+
+    Un simple site web ne suffit PAS à faire cette exception, et c'est un
+    correctif : le château d'Hérouville en a un — descriptif, patrimonial —
+    sans être ouvert au public, et se faisait donc réadmettre par la première
+    version de ce filtre alors qu'il en est l'exemple même. Un site web prouve
+    qu'un lieu existe et qu'on en parle ; seuls des horaires prouvent qu'on
+    peut s'y rendre à une heure donnée.
     """
     refused = [
         p for p in places
-        # Un lieu qui affiche des horaires ou un site web accueille du public,
-        # quoi que dise sa balise d'accès : une grotte aménagée porte souvent
-        # `access=no` parce qu'on n'y entre pas seul, et se visite pourtant.
-        if p.visitable is False and not p.pinned and not (p.opening_hours or p.website)
+        # Seuls des horaires renversent un accès refusé — un site web ne le
+        # prouve pas, voir la docstring pour le cas du château d'Hérouville.
+        if p.visitable is False and not p.pinned and not p.opening_hours
     ]
     excluded = {id(p) for p in refused}
     kept = [p for p in places if id(p) not in excluded]

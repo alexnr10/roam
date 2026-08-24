@@ -289,11 +289,18 @@ d'Hérouville, qui restait au niveau 2 des châteaux d'Île-de-France.
 Le signal est délibéré : `access=private|no` est posé à la main par un contributeur. Mais
 il ne veut pas toujours dire ce qu'il semble dire — sur une grotte aménagée, il signifie
 qu'on n'y entre pas **seul**, et la visite guidée existe bel et bien. Un lieu qui affiche
-par ailleurs des horaires ou un site web est donc considéré comme ouvert : sans cette
-nuance, la grotte des Planches et celle de Marsoulas disparaissaient, avec cent six autres.
+par ailleurs des **horaires** est donc considéré comme ouvert : sans cette nuance, la
+grotte des Planches et celle de Marsoulas disparaissaient, avec cent six autres.
 
-Deux échappatoires, donc : ce signe d'accueil, et l'épinglage par le curateur — ce qui se
-voit très bien depuis la route reste son choix.
+Un simple **site web** ne suffit en revanche pas à faire l'exception — et c'est un
+correctif après coup. Le château d'Hérouville en a un, descriptif et patrimonial, sans
+être ouvert au public ; le laisser rouvrir l'accès sur cette seule base l'a fait
+réapparaître dans le catalogue, alors qu'il est l'exemple même qui a motivé ce filtre. Un
+site web prouve qu'un lieu existe et qu'on en parle ; seuls des horaires prouvent qu'on
+peut s'y rendre à une heure donnée.
+
+Deux échappatoires, donc : des horaires, et l'épinglage par le curateur — ce qui se voit
+très bien depuis la route reste son choix.
 
 ### Un sommet sans preuve d'accès est écarté
 

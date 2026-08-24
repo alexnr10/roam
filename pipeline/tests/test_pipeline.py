@@ -569,6 +569,26 @@ class TestAccessAndRescue(unittest.TestCase):
         self.assertIsNone(inconnu.visitable)
         self.assertEqual(len(apply_access_filter([inconnu], CONFIG)), 1)
 
+    def test_a_website_alone_does_not_reopen_a_refused_place(self):
+        from roam_pipeline.collections import apply_access_filter
+
+        # Régression : le château d'Hérouville a un site web descriptif —
+        # patrimonial, pas billetterie — sans être ouvert au public. La
+        # première version du filtre le laissait passer sur ce seul site web,
+        # exactement le lieu qui avait motivé le filtre.
+        herouville = make_place("Château d'Hérouville", sitelinks=10)
+        herouville.visitable, herouville.website = False, "https://exemple.fr"
+        self.assertEqual(apply_access_filter([herouville], CONFIG), [])
+
+    def test_opening_hours_alone_do_reopen_a_refused_place(self):
+        from roam_pipeline.collections import apply_access_filter
+
+        # Contraste avec Hérouville : la grotte des Planches affiche des
+        # horaires malgré `access=no` — la visite est guidée, pas fermée.
+        grotte = make_place("Grotte des Planches", sitelinks=10)
+        grotte.visitable, grotte.opening_hours = False, "Mo-Su 10:00-18:00"
+        self.assertEqual(len(apply_access_filter([grotte], CONFIG)), 1)
+
     def test_giverny_is_rescued_from_the_floor(self):
         from roam_pipeline.collections import apply_notoriety_floor
 
