@@ -654,6 +654,52 @@ class TestThemeKind(unittest.TestCase):
             _validate([bancal], [])
 
 
+class TestBuildFunnel(unittest.TestCase):
+    """Suivre les mêmes lieux d'un bout à l'autre, sans soustraire des lignes."""
+
+    def _catalogue(self):
+        places = []
+        for i in range(12):
+            place = make_place(f"Château {i}", theme_id="chateaux", wikidata_id=f"QC{i}",
+                               sitelinks=20, lat=45 + i / 50, lon=2.0)
+            place.departement_code, place.region_code = "15", "84"
+            places.append(place)
+        for i in range(6):
+            # Les deux derniers sont hors périmètre, les deux suivants sous le
+            # plancher : trois étapes différentes, sur le même thème.
+            place = make_place(f"Dune {i}", theme_id="dunes-marais", wikidata_id=f"QD{i}",
+                               sitelinks=10 if i < 2 else 1, lat=44 + i / 50, lon=-1.2)
+            place.departement_code = "33" if i < 4 else None
+            place.region_code = "75"
+            places.append(place)
+        return places
+
+    def test_the_funnel_follows_a_theme_through_every_stage(self):
+        from roam_pipeline.collections import build_all
+
+        with self.assertLogs("roam_pipeline.collections", level="INFO") as logs:
+            build_all(self._catalogue(), CONFIG)
+        table = "\n".join(logs.output)
+
+        self.assertIn("étape par étape", table)
+        # Six dunes au départ, quatre après le périmètre, deux après le plancher.
+        ligne = next(l for l in table.splitlines() if l.strip().startswith("dunes-marais"))
+        self.assertEqual([int(n) for n in ligne.split()[1:]], [6, 4, 4, 4, 4, 2, 2])
+
+    def test_a_theme_without_any_place_is_left_out_of_the_funnel(self):
+        from roam_pipeline.collections import build_all
+
+        # Vingt lignes à zéro noieraient les deux qui parlent. L'assertion ne
+        # porte que sur le tableau : l'avertissement des thèmes sans
+        # collection, lui, DOIT nommer les thèmes vides — c'est ainsi que le
+        # thème `maisons`, vide depuis sa création, a fini par se signaler.
+        with self.assertLogs("roam_pipeline.collections", level="INFO") as logs:
+            build_all(self._catalogue(), CONFIG)
+        tableau = next(entry for entry in logs.output if "étape par étape" in entry)
+        self.assertNotIn("cathedrales", tableau)
+        self.assertIn("chateaux", tableau)
+
+
 class TestStarvedThemes(unittest.TestCase):
     """Un thème trop maigre pour faire une collection doit se signaler."""
 

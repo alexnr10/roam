@@ -393,19 +393,60 @@ def apply_alpine_filter(places: list[Place], config: Config) -> list[Place]:
     return kept
 
 
+def _funnel(stages: list[tuple[str, list[Place]]], config: Config) -> None:
+    """Combien de lieux chaque thème conserve, étape par étape.
+
+    Chaque étape journalise déjà ce qu'elle écarte, mais chacune compte sur
+    une population différente : « plancher : dunes-marais 9 » désigne neuf
+    lieux parmi ceux qui ATTEIGNENT le plancher, pas parmi les candidats
+    bruts. Soustraire ces lignes entre elles donne des résultats faux — je
+    m'y suis laissé prendre en cherchant quinze dunes qui n'avaient jamais
+    disparu.
+
+    Un tableau qui suit les mêmes lieux d'un bout à l'autre rend la question
+    lisible d'un coup d'œil, comme celui de `discover` pour les candidats.
+    """
+    themes = [theme.id for theme in config.themes]
+    header = "".join(f"{label[:9]:>10}" for label, _ in stages)
+    lines = [f"\n  Ce que chaque thème conserve, étape par étape :",
+             f"      {'thème':<16}{header}"]
+
+    for theme_id in themes:
+        counts = [sum(1 for p in group if p.theme_id == theme_id) for _, group in stages]
+        # Un thème qui n'a jamais eu de lieu n'apprend rien : il est déjà
+        # signalé par l'avertissement des thèmes sans collection.
+        if not counts[0]:
+            continue
+        lines.append(f"      {theme_id:<16}" + "".join(f"{n:>10}" for n in counts))
+
+    LOG.info("\n".join(lines))
+
+
 def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Collection]]:
     # L'ordre compte : on fixe d'abord le thème de chaque lieu, puis on lui
     # applique le plancher de CE thème, puis on écarte les doublons de lieu.
-    kept = dedupe(
-        apply_notoriety_floor(
-            apply_alpine_filter(
-                apply_access_filter(
-                    dedupe_across_themes(apply_geographic_scope(places, config), config), config
-                ),
-                config,
-            ),
-            config,
-        )
+    #
+    # Les étapes sont déroulées une à une plutôt qu'imbriquées : c'est ce qui
+    # permet de garder chaque population intermédiaire et d'en tirer
+    # l'entonnoir par thème.
+    en_france = apply_geographic_scope(places, config)
+    un_theme = dedupe_across_themes(en_france, config)
+    accessible = apply_access_filter(un_theme, config)
+    non_alpin = apply_alpine_filter(accessible, config)
+    au_dessus = apply_notoriety_floor(non_alpin, config)
+    kept = dedupe(au_dessus)
+
+    _funnel(
+        [
+            ("bruts", places),
+            ("France", en_france),
+            ("1 thème", un_theme),
+            ("accès", accessible),
+            ("non alpin", non_alpin),
+            ("plancher", au_dessus),
+            ("dédoublé", kept),
+        ],
+        config,
     )
     collections = (
         build_theme_collections(kept, config)
