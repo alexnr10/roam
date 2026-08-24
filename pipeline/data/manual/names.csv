@@ -1,0 +1,10 @@
+# Noms d'affichage choisis par le curateur.
+#
+# Wikidata donne un libellé, pas un titre. Il est parfois exact mais illisible
+# (« musée des impressionnismes Giverny »), parfois encombré d'une précision
+# qui n'a de sens que dans une base de données. Une ligne ici l'emporte.
+#
+# Ce n'est PAS un verdict d'inclusion : renommer et écarter sont deux gestes
+# différents, et les mélanger rendrait `decisions.csv` ambigu. D'où ce fichier.
+#
+wikidata_id,name,note

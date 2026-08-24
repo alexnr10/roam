@@ -393,6 +393,44 @@ def apply_alpine_filter(places: list[Place], config: Config) -> list[Place]:
     return kept
 
 
+def apply_class_exclusion(places: list[Place], config: Config) -> list[Place]:
+    """Écarte les lieux qui relèvent d'une classe disqualifiante.
+
+    Un parc d'attractions entre au catalogue par la porte des musées, parce
+    qu'un de ses équipements est classé comme aquarium et qu'un aquarium public
+    est, chez Wikidata, une sorte de musée. Le rattachement n'est pas faux ;
+    c'est le lieu qui n'a rien à faire dans Roam.
+
+    Le retrait est ici et non à la collecte pour deux raisons : il se rejoue en
+    une seconde quand la liste change, et il peut NOMMER ce qu'il enlève. Une
+    exclusion par classe est assez brutale pour mériter d'être relue — le
+    Jardin des plantes abrite une ménagerie.
+
+    Un lieu épinglé y échappe : le curateur a déjà tranché.
+    """
+    if not config.exclusions.qids:
+        return places
+
+    kept: list[Place] = []
+    dropped: list[Place] = []
+    for place in places:
+        if place.excluded_class and not place.pinned:
+            dropped.append(place)
+        else:
+            kept.append(place)
+
+    if dropped:
+        by_class: dict[str, list[str]] = {}
+        for place in dropped:
+            by_class.setdefault(place.excluded_class or "?", []).append(place.name)
+        LOG.info("classes écartées : %s lieux retirés", len(dropped))
+        for label, names in sorted(by_class.items(), key=lambda kv: -len(kv[1])):
+            shown = ", ".join(sorted(names)[:8])
+            more = f" (+{len(names) - 8})" if len(names) > 8 else ""
+            LOG.info("    %-24s %3d — %s%s", label, len(names), shown, more)
+    return kept
+
+
 def _funnel(stages: list[tuple[str, list[Place]]], config: Config) -> None:
     """Combien de lieux chaque thème conserve, étape par étape.
 
@@ -431,7 +469,8 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
     # l'entonnoir par thème.
     en_france = apply_geographic_scope(places, config)
     un_theme = dedupe_across_themes(en_france, config)
-    accessible = apply_access_filter(un_theme, config)
+    dans_le_sujet = apply_class_exclusion(un_theme, config)
+    accessible = apply_access_filter(dans_le_sujet, config)
     non_alpin = apply_alpine_filter(accessible, config)
     au_dessus = apply_notoriety_floor(non_alpin, config)
     kept = dedupe(au_dessus)
@@ -441,6 +480,7 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
             ("bruts", places),
             ("France", en_france),
             ("1 thème", un_theme),
+            ("sujet", dans_le_sujet),
             ("accès", accessible),
             ("non alpin", non_alpin),
             ("plancher", au_dessus),

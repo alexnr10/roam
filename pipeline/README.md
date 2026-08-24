@@ -377,6 +377,58 @@ plancher applicable et la décision enregistrée — puis **l'étape exacte** qu
 ou les collections dans lesquelles il est entré. Un nom introuvable est une réponse aussi :
 ni Wikidata ni OpenStreetMap ne l'ont signalé.
 
+### Wikidata donne un libellé, pas un titre
+
+Les libellés français de Wikidata ne sont pas capitalisés de façon fiable :
+« Dune du Pilat » y côtoie « château d'Hérouville » et « musée des
+impressionnismes Giverny ». C'est cohérent de leur point de vue — un libellé y
+est un syntagme, pas un titre — mais dans une liste de lieux, une minuscule
+initiale se lit comme une faute.
+
+Le pipeline capitalise donc **la première lettre, et rien d'autre**, à la
+construction de chaque lieu, d'où qu'il vienne. Aller plus loin détruirait les
+noms propres internes (« Saint-Cirq-Lapopie ») : il n'existe aucune règle
+mécanique pour distinguer « Pont du Gard » de « pont de Normandie ».
+
+Reste le cas où le libellé est exact mais mauvais comme titre. Il se règle à la
+main, durablement :
+
+```bash
+python -m roam_pipeline rename Q3330248 "Musée des impressionnismes"
+python -m roam_pipeline rename                    # liste les renommages
+python -m roam_pipeline rename Q3330248 --clear   # revenir au libellé Wikidata
+```
+
+Le nom choisi vit dans `data/manual/names.csv` et s'applique à **chaque**
+construction — y compris dans la feuille de revue, faute de quoi on relirait un
+nom qu'on ne reconnaît plus.
+
+### Un parc d'attractions n'est pas un musée
+
+Marineland est entré au catalogue par le thème « musées », parce qu'un de ses
+équipements est classé comme aquarium public et qu'un aquarium public est,
+dans la hiérarchie de Wikidata, une sorte de musée. Le rattachement n'est pas
+faux ; c'est le lieu qui n'a pas sa place ici.
+
+Le bloc `exclude_classes` de `themes.yaml` liste les classes qui
+**disqualifient** un lieu quel que soit le thème par lequel il est entré. La
+liste est globale et non par thème : le problème n'est pas qu'un delphinarium
+soit mal rangé, c'est qu'il ne doit exister nulle part.
+
+Le marquage se fait à `enrich`, par une requête **bornée** sur les seuls lieux
+déjà collectés — comme la remontée administrative, et pour la même raison :
+poser ce filtre dans `theme_query` ajouterait un chemin transitif de plus aux
+classes les plus volumineuses, ce qui faisait déjà dépasser le délai. Bénéfice
+supplémentaire : ajouter une classe à la liste ne demande pas de recollecter,
+seulement de rejouer `enrich` puis `build`.
+
+> ⚠️ **Une exclusion par classe est un instrument brut.** Le Jardin des plantes
+> abrite une ménagerie ; s'il porte lui-même la classe « parc zoologique », il
+> tombe avec elle. `build` nomme donc les lieux qu'il écarte à ce titre, classe
+> par classe, et `explain` le dit lieu par lieu. C'est la seule protection
+> contre une exclusion trop large — et elle suppose de lire le journal une fois.
+> Un lieu épinglé (`keep`) y échappe.
+
 ### Les décisions du curateur sont conservées
 
 Elles vivent dans **`data/manual/decisions.csv`**, cumulées d'une revue à l'autre, et

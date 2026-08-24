@@ -86,6 +86,21 @@ class Tiers:
 
 
 @dataclass(frozen=True)
+class Exclusions:
+    """Classes Wikidata qui disqualifient un lieu, quel que soit son thème.
+
+    Un parc d'attractions n'entre pas au catalogue parce qu'il possède un
+    aquarium classé « musée » quelque part dans sa hiérarchie de classes. La
+    liste est GLOBALE et non par thème : le problème n'est pas qu'un delphinarium
+    soit mal rangé, c'est qu'il n'a rien à faire dans Roam.
+    """
+
+    qids: list[str] = field(default_factory=list)
+    # Termes à résoudre avec `suggest-qids`, comme pour les thèmes.
+    search: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
 class Alerts:
     alpine_elevation_m: int
 
@@ -107,6 +122,7 @@ class Config:
     tiers: Tiers
     collections: CollectionRules
     alerts: Alerts
+    exclusions: Exclusions = field(default_factory=Exclusions)
 
     def theme(self, theme_id: str) -> Theme:
         for t in self.themes:
@@ -176,7 +192,14 @@ def load_config(config_dir: Path | None = None) -> Config:
 
     alerts = Alerts(**raw.get("alerts", {"alpine_elevation_m": 2500}))
 
-    _validate(themes, labels)
+    raw_themes = _read_yaml(d / "themes.yaml")
+    excluded = raw_themes.get("exclude_classes") or {}
+    exclusions = Exclusions(
+        qids=list(excluded.get("qids") or []),
+        search=list(excluded.get("search") or []),
+    )
+
+    _validate(themes, labels, exclusions)
     return Config(
         themes=themes,
         labels=labels,
@@ -184,10 +207,12 @@ def load_config(config_dir: Path | None = None) -> Config:
         tiers=tiers,
         collections=rules,
         alerts=alerts,
+        exclusions=exclusions,
     )
 
 
-def _validate(themes: list[Theme], labels: list[Label]) -> None:
+def _validate(themes: list[Theme], labels: list[Label],
+              exclusions: Exclusions | None = None) -> None:
     label_ids = {lbl.id for lbl in labels}
     seen: set[str] = set()
     for t in themes:
@@ -225,4 +250,19 @@ def _validate(themes: list[Theme], labels: list[Label]) -> None:
         if not lbl.is_manual and not lbl.qid and not lbl.search:
             raise ValueError(
                 f"le label {lbl.id} n'est pas 'manual' et n'a ni qid ni terme de recherche"
+            )
+
+    for qid in (exclusions.qids if exclusions else []):
+        if not qid.startswith("Q") or not qid[1:].isdigit():
+            raise ValueError(f"Q-id invalide dans `exclude_classes` : {qid}")
+
+    # Une classe ne peut pas être à la fois ce qu'on cherche et ce qu'on refuse :
+    # le thème serait vidé sans que rien ne le dise.
+    banned = set(exclusions.qids if exclusions else [])
+    for theme in themes:
+        clash = banned.intersection(theme.wikidata_classes)
+        if clash:
+            raise ValueError(
+                f"le thème {theme.id} collecte une classe que `exclude_classes` refuse : "
+                f"{', '.join(sorted(clash))}"
             )

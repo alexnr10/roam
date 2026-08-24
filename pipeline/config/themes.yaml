@@ -28,6 +28,34 @@
 #                      Les jardins comptent en nature : dessinés de main d'homme,
 #                      mais on y va pour le paysage.
 
+# Classes qui DISQUALIFIENT un lieu, quel que soit le thème par lequel il est
+# entré.
+#
+# Marineland est arrivé dans « musées » parce qu'un de ses équipements est
+# classé comme aquarium, et qu'un aquarium public est, dans la hiérarchie de
+# Wikidata, une sorte de musée. Le rattachement n'est pas faux ; c'est le lieu
+# qui n'a pas sa place ici. Roam propose des paysages et du patrimoine, pas des
+# parcs de loisirs.
+#
+# La liste est globale et non par thème : le problème n'est pas qu'un
+# delphinarium soit mal rangé, c'est qu'il ne doit exister nulle part.
+#
+# ⚠️  Une exclusion par classe est un instrument BRUT. Le Jardin des plantes
+#     abrite une ménagerie ; s'il porte lui-même la classe « parc zoologique »,
+#     il tombe avec elle. `build` nomme donc les lieux qu'il écarte à ce titre,
+#     et `explain` le dit lieu par lieu : c'est la seule protection contre une
+#     exclusion trop large, et elle suppose de lire le journal une fois.
+exclude_classes:
+  qids: []
+  search:
+    - parc d'attractions
+    - parc à thème
+    - parc animalier
+    - parc zoologique
+    - aquarium public
+    - delphinarium
+    - parc aquatique
+
 themes:
   - id: villages
     name: Villages de caractère

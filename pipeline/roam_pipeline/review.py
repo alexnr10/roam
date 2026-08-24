@@ -7,6 +7,11 @@ listes, et non dans les fichiers de sortie que chaque commande réécrit.
 
 Le fichier est cumulatif : relire cent lieux de plus n'efface pas les mille
 précédents.
+
+Un second fichier, `names.csv`, porte les noms d'affichage choisis. Les deux
+sont séparés à dessein : renommer et écarter sont deux gestes différents, et un
+lieu peut être renommé ET gardé, renommé ET écarté. Fondus en un seul fichier,
+la colonne `decision` deviendrait ambiguë.
 """
 
 from __future__ import annotations
@@ -16,7 +21,7 @@ import logging
 from collections import Counter
 from pathlib import Path
 
-from .models import Place
+from .models import Place, display_name
 
 LOG = logging.getLogger(__name__)
 
@@ -111,3 +116,65 @@ def apply_decisions(
         kept.append(place)
 
     return kept, counts
+
+
+# ---------------------------------------------------------------------------
+# Renommages
+# ---------------------------------------------------------------------------
+
+NAMES_HEADER = """# Noms d'affichage choisis par le curateur.
+#
+# Wikidata donne un libellé, pas un titre. Il est parfois exact mais illisible
+# (« musée des impressionnismes Giverny »), parfois encombré d'une précision
+# qui n'a de sens que dans une base de données. Une ligne ici l'emporte.
+#
+# Ce n'est PAS un verdict d'inclusion : renommer et écarter sont deux gestes
+# différents, et les mélanger rendrait `decisions.csv` ambigu. D'où ce fichier.
+#
+wikidata_id,name,note
+"""
+
+
+def read_names(path: Path) -> dict[str, str]:
+    """`{qid: nom choisi}`. Fichier absent = aucun renommage."""
+    names: dict[str, str] = {}
+    if not path.exists():
+        return names
+
+    lines = [
+        line
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    for row in csv.DictReader(lines):
+        qid = (row.get("wikidata_id") or "").strip()
+        name = (row.get("name") or "").strip()
+        if qid and name:
+            names[qid] = display_name(name)
+    return names
+
+
+def write_names(path: Path, names: dict[str, str], notes: dict[str, str] | None = None) -> None:
+    notes = notes or {}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as fh:
+        fh.write(NAMES_HEADER)
+        writer = csv.writer(fh)
+        for qid in sorted(names):
+            writer.writerow([qid, names[qid], notes.get(qid, "")])
+    LOG.info("noms : %s renommages conservés dans %s", len(names), path)
+
+
+def apply_names(places: list[Place], names: dict[str, str]) -> int:
+    """Remplace le libellé de Wikidata par celui du curateur. Renvoie le compte.
+
+    Appliqué à CHAQUE construction, comme les décisions : un renommage qui ne
+    survit pas au prochain `build` n'est pas une décision, c'est un affichage.
+    """
+    changed = 0
+    for place in places:
+        chosen = names.get(place.wikidata_id)
+        if chosen and chosen != place.name:
+            place.name = chosen
+            changed += 1
+    return changed

@@ -8,6 +8,26 @@ from dataclasses import dataclass, field, asdict
 from typing import Any
 
 
+def display_name(value: str) -> str:
+    """Le nom tel qu'il doit s'afficher.
+
+    Les libellés français de Wikidata ne sont pas capitalisés de façon fiable :
+    « Dune du Pilat » y côtoie « château d'Hérouville » et « musée des
+    impressionnismes Giverny ». C'est cohérent du point de vue de Wikidata, qui
+    traite le libellé comme un syntagme et non comme un titre — mais dans une
+    liste de lieux, une minuscule initiale se lit comme une faute.
+
+    On ne touche QUE la première lettre. Capitaliser davantage détruirait les
+    noms propres internes (« Saint-Cirq-Lapopie », « d'Hérouville ») et les
+    sigles, et il n'existe aucune règle mécanique pour distinguer « Pont du
+    Gard » de « pont de Normandie ».
+    """
+    cleaned = " ".join(value.split())
+    if cleaned and cleaned[0].islower():
+        return cleaned[0].upper() + cleaned[1:]
+    return cleaned
+
+
 def slugify(value: str) -> str:
     normalized = unicodedata.normalize("NFKD", value)
     ascii_only = normalized.encode("ascii", "ignore").decode("ascii").lower()
@@ -72,6 +92,16 @@ class Place:
     # change rien au score — elle dit au relecteur pourquoi la ligne est là.
     source: str = "wikidata"
     inclusion_criteria: list[str] = field(default_factory=list)
+    # Classe Wikidata disqualifiante, quand il y en a une : un parc
+    # d'attractions entré par la porte des musées, par exemple. Le libellé de
+    # la classe, pas son Q-id — pour que le journal se lise.
+    excluded_class: str | None = None
+
+    def __post_init__(self) -> None:
+        # Le nom est normalisé à la construction, d'où qu'il vienne : Wikidata,
+        # OpenStreetMap ou une liste manuelle. Le faire au seul point de
+        # collecte laissait passer les autres sources.
+        self.name = display_name(self.name)
 
     @property
     def slug(self) -> str:

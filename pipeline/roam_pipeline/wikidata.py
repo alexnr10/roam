@@ -271,6 +271,31 @@ SELECT ?item ?dissolved ?elevation WHERE {{
 """
 
 
+def excluded_classes_query(item_qids: list[str], class_qids: list[str]) -> str:
+    """Parmi ces lieux, lesquels relèvent d'une classe disqualifiante ?
+
+    Requête BORNÉE par `VALUES`, sur le même modèle que `admin_codes_query` :
+    c'est ce qui la rend rapide. Poser le filtre dans `theme_query` aurait
+    ajouté un chemin transitif de plus aux classes les plus volumineuses —
+    exactement ce qui faisait dépasser le délai avant qu'on ne sorte la
+    remontée administrative de cette requête.
+
+    L'autre bénéfice est éditorial : l'exclusion se rejoue à `enrich`, en
+    quelques secondes, sans repasser une demi-heure sur Wikidata à chaque fois
+    qu'une classe s'ajoute à la liste.
+    """
+    items = " ".join(f"wd:{q}" for q in item_qids)
+    classes = " ".join(f"wd:{q}" for q in class_qids)
+    return f"""
+SELECT DISTINCT ?item ?class ?classLabel WHERE {{
+  VALUES ?item {{ {items} }}
+  VALUES ?class {{ {classes} }}
+  ?item wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* ?class .
+  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+}}
+"""
+
+
 def label_members_query(kind: str, qid: str) -> str:
     """Membres d'un label. `kind` ∈ {heritage, member_of, instance}."""
     predicate = {

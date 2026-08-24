@@ -10,11 +10,13 @@ import tempfile
 from contextlib import contextmanager
 from io import StringIO
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from roam_pipeline.collections import (
+    apply_class_exclusion,
     apply_geographic_scope,
     apply_notoriety_floor,
     build_all,
@@ -22,14 +24,16 @@ from roam_pipeline.collections import (
     dedupe_across_themes,
     haversine_m,
 )
-from roam_pipeline.config import load_config
+from roam_pipeline.config import CONFIG_DIR, Exclusions, load_config
 from roam_pipeline.export import _sql_str, write_seed_sql
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
-from roam_pipeline.models import Place, slugify
+from roam_pipeline.models import Place, display_name, slugify
 from roam_pipeline import outlines
 from roam_pipeline.fetch import enrich_departements
 from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from_insee
 from roam_pipeline.wikipedia import title_from_url
+from roam_pipeline.wikidata import excluded_classes_query
+from roam_pipeline.review import DECISIONS, apply_names, read_names, write_names
 
 
 @contextmanager
@@ -737,7 +741,7 @@ class TestBuildFunnel(unittest.TestCase):
         self.assertIn("étape par étape", table)
         # Six dunes au départ, quatre après le périmètre, deux après le plancher.
         ligne = next(l for l in table.splitlines() if l.strip().startswith("dunes-marais"))
-        self.assertEqual([int(n) for n in ligne.split()[1:]], [6, 4, 4, 4, 4, 2, 2])
+        self.assertEqual([int(n) for n in ligne.split()[1:]], [6, 4, 4, 4, 4, 4, 2, 2])
 
     def test_a_theme_without_any_place_is_left_out_of_the_funnel(self):
         from roam_pipeline.collections import build_all
@@ -1350,7 +1354,7 @@ class TestNotorietyFloor(unittest.TestCase):
             make_place("connu", theme="sommets", sitelinks=floor + 5),
         ]
         kept = apply_notoriety_floor(places, CONFIG)
-        self.assertEqual([p.name for p in kept], ["connu"])
+        self.assertEqual([p.name for p in kept], ["Connu"])
 
     def test_floor_is_per_theme(self):
         # Une cascade à 3 langues reste ; un sommet à 3 langues part.
@@ -1358,7 +1362,7 @@ class TestNotorietyFloor(unittest.TestCase):
             make_place("cascade", theme="cascades", sitelinks=3),
             make_place("sommet", theme="sommets", sitelinks=3),
         ]
-        self.assertEqual([p.name for p in apply_notoriety_floor(places, CONFIG)], ["cascade"])
+        self.assertEqual([p.name for p in apply_notoriety_floor(places, CONFIG)], ["Cascade"])
 
     def test_unknown_theme_is_dropped(self):
         self.assertEqual(apply_notoriety_floor([make_place("x", theme="inconnu")], CONFIG), [])
@@ -1630,6 +1634,125 @@ class TestShippedOutlines(unittest.TestCase):
 
     def test_the_file_stays_light_enough_to_embed(self):
         self.assertLess(self.PATH.stat().st_size, 900 * 1024)
+
+
+class TestDisplayName(unittest.TestCase):
+    """Les libellés de Wikidata ne sont pas des titres."""
+
+    def test_capitalises_only_the_first_letter(self):
+        self.assertEqual(display_name("musée des impressionnismes Giverny"),
+                         "Musée des impressionnismes Giverny")
+        self.assertEqual(display_name("château d'Hérouville"), "Château d'Hérouville")
+
+    def test_never_touches_the_rest_of_the_name(self):
+        # `str.capitalize()` écrirait « Saint-cirq-lapopie » : il n'existe
+        # aucune règle mécanique pour recapitaliser un nom propre français.
+        self.assertEqual(display_name("Saint-Cirq-Lapopie"), "Saint-Cirq-Lapopie")
+        self.assertEqual(display_name("phare de la Vieille"), "Phare de la Vieille")
+
+    def test_normalises_whitespace(self):
+        self.assertEqual(display_name("  cascade  du Hérisson "), "Cascade du Hérisson")
+
+    def test_applies_to_every_place_whatever_its_source(self):
+        # Posé à la construction du lieu et non au point de collecte : sinon
+        # OpenStreetMap et les listes manuelles y échappaient.
+        self.assertEqual(make_place("cascade du Hérisson").name, "Cascade du Hérisson")
+
+
+class TestCuratorNames(unittest.TestCase):
+    """Renommer est un geste durable, et distinct d'un verdict d'inclusion."""
+
+    def test_a_chosen_name_survives_and_is_normalised(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "names.csv"
+            write_names(path, {"Q1": "musée des impressionnismes"})
+            self.assertEqual(read_names(path), {"Q1": "Musée des impressionnismes"})
+
+    def test_it_replaces_the_wikidata_label(self):
+        place = make_place("Musée des impressionnismes Giverny")
+        place.wikidata_id = "Q3330248"
+        changed = apply_names([place], {"Q3330248": "Musée des impressionnismes"})
+        self.assertEqual(place.name, "Musée des impressionnismes")
+        self.assertEqual(changed, 1)
+
+    def test_an_unknown_place_is_left_alone(self):
+        place = make_place("Château de Chambord")
+        self.assertEqual(apply_names([place], {"Q999": "Autre"}), 0)
+        self.assertEqual(place.name, "Château de Chambord")
+
+    def test_renaming_is_not_a_verdict(self):
+        # Les deux fichiers sont séparés exprès : un lieu peut être renommé ET
+        # gardé, renommé ET écarté. Mélangés, `decision` deviendrait ambigu.
+        self.assertNotIn("rename", DECISIONS)
+
+
+class TestClassExclusion(unittest.TestCase):
+    """Un parc d'attractions entré par la porte des musées."""
+
+    @staticmethod
+    def _config(qids):
+        return replace(CONFIG, exclusions=Exclusions(qids=list(qids)))
+
+    def test_a_disqualified_place_leaves_the_catalogue(self):
+        marineland = make_place("Marineland", theme="musees", sitelinks=30)
+        marineland.excluded_class = "parc à thème"
+        musee = make_place("Musée du Louvre", theme="musees", sitelinks=80)
+
+        kept = apply_class_exclusion([marineland, musee], self._config(["Q1"]))
+        self.assertEqual([p.name for p in kept], ["Musée du Louvre"])
+
+    def test_an_empty_list_changes_nothing(self):
+        marineland = make_place("Marineland", theme="musees")
+        marineland.excluded_class = "parc à thème"
+        # Sans classe déclarée, la marque d'un `enrich` précédent ne doit pas
+        # continuer d'agir : retirer une classe de la liste rend ses lieux.
+        kept = apply_class_exclusion([marineland], self._config([]))
+        self.assertEqual(len(kept), 1)
+
+    def test_a_pinned_place_escapes_it(self):
+        # L'exclusion par classe est brute : le curateur garde le dernier mot.
+        zoo = make_place("Jardin des plantes", theme="jardins")
+        zoo.excluded_class = "parc zoologique"
+        zoo.pinned = True
+        self.assertEqual(len(apply_class_exclusion([zoo], self._config(["Q1"]))), 1)
+
+    def test_it_names_what_it_removes(self):
+        # Une exclusion silencieuse serait indétectable : le Jardin des plantes
+        # abrite une ménagerie, et personne ne s'apercevrait de sa disparition.
+        marineland = make_place("Marineland", theme="musees")
+        marineland.excluded_class = "parc à thème"
+        with self.assertLogs("roam_pipeline.collections", level="INFO") as logs:
+            apply_class_exclusion([marineland], self._config(["Q1"]))
+        journal = "\n".join(logs.output)
+        self.assertIn("Marineland", journal)
+        self.assertIn("parc à thème", journal)
+
+    def test_the_query_binds_both_sides(self):
+        # Bornée par `VALUES` des deux côtés : c'est ce qui la rend tenable là
+        # où le même chemin transitif posé dans `theme_query` expirait.
+        sparql = excluded_classes_query(["Q10", "Q11"], ["Q20"])
+        self.assertIn("VALUES ?item { wd:Q10 wd:Q11 }", sparql)
+        self.assertIn("VALUES ?class { wd:Q20 }", sparql)
+        self.assertIn("wdt:P31/wdt:P279* ?class", sparql)
+
+    def test_a_class_cannot_be_collected_and_refused_at_once(self):
+        # Sinon le thème se viderait sans qu'aucun message ne le dise.
+        collected = CONFIG.themes[1].wikidata_classes[0]
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            for name in ("themes.yaml", "labels.yaml", "scoring.yaml"):
+                (base / name).write_text(
+                    (CONFIG_DIR / name).read_text(encoding="utf-8"), encoding="utf-8"
+                )
+            themes = (base / "themes.yaml").read_text(encoding="utf-8")
+            (base / "themes.yaml").write_text(
+                themes.replace("exclude_classes:\n  qids: []",
+                               f"exclude_classes:\n  qids: [{collected}]"),
+                encoding="utf-8",
+            )
+            with self.assertRaises(ValueError) as raised:
+                load_config(base)
+        self.assertIn("exclude_classes", str(raised.exception))
 
 
 if __name__ == "__main__":

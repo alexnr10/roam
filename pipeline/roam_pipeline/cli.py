@@ -23,6 +23,7 @@ from .export import (
     write_seed_sql,
 )
 from .fetch import (
+    enrich_exclusions,
     enrich_article_sizes,
     enrich_communes,
     enrich_departements,
@@ -37,7 +38,10 @@ from .fetch import (
 from .models import Collection, CollectionPlace, Place
 from .outlines import ATTRIBUTION as OUTLINE_ATTRIBUTION, DEFAULT_TOLERANCE_KM2
 from .outlines import export as export_outlines
-from .review import DECISIONS, apply_decisions, read_decisions, write_decisions
+from .review import (
+    DECISIONS, apply_decisions, apply_names, read_decisions, read_names,
+    write_decisions, write_names,
+)
 from .score import score_all
 
 LOG = logging.getLogger("roam")
@@ -76,6 +80,8 @@ def cmd_verify_qids(args: argparse.Namespace, config: Config) -> int:
     for label in config.labels:
         if label.qid:
             qids.setdefault(label.qid, []).append(f"label {label.id}")
+    for qid in config.exclusions.qids:
+        qids.setdefault(qid, []).append("exclusion")
 
     client = wd.SparqlClient()
     resolved: dict[str, tuple[str, str]] = {}
@@ -117,6 +123,8 @@ def _pending_terms(config: Config) -> list[tuple[str, str]]:
     for label in config.labels:
         if not label.is_manual and not label.qid and label.search:
             pending.append((f"label {label.id}", label.search))
+    for term in config.exclusions.search:
+        pending.append(("exclusion", term))
     return pending
 
 
@@ -175,7 +183,12 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
 
     places = _load_places(raw_path)
     found = enrich_article_sizes(places)
-    enrich_flags(wd.SparqlClient(), places)
+    client = wd.SparqlClient()
+    enrich_flags(client, places)
+    # Les classes disqualifiantes se marquent ici et s'appliquent à la
+    # construction : ajouter une classe à la liste ne demande donc pas de
+    # recollecter, juste de rejouer `enrich` puis `build`.
+    enrich_exclusions(client, places, config.exclusions.qids)
     enrich_departements(places)
     # Après le département : la commune fait autorité sur lui, et la corrige au
     # passage quand Wikidata l'avait mal rattaché.
@@ -425,6 +438,9 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     # `scored` garde TOUS les candidats : c'est lui qui alimente la distribution,
     # qui ne sert à régler le plancher que si elle porte sur l'avant-filtre.
     scored = score_all(_load_places(raw_path), config)
+    # Avant tout le reste : le nom choisi par le curateur doit valoir partout,
+    # jusque dans la feuille de revue où il relira la ligne.
+    renamed = apply_names(scored, read_names(args.manual / "names.csv"))
     decisions = read_decisions(args.manual / "decisions.csv")
     kept, counts = apply_decisions(scored, decisions, args.adjust, strict=args.strict)
     # Rescoré après ajustement : la correction du relecteur fait partie du score,
@@ -437,6 +453,8 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     write_review_html(retained, collections, config, args.out / "review.html")
     write_seed_sql(retained, collections, config, args.out / "seed.sql")
 
+    if renamed:
+        print(f"Renommages appliqués : {renamed}")
     if decisions:
         print("Décisions reprises :",
               ", ".join(f"{k}={v}" for k, v in sorted(counts.items())))
@@ -453,8 +471,8 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
     suivre un lieu à travers elles et de dire laquelle l'arrête.
     """
     from .collections import (
-        apply_access_filter, apply_alpine_filter, apply_geographic_scope,
-        apply_notoriety_floor, dedupe, dedupe_across_themes,
+        apply_access_filter, apply_alpine_filter, apply_class_exclusion,
+        apply_geographic_scope, apply_notoriety_floor, dedupe, dedupe_across_themes,
     )
     from .score import rescued
 
@@ -465,6 +483,7 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
 
     needle = _fold(args.name)
     everything = score_all(_load_places(raw_path), config)
+    apply_names(everything, read_names(args.manual / "names.csv"))
     found = [p for p in everything if needle in _fold(p.name)]
 
     if not found:
@@ -489,6 +508,7 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
         stages = [("décision du curateur", kept)]
         stages.append(("périmètre français", apply_geographic_scope(stages[-1][1], config)))
         stages.append(("thème unique", dedupe_across_themes(stages[-1][1], config)))
+        stages.append(("classe écartée", apply_class_exclusion(stages[-1][1], config)))
         stages.append(("accès refusé", apply_access_filter(stages[-1][1], config)))
         stages.append(("accès alpin non prouvé", apply_alpine_filter(stages[-1][1], config)))
         stages.append(("plancher de notoriété", apply_notoriety_floor(stages[-1][1], config)))
@@ -514,6 +534,8 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
         print(f"  plancher du thème : {floor} langues"
               + (" — repêché malgré lui" if rescued(place, config) else ""))
         print(f"  décision enregistrée : {decision}")
+        if place.excluded_class:
+            print(f"  classe disqualifiante : {place.excluded_class}")
 
         blocked = None
         for label, survivors in stages:
@@ -566,6 +588,49 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
           f"({before} → {len(decisions)} au total dans {path.name}).")
 
     return _build_and_write(args, config)
+
+
+def cmd_rename(args: argparse.Namespace, config: Config) -> int:
+    """Choisit le nom d'affichage d'un lieu, durablement.
+
+    Wikidata donne un libellé, pas un titre. Il est parfois exact mais
+    illisible, parfois encombré d'une précision de base de données. Le curateur
+    tranche, et sa décision survit à toutes les reconstructions.
+    """
+    path = args.manual / "names.csv"
+    names = read_names(path)
+
+    if args.wikidata_id is None:
+        if not names:
+            print("Aucun renommage. Usage : rename Q3330248 « Nom choisi »")
+            return 0
+        for qid in sorted(names):
+            print(f"  {qid:<12} {names[qid]}")
+        print(f"\n{len(names)} renommage(s) dans {path}")
+        return 0
+
+    qid = args.wikidata_id.strip()
+    if not qid.startswith("Q") or not qid[1:].isdigit():
+        print(f"« {qid} » n'est pas un identifiant Wikidata.", file=sys.stderr)
+        return 1
+
+    if args.clear:
+        if names.pop(qid, None) is None:
+            print(f"{qid} n'avait pas de nom choisi.")
+            return 0
+        write_names(path, names)
+        print(f"{qid} reprend son libellé Wikidata.")
+        return 0
+
+    if not args.name:
+        print("Il manque le nom. Usage : rename Q3330248 « Nom choisi »", file=sys.stderr)
+        return 1
+
+    names[qid] = args.name
+    write_names(path, names)
+    print(f"{qid} s'affichera « {read_names(path)[qid]} ».")
+    print("Relance `build` : le nom vaudra partout, y compris dans la revue.")
+    return 0
 
 
 APP_CATALOG = BASE_DIR.parent / "mobile" / "src" / "data" / "catalog.json"
@@ -930,6 +995,15 @@ def build_parser() -> argparse.ArgumentParser:
     review.add_argument("--review", type=Path, help="chemin de review.csv")
     add_decision_args(review)
 
+    rename = sub.add_parser(
+        "rename", help="choisit le nom d'affichage d'un lieu (durable)"
+    )
+    rename.add_argument("wikidata_id", nargs="?", help="Q-id du lieu ; omis, liste les renommages")
+    rename.add_argument("name", nargs="?", help="nom à afficher")
+    rename.add_argument(
+        "--clear", action="store_true", help="revenir au libellé de Wikidata"
+    )
+
     sub.add_parser("stats", help="statistiques du catalogue construit")
 
     app = sub.add_parser("export-app", help="écrit le catalogue dans l'application")
@@ -979,6 +1053,7 @@ def main(argv: list[str] | None = None) -> int:
         "apply-review": cmd_apply_review,
         "stats": cmd_stats,
         "review": cmd_review,
+        "rename": cmd_rename,
         "export-app": cmd_export_app,
         "export-outlines": cmd_export_outlines,
     }

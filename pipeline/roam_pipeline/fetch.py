@@ -594,6 +594,42 @@ def enrich_flags(client: wd.SparqlClient, places: list[Place]) -> int:
     return found
 
 
+def enrich_exclusions(
+    client: wd.SparqlClient, places: list[Place], class_qids: list[str]
+) -> int:
+    """Marque les lieux qui relèvent d'une classe disqualifiante.
+
+    Marque, mais n'écarte pas : le retrait appartient à la construction, qui
+    sait épargner un lieu épinglé et surtout qui NOMME ce qu'elle enlève. Une
+    exclusion par classe est assez brutale pour mériter d'être relue.
+    """
+    # Repartir de zéro : retirer une classe de la liste doit rendre au
+    # catalogue les lieux qu'elle écartait, sans quoi l'exclusion serait un
+    # aller sans retour.
+    for place in places:
+        place.excluded_class = None
+    if not class_qids or not places:
+        return 0
+
+    by_qid = {place.wikidata_id: place for place in places}
+    marked = 0
+    for batch in wd.chunked(sorted(by_qid), 200):
+        try:
+            rows = client.query(wd.excluded_classes_query(batch, class_qids))
+        except Exception as exc:
+            LOG.error("exclusions : lot échoué (%s)", exc)
+            continue
+        for row in rows:
+            place = by_qid.get(wd.qid_from_uri(row.get("item")) or "")
+            if place is None or place.excluded_class:
+                continue
+            place.excluded_class = row.get("classLabel") or wd.qid_from_uri(row.get("class"))
+            marked += 1
+
+    LOG.info("exclusions : %s lieux relèvent d'une classe écartée", marked)
+    return marked
+
+
 def fetch_label_members(client: wd.SparqlClient, label: Label, manual_dir: Path) -> set[str]:
     """Q-ids des lieux portant un label."""
     if label.is_manual:
