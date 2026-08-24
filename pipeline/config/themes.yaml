@@ -307,7 +307,12 @@ themes:
     icon: dune
     kind: nature
     radius_m: 600
-    min_sitelinks: 4
+    # Abaissé de 4 à 2, comme les cascades et les curiosités géologiques.
+    # L'entonnoir montre que le thème n'a que onze lieux à cette étape : les
+    # étangs côtiers partent aux `lacs`, déclarés avant lui — un étang côtier
+    # EST un lac, la priorité est correcte. À 4, il n'en restait que deux et
+    # le thème n'avait aucune collection ; à 2, les onze passent.
+    min_sitelinks: 2
     fetch_min_sitelinks: 2
     cap: 40
     wikidata_classes: [Q25391, Q244326, Q55706997, Q135951980]
