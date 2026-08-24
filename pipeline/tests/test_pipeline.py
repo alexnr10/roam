@@ -639,8 +639,7 @@ class TestThemeKind(unittest.TestCase):
             # Les jardins comptent en nature : dessinés de main d'homme, mais
             # on y va pour le paysage.
             {"cascades", "cirques", "dunes-marais", "forets", "gorges", "grottes",
-             "iles", "jardins", "lacs", "plages", "rochers", "sommets",
-             "sources", "volcans"},
+             "iles", "jardins", "lacs", "plages", "rochers", "sommets", "volcans"},
         )
 
     def test_an_unknown_kind_is_refused(self):
@@ -661,18 +660,20 @@ class TestStarvedThemes(unittest.TestCase):
     def test_a_theme_below_the_minimum_is_named_in_the_log(self):
         from roam_pipeline.collections import build_theme_collections
 
-        # Cinq sources : c'est ce qu'a ramené la vraie collecte, sous le
-        # minimum de huit. Sans avertissement, le thème disparaîtrait sans un
-        # mot et l'onglet resterait vide dans l'application.
+        # Cinq lieux, sous le minimum de huit. Sans avertissement, le thème
+        # disparaîtrait sans un mot et l'onglet resterait vide dans
+        # l'application — c'est ce qui est arrivé au thème `sources`, dont la
+        # vraie collecte n'a ramené que cinq candidats, et à `maisons`, jamais
+        # collecté et vide depuis sa création sans que rien ne le dise.
         maigre = [
-            make_place(f"Source {i}", theme_id="sources", wikidata_id=f"Q{i}")
+            make_place(f"Curiosité {i}", theme_id="rochers", wikidata_id=f"Q{i}")
             for i in range(5)
         ]
         with self.assertLogs("roam_pipeline.collections", level="WARNING") as logs:
             built = build_theme_collections(maigre, CONFIG)
 
         self.assertEqual([c.slug for c in built], [])
-        self.assertIn("sources 5", "\n".join(logs.output))
+        self.assertIn("rochers 5", "\n".join(logs.output))
 
     def test_a_theme_with_enough_places_builds_quietly(self):
         from roam_pipeline.collections import build_theme_collections

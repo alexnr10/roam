@@ -284,6 +284,22 @@ themes:
     cap: 60
     wikidata_classes: [Q8502, Q2231510]              # montagne, col
 
+  # Avant `plages` : une dune est une plage, mais on y va pour la dune.
+  # Déclaré après `plages` au premier jet, ce thème perdait 15 lieux sur 17
+  # au dédoublonnage — le Pilat comptait comme une plage.
+  - id: dunes-marais
+    name: Dunes et marais
+    name_singular: Site
+    icon: dune
+    kind: nature
+    radius_m: 600
+    min_sitelinks: 4
+    fetch_min_sitelinks: 2
+    cap: 40
+    wikidata_classes: [Q25391, Q244326, Q55706997, Q135951980]
+    # dune, marais salant, marais maritime (pour « marais littoral »),
+    # étang côtier.
+
   - id: plages
     name: Littoral et plages
     name_singular: Site
@@ -337,43 +353,27 @@ themes:
     # même piège que les 289 801 sites OSM du tout début. Le label Forêt
     # d'Exception (ONF) porte la curation qualitative sur ce thème.
 
-  - id: dunes-marais
-    name: Dunes et marais
-    name_singular: Site
-    icon: dune
-    kind: nature
-    radius_m: 600
-    min_sitelinks: 4
-    fetch_min_sitelinks: 2
-    cap: 40
-    wikidata_classes: [Q25391, Q244326, Q55706997, Q135951980]
-    # dune, marais salant, marais maritime (pour « marais littoral »),
-    # étang côtier.
-
   - id: rochers
-    name: Rochers et curiosités géologiques
-    name_singular: Site
+    name: Curiosités géologiques
+    name_singular: Curiosité
     icon: rocher
     kind: nature
     radius_m: 300
-    min_sitelinks: 4
+    # Plancher à 2 et non 4 : à 4, ce thème tombait à six lieux, sous le
+    # minimum de huit exigé pour former une collection. Le vivier est petit,
+    # le plancher doit l'être aussi.
+    min_sitelinks: 2
     fetch_min_sitelinks: 2
     cap: 50
-    wikidata_classes: [Q954501]   # arche naturelle
+    wikidata_classes: [Q954501, Q112269120, Q590992]
+    # arche naturelle, résurgence, exsurgence.
+    #
+    # Le thème `sources` a été fondu ici : cinq candidats sur toute la France
+    # ne feront jamais une collection, et une résurgence — la fontaine de
+    # Vaucluse, la source de la Loue — est bien une curiosité géologique. Un
+    # thème de cinq lieux n'est pas un thème, c'est une ligne morte dans
+    # l'application.
     # Les trois autres termes (chaos rocheux, aiguille rocheuse, site
     # géologique remarquable) n'ont renvoyé aucune classe exploitable. Thème
     # délibérément maigre : le label site-classé et les propositions de la
     # communauté couvrent le reste plutôt qu'une classe trop large et bruitée.
-
-  - id: sources
-    name: Sources et résurgences
-    name_singular: Source
-    icon: source
-    kind: nature
-    radius_m: 250
-    min_sitelinks: 4
-    fetch_min_sitelinks: 2
-    cap: 40
-    wikidata_classes: [Q112269120, Q590992]
-    # résurgence, exsurgence — deux concepts hydrogéologiques distincts,
-    # d'où deux classes plutôt qu'une. « source karstique » recouvre exsurgence.
