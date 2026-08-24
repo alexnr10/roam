@@ -254,6 +254,24 @@ plutôt que l'intérêt des lieux.
 Le malus fait reculer, il n'exclut pas : un château qu'on ne visite pas peut se
 photographier depuis la route, et une alerte prévient déjà le relecteur.
 
+### Nature et culture : un équilibre à surveiller
+
+Roam promet des **paysages** autant que du patrimoine. Or rien dans les sources ne
+défend cet équilibre, et trois mécanismes penchent tous du même côté :
+
+- **Wikidata documente le bâti bien mieux que le naturel.** Un château a un article en
+  dix langues, une cascade en a un — en français. Le plancher de notoriété, qui compte
+  les langues, écarte donc les paysages plus vite.
+- **Le repêchage exige des horaires d'ouverture.** Un musée en a, une cascade jamais.
+  Sur les 512 lieux repêchés du premier vrai passage, **onze** étaient naturels.
+- **L'offre elle-même est courte** sur certains thèmes : Wikidata ne connaît que 86
+  cascades et 34 gorges en France dans les classes interrogées. Ces thèmes sont déjà
+  pris presque en entier — ils ne grandiront pas depuis cette source.
+
+Chaque thème porte donc un `kind` (`nature` ou `culture`), et `build` affiche la
+répartition. Un décompte visible à chaque construction est le seul moyen qu'une dérive
+vers le bâti ne s'installe pas sans qu'on la voie.
+
 ### Le repêchage : sortir du plancher, mais pas avec plus de documentation
 
 Le plancher de notoriété ne regarde **qu'un** signal : le nombre de versions

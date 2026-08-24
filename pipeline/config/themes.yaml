@@ -22,12 +22,18 @@
 #                        Il ne sert qu'à garder les requêtes tenables : le laisser
 #                        bas permet de régler le plancher éditorial librement.
 # `cap`              : nombre maximum de lieux retenus pour la collection nationale.
+# `kind`             : « nature » ou « culture ». Roam promet des PAYSAGES autant
+#                      que du patrimoine ; `build` affiche l'équilibre entre les
+#                      deux pour qu'une dérive vers le bâti ne passe pas inaperçue.
+#                      Les jardins comptent en nature : dessinés de main d'homme,
+#                      mais on y va pour le paysage.
 
 themes:
   - id: villages
     name: Villages de caractère
     name_singular: Village
     icon: village
+    kind: culture
     radius_m: 600
     min_sitelinks: 3
     fetch_min_sitelinks: 2
@@ -39,6 +45,7 @@ themes:
     name: Cathédrales et basiliques
     name_singular: Cathédrale
     icon: cathedral
+    kind: culture
     radius_m: 120
     min_sitelinks: 10
     fetch_min_sitelinks: 4
@@ -52,6 +59,7 @@ themes:
     name: Abbayes et monastères
     name_singular: Abbaye
     icon: abbey
+    kind: culture
     radius_m: 150
     min_sitelinks: 8
     fetch_min_sitelinks: 3
@@ -62,6 +70,7 @@ themes:
     name: Châteaux
     name_singular: Château
     icon: castle
+    kind: culture
     radius_m: 200
     min_sitelinks: 8
     fetch_min_sitelinks: 3
@@ -72,6 +81,7 @@ themes:
     name: Musées
     name_singular: Musée
     icon: museum
+    kind: culture
     radius_m: 120
     min_sitelinks: 12
     fetch_min_sitelinks: 4
@@ -85,6 +95,7 @@ themes:
     name: Maisons d'artistes et d'écrivains
     name_singular: Maison
     icon: house
+    kind: culture
     radius_m: 150
     min_sitelinks: 4
     fetch_min_sitelinks: 2
@@ -107,6 +118,7 @@ themes:
     name: Monuments et édifices remarquables
     name_singular: Monument
     icon: monument
+    kind: culture
     radius_m: 150
     min_sitelinks: 8
     fetch_min_sitelinks: 4
@@ -127,6 +139,7 @@ themes:
     name: Grottes et gouffres
     name_singular: Grotte
     icon: cave
+    kind: nature
     radius_m: 200
     min_sitelinks: 5
     fetch_min_sitelinks: 3
@@ -137,6 +150,7 @@ themes:
     name: Mégalithes et sites antiques
     name_singular: Site
     icon: megalith
+    kind: culture
     radius_m: 200
     min_sitelinks: 6
     fetch_min_sitelinks: 3
@@ -152,6 +166,7 @@ themes:
     name: Jardins remarquables
     name_singular: Jardin
     icon: garden
+    kind: nature
     radius_m: 200
     min_sitelinks: 5
     fetch_min_sitelinks: 3
@@ -164,6 +179,7 @@ themes:
     name: Phares
     name_singular: Phare
     icon: lighthouse
+    kind: culture
     radius_m: 200
     min_sitelinks: 5
     fetch_min_sitelinks: 3
@@ -174,6 +190,7 @@ themes:
     name: Ponts et viaducs
     name_singular: Pont
     icon: bridge
+    kind: culture
     radius_m: 300
     min_sitelinks: 8
     fetch_min_sitelinks: 3
@@ -187,6 +204,7 @@ themes:
     name: Cascades
     name_singular: Cascade
     icon: waterfall
+    kind: nature
     radius_m: 300
     min_sitelinks: 2
     fetch_min_sitelinks: 2
@@ -197,6 +215,7 @@ themes:
     name: Gorges et canyons
     name_singular: Gorges
     icon: canyon
+    kind: nature
     # Site étendu : le point est celui de l'entrée, le rayon porte la taille.
     radius_m: 2000
     min_sitelinks: 3
@@ -209,6 +228,7 @@ themes:
     name: Lacs
     name_singular: Lac
     icon: lake
+    kind: nature
     radius_m: 1500
     min_sitelinks: 8
     fetch_min_sitelinks: 3
@@ -219,6 +239,7 @@ themes:
     name: Îles
     name_singular: Île
     icon: island
+    kind: nature
     radius_m: 2000
     min_sitelinks: 10
     fetch_min_sitelinks: 4
@@ -229,6 +250,7 @@ themes:
     name: Sommets
     name_singular: Sommet
     icon: mountain
+    kind: nature
     radius_m: 1000
     min_sitelinks: 12
     fetch_min_sitelinks: 4
@@ -239,6 +261,7 @@ themes:
     name: Littoral et plages
     name_singular: Site
     icon: beach
+    kind: nature
     radius_m: 500
     min_sitelinks: 3
     fetch_min_sitelinks: 2

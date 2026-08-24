@@ -26,6 +26,10 @@ class Theme:
     fetch_min_sitelinks: int
     cap: int
     wikidata_classes: list[str]
+    # « nature » ou « culture ». Roam promet des PAYSAGES autant que du
+    # patrimoine ; sans cette étiquette, l'équilibre entre les deux ne se
+    # mesure pas, et une dérive vers le bâti passe inaperçue.
+    kind: str = "culture"
     # Thème alimenté par des listes officielles plutôt que par une classe
     # Wikidata : les labels sont déjà une curation humaine, finie et fiable.
     from_labels: list[str] = field(default_factory=list)
@@ -135,6 +139,7 @@ def load_config(config_dir: Path | None = None) -> Config:
             min_sitelinks=int(t["min_sitelinks"]),
             fetch_min_sitelinks=int(t.get("fetch_min_sitelinks", 3)),
             cap=int(t["cap"]),
+            kind=t.get("kind", "culture"),
             wikidata_classes=list(t.get("wikidata_classes") or []),
             from_labels=list(t.get("from_labels") or []),
             search=list(t.get("search") or []),
@@ -209,6 +214,14 @@ def _validate(themes: list[Theme], labels: list[Label]) -> None:
         # Un label sans qid est admis s'il porte un terme de recherche : il est
         # en attente de résolution par `suggest-qids`, et sera simplement ignoré
         # par la collecte avec un avertissement.
+    for theme in themes:
+        if theme.kind not in ("nature", "culture"):
+            raise ValueError(
+                f"le thème {theme.id} a un `kind` inconnu : « {theme.kind} » "
+                "(attendu « nature » ou « culture »)"
+            )
+
+    for lbl in labels:
         if not lbl.is_manual and not lbl.qid and not lbl.search:
             raise ValueError(
                 f"le label {lbl.id} n'est pas 'manual' et n'a ni qid ni terme de recherche"

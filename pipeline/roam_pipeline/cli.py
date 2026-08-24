@@ -674,6 +674,23 @@ def _print_stats(places, collections, raw=None, config: Config | None = None) ->
     for theme_id, n in themes.most_common():
         print(f"      {theme_id:<16} : {n}")
 
+    if config is not None:
+        # Roam promet des PAYSAGES autant que du patrimoine. Wikidata documente
+        # bien mieux le bâti que le naturel, et plusieurs mécanismes du pipeline
+        # penchent du même côté sans le dire : sans ce compte, la dérive vers le
+        # culturel resterait invisible jusqu'à ce qu'un utilisateur la remarque.
+        kinds = {theme.id: theme.kind for theme in config.themes}
+        counts = Counter(
+            kinds.get(p.theme_id if hasattr(p, "theme_id") else p["theme_id"], "culture")
+            for p in places
+        )
+        total = sum(counts.values())
+        if total:
+            print("  Nature / culture     : " + " · ".join(
+                f"{label} {counts.get(key, 0)} ({counts.get(key, 0) / total:.0%})"
+                for key, label in (("nature", "nature"), ("culture", "culture"))
+            ))
+
     ouverts = sum(1 for p in places if getattr(p, "visitable", None) is True)
     fermes = sum(1 for p in places if getattr(p, "visitable", None) is False)
     rapproches = sum(1 for p in places if getattr(p, "osm_id", None))

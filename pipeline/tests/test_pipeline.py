@@ -619,6 +619,41 @@ class TestPublicAccessInScore(unittest.TestCase):
         self.assertFalse(rescued(modeste, CONFIG))
 
 
+class TestThemeKind(unittest.TestCase):
+    """Roam promet des paysages autant que du patrimoine."""
+
+    def test_every_theme_declares_its_kind(self):
+        for theme in CONFIG.themes:
+            self.assertIn(theme.kind, ("nature", "culture"), theme.id)
+
+    def test_both_kinds_are_represented(self):
+        kinds = {theme.kind for theme in CONFIG.themes}
+        self.assertEqual(kinds, {"nature", "culture"})
+
+    def test_the_natural_themes_are_the_expected_ones(self):
+        # Nommés un par un : une réaffectation silencieuse fausserait le
+        # décompte que `build` affiche, et donc le jugement porté dessus.
+        nature = {theme.id for theme in CONFIG.themes if theme.kind == "nature"}
+        self.assertEqual(
+            nature,
+            # Les jardins comptent en nature : dessinés de main d'homme, mais
+            # on y va pour le paysage.
+            {"cascades", "gorges", "grottes", "iles", "jardins", "lacs",
+             "plages", "sommets"},
+        )
+
+    def test_an_unknown_kind_is_refused(self):
+        from roam_pipeline.config import Theme, _validate
+
+        bancal = Theme(
+            id="x", name="X", name_singular="X", icon="x", radius_m=100,
+            min_sitelinks=1, fetch_min_sitelinks=1, cap=10,
+            wikidata_classes=["Q1"], kind="paysage",
+        )
+        with self.assertRaises(ValueError):
+            _validate([bancal], [])
+
+
 class TestAccessAndRescue(unittest.TestCase):
     """Deux règles nées de deux lieux précis."""
 
