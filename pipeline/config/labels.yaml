@@ -77,14 +77,14 @@ labels:
     authority: Ministère de la Transition écologique
     score_bonus: 25
     makes_collection: true
-    wikidata_query: { kind: heritage, search: site classé }
+    wikidata_query: { kind: heritage, qid: Q3485446 }   # site classé ✓
 
   - id: site-inscrit
     name: Site inscrit au titre des paysages
     authority: Ministère de la Transition écologique
     score_bonus: 12
     makes_collection: false
-    wikidata_query: { kind: heritage, search: site inscrit }
+    wikidata_query: { kind: heritage, qid: Q2290523 }   # site inscrit ✓
 
   # Label de l'Office national des forêts, attribué à une vingtaine de forêts
   # domaniales : la curation officielle des forêts remarquables.
@@ -93,21 +93,26 @@ labels:
     authority: Office national des forêts
     score_bonus: 15
     makes_collection: true
-    wikidata_query: { kind: heritage, search: forêt d'exception }
+    wikidata_query: { kind: heritage, qid: Q43187359 }   # Forêt d'Exception ✓
 
   - id: reserve-naturelle
     name: Réserve naturelle nationale
     authority: Office français de la biodiversité
     score_bonus: 10
     makes_collection: false
-    wikidata_query: { kind: heritage, search: réserve naturelle nationale }
+    # `instance`, pas `heritage` : une réserve naturelle EST une classe de
+    # lieu, ce n'est pas une désignation apposée sur un lieu par ailleurs
+    # catalogué — même distinction que celle qui a mis « parc-national » en
+    # attente plus bas dans ce fichier.
+    wikidata_query: { kind: instance, qid: Q19656847 }   # réserve naturelle nationale ✓
 
   - id: parc-naturel-regional
     name: Parc naturel régional
     authority: Fédération des parcs naturels régionaux
     score_bonus: 8
     makes_collection: false
-    wikidata_query: { kind: heritage, search: parc naturel régional }
+    # `instance`, pas `heritage` : voir la note sur réserve-naturelle ci-dessus.
+    wikidata_query: { kind: instance, qid: Q1818761 }   # parc naturel régional ✓
 
   # ⚠️ Mis en attente volontairement. La requête prévue (`instance`) ramènerait
   # les parcs eux-mêmes, pas les lieux qui s'y trouvent — or le critère C4 de la

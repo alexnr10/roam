@@ -220,8 +220,7 @@ themes:
     min_sitelinks: 3
     fetch_min_sitelinks: 2
     cap: 40
-    wikidata_classes: []
-    search: [cirque glaciaire, cirque naturel, reculée]
+    wikidata_classes: [Q388227, Q184368, Q664803]   # cirque glaciaire, cirque, reculée
 
   - id: gorges
     name: Gorges et canyons
@@ -268,8 +267,11 @@ themes:
     min_sitelinks: 4
     fetch_min_sitelinks: 2
     cap: 50
-    wikidata_classes: []
-    search: [volcan, puy, cratère volcanique, maar, cheminée volcanique]
+    wikidata_classes: [Q8072, Q109391, Q192503, Q2261752]
+    # volcan, cratère volcanique, maar, cheminée volcanique.
+    # « puy » n'a renvoyé aucune classe exploitable : les puys notables sont
+    # déjà couverts par « volcan » ou par le thème sommets. À ajouter à la
+    # main (data/manual/places.csv) si un puy précis manque.
 
   - id: sommets
     name: Sommets
@@ -292,8 +294,11 @@ themes:
     min_sitelinks: 4
     fetch_min_sitelinks: 2
     cap: 60
-    wikidata_classes: []
-    search: [calanque, cap, pointe côtière, falaise côtière, presqu'île]
+    wikidata_classes: [Q1026259, Q185113, Q6502866, Q2362867]
+    # calanque, cap, falaise côtière, presqu'île.
+    # Q185113 plutôt que Q191992 pour « cap » : doublon Wikidata connu,
+    # Q185113 est la fiche la plus générale et la mieux peuplée.
+    # « pointe côtière » n'a renvoyé aucun résultat.
 
   - id: plages
     name: Littoral et plages
@@ -329,8 +334,11 @@ themes:
     min_sitelinks: 4
     fetch_min_sitelinks: 2
     cap: 40
-    wikidata_classes: []
-    search: [forêt domaniale, forêt remarquable, futaie]
+    wikidata_classes: [Q3079027]   # forêt domaniale
+    # « forêt remarquable » : aucun résultat. « futaie » écarté à dessein :
+    # un type de peuplement forestier très commun, pas un critère de beauté —
+    # même piège que les 289 801 sites OSM du tout début. Le label Forêt
+    # d'Exception (ONF) porte la curation qualitative sur ce thème.
 
   - id: dunes-marais
     name: Dunes et marais
@@ -341,8 +349,9 @@ themes:
     min_sitelinks: 4
     fetch_min_sitelinks: 2
     cap: 40
-    wikidata_classes: []
-    search: [dune, marais salant, marais littoral, étang côtier]
+    wikidata_classes: [Q25391, Q244326, Q55706997, Q135951980]
+    # dune, marais salant, marais maritime (pour « marais littoral »),
+    # étang côtier.
 
   - id: rochers
     name: Rochers et curiosités géologiques
@@ -353,8 +362,11 @@ themes:
     min_sitelinks: 4
     fetch_min_sitelinks: 2
     cap: 50
-    wikidata_classes: []
-    search: [arche naturelle, chaos rocheux, aiguille rocheuse, site géologique remarquable]
+    wikidata_classes: [Q954501]   # arche naturelle
+    # Les trois autres termes (chaos rocheux, aiguille rocheuse, site
+    # géologique remarquable) n'ont renvoyé aucune classe exploitable. Thème
+    # délibérément maigre : le label site-classé et les propositions de la
+    # communauté couvrent le reste plutôt qu'une classe trop large et bruitée.
 
   - id: sources
     name: Sources et résurgences
@@ -365,5 +377,6 @@ themes:
     min_sitelinks: 4
     fetch_min_sitelinks: 2
     cap: 40
-    wikidata_classes: []
-    search: [résurgence, source karstique, exsurgence]
+    wikidata_classes: [Q112269120, Q590992]
+    # résurgence, exsurgence — deux concepts hydrogéologiques distincts,
+    # d'où deux classes plutôt qu'une. « source karstique » recouvre exsurgence.
