@@ -33,7 +33,20 @@ export const mapAvailable = true;
 // par `scripts/sync-maplibre-worker.mjs`, et c'est là qu'on l'envoie chercher.
 // Sans cela le worker répond 404 et la carte reste muette, sans erreur — ni
 // fond de tuiles, ni lieux.
-maplibregl.setWorkerUrl('/maplibre/maplibre-gl-worker.mjs');
+//
+// Une page repliée en un seul fichier n'a pas ce voisin. Elle peut alors
+// fabriquer le worker elle-même et en déposer l'adresse ici : voir
+// `scripts/inline-web-build.mjs`.
+declare global {
+  interface Window {
+    __ROAM_MAPLIBRE_WORKER__?: string;
+  }
+}
+
+maplibregl.setWorkerUrl(
+  (typeof window !== 'undefined' && window.__ROAM_MAPLIBRE_WORKER__) ||
+    '/maplibre/maplibre-gl-worker.mjs',
+);
 
 const SOURCE = 'places';
 

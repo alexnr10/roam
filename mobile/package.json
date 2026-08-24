@@ -11,6 +11,7 @@
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "export:web": "node scripts/sync-maplibre-worker.mjs && EXPO_OFFLINE=1 expo export --platform web --output-dir dist",
+    "preview:single": "npm run export:web && node scripts/inline-web-build.mjs",
     "postinstall": "node scripts/sync-maplibre-worker.mjs"
   },
   "dependencies": {
