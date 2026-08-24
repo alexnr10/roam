@@ -284,22 +284,6 @@ themes:
     cap: 60
     wikidata_classes: [Q8502, Q2231510]              # montagne, col
 
-  # Avant `plages` : une calanque a une plage, mais on y va pour la calanque.
-  - id: littoral
-    name: Littoral remarquable
-    name_singular: Site du littoral
-    icon: falaise
-    kind: nature
-    radius_m: 400
-    min_sitelinks: 4
-    fetch_min_sitelinks: 2
-    cap: 60
-    wikidata_classes: [Q1026259, Q185113, Q6502866, Q2362867]
-    # calanque, cap, falaise côtière, presqu'île.
-    # Q185113 plutôt que Q191992 pour « cap » : doublon Wikidata connu,
-    # Q185113 est la fiche la plus générale et la mieux peuplée.
-    # « pointe côtière » n'a renvoyé aucun résultat.
-
   - id: plages
     name: Littoral et plages
     name_singular: Site
@@ -309,12 +293,16 @@ themes:
     min_sitelinks: 3
     fetch_min_sitelinks: 2
     cap: 60
-    wikidata_classes: [Q40080, Q107679, Q185113, Q191992, Q34763]
-    # plage, falaise, cap, cap (promontoire marin), péninsule
+    wikidata_classes: [Q40080, Q107679, Q185113, Q191992, Q34763, Q1026259, Q6502866]
+    # plage, falaise, cap, cap (promontoire marin), péninsule, calanque,
+    # falaise côtière.
     #
     # Q107679 porte en français le libellé « rempart montagneux », mais sa
     # définition est bien l'escarpement rocheux — c'est la classe d'Étretat.
     # À surveiller en revue : elle ramènera aussi des escarpements de montagne.
+    # Q6502866 « falaise côtière » est la classe précise pour la même idée —
+    # gardée à côté plutôt qu'à sa place, faute de savoir laquelle Wikidata
+    # peuple le mieux sans avoir tourné une vraie collecte.
     #
     # Deux entités « cap » coexistent sur Wikidata, aux définitions presque
     # identiques. Les deux sont retenues : si l'une dérive de l'autre, la
@@ -324,6 +312,15 @@ themes:
     # « promontoire » (Q1245089) écarté : il désigne un éperon rocheux dominant
     # une étendue quelconque, pas une formation littorale. Il aurait rempli le
     # thème d'affleurements de l'intérieur des terres.
+    #
+    # « presqu'île » (Q2362867, « petite péninsule ») délibérément absente :
+    # sous-classe de péninsule (Q34763) déjà retenue ci-dessus — l'ajouter
+    # aurait recréé pour ce couple le doublon qu'on assume déjà pour « cap ».
+    #
+    # Un thème `littoral` a été créé puis fondu ici : je ne m'étais pas
+    # aperçu, en l'ajoutant, que ce thème couvrait déjà exactement le même
+    # terrain sous le nom « Littoral et plages ». `calanque` et
+    # `falaise côtière` sont ce qu'il apportait de réellement neuf.
 
   - id: forets
     name: Forêts remarquables
