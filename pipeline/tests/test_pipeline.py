@@ -655,6 +655,36 @@ class TestThemeKind(unittest.TestCase):
             _validate([bancal], [])
 
 
+class TestStarvedThemes(unittest.TestCase):
+    """Un thème trop maigre pour faire une collection doit se signaler."""
+
+    def test_a_theme_below_the_minimum_is_named_in_the_log(self):
+        from roam_pipeline.collections import build_theme_collections
+
+        # Cinq sources : c'est ce qu'a ramené la vraie collecte, sous le
+        # minimum de huit. Sans avertissement, le thème disparaîtrait sans un
+        # mot et l'onglet resterait vide dans l'application.
+        maigre = [
+            make_place(f"Source {i}", theme_id="sources", wikidata_id=f"Q{i}")
+            for i in range(5)
+        ]
+        with self.assertLogs("roam_pipeline.collections", level="WARNING") as logs:
+            built = build_theme_collections(maigre, CONFIG)
+
+        self.assertEqual([c.slug for c in built], [])
+        self.assertIn("sources 5", "\n".join(logs.output))
+
+    def test_a_theme_with_enough_places_builds_quietly(self):
+        from roam_pipeline.collections import build_theme_collections
+
+        assez = [
+            make_place(f"Volcan {i}", theme_id="volcans", wikidata_id=f"QV{i}")
+            for i in range(CONFIG.collections.min_places)
+        ]
+        built = build_theme_collections(assez, CONFIG)
+        self.assertIn("theme-volcans", [c.slug for c in built])
+
+
 class TestAccessAndRescue(unittest.TestCase):
     """Deux règles nées de deux lieux précis."""
 

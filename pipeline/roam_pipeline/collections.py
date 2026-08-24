@@ -77,6 +77,7 @@ def build_theme_collections(places: list[Place], config: Config) -> list[Collect
         by_theme[place.theme_id].append(place)
 
     out = []
+    starved: list[str] = []
     for theme in config.themes:
         collection = Collection(
             slug=f"theme-{theme.id}",
@@ -84,9 +85,25 @@ def build_theme_collections(places: list[Place], config: Config) -> list[Collect
             kind="theme",
             theme_id=theme.id,
         )
-        built = _finalize(collection, by_theme.get(theme.id, []), config, cap=theme.cap)
+        members = by_theme.get(theme.id, [])
+        built = _finalize(collection, members, config, cap=theme.cap)
         if built:
             out.append(built)
+        else:
+            starved.append(f"{theme.id} {len(members)}")
+
+    if starved:
+        # Un thème déclaré qui ne produit AUCUNE collection nationale disparaît
+        # sinon sans un mot : ses lieux ne survivent qu'au hasard des
+        # collections géographiques, et l'onglet du thème reste vide dans
+        # l'application. C'est le symptôme d'un thème à revoir ou à fusionner,
+        # pas un détail de construction.
+        LOG.warning(
+            "%s thème(s) sans collection nationale, faute d'atteindre %s lieux : %s",
+            len(starved),
+            config.collections.min_places,
+            ", ".join(starved),
+        )
     return out
 
 

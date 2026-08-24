@@ -88,12 +88,19 @@ labels:
 
   # Label de l'Office national des forêts, attribué à une vingtaine de forêts
   # domaniales : la curation officielle des forêts remarquables.
+  #
+  # ⚠️ Le Q-id existe et est correct (verify-qids le confirme), mais la requête
+  # `heritage` (P1435) a ramené ZÉRO membre sur une vraie collecte : les forêts
+  # concernées ne portent pas cette désignation sur Wikidata. Un label qui
+  # renvoie zéro sans lever d'erreur est exactement le bug le plus coûteux de ce
+  # pipeline — il est donc basculé en saisie manuelle, comme les autres labels
+  # sans propriété Wikidata fiable. Une vingtaine de forêts à lister, pas plus.
   - id: foret-exception
     name: Forêt d'Exception
     authority: Office national des forêts
     score_bonus: 15
     makes_collection: true
-    wikidata_query: { kind: heritage, qid: Q43187359 }   # Forêt d'Exception ✓
+    wikidata_query: { kind: manual }
 
   - id: reserve-naturelle
     name: Réserve naturelle nationale
