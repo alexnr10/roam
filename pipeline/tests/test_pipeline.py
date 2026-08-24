@@ -654,6 +654,36 @@ class TestThemeKind(unittest.TestCase):
             _validate([bancal], [])
 
 
+class TestThemeOrder(unittest.TestCase):
+    """Le plus spécifique avant le plus générique, sans exception."""
+
+    # Couples dont la sous-classe est certaine : chaque membre de gauche EST
+    # aussi un membre de droite dans Wikidata, donc le thème de gauche doit
+    # être déclaré en premier, sinon celui de droite lui prend ses lieux.
+    #
+    # Chaque ligne vient d'une régression réelle, pas d'une précaution :
+    # `maisons` après `musees` a coûté neuf lieux sur trente au thème créé
+    # pour Giverny, et `dunes-marais` après `plages` quinze sur dix-sept.
+    PLUS_SPECIFIQUE = [
+        ("maisons", "musees"),        # une maison-musée est un musée
+        ("dunes-marais", "plages"),   # une dune est une formation littorale
+        ("volcans", "sommets"),       # un puy est un sommet
+        ("cirques", "gorges"),        # un cirque est une vallée encaissée
+    ]
+
+    def test_the_more_specific_theme_is_declared_first(self):
+        rang = {theme.id: index for index, theme in enumerate(CONFIG.themes)}
+        for specifique, generique in self.PLUS_SPECIFIQUE:
+            self.assertIn(specifique, rang)
+            self.assertIn(generique, rang)
+            self.assertLess(
+                rang[specifique],
+                rang[generique],
+                f"« {specifique} » doit être déclaré avant « {generique} » : "
+                f"sinon {generique} lui prend ses lieux au dédoublonnage croisé",
+            )
+
+
 class TestNatureFloors(unittest.TestCase):
     """Un paysage n'est pas documenté comme un monument."""
 

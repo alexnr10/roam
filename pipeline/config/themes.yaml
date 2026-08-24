@@ -77,20 +77,11 @@ themes:
     cap: 80
     wikidata_classes: [Q23413, Q751876, Q1785071]   # château fort, château, fort
 
-  - id: musees
-    name: Musées
-    name_singular: Musée
-    icon: museum
-    kind: culture
-    radius_m: 120
-    min_sitelinks: 12
-    fetch_min_sitelinks: 4
-    cap: 50
-    wikidata_classes: [Q33506]                       # musée
-
-  # Trou constaté à la relecture : Giverny, l'auberge Ravoux où mourut Van Gogh
-  # et les maisons d'écrivains n'entraient dans aucun thème. Ce sont pourtant
-  # des lieux pour lesquels on vient du monde entier.
+  # AVANT `musees`, et c'est essentiel : une maison-musée est une
+  # sous-classe de musée. Déclaré après, ce thème perdait Giverny, la
+  # maison de Van Gogh et l'atelier Cézanne au profit de `musees` — neuf
+  # lieux sur trente, et précisément les mieux documentés. Il ne lui
+  # restait que deux lieux, sous le minimum d'une collection.
   - id: maisons
     name: Maisons d'artistes et d'écrivains
     name_singular: Maison
@@ -114,6 +105,20 @@ themes:
     # par identifiant fait le ménage. Sous-inclure ferait rater au thème
     # exactement ce pour quoi il a été créé.
 
+  - id: musees
+    name: Musées
+    name_singular: Musée
+    icon: museum
+    kind: culture
+    radius_m: 120
+    min_sitelinks: 12
+    fetch_min_sitelinks: 4
+    cap: 50
+    wikidata_classes: [Q33506]                       # musée
+
+  # Trou constaté à la relecture : Giverny, l'auberge Ravoux où mourut Van Gogh
+  # et les maisons d'écrivains n'entraient dans aucun thème. Ce sont pourtant
+  # des lieux pour lesquels on vient du monde entier.
   - id: monuments
     name: Monuments et édifices remarquables
     name_singular: Monument
