@@ -6,6 +6,7 @@ Aucune requête réseau — ces tests valident la logique métier, pas Wikidata.
 from __future__ import annotations
 
 import json
+import re
 import sys
 import tempfile
 from contextlib import contextmanager
@@ -1845,6 +1846,61 @@ class TestProbe(unittest.TestCase):
             self.assertEqual(_known_qids(base / "places_raw.json"), {"Q1", "Q2"})
             self.assertEqual(_known_qids(base / "candidates.csv"), {"Q3"})
             self.assertEqual(_known_qids(base / "absent.json"), set())
+
+
+class TestBroadClasses(unittest.TestCase):
+    """Une classe générique, admise seulement très haut.
+
+    La fondation Claude-Monet n'est chez Wikidata qu'une « maison ». Collecter
+    cette classe au plancher du thème ramènerait toutes les maisons de France ;
+    ne pas la collecter laisse dehors la maison de Monet. Le plancher est la
+    sortie — et il ne vaut que s'il est vraiment plus haut.
+    """
+
+    def test_a_broad_class_is_collected_at_its_own_floor(self):
+        maisons = CONFIG.theme("maisons")
+        floors = dict(maisons.collected_classes)
+        self.assertEqual(floors["Q3947"], 8)
+        # Les classes propres du thème gardent le plancher du thème.
+        self.assertEqual(floors["Q2087181"], maisons.fetch_min_sitelinks)
+
+    def test_the_fondation_would_now_be_collected(self):
+        # Onze langues, d'après `probe` : au-dessus du plancher générique.
+        self.assertLessEqual(dict(CONFIG.theme("maisons").collected_classes)["Q3947"], 11)
+
+    def test_a_broad_class_at_the_theme_floor_is_refused(self):
+        # Sans écart, le garde-fou serait décoratif et le thème se noierait.
+        with self.assertRaises(ValueError) as raised:
+            self._load_with(
+                "    broad_classes:\n      - qid: Q3947\n        fetch_min_sitelinks: 2"
+            )
+        self.assertIn("ramènerait tout", str(raised.exception))
+
+    def test_a_broad_class_is_verified_like_any_other(self):
+        # Un Q-id générique erroné ne lèverait rien : il rendrait zéro résultat,
+        # et la maison de Monet manquerait encore.
+        with self.assertRaises(ValueError):
+            self._load_with(
+                "    broad_classes:\n      - qid: 3947\n        fetch_min_sitelinks: 8"
+            )
+
+    @staticmethod
+    def _load_with(block: str):
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            for name in ("themes.yaml", "labels.yaml", "scoring.yaml"):
+                (base / name).write_text(
+                    (CONFIG_DIR / name).read_text(encoding="utf-8"), encoding="utf-8"
+                )
+            themes = (base / "themes.yaml").read_text(encoding="utf-8")
+            # Le bloc réel porte un commentaire en fin de ligne : on le
+            # remplace par sa forme, pas par son texte exact.
+            themes, count = re.subn(
+                r"    broad_classes:\n(?:      .*\n|        .*\n)+", block + "\n", themes
+            )
+            assert count == 1, "bloc `broad_classes` introuvable dans themes.yaml"
+            (base / "themes.yaml").write_text(themes, encoding="utf-8")
+            return load_config(base)
 
 
 if __name__ == "__main__":

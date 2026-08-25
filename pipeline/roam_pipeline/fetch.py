@@ -30,7 +30,7 @@ def fetch_theme(
     """
     by_qid: dict[str, Place] = {}
 
-    if not theme.wikidata_classes and not theme.from_labels:
+    if not theme.collected_classes and not theme.from_labels:
         LOG.warning(
             "thème %s : aucune classe résolue (termes en attente : %s) — ignoré. "
             "Lance `suggest-qids` puis renseigne wikidata_classes.",
@@ -55,10 +55,10 @@ def fetch_theme(
 
     # Une classe à la fois, et par pages : les classes volumineuses (châteaux,
     # abbayes, cathédrales) dépassaient le délai de WDQS en une seule requête.
-    for class_qid in theme.wikidata_classes:
-        LOG.info("thème %s : classe %s", theme.id, class_qid)
-        for row in _paged(client, lambda limit, offset, q=class_qid: wd.theme_query(
-            [q], theme.fetch_min_sitelinks, limit=limit, offset=offset
+    for class_qid, floor in theme.collected_classes:
+        LOG.info("thème %s : classe %s (≥ %s langues)", theme.id, class_qid, floor)
+        for row in _paged(client, lambda limit, offset, q=class_qid, f=floor: wd.theme_query(
+            [q], f, limit=limit, offset=offset
         )):
             place = _row_to_place(row, theme)
             if place is None:

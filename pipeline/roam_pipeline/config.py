@@ -12,6 +12,23 @@ CONFIG_DIR = Path(__file__).resolve().parent.parent / "config"
 
 
 @dataclass(frozen=True)
+class BroadClass:
+    """Classe trop générique pour le plancher du thème, admise plus haut.
+
+    La fondation Claude-Monet n'est, chez Wikidata, qu'une « maison » (Q3947).
+    Collecter cette classe au plancher du thème ramènerait toutes les maisons
+    de France ; ne pas la collecter du tout laisse dehors la maison de Monet.
+
+    Le plancher est la sortie : une classe générique n'est admise qu'au-dessus
+    d'une notoriété qui, à elle seule, prouve qu'on ne parle plus d'un pavillon.
+    C'est le seul filtre dont on dispose quand la classe ne dit rien.
+    """
+
+    qid: str
+    fetch_min_sitelinks: int
+
+
+@dataclass(frozen=True)
 class Theme:
     id: str
     name: str
@@ -36,6 +53,15 @@ class Theme:
     # Termes à résoudre avec `suggest-qids` — présents tant qu'un identifiant
     # reste à confirmer.
     search: list[str] = field(default_factory=list)
+    # Classes génériques, collectées à un plancher qui leur est propre.
+    broad_classes: list[BroadClass] = field(default_factory=list)
+
+    @property
+    def collected_classes(self) -> list[tuple[str, int]]:
+        """`(classe, plancher de collecte)` — tout ce que le thème interroge."""
+        return [(qid, self.fetch_min_sitelinks) for qid in self.wikidata_classes] + [
+            (broad.qid, broad.fetch_min_sitelinks) for broad in self.broad_classes
+        ]
 
 
 @dataclass(frozen=True)
@@ -156,9 +182,16 @@ def load_config(config_dir: Path | None = None) -> Config:
             fetch_min_sitelinks=int(t.get("fetch_min_sitelinks", 3)),
             cap=int(t["cap"]),
             kind=t.get("kind", "culture"),
-            wikidata_classes=list(t.get("wikidata_classes") or []),
+            # `str()` n'est pas cosmétique : YAML lit « 3947 » comme un entier,
+            # et la validation ci-dessous — celle qui dit clairement ce qui ne
+            # va pas — mourait avant d'avoir pu parler.
+            wikidata_classes=[str(q) for q in (t.get("wikidata_classes") or [])],
             from_labels=list(t.get("from_labels") or []),
             search=list(t.get("search") or []),
+            broad_classes=[
+                BroadClass(qid=str(b["qid"]), fetch_min_sitelinks=int(b["fetch_min_sitelinks"]))
+                for b in (t.get("broad_classes") or [])
+            ],
         )
         for t in _read_yaml(d / "themes.yaml")["themes"]
     ]
@@ -195,7 +228,7 @@ def load_config(config_dir: Path | None = None) -> Config:
     raw_themes = _read_yaml(d / "themes.yaml")
     excluded = raw_themes.get("exclude_classes") or {}
     exclusions = Exclusions(
-        qids=list(excluded.get("qids") or []),
+        qids=[str(q) for q in (excluded.get("qids") or [])],
         search=list(excluded.get("search") or []),
     )
 
@@ -222,14 +255,23 @@ def _validate(themes: list[Theme], labels: list[Label],
         # Un thème sans source est admis s'il porte des termes de recherche : il
         # est en attente de résolution par `suggest-qids`, et la collecte
         # l'ignorera bruyamment plutôt que de le taire.
-        if not t.wikidata_classes and not t.from_labels and not t.search:
+        if not t.collected_classes and not t.from_labels and not t.search:
             raise ValueError(f"le thème {t.id} n'a ni classe Wikidata ni label source")
         for label_id in t.from_labels:
             if label_id not in label_ids:
                 raise ValueError(f"le thème {t.id} référence un label inconnu : {label_id}")
-        for qid in t.wikidata_classes:
+        for qid, _floor in t.collected_classes:
             if not qid.startswith("Q") or not qid[1:].isdigit():
                 raise ValueError(f"Q-id invalide dans le thème {t.id} : {qid}")
+        for broad in t.broad_classes:
+            # Une classe générique au plancher du thème n'est plus générique :
+            # elle ramènerait tout, et le garde-fou serait décoratif.
+            if broad.fetch_min_sitelinks <= t.fetch_min_sitelinks:
+                raise ValueError(
+                    f"le thème {t.id} déclare la classe générique {broad.qid} à un plancher "
+                    f"({broad.fetch_min_sitelinks}) qui n'est pas plus haut que le sien "
+                    f"({t.fetch_min_sitelinks}) : elle ramènerait tout"
+                )
 
     seen.clear()
     for lbl in labels:
@@ -252,7 +294,7 @@ def _validate(themes: list[Theme], labels: list[Label],
                 f"le label {lbl.id} n'est pas 'manual' et n'a ni qid ni terme de recherche"
             )
 
-    for qid in (exclusions.qids if exclusions else []):
+    for qid in (str(q) for q in (exclusions.qids if exclusions else [])):
         if not qid.startswith("Q") or not qid[1:].isdigit():
             raise ValueError(f"Q-id invalide dans `exclude_classes` : {qid}")
 
@@ -260,7 +302,7 @@ def _validate(themes: list[Theme], labels: list[Label],
     # le thème serait vidé sans que rien ne le dise.
     banned = set(exclusions.qids if exclusions else [])
     for theme in themes:
-        clash = banned.intersection(theme.wikidata_classes)
+        clash = banned.intersection(qid for qid, _ in theme.collected_classes)
         if clash:
             raise ValueError(
                 f"le thème {theme.id} collecte une classe que `exclude_classes` refuse : "

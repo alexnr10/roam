@@ -123,6 +123,18 @@ themes:
     # maison-musée (le bâtiment), maison-musée d'artiste, maison-musée
     # (l'institution), maison d'écrivain, atelier (le bâtiment), atelier (le lieu)
     #
+    # La fondation Claude-Monet à Giverny — la maison et les jardins de Monet —
+    # n'est, chez Wikidata, qu'une « maison » (Q3947). Aucune des classes
+    # ci-dessus ne la voit, et elle manquait purement et simplement au
+    # catalogue. Collecter Q3947 au plancher du thème ramènerait en revanche
+    # toutes les maisons de France.
+    #
+    # Le plancher est la sortie : à onze langues, on ne parle plus d'un
+    # pavillon. C'est le seul filtre disponible quand la classe ne dit rien.
+    broad_classes:
+      - qid: Q3947            # maison
+        fetch_min_sitelinks: 8
+    #
     # Deux couples portent le même libellé français pour des entités
     # différentes : le BÂTIMENT et l'INSTITUTION d'une part, le LIEU de travail
     # et le BÂTIMENT de l'autre. Impossible de savoir sans vérifier lequel

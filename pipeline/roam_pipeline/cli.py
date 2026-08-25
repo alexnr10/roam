@@ -78,6 +78,10 @@ def cmd_verify_qids(args: argparse.Namespace, config: Config) -> int:
     for theme in config.themes:
         for qid in theme.wikidata_classes:
             qids.setdefault(qid, []).append(f"thème {theme.id}")
+        for broad in theme.broad_classes:
+            qids.setdefault(broad.qid, []).append(
+                f"thème {theme.id}, classe générique ≥ {broad.fetch_min_sitelinks}"
+            )
     for label in config.labels:
         if label.qid:
             qids.setdefault(label.qid, []).append(f"label {label.id}")
@@ -594,7 +598,9 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
 def _theme_of_class(config: Config) -> dict[str, str]:
     """`{Q-id de classe: identifiant de thème}` — quel thème prend quoi."""
     return {
-        qid: theme.id for theme in config.themes for qid in theme.wikidata_classes
+        qid: theme.id
+        for theme in config.themes
+        for qid, _floor in theme.collected_classes
     }
 
 

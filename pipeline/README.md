@@ -417,6 +417,41 @@ Quatre verdicts possibles, et ils n'appellent pas le même remède :
 | aucune classe reconnue | aucun thème ne la collecte | ajouter la classe à un thème — en vérifiant ce qu'elle ramène d'autre |
 | sous le plancher de collecte | écartée par la requête SPARQL elle-même | baisser `fetch_min_sitelinks`, ou liste manuelle |
 
+### Quand la classe ne dit rien : les classes génériques
+
+`probe` a rendu son verdict sur la fondation Claude-Monet : chez Wikidata,
+elle n'est qu'une **maison** (Q3947). Pas une maison-musée, pas un jardin. Onze
+langues, un article francophone, des coordonnées, en France — et pourtant
+invisible, parce qu'aucun thème ne collecte une classe aussi large.
+
+Les deux issues évidentes sont mauvaises. Ne rien faire laisse dehors la maison
+de Monet. Ajouter `maison` aux classes du thème ramène toutes les maisons de
+France.
+
+**Le plancher est la sortie.** Une classe générique se déclare avec un plancher
+de collecte qui lui est propre, plus haut que celui du thème :
+
+```yaml
+  - id: maisons
+    fetch_min_sitelinks: 2
+    wikidata_classes: [Q2087181, ...]     # maison-musée, atelier, …
+    broad_classes:
+      - qid: Q3947                        # maison
+        fetch_min_sitelinks: 8
+```
+
+À onze langues, on ne parle plus d'un pavillon : la notoriété fait à elle seule
+le tri que la classe ne fait pas. C'est le seul filtre disponible quand la
+classe ne dit rien.
+
+Le chargement refuse un plancher générique qui ne serait pas **strictement plus
+haut** que celui du thème — sans écart, le garde-fou serait décoratif et le
+thème se noierait. Ces classes passent par `verify-qids` comme les autres.
+
+> Le bon plancher se calibre sur le volume réel : `fetch --only maisons`
+> journalise le nombre de candidats. Trop haut, on rate des lieux ; trop bas,
+> la revue devient impraticable.
+
 ### Wikidata donne un libellé, pas un titre
 
 Les libellés français de Wikidata ne sont pas capitalisés de façon fiable :
