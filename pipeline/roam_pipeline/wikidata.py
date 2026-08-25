@@ -271,8 +271,8 @@ SELECT ?item ?dissolved ?elevation WHERE {{
 """
 
 
-def excluded_classes_query(item_qids: list[str], class_qids: list[str]) -> str:
-    """Parmi ces lieux, lesquels relèvent d'une classe disqualifiante ?
+def class_ancestry_query(item_qids: list[str], class_qids: list[str]) -> str:
+    """Parmi ces lieux, lesquels descendent de l'une de ces classes ?
 
     Requête BORNÉE par `VALUES`, sur le même modèle que `admin_codes_query` :
     c'est ce qui la rend rapide. Poser le filtre dans `theme_query` aurait
@@ -291,6 +291,32 @@ SELECT DISTINCT ?item ?class ?classLabel WHERE {{
   VALUES ?item {{ {items} }}
   VALUES ?class {{ {classes} }}
   ?item wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* ?class .
+  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+}}
+"""
+
+
+def probe_query(qids: list[str]) -> str:
+    """Tout ce qui décide du sort d'une entité, sans aucun filtre.
+
+    L'inverse exact de `theme_query` : celle-ci n'exige rien — ni pays, ni
+    coordonnées, ni notoriété — et rapporte justement ce qui manque. C'est ce
+    qui permet de répondre à « pourquoi ce lieu emblématique n'est-il nulle
+    part ? », question à laquelle `explain` ne peut pas répondre puisqu'il ne
+    connaît que ce qui a déjà été collecté.
+    """
+    values = " ".join(f"wd:{q}" for q in qids)
+    return f"""
+SELECT ?item ?itemLabel ?itemDescription ?country ?countryLabel ?coord
+       ?sitelinks ?frwiki ?class ?classLabel ?adminLabel
+WHERE {{
+  VALUES ?item {{ {values} }}
+  OPTIONAL {{ ?item wdt:{P_COUNTRY} ?country. }}
+  OPTIONAL {{ ?item wdt:{P_COORDINATE} ?coord. }}
+  OPTIONAL {{ ?item wikibase:sitelinks ?sitelinks. }}
+  OPTIONAL {{ ?item wdt:{P_INSTANCE_OF} ?class. }}
+  OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY} ?admin. }}
+  OPTIONAL {{ ?frwiki schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> . }}
   SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
 }}
 """

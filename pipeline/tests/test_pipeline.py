@@ -5,6 +5,7 @@ Aucune requête réseau — ces tests valident la logique métier, pas Wikidata.
 
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 from contextlib import contextmanager
@@ -31,8 +32,9 @@ from roam_pipeline.models import Place, display_name, slugify
 from roam_pipeline import outlines
 from roam_pipeline.fetch import enrich_departements
 from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from_insee
+from roam_pipeline.cli import _known_qids, _probe_verdict
 from roam_pipeline.wikipedia import title_from_url
-from roam_pipeline.wikidata import excluded_classes_query
+from roam_pipeline.wikidata import class_ancestry_query, probe_query
 from roam_pipeline.review import DECISIONS, apply_names, read_names, write_names
 
 
@@ -1730,7 +1732,7 @@ class TestClassExclusion(unittest.TestCase):
     def test_the_query_binds_both_sides(self):
         # Bornée par `VALUES` des deux côtés : c'est ce qui la rend tenable là
         # où le même chemin transitif posé dans `theme_query` expirait.
-        sparql = excluded_classes_query(["Q10", "Q11"], ["Q20"])
+        sparql = class_ancestry_query(["Q10", "Q11"], ["Q20"])
         self.assertIn("VALUES ?item { wd:Q10 wd:Q11 }", sparql)
         self.assertIn("VALUES ?class { wd:Q20 }", sparql)
         self.assertIn("wdt:P31/wdt:P279* ?class", sparql)
@@ -1753,6 +1755,96 @@ class TestClassExclusion(unittest.TestCase):
             with self.assertRaises(ValueError) as raised:
                 load_config(base)
         self.assertIn("exclude_classes", str(raised.exception))
+
+
+class TestProbe(unittest.TestCase):
+    """Pourquoi un lieu emblématique n'a-t-il jamais été collecté ?
+
+    C'est le défaut le plus grave possible et le plus discret : une clause non
+    remplie de `theme_query` ne lève rien, elle retire l'entité du résultat.
+    Rien, nulle part, ne dit qu'un lieu manque.
+    """
+
+    @staticmethod
+    def _entry(**over):
+        base = {
+            "label": "Fondation Claude Monet",
+            "description": "maison et jardins",
+            "country": "France",
+            "country_qid": "Q142",
+            "coord": "Point(1.53 49.07)",
+            "sitelinks": 12,
+            "frwiki": "https://fr.wikipedia.org/wiki/x",
+            "admin": "Giverny",
+            "classes": {},
+        }
+        base.update(over)
+        return base
+
+    def test_a_missing_country_is_named_first(self):
+        # `theme_query` exige P17 = France. Sans elle, aucun thème ne peut voir
+        # l'entité — et c'est invisible depuis le catalogue.
+        lines = _probe_verdict(self._entry(country="", country_qid=""), ["maisons"], CONFIG, False)
+        self.assertIn("pays", lines[0])
+        self.assertTrue(any("manual/places.csv" in line for line in lines))
+
+    def test_a_foreign_country_blocks_too(self):
+        lines = _probe_verdict(
+            self._entry(country="Belgique", country_qid="Q31"), ["chateaux"], CONFIG, False
+        )
+        self.assertIn("pays", lines[0])
+
+    def test_missing_coordinates_are_named(self):
+        lines = _probe_verdict(self._entry(coord=""), ["maisons"], CONFIG, False)
+        self.assertIn("coordonnée", lines[0])
+
+    def test_an_unrecognised_class_is_named(self):
+        lines = _probe_verdict(self._entry(), [], CONFIG, False)
+        self.assertIn("classe", lines[0])
+
+    def test_the_collection_floor_is_named_with_its_value(self):
+        # Le plancher de COLLECTE, pas l'éditorial : le premier écarte avant
+        # que le lieu n'existe, le second se règle sans recollecter.
+        floor = CONFIG.theme("musees").fetch_min_sitelinks
+        lines = _probe_verdict(self._entry(sitelinks=floor - 1), ["musees"], CONFIG, False)
+        self.assertIn("COLLECTE", lines[0])
+        self.assertIn(str(floor), lines[0])
+
+    def test_one_permissive_theme_is_enough(self):
+        # Sous le plancher d'un thème mais pas de l'autre : la collecte la voit.
+        lines = _probe_verdict(self._entry(sitelinks=3), ["musees", "maisons"], CONFIG, False)
+        self.assertNotIn("COLLECTE", lines[0])
+
+    def test_nothing_blocking_and_absent_means_refetch(self):
+        lines = _probe_verdict(self._entry(), ["maisons"], CONFIG, False)
+        self.assertIn("fetch --only maisons", lines[0])
+
+    def test_already_collected_hands_over_to_explain(self):
+        # `probe` répond sur la collecte, `explain` sur la construction : se
+        # tromper d'outil fait chercher le défaut au mauvais endroit.
+        lines = _probe_verdict(self._entry(), ["maisons"], CONFIG, True)
+        self.assertIn("explain", lines[0])
+
+    def test_the_query_demands_nothing(self):
+        # L'inverse exact de `theme_query` : tout y est optionnel, puisque
+        # c'est justement ce qui manque qu'on vient chercher.
+        sparql = probe_query(["Q1"])
+        for demanded in ("P17", "P625", "sitelinks", "P31"):
+            self.assertIn(demanded, sparql)
+        self.assertEqual(sparql.count("OPTIONAL"), 6)
+
+    def test_known_qids_reads_both_formats(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            (base / "places_raw.json").write_text(
+                json.dumps([{"wikidata_id": "Q1"}, {"wikidata_id": "Q2"}]), encoding="utf-8"
+            )
+            (base / "candidates.csv").write_text(
+                "# commentaire\nwikidata_id,name\nQ3,Marineland\n", encoding="utf-8"
+            )
+            self.assertEqual(_known_qids(base / "places_raw.json"), {"Q1", "Q2"})
+            self.assertEqual(_known_qids(base / "candidates.csv"), {"Q3"})
+            self.assertEqual(_known_qids(base / "absent.json"), set())
 
 
 if __name__ == "__main__":

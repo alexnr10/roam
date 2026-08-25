@@ -377,6 +377,46 @@ plancher applicable et la décision enregistrée — puis **l'étape exacte** qu
 ou les collections dans lesquelles il est entré. Un nom introuvable est une réponse aussi :
 ni Wikidata ni OpenStreetMap ne l'ont signalé.
 
+### Et pourquoi ce lieu n'est-il NULLE PART ?
+
+`explain` ne connaît que ce qui a été collecté. Il est donc muet sur le défaut
+le plus grave possible : un lieu emblématique qui n'est jamais entré. La
+Fondation Claude Monet à Giverny en est l'exemple — `explain monet` renvoyait
+le musée Marmottan, le musée des impressionnismes voisin et deux homonymes,
+mais pas la maison de Monet.
+
+Rien ne signale une telle absence. Chaque clause de `theme_query` — pays,
+coordonnées, classe, notoriété — ne lève aucune erreur quand elle n'est pas
+remplie : elle retire simplement l'entité du résultat, sans laisser de trace.
+
+```bash
+python -m roam_pipeline probe "maison de Claude Monet" "jardins de Giverny"
+python -m roam_pipeline probe Q1244161
+```
+
+La requête est l'inverse exact de `theme_query` : elle n'exige **rien**, et
+rapporte justement ce qui manque.
+
+```
+Fondation Claude Monet  (Q1244161)
+  pays : France · commune : Giverny
+  coordonnées : Point(1.53 49.07)
+  langues : 12 · article francophone : oui
+  classes déclarées : maison-musée (Q2087181), jardin (Q1107656)
+  thème(s) qui la reconnaissent : maisons, jardins
+  déjà collectée : NON · proposée par OpenStreetMap : oui
+  Rien ne s'y oppose côté Wikidata : relance `fetch --only maisons,jardins`.
+```
+
+Quatre verdicts possibles, et ils n'appellent pas le même remède :
+
+| Verdict | Ce qui s'est passé | Remède |
+|---|---|---|
+| pas de `pays = France` | invisible à **toutes** les requêtes de thème | `data/manual/places.csv` |
+| pas de coordonnées | ni carte ni validation GPS possibles | `data/manual/places.csv` |
+| aucune classe reconnue | aucun thème ne la collecte | ajouter la classe à un thème — en vérifiant ce qu'elle ramène d'autre |
+| sous le plancher de collecte | écartée par la requête SPARQL elle-même | baisser `fetch_min_sitelinks`, ou liste manuelle |
+
 ### Wikidata donne un libellé, pas un titre
 
 Les libellés français de Wikidata ne sont pas capitalisés de façon fiable :

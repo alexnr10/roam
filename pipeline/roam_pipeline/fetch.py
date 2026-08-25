@@ -615,7 +615,7 @@ def enrich_exclusions(
     marked = 0
     for batch in wd.chunked(sorted(by_qid), 200):
         try:
-            rows = client.query(wd.excluded_classes_query(batch, class_qids))
+            rows = client.query(wd.class_ancestry_query(batch, class_qids))
         except Exception as exc:
             LOG.error("exclusions : lot échoué (%s)", exc)
             continue

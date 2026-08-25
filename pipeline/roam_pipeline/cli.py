@@ -9,6 +9,7 @@ import logging
 import sys
 import unicodedata
 from collections import Counter, defaultdict
+from typing import Any
 from pathlib import Path
 
 from . import wikidata as wd
@@ -590,6 +591,187 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
     return _build_and_write(args, config)
 
 
+def _theme_of_class(config: Config) -> dict[str, str]:
+    """`{Q-id de classe: identifiant de thème}` — quel thème prend quoi."""
+    return {
+        qid: theme.id for theme in config.themes for qid in theme.wikidata_classes
+    }
+
+
+def cmd_probe(args: argparse.Namespace, config: Config) -> int:
+    """Pourquoi ce lieu n'a-t-il JAMAIS été collecté ?
+
+    `explain` répond pour ce que le pipeline connaît. Il est muet sur ce qui
+    n'est jamais entré — or c'est le défaut le plus grave possible : un lieu
+    emblématique absent ne se signale nulle part, et rien dans le catalogue ne
+    dit qu'il manque.
+
+    Cette commande interroge donc Wikidata SANS AUCUN FILTRE et rapporte ce qui
+    manque : pas de pays, pas de coordonnées, une classe qu'aucun thème ne
+    collecte, une notoriété sous le plancher de collecte.
+    """
+    client = wd.SparqlClient()
+
+    qids = [t.strip() for t in args.terms if t.strip().startswith("Q") and t.strip()[1:].isdigit()]
+    words = [t for t in args.terms if t.strip() not in qids]
+    for term in words:
+        print(f"Recherche « {term} »…")
+        try:
+            hits = client.search(term, limit=args.limit)
+        except Exception as exc:
+            print(f"    recherche impossible : {exc}", file=sys.stderr)
+            continue
+        for hit in hits:
+            print(f"    {hit['id']:<11} {hit['label']:<36} {(hit['description'] or '')[:56]}")
+            qids.append(hit["id"])
+    if not qids:
+        print("Aucune entité à sonder.", file=sys.stderr)
+        return 1
+
+    qids = list(dict.fromkeys(qids))
+    rows = client.query(wd.probe_query(qids))
+
+    # Une entité peut avoir plusieurs classes : une ligne par classe.
+    facts: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        qid = wd.qid_from_uri(row.get("item"))
+        if not qid:
+            continue
+        entry = facts.setdefault(qid, {"classes": {}})
+        entry.setdefault("label", row.get("itemLabel") or "")
+        entry.setdefault("description", row.get("itemDescription") or "")
+        entry.setdefault("country", row.get("countryLabel") or "")
+        # Le Q-id plutôt que le libellé : c'est lui que `theme_query` compare,
+        # et un libellé retombé en anglais ferait mentir le verdict.
+        entry.setdefault("country_qid", wd.qid_from_uri(row.get("country")) or "")
+        entry.setdefault("coord", row.get("coord") or "")
+        entry.setdefault("sitelinks", int(row.get("sitelinks") or 0))
+        entry.setdefault("frwiki", row.get("frwiki") or "")
+        entry.setdefault("admin", row.get("adminLabel") or "")
+        class_qid = wd.qid_from_uri(row.get("class"))
+        if class_qid:
+            entry["classes"][class_qid] = row.get("classLabel") or class_qid
+
+    # De quelles classes CONFIGURÉES l'entité descend-elle ? La question n'est
+    # pas « quelle est sa classe » mais « un thème la reconnaît-il », et la
+    # réponse passe par la hiérarchie des sous-classes.
+    owner = _theme_of_class(config)
+    inherited: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    if owner:
+        for row in client.query(wd.class_ancestry_query(qids, sorted(owner))):
+            qid = wd.qid_from_uri(row.get("item"))
+            ancestor = wd.qid_from_uri(row.get("class"))
+            if qid and ancestor:
+                inherited[qid].append((ancestor, row.get("classLabel") or ancestor))
+
+    collected = _known_qids(args.out / "places_raw.json")
+    proposed = _known_qids(args.out / "candidates.csv")
+
+    for qid in qids:
+        entry = facts.get(qid)
+        print()
+        if not entry:
+            print(f"{qid} : introuvable sur Wikidata.")
+            continue
+
+        print(f"{entry['label']}  ({qid})")
+        if entry["description"]:
+            print(f"  {entry['description']}")
+        print(f"  pays : {entry['country'] or '— AUCUN —'}"
+              + (f" · commune : {entry['admin']}" if entry["admin"] else ""))
+        print(f"  coordonnées : {entry['coord'] or '— AUCUNE —'}")
+        print(f"  langues : {entry['sitelinks']}"
+              f" · article francophone : {'oui' if entry['frwiki'] else 'non'}")
+        classes = ", ".join(f"{name} ({q})" for q, name in sorted(entry["classes"].items()))
+        print(f"  classes déclarées : {classes or '— aucune —'}")
+
+        themes = sorted({owner[a] for a, _ in inherited.get(qid, []) if a in owner})
+        if themes:
+            via = ", ".join(f"{name}" for _, name in sorted(set(inherited[qid]), key=lambda x: x[1]))
+            print(f"  thème(s) qui la reconnaissent : {', '.join(themes)}  (via {via})")
+        else:
+            print("  thème(s) qui la reconnaissent : AUCUN")
+
+        print(f"  déjà collectée : {'oui' if qid in collected else 'NON'}"
+              f" · proposée par OpenStreetMap : {'oui' if qid in proposed else 'non'}")
+
+        for line in _probe_verdict(entry, themes, config, qid in collected):
+            print(f"  {line}")
+
+    return 0
+
+
+def _known_qids(path: Path) -> set[str]:
+    """Q-ids présents dans un fichier de sortie, quel que soit son format."""
+    if not path.exists():
+        return set()
+    if path.suffix == ".json":
+        return {row.get("wikidata_id", "") for row in json.loads(path.read_text(encoding="utf-8"))}
+    return {
+        (row.get("wikidata_id") or "").strip()
+        for row in csv.DictReader(
+            line
+            for line in path.read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        )
+    }
+
+
+def _probe_verdict(
+    entry: dict[str, Any], themes: list[str], config: Config, collected: bool
+) -> list[str]:
+    """Ce qui empêche la collecte, et par quoi y remédier.
+
+    Chaque condition correspond à une clause de `theme_query`. Une clause non
+    remplie n'y produit aucune erreur : elle retire simplement l'entité du
+    résultat, sans laisser de trace. C'est cette absence de trace qu'on répare
+    ici.
+    """
+    manual = "  Remède : l'inscrire dans `data/manual/places.csv` — les lieux "
+    out: list[str] = []
+
+    if entry.get("country_qid") != wd.Q_FRANCE:
+        out.append("⚠ pas de propriété « pays » = France : INVISIBLE à toutes les "
+                   "requêtes de thème, qui l'exigent pour borner la collecte.")
+        out.append(manual + "manuels échappent à toute la chaîne de collecte.")
+        return out
+
+    if not entry["coord"]:
+        out.append("⚠ aucune coordonnée : un lieu sans point ne peut ni se placer "
+                   "sur la carte ni se valider au GPS.")
+        out.append(manual + "manuels portent alors leurs coordonnées à la main.")
+        return out
+
+    if not themes:
+        out.append("⚠ aucune classe reconnue par un thème : la collecte ne peut pas "
+                   "la voir. Ajouter l'une de ses classes à un thème de "
+                   "`themes.yaml` la ramènerait — avec tout ce qui partage cette "
+                   "classe, ce qui se vérifie avant.")
+        out.append(manual + "manuels imposent leur thème.")
+        return out
+
+    floors = [
+        (theme_id, config.theme(theme_id).fetch_min_sitelinks, config.theme(theme_id).min_sitelinks)
+        for theme_id in themes
+    ]
+    blocked = [t for t, fetch, _ in floors if entry["sitelinks"] < fetch]
+    if blocked and len(blocked) == len(floors):
+        detail = ", ".join(f"{t} ≥ {fetch}" for t, fetch, _ in floors)
+        out.append(f"⚠ {entry['sitelinks']} langues, sous le plancher de COLLECTE "
+                   f"({detail}) : la requête l'écarte avant même le catalogue.")
+        return out
+
+    if not collected:
+        out.append("Rien ne s'y oppose côté Wikidata : elle devrait être collectée. "
+                   "Relance `fetch --only " + ",".join(themes) + "`.")
+        return out
+
+    editorial = ", ".join(f"{t} ≥ {floor}" for t, _, floor in floors)
+    out.append(f"Collectée. Le sort se joue donc à la construction — plancher "
+               f"éditorial {editorial} : `explain` le dira.")
+    return out
+
+
 def cmd_rename(args: argparse.Namespace, config: Config) -> int:
     """Choisit le nom d'affichage d'un lieu, durablement.
 
@@ -995,6 +1177,13 @@ def build_parser() -> argparse.ArgumentParser:
     review.add_argument("--review", type=Path, help="chemin de review.csv")
     add_decision_args(review)
 
+    probe = sub.add_parser(
+        "probe",
+        help="pourquoi un lieu n'a-t-il jamais été collecté ? (réseau requis)",
+    )
+    probe.add_argument("terms", nargs="+", help="Q-ids, ou termes à chercher")
+    probe.add_argument("--limit", type=int, default=4, help="candidats par terme")
+
     rename = sub.add_parser(
         "rename", help="choisit le nom d'affichage d'un lieu (durable)"
     )
@@ -1053,6 +1242,7 @@ def main(argv: list[str] | None = None) -> int:
         "apply-review": cmd_apply_review,
         "stats": cmd_stats,
         "review": cmd_review,
+        "probe": cmd_probe,
         "rename": cmd_rename,
         "export-app": cmd_export_app,
         "export-outlines": cmd_export_outlines,
