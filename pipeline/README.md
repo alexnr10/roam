@@ -452,6 +452,26 @@ thème se noierait. Ces classes passent par `verify-qids` comme les autres.
 > journalise le nombre de candidats. Trop haut, on rate des lieux ; trop bas,
 > la revue devient impraticable.
 
+### Un Q-id listé qui ne rend rien : trois causes, trois gestes
+
+Les listes tenues à la main — ajouts du curateur, candidats adoptés depuis
+OpenStreetMap — sont récupérées par `items_query`, qui **exige des
+coordonnées**. Une entité qui n'en a pas n'y produit aucune ligne : exactement
+comme une entité supprimée.
+
+Les deux tombaient sous le même message, « introuvable sur Wikidata ». Or ils
+n'appellent pas du tout le même geste :
+
+| Cause | Ce que c'est | Geste |
+|---|---|---|
+| **absent** | identifiant supprimé ou redirigé | retirer la ligne de la liste |
+| **sans coordonnées** | un lieu bien réel, que Wikidata ne situe pas | l'inscrire dans `data/manual/places.csv` avec ses coordonnées |
+| **sans libellé** | entité sans nom exploitable | rien à en tirer |
+| **inexpliqué** | tout est là et rien n'est rendu | à signaler, c'est un défaut du pipeline |
+
+Le diagnostic passe par `probe_query`, qui n'exige rien, et le nom du lieu
+accompagne chaque ligne : un Q-id nu n'aide personne à décider.
+
 ### Wikidata donne un libellé, pas un titre
 
 Les libellés français de Wikidata ne sont pas capitalisés de façon fiable :

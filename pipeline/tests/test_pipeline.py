@@ -31,7 +31,7 @@ from roam_pipeline.export import _sql_str, write_seed_sql
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
 from roam_pipeline.models import Place, display_name, slugify
 from roam_pipeline import outlines
-from roam_pipeline.fetch import enrich_departements
+from roam_pipeline.fetch import REMEDIES, diagnose_missing, enrich_departements
 from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from_insee
 from roam_pipeline.cli import _known_qids, _probe_verdict
 from roam_pipeline.wikipedia import title_from_url
@@ -1901,6 +1901,55 @@ class TestBroadClasses(unittest.TestCase):
             assert count == 1, "bloc `broad_classes` introuvable dans themes.yaml"
             (base / "themes.yaml").write_text(themes, encoding="utf-8")
             return load_config(base)
+
+
+class TestMissingDiagnosis(unittest.TestCase):
+    """« Introuvable sur Wikidata » disait deux choses très différentes.
+
+    `items_query` exige des coordonnées : une entité qui n'en a pas n'y rend
+    aucune ligne, comme une entité supprimée. Les deux tombaient sous le même
+    message, alors que l'un est un identifiant mort à retirer et l'autre un
+    lieu bien réel qu'on perd en silence — le défaut même qui a fait manquer
+    Giverny.
+    """
+
+    @staticmethod
+    def _row(qid, label="", coord=""):
+        return {
+            "item": f"http://www.wikidata.org/entity/{qid}",
+            "itemLabel": label,
+            "coord": coord,
+        }
+
+    def test_a_deleted_id_is_told_apart_from_a_real_place(self):
+        causes = diagnose_missing(
+            [self._row("Q1", "Maison de Monet")], {"Q1", "Q2"}
+        )
+        self.assertEqual(causes["absent"], ["Q2"])
+        self.assertEqual(causes["sans coordonnées"], ["Maison de Monet (Q1)"])
+
+    def test_the_name_travels_with_the_diagnosis(self):
+        # Un Q-id nu n'aide personne : le geste à faire dépend du lieu que
+        # c'est, et on ne va pas le chercher sur Wikidata pour douze lignes.
+        causes = diagnose_missing([self._row("Q1", "Château de X")], {"Q1"})
+        self.assertIn("Château de X", causes["sans coordonnées"][0])
+
+    def test_an_unlabelled_entity_has_its_own_cause(self):
+        causes = diagnose_missing([self._row("Q1", "Q1", "Point(1 2)")], {"Q1"})
+        self.assertEqual(causes["sans libellé"], ["Q1"])
+
+    def test_a_complete_entity_that_returned_nothing_is_flagged(self):
+        # Ni supprimée, ni sans coordonnées, ni sans nom : quelque chose
+        # d'autre cloche, et le taire serait revenir au point de départ.
+        causes = diagnose_missing([self._row("Q1", "Truc", "Point(1 2)")], {"Q1"})
+        self.assertEqual(causes["inexpliqué"], ["Truc (Q1)"])
+
+    def test_nothing_missing_says_nothing(self):
+        self.assertEqual(diagnose_missing([], set()), {})
+
+    def test_every_cause_carries_a_remedy(self):
+        for cause in ("absent", "sans coordonnées", "sans libellé", "inexpliqué"):
+            self.assertIn(cause, REMEDIES)
 
 
 if __name__ == "__main__":

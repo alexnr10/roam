@@ -209,8 +209,71 @@ def fetch_listed_places(
 
     missing = set(wanted) - {p.wikidata_id for p in places}
     if missing:
-        LOG.warning("introuvables sur Wikidata : %s", ", ".join(sorted(missing)))
+        report_missing(client, missing)
     return places
+
+
+def diagnose_missing(rows: list[dict[str, str]], missing: set[str]) -> dict[str, list[str]]:
+    """Range les Q-ids sans résultat par CAUSE, avec leur nom quand il existe.
+
+    `items_query` exige des coordonnées. Une entité qui n'en a pas n'y produit
+    donc aucune ligne — exactement comme une entité supprimée. Les deux
+    tombaient sous le même message, « introuvable sur Wikidata », alors qu'ils
+    n'appellent pas du tout le même geste : l'un est un identifiant mort à
+    retirer de la liste, l'autre est un lieu bien réel qu'on perd en silence.
+    """
+    seen: dict[str, dict[str, str]] = {}
+    for row in rows:
+        qid = wd.qid_from_uri(row.get("item"))
+        if not qid:
+            continue
+        entry = seen.setdefault(qid, {"label": "", "coord": ""})
+        entry["label"] = entry["label"] or (row.get("itemLabel") or "")
+        entry["coord"] = entry["coord"] or (row.get("coord") or "")
+
+    causes: dict[str, list[str]] = {"absent": [], "sans coordonnées": [], "sans libellé": []}
+    for qid in sorted(missing):
+        entry = seen.get(qid)
+        if entry is None:
+            causes["absent"].append(qid)
+        elif not entry["coord"]:
+            causes["sans coordonnées"].append(f"{entry['label'] or qid} ({qid})")
+        elif not entry["label"] or entry["label"] == qid:
+            causes["sans libellé"].append(qid)
+        else:
+            # Ni l'un ni l'autre : l'entité a tout, et n'a pourtant rien rendu.
+            causes.setdefault("inexpliqué", []).append(f"{entry['label']} ({qid})")
+    return {cause: items for cause, items in causes.items() if items}
+
+
+REMEDIES = {
+    "absent": "identifiants morts (supprimés ou redirigés) — à retirer de la liste",
+    "sans coordonnées": "EXISTENT mais sans coordonnées sur Wikidata — lieux réels, perdus ici",
+    "sans libellé": "sans libellé exploitable",
+    "inexpliqué": "rien ne les explique — à signaler",
+}
+
+
+def report_missing(client: wd.SparqlClient, missing: set[str]) -> None:
+    rows: list[dict[str, str]] = []
+    try:
+        for batch in wd.chunked(sorted(missing), 150):
+            rows.extend(client.query(wd.probe_query(batch)))
+    except Exception as exc:
+        LOG.warning(
+            "%s Q-ids listés sans résultat, diagnostic impossible (%s) : %s",
+            len(missing), exc, ", ".join(sorted(missing)),
+        )
+        return
+
+    for cause, items in diagnose_missing(rows, missing).items():
+        LOG.warning(
+            "%s Q-ids %s : %s%s",
+            len(items),
+            REMEDIES.get(cause, cause),
+            ", ".join(items[:12]),
+            f" (+{len(items) - 12})" if len(items) > 12 else "",
+        )
 
 
 def fetch_manual_places(
