@@ -6,6 +6,7 @@ import argparse
 import csv
 import json
 import logging
+import math
 import sys
 import unicodedata
 from collections import Counter, defaultdict
@@ -25,6 +26,7 @@ from .export import (
 )
 from .fetch import (
     enrich_exclusions,
+    enrich_visitors,
     enrich_article_sizes,
     enrich_communes,
     enrich_departements,
@@ -87,6 +89,8 @@ def cmd_verify_qids(args: argparse.Namespace, config: Config) -> int:
             qids.setdefault(label.qid, []).append(f"label {label.id}")
     for qid in config.exclusions.qids:
         qids.setdefault(qid, []).append("exclusion")
+    if config.visitors.property_id:
+        qids.setdefault(config.visitors.property_id, []).append("fréquentation")
 
     client = wd.SparqlClient()
     resolved: dict[str, tuple[str, str]] = {}
@@ -97,7 +101,7 @@ def cmd_verify_qids(args: argparse.Namespace, config: Config) -> int:
                 resolved[qid] = (row.get("itemLabel", ""), row.get("itemDescription", ""))
 
     problems = 0
-    for qid in sorted(qids, key=lambda q: int(q[1:])):
+    for qid in sorted(qids, key=lambda q: (q[0], int(q[1:]))):
         label, description = resolved.get(qid, ("", ""))
         used_by = ", ".join(qids[qid])
         if not label or label == qid:
@@ -109,8 +113,9 @@ def cmd_verify_qids(args: argparse.Namespace, config: Config) -> int:
     pending = _pending_terms(config)
     if pending:
         print("\nEn attente de résolution :")
-        for owner, term in pending:
-            print(f"  ? {term:<38} ({owner})")
+        for owner, term, kind in pending:
+            marque = "propriété" if kind == "property" else "entité"
+            print(f"  ? {term:<38} ({owner}, {marque})")
 
     print(f"\n{len(qids)} Q-ids vérifiés, {problems} introuvable(s), "
           f"{len(pending)} terme(s) à résoudre.")
@@ -119,17 +124,23 @@ def cmd_verify_qids(args: argparse.Namespace, config: Config) -> int:
     return 1 if problems else 0
 
 
-def _pending_terms(config: Config) -> list[tuple[str, str]]:
-    """Termes déclarés dans la configuration mais pas encore résolus en Q-id."""
-    pending: list[tuple[str, str]] = []
+def _pending_terms(config: Config) -> list[tuple[str, str, str]]:
+    """Termes déclarés dans la configuration mais pas encore résolus.
+
+    Le troisième champ dit ce qu'on cherche — une entité ou une propriété. Une
+    propriété cherchée parmi les entités ne rend rien, en silence.
+    """
+    pending: list[tuple[str, str, str]] = []
     for theme in config.themes:
         for term in theme.search:
-            pending.append((f"thème {theme.id}", term))
+            pending.append((f"thème {theme.id}", term, "item"))
     for label in config.labels:
         if not label.is_manual and not label.qid and label.search:
-            pending.append((f"label {label.id}", label.search))
+            pending.append((f"label {label.id}", label.search, "item"))
     for term in config.exclusions.search:
-        pending.append(("exclusion", term))
+        pending.append(("exclusion", term, "item"))
+    if config.visitors.search and not config.visitors.property_id:
+        pending.append(("fréquentation", config.visitors.search, "property"))
     return pending
 
 
@@ -140,16 +151,17 @@ def cmd_suggest_qids(args: argparse.Namespace, config: Config) -> int:
     exception, elle fait rater un thème en silence. On part donc toujours du
     libellé, et on choisit parmi ce que Wikidata renvoie réellement.
     """
-    terms = [("recherche", term) for term in args.terms] or _pending_terms(config)
+    kind = "property" if args.property else "item"
+    terms = [("recherche", term, kind) for term in args.terms] or _pending_terms(config)
     if not terms:
         print("Aucun terme en attente : la configuration est complète.")
         return 0
 
     client = wd.SparqlClient()
-    for owner, term in terms:
+    for owner, term, term_kind in terms:
         print(f"\n« {term} »  →  {owner}")
         try:
-            hits = client.search(term, limit=args.limit)
+            hits = client.search(term, limit=args.limit, kind=term_kind)
         except Exception as exc:
             print(f"    recherche impossible : {exc}")
             continue
@@ -194,6 +206,7 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     # construction : ajouter une classe à la liste ne demande donc pas de
     # recollecter, juste de rejouer `enrich` puis `build`.
     enrich_exclusions(client, places, config.exclusions.qids)
+    enrich_visitors(client, places, config.visitors.property_id)
     enrich_departements(places)
     # Après le département : la commune fait autorité sur lui, et la corrige au
     # passage quand Wikidata l'avait mal rattaché.
@@ -541,6 +554,9 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
         print(f"  décision enregistrée : {decision}")
         if place.excluded_class:
             print(f"  classe disqualifiante : {place.excluded_class}")
+        if place.visitors_per_year:
+            print(f"  fréquentation : {place.visitors_per_year:,} visiteurs par an"
+                  .replace(",", " "))
 
         blocked = None
         for label, survivors in stages:
@@ -981,11 +997,55 @@ def _print_stats(places, collections, raw=None, config: Config | None = None) ->
             f"{len(places) - ouverts - fermes} non renseignés"
         )
 
+    if config is not None:
+        _print_visitor_coverage(places, config)
+
     source = raw if raw is not None else places
     _print_sitelink_distribution(source, config_floors())
     if config is not None and hasattr(source[0] if source else None, "theme_id"):
         _print_rescue_distribution(source, config)
     print()
+
+
+def _print_visitor_coverage(places, config: Config) -> None:
+    """Couverture et barème de la fréquentation.
+
+    Le poids ne se choisit pas dans l'abstrait. Ce tableau dit deux choses : sur
+    combien de lieux le signal joue réellement, et combien de points il vaut à
+    chaque ordre de grandeur — à comparer aux 55 points que valent onze langues.
+    Trop haut, la fréquentation écrase tout ; trop bas, elle ne corrige rien.
+    """
+    rule = config.visitors
+    known = [p for p in places if getattr(p, "visitors_per_year", None)]
+    if not rule.property_id:
+        if rule.search:
+            print("  Fréquentation        : propriété non résolue — "
+                  "`suggest-qids --property` puis `enrich`")
+        return
+    if not known:
+        print("  Fréquentation        : aucun chiffre — as-tu relancé `enrich` ?")
+        return
+
+    print(f"  Fréquentation        : {len(known)} lieux sur {len(places)} "
+          f"({len(known) / max(len(places), 1):.0%}), poids {rule.weight}")
+
+    by_theme: dict[str, list[int]] = defaultdict(list)
+    for place in known:
+        by_theme[place.theme_id].append(place.visitors_per_year)
+    print(f"      {'thème':<16} {'avec chiffre':>12} {'médiane':>10} {'maximum':>12}")
+    for theme_id, counts in sorted(by_theme.items(), key=lambda kv: -len(kv[1])):
+        ordered = sorted(counts)
+        median = ordered[len(ordered) // 2]
+        print(f"      {theme_id:<16} {len(counts):>12} {median:>10,} {max(counts):>12,}"
+              .replace(",", " "))
+
+    bareme = " · ".join(
+        f"{count:,}".replace(",", " ") + f" → +{rule.weight * math.log1p(count / rule.scale):.0f}"
+        for count in (10_000, 100_000, 1_000_000, 10_000_000)
+    )
+    print(f"      barème : {bareme}")
+    print("      (onze langues valent 55 points de notoriété — c'est l'échelle "
+          "à laquelle comparer)")
 
 
 def config_floors() -> dict[str, int]:
@@ -1100,6 +1160,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     suggest.add_argument("terms", nargs="*", help="termes à chercher (défaut : ceux de la config)")
     suggest.add_argument("--limit", type=int, default=6, help="candidats par terme")
+    suggest.add_argument(
+        "--property",
+        action="store_true",
+        help="chercher des propriétés (P-ids) et non des entités",
+    )
 
     fetch = sub.add_parser("fetch", help="collecte les lieux candidats depuis Wikidata")
     fetch.add_argument(

@@ -498,6 +498,45 @@ Le nom choisi vit dans `data/manual/names.csv` et s'applique à **chaque**
 construction — y compris dans la feuille de revue, faute de quoi on relirait un
 nom qu'on ne reconnaît plus.
 
+### Le seul signal qui mesure l'affluence
+
+Tous les postes du score mesurent ce qu'on **écrit** d'un lieu : nombre de
+langues, taille de l'article, présence d'une photo. Aucun ne mesure ce que Roam
+promet — que ça vaille le déplacement.
+
+Le défaut se voit à l'œil nu. La fondation Claude-Monet, onze langues, était au
+**niveau 3 de sa propre collection** : trente-cinq maisons se classaient devant
+elle. Une villa d'architecte célèbre dans les revues internationales rassemble
+trente langues ; la maison de Monet reçoit sept cent mille personnes par an.
+
+D'où la **fréquentation annuelle**, quand Wikidata la porte :
+
+```yaml
+visitors:
+  property: P…          # à résoudre : `suggest-qids --property "nombre de visiteurs par an"`
+  weight: 10.0
+  scale: 10000
+```
+
+Même règle à trois états que l'ouverture au public, et pour la même raison : un
+lieu sans chiffre ne perd **rien**. Wikidata ne renseigne la fréquentation que
+d'une minorité de sites ; un malus noterait le zèle des contributeurs, pas
+l'intérêt des lieux. Bonus seul.
+
+`log1p` comme pour la notoriété : l'écart qui compte est celui entre un musée de
+sous-préfecture et un site national, pas entre le Louvre et Versailles.
+
+> **Le poids se calibre sur les chiffres réels.** `build` imprime la couverture
+> par thème et le barème — combien de points valent dix mille, cent mille, un
+> million de visiteurs — à comparer aux 55 points que valent onze langues. Trop
+> haut, la fréquentation écrase tout le reste ; trop bas, Giverny reste au
+> niveau 3.
+
+Tant que la propriété n'est pas résolue, le signal est **inactif** : aucun lieu
+n'en profite, aucun n'en pâtit. Une propriété écrite de mémoire serait aussi
+silencieuse qu'un Q-id faux — d'où `suggest-qids --property`, qui cherche parmi
+les propriétés et non parmi les entités.
+
 ### Un parc d'attractions n'est pas un musée
 
 Marineland est entré au catalogue par le thème « musées », parce qu'un de ses

@@ -59,10 +59,31 @@ def score_breakdown(place: Place, config: Config) -> dict[str, float]:
         # visitabilité. `None` ne vaut rien : l'absence de balise dans
         # OpenStreetMap ne dit pas qu'un lieu est fermé, elle ne dit rien.
         "acces": _access_score(place, s),
+        # Le seul poste qui mesure l'AFFLUENCE. Les autres mesurent ce qu'on
+        # écrit d'un lieu ; celui-ci, combien de gens s'y rendent.
+        "visiteurs": _visitors_score(place, config),
         "ajustement": round(place.curator_adjustment, 1),
     }
     parts["total"] = round(sum(parts.values()), 1)
     return parts
+
+
+def _visitors_score(place: Place, config: Config) -> float:
+    """Bonus de fréquentation. Jamais de malus.
+
+    Wikidata ne renseigne la fréquentation que d'une minorité de sites.
+    Pénaliser les autres reviendrait à noter le zèle des contributeurs, pas
+    l'intérêt des lieux — c'est le raisonnement déjà tenu pour l'ouverture au
+    public, et il vaut ici mot pour mot.
+
+    `log1p` comme pour la notoriété : l'écart qui compte est celui entre un
+    musée de sous-préfecture et un site national, pas entre le Louvre et
+    Versailles.
+    """
+    rule = config.visitors
+    if not rule.active or not place.visitors_per_year:
+        return 0.0
+    return round(rule.weight * math.log1p(place.visitors_per_year / rule.scale), 1)
 
 
 def _access_score(place: Place, s: Scoring) -> float:

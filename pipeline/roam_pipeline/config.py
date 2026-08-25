@@ -104,6 +104,28 @@ class Scoring:
 
 
 @dataclass(frozen=True)
+class Visitors:
+    """Fréquentation annuelle : le seul signal qui mesure l'affluence.
+
+    `property_id` reste `None` tant que l'identifiant n'a pas été résolu par
+    `suggest-qids --property`. Dans ce cas le signal est simplement inactif —
+    aucun lieu n'en profite, aucun n'en pâtit.
+
+    Le champ ne s'appelle pas `property` : dans un corps de classe, ce nom
+    masque la fonction intégrée du même nom et casse le décorateur ci-dessous.
+    """
+
+    property_id: str | None = None
+    search: str | None = None
+    weight: float = 0.0
+    scale: int = 10_000
+
+    @property
+    def active(self) -> bool:
+        return bool(self.property_id and self.weight)
+
+
+@dataclass(frozen=True)
 class Tiers:
     tier1_size: int
     tier2_size: int
@@ -149,6 +171,7 @@ class Config:
     collections: CollectionRules
     alerts: Alerts
     exclusions: Exclusions = field(default_factory=Exclusions)
+    visitors: Visitors = field(default_factory=Visitors)
 
     def theme(self, theme_id: str) -> Theme:
         for t in self.themes:
@@ -225,6 +248,14 @@ def load_config(config_dir: Path | None = None) -> Config:
 
     alerts = Alerts(**raw.get("alerts", {"alpine_elevation_m": 2500}))
 
+    seen_visitors = raw.get("visitors") or {}
+    visitors = Visitors(
+        property_id=(str(seen_visitors["property"]) if seen_visitors.get("property") else None),
+        search=seen_visitors.get("search"),
+        weight=float(seen_visitors.get("weight", 0.0)),
+        scale=int(seen_visitors.get("scale", 10_000)),
+    )
+
     raw_themes = _read_yaml(d / "themes.yaml")
     excluded = raw_themes.get("exclude_classes") or {}
     exclusions = Exclusions(
@@ -232,7 +263,7 @@ def load_config(config_dir: Path | None = None) -> Config:
         search=list(excluded.get("search") or []),
     )
 
-    _validate(themes, labels, exclusions)
+    _validate(themes, labels, exclusions, visitors)
     return Config(
         themes=themes,
         labels=labels,
@@ -241,11 +272,13 @@ def load_config(config_dir: Path | None = None) -> Config:
         collections=rules,
         alerts=alerts,
         exclusions=exclusions,
+        visitors=visitors,
     )
 
 
 def _validate(themes: list[Theme], labels: list[Label],
-              exclusions: Exclusions | None = None) -> None:
+              exclusions: Exclusions | None = None,
+              visitors: Visitors | None = None) -> None:
     label_ids = {lbl.id for lbl in labels}
     seen: set[str] = set()
     for t in themes:
@@ -297,6 +330,13 @@ def _validate(themes: list[Theme], labels: list[Label],
     for qid in (str(q) for q in (exclusions.qids if exclusions else [])):
         if not qid.startswith("Q") or not qid[1:].isdigit():
             raise ValueError(f"Q-id invalide dans `exclude_classes` : {qid}")
+
+    if visitors and visitors.property_id:
+        prop = visitors.property_id
+        if not prop.startswith("P") or not prop[1:].isdigit():
+            raise ValueError(f"identifiant de propriété invalide pour `visitors` : {prop}")
+        if visitors.scale < 1:
+            raise ValueError("`visitors.scale` doit être positif")
 
     # Une classe ne peut pas être à la fois ce qu'on cherche et ce qu'on refuse :
     # le thème serait vidé sans que rien ne le dise.

@@ -693,6 +693,45 @@ def enrich_exclusions(
     return marked
 
 
+def enrich_visitors(
+    client: wd.SparqlClient, places: list[Place], property_id: str | None
+) -> int:
+    """Complète la fréquentation annuelle. Renvoie le nombre de lieux servis."""
+    # Repartir de zéro, comme pour les exclusions : un chiffre retiré de
+    # Wikidata doit disparaître du score, pas y survivre indéfiniment.
+    for place in places:
+        place.visitors_per_year = None
+    if not property_id or not places:
+        return 0
+
+    by_qid = {place.wikidata_id: place for place in places}
+    for batch in wd.chunked(sorted(by_qid), 200):
+        try:
+            rows = client.query(wd.visitors_query(batch, property_id))
+        except Exception as exc:
+            LOG.error("fréquentation : lot échoué (%s)", exc)
+            continue
+        for row in rows:
+            place = by_qid.get(wd.qid_from_uri(row.get("item")) or "")
+            if place is None:
+                continue
+            try:
+                count = int(float(row["visitors"]))
+            except (KeyError, TypeError, ValueError):
+                continue
+            # Le plus élevé des chiffres publiés : une année de travaux ne doit
+            # pas décider de ce que vaut un lieu.
+            if count > 0 and (place.visitors_per_year or 0) < count:
+                place.visitors_per_year = count
+
+    served = sum(1 for p in places if p.visitors_per_year)
+    LOG.info(
+        "fréquentation : %s lieux sur %s portent un chiffre (%.0f %%)",
+        served, len(places), 100 * served / max(len(places), 1),
+    )
+    return served
+
+
 def fetch_label_members(client: wd.SparqlClient, label: Label, manual_dir: Path) -> set[str]:
     """Q-ids des lieux portant un label."""
     if label.is_manual:

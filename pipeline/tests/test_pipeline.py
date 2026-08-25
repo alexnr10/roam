@@ -26,16 +26,16 @@ from roam_pipeline.collections import (
     dedupe_across_themes,
     haversine_m,
 )
-from roam_pipeline.config import CONFIG_DIR, Exclusions, load_config
+from roam_pipeline.config import CONFIG_DIR, Exclusions, Visitors, load_config
 from roam_pipeline.export import _sql_str, write_seed_sql
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
 from roam_pipeline.models import Place, display_name, slugify
 from roam_pipeline import outlines
 from roam_pipeline.fetch import REMEDIES, diagnose_missing, enrich_departements
 from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from_insee
-from roam_pipeline.cli import _known_qids, _probe_verdict
+from roam_pipeline.cli import _known_qids, _pending_terms, _probe_verdict
 from roam_pipeline.wikipedia import title_from_url
-from roam_pipeline.wikidata import class_ancestry_query, probe_query
+from roam_pipeline.wikidata import class_ancestry_query, probe_query, visitors_query
 from roam_pipeline.review import DECISIONS, apply_names, read_names, write_names
 
 
@@ -47,7 +47,9 @@ def _capture():
     buffer = StringIO()
     with contextlib.redirect_stdout(buffer):
         yield buffer
-from roam_pipeline.score import assign_tiers, compute_score, label_bonus, score_all
+from roam_pipeline.score import (
+    assign_tiers, compute_score, label_bonus, score_all, score_breakdown,
+)
 
 CONFIG = load_config()
 
@@ -1748,11 +1750,16 @@ class TestClassExclusion(unittest.TestCase):
                     (CONFIG_DIR / name).read_text(encoding="utf-8"), encoding="utf-8"
                 )
             themes = (base / "themes.yaml").read_text(encoding="utf-8")
-            (base / "themes.yaml").write_text(
-                themes.replace("exclude_classes:\n  qids: []",
-                               f"exclude_classes:\n  qids: [{collected}]"),
-                encoding="utf-8",
+            # La liste réelle est commentée ligne à ligne : on remplace sa
+            # forme, pas son texte, pour que le test survive à son contenu.
+            patched, count = re.subn(
+                r"^exclude_classes:.*?\n  search:",
+                f"exclude_classes:\n  qids: [{collected}]\n  search:",
+                themes,
+                flags=re.MULTILINE | re.DOTALL,
             )
+            assert count == 1, "bloc `exclude_classes` introuvable"
+            (base / "themes.yaml").write_text(patched, encoding="utf-8")
             with self.assertRaises(ValueError) as raised:
                 load_config(base)
         self.assertIn("exclude_classes", str(raised.exception))
@@ -1950,6 +1957,99 @@ class TestMissingDiagnosis(unittest.TestCase):
     def test_every_cause_carries_a_remedy(self):
         for cause in ("absent", "sans coordonnées", "sans libellé", "inexpliqué"):
             self.assertIn(cause, REMEDIES)
+
+
+class TestVisitorSignal(unittest.TestCase):
+    """La fréquentation : le seul signal qui mesure l'affluence.
+
+    Tous les autres postes mesurent ce qu'on ÉCRIT d'un lieu. Le décompte de
+    langues classait une villa d'architecte devant la maison de Claude Monet,
+    qui reçoit sept cent mille personnes par an.
+    """
+
+    @staticmethod
+    def _config(**over):
+        base = dict(property_id="P1", weight=10.0, scale=10_000)
+        base.update(over)
+        return replace(CONFIG, visitors=Visitors(**base))
+
+    def test_a_place_without_a_count_loses_nothing(self):
+        # La condition que le curateur a posée mot pour mot : exploiter le
+        # chiffre quand il existe, sans impacter ceux qui ne l'ont pas.
+        place = make_place("Château sans chiffre", sitelinks=10)
+        config = self._config()
+        self.assertEqual(score_breakdown(place, config)["visiteurs"], 0.0)
+        # Et le total est exactement celui d'un catalogue sans le signal.
+        muet = replace(CONFIG, visitors=Visitors())
+        self.assertEqual(
+            score_breakdown(place, config)["total"], score_breakdown(place, muet)["total"]
+        )
+
+    def test_the_bonus_grows_with_the_crowd(self):
+        config = self._config()
+        petit = make_place("Petit musée")
+        petit.visitors_per_year = 10_000
+        grand = make_place("Grand musée")
+        grand.visitors_per_year = 1_000_000
+        self.assertLess(
+            score_breakdown(petit, config)["visiteurs"],
+            score_breakdown(grand, config)["visiteurs"],
+        )
+
+    def test_it_never_becomes_a_malus(self):
+        # Wikidata ne renseigne la fréquentation que d'une minorité de sites.
+        # Un malus noterait le zèle des contributeurs, pas l'intérêt des lieux.
+        for count in (None, 0, 1, 10, 10_000_000):
+            place = make_place("X")
+            place.visitors_per_year = count
+            self.assertGreaterEqual(score_breakdown(place, self._config())["visiteurs"], 0.0)
+
+    def test_an_unresolved_property_disables_the_signal(self):
+        # Tant que l'identifiant n'est pas résolu, le signal ne doit rien faire
+        # plutôt que d'inventer : une propriété fausse ne lève rien.
+        place = make_place("Giverny")
+        place.visitors_per_year = 700_000
+        dormant = replace(CONFIG, visitors=Visitors(search="nombre de visiteurs", weight=10.0))
+        self.assertFalse(dormant.visitors.active)
+        self.assertEqual(score_breakdown(place, dormant)["visiteurs"], 0.0)
+
+    def test_giverny_overtakes_a_better_documented_house(self):
+        # Le cas qui a motivé le signal, en miniature.
+        villa = make_place("Villa d'architecte", theme="maisons", sitelinks=30)
+        giverny = make_place("Fondation Claude-Monet", theme="maisons", sitelinks=11)
+        giverny.visitors_per_year = 700_000
+        config = self._config()
+        self.assertLess(
+            score_breakdown(villa, config)["total"], score_breakdown(giverny, config)["total"]
+        )
+
+    def test_the_query_is_bounded(self):
+        sparql = visitors_query(["Q1", "Q2"], "P1")
+        self.assertIn("VALUES ?item { wd:Q1 wd:Q2 }", sparql)
+        self.assertIn("wdt:P1", sparql)
+
+    def test_a_malformed_property_is_refused_at_load(self):
+        # Écrite sans son P, elle ne rendrait rien — en silence.
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            for name in ("themes.yaml", "labels.yaml", "scoring.yaml"):
+                (base / name).write_text(
+                    (CONFIG_DIR / name).read_text(encoding="utf-8"), encoding="utf-8"
+                )
+            scoring = (base / "scoring.yaml").read_text(encoding="utf-8")
+            (base / "scoring.yaml").write_text(
+                scoring.replace("  property: null", "  property: 1174"), encoding="utf-8"
+            )
+            with self.assertRaises(ValueError) as raised:
+                load_config(base)
+        self.assertIn("propriété", str(raised.exception))
+
+    def test_the_search_term_is_pending_until_resolved(self):
+        pending = _pending_terms(CONFIG)
+        kinds = {kind for _owner, _term, kind in pending}
+        if CONFIG.visitors.search and not CONFIG.visitors.property_id:
+            # Cherchée parmi les entités, une propriété ne rend rien.
+            self.assertIn("property", kinds)
 
 
 if __name__ == "__main__":

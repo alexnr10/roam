@@ -46,15 +46,19 @@
 #     et `explain` le dit lieu par lieu : c'est la seule protection contre une
 #     exclusion trop large, et elle suppose de lire le journal une fois.
 exclude_classes:
-  qids: []
-  search:
-    - parc d'attractions
-    - parc à thème
-    - parc animalier
-    - parc zoologique
-    - aquarium public
-    - delphinarium
-    - parc aquatique
+  # Résolus par `suggest-qids`, vérifiables par `verify-qids`. Ce sont les
+  # CLASSES et non les établissements : « parc animalier » (Q3363934), pas
+  # « parc animalier d'Auvergne ».
+  qids:
+    - Q194195      # parc d'attractions
+    - Q2416723     # parc à thèmes
+    - Q3363974     # parc d'attractions et animalier
+    - Q3363934     # parc animalier
+    - Q43501       # parc zoologique
+    - Q2281788     # aquarium public — la porte par laquelle Marineland est entré
+    - Q491675      # delphinarium
+    - Q740326      # parc aquatique
+  search: []
 
 themes:
   - id: villages

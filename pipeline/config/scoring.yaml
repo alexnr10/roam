@@ -58,10 +58,38 @@ scoring:
   # concernés à chaque seuil : c'est là qu'on choisit ce chiffre, pas ailleurs.
   rescue_score: 85.0
 
+
   # Les bonus de label sont définis dans labels.yaml (`score_bonus`).
   # Seul le plus élevé s'applique, plus la moitié du deuxième — pour éviter
   # qu'un empilement de petits labels dépasse un site UNESCO.
   label_stacking: half_second
+
+# Fréquentation annuelle, d'après Wikidata.
+#
+# C'est le seul signal gratuit qui mesure l'AFFLUENCE et non la documentation.
+# Le décompte de langues classe une villa d'architecte célèbre dans les revues
+# internationales devant la maison de Claude Monet, qui reçoit sept cent mille
+# personnes par an : le premier mesure ce qu'on écrit d'un lieu, le second ce
+# qu'il vaut le déplacement.
+#
+# Même règle à trois états que l'ouverture au public, et pour la même raison :
+# un lieu sans chiffre ne perd RIEN. Wikidata ne renseigne la fréquentation que
+# d'une minorité de sites ; pénaliser les autres reviendrait à noter le zèle
+# des contributeurs. Bonus seul, jamais de malus.
+visitors:
+  # À résoudre : `suggest-qids --property "nombre de visiteurs par an"`.
+  # Une propriété erronée ne lève rien — elle rend zéro résultat, en silence.
+  property: null
+  search: nombre de visiteurs par an
+  # Poids À CALIBRER sur les chiffres réels : `build` affiche la couverture et
+  # la distribution. Trop haut, la fréquentation écrase tout le reste ; trop
+  # bas, Giverny reste au niveau 3 de sa propre collection.
+  weight: 10.0
+  # Le score suit log1p(visiteurs / scale) : dix mille visiteurs valent un
+  # demi-poids, dix millions en valent sept. L'écart qui compte est celui entre
+  # un musée de sous-préfecture et un site national, pas entre le Louvre et
+  # Versailles.
+  scale: 10000
 
 tiers:
   # Le niveau est RELATIF à chaque collection : les meilleurs scores prennent

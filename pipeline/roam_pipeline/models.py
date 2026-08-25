@@ -96,6 +96,10 @@ class Place:
     # d'attractions entré par la porte des musées, par exemple. Le libellé de
     # la classe, pas son Q-id — pour que le journal se lise.
     excluded_class: str | None = None
+    # Fréquentation annuelle, d'après Wikidata. `None` signifie « non
+    # renseignée », ce qui ne vaut RIEN — ni bonus ni malus. Wikidata ne la
+    # documente que pour une minorité de sites.
+    visitors_per_year: int | None = None
 
     def __post_init__(self) -> None:
         # Le nom est normalisé à la construction, d'où qu'il vienne : Wikidata,

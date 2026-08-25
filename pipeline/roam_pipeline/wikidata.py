@@ -98,8 +98,12 @@ class SparqlClient:
         raise SparqlError(f"échec après {self.max_retries} tentatives") from last_error
 
 
-    def search(self, term: str, limit: int = 6) -> list[dict[str, str]]:
+    def search(self, term: str, limit: int = 6, kind: str = "item") -> list[dict[str, str]]:
         """Recherche d'entités par libellé (wbsearchentities).
+
+        `kind` vaut « item » (Q-ids) ou « property » (P-ids). Une propriété
+        écrite de mémoire est aussi silencieuse qu'un Q-id faux : elle ne lève
+        rien et ne rend rien.
 
         Sert à trouver un Q-id à partir d'un mot plutôt que de l'écrire de
         mémoire — c'est ainsi qu'on évite de reproduire une erreur d'identifiant,
@@ -113,7 +117,7 @@ class SparqlClient:
                 "search": term,
                 "language": "fr",
                 "uselang": "fr",
-                "type": "item",
+                "type": kind,
                 "limit": limit,
                 "format": "json",
             },
@@ -318,6 +322,25 @@ WHERE {{
   OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY} ?admin. }}
   OPTIONAL {{ ?frwiki schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> . }}
   SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+}}
+"""
+
+
+def visitors_query(qids: list[str], property_id: str) -> str:
+    """Fréquentation annuelle de lieux déjà collectés.
+
+    Bornée par `VALUES`, comme les autres requêtes d'enrichissement : elle se
+    rejoue en quelques secondes, sans repasser par la collecte.
+
+    Un lieu peut porter plusieurs chiffres — un par année mesurée. On les
+    ramène tous et l'appelant garde le plus élevé : une fréquentation record
+    dit mieux ce que vaut le lieu qu'une année de travaux.
+    """
+    values = " ".join(f"wd:{q}" for q in qids)
+    return f"""
+SELECT ?item ?visitors WHERE {{
+  VALUES ?item {{ {values} }}
+  ?item wdt:{property_id} ?visitors .
 }}
 """
 
