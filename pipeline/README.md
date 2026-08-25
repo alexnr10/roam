@@ -472,6 +472,17 @@ n'appellent pas du tout le même geste :
 Le diagnostic passe par `probe_query`, qui n'exige rien, et le nom du lieu
 accompagne chaque ligne : un Q-id nu n'aide personne à décider.
 
+### Les Q-ids listés qui n'arrivent jamais
+
+```bash
+python -m roam_pipeline check-lists
+```
+
+Les ajouts du curateur et les candidats adoptés sont désignés un par un. Quand
+l'un d'eux n'arrive pas dans `places_raw.json`, `fetch` le signale au passage —
+mais il faut une demi-heure de collecte pour revoir ce message. `check-lists`
+pose la même question en une requête bornée, et se rejoue autant qu'on veut.
+
 ### Wikidata donne un libellé, pas un titre
 
 Les libellés français de Wikidata ne sont pas capitalisés de façon fiable :

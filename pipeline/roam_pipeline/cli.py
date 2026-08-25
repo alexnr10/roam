@@ -25,6 +25,8 @@ from .export import (
     write_seed_sql,
 )
 from .fetch import (
+    REMEDIES,
+    diagnose_missing,
     enrich_exclusions,
     enrich_visitors,
     enrich_article_sizes,
@@ -506,10 +508,10 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
 
     if not found:
         print(f"Aucun lieu dont le nom contient « {args.name} » n'a été collecté.\n")
-        print("Cela veut dire que Wikidata ne le classe dans aucune des classes")
-        print("interrogées, et qu'OpenStreetMap ne l'a pas signalé non plus.")
-        print("Deux recours : `discover` (s'il n'a jamais tourné), ou l'ajouter")
-        print("à data/manual/places.csv, où il échappe à tous les planchers.")
+        print("`explain` ne connaît que ce qui a été collecté : il ne peut pas dire")
+        print("POURQUOI ce lieu n'est jamais entré. C'est le rôle de `probe`, qui")
+        print("interroge Wikidata sans aucun filtre et nomme ce qui manque :")
+        print(f"\n    python -m roam_pipeline probe \"{args.name}\"\n")
         return 0
 
     decisions = read_decisions(args.manual / "decisions.csv")
@@ -792,6 +794,47 @@ def _probe_verdict(
     out.append(f"Collectée. Le sort se joue donc à la construction — plancher "
                f"éditorial {editorial} : `explain` le dira.")
     return out
+
+
+def cmd_check_lists(args: argparse.Namespace, config: Config) -> int:
+    """Que sont devenus les Q-ids des listes tenues à la main ?
+
+    Les ajouts du curateur et les candidats adoptés sont désignés un par un.
+    Quand l'un d'eux n'arrive pas dans `places_raw.json`, `fetch` le signale au
+    passage — mais il faut une demi-heure de collecte pour revoir ce message.
+    Ici, une seule requête bornée suffit, et elle se rejoue autant qu'on veut.
+    """
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
+        return 1
+
+    collected = _known_qids(raw_path)
+    listed: dict[str, str] = {}
+    for name in ("places.csv", "candidates.csv"):
+        path = args.manual / name
+        for qid in read_place_list(config, path):
+            listed.setdefault(qid, name)
+    if not listed:
+        print("Aucune liste manuelle à vérifier.")
+        return 0
+
+    missing = {qid for qid in listed if qid not in collected}
+    print(f"{len(listed)} Q-ids listés, {len(listed) - len(missing)} collectés, "
+          f"{len(missing)} sans résultat.")
+    if not missing:
+        return 0
+
+    client = wd.SparqlClient()
+    rows: list[dict[str, str]] = []
+    for batch in wd.chunked(sorted(missing), 150):
+        rows.extend(client.query(wd.probe_query(batch)))
+
+    for cause, items in diagnose_missing(rows, missing).items():
+        print(f"\n{len(items)} — {REMEDIES.get(cause, cause)}")
+        for item in items:
+            print(f"    {item}")
+    return 0
 
 
 def cmd_rename(args: argparse.Namespace, config: Config) -> int:
@@ -1248,6 +1291,11 @@ def build_parser() -> argparse.ArgumentParser:
     review.add_argument("--review", type=Path, help="chemin de review.csv")
     add_decision_args(review)
 
+    sub.add_parser(
+        "check-lists",
+        help="diagnostique les Q-ids listés à la main qui n'arrivent pas (réseau requis)",
+    )
+
     probe = sub.add_parser(
         "probe",
         help="pourquoi un lieu n'a-t-il jamais été collecté ? (réseau requis)",
@@ -1313,6 +1361,7 @@ def main(argv: list[str] | None = None) -> int:
         "apply-review": cmd_apply_review,
         "stats": cmd_stats,
         "review": cmd_review,
+        "check-lists": cmd_check_lists,
         "probe": cmd_probe,
         "rename": cmd_rename,
         "export-app": cmd_export_app,

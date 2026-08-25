@@ -5,7 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import logging
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 from . import wikidata as wd
@@ -841,10 +841,14 @@ def run_fetch(
 
     # Reprise partielle : on réinjecte les thèmes qu'on n'a pas recollectés.
     if only and raw_path.exists():
+        recollected = {t.id for t in themes}
+        configured = {t.id for t in config.themes}
+        previous = json.loads(raw_path.read_text(encoding="utf-8"))
         kept = [
             Place(**{k: v for k, v in item.items() if k != "slug"})
-            for item in json.loads(raw_path.read_text(encoding="utf-8"))
-            if item.get("theme_id") not in {t.id for t in themes}
+            for item in previous
+            if item.get("theme_id") not in recollected
+            and item.get("theme_id") in configured
             # Ajouts manuels et candidats adoptés sont recollectés à chaque
             # passage, quels que soient les thèmes demandés : les conserver ici
             # les compterait deux fois.
@@ -852,6 +856,22 @@ def run_fetch(
             and item.get("source") != "osm"
         ]
         LOG.info("%s lieux conservés des thèmes non recollectés", len(kept))
+
+        # Un thème retiré de la configuration laissait ses lieux dans
+        # `places_raw.json` pour toujours : la reprise partielle ne recollecte
+        # pas son thème, donc elle le reconduisait. Ils ne sortaient dans
+        # aucune collection mais faussaient chaque tableau de diagnostic.
+        stale = Counter(
+            item["theme_id"]
+            for item in previous
+            if item.get("theme_id") not in configured and item.get("theme_id")
+        )
+        if stale:
+            LOG.warning(
+                "thèmes disparus de la configuration, %s lieux abandonnés : %s",
+                sum(stale.values()),
+                ", ".join(f"{theme} {count}" for theme, count in sorted(stale.items())),
+            )
         places = kept + places
 
     carry_osm_signals(places, raw_path)

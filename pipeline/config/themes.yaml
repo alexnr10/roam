@@ -58,7 +58,10 @@ exclude_classes:
     - Q2281788     # aquarium public — la porte par laquelle Marineland est entré
     - Q491675      # delphinarium
     - Q740326      # parc aquatique
-  search: []
+  # Encore à résoudre : le terme générique français, sous lequel se rangent
+  # les parcs qu'aucune des classes ci-dessus ne nomme.
+  search:
+    - parc de loisirs
 
 themes:
   - id: villages

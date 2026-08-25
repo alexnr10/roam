@@ -972,10 +972,14 @@ class TestExplain(unittest.TestCase):
         self.assertIn("plancher de notoriété", output)
         self.assertIn("ÉCARTÉ", output)
 
-    def test_a_place_never_collected_says_so_rather_than_nothing(self):
+    def test_a_place_never_collected_hands_over_to_probe(self):
+        # `explain` ne connaît que le collecté : il ne peut pas dire POURQUOI un
+        # lieu n'est jamais entré. Lui faire proposer un remède serait deviner ;
+        # il doit passer le relais à l'outil qui, lui, va le mesurer.
         output = self._run("maison de van gogh", self._catalogue())
         self.assertIn("Aucun lieu", output)
-        self.assertIn("places.csv", output)
+        self.assertIn("probe", output)
+        self.assertIn("maison de van gogh", output)
 
     def test_a_retained_place_lists_its_collections(self):
         giverny = make_place("Jardins de Giverny", wikidata_id="Q81", theme_id="jardins",
