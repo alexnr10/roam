@@ -10,6 +10,7 @@ import math
 import sys
 import unicodedata
 from collections import Counter, defaultdict
+from datetime import datetime
 from typing import Any
 from pathlib import Path
 
@@ -1292,6 +1293,25 @@ def cmd_review(args: argparse.Namespace, config: Config) -> int:
     )
     server = http.server.ThreadingHTTPServer(("127.0.0.1", args.port), handler)
     url = f"http://127.0.0.1:{args.port}/review.html"
+
+    # Dire CE QU'ON RELIT avant de le relire. La page est construite depuis le
+    # catalogue de CETTE machine : sur un clone où seuls quelques thèmes ont
+    # été collectés, on peut passer une soirée entière à relire un cinquième du
+    # catalogue sans que rien ne le signale.
+    built = args.out / "places.json"
+    if built.exists():
+        places = json.loads(built.read_text(encoding="utf-8"))
+        themes = {p.get("theme_id") for p in places}
+        manquants = [t.id for t in config.themes if t.id not in themes]
+        age = datetime.fromtimestamp(page.stat().st_mtime).strftime("%d/%m à %H:%M")
+        print(f"Page construite le {age} : {len(places)} lieux, "
+              f"{len(themes)} thèmes sur {len(config.themes)}.")
+        if manquants:
+            print(f"⚠ {len(manquants)} thèmes ABSENTS de cette page : "
+                  + ", ".join(manquants[:8])
+                  + (f" (+{len(manquants) - 8})" if len(manquants) > 8 else ""))
+            print("  Cette machine ne les a jamais collectés. Tu relirais un "
+                  "catalogue partiel.")
 
     print(f"Revue ouverte sur {url}")
     print("Les décisions sont mémorisées dans le navigateur.")
