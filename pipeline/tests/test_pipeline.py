@@ -33,7 +33,9 @@ from roam_pipeline.export import (
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
 from roam_pipeline.models import Place, display_name, slugify
 from roam_pipeline import outlines
-from roam_pipeline.fetch import REMEDIES, diagnose_missing, enrich_departements
+from roam_pipeline.fetch import (
+    REMEDIES, diagnose_missing, enrich_departements, stale_themes,
+)
 from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from_insee
 from roam_pipeline.cli import _known_qids, _pending_terms, _probe_verdict, census
 from roam_pipeline.wikipedia import title_from_url
@@ -2355,6 +2357,40 @@ class TestBroadRouteYields(unittest.TestCase):
         # « parc de loisirs » est le terme générique français : sans lui, un
         # parc qu'aucune des sept classes précises ne nomme passait encore.
         self.assertIn("Q15982170", CONFIG.exclusions.qids)
+
+
+class TestFetchState(unittest.TestCase):
+    """Un thème dont la collecte a échoué ne doit pas se taire indéfiniment.
+
+    L'échec était signalé une fois, en fin de journal, puis oublié : la reprise
+    partielle reconduisait les anciennes données à chaque passage. Le mont
+    Blanc a disparu du catalogue de cette façon, sans qu'aucun compteur ne
+    bouge et sans qu'aucun message ne le dise.
+    """
+
+    def test_a_failed_theme_is_reported_at_every_build(self):
+        state = {t.id: {"ok": True, "lieux": 5, "le": "2026-08-28"} for t in CONFIG.themes}
+        state["sommets"] = {"ok": False, "lieux": 950, "le": "2026-08-20"}
+        stale = dict(stale_themes(state, CONFIG))
+        self.assertIn("sommets", stale)
+        self.assertIn("ÉCHEC", stale["sommets"])
+
+    def test_a_theme_that_returned_nothing_is_suspect(self):
+        # Une collecte « réussie » qui ne rapporte rien est un échec silencieux.
+        state = {t.id: {"ok": True, "lieux": 5, "le": "x"} for t in CONFIG.themes}
+        state["phares"] = {"ok": True, "lieux": 0, "le": "x"}
+        self.assertIn("phares", dict(stale_themes(state, CONFIG)))
+
+    def test_an_untracked_theme_is_named_apart(self):
+        # Distinct d'un échec : le suivi est récent, tout est « jamais vu » au
+        # premier passage, et confondre les deux noierait le vrai signal.
+        stale = dict(stale_themes({}, CONFIG))
+        self.assertEqual(len(stale), len(CONFIG.themes))
+        self.assertTrue(all(r.startswith("jamais") for r in stale.values()))
+
+    def test_a_healthy_catalogue_says_nothing(self):
+        state = {t.id: {"ok": True, "lieux": 5, "le": "x"} for t in CONFIG.themes}
+        self.assertEqual(stale_themes(state, CONFIG), [])
 
 
 if __name__ == "__main__":

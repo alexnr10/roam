@@ -6,6 +6,7 @@ import csv
 import json
 import logging
 from collections import Counter, defaultdict
+from datetime import datetime, timezone
 from pathlib import Path
 
 from . import wikidata as wd
@@ -890,6 +891,8 @@ def run_fetch(
     )
     LOG.info("%s lieux écrits dans %s", len(places), raw_path)
 
+    _write_fetch_state(out_dir, themes, places, failed)
+
     if failed:
         # Le message doit être actionnable : une demi-heure de collecte ne se
         # relance pas en entier pour deux thèmes.
@@ -901,3 +904,68 @@ def run_fetch(
             " ".join(failed),
         )
     return places
+
+
+FETCH_STATE = "fetch-state.json"
+
+
+def _write_fetch_state(
+    out_dir: Path, themes: list[Theme], places: list[Place], failed: list[str]
+) -> None:
+    """Enregistre l'issue de la collecte, thème par thème.
+
+    Un thème en échec était signalé une fois, en fin de journal, puis oublié :
+    la reprise partielle reconduisait ses anciennes données à chaque passage,
+    et rien ne disait plus qu'elles étaient incomplètes. Le mont Blanc a
+    disparu du catalogue de cette façon, sans qu'aucun compteur ne bouge.
+
+    L'état est FUSIONNÉ avec le précédent : une reprise partielle ne dit rien
+    des thèmes qu'elle n'a pas touchés, et effacer leur état les blanchirait.
+    """
+    path = out_dir / FETCH_STATE
+    state: dict[str, dict] = {}
+    if path.exists():
+        try:
+            state = json.loads(path.read_text(encoding="utf-8"))
+        except ValueError:
+            LOG.warning("%s illisible — état de collecte reparti de zéro", path)
+
+    counts = Counter(place.theme_id for place in places)
+    stamp = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    for theme in themes:
+        state[theme.id] = {
+            "ok": theme.id not in failed,
+            "lieux": counts.get(theme.id, 0),
+            "le": stamp,
+        }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def read_fetch_state(out_dir: Path) -> dict[str, dict]:
+    path = out_dir / FETCH_STATE
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except ValueError:
+        return {}
+
+
+def stale_themes(state: dict[str, dict], config: Config) -> list[tuple[str, str]]:
+    """Thèmes dont les données ne sont pas fiables, et pourquoi.
+
+    Deux cas, et le second est celui qui a coûté le mont Blanc : un thème dont
+    la dernière collecte a échoué, et un thème dont on n'a aucune trace — ses
+    lieux viennent alors d'une collecte antérieure au suivi, ou de nulle part.
+    """
+    out: list[tuple[str, str]] = []
+    for theme in config.themes:
+        entry = state.get(theme.id)
+        if entry is None:
+            out.append((theme.id, "jamais collecté depuis le suivi"))
+        elif not entry.get("ok", True):
+            out.append((theme.id, f"dernière collecte EN ÉCHEC ({entry.get('le', '?')})"))
+        elif not entry.get("lieux"):
+            out.append((theme.id, "collecté, mais aucun lieu rapporté"))
+    return out

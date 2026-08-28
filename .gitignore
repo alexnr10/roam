@@ -12,6 +12,8 @@ pipeline/data/out/places_raw.json
 pipeline/data/out/places.json
 pipeline/data/out/collections.json
 pipeline/data/out/seed.sql
+# `fetch-state.json` est en revanche PETIT et utile à conserver : il dit quels
+# thèmes ont une collecte en échec, et `build` le rappelle à chaque passage.
 
 # Node / Expo (à venir)
 node_modules/

@@ -28,6 +28,8 @@ from .export import (
 )
 from .fetch import (
     REMEDIES,
+    read_fetch_state,
+    stale_themes,
     _paged,
     diagnose_missing,
     enrich_exclusions,
@@ -488,6 +490,7 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     write_seed_sql(retained, collections, config, args.out / "seed.sql")
 
     _report_tier_changes(changes, gone, before, retained)
+    _report_stale_themes(args.out, config)
 
     if renamed:
         print(f"Renommages appliqués : {renamed}")
@@ -497,6 +500,31 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
               ", ".join(f"{k}={v}" for k, v in sorted(counts.items())))
     _print_stats(retained, collections, raw=scored, config=config)
     return 0
+
+
+def _report_stale_themes(out_dir: Path, config: Config) -> None:
+    """Un thème dont la collecte a échoué ne doit pas se taire indéfiniment.
+
+    L'échec était signalé une fois, en fin de journal de `fetch`, puis oublié :
+    la reprise partielle reconduisait les anciennes données à chaque passage.
+    Le mont Blanc a disparu du catalogue de cette façon, sans qu'aucun compteur
+    ne bouge et sans qu'aucun message ne le dise.
+    """
+    stale = stale_themes(read_fetch_state(out_dir), config)
+    if not stale:
+        return
+    inconnus = [t for t, raison in stale if raison.startswith("jamais")]
+    casses = [(t, raison) for t, raison in stale if not raison.startswith("jamais")]
+
+    if casses:
+        print("\n⚠ Données de thème NON FIABLES :")
+        for theme_id, raison in casses:
+            print(f"    {theme_id:<16} {raison}")
+        print("    Reprends-les : `fetch --only "
+              + ",".join(t for t, _ in casses) + "`")
+    if inconnus:
+        print(f"\n{len(inconnus)} thèmes sans trace de collecte — le suivi ne "
+              "date que d'aujourd'hui, il se remplira au prochain `fetch`.")
 
 
 def _report_tier_changes(changes, gone, before, retained) -> None:

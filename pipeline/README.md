@@ -61,6 +61,14 @@ python -m roam_pipeline export-outlines
 | `review.html` | **la page de revue** — avec vignettes, c'est par là qu'on relit |
 | `review.csv` | la même chose en tableur, pour qui préfère |
 | `seed.sql` | seed idempotent pour la base |
+| `fetch-state.json` | issue de la dernière collecte, thème par thème |
+
+Un thème dont la collecte échoue était signalé **une fois**, en fin de journal
+de `fetch`, puis oublié : la reprise partielle reconduisait ses anciennes
+données à chaque passage, et plus rien ne disait qu'elles étaient incomplètes.
+Le mont Blanc a disparu du catalogue de cette façon, sans qu'aucun compteur ne
+bouge. `fetch-state.json` garde l'issue de chaque collecte, et **`build` la
+rappelle tant qu'elle n'est pas reprise**.
 
 `export-app` écrit en plus `mobile/src/data/catalog.json`, le fichier que lit
 l'application. Il ne contient que les lieux effectivement rattachés à une collection : un
