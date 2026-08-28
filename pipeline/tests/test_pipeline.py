@@ -27,7 +27,9 @@ from roam_pipeline.collections import (
     haversine_m,
 )
 from roam_pipeline.config import CONFIG_DIR, Exclusions, Visitors, load_config
-from roam_pipeline.export import _sql_str, write_seed_sql
+from roam_pipeline.export import (
+    _sql_str, write_review_csv, write_review_html, write_seed_sql,
+)
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
 from roam_pipeline.models import Place, display_name, slugify
 from roam_pipeline import outlines
@@ -36,7 +38,10 @@ from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from
 from roam_pipeline.cli import _known_qids, _pending_terms, _probe_verdict
 from roam_pipeline.wikipedia import title_from_url
 from roam_pipeline.wikidata import class_ancestry_query, probe_query, visitors_query
-from roam_pipeline.review import DECISIONS, apply_names, read_names, write_names
+from roam_pipeline.review import (
+    DECISIONS, apply_names, diff_tiers, read_names, read_snapshot, vanished,
+    write_names, write_snapshot,
+)
 
 
 @contextmanager
@@ -2058,6 +2063,85 @@ class TestVisitorSignal(unittest.TestCase):
         if CONFIG.visitors.search and not CONFIG.visitors.property_id:
             # Cherchée parmi les entités, une propriété ne rend rien.
             self.assertIn("property", kinds)
+
+
+class TestTierChanges(unittest.TestCase):
+    """Un lieu validé peut descendre sans que personne ne l'ait décidé.
+
+    Le niveau n'est pas une propriété du lieu : c'est son rang dans sa
+    collection. Ajouter la fréquentation au score, ou seulement collecter dix
+    lieux de plus, suffit à faire reculer un incontournable déjà relu — et rien
+    ne le disait.
+    """
+
+    @staticmethod
+    def _catalogue(bonus=0):
+        places = [
+            make_place(f"Château {i}", sitelinks=40 - i, lat=45 + i * 0.1, lon=2.0,
+                       wikidata_id=f"Q{i}")
+            for i in range(1, 15)
+        ]
+        if bonus:
+            places[-1].sitelinks = bonus
+        return score_all(places, CONFIG)
+
+    def _tiers(self, places):
+        from roam_pipeline.export import review_tiers
+        return review_tiers(build_all(places, CONFIG)[1])
+
+    def test_a_snapshot_survives_a_round_trip(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "tiers.csv"
+            write_snapshot(path, {"Q1": 1, "Q2": 3}, {"Q1": "Chambord"})
+            self.assertEqual(read_snapshot(path), {"Q1": 1, "Q2": 3})
+
+    def test_a_place_that_falls_is_named(self):
+        with _capture():
+            before = self._tiers(self._catalogue())
+            after = self._tiers(self._catalogue(bonus=99))
+        changes = diff_tiers(before, after)
+        self.assertIn("descend", changes.values())
+        self.assertIn("monte", changes.values())
+
+    def test_the_first_run_signals_nothing(self):
+        # Sans photographie précédente, tout serait « nouveau » : deux mille
+        # lignes noieraient le signal le jour où il compte vraiment.
+        self.assertEqual(diff_tiers({}, {"Q1": 1, "Q2": 2}), {})
+
+    def test_a_place_gone_from_the_catalogue_is_counted_apart(self):
+        # Il n'est plus là pour être relu : le confondre avec une descente
+        # enverrait le curateur chercher une carte qui n'existe plus.
+        self.assertEqual(vanished({"Q1": 1, "Q9": 2}, {"Q1": 1}), ["Q9"])
+        self.assertNotIn("Q9", diff_tiers({"Q1": 1, "Q9": 2}, {"Q1": 1}))
+
+    def test_an_unchanged_catalogue_reports_nothing(self):
+        with _capture():
+            tiers = self._tiers(self._catalogue())
+        self.assertEqual(diff_tiers(tiers, tiers), {})
+
+    def test_the_review_sheet_carries_the_change(self):
+        # Le curateur relit dans la feuille, pas dans le journal.
+        with _capture():
+            places = self._catalogue()
+            _retained, collections = build_all(places, CONFIG)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.csv"
+            write_review_csv(places, collections, path, CONFIG, {"Q3": "descend"})
+            lines = path.read_text(encoding="utf-8").splitlines()
+        self.assertIn("changement", lines[0])
+        self.assertTrue(any("descend" in line for line in lines[1:]))
+
+    def test_the_review_page_offers_to_filter_on_it(self):
+        # Relire ce qui a bougé est une session à part entière.
+        with _capture():
+            places = self._catalogue()
+            _retained, collections = build_all(places, CONFIG)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.html"
+            write_review_html(places, collections, CONFIG, path, {"Q3": "descend"})
+            body = path.read_text(encoding="utf-8")
+        self.assertIn('value="bouge"', body)
+        self.assertIn("descendu depuis ta dernière revue", body)
 
 
 if __name__ == "__main__":

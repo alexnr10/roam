@@ -24,6 +24,7 @@ travail éditorial. Ils sont relus à **chaque** construction :
 |---|---|
 | `decisions.csv` | verdicts d'inclusion — `keep`, `drop`, `promote`, `demote` |
 | `names.csv` | noms d'affichage choisis, quand le libellé de Wikidata ne convient pas |
+| `tiers.csv` | photographie des niveaux tels qu'ils ont été VUS à la dernière revue |
 
 Ils sont séparés à dessein. Renommer et écarter sont deux gestes différents :
 un lieu peut être renommé **et** gardé, renommé **et** écarté. Fondus dans un
@@ -37,5 +38,32 @@ python -m roam_pipeline rename                    # liste les renommages
 python -m roam_pipeline rename Q3330248 --clear   # revenir au libellé Wikidata
 ```
 
-**`decisions.csv` n'est pas versionné.** C'est plusieurs soirées de relecture :
-il ne survit qu'à une sauvegarde de la machine.
+### Ces fichiers se committent
+
+C'est plusieurs soirées de relecture, et ce sont des fichiers texte de quelques
+dizaines de kilo-octets. **Le dépôt est leur sauvegarde** — il n'y a rien de
+mieux à inventer :
+
+```bash
+git add pipeline/data/manual/decisions.csv pipeline/data/manual/names.csv \
+        pipeline/data/manual/tiers.csv
+git commit -m "Revue du <date>"
+```
+
+`apply-review` le rappelle à chaque passage.
+
+### Un niveau qui bouge sans qu'on l'ait décidé
+
+Le niveau d'un lieu n'est pas une propriété du lieu : c'est son **rang** dans sa
+collection. Ajouter un signal au score — la fréquentation, par exemple — ou
+seulement collecter dix lieux de plus suffit à faire reculer un incontournable
+déjà validé.
+
+`tiers.csv` est la photographie du dernier état vu. `build` compare et signale
+les écarts ; `apply-review` met la photographie à jour, parce que c'est le
+moment où le curateur a regardé. La prendre à chaque `build` effacerait le
+changement avant qu'il ne soit lu.
+
+Les lieux qui **descendent** sont nommés dans le journal — ce sont les seuls qui
+demandent un second regard, un lieu qui monte gardant sa décision valable. Dans
+la page de revue, le menu des niveaux offre « ce qui a changé de niveau ».

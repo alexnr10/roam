@@ -178,3 +178,82 @@ def apply_names(places: list[Place], names: dict[str, str]) -> int:
             place.name = chosen
             changed += 1
     return changed
+
+
+# ---------------------------------------------------------------------------
+# Photographie des niveaux
+# ---------------------------------------------------------------------------
+
+SNAPSHOT_HEADER = """# Niveau de chaque lieu tel que le curateur l'a vu à sa dernière revue.
+#
+# Le niveau d'un lieu n'est pas une propriété du lieu : c'est son rang dans sa
+# collection. Ajouter un signal au score, ou seulement collecter dix lieux de
+# plus, peut donc faire descendre un lieu qu'on avait validé — sans que rien ne
+# le dise.
+#
+# Ce fichier est la photographie du dernier état VU. `build` compare et signale
+# les écarts ; `apply-review` la met à jour, parce que c'est le moment où le
+# curateur a regardé.
+#
+wikidata_id,tier,name
+"""
+
+
+def read_snapshot(path: Path) -> dict[str, int]:
+    """`{qid: niveau}` du dernier état relu. Fichier absent = aucune photo."""
+    snapshot: dict[str, int] = {}
+    if not path.exists():
+        return snapshot
+    lines = [
+        line
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    for row in csv.DictReader(lines):
+        qid = (row.get("wikidata_id") or "").strip()
+        try:
+            tier = int((row.get("tier") or "").strip())
+        except ValueError:
+            continue
+        if qid:
+            snapshot[qid] = tier
+    return snapshot
+
+
+def write_snapshot(path: Path, tiers: dict[str, int], names: dict[str, str]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as fh:
+        fh.write(SNAPSHOT_HEADER)
+        writer = csv.writer(fh)
+        for qid in sorted(tiers):
+            writer.writerow([qid, tiers[qid], names.get(qid, "")])
+    LOG.info("niveaux : %s lieux photographiés dans %s", len(tiers), path)
+
+
+def diff_tiers(previous: dict[str, int], current: dict[str, int]) -> dict[str, str]:
+    """Ce qui a bougé depuis la dernière revue, par lieu.
+
+    Trois verdicts : `monte` (le lieu a gagné en priorité), `descend`, `nouveau`.
+    Un lieu sorti du catalogue n'y figure pas — il n'est plus là pour être relu,
+    et `build` le compte à part.
+
+    Sans photographie précédente, on ne renvoie RIEN : tout signaler comme
+    nouveau au premier passage noierait le signal le jour où il compte.
+    """
+    if not previous:
+        return {}
+    changes: dict[str, str] = {}
+    for qid, tier in current.items():
+        before = previous.get(qid)
+        if before is None:
+            changes[qid] = "nouveau"
+        elif tier < before:
+            changes[qid] = "monte"
+        elif tier > before:
+            changes[qid] = "descend"
+    return changes
+
+
+def vanished(previous: dict[str, int], current: dict[str, int]) -> list[str]:
+    """Lieux relus qui ne sont plus au catalogue."""
+    return sorted(set(previous) - set(current))

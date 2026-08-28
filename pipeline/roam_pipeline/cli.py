@@ -17,6 +17,7 @@ from . import wikidata as wd
 from .collections import build_all
 from .config import CONFIG_DIR, Config, load_config
 from .export import (
+    review_tiers,
     read_review_csv,
     write_json,
     write_review_csv,
@@ -44,8 +45,8 @@ from .models import Collection, CollectionPlace, Place
 from .outlines import ATTRIBUTION as OUTLINE_ATTRIBUTION, DEFAULT_TOLERANCE_KM2
 from .outlines import export as export_outlines
 from .review import (
-    DECISIONS, apply_decisions, apply_names, read_decisions, read_names,
-    write_decisions, write_names,
+    DECISIONS, apply_decisions, apply_names, diff_tiers, read_decisions, read_names,
+    read_snapshot, vanished, write_decisions, write_names, write_snapshot,
 )
 from .score import score_all
 
@@ -468,18 +469,66 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     score_all(kept, config)
 
     retained, collections = build_all(kept, config)
+
+    # Ce qui a bougé depuis la dernière revue. Le niveau d'un lieu n'est pas une
+    # propriété du lieu : c'est son rang dans sa collection. Ajouter un signal
+    # au score, ou seulement collecter dix lieux de plus, peut faire descendre
+    # un lieu déjà validé — et rien ne le disait.
+    snapshot_path = args.manual / "tiers.csv"
+    before = read_snapshot(snapshot_path)
+    current = review_tiers(collections)
+    changes = diff_tiers(before, current)
+    gone = vanished(before, current)
+
     write_json(retained, collections, args.out)
-    write_review_csv(retained, collections, args.out / "review.csv", config)
-    write_review_html(retained, collections, config, args.out / "review.html")
+    write_review_csv(retained, collections, args.out / "review.csv", config, changes)
+    write_review_html(retained, collections, config, args.out / "review.html", changes)
     write_seed_sql(retained, collections, config, args.out / "seed.sql")
+
+    _report_tier_changes(changes, gone, before, retained)
 
     if renamed:
         print(f"Renommages appliqués : {renamed}")
+
     if decisions:
         print("Décisions reprises :",
               ", ".join(f"{k}={v}" for k, v in sorted(counts.items())))
     _print_stats(retained, collections, raw=scored, config=config)
     return 0
+
+
+def _report_tier_changes(changes, gone, before, retained) -> None:
+    """Dit ce qui a bougé, sans noyer ce qui compte.
+
+    Un lieu qui MONTE n'a pas besoin d'être relu : il gagne en priorité, la
+    décision prise reste valable. Un lieu qui DESCEND, si — c'est là qu'un
+    incontournable validé se retrouve au fond de sa collection sans que
+    personne ne l'ait décidé.
+    """
+    if not before:
+        print("Aucune photographie des niveaux : elle sera prise au prochain "
+              "`apply-review`, et les changements seront signalés ensuite.")
+        return
+
+    counts = Counter(changes.values())
+    if not counts and not gone:
+        print("Niveaux inchangés depuis la dernière revue.")
+        return
+
+    print("Depuis ta dernière revue : "
+          + ", ".join(f"{n} {verdict}" for verdict, n in sorted(counts.items()))
+          + (f", {len(gone)} sortis du catalogue" if gone else ""))
+
+    names = {p.wikidata_id: p.name for p in retained}
+    descendus = [qid for qid, verdict in changes.items() if verdict == "descend"]
+    if descendus:
+        shown = sorted(names.get(q, q) for q in descendus)[:10]
+        print("  descendus : " + ", ".join(shown)
+              + (f" (+{len(descendus) - 10})" if len(descendus) > 10 else ""))
+    if gone:
+        print("  sortis    : " + ", ".join(gone[:10])
+              + (f" (+{len(gone) - 10})" if len(gone) > 10 else ""))
+    print("  `review` → filtre « ce qui a changé de niveau » pour les relire.")
 
 
 def cmd_explain(args: argparse.Namespace, config: Config) -> int:
@@ -610,7 +659,31 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
     print(f"{len(fresh)} décisions lues, {changed} nouvelles ou modifiées "
           f"({before} → {len(decisions)} au total dans {path.name}).")
 
-    return _build_and_write(args, config)
+    status = _build_and_write(args, config)
+
+    # La photographie se prend APRÈS la construction, et seulement ici : c'est
+    # le moment où le curateur a vu l'état des niveaux et l'a accepté. La
+    # prendre à chaque `build` effacerait le changement avant qu'il ne le lise.
+    collections_path = args.out / "collections.json"
+    if status == 0 and collections_path.exists():
+        rebuilt = [
+            Collection(
+                slug=c["slug"], name=c["name"], kind=c["kind"],
+                theme_id=c.get("theme_id"), label_id=c.get("label_id"),
+                geo_level=c.get("geo_level"), geo_code=c.get("geo_code"),
+                places=[CollectionPlace(m["place_id"], m["tier"], m["rank"])
+                        for m in c["places"]],
+            )
+            for c in json.loads(collections_path.read_text(encoding="utf-8"))
+        ]
+        write_snapshot(
+            args.manual / "tiers.csv",
+            review_tiers(rebuilt),
+            {p.wikidata_id: p.name for p in _load_places(args.out / "places.json")},
+        )
+        print("Décisions et niveaux enregistrés dans data/manual/ — "
+              "pense à les committer, c'est ta seule copie.")
+    return status
 
 
 def _theme_of_class(config: Config) -> dict[str, str]:

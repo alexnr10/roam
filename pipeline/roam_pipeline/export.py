@@ -26,6 +26,10 @@ REVIEW_HEADER = [
     "origine",
     "departement",
     "best_tier",
+    # Ce qui a bougé depuis la dernière revue : monte, descend, nouveau. Le
+    # niveau n'est pas une propriété du lieu mais son rang dans sa collection ;
+    # il change donc sans que le lieu ait changé.
+    "changement",
     "score",
     # Détail du score : un classement qu'on ne peut pas auditer ne peut pas être
     # corrigé. Le relecteur doit voir pourquoi un lieu passe devant un autre.
@@ -37,6 +41,8 @@ REVIEW_HEADER = [
     # Accueil du public : bonus s'il est attesté, malus s'il est refusé, zéro
     # s'il n'est pas renseigné.
     "bonus_acces",
+    # Fréquentation annuelle : bonus seul, zéro quand Wikidata l'ignore.
+    "bonus_visiteurs",
     "sitelinks",
     "labels",
     "collections",
@@ -109,11 +115,22 @@ def _membership(collections: list[Collection]) -> tuple[dict[str, list[str]], di
     return membership, review_tier
 
 
+def review_tiers(collections: list[Collection]) -> dict[str, int]:
+    """`{qid: niveau de revue}` — celui de la collection thématique nationale.
+
+    C'est le niveau que la feuille de revue affiche et sur lequel elle trie :
+    c'est donc lui, et pas un autre, qu'il faut photographier pour dire à un
+    curateur que quelque chose a bougé sous ses yeux.
+    """
+    return _membership(collections)[1]
+
+
 def write_review_csv(
     places: list[Place],
     collections: list[Collection],
     out_path: Path,
     config: Config | None = None,
+    changes: dict[str, str] | None = None,
 ) -> None:
     """Feuille de revue éditoriale.
 
@@ -145,7 +162,8 @@ def write_review_csv(
                 score_breakdown(place, config)
                 if config
                 else dict.fromkeys(
-                    ("notoriete", "labels", "article", "image", "frwiki", "acces"), ""
+                    ("notoriete", "labels", "article", "image", "frwiki", "acces",
+                     "visiteurs"), ""
                 )
             )
             writer.writerow(
@@ -157,6 +175,7 @@ def write_review_csv(
                     place.source,
                     dept.name if dept else "",
                     best_tier.get(place.wikidata_id, ""),
+                    (changes or {}).get(place.wikidata_id, ""),
                     f"{place.score:.1f}",
                     parts["notoriete"],
                     parts["labels"],
@@ -164,6 +183,7 @@ def write_review_csv(
                     parts["image"],
                     parts["frwiki"],
                     parts["acces"],
+                    parts["visiteurs"],
                     place.sitelinks,
                     "|".join(place.labels),
                     len(membership.get(place.wikidata_id, [])),
@@ -339,6 +359,7 @@ def write_review_html(
     collections: list[Collection],
     config: Config,
     out_path: Path,
+    changes: dict[str, str] | None = None,
 ) -> None:
     """Page de revue avec vignettes.
 
@@ -378,6 +399,9 @@ def write_review_html(
                 "hours": place.opening_hours,
                 "source": place.source,
                 "underFloor": under_floor(place, config),
+                # Ce qui a bougé depuis la dernière revue. Le niveau est un
+                # rang, pas une propriété : il change sans que le lieu change.
+                "changed": (changes or {}).get(place.wikidata_id, ""),
             }
         )
 
@@ -438,6 +462,10 @@ _REVIEW_TEMPLATE = """<!doctype html>
            border-radius: 6px; padding: 4px 8px; font-size: 12px; }
   .open { background: #E3F0E8; color: #2F6F4E; border-radius: 6px;
           padding: 4px 8px; font-size: 12px; }
+  .moved { border-radius: 6px; padding: 1px 6px; margin-left: 6px; font-weight: 700; }
+  .moved.monte { background: #E4F1E8; color: #2F6F4E; }
+  .moved.descend { background: #FBE9E4; color: #B4532B; }
+  .moved.nouveau { background: #F1EBDC; color: #6F6A62; }
   .found { background: #EAEDF4; color: #3B4A6B; border-radius: 6px;
            padding: 4px 8px; font-size: 12px; }
   .alerts { display: flex; flex-direction: column; gap: 4px; }
@@ -458,6 +486,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
     <select id="theme"><option value="">Tous les thèmes</option></select>
     <select id="tier">
       <option value="">Tous les niveaux</option>
+      <option value="bouge">— ce qui a changé de niveau —</option>
       <option value="1">Niveau 1 — les incontournables</option>
       <option value="2">Niveau 2</option>
       <option value="3">Niveau 3</option>
@@ -516,7 +545,10 @@ function visible() {
   const state = document.getElementById("state").value;
   return DATA.filter(p => {
     if (theme && p.theme !== theme) return false;
-    if (tier && String(p.tier) !== tier) return false;
+    // « bouge » n'est pas un niveau mais une raison de relire : un lieu validé
+    // qui a changé de rang mérite un second regard, quel que soit son niveau.
+    if (tier === "bouge") { if (!p.changed) return false; }
+    else if (tier && String(p.tier) !== tier) return false;
     const d = decisions[p.id] || "";
     if (state === "todo") return !d;
     if (state === "alert") return p.alerts.length > 0;
@@ -541,7 +573,11 @@ function card(p) {
   const parts = p.parts;
   el.innerHTML = img + `
     <div class="body">
-      <div class="tier">NIVEAU ${p.tier} · ${p.collections} collection${p.collections > 1 ? "s" : ""}</div>
+      <div class="tier">NIVEAU ${p.tier} · ${p.collections} collection${p.collections > 1 ? "s" : ""}
+        ${p.changed ? `<span class="moved ${p.changed}">${
+          p.changed === "monte" ? "▲ monté depuis ta dernière revue"
+          : p.changed === "descend" ? "▼ descendu depuis ta dernière revue"
+          : "● nouveau"}</span>` : ""}</div>
       <div class="name">${p.name}</div>
       <div class="meta">${p.theme}${p.dept ? " · " + p.dept : ""}</div>
       ${p.source === "osm"
@@ -558,6 +594,7 @@ function card(p) {
         ${parts.image ? " + " + parts.image + " image" : ""}
         ${parts.frwiki ? " + " + parts.frwiki + " fr" : ""}
         ${parts.acces ? (parts.acces > 0 ? " + " : " − ") + Math.abs(parts.acces) + " accès" : ""}
+        ${parts.visiteurs ? " + " + parts.visiteurs + " fréquentation" : ""}
         ${parts.ajustement ? (parts.ajustement > 0 ? " + " : " − ")
           + Math.abs(parts.ajustement) + " curation" : ""}</div>
       ${p.visitable === true
