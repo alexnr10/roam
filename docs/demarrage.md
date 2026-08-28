@@ -5,6 +5,35 @@ le serveur recharge l'app à chaque modification du code.
 
 Compte 15 minutes la première fois, dont l'essentiel en téléchargement.
 
+## Le plus simple : l'aperçu publié
+
+Chaque poussée sur le dépôt reconstruit l'application et la publie. Rien à
+installer, rien à allumer :
+
+**https://alexnr10.github.io/roam/**
+
+C'est une vraie adresse en HTTPS, ce qui change deux choses par rapport à un
+serveur de développement joint par le Wi-Fi : le fond de carte se charge, et
+**le navigateur autorise la géolocalisation** — la validation par GPS est donc
+éprouvable depuis le téléphone.
+
+La page embarque le catalogue tel qu'il est **dans le dépôt**. Pour y voir le
+tien, il faut l'y mettre :
+
+```bash
+python -m roam_pipeline export-app
+git add mobile/src/data/catalog.json pipeline/data/manual/*.csv
+git commit -m "Catalogue du <date>" && git push
+```
+
+Deux ou trois minutes plus tard, l'adresse sert la nouvelle version. Tout se
+fait donc depuis un téléphone sous Termux, sans jamais rallumer le Mac.
+
+> Si le dépôt est privé et le forfait GitHub gratuit, Pages n'est pas
+> disponible : la page reste récupérable en pièce jointe de la construction,
+> sous l'onglet **Actions** du dépôt. Rendre le dépôt public lève la
+> limitation.
+
 ## Avant de commencer
 
 | Sur l'ordinateur | Sur le téléphone |

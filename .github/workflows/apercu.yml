@@ -1,0 +1,85 @@
+# Publie l'aperçu web de Roam à chaque poussée.
+#
+# Le but : ouvrir l'application depuis un téléphone, sans Mac allumé et sans
+# installer six cents mégaoctets de dépendances sur l'appareil. La construction
+# se fait ici, chez GitHub ; le téléphone n'a plus qu'une adresse à ouvrir.
+#
+# C'est la page repliée en un seul fichier qui est publiée, et non le dossier
+# `dist` : servie sous `/roam/`, une application dont les chemins commencent par
+# `/` chercherait ses fichiers à la racine du domaine. Le fichier unique n'a
+# aucun voisin à trouver — il porte son worker MapLibre en blob.
+name: Aperçu
+
+on:
+  push:
+    branches: ["**"]
+  workflow_dispatch:
+
+# Une seule publication à la fois : deux poussées rapprochées se battraient
+# pour le même site, et la plus lente gagnerait.
+concurrency:
+  group: apercu
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  construire:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Installer
+        working-directory: mobile
+        run: npm ci
+
+      - name: Vérifier
+        working-directory: mobile
+        run: npm run typecheck && npx jest
+
+      - name: Construire la page autonome
+        working-directory: mobile
+        run: npm run preview:single
+
+      - name: Préparer le site
+        run: |
+          mkdir -p site
+          cp mobile/dist/roam-apercu.html site/index.html
+          # Sans ce fichier, GitHub Pages passe la page au moteur Jekyll, qui
+          # mange les accolades du bundle JavaScript.
+          touch site/.nojekyll
+
+      # Toujours déposée, même si Pages n'est pas activé : sur un dépôt privé
+      # sans forfait, c'est par ici qu'on récupère la page.
+      - name: Déposer la page
+        uses: actions/upload-artifact@v4
+        with:
+          name: roam-apercu
+          path: site/index.html
+          retention-days: 30
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  publier:
+    needs: construire
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      # Échoue sans bruit tant que Pages n'est pas activé dans les réglages du
+      # dépôt : la page reste récupérable en pièce jointe de la construction.
+      - id: deploiement
+        uses: actions/deploy-pages@v4
+        continue-on-error: true

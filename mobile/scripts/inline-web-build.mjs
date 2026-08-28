@@ -5,6 +5,11 @@
  * une page autonome se publie et s'ouvre n'importe où. Le fragment produit n'a
  * ni `<html>` ni `<head>` — l'hôte les fournit.
  *
+ * C'est aussi ce fichier que publie `.github/workflows/apercu.yml`, et pour une
+ * raison qui n'est pas seulement pratique : servi sous `/roam/`, un dossier
+ * `dist` dont les chemins commencent par `/` chercherait ses fichiers à la
+ * racine du domaine. Le fichier unique, lui, n'a aucun voisin à trouver.
+ *
  * Le worker de MapLibre vit normalement dans un fichier voisin, que la page
  * repliée n'a pas : elle le reconstitue en blob (voir plus bas). Sans lui,
  * MapLibre ne traiterait AUCUNE donnée et les cartes resteraient muettes.
