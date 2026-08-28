@@ -115,6 +115,21 @@ def _membership(collections: list[Collection]) -> tuple[dict[str, list[str]], di
     return membership, review_tier
 
 
+def review_state(
+    places: list[Place], collections: list[Collection]
+) -> dict[str, tuple[int, str]]:
+    """`{qid: (niveau de revue, thème)}` — l'état que le curateur voit.
+
+    Le thème accompagne le niveau parce qu'il prime sur lui : changer de thème,
+    c'est changer de collection et de voisins.
+    """
+    tiers = review_tiers(collections)
+    return {
+        place.wikidata_id: (tiers.get(place.wikidata_id, 3), place.theme_id)
+        for place in places
+    }
+
+
 def review_tiers(collections: list[Collection]) -> dict[str, int]:
     """`{qid: niveau de revue}` — celui de la collection thématique nationale.
 
@@ -466,6 +481,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
   .moved.monte { background: #E4F1E8; color: #2F6F4E; }
   .moved.descend { background: #FBE9E4; color: #B4532B; }
   .moved.nouveau { background: #F1EBDC; color: #6F6A62; }
+  .moved.theme { background: #3B4A6B; color: #FFFFFF; }
   .found { background: #EAEDF4; color: #3B4A6B; border-radius: 6px;
            padding: 4px 8px; font-size: 12px; }
   .alerts { display: flex; flex-direction: column; gap: 4px; }
@@ -486,7 +502,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
     <select id="theme"><option value="">Tous les thèmes</option></select>
     <select id="tier">
       <option value="">Tous les niveaux</option>
-      <option value="bouge">— ce qui a changé de niveau —</option>
+      <option value="bouge">— ce qui a changé de niveau ou de thème —</option>
       <option value="1">Niveau 1 — les incontournables</option>
       <option value="2">Niveau 2</option>
       <option value="3">Niveau 3</option>
@@ -575,7 +591,8 @@ function card(p) {
     <div class="body">
       <div class="tier">NIVEAU ${p.tier} · ${p.collections} collection${p.collections > 1 ? "s" : ""}
         ${p.changed ? `<span class="moved ${p.changed}">${
-          p.changed === "monte" ? "▲ monté depuis ta dernière revue"
+          p.changed === "theme" ? "◆ a CHANGÉ DE THÈME depuis ta dernière revue"
+          : p.changed === "monte" ? "▲ monté depuis ta dernière revue"
           : p.changed === "descend" ? "▼ descendu depuis ta dernière revue"
           : "● nouveau"}</span>` : ""}</div>
       <div class="name">${p.name}</div>

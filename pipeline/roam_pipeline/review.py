@@ -195,13 +195,19 @@ SNAPSHOT_HEADER = """# Niveau de chaque lieu tel que le curateur l'a vu à sa de
 # les écarts ; `apply-review` la met à jour, parce que c'est le moment où le
 # curateur a regardé.
 #
-wikidata_id,tier,name
+wikidata_id,tier,theme,name
 """
 
 
-def read_snapshot(path: Path) -> dict[str, int]:
-    """`{qid: niveau}` du dernier état relu. Fichier absent = aucune photo."""
-    snapshot: dict[str, int] = {}
+def read_snapshot(path: Path) -> dict[str, tuple[int, str]]:
+    """`{qid: (niveau, thème)}` du dernier état relu.
+
+    Le thème compte autant que le niveau : un lieu qui change de thème change
+    de collection, de voisins et de sens. Le Petit Palais classé en « maison
+    d'artiste » puis rendu aux musées est un événement éditorial, pas un
+    ajustement de rang.
+    """
+    snapshot: dict[str, tuple[int, str]] = {}
     if not path.exists():
         return snapshot
     lines = [
@@ -216,44 +222,57 @@ def read_snapshot(path: Path) -> dict[str, int]:
         except ValueError:
             continue
         if qid:
-            snapshot[qid] = tier
+            snapshot[qid] = (tier, (row.get("theme") or "").strip())
     return snapshot
 
 
-def write_snapshot(path: Path, tiers: dict[str, int], names: dict[str, str]) -> None:
+def write_snapshot(
+    path: Path, state: dict[str, tuple[int, str]], names: dict[str, str]
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as fh:
         fh.write(SNAPSHOT_HEADER)
         writer = csv.writer(fh)
-        for qid in sorted(tiers):
-            writer.writerow([qid, tiers[qid], names.get(qid, "")])
-    LOG.info("niveaux : %s lieux photographiés dans %s", len(tiers), path)
+        for qid in sorted(state):
+            tier, theme = state[qid]
+            writer.writerow([qid, tier, theme, names.get(qid, "")])
+    LOG.info("niveaux : %s lieux photographiés dans %s", len(state), path)
 
 
-def diff_tiers(previous: dict[str, int], current: dict[str, int]) -> dict[str, str]:
+def diff_tiers(
+    previous: dict[str, tuple[int, str]], current: dict[str, tuple[int, str]]
+) -> dict[str, str]:
     """Ce qui a bougé depuis la dernière revue, par lieu.
 
-    Trois verdicts : `monte` (le lieu a gagné en priorité), `descend`, `nouveau`.
-    Un lieu sorti du catalogue n'y figure pas — il n'est plus là pour être relu,
-    et `build` le compte à part.
+    Quatre verdicts. `theme` d'abord, parce qu'il prime : changer de thème,
+    c'est changer de collection, de voisins et de sens — un lieu validé comme
+    maison d'artiste et rendu aux musées doit être revu comme musée, quel que
+    soit le rang qu'il y prend. Puis `monte`, `descend`, `nouveau`.
 
-    Sans photographie précédente, on ne renvoie RIEN : tout signaler comme
+    Un lieu sorti du catalogue n'y figure pas : il n'est plus là pour être
+    relu, et `build` le compte à part.
+
+    Sans photographie précédente, on ne renvoie RIEN — tout signaler comme
     nouveau au premier passage noierait le signal le jour où il compte.
     """
     if not previous:
         return {}
     changes: dict[str, str] = {}
-    for qid, tier in current.items():
+    for qid, (tier, theme) in current.items():
         before = previous.get(qid)
         if before is None:
             changes[qid] = "nouveau"
-        elif tier < before:
+            continue
+        tier_avant, theme_avant = before
+        if theme_avant and theme != theme_avant:
+            changes[qid] = "theme"
+        elif tier < tier_avant:
             changes[qid] = "monte"
-        elif tier > before:
+        elif tier > tier_avant:
             changes[qid] = "descend"
     return changes
 
 
-def vanished(previous: dict[str, int], current: dict[str, int]) -> list[str]:
+def vanished(previous: dict, current: dict) -> list[str]:
     """Lieux relus qui ne sont plus au catalogue."""
     return sorted(set(previous) - set(current))

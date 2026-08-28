@@ -24,7 +24,7 @@ travail éditorial. Ils sont relus à **chaque** construction :
 |---|---|
 | `decisions.csv` | verdicts d'inclusion — `keep`, `drop`, `promote`, `demote` |
 | `names.csv` | noms d'affichage choisis, quand le libellé de Wikidata ne convient pas |
-| `tiers.csv` | photographie des niveaux tels qu'ils ont été VUS à la dernière revue |
+| `tiers.csv` | photographie du niveau ET du thème tels qu'ils ont été VUS à la dernière revue |
 
 Ils sont séparés à dessein. Renommer et écarter sont deux gestes différents :
 un lieu peut être renommé **et** gardé, renommé **et** écarté. Fondus dans un
@@ -64,6 +64,11 @@ les écarts ; `apply-review` met la photographie à jour, parce que c'est le
 moment où le curateur a regardé. La prendre à chaque `build` effacerait le
 changement avant qu'il ne soit lu.
 
-Les lieux qui **descendent** sont nommés dans le journal — ce sont les seuls qui
+Le **thème** est photographié avec le niveau, et il prime sur lui : changer de
+thème, c'est changer de collection, de voisins et de sens. Un lieu validé
+comme maison d'artiste et rendu aux musées doit être revu comme musée, quel que
+soit le rang qu'il y prend — sa décision avait été prise dans un autre contexte.
+
+Les lieux qui **changent de thème** et ceux qui **descendent** sont nommés dans le journal — ce sont les seuls qui
 demandent un second regard, un lieu qui monte gardant sa décision valable. Dans
 la page de revue, le menu des niveaux offre « ce qui a changé de niveau ».

@@ -190,6 +190,7 @@ def theme_query(
     min_sitelinks: int,
     limit: int | None = None,
     offset: int = 0,
+    exclude_classes: list[str] | None = None,
 ) -> str:
     """Lieux français d'un thème, avec notoriété et commune de rattachement.
 
@@ -204,6 +205,14 @@ def theme_query(
     """
     values = " ".join(f"wd:{q}" for q in class_qids)
     page = f"\nORDER BY ?item\nLIMIT {limit} OFFSET {offset}" if limit else ""
+    # `MINUS` ferme la ROUTE sans écarter le lieu du catalogue : il reste
+    # disponible pour un thème déclaré plus loin. Un palais-musée cesse d'être
+    # une maison d'artiste et redevient un musée.
+    refused = ""
+    if exclude_classes:
+        bad = " ".join(f"wd:{q}" for q in exclude_classes)
+        refused = (f"\n  MINUS {{ VALUES ?refuse {{ {bad} }} "
+                   f"?item wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* ?refuse . }}")
     return f"""
 SELECT DISTINCT ?item ?itemLabel ?coord ?sitelinks ?image ?commons ?elevation ?admin ?frwiki
 WHERE {{
@@ -212,7 +221,7 @@ WHERE {{
   ?item wdt:{P_COUNTRY} wd:{Q_FRANCE} .
   ?item wdt:{P_COORDINATE} ?coord .
   ?item wikibase:sitelinks ?sitelinks .
-  FILTER(?sitelinks >= {min_sitelinks})
+  FILTER(?sitelinks >= {min_sitelinks}){refused}
   OPTIONAL {{ ?item wdt:{P_IMAGE} ?image. }}
   OPTIONAL {{ ?item wdt:{P_COMMONS_CATEGORY} ?commons. }}
   OPTIONAL {{ ?item wdt:{P_ELEVATION} ?elevation. }}

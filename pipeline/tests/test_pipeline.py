@@ -2114,20 +2114,25 @@ class TestTierChanges(unittest.TestCase):
             places[-1].sitelinks = bonus
         return score_all(places, CONFIG)
 
-    def _tiers(self, places):
-        from roam_pipeline.export import review_tiers
-        return review_tiers(build_all(places, CONFIG)[1])
+    def _state(self, places):
+        from roam_pipeline.export import review_state
+        retained, collections = build_all(places, CONFIG)
+        return review_state(retained, collections)
 
     def test_a_snapshot_survives_a_round_trip(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "tiers.csv"
-            write_snapshot(path, {"Q1": 1, "Q2": 3}, {"Q1": "Chambord"})
-            self.assertEqual(read_snapshot(path), {"Q1": 1, "Q2": 3})
+            write_snapshot(
+                path, {"Q1": (1, "chateaux"), "Q2": (3, "musees")}, {"Q1": "Chambord"}
+            )
+            self.assertEqual(
+                read_snapshot(path), {"Q1": (1, "chateaux"), "Q2": (3, "musees")}
+            )
 
     def test_a_place_that_falls_is_named(self):
         with _capture():
-            before = self._tiers(self._catalogue())
-            after = self._tiers(self._catalogue(bonus=99))
+            before = self._state(self._catalogue())
+            after = self._state(self._catalogue(bonus=99))
         changes = diff_tiers(before, after)
         self.assertIn("descend", changes.values())
         self.assertIn("monte", changes.values())
@@ -2135,18 +2140,34 @@ class TestTierChanges(unittest.TestCase):
     def test_the_first_run_signals_nothing(self):
         # Sans photographie précédente, tout serait « nouveau » : deux mille
         # lignes noieraient le signal le jour où il compte vraiment.
-        self.assertEqual(diff_tiers({}, {"Q1": 1, "Q2": 2}), {})
+        self.assertEqual(diff_tiers({}, {"Q1": (1, "a"), "Q2": (2, "a")}), {})
 
     def test_a_place_gone_from_the_catalogue_is_counted_apart(self):
         # Il n'est plus là pour être relu : le confondre avec une descente
         # enverrait le curateur chercher une carte qui n'existe plus.
-        self.assertEqual(vanished({"Q1": 1, "Q9": 2}, {"Q1": 1}), ["Q9"])
-        self.assertNotIn("Q9", diff_tiers({"Q1": 1, "Q9": 2}, {"Q1": 1}))
+        avant = {"Q1": (1, "a"), "Q9": (2, "a")}
+        apres = {"Q1": (1, "a")}
+        self.assertEqual(vanished(avant, apres), ["Q9"])
+        self.assertNotIn("Q9", diff_tiers(avant, apres))
 
     def test_an_unchanged_catalogue_reports_nothing(self):
         with _capture():
-            tiers = self._tiers(self._catalogue())
-        self.assertEqual(diff_tiers(tiers, tiers), {})
+            state = self._state(self._catalogue())
+        self.assertEqual(diff_tiers(state, state), {})
+
+    def test_a_theme_change_outranks_a_tier_change(self):
+        # Le Petit Palais validé en « maison d'artiste » puis rendu aux musées :
+        # sa décision a été prise dans un autre contexte, et le rang qu'il
+        # prend chez les musées ne dit rien de ce qu'il vaut là-bas.
+        changes = diff_tiers(
+            {"Q1": (1, "maisons")}, {"Q1": (3, "musees")}
+        )
+        self.assertEqual(changes["Q1"], "theme")
+
+    def test_a_snapshot_without_a_theme_still_reads(self):
+        # Les photographies prises avant que le thème n'y figure ne doivent pas
+        # faire croire que tout le catalogue a changé de thème.
+        self.assertEqual(diff_tiers({"Q1": (1, "")}, {"Q1": (1, "musees")}), {})
 
     def test_the_review_sheet_carries_the_change(self):
         # Le curateur relit dans la feuille, pas dans le journal.

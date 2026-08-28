@@ -85,7 +85,13 @@ themes:
     min_sitelinks: 10
     fetch_min_sitelinks: 4
     cap: 60
-    wikidata_classes: [Q2977, Q163687, Q120560]      # cathédrale, basilique, basilique mineure
+    wikidata_classes: [Q2977, Q163687, Q120560, Q56242215]
+    # cathédrale, basilique, basilique mineure, cathédrale catholique
+    #
+    # « cathédrale catholique » n'est pas rattachée à « cathédrale » chez
+    # Wikidata : 52 édifices y échappaient, dont Notre-Dame de Paris et la
+    # primatiale Saint-Jean de Lyon. Deuxième trou de la même famille que les
+    # basiliques mineures, trouvé par le même recensement.
     # « basilique mineure » est un TITRE canonique, pas une forme
     # architecturale : Wikidata ne la range donc pas sous « basilique »
     # (Q163687), et cinquante édifices lui échappaient — dont Notre-Dame de
@@ -145,6 +151,14 @@ themes:
     broad_classes:
       - qid: Q3947            # maison
         fetch_min_sitelinks: 8
+        # Un palais est, chez Wikidata, une sorte de maison — et `maisons` est
+        # déclaré avant `musees`. Le Petit Palais se retrouvait donc en
+        # « maison d'artiste », avec tous les musées-palais. La classe n'est
+        # pas fausse : c'est la ROUTE qui l'est. Un palais-musée relève de
+        # `musees`, et l'exception le lui rend.
+        except: []
+        except_search:
+          - palais
     #
     # Deux couples portent le même libellé français pour des entités
     # différentes : le BÂTIMENT et l'INSTITUTION d'une part, le LIEU de travail

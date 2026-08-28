@@ -17,6 +17,7 @@ from . import wikidata as wd
 from .collections import build_all
 from .config import CONFIG_DIR, Config, load_config
 from .export import (
+    review_state,
     review_tiers,
     read_review_csv,
     write_json,
@@ -88,6 +89,8 @@ def cmd_verify_qids(args: argparse.Namespace, config: Config) -> int:
             qids.setdefault(broad.qid, []).append(
                 f"thème {theme.id}, classe générique ≥ {broad.fetch_min_sitelinks}"
             )
+            for qid in broad.exceptions:
+                qids.setdefault(qid, []).append(f"thème {theme.id}, exception")
     for label in config.labels:
         if label.qid:
             qids.setdefault(label.qid, []).append(f"label {label.id}")
@@ -138,6 +141,9 @@ def _pending_terms(config: Config) -> list[tuple[str, str, str]]:
     for theme in config.themes:
         for term in theme.search:
             pending.append((f"thème {theme.id}", term, "item"))
+        for broad in theme.broad_classes:
+            for term in broad.except_search:
+                pending.append((f"thème {theme.id}, exception de {broad.qid}", term, "item"))
     for label in config.labels:
         if not label.is_manual and not label.qid and label.search:
             pending.append((f"label {label.id}", label.search, "item"))
@@ -477,7 +483,7 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     # un lieu déjà validé — et rien ne le disait.
     snapshot_path = args.manual / "tiers.csv"
     before = read_snapshot(snapshot_path)
-    current = review_tiers(collections)
+    current = review_state(retained, collections)
     changes = diff_tiers(before, current)
     gone = vanished(before, current)
 
@@ -504,7 +510,9 @@ def _report_tier_changes(changes, gone, before, retained) -> None:
     Un lieu qui MONTE n'a pas besoin d'être relu : il gagne en priorité, la
     décision prise reste valable. Un lieu qui DESCEND, si — c'est là qu'un
     incontournable validé se retrouve au fond de sa collection sans que
-    personne ne l'ait décidé.
+    personne ne l'ait décidé. Et un lieu qui CHANGE DE THÈME plus encore : il
+    a changé de collection, de voisins et de sens, et la décision prise sur
+    lui l'a été dans un autre contexte.
     """
     if not before:
         print("Aucune photographie des niveaux : elle sera prise au prochain "
@@ -521,11 +529,12 @@ def _report_tier_changes(changes, gone, before, retained) -> None:
           + (f", {len(gone)} sortis du catalogue" if gone else ""))
 
     names = {p.wikidata_id: p.name for p in retained}
-    descendus = [qid for qid, verdict in changes.items() if verdict == "descend"]
-    if descendus:
-        shown = sorted(names.get(q, q) for q in descendus)[:10]
-        print("  descendus : " + ", ".join(shown)
-              + (f" (+{len(descendus) - 10})" if len(descendus) > 10 else ""))
+    for verdict, titre in (("theme", "changé de thème"), ("descend", "descendus")):
+        touches = [qid for qid, v in changes.items() if v == verdict]
+        if touches:
+            shown = sorted(names.get(q, q) for q in touches)[:10]
+            print(f"  {titre:<16}: " + ", ".join(shown)
+                  + (f" (+{len(touches) - 10})" if len(touches) > 10 else ""))
     if gone:
         print("  sortis    : " + ", ".join(gone[:10])
               + (f" (+{len(gone) - 10})" if len(gone) > 10 else ""))
@@ -677,10 +686,11 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
             )
             for c in json.loads(collections_path.read_text(encoding="utf-8"))
         ]
+        finales = _load_places(args.out / "places.json")
         write_snapshot(
             args.manual / "tiers.csv",
-            review_tiers(rebuilt),
-            {p.wikidata_id: p.name for p in _load_places(args.out / "places.json")},
+            review_state(finales, rebuilt),
+            {p.wikidata_id: p.name for p in finales},
         )
         print("Décisions et niveaux enregistrés dans data/manual/ — "
               "pense à les committer, c'est ta seule copie.")
