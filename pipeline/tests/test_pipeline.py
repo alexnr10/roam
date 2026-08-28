@@ -2041,9 +2041,13 @@ class TestVisitorSignal(unittest.TestCase):
                     (CONFIG_DIR / name).read_text(encoding="utf-8"), encoding="utf-8"
                 )
             scoring = (base / "scoring.yaml").read_text(encoding="utf-8")
-            (base / "scoring.yaml").write_text(
-                scoring.replace("  property: null", "  property: 1174"), encoding="utf-8"
+            # On remplace la forme de la ligne, pas sa valeur : le test doit
+            # survivre à la résolution de la propriété.
+            patched, count = re.subn(
+                r"^  property: .*$", "  property: 1174", scoring, flags=re.MULTILINE
             )
+            assert count == 1, "ligne `property` introuvable dans scoring.yaml"
+            (base / "scoring.yaml").write_text(patched, encoding="utf-8")
             with self.assertRaises(ValueError) as raised:
                 load_config(base)
         self.assertIn("propriété", str(raised.exception))

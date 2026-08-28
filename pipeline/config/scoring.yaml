@@ -77,10 +77,10 @@ scoring:
 # d'une minorité de sites ; pénaliser les autres reviendrait à noter le zèle
 # des contributeurs. Bonus seul, jamais de malus.
 visitors:
-  # À résoudre : `suggest-qids --property "nombre de visiteurs par an"`.
+  # Résolue par `suggest-qids --property`, vérifiable par `verify-qids`.
   # Une propriété erronée ne lève rien — elle rend zéro résultat, en silence.
-  property: null
-  search: nombre de visiteurs par an
+  property: P1174        # nombre de visiteurs par an
+  search: null
   # Poids À CALIBRER sur les chiffres réels : `build` affiche la couverture et
   # la distribution. Trop haut, la fréquentation écrase tout le reste ; trop
   # bas, Giverny reste au niveau 3 de sa propre collection.
