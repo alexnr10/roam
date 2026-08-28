@@ -74,12 +74,18 @@ jobs:
   publier:
     needs: construire
     runs-on: ubuntu-latest
+    # Au NIVEAU DU JOB, et non de l'étape : tant que Pages n'est pas activé
+    # dans les réglages du dépôt, c'est l'environnement `github-pages` qui est
+    # refusé — le job échoue donc avant sa première étape, et un
+    # `continue-on-error` posé sur celle-ci n'a jamais l'occasion d'agir.
+    #
+    # La construction, elle, réussit toujours : la page reste récupérable en
+    # pièce jointe. Une croix rouge ici ne dit qu'une chose, « Pages n'est pas
+    # activé », et elle ne doit pas faire croire que le build est cassé.
+    continue-on-error: true
     environment:
       name: github-pages
       url: ${{ steps.deploiement.outputs.page_url }}
     steps:
-      # Échoue sans bruit tant que Pages n'est pas activé dans les réglages du
-      # dépôt : la page reste récupérable en pièce jointe de la construction.
       - id: deploiement
         uses: actions/deploy-pages@v4
-        continue-on-error: true
