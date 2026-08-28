@@ -1,4 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import React, { useMemo } from 'react';
 import {
   Linking,
@@ -24,11 +25,12 @@ import { useCheckIn } from '../../src/lib/useCheckIn';
 import { useLocation } from '../../src/lib/useLocation';
 import { useVisits } from '../../src/store/visits';
 import { colors, radius, spacing, themeEmoji, type } from '../../src/theme';
-import { Button, Card, Pill, ProgressBar, TierDot } from '../../src/ui/components';
+import { BackBar, Button, Card, Pill, ProgressBar, TierDot } from '../../src/ui/components';
 
 export default function PlaceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { visits, visitedIds, removeVisit } = useVisits();
   const checkIn = useCheckIn();
   const { position } = useLocation();
@@ -55,8 +57,13 @@ export default function PlaceScreen() {
   return (
     <ScrollView
       style={{ backgroundColor: colors.bg }}
-      contentContainerStyle={{ padding: spacing.lg, paddingBottom: spacing.xxl }}
+      contentContainerStyle={{
+        padding: spacing.lg,
+        paddingTop: insets.top + spacing.md,
+        paddingBottom: spacing.xxl,
+      }}
     >
+      <BackBar />
       <Text style={styles.emoji}>{themeEmoji[place.themeId] ?? '📍'}</Text>
       <Text style={type.title}>{place.name}</Text>
       <Text style={[type.small, { marginTop: spacing.xs }]}>

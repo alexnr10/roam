@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, ViewStyle } from 'react-native';
 
@@ -72,6 +73,34 @@ export function TierDot({ tier, size = 10 }: { tier: Tier; size?: number }) {
  * voir le choix courant, là où un menu déroulant le cacherait derrière un
  * appui de plus.
  */
+/**
+ * Retour vers l'écran précédent, posé DANS l'écran.
+ *
+ * L'en-tête de la pile de navigation en fournissait un — sauf dans la page
+ * repliée en un seul fichier, où l'adresse ne change jamais : la pile croit
+ * n'avoir qu'un écran, l'en-tête reste vide, et on se retrouve enfermé sur la
+ * fiche d'un lieu sans aucun moyen d'en sortir.
+ *
+ * Un contrôle qui ne dépend d'aucune de ces subtilités, et un repli explicite
+ * vers la carte quand il n'y a réellement rien derrière : on ne doit jamais
+ * pouvoir rester bloqué.
+ */
+export function BackBar({ label = 'Retour' }: { label?: string }) {
+  const router = useRouter();
+  return (
+    <Pressable
+      onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+      style={styles.back}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      hitSlop={12}
+    >
+      <Text style={styles.backArrow}>←</Text>
+      <Text style={styles.backLabel}>{label}</Text>
+    </Pressable>
+  );
+}
+
 export function ChipRow<T extends string>({
   options,
   value,
@@ -195,6 +224,17 @@ export function EmptyState({ title, body }: { title: string; body: string }) {
 }
 
 const styles = StyleSheet.create({
+  back: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    alignSelf: 'flex-start',
+    paddingVertical: spacing.xs,
+    paddingRight: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  backArrow: { fontSize: 20, color: colors.primary, lineHeight: 22 },
+  backLabel: { fontSize: 15, color: colors.primary, fontWeight: '600' },
   chipRow: { gap: spacing.xs, paddingVertical: spacing.xs, paddingRight: spacing.lg },
   chip: {
     paddingHorizontal: spacing.md,

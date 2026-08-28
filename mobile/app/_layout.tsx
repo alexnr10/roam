@@ -22,8 +22,11 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="place/[id]" options={{ title: '' }} />
-          <Stack.Screen name="collection/[slug]" options={{ title: '' }} />
+          {/* Pas d'en-tête de pile : son bouton retour dépend de l'historique
+              du navigateur, que la page repliée en un seul fichier fige. Les
+              écrans portent leur propre `BackBar`, qui marche partout. */}
+          <Stack.Screen name="place/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="collection/[slug]" options={{ headerShown: false }} />
         </Stack>
         </CelebrationProvider>
       </VisitsProvider>

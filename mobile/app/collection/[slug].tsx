@@ -1,4 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import React, { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -6,7 +7,7 @@ import { getCollection, getPlace, themeLabel } from '../../src/data/catalog';
 import { computeProgress, nextMilestone } from '../../src/lib/progress';
 import { useVisits } from '../../src/store/visits';
 import { colors, radius, spacing, themeEmoji, type } from '../../src/theme';
-import { Card, Pill, ProgressBar, TierDot } from '../../src/ui/components';
+import { BackBar, Card, Pill, ProgressBar, TierDot } from '../../src/ui/components';
 import type { Tier } from '../../src/types';
 
 const TIER_TITLES: Record<Tier, string> = {
@@ -18,6 +19,7 @@ const TIER_TITLES: Record<Tier, string> = {
 export default function CollectionScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { visits, visitedIds } = useVisits();
 
   const collection = slug ? getCollection(slug) : undefined;
@@ -39,8 +41,13 @@ export default function CollectionScreen() {
   return (
     <ScrollView
       style={{ backgroundColor: colors.bg }}
-      contentContainerStyle={{ padding: spacing.lg, paddingBottom: spacing.xxl }}
+      contentContainerStyle={{
+        padding: spacing.lg,
+        paddingTop: insets.top + spacing.md,
+        paddingBottom: spacing.xxl,
+      }}
     >
+      <BackBar />
       <Text style={type.title}>{collection.name}</Text>
 
       <Card style={{ marginTop: spacing.lg, gap: spacing.md }}>
