@@ -1020,12 +1020,18 @@ def cmd_gaps(args: argparse.Namespace, config: Config) -> int:
     print(f"{len(counts)} classes, {len(candidates)} assez fournies — "
           f"examen de leurs membres…")
 
+    # Par petits lots : les classes massives (église, musée, montagne) font
+    # dépasser le délai de WDQS dès qu'on en groupe dix. Un lot perdu, ce sont
+    # dix angles morts qui restent aveugles — et le recensement ne sert plus à
+    # rien s'il tait ce qu'il n'a pas pu regarder.
     rows: list[dict] = []
-    for batch in wd.chunked(candidates, 10):
+    manques: list[str] = []
+    for batch in wd.chunked(candidates, 4):
         try:
             rows.extend(client.query(wd.class_members_query(batch, args.min_sitelinks)))
         except Exception as exc:
-            LOG.error("classes %s : lot échoué (%s)", ", ".join(batch), exc)
+            LOG.warning("classes non examinées (%s) : %s", exc, ", ".join(batch))
+            manques.extend(batch)
 
     classes = [c for c in census(rows, counts, known, owned) if c["manquants"]]
     labels = _entity_labels(client, [c["qid"] for c in classes[: args.limit]])
@@ -1040,6 +1046,16 @@ def cmd_gaps(args: argparse.Namespace, config: Config) -> int:
         label = f"{marque} {entry['label']} ({entry['qid']})"
         print(f"  {label[:38]:<38} {entry['manquants']:>8} {entry['total']:>6}   "
               + ", ".join(entry["exemples"][:3])[:60])
+
+    if manques:
+        # Le dire fort : une liste incomplète qui se présente comme complète
+        # est pire que pas de liste du tout.
+        print(f"\n⚠ {len(manques)} classes N'ONT PAS PU être examinées — le "
+              f"recensement ci-dessus est INCOMPLET.")
+        print("  Relance avec un plancher plus haut (`--min-sitelinks 15`) ou "
+              "moins de classes (`--min-places 20`).")
+        print("  " + ", ".join(manques[:20]) + (f" (+{len(manques) - 20})"
+              if len(manques) > 20 else ""))
 
     print("\n« ✗ » : aucun thème ne collecte cette classe — c'est un angle mort.")
     print("« · » : classe collectée ; ses absents sont sous un plancher, pas hors")

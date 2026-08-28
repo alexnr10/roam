@@ -85,7 +85,11 @@ themes:
     min_sitelinks: 10
     fetch_min_sitelinks: 4
     cap: 60
-    wikidata_classes: [Q2977, Q163687]               # cathédrale, basilique
+    wikidata_classes: [Q2977, Q163687, Q120560]      # cathédrale, basilique, basilique mineure
+    # « basilique mineure » est un TITRE canonique, pas une forme
+    # architecturale : Wikidata ne la range donc pas sous « basilique »
+    # (Q163687), et cinquante édifices lui échappaient — dont Notre-Dame de
+    # Fourvière. Trouvé par `gaps`, qui l'a signalée à 50 absents sur 50.
 
   # Pas de classe Wikidata : « commune française » ramènerait les 35 000 communes.
   # Les labels sont ici la seule sélection défendable — et ils sont déjà finis.
@@ -161,7 +165,11 @@ themes:
     min_sitelinks: 12
     fetch_min_sitelinks: 4
     cap: 50
-    wikidata_classes: [Q33506]                       # musée
+    wikidata_classes: [Q33506, Q207694]              # musée, musée d'art
+    # « musée d'art » devrait être une sous-classe de « musée » et remonter
+    # toute seule ; dans les faits elle ne le fait pas, et `gaps` a compté 55
+    # absents sur 62 — dont le Petit Palais. Une hiérarchie qu'on suppose ne
+    # remplace pas une classe qu'on déclare.
 
   # Trou constaté à la relecture : Giverny, l'auberge Ravoux où mourut Van Gogh
   # et les maisons d'écrivains n'entraient dans aucun thème. Ce sont pourtant

@@ -7,6 +7,7 @@ l'en-tête `Retry-After` quand le service le renvoie.
 
 from __future__ import annotations
 
+import json
 import logging
 import time
 from typing import Any, Iterable, Iterator
@@ -82,7 +83,11 @@ class SparqlClient:
                 LOG.warning("tentative %s/%s échouée : %s", attempt, self.max_retries, exc)
             else:
                 if resp.status_code == 200:
-                    return _flatten(resp.json())
+                    # `strict=False` : un libellé Wikidata peut contenir un
+                    # caractère de contrôle brut, que le décodeur JSON refuse
+                    # par défaut. Un lot entier de classes mourait pour un seul
+                    # caractère, à la ligne 22 478 d'une réponse.
+                    return _flatten(json.loads(resp.text, strict=False))
                 if resp.status_code in (429, 503):
                     wait = float(resp.headers.get("Retry-After", delay))
                     LOG.warning("WDQS %s, attente de %.0fs", resp.status_code, wait)

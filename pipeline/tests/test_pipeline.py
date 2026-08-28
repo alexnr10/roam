@@ -2252,5 +2252,32 @@ class TestGapCensus(unittest.TestCase):
         self.assertIn("SUM(IF(?sitelinks >= 8, 1, 0)) AS ?n8", sparql)
 
 
+class TestClassesFoundByTheCensus(unittest.TestCase):
+    """Les deux trous que `gaps` a nommés, et qu'il ne doit plus rouvrir."""
+
+    def test_minor_basilicas_are_collected(self):
+        # « basilique mineure » est un TITRE canonique, pas une forme
+        # architecturale : Wikidata ne la range pas sous « basilique », et
+        # cinquante édifices y échappaient — dont Notre-Dame de Fourvière.
+        self.assertIn("Q120560", CONFIG.theme("cathedrales").wikidata_classes)
+
+    def test_art_museums_are_collected(self):
+        # Elle devrait remonter comme sous-classe de « musée ». Dans les faits
+        # elle ne le fait pas : 55 absents sur 62, dont le Petit Palais. Une
+        # hiérarchie qu'on suppose ne remplace pas une classe qu'on déclare.
+        self.assertIn("Q207694", CONFIG.theme("musees").wikidata_classes)
+
+    def test_a_control_character_does_not_kill_a_batch(self):
+        # Un libellé Wikidata peut contenir un caractère de contrôle brut. Le
+        # décodeur JSON le refuse par défaut, et tout un lot de classes mourait
+        # pour un seul caractère.
+        import json as _json
+        payload = '{"results": {"bindings": [{"x": {"value": "a\x01b"}}]}}'
+        with self.assertRaises(_json.JSONDecodeError):
+            _json.loads(payload)
+        self.assertEqual(_json.loads(payload, strict=False)["results"]["bindings"][0]["x"]["value"],
+                         "a\x01b")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
