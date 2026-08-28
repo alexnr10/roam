@@ -3,14 +3,14 @@ import React, { useMemo, useState } from 'react';
 import { FlatList, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { places as allPlaces, themeLabel } from '../../src/data/catalog';
+import { places as allPlaces, themeLabel, themes } from '../../src/data/catalog';
 import { evaluateCheckIn, suggestCheckIn } from '../../src/lib/checkin';
 import { distanceToPlace, formatDistance } from '../../src/lib/geo';
 import { useCheckIn } from '../../src/lib/useCheckIn';
 import { useLocation } from '../../src/lib/useLocation';
 import { useVisits } from '../../src/store/visits';
 import { colors, spacing, radius, type, themeEmoji } from '../../src/theme';
-import { Button, Pill, SegmentedControl } from '../../src/ui/components';
+import { Button, ChipRow, Pill, SegmentedControl } from '../../src/ui/components';
 import { MapCanvas } from '../../src/ui/MapCanvas';
 import type { Place } from '../../src/types';
 
@@ -23,12 +23,26 @@ export default function MapScreen() {
   const checkIn = useCheckIn();
   const { position, granted, simulated } = useLocation();
   const [filter, setFilter] = useState<Filter>('all');
+  const [theme, setTheme] = useState<string | null>(null);
 
   const visible = useMemo(() => {
-    if (filter === 'todo') return allPlaces.filter((p) => !visitedIds.has(p.id));
-    if (filter === 'done') return allPlaces.filter((p) => visitedIds.has(p.id));
-    return allPlaces;
-  }, [filter, visitedIds]);
+    // Le thème d'abord : c'est lui qui dit ce qu'on cherche, l'état de
+    // validation ne fait que trancher dans cette recherche.
+    const scope = theme ? allPlaces.filter((p) => p.themeId === theme) : allPlaces;
+    if (filter === 'todo') return scope.filter((p) => !visitedIds.has(p.id));
+    if (filter === 'done') return scope.filter((p) => visitedIds.has(p.id));
+    return scope;
+  }, [filter, theme, visitedIds]);
+
+  const themeOptions = useMemo(
+    () => [
+      { value: null, label: 'Tous les thèmes' },
+      ...themes
+        .map((entry) => ({ value: entry.id, label: entry.name }))
+        .sort((a, b) => a.label.localeCompare(b.label, 'fr')),
+    ],
+    [],
+  );
 
   /**
    * Lieux les plus proches, dans l'ordre. Sans position, on affiche quand même
@@ -70,6 +84,9 @@ export default function MapScreen() {
             { value: 'done', label: 'Visités' },
           ]}
         />
+        {/* Vingt-trois thèmes : une rangée défilante plutôt qu'un contrôle
+            segmenté, qui n'en tient que quatre. */}
+        <ChipRow options={themeOptions} value={theme} onChange={setTheme} />
       </View>
 
       <View style={styles.map}>

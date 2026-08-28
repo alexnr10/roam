@@ -155,11 +155,26 @@ de lecture, pas seulement de navigation.
    partagés, 460 Ko pour 119 territoires
 5. **Coloriage sur la carte MapLibre** ✅ — carte au-dessus, liste dessous ; taper un
    territoire y réduit la liste
-6. Communes, et une carte par thème
+6. **Filtre par thème** ✅ — carte et liste, « où ai-je conquis les châteaux ? »
+7. Communes, et filtre par région
 
 Les étapes 2 et 3 ont validé les règles avant tout investissement dans le rendu
 géographique — et l'écran en liste reste utile après : il dit ce qu'il reste à faire, là
 où un aplat de couleur ne dit que ce qui est fait.
+
+## Filtrer par thème change ce que la couleur veut dire
+
+Sans filtre, deux couleurs : or pour une collection thématique finie,
+terracotta pour le territoire entier. Sous filtre, **les deux se confondent** —
+« j'ai fini les châteaux du Val-d'Oise » EST la conquête, il n'y a plus de
+second palier au-dessus. La légende se réduit donc à une seule couleur.
+
+Le seuil de jouabilité, lui, s'applique alors à l'unité « tous thèmes », qui
+n'en couvre plus qu'un : sans quoi un département d'un seul château se
+colorierait en une visite. Un territoire trop pauvre dans le thème reste
+neutre — **et la liste doit le dire de la même façon**. Annoncer « territoire
+conquis » sur une zone que l'aplat laisse grise était une contradiction à
+l'écran, et c'est le premier défaut qu'a révélé le filtre.
 
 ## Ce qui manque encore
 
@@ -169,8 +184,8 @@ où un aplat de couleur ne dit que ce qui est fait.
 - **L'outre-mer sort du cadre.** La vue initiale se cale sur l'emprise de la métropole ;
   un département des Antilles conquis se colorie, mais hors champ. La liste, elle, les
   montre. À traiter par un cartouche ou un raccourci de cadrage.
-- **La carte par thème** — « où ai-je conquis les châteaux ? ». Les règles la permettent
-  déjà (le niveau est calculé par thème × territoire), il ne manque que le sélecteur.
+- **Les filtres par région** — cadrer la carte et la liste sur une région, pour
+  travailler sa propre moitié de France sans faire défiler les autres.
 
 ## À trancher
 

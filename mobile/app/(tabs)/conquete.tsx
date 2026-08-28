@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
-import { areas, places, themeLabel } from '../../src/data/catalog';
+import { areas, places, themeLabel, themes } from '../../src/data/catalog';
 import { conquestByZone, shadeOf } from '../../src/lib/conquest';
 import type { ZoneConquest, ZoneShade } from '../../src/lib/conquest';
 import { useVisits } from '../../src/store/visits';
 import { colors, conquest, radius, spacing, type } from '../../src/theme';
 import { ConquestMap, conquestOutlinesExist } from '../../src/ui/ConquestMap';
-import { EmptyState, Pill, ProgressBar } from '../../src/ui/components';
+import { ChipRow, EmptyState, Pill, ProgressBar } from '../../src/ui/components';
 import { SegmentedControl } from '../../src/ui/components';
 import type { AreaLevel } from '../../src/types';
 
@@ -61,11 +61,24 @@ export default function ConquestScreen() {
   const { visits } = useVisits();
   const [level, setLevel] = useState<AreaLevel>('departement');
   const [selected, setSelected] = useState<string | null>(null);
+  const [theme, setTheme] = useState<string | null>(null);
   const { height } = useWindowDimensions();
 
   const zones = useMemo(
-    () => conquestByZone(places, areas[level], level, visits),
-    [level, visits],
+    () => conquestByZone(places, areas[level], level, visits, theme),
+    [level, visits, theme],
+  );
+
+  // Un thème n'a pas partout de quoi jouer ; ne proposer que ceux du catalogue
+  // évite de filtrer sur du vide.
+  const themeOptions = useMemo(
+    () => [
+      { value: null, label: 'Tous les thèmes' },
+      ...themes
+        .map((entry) => ({ value: entry.id, label: entry.name }))
+        .sort((a, b) => a.label.localeCompare(b.label, 'fr')),
+    ],
+    [],
   );
 
   // Un code de département n'a aucun sens à l'échelle des régions.
@@ -73,7 +86,7 @@ export default function ConquestScreen() {
 
   const current = LEVELS.find((entry) => entry.value === level)!;
   const totals = useMemo(() => {
-    const conquered = zones.filter((zone) => zone.allComplete).length;
+    const conquered = zones.filter((zone) => zone.allComplete && zone.playable).length;
     const partial = zones.filter(
       (zone) => !zone.allComplete && zone.anyThemeComplete,
     ).length;
@@ -101,6 +114,9 @@ export default function ConquestScreen() {
           value={level}
           onChange={setLevel}
         />
+        {/* Filtrer par thème change ce que « territoire complet » veut dire :
+            avoir fini les châteaux du Val-d'Oise est une conquête en soi. */}
+        <ChipRow options={themeOptions} value={theme} onChange={setTheme} />
       </View>
 
       {drawn && zones.length > 0 ? (
@@ -136,6 +152,7 @@ export default function ConquestScreen() {
                 </Pressable>
               ) : (
                 <Text style={type.small}>
+                  {theme ? `${themeLabel(theme)} — ` : ''}
                   {plural(totals.conquered, current.one, current.many)} au complet ·{' '}
                   {totals.partial} avec une collection finie · {totals.started}{' '}
                   {`entamé${current.feminine ? 'e' : ''}${totals.started > 1 ? 's' : ''}`} sur{' '}
@@ -143,8 +160,17 @@ export default function ConquestScreen() {
                 </Text>
               )}
               <View style={styles.legend}>
-                <Legend color={conquest.theme} label="une collection finie" />
-                <Legend color={conquest.total} label="territoire complet" />
+                {theme ? (
+                  <Legend
+                    color={conquest.total}
+                    label={`${themeLabel(theme)} — thème terminé ici`}
+                  />
+                ) : (
+                  <>
+                    <Legend color={conquest.theme} label="une collection finie" />
+                    <Legend color={conquest.total} label="territoire complet" />
+                  </>
+                )}
               </View>
             </View>
 
@@ -152,6 +178,7 @@ export default function ConquestScreen() {
               <ZoneCard
                 key={`${level}:${zone.area.code}`}
                 zone={zone}
+                themeId={theme}
                 onPress={() =>
                   setSelected(selected === zone.area.code ? null : zone.area.code)
                 }
@@ -173,7 +200,15 @@ function Legend({ color, label }: { color: string; label: string }) {
   );
 }
 
-function ZoneCard({ zone, onPress }: { zone: ZoneConquest; onPress: () => void }) {
+function ZoneCard({
+  zone,
+  themeId,
+  onPress,
+}: {
+  zone: ZoneConquest;
+  themeId: string | null;
+  onPress: () => void;
+}) {
   const shade = shadeOf(zone);
   const color = shadeColor(shade);
   const done = zone.themes.filter((entry) => entry.state.complete);
@@ -209,9 +244,12 @@ function ZoneCard({ zone, onPress }: { zone: ZoneConquest; onPress: () => void }
         <Text style={type.small}>
           {zone.overall.visited}/{plural(zone.overall.total, 'lieu', 'lieux')}
         </Text>
-        {zone.allComplete ? (
+        {/* La liste doit dire la même chose que la carte. Annoncer « territoire
+            conquis » sur une zone que l'aplat laisse grise, parce qu'elle n'a
+            pas assez de lieux du thème, était une contradiction à l'écran. */}
+        {zone.allComplete && zone.playable ? (
           <Pill label="Territoire conquis" tone="primary" />
-        ) : zone.overall.tier > 0 ? (
+        ) : zone.overall.tier > 0 && zone.playable ? (
           <Text style={type.small}>Niveau {zone.overall.tier}</Text>
         ) : null}
       </View>
@@ -240,11 +278,16 @@ function ZoneCard({ zone, onPress }: { zone: ZoneConquest; onPress: () => void }
         </View>
       )}
 
-      {zone.themes.length === 0 && zone.overall.visited > 0 && (
+      {!zone.playable ? (
+        <Text style={type.tiny}>
+          Trop peu de {themeLabel(themeId!).toLowerCase()} ici pour que la conquête
+          compte — il en faut au moins trois.
+        </Text>
+      ) : themeId === null && zone.themes.length === 0 && zone.overall.visited > 0 ? (
         <Text style={type.tiny}>
           Aucun thème jouable ici — il faut au moins trois lieux d'un même thème.
         </Text>
-      )}
+      ) : null}
     </Pressable>
   );
 }

@@ -223,3 +223,53 @@ describe('conquête par territoire', () => {
     expect(zones.map((zone) => zone.area.code)).toEqual(['15', '27']);
   });
 });
+
+describe('conquête filtrée par thème', () => {
+  const eure: Area = { code: '27', name: 'Eure', deForm: "de l'Eure" };
+
+  /** Trois châteaux dans le Cantal, un seul dans l'Eure, deux musées. */
+  const catalogue = (): Place[] => [
+    place({ id: 'C1', score: 100 }),
+    place({ id: 'C2', score: 90 }),
+    place({ id: 'C3', score: 80 }),
+    place({ id: 'M1', themeId: 'musees', score: 70 }),
+    place({ id: 'M2', themeId: 'musees', score: 60 }),
+    place({ id: 'E1', departementCode: '27', communeCode: '27285', score: 50 }),
+  ];
+
+  it('colore le territoire quand le thème filtré y est fini', () => {
+    // « J'ai fini les châteaux du Cantal » est une conquête en soi, même s'il
+    // reste des musées à y faire.
+    const visits = ['C1', 'C2', 'C3'].map(visit);
+    const [zone] = conquestByZone(catalogue(), [cantal], 'departement', visits, 'chateaux');
+    expect(zone.allComplete).toBe(true);
+    expect(shadeOf(zone).kind).toBe('total');
+
+    // Sans filtre, le même état ne donne que « une collection finie ».
+    const [sans] = conquestByZone(catalogue(), [cantal], 'departement', visits);
+    expect(sans.allComplete).toBe(false);
+    expect(shadeOf(sans).kind).toBe('theme');
+  });
+
+  it('ignore les lieux des autres thèmes', () => {
+    const zones = conquestByZone(catalogue(), [cantal], 'departement', [], 'chateaux');
+    expect(zones[0].overall.total).toBe(3);
+  });
+
+  it('laisse neutre un territoire trop pauvre dans le thème', () => {
+    // Un seul château dans l'Eure : le colorier en une visite ne
+    // récompenserait rien, et c'est tout l'objet du seuil de jouabilité.
+    const zones = conquestByZone(catalogue(), [eure], 'departement', [visit('E1')], 'chateaux');
+    expect(zones[0].playable).toBe(false);
+    expect(zones[0].overall.complete).toBe(true);
+    expect(shadeOf(zones[0])).toEqual({ kind: 'empty' });
+  });
+
+  it("n'impose pas ce seuil quand aucun filtre n'est posé", () => {
+    // La carte générale se remplit vite : une commune d'un seul lieu se
+    // conquiert en une visite, et c'est l'effet voulu.
+    const zones = conquestByZone(catalogue(), [eure], 'departement', [visit('E1')]);
+    expect(zones[0].playable).toBe(true);
+    expect(shadeOf(zones[0]).kind).toBe('total');
+  });
+});

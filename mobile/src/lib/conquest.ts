@@ -72,6 +72,14 @@ export type ZoneConquest = {
   anyThemeComplete: boolean;
   /** Tous les lieux du territoire validés : seconde couleur. */
   allComplete: boolean;
+  /**
+   * Assez de lieux pour que la couleur veuille dire quelque chose.
+   *
+   * Toujours vrai sans filtre — la carte générale se remplit vite, et c'est
+   * l'effet voulu. Sous filtre, un territoire d'un ou deux lieux du thème
+   * reste neutre : le colorier en une visite ne récompenserait rien.
+   */
+  playable: boolean;
 };
 
 export function zoneCodeOf(place: Place, level: AreaLevel): string | null {
@@ -96,7 +104,11 @@ export function zoneCodeOf(place: Place, level: AreaLevel): string | null {
  * France. C'est ce qui correspond à l'intuition — « j'ai fait les trois
  * meilleurs châteaux du Cantal, donc le Cantal est acquis ».
  */
-export function buildUnits(places: Place[], level: AreaLevel): ConquestUnit[] {
+export function buildUnits(
+  places: Place[],
+  level: AreaLevel,
+  { filtered = false }: { filtered?: boolean } = {},
+): ConquestUnit[] {
   const byZone = new Map<string, Place[]>();
   const byZoneTheme = new Map<string, Place[]>();
 
@@ -109,12 +121,12 @@ export function buildUnits(places: Place[], level: AreaLevel): ConquestUnit[] {
 
   const units: ConquestUnit[] = [];
   for (const [code, members] of byZone) {
-    units.push(makeUnit(level, code, null, members));
+    units.push(makeUnit(level, code, null, members, filtered));
   }
   for (const [key, members] of byZoneTheme) {
     const separator = key.indexOf(' ');
     units.push(
-      makeUnit(level, key.slice(0, separator), key.slice(separator + 1), members),
+      makeUnit(level, key.slice(0, separator), key.slice(separator + 1), members, filtered),
     );
   }
   return units;
@@ -131,6 +143,7 @@ function makeUnit(
   code: string,
   themeId: string | null,
   members: Place[],
+  filtered: boolean,
 ): ConquestUnit {
   const ordered = [...members].sort(
     (a, b) => b.score - a.score || a.name.localeCompare(b.name, 'fr'),
@@ -141,8 +154,11 @@ function makeUnit(
     themeId,
     placeIds: ordered.map((place) => place.id),
     tiers: ordered.map((_, index) => localTier(index)),
-    // Le seuil ne vaut que pour un thème : voir PLAYABLE_MIN.
-    playable: themeId === null || ordered.length >= PLAYABLE_MIN,
+    // Le seuil ne vaut que pour un thème : voir PLAYABLE_MIN. Mais dès qu'un
+    // FILTRE est posé, l'unité « tous thèmes » n'en couvre plus qu'un seul —
+    // elle redevient une collection thématique et doit repasser le seuil,
+    // sinon un département d'un seul château se colorierait en une visite.
+    playable: (themeId === null && !filtered) || ordered.length >= PLAYABLE_MIN,
   };
 }
 
@@ -195,10 +211,15 @@ export function conquestByZone(
   areas: Area[],
   level: AreaLevel,
   visits: Visit[],
+  themeId: string | null = null,
 ): ZoneConquest[] {
   const visited = new Set(visits.map((visit) => visit.placeId));
   const byCode = new Map(areas.map((area) => [area.code, area]));
-  const units = buildUnits(places, level);
+  // Sous filtre, « le territoire entier » ne veut plus dire tous les lieux
+  // mais tous les CHÂTEAUX : les deux couleurs se confondent, et c'est juste.
+  // « J'ai fini les châteaux du Val-d'Oise » est une conquête en soi.
+  const retained = themeId ? places.filter((place) => place.themeId === themeId) : places;
+  const units = buildUnits(retained, level, { filtered: themeId !== null });
 
   const zones = new Map<string, ZoneConquest>();
   for (const unit of units) {
@@ -212,11 +233,13 @@ export function conquestByZone(
       themes: [],
       anyThemeComplete: false,
       allComplete: false,
+      playable: true,
     };
 
     if (unit.themeId === null) {
       zone.overall = state;
       zone.allComplete = state.complete;
+      zone.playable = unit.playable;
     } else if (unit.playable) {
       zone.themes.push({ themeId: unit.themeId, state });
       zone.anyThemeComplete = zone.anyThemeComplete || state.complete;
@@ -254,6 +277,9 @@ export type ZoneShade =
   | { kind: 'total'; tier: Tier };
 
 export function shadeOf(zone: ZoneConquest): ZoneShade {
+  // Sous filtre, un territoire trop pauvre en lieux du thème reste neutre :
+  // le colorier en une visite ne récompenserait rien.
+  if (!zone.playable) return { kind: 'empty' };
   if (zone.allComplete) return { kind: 'total', tier: zone.overall.tier || 1 };
   if (zone.anyThemeComplete) {
     const best = zone.themes

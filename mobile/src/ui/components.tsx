@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 import { colors, radius, spacing, type } from '../theme';
 import type { Tier } from '../types';
@@ -61,6 +61,49 @@ export function TierDot({ tier, size = 10 }: { tier: Tier; size?: number }) {
         backgroundColor: colors.tier[tier - 1],
       }}
     />
+  );
+}
+
+/**
+ * Rangée de pastilles défilante, pour un choix parmi beaucoup.
+ *
+ * Le contrôle segmenté ne tient qu'à quatre ou cinq options ; les thèmes sont
+ * vingt-trois. Le défilement horizontal garde le geste à un doigt et laisse
+ * voir le choix courant, là où un menu déroulant le cacherait derrière un
+ * appui de plus.
+ */
+export function ChipRow<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: Array<{ value: T | null; label: string }>;
+  value: T | null;
+  onChange: (value: T | null) => void;
+}) {
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.chipRow}
+    >
+      {options.map((option) => {
+        const selected = option.value === value;
+        return (
+          <Pressable
+            key={option.value ?? '__all__'}
+            onPress={() => onChange(option.value)}
+            style={[styles.chip, selected && styles.chipSelected]}
+            accessibilityRole="button"
+            accessibilityState={{ selected }}
+          >
+            <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
+              {option.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </ScrollView>
   );
 }
 
@@ -152,6 +195,18 @@ export function EmptyState({ title, body }: { title: string; body: string }) {
 }
 
 const styles = StyleSheet.create({
+  chipRow: { gap: spacing.xs, paddingVertical: spacing.xs, paddingRight: spacing.lg },
+  chip: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: 6,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  chipText: { fontSize: 13, color: colors.muted },
+  chipTextSelected: { color: '#FFFFFF', fontWeight: '600' },
   track: { backgroundColor: colors.surfaceAlt, overflow: 'hidden', width: '100%' },
   pill: {
     paddingHorizontal: spacing.md,
