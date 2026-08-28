@@ -34,6 +34,26 @@ fait donc depuis un téléphone sous Termux, sans jamais rallumer le Mac.
 > sous l'onglet **Actions** du dépôt. Rendre le dépôt public lève la
 > limitation.
 
+## Relire depuis le téléphone
+
+```bash
+python -m roam_pipeline review --host 0.0.0.0
+```
+
+La commande affiche alors une adresse en `192.168.x.x` à ouvrir dans Chrome.
+
+Le défaut `127.0.0.1` suffit sur un ordinateur, mais sur certains Android
+Chrome n'atteint pas la boucle locale d'une autre application : la connexion
+est refusée alors que le serveur tourne. Passer par l'adresse de l'appareil sur
+le Wi-Fi contourne le problème — la requête sort et revient par l'interface
+réseau au lieu de rester à l'intérieur.
+
+> La page est alors lisible par tout le monde sur le même réseau. Chez soi
+> c'est sans conséquence ; dans un train, préfère attendre.
+
+Garde Termux au premier plan, ou pose un `termux-wake-lock` avant : Android tue
+volontiers les processus en arrière-plan, et le serveur avec.
+
 ## Avant de commencer
 
 | Sur l'ordinateur | Sur le téléphone |

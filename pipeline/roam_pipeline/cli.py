@@ -1291,8 +1291,27 @@ def cmd_review(args: argparse.Namespace, config: Config) -> int:
     handler = functools.partial(
         http.server.SimpleHTTPRequestHandler, directory=str(args.out)
     )
-    server = http.server.ThreadingHTTPServer(("127.0.0.1", args.port), handler)
+    server = http.server.ThreadingHTTPServer((args.host, args.port), handler)
     url = f"http://127.0.0.1:{args.port}/review.html"
+
+    # Sur certains Android, Chrome n'atteint pas la boucle locale d'une autre
+    # application : la connexion est refusée alors que le serveur tourne. Passer
+    # par l'adresse de l'appareil sur le Wi-Fi contourne le problème — la
+    # requête sort et revient par l'interface réseau au lieu de rester à
+    # l'intérieur.
+    if args.host != "127.0.0.1":
+        import socket
+
+        try:
+            sonde = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sonde.connect(("192.0.2.1", 1))  # adresse de documentation, rien n'est envoyé
+            adresse = sonde.getsockname()[0]
+            sonde.close()
+            url = f"http://{adresse}:{args.port}/review.html"
+        except OSError:
+            pass
+        print("⚠ Servie sur toutes les interfaces : n'importe qui sur ce réseau "
+              "peut lire la page. À éviter hors de chez toi.")
 
     # Dire CE QU'ON RELIT avant de le relire. La page est construite depuis le
     # catalogue de CETTE machine : sur un clone où seuls quelques thèmes ont
@@ -1705,6 +1724,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     serve = sub.add_parser("review", help="ouvre la page de revue dans le navigateur")
     serve.add_argument("--port", type=int, default=8765)
+    serve.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="interface d'écoute ; `0.0.0.0` quand le navigateur n'atteint pas "
+             "la boucle locale (Android)",
+    )
     return parser
 
 
