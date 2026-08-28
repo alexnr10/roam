@@ -300,29 +300,70 @@ SELECT DISTINCT ?item ?class ?classLabel WHERE {{
 """
 
 
-def notable_places_query(min_sitelinks: int, limit: int, offset: int) -> str:
-    """Lieux français notoires, avec leurs classes — SANS filtre de thème.
+#: Le corps commun du recensement : ce qui est en France, situé, et documenté.
+def _notable_body(min_sitelinks: int) -> str:
+    return f"""  ?item wdt:{P_COUNTRY} wd:{Q_FRANCE} .
+  ?item wdt:{P_COORDINATE} ?coord .
+  ?item wikibase:sitelinks ?sitelinks .
+  FILTER(?sitelinks >= {min_sitelinks})"""
 
-    Le recensement des trous. La collecte part des classes qu'on connaît ; elle
-    ne peut donc pas dire ce qu'elle ignore. Cette requête part de l'inverse —
-    tout ce qui est en France, situé, et documenté dans plusieurs langues — et
-    laisse le pipeline soustraire localement ce qu'il possède déjà.
 
-    Ce qui reste, groupé par classe, ce sont les portes qu'on n'a pas ouvertes.
-    La fondation Claude-Monet a passé des mois derrière l'une d'elles, sans
-    qu'aucun compteur ne baisse ni qu'aucun message ne sorte.
+def class_census_query(min_sitelinks: int, limit: int = 300) -> str:
+    """Combien de lieux français notoires par CLASSE déclarée.
+
+    Première moitié du recensement des trous. L'agrégation se fait chez WDQS :
+    la version paginée de cette requête devait trier des dizaines de milliers
+    de lignes à chaque page, et mourait en 504 après six tentatives.
+
+    `wdt:P31` sans `P279*` : on veut la classe réellement DÉCLARÉE, celle qu'il
+    faudra écrire dans `themes.yaml`, pas toute son ascendance.
     """
     return f"""
-SELECT ?item ?itemLabel ?sitelinks ?class ?classLabel WHERE {{
+SELECT ?class (COUNT(DISTINCT ?item) AS ?n) WHERE {{
+{_notable_body(min_sitelinks)}
+  ?item wdt:{P_INSTANCE_OF} ?class .
+}}
+GROUP BY ?class
+ORDER BY DESC(?n)
+LIMIT {limit}
+"""
+
+
+def class_members_query(class_qids: list[str], min_sitelinks: int) -> str:
+    """Les lieux notoires de ces classes, pour en soustraire ce qu'on possède.
+
+    Seconde moitié. Bornée par `VALUES` : c'est la classe qui mène la requête,
+    et non l'ensemble des lieux de France, d'où un coût sans rapport.
+    """
+    values = " ".join(f"wd:{q}" for q in class_qids)
+    return f"""
+SELECT ?class ?item ?itemLabel WHERE {{
+  VALUES ?class {{ {values} }}
+  ?item wdt:{P_INSTANCE_OF} ?class .
+{_notable_body(min_sitelinks)}
+  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+}}
+"""
+
+
+def class_thresholds_query(class_qid: str, thresholds: list[int]) -> str:
+    """Combien de lieux d'une classe survivent à chaque plancher de collecte.
+
+    Répond à « si je descends le plancher à quatre, combien de lieux en plus ? »
+    sans relancer une demi-heure de collecte pour le savoir.
+    """
+    lines = "\n".join(
+        f"  (SUM(IF(?sitelinks >= {t}, 1, 0)) AS ?n{t})" for t in thresholds
+    )
+    return f"""
+SELECT
+{lines}
+WHERE {{
+  ?item wdt:{P_INSTANCE_OF} wd:{class_qid} .
   ?item wdt:{P_COUNTRY} wd:{Q_FRANCE} .
   ?item wdt:{P_COORDINATE} ?coord .
   ?item wikibase:sitelinks ?sitelinks .
-  FILTER(?sitelinks >= {min_sitelinks})
-  ?item wdt:{P_INSTANCE_OF} ?class .
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
 }}
-ORDER BY ?item
-LIMIT {limit} OFFSET {offset}
 """
 
 

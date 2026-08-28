@@ -939,30 +939,27 @@ def cmd_check_lists(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
-def census(rows, known: set[str], owned: set[str]) -> list[dict[str, Any]]:
+def census(rows, counts: dict[str, int], known: set[str], owned: set[str]) -> list[dict]:
     """Regroupe par classe les lieux notoires que le catalogue n'a pas.
 
     Le tri se fait sur les lieux INCONNUS et non sur le total : une classe déjà
     largement collectée n'est pas un trou, même si elle est immense. Ce qu'on
     cherche, ce sont les portes fermées.
     """
-    par_classe: dict[str, dict[str, Any]] = {}
+    par_classe: dict[str, dict] = {}
     vus: dict[str, set[str]] = defaultdict(set)
 
     for row in rows:
         qid = wd.qid_from_uri(row.get("item"))
         class_qid = wd.qid_from_uri(row.get("class"))
-        if not qid or not class_qid:
-            continue
-        entry = par_classe.setdefault(
-            class_qid,
-            {"qid": class_qid, "label": row.get("classLabel") or class_qid,
-             "total": 0, "manquants": 0, "exemples": []},
-        )
-        if qid in vus[class_qid]:
+        if not qid or not class_qid or qid in vus[class_qid]:
             continue
         vus[class_qid].add(qid)
-        entry["total"] += 1
+        entry = par_classe.setdefault(
+            class_qid,
+            {"qid": class_qid, "label": "", "total": counts.get(class_qid, 0),
+             "manquants": 0, "exemples": []},
+        )
         if qid not in known:
             entry["manquants"] += 1
             if len(entry["exemples"]) < 5:
@@ -971,6 +968,10 @@ def census(rows, known: set[str], owned: set[str]) -> list[dict[str, Any]]:
     for entry in par_classe.values():
         entry["collectee"] = entry["qid"] in owned
     return sorted(par_classe.values(), key=lambda e: -e["manquants"])
+
+
+#: Planchers explorés par `gaps --class` : ceux qu'on écrirait vraiment.
+THRESHOLDS = [2, 3, 4, 6, 8, 10, 12, 15, 20]
 
 
 def cmd_gaps(args: argparse.Namespace, config: Config) -> int:
@@ -982,7 +983,11 @@ def cmd_gaps(args: argparse.Namespace, config: Config) -> int:
 
     On part donc de l'inverse : tout ce que Wikidata situe en France et
     documente dans plusieurs langues, moins ce que le catalogue possède déjà.
-    Ce qui reste, groupé par classe, ce sont les portes qu'on n'a pas ouvertes.
+
+    En DEUX temps, et c'est ce qui rend la chose tenable. Un décompte agrégé
+    chez WDQS d'abord, puis les membres des seules classes intéressantes,
+    bornés par `VALUES`. La version qui paginait tous les lieux de France
+    mourait en 504 : chaque page retriait des dizaines de milliers de lignes.
     """
     raw_path = args.out / "places_raw.json"
     if not raw_path.exists():
@@ -993,37 +998,93 @@ def cmd_gaps(args: argparse.Namespace, config: Config) -> int:
     owned = set(_class_owners(config))
     client = wd.SparqlClient()
 
-    print(f"Recensement des lieux français à {args.min_sitelinks} langues ou plus…")
-    rows = list(
-        _paged(
-            client,
-            lambda limit, offset: wd.notable_places_query(
-                args.min_sitelinks, limit, offset
-            ),
-        )
-    )
-    classes = census(rows, known, owned)
-    if not classes:
+    if args.klass:
+        return _print_thresholds(client, args.klass, known, config)
+
+    print(f"Décompte des lieux français à {args.min_sitelinks} langues ou plus…")
+    counts: dict[str, int] = {}
+    for row in client.query(wd.class_census_query(args.min_sitelinks)):
+        class_qid = wd.qid_from_uri(row.get("class"))
+        if class_qid:
+            counts[class_qid] = int(row.get("n") or 0)
+    if not counts:
         print("Aucun résultat — le plancher est peut-être trop haut.")
         return 0
 
-    total_manquants = sum(c["manquants"] for c in classes)
-    print(f"{len(known)} lieux au catalogue · {total_manquants} lieux notoires "
-          f"non collectés, répartis sur {len(classes)} classes.\n")
-    print(f"  {'classe':<34} {'absents':>8} {'sur':>7}   exemples")
+    # On n'interroge les membres que des classes assez fournies pour valoir un
+    # thème : le reste est du bruit, et chaque classe coûte une requête.
+    candidates = [
+        qid for qid, n in sorted(counts.items(), key=lambda kv: -kv[1])
+        if n >= args.min_places
+    ][: args.limit * 2]
+    print(f"{len(counts)} classes, {len(candidates)} assez fournies — "
+          f"examen de leurs membres…")
+
+    rows: list[dict] = []
+    for batch in wd.chunked(candidates, 10):
+        try:
+            rows.extend(client.query(wd.class_members_query(batch, args.min_sitelinks)))
+        except Exception as exc:
+            LOG.error("classes %s : lot échoué (%s)", ", ".join(batch), exc)
+
+    classes = [c for c in census(rows, counts, known, owned) if c["manquants"]]
+    labels = _entity_labels(client, [c["qid"] for c in classes[: args.limit]])
+    for entry in classes:
+        entry["label"] = labels.get(entry["qid"], entry["qid"])
+
+    print(f"\n{len(known)} lieux au catalogue · "
+          f"{sum(c['manquants'] for c in classes)} lieux notoires non collectés.\n")
+    print(f"  {'classe':<38} {'absents':>8} {'sur':>6}   exemples")
     for entry in classes[: args.limit]:
-        if entry["manquants"] < args.min_places:
-            break
         marque = "·" if entry["collectee"] else "✗"
         label = f"{marque} {entry['label']} ({entry['qid']})"
-        print(f"  {label[:34]:<34} {entry['manquants']:>8} {entry['total']:>7}   "
-              + ", ".join(entry["exemples"][:3]))
+        print(f"  {label[:38]:<38} {entry['manquants']:>8} {entry['total']:>6}   "
+              + ", ".join(entry["exemples"][:3])[:60])
 
-    print("\n« ✗ » : classe qu'aucun thème ne collecte. « · » : classe déjà")
-    print("collectée — ses absents sont sous un plancher, pas hors du radar.")
-    print("Une classe à ouvrir se déclare dans `themes.yaml`, en `wikidata_classes`")
-    print("si elle est spécifique, en `broad_classes` avec son propre plancher si")
-    print("elle est générique.")
+    print("\n« ✗ » : aucun thème ne collecte cette classe — c'est un angle mort.")
+    print("« · » : classe collectée ; ses absents sont sous un plancher, pas hors")
+    print("du radar. `gaps --class Q3947` dit ce que changerait chaque plancher.")
+    return 0
+
+
+def _entity_labels(client, qids: list[str]) -> dict[str, str]:
+    labels: dict[str, str] = {}
+    for batch in wd.chunked(qids, 40):
+        for row in client.query(wd.entity_labels_query(batch)):
+            qid = wd.qid_from_uri(row.get("item"))
+            if qid:
+                labels[qid] = row.get("itemLabel") or qid
+    return labels
+
+
+def _print_thresholds(client, class_qid: str, known: set[str], config: Config) -> int:
+    """Ce que changerait chaque plancher, pour une classe donnée.
+
+    Baisser un plancher se décide sur un nombre, pas sur une impression — et
+    le nombre ne devrait pas coûter une demi-heure de collecte à obtenir.
+    """
+    label = _entity_labels(client, [class_qid]).get(class_qid, class_qid)
+    rows = client.query(wd.class_thresholds_query(class_qid, THRESHOLDS))
+    if not rows:
+        print(f"{class_qid} : aucun lieu français situé de cette classe.")
+        return 0
+
+    row = rows[0]
+    current = dict(_class_owners(config)).get(class_qid)
+    print(f"\n{label} ({class_qid}) — lieux français situés, par plancher de collecte\n")
+    print("      " + "".join(f"{'≥' + str(t):>8}" for t in THRESHOLDS))
+    print("      " + "".join(f"{row.get('n' + str(t), '0'):>8}" for t in THRESHOLDS))
+    if current:
+        theme_id, floor = current
+        print(f"\n  Collectée par « {theme_id} » à partir de {floor} langues.")
+        for lower, higher in zip(THRESHOLDS, THRESHOLDS[1:]):
+            if lower < floor <= higher:
+                gagne = int(row.get(f"n{lower}", 0)) - int(row.get(f"n{higher}", 0))
+                print(f"  Descendre à {lower} en ramènerait environ {gagne} de plus.")
+                break
+    else:
+        print("\n  Aucun thème ne collecte cette classe.")
+    print("  Le plancher se règle dans `themes.yaml`, puis `fetch --only <thème>`.")
     return 0
 
 
@@ -1489,10 +1550,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--min-sitelinks", type=int, default=12,
         help="notoriété minimale des lieux recensés (défaut 12 ; plus bas = plus long)",
     )
-    gaps.add_argument("--limit", type=int, default=40, help="classes affichées")
+    gaps.add_argument("--limit", type=int, default=30, help="classes affichées")
     gaps.add_argument(
-        "--min-places", type=int, default=3,
-        help="ignorer les classes sous ce nombre d'absents",
+        "--class", dest="klass", metavar="QID",
+        help="au lieu du recensement : ce que changerait chaque plancher pour CETTE classe",
+    )
+    gaps.add_argument(
+        "--min-places", type=int, default=5,
+        help="ignorer les classes sous ce nombre de lieux",
     )
 
     sub.add_parser(

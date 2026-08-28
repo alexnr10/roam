@@ -477,7 +477,14 @@ accompagne chaque ligne : un Q-id nu n'aide personne à décider.
 ```bash
 python -m roam_pipeline gaps                      # défaut : lieux à 12 langues ou plus
 python -m roam_pipeline gaps --min-sitelinks 8    # plus fin, plus long
+python -m roam_pipeline gaps --class Q3947        # calibrer le plancher d'UNE classe
 ```
+
+Le recensement se fait en **deux temps**, et c'est ce qui le rend tenable : un
+décompte agrégé par WDQS d'abord, puis les membres des seules classes assez
+fournies, bornés par `VALUES`. Une première version paginait tous les lieux de
+France et mourait en 504 — chaque page retriait des dizaines de milliers de
+lignes avant d'en garder huit cents.
 
 La collecte part des classes qu'on connaît : elle est **par construction
 incapable de dire ce qu'elle ignore**. Une liste d'incontournables écrite de
@@ -504,6 +511,21 @@ collectée n'est pas un trou, même si elle est immense.
 Une classe à ouvrir se déclare dans `themes.yaml` — en `wikidata_classes` si
 elle est spécifique, en `broad_classes` avec son propre plancher si elle est
 générique.
+
+**Calibrer un plancher** ne devrait pas coûter une demi-heure de collecte :
+
+```
+maison (Q3947) — lieux français situés, par plancher de collecte
+
+            ≥2      ≥3      ≥4      ≥6      ≥8     ≥10     ≥12     ≥15     ≥20
+           412     311     198     132      87      61      44      28      14
+
+  Collectée par « maisons » à partir de 8 langues.
+  Descendre à 6 en ramènerait environ 45 de plus.
+```
+
+On lit d'un coup ce qu'on gagne et ce qu'on s'impose à relire. Le réglage se
+fait ensuite dans `themes.yaml`, suivi de `fetch --only <thème>`.
 
 > La requête ne voit que ce qui porte `pays = France`. Un lieu sans cette
 > propriété reste invisible ici comme à la collecte ; `probe` est le seul outil

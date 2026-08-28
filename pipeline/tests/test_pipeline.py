@@ -38,7 +38,8 @@ from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from
 from roam_pipeline.cli import _known_qids, _pending_terms, _probe_verdict, census
 from roam_pipeline.wikipedia import title_from_url
 from roam_pipeline.wikidata import (
-    class_ancestry_query, notable_places_query, probe_query, visitors_query,
+    class_ancestry_query, class_census_query, class_members_query,
+    class_thresholds_query, probe_query, visitors_query,
 )
 from roam_pipeline.review import (
     DECISIONS, apply_names, diff_tiers, read_names, read_snapshot, vanished,
@@ -2195,7 +2196,7 @@ class TestGapCensus(unittest.TestCase):
             self._row("Q2", "Maison du docteur Gachet", "Q3947", "maison"),
             self._row("Q3", "Château de Chambord", "Q23413", "château fort"),
         ]
-        classes = census(rows, known={"Q3"}, owned={"Q23413"})
+        classes = census(rows, {"Q3947": 2, "Q23413": 1}, known={"Q3"}, owned={"Q23413"})
         maison = next(c for c in classes if c["qid"] == "Q3947")
         chateau = next(c for c in classes if c["qid"] == "Q23413")
         self.assertEqual(maison["manquants"], 2)
@@ -2207,8 +2208,8 @@ class TestGapCensus(unittest.TestCase):
         # Deux situations très différentes : une classe absente du radar, et
         # une classe collectée dont les absents sont sous un plancher.
         rows = [self._row("Q1", "X", "Q3947", "maison")]
-        self.assertFalse(census(rows, known=set(), owned=set())[0]["collectee"])
-        self.assertTrue(census(rows, known=set(), owned={"Q3947"})[0]["collectee"])
+        self.assertFalse(census(rows, {}, known=set(), owned=set())[0]["collectee"])
+        self.assertTrue(census(rows, {}, known=set(), owned={"Q3947"})[0]["collectee"])
 
     def test_a_place_counted_once_per_class(self):
         # Une entité rend plusieurs lignes quand elle a plusieurs classes ; la
@@ -2218,24 +2219,37 @@ class TestGapCensus(unittest.TestCase):
             self._row("Q1", "X", "Q3947", "maison"),
             self._row("Q1", "X", "Q23413", "château fort"),
         ]
-        classes = census(rows, known=set(), owned=set())
+        classes = census(rows, {}, known=set(), owned=set())
         self.assertEqual({c["qid"]: c["manquants"] for c in classes},
                          {"Q3947": 1, "Q23413": 1})
 
     def test_examples_help_decide(self):
         # Un décompte ne dit pas s'il faut ouvrir la porte ; des noms, si.
         rows = [self._row(f"Q{i}", f"Lieu {i}", "Q3947", "maison") for i in range(9)]
-        entry = census(rows, known=set(), owned=set())[0]
+        entry = census(rows, {}, known=set(), owned=set())[0]
         self.assertEqual(len(entry["exemples"]), 5)
         self.assertIn("Lieu 0", entry["exemples"])
 
-    def test_the_query_demands_no_theme(self):
-        # Filtrer par classe connue reviendrait à demander au pipeline ce
-        # qu'il sait déjà : la soustraction se fait ici, pas là-bas.
-        sparql = notable_places_query(12, 800, 0)
-        self.assertIn("FILTER(?sitelinks >= 12)", sparql)
-        self.assertIn("LIMIT 800 OFFSET 0", sparql)
-        self.assertNotIn("VALUES ?class", sparql)
+    def test_the_count_is_aggregated_by_the_server(self):
+        # La version paginée retriait des dizaines de milliers de lignes à
+        # chaque page et mourait en 504. L'agrégation se fait chez WDQS.
+        sparql = class_census_query(12)
+        self.assertIn("COUNT(DISTINCT ?item)", sparql)
+        self.assertIn("GROUP BY ?class", sparql)
+        self.assertNotIn("OFFSET", sparql)
+
+    def test_members_are_bounded_by_their_classes(self):
+        # C'est la classe qui mène la requête, pas l'ensemble des lieux de
+        # France : d'où un coût sans rapport.
+        sparql = class_members_query(["Q3947", "Q23413"], 12)
+        self.assertIn("VALUES ?class { wd:Q3947 wd:Q23413 }", sparql)
+
+    def test_the_threshold_table_counts_every_floor_at_once(self):
+        # Baisser un plancher se décide sur un nombre, et ce nombre ne doit pas
+        # coûter une demi-heure de collecte.
+        sparql = class_thresholds_query("Q3947", [2, 8])
+        self.assertIn("SUM(IF(?sitelinks >= 2, 1, 0)) AS ?n2", sparql)
+        self.assertIn("SUM(IF(?sitelinks >= 8, 1, 0)) AS ?n8", sparql)
 
 
 if __name__ == "__main__":
