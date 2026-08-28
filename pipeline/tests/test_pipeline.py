@@ -2422,5 +2422,42 @@ class TestEmptyThemes(unittest.TestCase):
         self.assertEqual(len(empty_themes(CONFIG, [])), len(CONFIG.themes))
 
 
+class TestUnknownAccessReview(unittest.TestCase):
+    """Le château de Champlatreux : privé, loué pour des mariages, au catalogue.
+
+    Aucun signal ne le trahit. Wikidata ne dit rien de l'accueil du public, et
+    OpenStreetMap ne le tague ni ouvert ni fermé. Sur deux mille deux cent
+    quatre-vingt-dix lieux, mille deux cent soixante-sept sont dans ce cas :
+    c'est la population où se cachent les lieux qu'on ne visite pas, et la
+    seule façon de la traiter est de savoir la regarder.
+    """
+
+    @staticmethod
+    def _page(places):
+        with _capture():
+            retained, collections = build_all(places, CONFIG)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.html"
+            write_review_html(places, collections, CONFIG, path)
+            return path.read_text(encoding="utf-8")
+
+    def test_the_page_offers_to_filter_on_the_doubt(self):
+        body = self._page([make_place("Château de Champlatreux", sitelinks=12)])
+        self.assertIn('value="doute"', body)
+
+    def test_a_place_without_a_signal_says_so_on_its_card(self):
+        # Le filtre ne suffit pas : relire cent châteaux sans savoir lesquels
+        # sont douteux, c'est relire sans rien voir.
+        muet = make_place("Château de Champlatreux", sitelinks=12)
+        self.assertIsNone(muet.visitable)
+        self.assertIn("Accueil du public non renseigné", self._page([muet]))
+
+    def test_a_confirmed_place_carries_no_doubt(self):
+        ouvert = make_place("Château de Chambord", sitelinks=40)
+        ouvert.visitable = True
+        body = self._page([ouvert])
+        self.assertIn('"visitable":true', body.replace(" ", ""))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

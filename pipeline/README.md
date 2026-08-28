@@ -333,6 +333,23 @@ Le seuil se choisit sur la table que `build` imprime — combien de lieux seraie
 par thème, à 70, 80, 85, 90, 100, 120 — et non sur un exemple. C'est cette table qui
 manquait la première fois.
 
+### Le doute : ni ouvert, ni fermé
+
+Le château de Champlatreux est privé et se loue pour des mariages. Rien ne le
+dit : Wikidata ignore l'accueil du public, et OpenStreetMap ne le tague ni
+ouvert ni fermé. Il est donc entré au catalogue comme n'importe quel château.
+
+Ces lieux-là ne se détectent pas. Sur deux mille deux cent quatre-vingt-dix
+lieux, **mille deux cent soixante-sept** n'ont aucun signal d'accès — et c'est
+dans cette population, et nulle part ailleurs, que se cachent les lieux qu'on
+ne visite pas.
+
+La seule réponse est humaine, mais elle peut être ciblée. La page de revue
+offre le filtre **« Accueil du public NON RENSEIGNÉ »**, et chaque carte
+concernée porte un bandeau : *rien ne prouve qu'on puisse y entrer*. Combiné au
+filtre de niveau, il donne la sous-population qui compte vraiment — les lieux
+de niveau 1 et 2 sans preuve d'accès, ceux que l'application met en avant.
+
 ### Un lieu où l'on ne peut pas entrer n'est pas collectionnable
 
 L'application se joue sur place : on valide en s'y rendant. Les lieux dont OpenStreetMap

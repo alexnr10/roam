@@ -482,6 +482,8 @@ _REVIEW_TEMPLATE = """<!doctype html>
   .moved.descend { background: #FBE9E4; color: #B4532B; }
   .moved.nouveau { background: #F1EBDC; color: #6F6A62; }
   .moved.theme { background: #3B4A6B; color: #FFFFFF; }
+  .doute { background: #FBF2E4; color: #7A5A22; border-radius: 6px;
+           padding: 4px 8px; margin-top: 6px; font-size: 12px; }
   .found { background: #EAEDF4; color: #3B4A6B; border-radius: 6px;
            padding: 4px 8px; font-size: 12px; }
   .alerts { display: flex; flex-direction: column; gap: 4px; }
@@ -512,6 +514,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
       <option value="">Tout</option>
       <option value="alert">À vérifier — disparu, accès, photo</option>
       <option value="open">Ouverts au public</option>
+      <option value="doute">Accueil du public NON RENSEIGNÉ</option>
       <option value="osm">Découverts sur OpenStreetMap</option>
       <option value="relief">Entrés par la remise « ouvert au public »</option>
       <option value="keep">Gardés</option>
@@ -569,6 +572,11 @@ function visible() {
     if (state === "todo") return !d;
     if (state === "alert") return p.alerts.length > 0;
     if (state === "open") return p.visitable === true;
+    // Ni ouverture attestée, ni accès refusé : OpenStreetMap ne dit RIEN.
+    // C'est là que se cachent les lieux privés qu'aucun signal ne trahit — le
+    // château qui n'ouvre que pour des mariages, la demeure qu'on ne visite
+    // pas. Seul un humain peut trancher, encore faut-il savoir où regarder.
+    if (state === "doute") return p.visitable === null || p.visitable === undefined;
     if (state === "osm") return p.source === "osm";
     if (state === "relief") return p.underFloor;
     if (state && d !== state) return false;
@@ -603,6 +611,10 @@ function card(p) {
       ${p.underFloor
         ? `<div class="found">Sous le plancher de son thème (${p.sitelinks} langues) —
              repêché parce qu'il accueille du public</div>`
+        : ""}
+      ${p.visitable === null || p.visitable === undefined
+        ? `<div class="doute">Accueil du public non renseigné — rien ne prouve
+             qu'on puisse y entrer</div>`
         : ""}
       <div class="parts">${p.score.toFixed(0)} pts =
         ${parts.notoriete} notoriété (${p.sitelinks} langues)
