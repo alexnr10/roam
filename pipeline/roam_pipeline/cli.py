@@ -490,7 +490,7 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     write_seed_sql(retained, collections, config, args.out / "seed.sql")
 
     _report_tier_changes(changes, gone, before, retained)
-    _report_stale_themes(args.out, config)
+    _report_stale_themes(args.out, config, scored)
 
     if renamed:
         print(f"Renommages appliqués : {renamed}")
@@ -502,15 +502,46 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
-def _report_stale_themes(out_dir: Path, config: Config) -> None:
-    """Un thème dont la collecte a échoué ne doit pas se taire indéfiniment.
+def empty_themes(config: Config, raw) -> list[str]:
+    """Thèmes configurés dont le catalogue brut ne contient AUCUN lieu.
 
-    L'échec était signalé une fois, en fin de journal de `fetch`, puis oublié :
-    la reprise partielle reconduisait les anciennes données à chaque passage.
-    Le mont Blanc a disparu du catalogue de cette façon, sans qu'aucun compteur
-    ne bouge et sans qu'aucun message ne le dise.
+    La preuve la plus dure qui soit, et elle ne dépend d'aucun fichier d'état :
+    un thème sans un seul candidat n'a pas été collecté ici, point. Sur une
+    machine fraîchement clonée, `places_raw.json` n'existe pas — collecter deux
+    ou trois thèmes suffit alors à produire un catalogue qui a l'air complet et
+    auquel il manque vingt thèmes entiers. C'est ainsi qu'un aperçu publié
+    s'est retrouvé sans une seule abbaye.
     """
-    stale = stale_themes(read_fetch_state(out_dir), config)
+    presents = {getattr(place, "theme_id", None) for place in raw}
+    return [theme.id for theme in config.themes if theme.id not in presents]
+
+
+def _report_stale_themes(out_dir: Path, config: Config, raw=()) -> None:
+    """Un thème absent ou en échec ne doit pas se taire indéfiniment.
+
+    L'échec de collecte était signalé une fois, en fin de journal de `fetch`,
+    puis oublié : la reprise partielle reconduisait les anciennes données à
+    chaque passage. Le mont Blanc a disparu du catalogue de cette façon, sans
+    qu'aucun compteur ne bouge.
+
+    Le fichier d'état ne suffit pas : il ne dit rien des collectes antérieures
+    à sa mise en place, et son message rassurant — « le suivi se remplira » —
+    couvrait exactement le cas d'un thème jamais collecté sur cette machine.
+    Le catalogue brut, lui, ne ment pas.
+    """
+    vides = empty_themes(config, raw)
+    if vides:
+        print(f"\n⚠ {len(vides)} thèmes SANS AUCUN LIEU dans les candidats bruts :")
+        print("    " + ", ".join(vides))
+        print("    Ils n'ont jamais été collectés ici. Le catalogue construit est")
+        print("    PARTIEL — ne le publie pas en l'état.")
+        print("    `fetch --only " + ",".join(vides) + "`")
+
+    stale = [
+        (theme_id, raison)
+        for theme_id, raison in stale_themes(read_fetch_state(out_dir), config)
+        if theme_id not in set(vides)
+    ]
     if not stale:
         return
     inconnus = [t for t, raison in stale if raison.startswith("jamais")]

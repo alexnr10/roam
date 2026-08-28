@@ -37,7 +37,9 @@ from roam_pipeline.fetch import (
     REMEDIES, diagnose_missing, enrich_departements, stale_themes,
 )
 from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from_insee
-from roam_pipeline.cli import _known_qids, _pending_terms, _probe_verdict, census
+from roam_pipeline.cli import (
+    _known_qids, _pending_terms, _probe_verdict, census, empty_themes,
+)
 from roam_pipeline.wikipedia import title_from_url
 from roam_pipeline.wikidata import (
     class_ancestry_query, class_census_query, class_members_query,
@@ -2391,6 +2393,33 @@ class TestFetchState(unittest.TestCase):
     def test_a_healthy_catalogue_says_nothing(self):
         state = {t.id: {"ok": True, "lieux": 5, "le": "x"} for t in CONFIG.themes}
         self.assertEqual(stale_themes(state, CONFIG), [])
+
+
+class TestEmptyThemes(unittest.TestCase):
+    """Un catalogue partiel ne doit pas avoir l'air complet.
+
+    Sur une machine fraîchement clonée, `places_raw.json` n'existe pas :
+    collecter deux ou trois thèmes suffit à produire un catalogue qui a l'air
+    entier et auquel il manque vingt thèmes. C'est ainsi qu'un aperçu publié
+    s'est retrouvé sans une seule abbaye — et que `explain maubuisson` ne
+    répondait pas « écarté » mais « aucun lieu ».
+    """
+
+    def test_a_theme_without_a_single_candidate_is_named(self):
+        raw = [make_place("Château de X", theme="chateaux")]
+        vides = empty_themes(CONFIG, raw)
+        self.assertIn("abbayes", vides)
+        self.assertNotIn("chateaux", vides)
+
+    def test_a_full_catalogue_names_nothing(self):
+        raw = [make_place(f"Lieu {theme.id}", theme=theme.id) for theme in CONFIG.themes]
+        self.assertEqual(empty_themes(CONFIG, raw), [])
+
+    def test_the_proof_needs_no_state_file(self):
+        # Le fichier d'état ne dit rien des collectes antérieures à sa mise en
+        # place, et son message rassurant couvrait exactement ce cas. Le
+        # catalogue brut, lui, ne ment pas.
+        self.assertEqual(len(empty_themes(CONFIG, [])), len(CONFIG.themes))
 
 
 if __name__ == "__main__":
