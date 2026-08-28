@@ -472,6 +472,43 @@ n'appellent pas du tout le même geste :
 Le diagnostic passe par `probe_query`, qui n'exige rien, et le nom du lieu
 accompagne chaque ligne : un Q-id nu n'aide personne à décider.
 
+### Le recensement des portes fermées
+
+```bash
+python -m roam_pipeline gaps                      # défaut : lieux à 12 langues ou plus
+python -m roam_pipeline gaps --min-sitelinks 8    # plus fin, plus long
+```
+
+La collecte part des classes qu'on connaît : elle est **par construction
+incapable de dire ce qu'elle ignore**. Une liste d'incontournables écrite de
+mémoire ne le peut pas davantage — elle oublie précisément ce qu'on oublie.
+
+`gaps` part de l'inverse : tout ce que Wikidata situe en France et documente
+dans plusieurs langues, moins ce que le catalogue possède déjà. Ce qui reste,
+groupé par classe, ce sont les portes qu'on n'a pas ouvertes.
+
+```
+  classe                              absents     sur   exemples
+  ✗ maison (Q3947)                         87     412   Fondation Claude-Monet, …
+  · musée (Q33506)                         41    1180   …
+```
+
+- **`✗`** : aucun thème ne collecte cette classe. C'est un angle mort — la
+  fondation Claude-Monet en est sortie.
+- **`·`** : classe déjà collectée. Ses absents sont sous un plancher, pas hors
+  du radar : c'est un réglage, pas un trou.
+
+Le tri porte sur les **absents** et non sur le total : une classe massivement
+collectée n'est pas un trou, même si elle est immense.
+
+Une classe à ouvrir se déclare dans `themes.yaml` — en `wikidata_classes` si
+elle est spécifique, en `broad_classes` avec son propre plancher si elle est
+générique.
+
+> La requête ne voit que ce qui porte `pays = France`. Un lieu sans cette
+> propriété reste invisible ici comme à la collecte ; `probe` est le seul outil
+> qui le débusque, un lieu à la fois.
+
 ### Les Q-ids listés qui n'arrivent jamais
 
 ```bash

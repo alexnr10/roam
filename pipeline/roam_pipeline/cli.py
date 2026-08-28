@@ -27,6 +27,7 @@ from .export import (
 )
 from .fetch import (
     REMEDIES,
+    _paged,
     diagnose_missing,
     enrich_exclusions,
     enrich_visitors,
@@ -686,13 +687,25 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
     return status
 
 
-def _theme_of_class(config: Config) -> dict[str, str]:
-    """`{Q-id de classe: identifiant de thème}` — quel thème prend quoi."""
-    return {
-        qid: theme.id
-        for theme in config.themes
-        for qid, _floor in theme.collected_classes
-    }
+def _class_owners(config: Config) -> dict[str, tuple[str, int]]:
+    """`{Q-id de classe: (thème, plancher de collecte DE CETTE CLASSE)}`.
+
+    Le plancher appartient à la classe, pas au thème : `maisons` collecte ses
+    maisons-musées à partir de deux langues, mais la classe générique
+    « maison » à partir de huit. Confondre les deux fait dire à `probe` que
+    rien ne s'oppose à un lieu que la requête écarte — c'est exactement ce qui
+    est arrivé à la maison du docteur Gachet.
+
+    Quand deux classes du même thème mènent au même lieu, la moins exigeante
+    l'emporte : il suffit d'une route pour être collecté.
+    """
+    owners: dict[str, tuple[str, int]] = {}
+    for theme in config.themes:
+        for qid, floor in theme.collected_classes:
+            known = owners.get(qid)
+            if known is None or floor < known[1]:
+                owners[qid] = (theme.id, floor)
+    return owners
 
 
 def cmd_probe(args: argparse.Namespace, config: Config) -> int:
@@ -752,13 +765,13 @@ def cmd_probe(args: argparse.Namespace, config: Config) -> int:
     # De quelles classes CONFIGURÉES l'entité descend-elle ? La question n'est
     # pas « quelle est sa classe » mais « un thème la reconnaît-il », et la
     # réponse passe par la hiérarchie des sous-classes.
-    owner = _theme_of_class(config)
+    owners = _class_owners(config)
     inherited: dict[str, list[tuple[str, str]]] = defaultdict(list)
-    if owner:
-        for row in client.query(wd.class_ancestry_query(qids, sorted(owner))):
+    if owners:
+        for row in client.query(wd.class_ancestry_query(qids, sorted(owners))):
             qid = wd.qid_from_uri(row.get("item"))
             ancestor = wd.qid_from_uri(row.get("class"))
-            if qid and ancestor:
+            if qid and ancestor in owners:
                 inherited[qid].append((ancestor, row.get("classLabel") or ancestor))
 
     collected = _known_qids(args.out / "places_raw.json")
@@ -782,17 +795,27 @@ def cmd_probe(args: argparse.Namespace, config: Config) -> int:
         classes = ", ".join(f"{name} ({q})" for q, name in sorted(entry["classes"].items()))
         print(f"  classes déclarées : {classes or '— aucune —'}")
 
-        themes = sorted({owner[a] for a, _ in inherited.get(qid, []) if a in owner})
-        if themes:
-            via = ", ".join(f"{name}" for _, name in sorted(set(inherited[qid]), key=lambda x: x[1]))
-            print(f"  thème(s) qui la reconnaissent : {', '.join(themes)}  (via {via})")
+        # Une route = une classe qui mène à un thème, avec SON plancher.
+        routes = sorted(
+            {
+                (owners[ancestor][0], label, owners[ancestor][1])
+                for ancestor, label in inherited.get(qid, [])
+            },
+            key=lambda route: route[2],
+        )
+        if routes:
+            print("  routes de collecte :")
+            for theme_id, label, floor in routes:
+                verdict = "✓" if entry["sitelinks"] >= floor else "✗"
+                print(f"      {verdict} {theme_id:<12} via « {label} » — exige "
+                      f"{floor} langues")
         else:
             print("  thème(s) qui la reconnaissent : AUCUN")
 
         print(f"  déjà collectée : {'oui' if qid in collected else 'NON'}"
               f" · proposée par OpenStreetMap : {'oui' if qid in proposed else 'non'}")
 
-        for line in _probe_verdict(entry, themes, config, qid in collected):
+        for line in _probe_verdict(entry, routes, config, qid in collected):
             print(f"  {line}")
 
     return 0
@@ -815,7 +838,10 @@ def _known_qids(path: Path) -> set[str]:
 
 
 def _probe_verdict(
-    entry: dict[str, Any], themes: list[str], config: Config, collected: bool
+    entry: dict[str, Any],
+    routes: list[tuple[str, str, int]],
+    config: Config,
+    collected: bool,
 ) -> list[str]:
     """Ce qui empêche la collecte, et par quoi y remédier.
 
@@ -839,7 +865,7 @@ def _probe_verdict(
         out.append(manual + "manuels portent alors leurs coordonnées à la main.")
         return out
 
-    if not themes:
+    if not routes:
         out.append("⚠ aucune classe reconnue par un thème : la collecte ne peut pas "
                    "la voir. Ajouter l'une de ses classes à un thème de "
                    "`themes.yaml` la ramènerait — avec tout ce qui partage cette "
@@ -847,23 +873,26 @@ def _probe_verdict(
         out.append(manual + "manuels imposent leur thème.")
         return out
 
-    floors = [
-        (theme_id, config.theme(theme_id).fetch_min_sitelinks, config.theme(theme_id).min_sitelinks)
-        for theme_id in themes
-    ]
-    blocked = [t for t, fetch, _ in floors if entry["sitelinks"] < fetch]
-    if blocked and len(blocked) == len(floors):
-        detail = ", ".join(f"{t} ≥ {fetch}" for t, fetch, _ in floors)
+    # Il suffit d'une route pour être collecté : on regarde la moins exigeante.
+    ouvertes = [route for route in routes if entry["sitelinks"] >= route[2]]
+    if not ouvertes:
+        theme_id, label, floor = routes[0]
         out.append(f"⚠ {entry['sitelinks']} langues, sous le plancher de COLLECTE "
-                   f"({detail}) : la requête l'écarte avant même le catalogue.")
+                   f"de la classe « {label} » ({floor}) : la requête l'écarte avant "
+                   f"même le catalogue.")
+        out.append(f"  Le plancher appartient à la CLASSE, pas au thème — "
+                   f"{theme_id} collecte ses classes propres plus bas. Remèdes : "
+                   f"abaisser ce plancher dans `themes.yaml`, ou " + manual.strip() +
+                   "manuels échappent à toute la chaîne de collecte.")
         return out
 
+    themes = sorted({theme_id for theme_id, _label, _floor in ouvertes})
     if not collected:
         out.append("Rien ne s'y oppose côté Wikidata : elle devrait être collectée. "
                    "Relance `fetch --only " + ",".join(themes) + "`.")
         return out
 
-    editorial = ", ".join(f"{t} ≥ {floor}" for t, _, floor in floors)
+    editorial = ", ".join(f"{t} ≥ {config.theme(t).min_sitelinks}" for t in themes)
     out.append(f"Collectée. Le sort se joue donc à la construction — plancher "
                f"éditorial {editorial} : `explain` le dira.")
     return out
@@ -907,6 +936,94 @@ def cmd_check_lists(args: argparse.Namespace, config: Config) -> int:
         print(f"\n{len(items)} — {REMEDIES.get(cause, cause)}")
         for item in items:
             print(f"    {item}")
+    return 0
+
+
+def census(rows, known: set[str], owned: set[str]) -> list[dict[str, Any]]:
+    """Regroupe par classe les lieux notoires que le catalogue n'a pas.
+
+    Le tri se fait sur les lieux INCONNUS et non sur le total : une classe déjà
+    largement collectée n'est pas un trou, même si elle est immense. Ce qu'on
+    cherche, ce sont les portes fermées.
+    """
+    par_classe: dict[str, dict[str, Any]] = {}
+    vus: dict[str, set[str]] = defaultdict(set)
+
+    for row in rows:
+        qid = wd.qid_from_uri(row.get("item"))
+        class_qid = wd.qid_from_uri(row.get("class"))
+        if not qid or not class_qid:
+            continue
+        entry = par_classe.setdefault(
+            class_qid,
+            {"qid": class_qid, "label": row.get("classLabel") or class_qid,
+             "total": 0, "manquants": 0, "exemples": []},
+        )
+        if qid in vus[class_qid]:
+            continue
+        vus[class_qid].add(qid)
+        entry["total"] += 1
+        if qid not in known:
+            entry["manquants"] += 1
+            if len(entry["exemples"]) < 5:
+                entry["exemples"].append(row.get("itemLabel") or qid)
+
+    for entry in par_classe.values():
+        entry["collectee"] = entry["qid"] in owned
+    return sorted(par_classe.values(), key=lambda e: -e["manquants"])
+
+
+def cmd_gaps(args: argparse.Namespace, config: Config) -> int:
+    """Quelles classes de lieux nous échappent ?
+
+    La collecte part des classes qu'on connaît : elle est par construction
+    incapable de dire ce qu'elle ignore. Une liste d'incontournables écrite de
+    mémoire ne le peut pas non plus — elle oublie précisément ce qu'on oublie.
+
+    On part donc de l'inverse : tout ce que Wikidata situe en France et
+    documente dans plusieurs langues, moins ce que le catalogue possède déjà.
+    Ce qui reste, groupé par classe, ce sont les portes qu'on n'a pas ouvertes.
+    """
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
+        return 1
+
+    known = _known_qids(raw_path)
+    owned = set(_class_owners(config))
+    client = wd.SparqlClient()
+
+    print(f"Recensement des lieux français à {args.min_sitelinks} langues ou plus…")
+    rows = list(
+        _paged(
+            client,
+            lambda limit, offset: wd.notable_places_query(
+                args.min_sitelinks, limit, offset
+            ),
+        )
+    )
+    classes = census(rows, known, owned)
+    if not classes:
+        print("Aucun résultat — le plancher est peut-être trop haut.")
+        return 0
+
+    total_manquants = sum(c["manquants"] for c in classes)
+    print(f"{len(known)} lieux au catalogue · {total_manquants} lieux notoires "
+          f"non collectés, répartis sur {len(classes)} classes.\n")
+    print(f"  {'classe':<34} {'absents':>8} {'sur':>7}   exemples")
+    for entry in classes[: args.limit]:
+        if entry["manquants"] < args.min_places:
+            break
+        marque = "·" if entry["collectee"] else "✗"
+        label = f"{marque} {entry['label']} ({entry['qid']})"
+        print(f"  {label[:34]:<34} {entry['manquants']:>8} {entry['total']:>7}   "
+              + ", ".join(entry["exemples"][:3]))
+
+    print("\n« ✗ » : classe qu'aucun thème ne collecte. « · » : classe déjà")
+    print("collectée — ses absents sont sous un plancher, pas hors du radar.")
+    print("Une classe à ouvrir se déclare dans `themes.yaml`, en `wikidata_classes`")
+    print("si elle est spécifique, en `broad_classes` avec son propre plancher si")
+    print("elle est générique.")
     return 0
 
 
@@ -1364,6 +1481,20 @@ def build_parser() -> argparse.ArgumentParser:
     review.add_argument("--review", type=Path, help="chemin de review.csv")
     add_decision_args(review)
 
+    gaps = sub.add_parser(
+        "gaps",
+        help="quelles classes de lieux nous échappent ? (réseau requis, long)",
+    )
+    gaps.add_argument(
+        "--min-sitelinks", type=int, default=12,
+        help="notoriété minimale des lieux recensés (défaut 12 ; plus bas = plus long)",
+    )
+    gaps.add_argument("--limit", type=int, default=40, help="classes affichées")
+    gaps.add_argument(
+        "--min-places", type=int, default=3,
+        help="ignorer les classes sous ce nombre d'absents",
+    )
+
     sub.add_parser(
         "check-lists",
         help="diagnostique les Q-ids listés à la main qui n'arrivent pas (réseau requis)",
@@ -1435,6 +1566,7 @@ def main(argv: list[str] | None = None) -> int:
         "stats": cmd_stats,
         "review": cmd_review,
         "check-lists": cmd_check_lists,
+        "gaps": cmd_gaps,
         "probe": cmd_probe,
         "rename": cmd_rename,
         "export-app": cmd_export_app,

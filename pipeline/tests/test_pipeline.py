@@ -35,9 +35,11 @@ from roam_pipeline.models import Place, display_name, slugify
 from roam_pipeline import outlines
 from roam_pipeline.fetch import REMEDIES, diagnose_missing, enrich_departements
 from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from_insee
-from roam_pipeline.cli import _known_qids, _pending_terms, _probe_verdict
+from roam_pipeline.cli import _known_qids, _pending_terms, _probe_verdict, census
 from roam_pipeline.wikipedia import title_from_url
-from roam_pipeline.wikidata import class_ancestry_query, probe_query, visitors_query
+from roam_pipeline.wikidata import (
+    class_ancestry_query, notable_places_query, probe_query, visitors_query,
+)
 from roam_pipeline.review import (
     DECISIONS, apply_names, diff_tiers, read_names, read_snapshot, vanished,
     write_names, write_snapshot,
@@ -1798,21 +1800,26 @@ class TestProbe(unittest.TestCase):
         base.update(over)
         return base
 
+    #: Une route de collecte : (thème, libellé de la classe, plancher de CETTE classe).
+    MAISONS = [("maisons", "maison-musée", 2)]
+    GENERIQUE = [("maisons", "maison", 8)]
+
     def test_a_missing_country_is_named_first(self):
         # `theme_query` exige P17 = France. Sans elle, aucun thème ne peut voir
         # l'entité — et c'est invisible depuis le catalogue.
-        lines = _probe_verdict(self._entry(country="", country_qid=""), ["maisons"], CONFIG, False)
+        lines = _probe_verdict(self._entry(country="", country_qid=""), self.MAISONS, CONFIG, False)
         self.assertIn("pays", lines[0])
         self.assertTrue(any("manual/places.csv" in line for line in lines))
 
     def test_a_foreign_country_blocks_too(self):
         lines = _probe_verdict(
-            self._entry(country="Belgique", country_qid="Q31"), ["chateaux"], CONFIG, False
+            self._entry(country="Belgique", country_qid="Q31"),
+            [("chateaux", "château", 3)], CONFIG, False,
         )
         self.assertIn("pays", lines[0])
 
     def test_missing_coordinates_are_named(self):
-        lines = _probe_verdict(self._entry(coord=""), ["maisons"], CONFIG, False)
+        lines = _probe_verdict(self._entry(coord=""), self.MAISONS, CONFIG, False)
         self.assertIn("coordonnée", lines[0])
 
     def test_an_unrecognised_class_is_named(self):
@@ -1822,25 +1829,46 @@ class TestProbe(unittest.TestCase):
     def test_the_collection_floor_is_named_with_its_value(self):
         # Le plancher de COLLECTE, pas l'éditorial : le premier écarte avant
         # que le lieu n'existe, le second se règle sans recollecter.
-        floor = CONFIG.theme("musees").fetch_min_sitelinks
-        lines = _probe_verdict(self._entry(sitelinks=floor - 1), ["musees"], CONFIG, False)
+        lines = _probe_verdict(
+            self._entry(sitelinks=9), [("musees", "musée", 10)], CONFIG, False
+        )
         self.assertIn("COLLECTE", lines[0])
-        self.assertIn(str(floor), lines[0])
+        self.assertIn("10", lines[0])
 
-    def test_one_permissive_theme_is_enough(self):
-        # Sous le plancher d'un thème mais pas de l'autre : la collecte la voit.
-        lines = _probe_verdict(self._entry(sitelinks=3), ["musees", "maisons"], CONFIG, False)
-        self.assertNotIn("COLLECTE", lines[0])
+    def test_the_floor_belongs_to_the_class_not_to_the_theme(self):
+        # LE bug de la maison du docteur Gachet. Reconnue par `maisons` via la
+        # classe générique « maison », qui exige huit langues — mais `probe`
+        # comparait au plancher du THÈME (deux) et répondait « rien ne s'y
+        # oppose, relance fetch », ce que le fetch démentait sans un mot.
+        lines = _probe_verdict(self._entry(sitelinks=4), self.GENERIQUE, CONFIG, False)
+        self.assertIn("COLLECTE", lines[0])
+        self.assertIn("maison", lines[0])
+        self.assertIn("8", lines[0])
+        self.assertNotIn("Rien ne s'y oppose", " ".join(lines))
+
+    def test_one_open_route_is_enough(self):
+        # Deux classes mènent au même lieu : il suffit que l'une l'admette.
+        lines = _probe_verdict(
+            self._entry(sitelinks=4), self.MAISONS + self.GENERIQUE, CONFIG, False
+        )
+        self.assertIn("fetch --only maisons", lines[0])
 
     def test_nothing_blocking_and_absent_means_refetch(self):
-        lines = _probe_verdict(self._entry(), ["maisons"], CONFIG, False)
+        lines = _probe_verdict(self._entry(), self.MAISONS, CONFIG, False)
         self.assertIn("fetch --only maisons", lines[0])
 
     def test_already_collected_hands_over_to_explain(self):
         # `probe` répond sur la collecte, `explain` sur la construction : se
         # tromper d'outil fait chercher le défaut au mauvais endroit.
-        lines = _probe_verdict(self._entry(), ["maisons"], CONFIG, True)
+        lines = _probe_verdict(self._entry(), self.MAISONS, CONFIG, True)
         self.assertIn("explain", lines[0])
+
+    def test_the_least_demanding_route_wins_per_class(self):
+        from roam_pipeline.cli import _class_owners
+        owners = _class_owners(CONFIG)
+        # La classe générique porte SON plancher, pas celui du thème.
+        self.assertEqual(owners["Q3947"], ("maisons", 8))
+        self.assertEqual(owners["Q2087181"], ("maisons", CONFIG.theme("maisons").fetch_min_sitelinks))
 
     def test_the_query_demands_nothing(self):
         # L'inverse exact de `theme_query` : tout y est optionnel, puisque
@@ -2142,6 +2170,72 @@ class TestTierChanges(unittest.TestCase):
             body = path.read_text(encoding="utf-8")
         self.assertIn('value="bouge"', body)
         self.assertIn("descendu depuis ta dernière revue", body)
+
+
+class TestGapCensus(unittest.TestCase):
+    """Le recensement des portes qu'on n'a pas ouvertes.
+
+    La collecte part des classes qu'on connaît : elle ne peut pas dire ce
+    qu'elle ignore. Une liste d'incontournables écrite de mémoire ne le peut
+    pas non plus — elle oublie précisément ce qu'on oublie.
+    """
+
+    @staticmethod
+    def _row(qid, label, class_qid, class_label):
+        return {
+            "item": f"http://www.wikidata.org/entity/{qid}",
+            "itemLabel": label,
+            "class": f"http://www.wikidata.org/entity/{class_qid}",
+            "classLabel": class_label,
+        }
+
+    def test_it_counts_what_the_catalogue_lacks(self):
+        rows = [
+            self._row("Q1", "Fondation Claude-Monet", "Q3947", "maison"),
+            self._row("Q2", "Maison du docteur Gachet", "Q3947", "maison"),
+            self._row("Q3", "Château de Chambord", "Q23413", "château fort"),
+        ]
+        classes = census(rows, known={"Q3"}, owned={"Q23413"})
+        maison = next(c for c in classes if c["qid"] == "Q3947")
+        chateau = next(c for c in classes if c["qid"] == "Q23413")
+        self.assertEqual(maison["manquants"], 2)
+        self.assertEqual(chateau["manquants"], 0)
+        # Le tri met les trous en tête, pas les grosses classes.
+        self.assertEqual(classes[0]["qid"], "Q3947")
+
+    def test_it_says_whether_the_class_is_already_collected(self):
+        # Deux situations très différentes : une classe absente du radar, et
+        # une classe collectée dont les absents sont sous un plancher.
+        rows = [self._row("Q1", "X", "Q3947", "maison")]
+        self.assertFalse(census(rows, known=set(), owned=set())[0]["collectee"])
+        self.assertTrue(census(rows, known=set(), owned={"Q3947"})[0]["collectee"])
+
+    def test_a_place_counted_once_per_class(self):
+        # Une entité rend plusieurs lignes quand elle a plusieurs classes ; la
+        # compter deux fois gonflerait le trou et ferait courir après un vide.
+        rows = [
+            self._row("Q1", "X", "Q3947", "maison"),
+            self._row("Q1", "X", "Q3947", "maison"),
+            self._row("Q1", "X", "Q23413", "château fort"),
+        ]
+        classes = census(rows, known=set(), owned=set())
+        self.assertEqual({c["qid"]: c["manquants"] for c in classes},
+                         {"Q3947": 1, "Q23413": 1})
+
+    def test_examples_help_decide(self):
+        # Un décompte ne dit pas s'il faut ouvrir la porte ; des noms, si.
+        rows = [self._row(f"Q{i}", f"Lieu {i}", "Q3947", "maison") for i in range(9)]
+        entry = census(rows, known=set(), owned=set())[0]
+        self.assertEqual(len(entry["exemples"]), 5)
+        self.assertIn("Lieu 0", entry["exemples"])
+
+    def test_the_query_demands_no_theme(self):
+        # Filtrer par classe connue reviendrait à demander au pipeline ce
+        # qu'il sait déjà : la soustraction se fait ici, pas là-bas.
+        sparql = notable_places_query(12, 800, 0)
+        self.assertIn("FILTER(?sitelinks >= 12)", sparql)
+        self.assertIn("LIMIT 800 OFFSET 0", sparql)
+        self.assertNotIn("VALUES ?class", sparql)
 
 
 if __name__ == "__main__":

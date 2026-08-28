@@ -300,6 +300,32 @@ SELECT DISTINCT ?item ?class ?classLabel WHERE {{
 """
 
 
+def notable_places_query(min_sitelinks: int, limit: int, offset: int) -> str:
+    """Lieux français notoires, avec leurs classes — SANS filtre de thème.
+
+    Le recensement des trous. La collecte part des classes qu'on connaît ; elle
+    ne peut donc pas dire ce qu'elle ignore. Cette requête part de l'inverse —
+    tout ce qui est en France, situé, et documenté dans plusieurs langues — et
+    laisse le pipeline soustraire localement ce qu'il possède déjà.
+
+    Ce qui reste, groupé par classe, ce sont les portes qu'on n'a pas ouvertes.
+    La fondation Claude-Monet a passé des mois derrière l'une d'elles, sans
+    qu'aucun compteur ne baisse ni qu'aucun message ne sorte.
+    """
+    return f"""
+SELECT ?item ?itemLabel ?sitelinks ?class ?classLabel WHERE {{
+  ?item wdt:{P_COUNTRY} wd:{Q_FRANCE} .
+  ?item wdt:{P_COORDINATE} ?coord .
+  ?item wikibase:sitelinks ?sitelinks .
+  FILTER(?sitelinks >= {min_sitelinks})
+  ?item wdt:{P_INSTANCE_OF} ?class .
+  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+}}
+ORDER BY ?item
+LIMIT {limit} OFFSET {offset}
+"""
+
+
 def probe_query(qids: list[str]) -> str:
     """Tout ce qui décide du sort d'une entité, sans aucun filtre.
 
