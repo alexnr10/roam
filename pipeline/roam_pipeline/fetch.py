@@ -55,18 +55,22 @@ def fetch_theme(
 
     # Une classe à la fois, et par pages : les classes volumineuses (châteaux,
     # abbayes, cathédrales) dépassaient le délai de WDQS en une seule requête.
-    for class_qid, floor, refused in theme.collection_routes:
-        LOG.info("thème %s : classe %s (≥ %s langues%s)", theme.id, class_qid, floor,
-                 f", sauf {', '.join(refused)}" if refused else "")
+    broad = {b.qid for b in theme.broad_classes}
+    for class_qid, floor in theme.collected_classes:
+        LOG.info(
+            "thème %s : classe %s (≥ %s langues%s)", theme.id, class_qid, floor,
+            ", générique" if class_qid in broad else "",
+        )
         for row in _paged(
             client,
-            lambda limit, offset, q=class_qid, f=floor, x=refused: wd.theme_query(
-                [q], f, limit=limit, offset=offset, exclude_classes=x
+            lambda limit, offset, q=class_qid, f=floor: wd.theme_query(
+                [q], f, limit=limit, offset=offset
             ),
         ):
             place = _row_to_place(row, theme)
             if place is None:
                 continue
+            place.via_broad_class = class_qid in broad
             existing = by_qid.get(place.wikidata_id)
             # Une même entité peut remonter via plusieurs classes : on garde la
             # variante la mieux renseignée.

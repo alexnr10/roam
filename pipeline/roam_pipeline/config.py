@@ -26,11 +26,6 @@ class BroadClass:
 
     qid: str
     fetch_min_sitelinks: int
-    #: Classes qui FERMENT cette route sans écarter le lieu du catalogue : il
-    #: reste disponible pour un thème déclaré plus loin.
-    exceptions: list[str] = field(default_factory=list)
-    #: Termes d'exception encore à résoudre par `suggest-qids`.
-    except_search: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -64,20 +59,8 @@ class Theme:
     @property
     def collected_classes(self) -> list[tuple[str, int]]:
         """`(classe, plancher de collecte)` — tout ce que le thème interroge."""
-        return [(qid, floor) for qid, floor, _ in self.collection_routes]
-
-    @property
-    def collection_routes(self) -> list[tuple[str, int, list[str]]]:
-        """`(classe, plancher, classes qui ferment la route)`.
-
-        Les trois éléments d'une requête de collecte. Les classes propres du
-        thème n'ont pas d'exception : elles sont déjà spécifiques.
-        """
-        return [
-            (qid, self.fetch_min_sitelinks, []) for qid in self.wikidata_classes
-        ] + [
-            (broad.qid, broad.fetch_min_sitelinks, list(broad.exceptions))
-            for broad in self.broad_classes
+        return [(qid, self.fetch_min_sitelinks) for qid in self.wikidata_classes] + [
+            (broad.qid, broad.fetch_min_sitelinks) for broad in self.broad_classes
         ]
 
 
@@ -229,12 +212,7 @@ def load_config(config_dir: Path | None = None) -> Config:
             from_labels=list(t.get("from_labels") or []),
             search=list(t.get("search") or []),
             broad_classes=[
-                BroadClass(
-                    qid=str(b["qid"]),
-                    fetch_min_sitelinks=int(b["fetch_min_sitelinks"]),
-                    exceptions=[str(q) for q in (b.get("except") or [])],
-                    except_search=list(b.get("except_search") or []),
-                )
+                BroadClass(qid=str(b["qid"]), fetch_min_sitelinks=int(b["fetch_min_sitelinks"]))
                 for b in (t.get("broad_classes") or [])
             ],
         )
@@ -319,11 +297,6 @@ def _validate(themes: list[Theme], labels: list[Label],
             if not qid.startswith("Q") or not qid[1:].isdigit():
                 raise ValueError(f"Q-id invalide dans le thème {t.id} : {qid}")
         for broad in t.broad_classes:
-            for qid in broad.exceptions:
-                if not qid.startswith("Q") or not qid[1:].isdigit():
-                    raise ValueError(
-                        f"Q-id d'exception invalide dans le thème {t.id} : {qid}"
-                    )
             # Une classe générique au plancher du thème n'est plus générique :
             # elle ramènerait tout, et le garde-fou serait décoratif.
             if broad.fetch_min_sitelinks <= t.fetch_min_sitelinks:

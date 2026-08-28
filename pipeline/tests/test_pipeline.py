@@ -2300,5 +2300,62 @@ class TestClassesFoundByTheCensus(unittest.TestCase):
                          "a\x01b")
 
 
+class TestBroadRouteYields(unittest.TestCase):
+    """Une porte large ne vaut pas une porte précise.
+
+    Le Petit Palais est un « musée d'art » — classe propre de `musees` — et une
+    « maison », classe générique de `maisons`, déclaré plus tôt pour protéger
+    les maisons-musées. L'ordre seul en faisait une maison d'artiste, avec tous
+    les musées-palais.
+    """
+
+    @staticmethod
+    def _pair(broad_theme="maisons", specific_theme="musees"):
+        large = make_place("Petit Palais", theme=broad_theme, wikidata_id="Q1")
+        large.via_broad_class = True
+        precis = make_place("Petit Palais", theme=specific_theme, wikidata_id="Q1")
+        return large, precis
+
+    def test_a_generic_entry_yields_to_a_specific_one(self):
+        large, precis = self._pair()
+        for order in ([large, precis], [precis, large]):
+            kept = dedupe_across_themes(order, CONFIG)
+            self.assertEqual([p.theme_id for p in kept], ["musees"])
+
+    def test_it_beats_the_declaration_order(self):
+        # `maisons` est déclaré AVANT `musees` : sans cette règle, l'ordre
+        # gagnerait, et c'est précisément ce qui rangeait les palais-musées
+        # chez les maisons d'artistes.
+        themes = [t.id for t in CONFIG.themes]
+        self.assertLess(themes.index("maisons"), themes.index("musees"))
+
+    def test_two_generic_entries_fall_back_on_the_order(self):
+        a, b = self._pair(broad_theme="maisons", specific_theme="musees")
+        b.via_broad_class = True
+        kept = dedupe_across_themes([b, a], CONFIG)
+        self.assertEqual([p.theme_id for p in kept], ["maisons"])
+
+    def test_a_place_with_only_a_generic_entry_keeps_its_theme(self):
+        # La fondation Claude-Monet n'est QUE « maison » : elle doit rester
+        # une maison d'artiste, sans quoi la correction précédente serait
+        # défaite par celle-ci.
+        seule = make_place("Fondation Claude-Monet", theme="maisons", wikidata_id="Q2")
+        seule.via_broad_class = True
+        kept = dedupe_across_themes([seule], CONFIG)
+        self.assertEqual([p.theme_id for p in kept], ["maisons"])
+
+    def test_a_pinned_place_still_imposes_its_theme(self):
+        # Un choix explicite du curateur passe avant toute règle automatique.
+        large, precis = self._pair()
+        large.pinned = True
+        kept = dedupe_across_themes([precis, large], CONFIG)
+        self.assertEqual([p.theme_id for p in kept], ["maisons"])
+
+    def test_amusement_parks_have_their_generic_class(self):
+        # « parc de loisirs » est le terme générique français : sans lui, un
+        # parc qu'aucune des sept classes précises ne nomme passait encore.
+        self.assertIn("Q15982170", CONFIG.exclusions.qids)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

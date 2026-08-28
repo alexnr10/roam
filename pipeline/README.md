@@ -444,6 +444,18 @@ de collecte qui lui est propre, plus haut que celui du thème :
 le tri que la classe ne fait pas. C'est le seul filtre disponible quand la
 classe ne dit rien.
 
+**Une entrée générique cède devant une entrée spécifique.** Un palais est, chez
+Wikidata, une sorte de maison — et `maisons` est déclaré avant `musees` pour
+protéger les maisons-musées. L'ordre seul rangeait donc le Petit Palais en
+« maison d'artiste », avec tous les musées-palais.
+
+Interdire « palais » aux maisons aurait été le mauvais remède : il aurait mal
+rangé un palais qui serait vraiment une maison d'artiste, et il aurait fallu
+énumérer une à une les classes fautives. C'est `dedupe_across_themes` qui
+tranche : un lieu entré par une classe générique cède devant n'importe quelle
+entrée spécifique, **quel que soit l'ordre des thèmes**. La règle « du plus
+spécifique au plus générique » appliquée jusqu'au bout, sans liste à tenir.
+
 Le chargement refuse un plancher générique qui ne serait pas **strictement plus
 haut** que celui du thème — sans écart, le garde-fou serait décoratif et le
 thème se noierait. Ces classes passent par `verify-qids` comme les autres.

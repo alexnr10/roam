@@ -89,8 +89,6 @@ def cmd_verify_qids(args: argparse.Namespace, config: Config) -> int:
             qids.setdefault(broad.qid, []).append(
                 f"thème {theme.id}, classe générique ≥ {broad.fetch_min_sitelinks}"
             )
-            for qid in broad.exceptions:
-                qids.setdefault(qid, []).append(f"thème {theme.id}, exception")
     for label in config.labels:
         if label.qid:
             qids.setdefault(label.qid, []).append(f"label {label.id}")
@@ -141,9 +139,6 @@ def _pending_terms(config: Config) -> list[tuple[str, str, str]]:
     for theme in config.themes:
         for term in theme.search:
             pending.append((f"thème {theme.id}", term, "item"))
-        for broad in theme.broad_classes:
-            for term in broad.except_search:
-                pending.append((f"thème {theme.id}, exception de {broad.qid}", term, "item"))
     for label in config.labels:
         if not label.is_manual and not label.qid and label.search:
             pending.append((f"label {label.id}", label.search, "item"))

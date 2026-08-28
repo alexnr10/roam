@@ -100,6 +100,10 @@ class Place:
     # renseignée », ce qui ne vaut RIEN — ni bonus ni malus. Wikidata ne la
     # documente que pour une minorité de sites.
     visitors_per_year: int | None = None
+    # Entré par une classe GÉNÉRIQUE (`broad_classes`) et non par une classe
+    # propre au thème. Une porte large ne vaut pas une porte précise : le
+    # dédoublonnage inter-thèmes s'en sert pour trancher.
+    via_broad_class: bool = False
 
     def __post_init__(self) -> None:
         # Le nom est normalisé à la construction, d'où qu'il vienne : Wikidata,

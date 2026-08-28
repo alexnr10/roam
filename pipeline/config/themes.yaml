@@ -60,8 +60,8 @@ exclude_classes:
     - Q740326      # parc aquatique
   # Encore à résoudre : le terme générique français, sous lequel se rangent
   # les parcs qu'aucune des classes ci-dessus ne nomme.
-  search:
-    - parc de loisirs
+    - Q15982170    # parc de loisirs — le terme générique français
+  search: []
 
 themes:
   - id: villages
@@ -151,14 +151,16 @@ themes:
     broad_classes:
       - qid: Q3947            # maison
         fetch_min_sitelinks: 8
+        #
         # Un palais est, chez Wikidata, une sorte de maison — et `maisons` est
-        # déclaré avant `musees`. Le Petit Palais se retrouvait donc en
-        # « maison d'artiste », avec tous les musées-palais. La classe n'est
-        # pas fausse : c'est la ROUTE qui l'est. Un palais-musée relève de
-        # `musees`, et l'exception le lui rend.
-        except: []
-        except_search:
-          - palais
+        # déclaré avant `musees` pour protéger les maisons-musées. Le Petit
+        # Palais se retrouvait donc en « maison d'artiste ».
+        #
+        # Ce n'est PAS réglé ici, et c'est délibéré : interdire « palais » aux
+        # maisons aurait mal rangé un palais qui serait vraiment une maison
+        # d'artiste. Le dédoublonnage inter-thèmes s'en charge — une entrée par
+        # classe générique cède devant n'importe quelle entrée spécifique, quel
+        # que soit l'ordre des thèmes. Voir `dedupe_across_themes`.
     #
     # Deux couples portent le même libellé français pour des entités
     # différentes : le BÂTIMENT et l'INSTITUTION d'une part, le LIEU de travail

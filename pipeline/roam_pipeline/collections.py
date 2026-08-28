@@ -233,6 +233,19 @@ def dedupe_across_themes(places: list[Place], config: Config) -> list[Place]:
     Le thème retenu est le premier déclaré dans `themes.yaml`, dont l'ordre va
     du plus spécifique au plus générique — un lieu à la fois cathédrale et
     monument est une cathédrale.
+
+    **Sauf** quand il n'est entré que par une classe GÉNÉRIQUE. Le Petit Palais
+    est un « musée d'art », classe propre du thème `musees` ; il est aussi une
+    « maison », classe générique du thème `maisons` — déclaré plus tôt pour
+    protéger les maisons-musées. L'ordre seul en faisait donc une maison
+    d'artiste, avec tous les musées-palais.
+
+    Une porte large ne vaut pas une porte précise : une entrée générique cède
+    devant n'importe quelle entrée spécifique, quel que soit l'ordre. C'est la
+    règle « du plus spécifique au plus générique » appliquée jusqu'au bout —
+    et elle ne demande d'énumérer aucune classe fautive, là où interdire
+    « palais » aux maisons aurait mal rangé un palais qui serait vraiment une
+    maison d'artiste.
     """
     rank = {theme.id: index for index, theme in enumerate(config.themes)}
     best: dict[str, Place] = {}
@@ -247,10 +260,12 @@ def dedupe_across_themes(places: list[Place], config: Config) -> list[Place]:
         if place.pinned != current.pinned:
             winner, loser = (place, current) if place.pinned else (current, place)
         else:
+            # (entrée générique ?, rang du thème) : le premier critère prime.
+            def key(p: Place) -> tuple[int, int]:
+                return (1 if p.via_broad_class else 0, rank.get(p.theme_id, 99))
+
             winner, loser = (
-                (place, current)
-                if rank.get(place.theme_id, 99) < rank.get(current.theme_id, 99)
-                else (current, place)
+                (place, current) if key(place) < key(current) else (current, place)
             )
         best[place.wikidata_id] = winner
         collisions.append((winner.name, winner.theme_id, loser.theme_id))
