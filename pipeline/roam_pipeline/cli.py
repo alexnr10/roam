@@ -1398,6 +1398,24 @@ def _print_stats(places, collections, raw=None, config: Config | None = None) ->
                 for key, label in (("nature", "nature"), ("culture", "culture"))
             ))
 
+    rapproches_total = sum(1 for p in places if getattr(p, "osm_id", None))
+    if not rapproches_total and places:
+        # Sans la couche OpenStreetMap, DEUX mécanismes disparaissent en
+        # silence : le filtre d'accès n'écarte plus rien, et le repêchage —
+        # qui exige un accueil du public attesté — ne sauve plus personne.
+        # Le catalogue rétrécit de plusieurs centaines de lieux sans qu'aucune
+        # ligne ne dise pourquoi.
+        print("\n⚠ AUCUNE donnée OpenStreetMap : ni ouverture au public, ni "
+              "accès refusé.")
+        print("    Le filtre d'accès n'écarte rien et le repêchage ne sauve "
+              "personne — plusieurs")
+        print("    centaines de lieux manquent au catalogue sans autre "
+              "explication.")
+        print("    Cette machine n'a pas `data/out/candidates.csv` ni "
+              "`data/manual/candidates.csv`.")
+        print("    Récupère-les de la machine qui a lancé `discover`, ou "
+              "relance `discover` puis `adopt`.")
+
     ouverts = sum(1 for p in places if getattr(p, "visitable", None) is True)
     fermes = sum(1 for p in places if getattr(p, "visitable", None) is False)
     rapproches = sum(1 for p in places if getattr(p, "osm_id", None))

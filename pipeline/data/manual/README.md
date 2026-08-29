@@ -25,6 +25,14 @@ travail éditorial. Ils sont relus à **chaque** construction :
 | `decisions.csv` | verdicts d'inclusion — `keep`, `drop`, `promote`, `demote` |
 | `names.csv` | noms d'affichage choisis, quand le libellé de Wikidata ne convient pas |
 | `tiers.csv` | photographie du niveau ET du thème tels qu'ils ont été VUS à la dernière revue |
+| `candidates.csv` | candidats adoptés depuis OpenStreetMap — une ligne retirée à la main le reste |
+
+`data/out/candidates.csv`, la sortie de `discover`, se committe aussi. Ce n'est
+pas une sortie comme les autres : elle coûte vingt minutes de requêtes Overpass
+et elle porte les seuls faits de terrain du catalogue — horaires, tarifs, accès
+refusé. Sans elle, le filtre d'accès n'écarte rien et le repêchage ne sauve
+personne : le catalogue perd plusieurs centaines de lieux sans qu'aucune ligne
+ne l'explique.
 
 Ils sont séparés à dessein. Renommer et écarter sont deux gestes différents :
 un lieu peut être renommé **et** gardé, renommé **et** écarté. Fondus dans un
