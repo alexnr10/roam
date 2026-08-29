@@ -1,0 +1,946 @@
+wikidata_id,theme_id,note,nom,departement,osm_id,horaires,tarif,site_web,lat,lon
+Q290621,monuments,Étoile du Roy,Étoile du Roy,35,way/1065056927,"Mo-Su 10:00-12:30,14:00-18:00",yes,https://www.etoile-marine.com/,48.650834,-2.020935
+Q3578611,musees,Écomusée du Train des Merveilles,Écomusée du Train des Merveilles,06,node/2184426664,Aug-Oct Tu-Su 14:00-17:30,yes,http://www.ecomusee-breil.fr,43.946230,7.516946
+Q17504432,musees,Écomusée de la Bresse bourguignonne,Écomusée de la Bresse bourguignonne,71,node/9111028718,Mar 30-Nov 10,yes,https://www.ecomusee-bresse71.fr/,46.882059,5.265474
+Q3578601,musees,Écomusée,Écomusée,56,node/4200119909,"Apr-May,Oct Tu-Su 10:00-12:00, Apr-May,Oct Tu-Su 14:00-17:00, Jun-Sep Tu-Su 10:00-12:30, Jun-Sep Tu-Su 14:00-18:00",yes,http://www.groix.fr/?mode=ecomusee-maison-kerlard,47.642725,-3.447947
+Q220125,musees,Zoo de la Palmyre,Zoo de la Palmyre,17,way/73848200,Apr-Sep Mo-Su 09:00-19:00; Oct-Mar Mo-Su 09:00-18:00,yes,https://www.zoo-palmyre.fr/,45.687164,-1.165614
+Q2180449,musees,Zoo de Lille,Zoo de Lille,59,way/76232210,"Feb 11-Mar 24 10:00-17:00; Feb 11-Mar 24,Mar 25-Oct 01,Oct 02-27 Tu off; Mar 25-Oct 01 Mo-Fr 10:00-18:00; Mar 25-Oct 01 Sa,Su 10:00-19:00; Oct 02-27 Mo-Fr 10:00-17:00; Oct 02-27 Sa,Su 10:00-18:00",yes,https://www.lille.fr/Zoo-de-Lille,50.637929,3.045981
+Q3576022,musees,Zoo de La Flèche,Zoo de La Flèche,72,way/513148370,Mo-Su 09:30-18:00,yes,https://www.zoo-la-fleche.com/,47.678784,-0.048047
+Q3364784,musees,Zoo de Jurques,Zoo de Jurques,14,way/108243859,"Feb 14-Apr 03 10:00-17:00; Apr 04-Jul 03 10:00-18:00; Jul 04-Aug 30 10:00-19:00; Aug 31-Sep 27,Oct 03-04,Oct 10-11,Oct 17-Nov 01 10:00-18:00",yes,https://www.zoodejurques.fr,49.004185,-0.754806
+Q3364787,musees,Zoo de Cerza,Zoo de Cerza,14,way/108158634,"Feb,Mar,Oct,Nov Mo-Su,PH 10:00-17:30; Apr-Jun,Sep Mo-Su,PH 09:30-18:30; Jul,Aug Mo-Su,PH 09:30-19:00; Dec,Jan off",yes,https://www.cerza.com/,49.178525,0.308815
+Q65132337,musees,Zoo d'Upie,Zoo d'Upie,26,way/27530440,Mo-Sa 10:00-18:00,yes,https://www.zooupie.com/,44.801858,4.961577
+Q22916181,musees,Villa-Musée Jean-Honoré Fragonard,Villa-Musée Jean-Honoré Fragonard,06,way/67332571,"Oct-May: Mo-Su 11:00-19:00; Jun-Sep: Mo-Su 10:00-18:00, Tu off; Dec 25: off; Jan 01: off; May 01: off",no,https://www.museesdegrasse.com/,43.656630,6.921158
+Q109046481,musees,Villa du Châtelet,Villa du Châtelet,74,way/66976999,Mo-Tu off; We-Su 14:30-18:30,yes,http://www.evianchatelet.org/,46.401119,6.601966
+Q940746,musees,Villa Savoye,Villa Savoye,78,way/38327851,Tu-Su 10:00-18:00,yes,https://www.villa-savoye.fr/,48.924430,2.028281
+Q22915876,musees,Villa Médicis,Villa Médicis,94,way/96939061,Tu-Su 14:00-18:00,yes,https://musee-saintmaur.fr/,48.792922,2.514475
+Q16964856,chateaux,Villa Majorelle,Villa Majorelle,54,way/43323114,"We-Su 09:00-12:00,14:00-18:00",yes,https://musee-ecole-de-nancy.nancy.fr/la-villa-majorelle-2887.html,48.685468,6.163869
+Q627266,musees,Villa E-1027,Villa E-1027,06,way/138590512,Apr-Nov,yes,https://capmoderne.monuments-nationaux.fr/visiter/informations-pratiques,43.759901,7.463186
+Q518747,musees,Villa Cavrois,Villa Cavrois,59,way/85286611,"Tu-Su 10:00-18:00; Jan 01,May 01,Dec 25 off",yes,https://www.villa-cavrois.fr/,50.666700,3.164036
+Q1637288,monuments,Tour LU,Tour LU,44,node/2692960424,"Su 15:00-19:00; SH,We-Sa 14:00-19:00",yes,https://www.lelieuunique.com/infos-pratiques,47.215466,-1.546197
+Q193193,monuments,Sainte-Chapelle,Sainte-Chapelle,75,relation/3344870,Jan-Mar 09:00-17:00; Apr-Sep 09:00-19:00; Oct-Dec 09:00-17:00,yes,http://sainte-chapelle.monuments-nationaux.fr/,48.855397,2.345014
+Q40041199,musees,Quai des savoirs,Quai des savoirs,31,node/4011776228,Tu-Su 10:00-18:00,yes,https://www.quaidessavoirs.fr,43.594521,1.451081
+Q22920838,musees,Prison des Evêques,Prison des Evêques,64,way/64594481,10:00-19:30,no,https://www.st-jean-pied-de-port.fr/,43.163705,-1.235635
+Q3403051,musees,Prieuré de Saint Rémy la Varenne,Prieuré de Saint Rémy la Varenne,49,node/13997174667,"May 01-Sep 30 We-Su 10:00-12:30,14:00-17:45",yes,https://www.prieure-saint-remy.fr/,47.398137,-0.315520
+,musees,Port-musée,Port-musée,29,node/12979759693,"Tu-Su 09:00-12:30, 14:00-18:00",yes,https://www.port-musee.org/,48.093105,-4.334082
+Q3290344,musees,Planet Ocean Montpellier,Planet Ocean Montpellier,34,way/29378204,Apr-Aug 10:00-18:00; Sep-Mar We-Su 10:00-18:00; SH 10:00-19:00,yes,https://www.planetoceanworld.fr,43.602875,3.917060
+Q3290344,monuments,Planet Ocean Montpellier,Planet Ocean Montpellier,34,way/29378357,Apr-Aug 10:00-18:00; Sep-Mar We-Su 10:00-18:00; SH 10:00-19:00,yes,https://www.planetoceanworld.fr,43.603188,3.916601
+Q3471001,musees,Pavillon de l'Eau,Pavillon de l'Eau,75,way/86428524,Tu-Su 14:00-18:00,no,https://www.eaudeparis.fr/lespace-culture/pavillon-de-leau/,48.846358,2.273220
+Q3373050,musees,Pavillon de Vendôme,Pavillon de Vendôme,92,way/74468585,Tu-Sa 11:00-19:00; Th 11:00-21:00; Su 14:00-18:00,no,http://www.ville-clichy.fr/382-le-pavillon-vendome-centre-d-art-contemporain.htm,48.904787,2.303840
+Q3373119,musees,Pavillon Populaire,Pavillon Populaire,34,way/26576910,off,no,https://www.montpellier.fr/506-les-expos-du-pavillon-populaire-a-montpellier.htm,43.610223,3.882158
+Q117083225,musees,Parrot World,Parrot World,77,way/830369531,Mo-Su 10:00-18:00,yes,https://www.parrotworld.fr/,48.842227,2.950627
+Q3364322,musees,Parc des Félins,Parc des Félins,77,way/42108722,Mo-Su 09:30-19:30,yes,https://www.parcs-zoologiques-lumigny.fr/,48.708086,2.954961
+Q18923550,musees,Parc de l'Auxois,Parc de l'Auxois,21,way/393500044,"Feb-Mar,Oct-Nov 10:00-18:00; Apr-Sep 10:00-19:00",yes,https://www.parc-auxois.fr,47.453136,4.500692
+Q3363937,musees,Parc animalier de Merlet,Parc animalier de Merlet,74,way/126974760,"May, Jun, Sep Tu-Su 10:00-18:00; Jul, Aug Mo-Su 09:30-19:30; 24/7 off",yes,https://www.parcdemerlet.com/,45.907630,6.818184
+Q220047,musees,Parc animalier de La Barben,Parc animalier de La Barben,13,way/329911182,Nov-Feb 10:00-17:30; Mar-Jun 10:00-18:00; Jul-Aug 09:30-19:00; Sep-Oct 10:00-18:00,yes,https://www.parcanimalierlabarben.com/,43.623923,5.210408
+,musees,Parc Zoologique de la Petite Hotoie,Parc Zoologique de la Petite Hotoie,80,way/203934615,Mo-Sa 10:00-18:00; Su 10:00-19:00,yes,https://www.zoo-amiens.fr/,49.900551,2.278485
+Q3364777,musees,Parc Zoologique de Champrepus,Parc Zoologique de Champrepus,50,way/108243858,"Feb 07-Mar 06 11:00-18:00; Mar 07-25 Sa-Su 11:00-18:00; Mar 26-Aug 31 10:00-19:00; Sep 01-11 10:30-18:30; Sep 12-30 11:00-18:00; Oct 01-19 Sa,Su 11:00-18:00; Oct 20-31 11:00-18:00",yes,http://www.zoo-champrepus.com/,48.832487,-1.323651
+Q3576023,musees,Parc Zoologique,Parc Zoologique,59,relation/19359176,"Mar-Sep 10:00-18:00; Jul,Aug 10:00-19:00; Oct,Nov 10:00-17:30; PH ""ouvert normalement""; Dec 01-Mar Sa[4] off",yes,https://www.zoodemaubeuge.fr/,50.278521,3.968024
+Q188856,monuments,Panthéon,Panthéon,75,way/16407465,"Mo-Su 10:00-18:00; Apr 1-Sep 30: Mo-Su 10:00-18:30; Jan 1,May 1,Dec 25: off",yes,https://www.paris-pantheon.fr/,48.846189,2.346072
+,musees,Océarium du Croisic,Océarium du Croisic,44,way/70626267,Aug 10:00-19:00; Sep 01-Nov 02 10:00-18:00; Nov 01-Dec 20 14:00-18:00; Dec 21-31 10:00-18:00; Dec 25 off,yes,https://www.ocearium-croisic.fr/,47.299636,-2.523749
+Q3341433,musees,Nigloland,Nigloland,10,way/114118237,10:30-17:30,yes,https://www.nigloland.fr/,48.261587,4.613836
+Q3337173,musees,Nausicaá,Nausicaá,62,way/96085211,Mo-Su 09:30-18:30; Jan 1 14:00-18:30; Dec 25 off; Jan 5-30 off,yes,https://www.nausicaa.fr/,50.730256,1.594554
+Q30738411,musees,Narbo Via,Narbo Via,11,way/765170978,Tu-Su 10:00-18:00,yes,https://narbovia.fr,43.178889,3.018920
+Q3333155,musees,Mémorial des déportations,Mémorial des déportations,13,way/67715872,"Tu-Fr 11:00-12:30, 13:30-18:00; Sa-Su 09:30-12:30, 13:30-18:00",no,https://www.musee-histoire-marseille-voie-historique.fr/,43.295575,5.362488
+Q26493376,musees,Mémorial de la Shoah de Drancy,Mémorial de la Shoah de Drancy,93,way/465618528,Su-Th 10:00-18:00,no,https://drancy.memorialdelashoah.org,48.918695,2.453276
+Q3333140,musees,Mémorial de l'Alsace-Moselle,Mémorial de l'Alsace-Moselle,67,way/59274412,Mo-Su 09:30-18:00,yes,https://www.memorial-alsace-moselle.com/,48.487059,7.221748
+Q3333135,monuments,Mémorial de Coudehard-Montormel,Mémorial de Coudehard-Montormel,61,node/602981560,"Apr,Sep,Oct: 10:00-17:00; May,Jun,Jul,Aug: 09:30-18:00; Nov-Mar: We 10:00-17:00; Nov-Mar: Sa-Su 10:00-17:00",no,https://www.memorial-montormel.org/,48.837333,0.142136
+Q2042,musees,Mémorial Charles de Gaulle,Mémorial Charles de Gaulle,52,way/64830858,We-Mo 10:00-17:30,yes,https://www.memorial-charlesdegaulle.fr/,48.223380,4.879429
+Q3166916,musees,Médard,Médard,34,way/742164185,We-Fr 14:00-18:00; Sa 10:00-18:00; PH off,no,https://www.museemedard.fr/,43.675439,4.134311
+Q22966993,musees,Muséum d'histoire naturelle,Muséum d'histoire naturelle,38,way/35095625,"Tu-Fr 09:15-12:00,13:30-18:00; Sa-Su 14:00-18:00; Dec 25 off; Jan 01 off; May 01 off",no,http://www.museum-grenoble.fr,45.188018,5.735237
+Q3330865,musees,Muséum d'Histoire Naturelle,Muséum d'Histoire Naturelle,71,node/2566833009,"Tu-Su 10:00-13:00,14:00-18:00",yes,http://www.autun.com/tourism_cult_muséum.php,46.948029,4.301693
+Q16665658,musees,Muséum d'Histoire Naturelle,Muséum d'Histoire Naturelle,73,way/51263801,We 14:00-18:00,yes,http://www.cg73.fr/index.php?id=1784,45.564102,5.916292
+Q3330889,musees,Muséum d'Histoire Naturelle,Muséum d'Histoire Naturelle,37,way/38576800,"Tu-Fr 10:00-12:00,14:00-18:00; Sa-Su 14:00-18:00; Jan 01 off; May 01 off; Jul 14 off; Nov 01 off; Nov 11 off; Dec 25 off",yes,http://www.museum.tours.fr/,47.394601,0.683641
+Q15490321,musees,Muséum d'Histoire Naturelle,Muséum d'Histoire Naturelle,21,node/255935624,"Mo,We-Sa 09:00-12:30,14:00-18:00, Sa,Su,PH 14:00-18:00; Tu off",no,https://ma-nature.dijon.fr/,47.321852,5.028942
+Q3330860,musees,Muséum Henri-Lecoq,Muséum Henri-Lecoq,63,way/67552132,"Tu-Sa 10:00-18:00; Su 13:00-18:00; Jan 01,May 01,Nov 01,Dec 25 off",yes,https://www.clermontmetropole.eu/bouger-se-divertir/le-dynamisme-culturel/les-musees-de-clermont-auvergne-metropole/museum-henri-lecoq/,45.774201,3.088452
+Q3329030,musees,Musée-Librairie du Compagnonnage,Musée-Librairie du Compagnonnage,75,node/1426093837,Tu-Fr 14:00-18:00,no,http://www.compagnons.org,48.852227,2.335005
+Q3330717,musees,Musée national des Douanes,Musée national des Douanes,33,node/279711473,Tu-Su 10:00-18:00,yes,https://musee-douanes.fr,44.840951,-0.569812
+Q3330703,musees,Musée national de l’Éducation,Musée national de l’Éducation,76,node/4583391306,"Mo-Fr 13:30-18:15; Sa,Su 10:00-12:30,13:30-18:15",no,https://www.munae.fr/,49.441370,1.101699
+Q3330709,musees,Musée national de la Marine,Musée national de la Marine,29,node/5882540291,We-Mo 13:30-18:30,yes,http://www.musee-marine.fr/brest,48.381272,-4.492364
+Q3329287,musees,Musée mémorial de la Bataille de Normandie,Musée mémorial de la Bataille de Normandie,14,relation/1774525,"Feb-Apr 10:00-12:30,14:00-18:00; May-Sep 09:30-18:30; Oct-Dec 10:00-12:30, 14:00-18:00",yes,https://www.bayeuxmuseum.com/musee-memorial-de-la-bataille-de-normandie,49.273415,-0.711426
+Q3330617,musees,Musée international des Arts modestes,Musée international des Arts modestes,34,node/1964228636,"Tu-Su 09:30-12:00, 14:00-18:00",yes,https://miam.org/,43.406067,3.696194
+Q3058122,musees,Musée interactif,Musée interactif,56,node/2855257968,"Mo-We,Fr,Sa 10:00-18:00",yes,https://www.la-flore.fr/fr/visite/musee-interactif,47.730268,-3.372336
+,musees,Musée d’Artagnan,Musée d’Artagnan,32,node/3334403116,"Jun,Sep Tu-Su 10:30-18:00; Jul-Aug 10:30-19:00; Oct Tu-Su 14:00-18:00; Nov 01 14:00-18:00",yes,https://www.lupiac.fr/lupiac#dartagnan-musee,43.682130,0.179429
+Q3329626,musees,Musée d’Art et d’Histoire Michel Hachet,Musée d’Art et d’Histoire Michel Hachet,54,way/134254680,"Mo,We-Fr 10:30-12:30,13:30-18:00; Sa,Su 13:30-18:00",yes,https://www.toul.fr/?presentation-126,48.678569,5.890999
+Q3330506,musees,Musée départemental Maurice Denis,Musée départemental Maurice Denis,78,way/154883691,"Tu-Su 10:30-12:30,14:00-17:30",yes,https://www.musee-mauricedenis.fr/,48.892511,2.086660
+Q16335720,musees,Musée du vieux Lacaune,Musée du vieux Lacaune,81,node/5071971298,"May,Jun,Sep Tu-Sa 15:00-18:00; Jul-Aug Mo 14:30-18:00; Jul-Aug Tu-Su 10:00-12:00,14:30-18:00; Oct-Apr off",yes,https://www.museeduvieuxlacaune.fr/,43.706391,2.689934
+Q106847327,musees,Musée du tissage et de la soierie,Musée du tissage et de la soierie,42,node/2345325957,"Apr-Jun,Sep-Oct Sa,Su 15:00-18:00; Jul-Aug Tu-Su 15:00-18:00",yes,https://www.museedutissage.com/,45.836439,4.268592
+Q3330333,musees,Musée du chocolat,Musée du chocolat,75,node/1209893702,Mo-Su 10:00-18:00,yes,https://www.museeduchocolat.fr,48.870585,2.350096
+Q3330411,musees,Musée du bonbon Haribo,Musée du bonbon Haribo,30,node/802884456,Tu-Su 10:00-19:00,yes,https://www.museeharibo.fr/,43.993241,4.423353
+Q23727155,musees,Musée du Vignoble Nantais,Musée du Vignoble Nantais,44,way/79384224,"Apr-Jun Su-Fr 14:00-18:00; Jul-Aug Mo-Su 10:00-13:00,14:00-18:00; Sep-Nov Su-Fr 14:00-18:00",yes,https://www.musee-vignoble-nantais.eu/,47.134473,-1.330010
+Q3330398,musees,Musée du Viel Aix,Musée du Viel Aix,13,node/11067392922,"May-Oct: We-Mo 10:00-12:30,13:30-18:00; Nov-Apr: We-Mo 10:00-12:30,13:30-17:00",yes,https://www.aixenprovence.fr/Presentation-du-Musee-du-Vieil-Aix,43.530831,5.447356
+Q18607845,musees,Musée du Textile des Vosges,Musée du Textile des Vosges,88,node/2047920736,"Tu-Su 10:00-12:00, 14:00-18:00",yes,https://musee.ventron.fr/,47.926715,6.890704
+Q60382589,musees,Musée du Sceau,Musée du Sceau,67,way/204645889,"Sa, Su 14:00-17:00",no,http://www.musee-sceau.com/,48.856698,7.316343
+Q41010745,musees,Musée du Scaphandre,Musée du Scaphandre,12,way/152865476,"Jun-Sep: Tu-Su 10:00-12:30,14:00-18:00",yes,https://musees.aveyron.fr,44.521245,2.762299
+,musees,Musée du Sapeur-Pompier d'Alsace,Musée du Sapeur-Pompier d'Alsace,68,node/5144762817,Apr-Sep Tu-Su 10:00-18:00,yes,https://www.musee-sapeur-pompier.fr/,47.504040,7.304159
+Q3330379,musees,Musée du Sabotier,Musée du Sabotier,57,way/228227723,Mo-Su 14:00-18:00; Tu off; Nov-Mar off,yes,http://museedusabotier.fr/,48.959796,7.340568
+Q23646108,musees,Musée du Poiré,Musée du Poiré,50,node/2420808765,"10:00-13:00,14:00-18:00; Jul-Aug 10:00-13:00,14:00-18:30; May 01 off",no,https://www.parc-naturel-normandie-maine.fr/scripts/site/04_page.php?cont_id=1&cont_appli_id=6&page_id=26&menu_id=26,48.587655,-0.806470
+Q3330357,musees,Musée du Nouveau Monde,Musée du Nouveau Monde,17,way/119815407,"Mo,We-Fr 10:00-18:00; Sa 14:00-18:00; PH,Su 10:00-18:00",yes,https://museedunouveaumonde.larochelle.fr,46.161584,-1.151129
+Q3330452,musees,Musée du Moteur,Musée du Moteur,49,way/151753509,We-Su 14:00-18:00; Tu-Sa 14:00-18:00,yes,https://www.museedumoteur.fr/,47.250503,-0.088146
+Q15650989,musees,Musée du Jouet,Musée du Jouet,39,node/9889762314,"Jul-Aug Mo-Su 09:30-18:30; Sep-Jun SH,Mo-Fr 10:00-12:30,14:00-18:00; Sep-Jun SH,Sa-Su 14:00-18:00; Mar 12-Apr 05,Oct 01-Oct 18,Dec 14-Dec 20 Tu-Su 14:00-17:30; May 07-Jun 30,Sep 03-Sep 30 Tu-Fr 10:00-12:30,14:00-18:00; Nov 04-Dec 13 closed",yes,https://www.musee-du-jouet.com/,46.432446,5.726969
+Q3330441,musees,Musée du Jouet,Musée du Jouet,68,way/47584584,"Feb-Jun,Sep-Nov: We-Mo 10:00-17:00; Jul,Aug,Dec: Mo-Su 10:00-18:00",yes,https://www.museejouet.com/,48.079103,7.362206
+Q3330355,musees,Musée du Hurepoix,Musée du Hurepoix,91,way/71355415,"Tu,Th 14:00-18:00",yes,http://musee-palaisien-du-hurepoix.fr/,48.711972,2.242656
+Q3145940,musees,Musée du Gévaudan,Musée du Gévaudan,48,node/9976832120,"Apr-May,Oct-Dec We-Su 14:00-18:00; PH off; Jun-Sep Tu-Su 10:00-18:00",no,https://www.musee-du-gevaudan.fr,44.518500,3.499239
+Q3330433,musees,Musée du Génie,Musée du Génie,49,way/978224948,"Tu-Fr 13:30-18:00; Sa,Su,PH 14:00-18:00; Mo off",no,https://www.musee-du-genie-angers.fr/,47.457197,-0.565107
+,musees,Musée du Domaine royal de Marly,Musée du Domaine royal de Marly,78,way/111722627,"We-Fr 09:30-12:30,14:00-18:00; Sa,Su 10:30-18:00; Mo off",yes,http://www.musee-promenade.fr,48.858897,2.105443
+Q3329042,musees,Musée du Docteur Albert Schweitzer,Musée du Docteur Albert Schweitzer,68,way/78495838,"We-Mo 10:30-13:00, 14:00-17:30; Jan off; May 1 off; Dec 25 off; Tu off",yes,https://centreschweitzer.org,48.140800,7.258918
+Q30739605,musees,Musée du Chapeau,Musée du Chapeau,42,node/6050847032,"Tu-Su 14:00-18:00; Jul-Aug Tu-Su 14:00-18:30; Jan 01,May 01,Dec 25 off",yes,https://www.ateliermuseeduchapeau.com/,45.638658,4.395141
+Q3330317,musees,Musée du 34e Régiment d'Infanterie,Musée du 34e Régiment d'Infanterie,40,node/5825871641,"Sep-Jun: We,Fr,Sa 14:00-17:00; Jul-Aug: We,Sa 15:00-18:00",no,https://www.amicaledu34ri.fr/,43.896051,-0.492042
+Q116994847,musees,Musée des soieries Brochier,Musée des soieries Brochier,69,node/10716445268,"Mo-Sa 10:00-13:00,14:00-19:00; Su,PH 10:00-13:00,14:00-18:00",yes,https://www.brochiersoieries.com/le-musee/,45.759766,4.837297
+Q3329886,musees,Musée des explorations du monde,Musée des explorations du monde,06,way/64917198,"Oct-Mar Tu-Su 10:00-13:00,14:00-17:00; Apr-May Tu-Su 10:00-13:00,14:00-18:00; Jun Tu,Th-Su 10:00-13:00,14:00-18:00; We 10:00-13:00,14:00-21:00; Jul-Aug Tu,Th-Su 10:00-19:00; We 10:00-21:00; Sep Tu,Th-Su 10:00-13:00,14:00-18:00; We 10:00-13:00,14:00-18:00",yes,https://www.cannes.com/fr/culture/musees-et-expositions/musee-des-explorations-du-monde.html,43.550147,7.010378
+Q3330235,musees,Musée des canonniers sédentaires de Lille,Musée des canonniers sédentaires de Lille,59,node/5058102713,Mar-Oct Sa 10:00-18:00; Nov-Feb Sa 10:00-17:00; PH off,yes,https://www.lille.fr/A-l-affiche/Musees-et-arts-visuels/Musees/Musee-des-Canonniers,50.640875,3.069370
+Q3330075,musees,Musée des boissons,Musée des boissons,49,node/8366538109,"""sur rendez-vous""",yes,https://www.musee-boissons.com/,47.427092,-0.550387
+Q3329305,musees,Musée des arts précieux Paul-Dupuy,Musée des arts précieux Paul-Dupuy,31,way/833971998,Tu-Su 10:00-18:00,yes,https://museepauldupuy.toulouse.fr/,43.597017,1.446913
+Q23640606,musees,Musée des arts et métiers traditionnels,Musée des arts et métiers traditionnels,12,node/1434993410,We-Mo 14:00-18:00,yes,https://musees.aveyron.fr/thematiques/musée%20de%20salles%20la%20source,44.437582,2.514146
+Q3330302,musees,Musée des Transports Urbains de Saint-Étienne et sa région,Musée des Transports Urbains de Saint-Étienne et sa région,42,way/65641379,We 14:00-17:00,yes,https://www.musee-transports42.fr/,45.476461,4.364127
+Q3330147,musees,Musée des Transmissions,Musée des Transmissions,35,node/13631283071,"Tu-Fr 10:00-18:00; Sa,Su 14:00-18:00; Mo off",no,https://www.terre.defense.gouv.fr/musee-transmissions,48.122469,-1.626121
+Q23780987,musees,Musée des Traditions populaires et d'archéologie,Musée des Traditions populaires et d'archéologie,86,node/7280016472,"Jan 01 off; Jan 02-Mar 31 Sa-Su 14:00-18:00; Apr 01-Jun 14 14:00-18:00; Jun 15-Aug 31 Mo-Fr 10:00-12:30,14:30-18:30; Jun 15-Aug 31 Su 14:30-18:30; Sep-Oct 14:00-18:00; Nov-Dec Sa-Su 14:00-18:00; Dec 24-31 off",yes,https://www.chauvigny-patrimoine.fr/Musees/musee_traditions_populaires_archeologie.php,46.570594,0.648105
+Q3330272,musees,Musée des Sapeurs-Pompiers de France,Musée des Sapeurs-Pompiers de France,76,way/1277653029,"Tu-Sa 09:00-12:30, 14:00-18:00; Su 14:00-18:00",yes,https://www.musee-sapeurs-pompiers.org/,49.547464,1.076143
+Q55598705,musees,Musée des Moulages,Musée des Moulages,69,node/6221619681,"We,Sa 14:00-18:00",no,https://www.univ-lyon2.fr/universite/mumo,45.751593,4.854312
+Q3330128,musees,Musée des Cordeliers,Musée des Cordeliers,17,way/89447700,"Sep 15-Jun 15 We-Fr 14:00-18:00; Sa,Su 15:00-18:30; Jun 16-Sep 14 Tu-Su 10:00-12:30,14:30-19:00",no,https://www.angely.net/services-publics/culture/musee-des-cordeliers/,45.942636,-0.524030
+Q23498487,musees,Musée des Beaux-Arts et d'Histoire naturelle,Musée des Beaux-Arts et d'Histoire naturelle,28,way/287912487,"Mo-Fr 09:00-12:00, 13:30-17:00; Sa-Su 14:00-17:00",yes,https://www.chateaudun-tourisme.fr/sites-et-monuments/musee-des-beaux-arts-et-d-histoire-naturelle-1623160,48.071188,1.328057
+Q3330195,musees,Musée des Beaux-Arts,Musée des Beaux-Arts,11,node/842466709,"Tu-Sa 13:30-18:00,10:00-12:30",no,https://www.carcassonne.org/lieux/musee-des-beaux-arts,43.212482,2.355296
+Q3330229,musees,Musée des Beaux-Arts,Musée des Beaux-Arts,39,node/631011962,Tu-Su 14:00-18:00,yes,https://www.lonslesaunier.fr/les-musees/musee-des-beaux-arts/,46.676064,5.553533
+Q3330192,musees,Musée des Beaux-Arts,Musée des Beaux-Arts,29,way/730880579,"closed ""pour cause de contamination des œuvres""",yes,https://musee.brest.fr/,48.385028,-4.490240
+Q15818381,musees,Musée des Beaux-Arts,Musée des Beaux-Arts,50,node/3446879240,"Sep-Jun: Tu-Su 14:00-18:00; Jul-Aug: Tu-Su 10:00-12:00,14:00-18:00",yes,https://www.saint-lo.fr/decouvrir-bouger/culture/musee-d-art-et-d-histoire,49.117049,-1.088112
+Q2391572,musees,Musée des Avelines,Musée des Avelines,92,way/132284683,We-Sa 12:00-18:00; Su 14:00-18:00,no,https://www.musee-saintcloud.fr,48.843434,2.208273
+Q31203264,musees,Musée de paléontologie Christian Guth,Musée de paléontologie Christian Guth,43,node/4398955697,"Jul 1-Aug 31 Tu-Su 14:00-18:00; easter-Nov 1 Tu-Su 15:00-18:00 ""sur réservation au +33 6 48 20 58 82""; PH closed",yes,https://www.museechilhac.com,45.155918,3.437559
+Q106963760,musees,Musée de la photographie Charles Nègre,Musée de la photographie Charles Nègre,06,node/4688883802,Tu-Su 10:00-18:00,yes,https://museephotographie.nice.fr/,43.695915,7.274599
+Q122878457,musees,Musée de la lumière et de la matière,Musée de la lumière et de la matière,91,node/3752720447,"""Sur rendez-vous""",no,https://sciencesaco.fr/,48.699107,2.172172
+Q16665630,musees,Musée de la guerre de 1870,Musée de la guerre de 1870,57,way/309445273,Tu-Su 14:00-18:00,yes,https://www.mosellepassion.fr/index.php/les-sites-moselle-passion/musee-de-la-guerre-de-1870,49.114021,6.029760
+Q3330651,musees,Musée de la faïence et des beaux-arts,Musée de la faïence et des beaux-arts,58,node/10894613706,"We-Mo 10:00-13:00,14:00-18:00",yes,https://musee-faience.nevers.fr/,46.986100,3.154588
+Q3329526,musees,Musée de la colombophilie militaire,Musée de la colombophilie militaire,92,way/70966376,"""visitable aux journées du patrimoine""",no,https://www.cheminsdememoire.gouv.fr/fr/revue/le-musee-de-la-colombophilie-militaire,48.871916,2.216086
+Q35676653,musees,Musée de la bataille de Fromelles,Musée de la bataille de Fromelles,59,way/220344161,"09:30-17:30; Tu off; Jan 01,May 01,Dec 25 off; easter off; easter +1 day off; Sep Sa[1] off; Sep Su[1] off",yes,https://www.musee-bataille-fromelles.fr/,50.608134,2.851788
+Q3329983,musees,Musée de la Vilaine Maritime,Musée de la Vilaine Maritime,56,node/4961541929,Fr-Su 14:00-18:00,yes,https://lesamisdumuseevilainemaritime.jimdofree.com/,47.518012,-2.303106
+Q15953415,musees,Musée de la Tour des échevins,Musée de la Tour des échevins,70,node/6330861575,Apr-Oct Tu 14:00-18:00; Jul-Aug Th-Tu 14:00-18:00; Jul-Aug Tu off,2.5,https://www.ecclesia-luxeuil.fr/decouvrir/musee-de-la-tour-des-echevins/,47.817801,6.380367
+Q187483,musees,Musée de la Tapisserie de Bayeux,Musée de la Tapisserie de Bayeux,14,node/3836386657,"Mo-Su 09:00-17:00,09:00-19:00; 2025 Sep 01-2027 Oct 01 off",yes,https://www.bayeuxmuseum.com,49.274413,-0.699938
+Q3329945,musees,Musée de la Poupée et du Jouet Ancien de Wambrechies,Musée de la Poupée et du Jouet Ancien de Wambrechies,59,node/2622590194,"We,Su 14:00-18:00; PH,SH 14:00-18:00; Dec 25,Jan 01 off",yes,http://www.musee-du-jouet-ancien.com/,50.686247,3.054762
+Q3330044,musees,Musée de la Mécanographie,Musée de la Mécanographie,01,node/11052203162,We 14:30-18:00,yes,https://musee-mecanographie.jimdofree.com/,46.202047,5.231325
+Q122971944,musees,Musée de la Musique Mécanique,Musée de la Musique Mécanique,72,node/7223866305,Su 14:30-18:00,yes,https://www.musiquesmagiques.fr/,48.038614,0.587583
+Q20738307,musees,Musée de la Mine Site Couriot,Musée de la Mine Site Couriot,42,way/49047701,Tu-Su 10:00-18:00,yes,https://musee-mine.saint-etienne.fr/,45.438228,4.376363
+Q55114817,musees,Musée de la Mine,Musée de la Mine,63,node/1685196870,"2026 Apr 14-2026 Oct 10 We-Su 10:00-12:00,14:00-18:00",yes,https://www.brassaclesmines.fr/spip.php?article30,45.426339,3.301811
+Q3330710,musees,Musée de la Marine,Musée de la Marine,56,node/2854735858,Mo-Su 10:00-18:30,yes,http://www.musee-marine.fr/port-louis,47.710237,-3.364238
+Q22963942,musees,Musée de la Marine,Musée de la Marine,14,way/136770668,"Tu-Su 10:00-12:00,14:00-18:00",yes,https://www.musees-honfleur.fr/,49.419722,0.233732
+Q106854845,musees,Musée de la Machine à Bois,Musée de la Machine à Bois,38,node/8061728360,"May-Sep We-Fr 09:00-12:00,14:00-18:00; May-Sep Su 14:00-18:00; Mar-Nov Sa,Su 14:00-18:00; Dec 01-15 Sa,Su 14:00-18:00; May 01,Nov 01 off",yes,https://lepontdebeauvoisin.fr/musee-de-la-machine-a-bois/,45.535086,5.670070
+Q611062,musees,Musée de la Grande Guerre,Musée de la Grande Guerre,77,way/293061482,Mo-Su 09:30-18:30; Tu off,full : 10,https://www.museedelagrandeguerre.eu/,48.971706,2.904572
+Q3329906,musees,Musée de la Grande Chartreuse,Musée de la Grande Chartreuse,38,node/4323986447,"Apr-May,Sep-Nov: Mo-We,Fr,Sa 14:00-18:00, Jun: Mo-We,Fr,Sa 10:00-12:30, Jun: Fr-We,PH 14:00-18:30, Jun: Su 14:00-18:30, Jul-Aug: Mo-Sa 10:00-12:30,14:00-18:30,14:00-18:30",yes,https://www.musee-grande-chartreuse.fr/en/,45.349910,5.791530
+Q23640267,musees,Musée de la Fortification,Musée de la Fortification,55,node/6051092191,"We-Su 10:30-13:00,13:30-17:00",yes,https://www.tourisme-montmedy.com/montmedy-citadelle.php,49.517911,5.361576
+Q3330530,musees,Musée de la Faïence et des Arts de la table,Musée de la Faïence et des Arts de la table,40,node/5681725229,Feb 15-Nov 15 Tu-Su 14:00-18:00,yes,https://www.landes.fr/musee-faience-samadet,43.641251,-0.510681
+Q23013069,musees,Musée de la Faïence de Quimper,Musée de la Faïence de Quimper,29,node/1354802421,Apr Mo[2]-Oct Sa[2] 10:00-18:00,yes,https://www.musee-faience-quimper.com,47.989240,-4.112219
+Q23640730,musees,Musée de la Faïence,Musée de la Faïence,57,node/8235091589,"Tu-Su 10:00-12:00,14:00-18:00",yes,https://www.sarreguemines-museum.fr/fr/decouvrir/musee-de-la-faience,49.109325,7.070429
+Q3330013,musees,Musée de la Céramique,Musée de la Céramique,76,node/4403230180,"14:00-18:00; Tu off; Jan 01,May 01,Nov 01,11,Dec 25 off",no,https://museedelaceramique.fr/,49.445513,1.093622
+Q3329892,musees,Musée de la Compagnie des Indes,Musée de la Compagnie des Indes,56,node/2854735857,Mo-Su 10:00-18:30,yes,https://musee.lorient.bzh,47.710622,-3.363782
+,musees,Musée de la Bande Dessinée,Musée de la Bande Dessinée,16,way/44840129,"Sep-Jun Tu-Sa 10:00-18:00; Sep-Jun PH,Su 14:00-18:00; Jul-Aug Tu-Sa 10:00-19:00; Jul-Aug PH,Su 14:00-19:00",yes,https://www.citebd.org/,45.655527,0.150794
+,musees,Musée de l'outil et de la pensée ouvrière,Musée de l'outil et de la pensée ouvrière,10,node/8990371375,"Mo-Su 09:00-12:00,14:00-18:00",yes,https://mopo3.com,48.294694,4.073088
+Q130344226,musees,Musée de l'informatique du centre de calcul de l'IN2P3,Musée de l'informatique du centre de calcul de l'IN2P3,69,node/12189622108,"""Sur rendez vous""",no,https://musee.cc.in2p3.fr,45.782613,4.865334
+Q3329811,musees,Musée de l'automobile Henri Malartre,Musée de l'automobile Henri Malartre,69,node/1563920259,"Jan Sa,Su 10:30-18:00; Feb-Dec Tu-Su 10:30-18:00; Feb-Dec Fr[3] 13:00-18:00; Dec 25,Jan 01 off",yes,https://www.musee-malartre.com/,45.844974,4.837000
+Q131399137,musees,Musée de l'Opéra,Musée de l'Opéra,03,node/617296348,Tu-Su 14:00-18:00,yes,https://www.operavichy-musee.com/,46.122408,3.423153
+Q64061311,musees,Musée de l'Institut Pasteur de Lille,Musée de l'Institut Pasteur de Lille,59,node/5325785675,"Sa, Su 10:00-12:00, 14:00-17:00",yes,https://www.pasteur-lille.fr/musee/,50.628669,3.074308
+Q106785113,musees,Musée de l'Imprimerie,Musée de l'Imprimerie,44,node/1620229100,"Mo-Sa 10:00-12:00,14:00-17:30; Jul-Aug Sa off",yes,https://musee-imprimerie.com/,47.210974,-1.562083
+Q3329839,musees,Musée de l'Impression sur Étoffes,Musée de l'Impression sur Étoffes,68,way/45841480,"Tu-Su 10:00-12:00, 14:00-18:00",yes,http://www.musee-impression.com,47.744793,7.344779
+Q3329838,musees,Musée de l'Image,Musée de l'Image,88,node/7012693985,"Mo 14:00-18:00; Tu-Sa 09:30-12:00,14:00-18:00; Fr 09:30-18:00; Su 10:00-12:00,14:00-18:00",yes,https://museedelimage.fr/,48.183868,6.446526
+Q108293274,musees,Musée de l'Illusion,Musée de l'Illusion,69,node/9039678060,Su-We 10:00-20:00; Th-Sa 10:00-22:00,yes,https://museedelillusion.fr/,45.759006,4.836127
+Q3330593,musees,Musée de l'Hydraviation,Musée de l'Hydraviation,40,node/1508590127,"Jul-Aug 10:00-19:00; Feb-Jun, Sep-Dec Tu-Su 14:00-18:00",yes,https://www.hydravions-biscarrosse.com/,44.389386,-1.182417
+Q1269923,musees,Musée de l'Avallonnais ou Musée d'Avallon,Musée de l'Avallonnais ou Musée d'Avallon,89,node/3050054378,We-Su 14:00-18:30,no,https://www.museeavallonnais.com/,47.486792,3.906466
+Q15971985,musees,Musée de l'Automobile,Musée de l'Automobile,51,way/629232715,"Apr 01-Oct 31 Mo-Su,PH 10:00-12:00,14:00-18:00; Nov 01-Mar 31 Mo-Su,PH 10:00-12:00,14:00-17:00",yes,http://www.musee-automobile-reims-champagne.com/fr,49.250207,4.050072
+Q3329779,musees,Musée de l'Ardenne,Musée de l'Ardenne,08,node/1765207774,"Oct-Apr Tu-Fr 09:00-12:00,13:30-17:30; Oct-Apr Sa,Su 14:00-17:30; May-Sep Tu-Fr 09:30-12:30,13:30-18:00; May-Sep Sa,Su 11:00-13:00,14:30-18:00",yes,https://www.musear.fr/p-3-musee-de-l-ardenne.html,49.772720,4.721446
+Q3330104,musees,Musée de Sismologie et de Magnétisme Terrestre,Musée de Sismologie et de Magnétisme Terrestre,67,way/19794129,We 14:00-18:00,no,http://musee-sismologie.unistra.fr/,48.583920,7.765644
+Q3329743,musees,Musée de Préhistoire des Gorges du Verdon,Musée de Préhistoire des Gorges du Verdon,04,way/88754715,Tu off; We-Mo 10:00-18:00,yes,https://www.museeprehistoire.com/,43.699680,6.037172
+Q3329734,musees,Musée de Nogent-sur-Marne,Musée de Nogent-sur-Marne,94,node/1788374144,"Tu-Th 14:00-18:00; Sa 10:00-12:00,14:00-18:00, Su 14:00-18:00",no,http://www.musee-nogentsurmarne.fr,48.840397,2.484918
+Q30256552,musees,Musée de Millau et des Grands Causses,Musée de Millau et des Grands Causses,12,way/68652358,"Mo-Sa 10:00-12:00,14:00-18:00; Oct-Apr: Su off; Oct-Apr: PH off; May-Jun Su off; May 01 off; Jul-Aug: Mo-Su 10:00-18:00; Sep Mo-Su 10:00-12:00,14:00-18:00",no,http://www.museedemillau.fr,44.097535,3.081079
+Q948051,musees,Musée de Louviers,Musée de Louviers,27,node/8024739567,Mo 14:00-18:00; Tu off; We-Su 14:00-18:00,no,https://www.ville-louviers.fr/le-musee/,49.214651,1.168640
+Q3330527,musees,Musée de La Résistance et de la Déportation,Musée de La Résistance et de la Déportation,31,node/1649207017,"Tu-Sa 10:00-12:30,13:30-18:00; PH off; Dec 24 off; Jul 16 off; Aug 16 off; May 08 open",no,https://www.haute-garonne.fr/service/le-musee-departemental-de-la-resistance-et-de-la-deportation,43.588900,1.456692
+Q15818174,musees,Musée de Gajac,Musée de Gajac,47,way/119672087,"Nov-Mar Tu-Fr 10:00-12:00,14:00-17:00; Nov-Mar Sa,Su 14:00-17:00; Apr-Oct Tu-Fr 10:00-12:00,14:00-18:00; Apr-Oct Sa,Su 14:00-18:00",yes,https://www.ville-villeneuve-sur-lot.fr/musee-de-gajac-cat67.html,44.404603,0.708139
+Q3329702,musees,Musée de Cahors Henri-Martin,Musée de Cahors Henri-Martin,46,way/62114469,We-Su 11:00-18:00,yes,https://cahorsagglo.fr/le-musee-henri-martin,44.448420,1.438428
+Q26678177,musees,Musée de Bourgoin-Jallieu,Musée de Bourgoin-Jallieu,38,way/120266165,"Tu-Fr 10:00-12:00,14:00-18:00; Sa,Su 14:00-18:00",no,https://www.bourgoinjallieu.fr/culture/musee,45.586714,5.279156
+Q3329700,musees,Musée de Borda,Musée de Borda,40,node/5223344896,"Feb-Dec Tu-Sa,Su[1] 14:00-18:00",yes,https://www.dax.fr/musee-de-borda,43.710564,-1.053864
+Q3329687,musees,Musée d'initiation à la Nature,Musée d'initiation à la Nature,14,way/155671841,Apr-Sep Tu-Sa 14:00-18:00; Oct-Mar We 14:00-17:30; 2026 Oct 19 - 2026 Oct 30 Mo-Fr 14:00-17:30; 2026 Feb 09 - 2026 Feb 20 Mo-Fr 14:00-17:30; PH off,no,https://www.cpievdo.fr/museeinitiationnature,49.180145,-0.373344
+Q88645574,musees,Musée d'histoire 39-45,Musée d'histoire 39-45,84,node/694831616,"Apr-Sep Th-Mo 11:00-13:00,14:00-18:00",yes,https://www.vaucluse.fr/culture-et-patrimoine/les-musees-departementaux/le-musee-d-histoire-jean-garcin-39-45-a-fontaine-de-vaucluse-865.html,43.922036,5.130335
+Q3329537,musees,Musée d'art sacré du Gard,Musée d'art sacré du Gard,30,way/73758873,"Sep-Jun Tu-Su 10:00-12:00,14:00-18:00; Jul-Aug Tu-Su 10:00-12:30,15:00-18:30",no,http://www.musees.gard.fr,44.255185,4.651037
+Q17347148,musees,Musée d'Histoire Maritime de Saint-Tropez,Musée d'Histoire Maritime de Saint-Tropez,83,node/2389843624,Oct-Mar 10:00-17:30; Apr-Sep 10:00-18:30; Jan 01 off; May 01 off; May 17 off; Nov 11 off; Dec 25 off,yes,https://www.sainttropeztourisme.com/fr/explorer/musees-lieux-remarquables/le-musee-de-l-histoire-maritime-de-saint-tropez/,43.272507,6.644222
+Q1495869,musees,Musée d'Art Roger Quilliot,Musée d'Art Roger Quilliot,63,way/67015490,"Tu-Fr 10:00-18:00; Sa-Su 10:00-12:00, 13:00-18:00",yes,https://www.clermontmetropole.eu/bouger-se-divertir/le-dynamisme-culturel/les-musees-de-clermont-auvergne-metropole/marq-musee-dart-roger-quilliot/,45.793931,3.116073
+Q3330563,musees,Musée d'Art Campanaire,Musée d'Art Campanaire,32,way/43270337,"Tu-Sa 10:00-12:00,14:00-18:00;Su[1] 10:00-12:00,14:00-18:00",yes,https://www.mairie-islejourdain.fr/musee-europeen-art-campanaire,43.613001,1.082133
+Q50603042,musees,Musée d'Arromanches,Musée d'Arromanches,14,way/128118203,"Feb,Nov,Dec Mo-Su 10:00-17:00; Mar,Oct Mo-Su 09:30-17:30; Apr-Sep Mo-Su 09:00-18:00; May-Aug Mo-Su 09:00-19:00",yes,https://www.musee-arromanches.fr,49.340209,-0.621033
+Q106725712,musees,Musée comtadin du Cycle,Musée comtadin du Cycle,84,node/1410900097,"We-Mo 10:15-12:30,15:30-19:00",no,https://www.museeducycle.fr,43.998231,5.060900
+Q3329495,musees,Musée automobile de Vendée,Musée automobile de Vendée,85,way/109468605,"Apr 01-May 31: 09:30-12:00,14:00-18:30; Jun 01-Aug 31: 09:30-19:00; Sep 01-Oct 01: 09:30-12:00,14:00-18:30; Jan 01-Jan 31: off",yes,http://www.musee-auto-vendee.com,46.477364,-1.667531
+Q115556757,musees,Musée archéologique de la bataille de Gergovie,Musée archéologique de la bataille de Gergovie,63,way/683945658,Mo-Su 13:00-18:00,yes,https://musee-gergovie.fr/,45.719772,3.126940
+Q3329436,musees,Musée archéologique Saint-Laurent,Musée archéologique Saint-Laurent,38,way/68283904,Tu-Su 10:00-18:00,no,https://musees.isere.fr/musee/musee-archeologique-saint-laurent,45.197660,5.731473
+Q3329380,musees,Musée Vert - Muséum d'Histoire naturelle,Musée Vert - Muséum d'Histoire naturelle,72,way/65554014,"Tu-Su 10:00-12:30,14:00-18:00",no,https://www.lemans.fr/dynamique/des-idees-de-visite/les-musees/le-musee-vert/,47.986721,0.207918
+Q3329532,musees,Musée Sauvage,Musée Sauvage,95,way/70352200,Th 17:00-20:00; We 12:00-20:00; Fr 17:00-22:00; Sa 16:00-20:00,yes,https://museesauvage.com,48.944126,2.257096
+Q13405482,chateaux,Musée Sarret de Grozon,Musée Sarret de Grozon,39,node/9056356155,Mo-Su 14:00-18:00,yes,https://www.arbois.fr/musee/musee-art-hotel-sarret-de-grozon/,46.902694,5.774391
+Q14912870,musees,Musée Rodin,Musée Rodin,92,node/6244621290,Sa-Su 10:00-18:00,no,https://www.meudon.musee-rodin.fr,48.814696,2.251783
+Q3329327,musees,Musée Robert Dubois-Corneau,Musée Robert Dubois-Corneau,91,way/48359053,We-Su 14:00-17:00,no,https://www.brunoy.fr/vos-demarches-services/vie-culturelle-et-animations/musee/,48.700324,2.500745
+Q3329324,musees,"Musée Rabelais, Maison La Devinière","Musée Rabelais, Maison La Devinière",37,node/1935506460,"Apr-Jun: 10:00-13:00,14:00-18:00; Jul-Aug: 10:00-19:00; Sep-Oct: 10:00-13:00,14:00-18:00; Nov-Mar: Mo,We-Su 10:00-12:30,14:00-17:00",yes,https://www.musee-rabelais.fr,47.140513,0.178481
+Q24006488,musees,Musée Prieuré du Vieux Logis,Musée Prieuré du Vieux Logis,06,way/1070004963,"""ouvert uniquement sur rdv auprès du musée Massena""",yes,https://www.nice.fr/fr/culture/musees-et-galeries/prieure-du-vieux-logis,43.720628,7.254972
+Q2403516,musees,Musée Pincé,Musée Pincé,49,node/13013715507,Tu-Su 10:00-18:00,yes,https://musees.angers.fr/lieux/musee-pince/index.html,47.472079,-0.552017
+Q3329310,musees,Musée Petiet,Musée Petiet,11,node/799714487,"Apr-Oct Tu-Sa 09:30-12:30,15:00-18:00",yes,http://www.facebook.com/Mus%C3%A9e-Petiet-384107738735364/,43.053404,2.214462
+Q3329303,musees,Musée Paul-Belmondo,Musée Paul-Belmondo,92,way/77679836,Tu-Fr 14:00-18:00;Su 11:00-18:00,yes,https://www.boulognebillancourt.com/loisirs/culture/musees/musee-paul-belmondo,48.847772,2.232589
+Q16335746,musees,Musée Paul Dini,Musée Paul Dini,69,relation/10338469,"We 13:30-18:00; Th,Fr 10:00-12:30,13:30-18:00; Sa,Su 14:30-18:00",yes,https://musee-paul-dini.com/,45.990663,4.721171
+Q1777602,musees,Musée Noilly Prat,Musée Noilly Prat,34,node/1435190913,"May-Sep Mo-Su 10:00-12:00,14:30-19:00; Mar-Apr,Oct-Dec Mo-Su 10:00-12:00,14:30-17:30",yes,https://www.noillyprat.com,43.353155,3.532242
+Q3330716,musees,Musée National de la Marine,Musée National de la Marine,17,node/13727664577,"Feb-Mar We-Mo 13:30-18:00; Apr-Sep Mo,We-Su 10:00-12:30, 13:00-18:00; May 01 off",yes,https://www.musee-marine.fr/nos-musees/rochefort/visiter/hotel-de-cheusses-arsenal/informations-pratiques.html,45.934727,-0.957842
+Q3330694,musees,Musée National de Port Royal des Champs,Musée National de Port Royal des Champs,78,node/823061902,"Mo-Fr 09:45-12:00,14:00-17:30; Sa,Su 10:30-18:00",yes,https://www.port-royal-des-champs.eu,48.747994,2.015251
+,musees,Musée Napoléon,Musée Napoléon,17,way/64991060,"Apr-Sep 09:30-12:30,14:00-18:00; Oct We-Mo 09:30-12:30,14:00-18:00; Nov-Mar We-Mo 09:30-12:30,14:00-17:00",yes,https://musees-nationaux-malmaison.fr/musees-napoleonien-africain/musee-et-collections/a-musee-napoleonien,46.013018,-1.174656
+Q22922306,musees,Musée Millet,Musée Millet,77,way/113288753,"Mo, We-Su 09:30-11:30, 14:00-17:30",yes,https://www.musee-millet.com,48.444351,2.607981
+Q3330643,musees,Musée Militaire - Gloires et Souvenirs,Musée Militaire - Gloires et Souvenirs,24,node/3057614599,Mo-Sa 14:00-18:00,yes,https://museemilitaire-perigord.fr/,45.183269,0.720970
+Q21027396,musees,Musée Mer Marine,Musée Mer Marine,33,way/581501288,Tu-Fr 13:00-18:00; Sa-Su 10:30-18:00,yes,https://www.mmmbordeaux.com/,44.867393,-0.553996
+Q3329270,musees,Musée Masséna,Musée Masséna,06,way/19597352,"Nov-Apr 11:00-18:00; May-Oct 10:00-18:00; Tu off; Jan 01,May 01,Dec 25,easter off",yes,https://www.nice.fr/fr/culture/musees-et-galeries/musee-massena-le-musee,43.695050,7.259049
+Q2371874,musees,Musée Maritime,Musée Maritime,17,node/1355650229,"Jun 15-Sep 15 Tu,We,Th,Fr,Su 10:00-18:00; Jun 15-Sep 15 Sa 14:00-18:00; Sep 16-Jun 14 Tu,We,Th,Fr,Su 10:00-17:30; Sep 16-Jun 14 Sa 13:30-17:30",yes,https://museemaritime.larochelle.fr/,46.150602,-1.150695
+Q23498495,musees,Musée Marcel Dessal,Musée Marcel Dessal,28,way/182675003,Mo-Fr 14:00-18:00; Tu off; Su 15:00-18:00,yes,https://www.dreux.com/musee-dart-et-dhistoire,48.733926,1.368041
+Q24649065,musees,Musée Louis Vouland,Musée Louis Vouland,84,way/83788659,Tu-Su 14:00-18:00; Mo off,yes,https://www.vouland.com/,43.947265,4.800622
+Q1423719,musees,Musée Jean-Lurçat et de la tapisserie contemporaine,Musée Jean-Lurçat et de la tapisserie contemporaine,49,relation/20961678,"Tu-Su 10:00-18:00; May 01,Nov 01,Nov 11,Jan 01,Dec 25 off",yes,https://musees.angers.fr/lieux/musee-jean-lurcat-et-de-la-tapisserie-contemporaine/index.html,47.478262,-0.557763
+Q3329555,musees,Musée Jean-Claude-Boulard / Carré Plantagenêt,Musée Jean-Claude-Boulard / Carré Plantagenêt,72,way/869006363,"Tu-Su 10:00-12:30,14:00-18:00",no,https://www.lemans-tourisme.com/,48.007120,0.198138
+Q3001655,musees,Musée International de la Chaussure de Romans,Musée International de la Chaussure de Romans,26,way/218894353,Tu-Sa 10:00-17:00; Su 14:30-18:00; Mo off,yes,https://www.museedelachaussure.fr/,45.044545,5.054807
+Q3330653,musees,Musée Intercommunal d'Étampes,Musée Intercommunal d'Étampes,91,node/10106067054,We-Su 14:00-17:00,2,https://www.mairie-etampes.fr/le-musee/,48.434468,2.161198
+Q3329205,musees,Musée Hébert,Musée Hébert,38,way/150134291,We-Mo 10:00-18:00,no,https://musees.isere.fr/musee/musee-hebert,45.205737,5.751056
+Q3329193,musees,Musée Hector-Berlioz,Musée Hector-Berlioz,38,node/615739719,"10:00-12:30,13:30-18:00; Sep-Jun Tu off; Jan 01,May 01,Dec 25 off",no,https://musees.isere.fr/musee/musee-hector-berlioz,45.393356,5.261221
+Q3330574,musees,Musée Gallo-Romain de Saint-Romain-en-Gal,Musée Gallo-Romain de Saint-Romain-en-Gal,69,way/131339006,Tu-Su 10:00-18:00,yes,https://musee-site.rhone.fr/,45.529097,4.870463
+,musees,Musée Français du Pétrole,Musée Français du Pétrole,67,way/181913580,"""Fermeture temporaire du musée - Visites en extérieur, se renseigner auprès de l'association""",yes,https://www.musee-du-petrole.com/,48.936842,7.827552
+Q3329160,musees,Musée Flaubert - Histoire de la Médecine,Musée Flaubert - Histoire de la Médecine,76,way/64920532,Tu-Fr 14:00-17:30,no,https://rouen.fr/medecine,49.445353,1.081689
+Q110929543,musees,Musée Escoffier de l'Art Culinaire,Musée Escoffier de l'Art Culinaire,06,node/9907745062,"10:00-13:00,14:00-18:00; Jul-Aug 10:00-13:00,14:00-19:00; Dec 1-25 off; Dec 31 10:00-13:00; Jan 1 off; May 1 off",no,https://www.musee-escoffier.com/,43.658111,7.123141
+Q3329134,musees,Musée Electropolis,Musée Electropolis,68,node/369752515,Tu-Su 10:00-18:00,yes,https://www.musee-electropolis.fr,47.749053,7.295155
+Q2945212,musees,Musée Edmond-Michelet,Musée Edmond-Michelet,19,node/975799385,Oct-Apr Mo-Sa 13:00-19:00; May 02-Sep 30 Mo-Fr 11:00-18:00; May 02-Sep 30 Sa 13:00-18:00; Aug 15 13:00-19:00; PH off,no,http://centremichelet.brive.fr/,45.156351,1.527721
+Q3330543,musees,Musée Départemental du Sel,Musée Départemental du Sel,57,node/253993536,"Mo-Sa,PH 09:30-12:30,13:30-18:00",yes,https://www.mosellepassion.fr/,48.788486,6.605774
+Q20971751,musees,Musée Départemental de Préhistoire Corse,Musée Départemental de Préhistoire Corse,2A,node/5708259714,Mo-Su 10:00-18:00,yes,http://www.corsedusud.fr/nos-competences/patrimoine-et-culture/musee-departemental-de-sartene,41.620780,8.973665
+Q3330515,musees,Musée Départemental d'Art Ancien et Contemporain,Musée Départemental d'Art Ancien et Contemporain,88,way/100809875,"Mo, Fr 09:30-12:30, 14:00-17:30; Th 09:30-12:30, 14:00-17:00; Sa 10:30-12:30, 14:00-18:00; Su 14:00-18:00",yes,https://mudaac.vosges.fr/,48.172785,6.446368
+Q106860201,musees,Musée D-Day Omaha,Musée D-Day Omaha,14,way/1070575798,Mo-Su 10:00-19:00,yes,https://www.dday-omaha.fr,49.375259,-0.908228
+Q108854328,musees,Musée Conserverie Le Gall,Musée Conserverie Le Gall,29,way/991557211,"Apr-Nov: Th-Su 10:00-12:30, 14:00-18:00",yes,https://www.musee-conserverie-loctudy.bzh/,47.835049,-4.168227
+Q3329117,musees,Musée Colette,Musée Colette,89,node/2598935771,"Mo,We-Su 10:00-18:00",yes,https://musee-colette.com/,47.617307,3.198978
+Q3330257,musees,Musée Cinéma & Miniature,Musée Cinéma & Miniature,69,node/1421012868,"Mo-Fr 10:00-18:30; Sa,Su 10:00-19:00; SH,Mo-Su 10:00-19:00",yes,https://www.museeminiatureetcinema.fr/,45.761875,4.827299
+Q3329106,musees,Musée Champollion,Musée Champollion,46,way/68383015,Jul-Aug: Mo-Su 10:30-18:30,yes,https://www.musee-champollion.fr/,44.609721,2.034475
+Q3329102,musees,Musée Calbet,Musée Calbet,82,way/89104903,We-Sa 15:00-18:00,no,https://www.musees-midi-pyrenees.fr/musees/musee-calbet/,43.827734,1.294700
+Q3329050,musees,Musée Blanche Hoschedé-Monet,Musée Blanche Hoschedé-Monet,27,node/1612275797,"Nov 01-Mar 31 Tu-Su 10:00-12:30,14:00-17:00; Apr 01-Oct 31 Tu-Su 10:00-12:30,14:00-18:00; PH off",yes,https://www.vernon27.fr/la-ville/culture/musee/,49.094892,1.485018
+Q30218775,musees,Musée Bernard d'Agesci,Musée Bernard d'Agesci,79,node/795257552,"Tu-We, Fr 10:00-13:00, 14:00-17:00; Sa-Su 13:00-18:00; Th 10:00-17:00",yes,https://musees.niortagglo.fr/index.html,46.321054,-0.454416
+Q126281470,musees,Musée Banksy,Musée Banksy,75,node/9610343418,"Mo-Fr 12:00-20:15, Sa 10:00-20:15, Su 10:00-18:15",yes,https://museebanksy.fr,48.874629,2.341716
+Q3329716,musees,Musée Archéologique de Die du Diois,Musée Archéologique de Die du Diois,26,node/4881145550,Apr 15-Jun 15 Tu-Fr 14:00-17:00; Jun 15-Sep 15 Tu-Sa 15:00-19:00,yes,https://www.museededie.org/,44.755010,5.369821
+Q17635463,musees,Musée Arcabas en Chartreuse,Musée Arcabas en Chartreuse,38,node/8895660057,"10:00-13:00,14:00-18:00; Tu off; Jan 01,May 01,Dec 25 off",no,https://musees.isere.fr/musee/musee-arcabas-en-chartreuse,45.323257,5.805789
+Q3329028,musees,Musée 39-45,Musée 39-45,22,node/8909135043,Mo-Su 10:00-17:30,yes,https://www.musee39-45.com/,48.447080,-2.053647
+Q3330894,musees,Museum d'Histoire Naturelle,Museum d'Histoire Naturelle,06,node/1398474011,Tu-Su 10:00-18:00,yes,http://www.mhnnice.org,43.701776,7.279580
+Q3330033,musees,"MuseoSeine, Le Musée de la Seine Normande","MuseoSeine, Le Musée de la Seine Normande",76,way/479793340,Tu-Su 10:00-18:30,yes,https://museoseine.cauxseine.fr/,49.524400,0.722200
+Q22993254,musees,Moulin à vent de Pargeat,Moulin à vent de Pargeat,43,way/311427359,Apr 15-Oct 31 Tu-Su 10:00-17:00,yes,https://surleplateaudally.com/,45.158088,3.305846
+Q116024970,musees,Microzoo,Microzoo,35,node/9907260067,Nov-Mar Mo-Su 10:00-18:00; Apr-Jun Mo-Su 10:00-19:00; Jul-Aug Mo-Su 10:00-20:00; Sep-Oct Mo-Su 10:00-19:00,yes,https://microzoo.fr/,48.651632,-2.024089
+Q125936049,musees,Micro-Folie,Micro-Folie,17,node/11584006756,We-Sa 14:00-18:00,no,https://www.angely.net/services-publics/culture/micro-folie/,45.944050,-0.522698
+Q3286305,musees,Manoir de l'automobile,Manoir de l'automobile,35,way/110050999,"Jul,Aug Mo-Su,PH 10:00-19:00; Sep-Jun: Tu-Su,PH 10:00-13:00,14:00-19:00; Dec 25,Jan 01 closed",yes,https://www.manoir-automobile.fr/accueil/,47.860645,-1.896734
+Q3329313,musees,Maison natale Pierre Corneille,Maison natale Pierre Corneille,76,node/8063434963,Tu-Su 14:00-18:00,no,https://rouen.fr/corneille,49.443084,1.086783
+Q2858640,musees,Maison du Docteur Gagnon,Maison du Docteur Gagnon,38,node/2388638743,"Tu-Fr 14:00-18:00; Th off; Sa 10:00-12:00,14:00-18:00",yes,https://www.bm-grenoble.fr/,45.191580,5.728147
+Q22940636,musees,Maison des Sancerre,Maison des Sancerre,18,node/13920093691,11:00-18:30,yes,https://sancerreaop.fr/la-maison-des-sancerre/,47.330649,2.838296
+Q136812623,musees,Maison des Mémoires,Maison des Mémoires,74,way/87933847,"We,Sa-Su 14:00-18:00; Mo-Tu,Th-Fr off",no,https://www.annemasse.fr/que-faire-a-annemasse/decouvrir/memoire-et-patrimoine/maison-des-memoires,46.195448,6.234122
+Q93143364,musees,Maison des Minéraux,Maison des Minéraux,29,node/1412624306,"Oct-Nov Mo,Su 14:00-17:00; Oct-Nov Tu-Fr 10:00-12:00,14:00-17:00",yes,https://www.maison-des-mineraux.org/,48.203944,-4.528048
+Q3279836,musees,Maison des Canuts,Maison des Canuts,69,node/4885281682,"Tu-Fr 10:00-13:00,14:00-18:00; Sa 10:00-18:00",yes,https://www.maisondescanuts.fr/,45.777106,4.833685
+Q6737061,musees,Maison de la Photographie - Robert Doisneau,Maison de la Photographie - Robert Doisneau,94,way/81091490,We-Su 13:30-18:30,no,http://www.maisondelaphotographie-robertdoisneau.fr,48.814300,2.347602
+Q53838245,musees,Maison de la Crau,Maison de la Crau,13,way/158402806,Tu-Sa 09:00-17:00; Sep-Jun: Su 09:00-17:00,yes,http://www.cen-paca.org/index.php?rub=4&pag=4_ecomusee,43.637078,4.806104
+Q3279654,musees,Maison de l'Armateur,Maison de l'Armateur,76,relation/10067814,We-Mo 10:00-12:30,yes,https://www.lehavre.fr/annuaire/maison-de-larmateur,49.486926,0.112825
+Q3279544,musees,Maison de Robert Schuman,Maison de Robert Schuman,57,way/161626234,Tu-Su 14:00-18:00,yes,http://www.mosellepassion.fr/index.php/les-sites-moselle-passion/maison-de-robert-schuman,49.110321,6.111180
+Q98076048,musees,Maison de Nostradamus,Maison de Nostradamus,13,node/5111304319,"Mo 10:00-12:30,14:00-18:00; We-Su 10:00-12:30,14:00-18:00",yes,https://maisondenostradamus.fr/,43.640861,5.097650
+Q3329144,musees,Maison d'Ernest Renan,Maison d'Ernest Renan,22,way/77933197,"Jul, Aug We-Su 10:30-13:00, 14:00-18:00",yes,https://www.maison-ernest-renan.fr/,48.787927,-3.229094
+Q23600664,musees,Maison Romane - Musée de Provins,Maison Romane - Musée de Provins,77,node/2281215620,Mo-Su 11:00-18:30,yes,https://provins.net/decouvrir-visiter/samuser-au-musee/le-musee-de-provins-et-du-provinois/,48.561582,3.290722
+Q1966959,musees,Maison Picassiette,Maison Picassiette,28,way/214805540,"Su 14:00-18:00; Mo-Fr 10:00-12:30,14:00-18:00",yes,https://www.maison-picassiette-chartres.com/,48.442127,1.506749
+Q1885892,musees,Maison Pasteur,Maison Pasteur,39,node/14054414371,Feb-Oct 14:00-18:00;May-Sep 09:30-12:30,yes,https://www.institutdefrance.fr/lepatrimoine/maison-de-louis-pasteur/,46.906569,5.769454
+Q2310474,musees,Maison Folie de Lille Wazemmes,Maison Folie de Lille Wazemmes,59,node/5525538037,We-Tu 14:00-19:00,no,https://maisonsfolie.lille.fr/,50.624456,3.048116
+Q108857106,musees,Maison Bergès,Maison Bergès,38,way/63151945,"Apr-Oct We-Fr 13:00-18:00; Apr-Oct Sa,Su 10:00-18:00; Nov-Mar We-Fr 13:30-17:30; Nov-Mar Sa,Su 10:00-17:30; Jan 01,May 01,Dec 25 off",no,https://musees.isere.fr/musee/maison-berges,45.233036,5.885939
+Q3330521,musees,MUDO – Musée de l'Oise,MUDO – Musée de l'Oise,60,way/556458814,"We-Mo 10:00-13:00,14:00-18:00",no,https://www.mudo.oise.fr/,49.433033,2.079610
+Q28952482,musees,MM Park France,MM Park France,67,way/700696814,Mo-Su 09:00-19:00,yes,https://www.mmpark.fr/,48.665417,7.809883
+Q3329394,musees,MDAM Musée Départemental d'Art Moderne,MDAM Musée Départemental d'Art Moderne,89,node/2628533133,"Apr-Jun Mo,We-Su 10:00-18:00; Sep-Nov Mo,We-Su 10:00-18:00; Jul-Aug Mo-Su 10:00-18:00",yes,https://www.mdam-zervos.fr/,47.463822,3.743302
+Q114059646,monuments,Lockheed 1049 C Super Constellation,Lockheed 1049 C Super Constellation,44,way/459803191,"Mar 01-Oct 31 Su[1] 10:00-12:00,14:00-16:00",yes,https://superconstellation-nantes.fr/,47.149356,-1.607090
+Q109310760,musees,Lieu de Mémoire,Lieu de Mémoire,43,way/533737796,Tu-Su 10:00-18:00,yes,https://memoireduchambon.com/,45.058921,4.301538
+Q967049,musees,Les Charmettes,Les Charmettes,73,way/101956960,Tu-Su 10:00-18:00,yes,https://www.chambery.fr/302-les-charmettes-maison-de-jean-jacques-rousseau.htm,45.553154,5.929622
+Q739957,musees,Le Vaisseau,Le Vaisseau,67,way/43949526,Tu-Su 10:00-18:00,yes,http://www.levaisseau.com/,48.572890,7.772157
+Q3538637,musees,Le Tripostal,Le Tripostal,59,node/1525113136,"We,Th,Su 10:00-19:00; Fr,Sa 10:00-20:00; Mo,Tu off",yes,https://www.lille.fr/Nos-equipements/Le-Tripostal,50.636664,3.072804
+Q3228523,musees,Le Rocher des aigles,Le Rocher des aigles,46,way/703825941,10:00-20:00,11€ / 7€,https://www.rocherdesaigles.com/,44.802057,1.611866
+Q3330353,musees,Le Musée du Fumeur,Le Musée du Fumeur,75,node/6860970815,Mo-Sa 12:30-19:30,yes,https://www.museedufumeur.net/,48.858646,2.382222
+Q3329859,musees,Le Musée de l'École,Le Musée de l'École,11,node/1722806976,"Apr-Sep Tu-Sa 09:45-12:30,13:30-18:15; Oct-Mar Mo-Su 09:45-12:30,13:30-18:15",yes,https://www.carcassonne.org/article-page/musee-de-lecole,43.205293,2.363909
+Q3330821,musees,Le Musée Vivant du Chemin de Fer,Le Musée Vivant du Chemin de Fer,77,node/3254769225,"Oct-May: Su 13:00-17:00, PH 13:00-17:00; Jun-Sep: Sa-Su 10:00-18:00, PH 10:00-18:00",full:4; discount:2,https://www.ajecta.fr/,48.512579,3.255700
+Q106691374,musees,Le Monde Souterrain Norbert Casteret,Le Monde Souterrain Norbert Casteret,84,node/6539845024,"Feb-Apr,Oct-Nov 14:00-18:00; May-Sep 10:00-12:30,14:00-19:00",yes,https://www.moulin-vallisclausa.com/fr/content/14-visiter-le-monde-souterrain,43.922665,5.128660
+,musees,Le Grand Filon,Le Grand Filon,73,way/150335413,Su-Fr 14:00-18:00,yes,https://www.grandfilon.net/,45.510632,6.280585
+Q3329826,musees,Le Féru des Sciences,Le Féru des Sciences,54,way/99542401,"We-Su 09:00-12:00,14:00-18:00",yes,https://www.leferudessciences.eu/,48.666509,6.208832
+Q65128339,musees,Le Comœdia,Le Comœdia,29,node/440188596,Th-Sa 14:00-18:00,no,https://www.artcomoedia.fr,48.385310,-4.488297
+Q105707154,musees,Le Chronographe,Le Chronographe,44,way/454524397,"We-Sa 14:00-18:00; Jul-Aug Tu-Sa 14:00-19:00; PH off; Jul 14,Aug 15 Tu-Sa 14:00-19:00",yes,https://lechronographe.nantesmetropole.fr/,47.191819,-1.564786
+Q16303707,musees,Lab 71,Lab 71,71,node/6438591978,Mo-Fr 09:00-17:30,yes,https://www.lab71.fr/,46.355397,4.486955
+Q64052728,musees,La manufacture - Musée de la mémoire et de la création textile,La manufacture - Musée de la mémoire et de la création textile,59,node/5525293589,Tu-Su 14:00-18:00,yes,http://www.lamanufacture-roubaix.fr,50.683047,3.195905
+Q106695295,musees,La Tour des Prisons,La Tour des Prisons,34,node/6946432728,"PH,Su 09:00-13:00; Sep-Jun Mo-Sa 09:00-12:00,14:00-18:00; Jul-Aug Mo-Sa 09:00-13:00,14:00-19:00",no,https://www.lunel.com/fr/page/le-musee-de-la-tour-des-prisons,43.674628,4.134229
+Q3329021,musees,La Plateforme - Centre d'information sur les projets urbains,La Plateforme - Centre d'information sur les projets urbains,38,way/28710703,We-Sa 13:00-19:00,no,https://www.grenoble.fr/lieu/731/137-la-plateforme.htm,45.189585,5.733279
+Q1955748,musees,La Piscine,La Piscine,59,way/38354578,"Tu-Th 11:00-18:00; Fr 11:00-20:00; Sa,Su 13:00-18:00",yes,https://www.roubaix-lapiscine.com/,50.692515,3.167862
+Q3314814,monuments,La Mine Bleue,La Mine Bleue,49,way/732160053,"Apr 01-Nov 12: open ""Voir https://laminebleue.com/fr/nos-horaires""",yes,https://laminebleue.com/,47.713310,-0.955886
+Q3279402,musees,La Maison-Musée Jean Monnet,La Maison-Musée Jean Monnet,78,way/893085686,Apr 15-Oct 15 Mo-Fr 10:00-17:00; Apr 15-Oct 15 Sa 13:00-18:00; Apr 15-Oct 15 Su 10:00-18:00; Oct 16-Apr 14 10:00-17:00; Oct 16-Apr 14 Sa 13:00-17:00,no,https://jean-monnet.fr/?resources=la-maison-musee-jean-monnet,48.770680,1.852234
+Q56716213,musees,La Magie des Automates,La Magie des Automates,38,way/492364822,"Jul 04-Aug 31,Oct 17-Nov 01 10:30-18:30; Sep 01-Oct 16 We-Sa 14:00-18:00; Sep 01-Oct 16,Nov 02-Dec 18 Su 10:30-18:30; Nov 02-Dec 18,Dec 19-Jan 03 We,Sa 14:00-18:00; Dec 19-Jan 03 Mo,Tu,Th off; Dec 19-Jan 03 10:30-18:30",yes,https://www.magiedesautomates.fr/,45.133743,5.585632
+Q2603171,musees,La Grande Saline - Musée du Sel,La Grande Saline - Musée du Sel,39,way/151950172,"PH,Mo-Su 09:30-18:00",yes,https://www.salinesdesalins.com/,46.937611,5.876246
+Q3073855,musees,La Flore,La Flore,56,way/256239444,"Mo-We,Fr,Sa 10:00-18:00",yes,https://www.la-flore.fr/,47.729945,-3.371872
+Q10143,musees,La Demeure du Chaos,La Demeure du Chaos,69,way/721137698,Sa-Su 14:00-17:00,no,https://www.demeureduchaos.com/,45.837208,4.826100
+Q15968440,musees,La Casemate,La Casemate,38,way/68283920,"We,Fr 09:00-12:00,13:30-18:00; Tu,Th 09:00-12:00,13:30-21:00; Sa 14:00-18:00",yes,https://lacasemate.fr/,45.197887,5.732145
+Q3238257,musees,"LAAC, Lieu d'art et d'action contemporaine","LAAC, Lieu d'art et d'action contemporaine",59,way/76432154,"Tu-Fr 09:30-18:00, Fr,Sa 10:00-18:00; Mo off",yes,http://www.musees-dunkerque.eu/,51.046037,2.382585
+Q6159866,jardins,Jardins ethnobotaniques de la Gardie,Jardins ethnobotaniques de la Gardie,30,way/618373076,24/7,no,https://jardinethno.fr/,44.205649,4.123978
+Q3151912,musees,Institut d'art contemporain,Institut d'art contemporain,69,node/1460479330,We-Fr 14:00-18:00; Sa-Su 13:00-19:00,yes,https://i-ac.eu/,45.762539,4.872759
+Q3145715,musees,Hôtel d'Assézat,Hôtel d'Assézat,31,relation/216048,Tu-Su 10:00-18:00; May-Jul Mo 08:00-18:00; Tu[1] 10:00-20:00,yes,http://www.fondation-bemberg.fr/,43.600381,1.442022
+Q22999521,musees,Hôtel Paul Arbaud,Hôtel Paul Arbaud,13,way/88612425,Tu-Sa 14:00-17:00,no,https://museebiblioarbaud.fr/,43.526160,5.449812
+Q1284848,musees,Hospices de Beaune,Hospices de Beaune,21,relation/1681385,"Apr 01-Nov 15 09:00-19:30; Nov 16-Mar 31 09:00-12:00,14:00-18:30; Jan 01,Dec 25 14:00-18:30",yes,https://hoteldieu.hospices-de-beaune.com/,47.022154,4.836621
+Q22953451,musees,Horreum Romain,Horreum Romain,11,way/92108427,"Tu-Su 10:00-13:00,14:00-18:00",yes,https://www.narbonne.fr/fr_horreum-romain,43.185778,3.004655
+Q55519883,musees,Historial franco-allemand de la Grande Guerre du Hartmannswillerkopf,Historial franco-allemand de la Grande Guerre du Hartmannswillerkopf,68,way/539721243,Mo-Sa 10:00-17:00; Su 10:00-18:00,yes,https://www.memorial-hwk.eu/fr/historial,47.857751,7.149040
+Q56550293,musees,HistoBus Dauphinois,HistoBus Dauphinois,38,node/2155000620,"""by appointment""",no,http://www.standard216.com/,45.137291,5.703361
+Q3117274,grottes,Grottes des Moidons,Grottes des Moidons,39,node/2813371957,"Apr-Jun,Sep 11:00-17:15; Apr-Jun,Sep We off; Jul-Aug 10:30-18:30; Jun 03,Jun 10,Sep 15,Sep 22,Sep 29 off",yes,https://www.grottesdesmoidons.com/,46.838441,5.806640
+Q125729763,musees,Grand Palais immersif,Grand Palais immersif,75,node/10941387207,Mo-Su 10:00-19:00,yes,https://grandpalais-immersif.fr,48.851207,2.370445
+Q17373215,musees,Gare de Guiscriff,Gare de Guiscriff,56,node/1200509257,Tu-Su 10:30-18:30; Sep-Mar off,yes,https://www.lagaredeguiscriff.com/,48.056921,-3.653946
+Q20971885,musees,Galerie Vrais Rêves,Galerie Vrais Rêves,69,node/8699441650,We-Sa 15:00-19:00,no,http://vraisreves.com/,45.776646,4.833747
+Q35556695,musees,Galerie Sonore,Galerie Sonore,49,node/5119217235,"Mo-Fr 09:30-12:00,13:30-16:00; We 09:30-12:00",no,https://www.galeriesonore.fr/,47.458328,-0.549822
+Q3078640,musees,Forum départemental des Sciences,Forum départemental des Sciences,59,way/79049625,"PH,We-Su 14:00-18:00; Th,Fr off; SH Tu-Fr 11:00-18:00",yes,https://forumdepartementaldessciences.fr/,50.620483,3.132916
+Q3077922,chateaux,Fort Liédot,Fort Liédot,17,relation/13152305,"Apr-Jun,Sep Tu-Su 11:00-13:00,13:30-16:30; Jul-Aug Mo-Su 11:00-17:00",yes,https://www.fortliedot.com/,46.022579,-1.164591
+Q3075903,musees,Fonds régional d’art contemporain Bretagne,Fonds régional d’art contemporain Bretagne,35,way/152472263,Tu-Su 12:00-19:00; PH off,yes,https://www.fracbretagne.fr/,48.130830,-1.695977
+Q16011234,musees,Fonds régional d'art contemporain (FRAC),Fonds régional d'art contemporain (FRAC),25,node/2812869839,"We-Fr 14:00-18:00; Sa,Su 14:00-19:00",yes,https://www.frac-franche-comte.fr/,47.235881,6.033958
+Q3075738,musees,Fonderie Cornille-Havard,Fonderie Cornille-Havard,50,node/5798392653,"Jan 10-Jul 09 30 Ma-Sa 10:00-12:30, 14:00-17:30; Jul 10-Aug 28 9:30-18:30; Aug 29-Dec 18 Ma-Sa 10:00-12:30, 14:00-17:30; ",yes,https://cornille-havard.com/,48.838380,-1.224267
+Q3075615,chateaux,Fondation de Coubertin,Fondation de Coubertin,78,way/340665060,"Sa,Su 13:30-18:00",yes,https://www.coubertin.fr/,48.702086,2.060005
+Q16303680,musees,Fondation Bemberg,Fondation Bemberg,31,node/1982847379,"Tu-Su 10:00-12:30,13:30-18:00, Th 10:00-12:30,13:30-20:30",yes,https://www.fondation-bemberg.fr/fr/home.html,43.600199,1.442046
+Q20751523,musees,FRAC Lorraine,FRAC Lorraine,57,way/63256340,Tu-Fr 14:00-19:00; Sa-Su 11:00-19:00,no,https://www.fraclorraine.org/,49.120707,6.179493
+Q40772746,musees,Espace des Sciences Pierre-Gilles de Gennes,Espace des Sciences Pierre-Gilles de Gennes,75,node/1367996793,Tu-Sa 14:00-17:00,no,https://www.espgg.org,48.841158,2.347305
+Q24940461,musees,Espace des Mondes Polaires Paul-Émile Victor,Espace des Mondes Polaires Paul-Émile Victor,39,way/109165789,"Mo-Su 09:00-12:30,14:00-18:00",yes,https://www.espacedesmondespolaires.org/,46.461170,6.028934
+Q3329274,musees,Espace Automobiles Matra,Espace Automobiles Matra,41,way/907325127,"Mo,We-Fr 09:00-12:00,14:00-18:00; Sa,Su,PH 10:00-12:00,14:00-18:00; Jul,Aug Mo-Fr 09:00-12:00,14:00-18:00; Sa,Su,PH 10:00-12:00,14:00-18:00; Jan 01,May 01,Dec 25 closed",yes,https://www.museematra.com/,47.357945,1.740442
+Q3028372,musees,Dino-Zoo,Dino-Zoo,25,way/601376469,Tu-Su 10:00-18:00,yes,https://www.dino-zoo.com/,47.146774,6.211243
+Q113834124,musees,Cosmocité,Cosmocité,38,way/1176917284,"We 13:30-18:00; Sa,Su 10:30-18:00; SH Tu-Su 10:30-18:00",yes,https://www.cosmocite.fr/,45.140543,5.702344
+Q111874022,musees,Collection des minéraux,Collection des minéraux,75,node/2526898729,Tu-Sa 13:00-18:00; Su off; Mo off,yes,http://collection-mineraux.sorbonne-universite.fr/fr/index.html,48.847541,2.354841
+Q55597579,musees,Citée des Couteliers,Citée des Couteliers,63,node/6632844474,"Jun-Sep Tu-Fr 14:00-18:00; Jun-Sep Sa 10:00-12:30,14:00-18:00; Jul-Aug Tu-Fr 10:00-12:30,14:00-18:00;SH Tu-Fr 14:00-18:00;SH Sa 10:00-12:30,14:00-18:00",no,https://ville-thiers.fr/cite-des-couteliers/,45.855231,3.547756
+Q3330816,musees,Cité musée Tony,Cité musée Tony,69,node/26132213,Tu-Sa 14:00-18:00,yes,https://cm-tonygarnier.org,45.733509,4.862983
+Q2974767,musees,Cité de la Voile Éric Tabarly,Cité de la Voile Éric Tabarly,56,way/1043733749,"Mo-We,Fr,Sa 10:00-18:00",yes,https://www.citevoile-tabarly.com/,47.730740,-3.374053
+Q2974758,musees,Cité de l'Économie,Cité de l'Économie,75,node/6548929685,"Tu-Fr,Su 10:00-18:00, Sa 10:00-19:00",yes,https://www.citeco.fr/,48.881891,2.310697
+Q74017785,musees,Cité Internationale de la Gastronomie de Lyon,Cité Internationale de la Gastronomie de Lyon,69,node/6943618299,"We,Fr,Sa,Su 11:00-19:00; Th 13:00-21:00",yes,https://citegastronomielyon.fr/,45.759690,4.836214
+Q206260,chateaux,Citadelle de Sisteron,Citadelle de Sisteron,04,way/538102668,"Mar 21-Mar 31,Oct 16-Oct 31: Mo-Su,PH 09:00-18:00; Apr-May,Oct 01-Oct 15: Mo-Su,PH 09:00-18:30; Jun,Sep: Mo-Su,PH 09:00-19:00; Jul,Aug Mo-Su,PH 09:00-19:30; Nov Mo-Su,PH 10:00-17:00",yes,https://www.citadelledesisteron.fr/,44.198924,5.942727
+Q2974403,musees,Citadelle Souterraine,Citadelle Souterraine,55,way/910629626,"Mo-Su,PH 09:00-19:00",yes,https://www.citadelle-souterraine-verdun.fr,49.157424,5.373354
+Q22938008,chateaux,Château de Thegra,Château de Thegra,31,way/64104445,Su-We 13:00-18:00;Oct 1 - Jun 14 Off,yes,https://www.chateau-de-thegra.com/,43.631724,1.500674
+Q2957369,monuments,Chapelle des Carmélites,Chapelle des Carmélites,31,way/60544436,We-Su 12:00-19:00,no,https://www.toulouse-tourisme.com/chapelle-des-carmelites/toulouse/pcumid031fs00094,43.607543,1.443285
+Q38380201,monuments,Chapelle Saint-Joseph de la Grave,Chapelle Saint-Joseph de la Grave,31,way/219747752,"Fr,Sa,Su 11:00-18:00;SH 11:00-18:00",yes,https://www.toulouse-tourisme.com/chapelle-saint-joseph-de-la-grave/toulouse/pcumid031v50160o,43.600812,1.432975
+Q58836709,musees,Centre international du vitrail,Centre international du vitrail,28,node/570334950,"Mo-Fr 10:15-12:15,14:00-17:30; Sa,Su 14:00-17:30",yes,https://www.centre-vitrail.org/fr/musee-du-vitrail/,48.448484,1.486053
+Q130240187,musees,Centre d’Interprétation de l’Architecture et du Patrimoine,Centre d’Interprétation de l’Architecture et du Patrimoine,74,node/12157595234,"Jun-Sep 10:30-18:00; Oct-May 10:00-12:00,14:00-17:00; Jan 01,May 01,May 08,Nov 01,Nov 11 off",yes,https://www.savoie-mont-blanc.com/sites-culturels/centre-dinterpretation-de-larchitecture-et-du-patrimoine-ciap-240104/,45.898574,6.126983
+Q8298179,musees,Centre du Patrimoine Arménien,Centre du Patrimoine Arménien,26,relation/1573550,"Tu-Fr 10:00-13:00,14:00-18:00; Sa,Su 14:00-18:00; PH off",yes,https://www.le-cpa.com/,44.931396,4.893532
+,musees,Centre de ressources du Munaé,Centre de ressources du Munaé,76,way/64717877,"Mo 09:00-12:00, 13:00-17:00",no,https://www.reseau-canope.fr,49.448425,1.102953
+Q12060923,musees,Centre Juno Beach,Centre Juno Beach,14,way/69698258,"Feb,Nov: Mo-Su,PH 10:00-17:00; Mar-Apr,Sep-Oct: Mo-Su,PH 09:30-18:00; May-Aug: Mo-Su 09:30-19:00",yes,https://www.junobeach.org,49.336402,-0.461673
+Q18324694,musees,Centre Jean-Moulin,Centre Jean-Moulin,33,way/79979931,Closed,no,https://www.bordeaux.fr/o276/centre-national-jean-moulin,44.838693,-0.577674
+Q1378218,musees,Centre Européen du Résistant Déporté,Centre Européen du Résistant Déporté,67,way/59141854,Feb 01-Apr 15 09:30-17:30; Apr 16-Sep 30 09:00-18:30; Nov 01-Dec 30 09:30-17:30,yes,https://www.struthof.fr/le-site/le-centre-europeen-du-resistant-deporte,48.454001,7.251271
+Q136099548,musees,Centre Azincourt 1415,Centre Azincourt 1415,62,way/1482312407,Nov-Mar We-Mo 10:00-17:00; Apr-Oct Mo-Su 10:00-18:00; Jul-Aug Mo-Su 09:30-18:30,yes,https://azincourt1415.com/,50.463166,2.127292
+Q16535900,musees,Cap Sciences,Cap Sciences,33,way/154309547,"Tu-Fr 14:00-18:00, Sa-Su 14:00-19:00",yes,https://www.cap-sciences.net/,44.859633,-0.554225
+Q36078579,musees,Bibracte,Bibracte,71,way/181221386,Mar 14-Apr 03 10:00-17:00; Apr 04-May 13 10:00-18:00; May 14-May 17 09:30-19:00; May 18-Jul 03 10:00-18:00; Jul 04-Aug 30 09:30-19:00; Aug 31-Nov 01 10:00-18:00; Nov 02-Nov 15 10:00-17:00,yes,https://www.bibracte.fr/,46.932559,4.047494
+Q20972508,musees,Bateau-lavoir Saint-Julien,Bateau-lavoir Saint-Julien,53,node/3902882362,Jul-Aug Tu-Su 14:00-18:00,no,https://www.laval.fr/decouvrir-sortir/musees-lieux-dexposition/bateau-lavoir-saint-julien,48.066329,-0.767407
+Q55206209,musees,Aubette 1928,Aubette 1928,67,node/6620864935,We-Sa 14:00-18:00,no,https://www.musees.strasbourg.eu/aubette-1928,48.583879,7.746082
+Q2638057,musees,Argonaute,Argonaute,75,way/58169110,Tu-Su 10:00-18:00+,yes,https://www.cite-sciences.fr/fr/argonaute,48.894535,2.389564
+Q8294,musees,Aquarium de Lyon,Aquarium de Lyon,69,way/420294842,Mo-Su 10:30-18:30,yes,https://www.aquariumlyon.fr,45.727960,4.815727
+Q2859173,musees,Aquarium de La Rochelle,Aquarium de La Rochelle,17,way/119832587,"Jan-Mar: Mo-Su,PH 10:00-20:00; Apr 01-Jul 08: Mo-Su,PH 09:00-20:00; Jul 09-Aug 31: Mo-Su,PH 09:00-23:00; Sep 01-Sep 30: Mo-Su,PH 09:00-20:00; Oct 01-Oct 21: Mo-Su,PH 10:00-20:00; Oct 22-Nov 06: Mo-Su,PH 09:00-20:00; Nov 07-Dec 31: Mo-Su,PH 10:00-20:00",yes,https://www.aquarium-larochelle.com/,46.153286,-1.150608
+Q2859190,musees,Aquarium Marin de Trégastel,Aquarium Marin de Trégastel,22,node/1356264186,"PH,Mo-Su 10:00-18:00",yes,https://www.aquarium-tregastel.com/,48.832866,-3.514040
+Q55065447,musees,Appartement-atelier de Le Corbusier,Appartement-atelier de Le Corbusier,92,node/13232394792,"Sa 10:00-13:00, 13:30-17:00",yes,https://www.fondationlecorbusier.fr/visite/appartement-le-corbusier-paris,48.843394,2.251281
+Q3330857,musees,Alésia Muséoparc,Alésia Muséoparc,21,relation/1614573,"Feb Sa[1]-Nov Su[-1] 10:00-17:00; Apr-Jun,Sep-Oct 10:00-18:00; Jul-Aug 09:30-19:00; PH ""Ouverture normale""",yes,https://www.alesia.com/,47.535715,4.468979
+Q40002294,musees,Aconit,Aconit,38,node/2006338406,"""ouvert sur rendez vous""",no,http://aconit.org,45.186101,5.717042
+Q334141,musees,Abbaye de Charlieu,Abbaye de Charlieu,42,way/625801255,"10:00-13:00,14:00-18:00; Tu off",yes,https://www.abbayebenedictine.fr/jcms/lw_1396720/fr/accueil,46.157706,4.168686
+Q2820503,musees,Abbaye d'Arthous,Abbaye d'Arthous,40,way/250016053,"Apr-Jun,Oct We-Su 14:00-17:30; Jul-Sep Tu-Su 10:00-13:00,14:00-18:00",yes,https://arthous.landes.fr/,43.527242,-1.121787
+Q38492901,musees,Église Saint-Cyr,Église Saint-Cyr,27,way/100543882,We-Su 13:30-18:00,no,,49.255821,1.206814
+Q3578617,musees,Écomusée du pays de la Roudoule,Écomusée du pays de la Roudoule,06,way/149921556,"Oct-Apr: Tu-Fr 10:00-12:00, 14:00-18:00; May-Sep: Tu-Su 10:00-12:00, 14:00-18:00",,https://roudoule.com/,43.974137,6.918912
+Q3068935,musees,Écomusée du Clos Parchet,Écomusée du Clos Parchet,74,way/1308990846,"Tu,Th, Fr 14:00-18:00",,https://leclosparchet.fr/,46.101857,6.700748
+Q3330396,musees,musée du Veinazes,musée du Veinazes,15,node/2085157238,"Apr We,Fr,Su,PH 14:00-17:00, May-Jun We,Fr,Su,PH 14:00-18:00, Jul-Aug Mo-Su 14:00-19:00, Sep We,Fr,Su 14:00-18:00",,https://www.musee-veinazes.com/,44.759965,2.461790
+Q3364790,musees,Zoo et Parc de Thoiry,Zoo et Parc de Thoiry,78,way/56236000,"Mo-Su 10:00-16:30 ""suivant les saisons fermeture des jardins historiques, labyrinthe, et la réserve animalière 16:30, 17h, ou 18h""",,https://www.thoiry.net/,48.861861,1.791528
+Q2387471,musees,Zoo de la Tête d'Or,Zoo de la Tête d'Or,69,way/444795116,"Apr-Oct: We-Mo 09:30-18:30, Oct-Apr: We-Mo 09:30-17:00",no,,45.777428,4.855511
+Q113625316,musees,Village des Métiers d'Antan & Musée Motobécane,Village des Métiers d'Antan & Musée Motobécane,02,way/130236600,"Jan 08-31 Fr-Su 14:00-18:00; Feb 01-Apr 30,Oct 01-Dec 31 Tu-Su 14:00-18:00; May 02-Sep 30 Tu-Sa 09:00-12:00,14:00-18:00; May 02-Sep 30 Su 14:00-18:00",,https://www.village-metiers-dantan.fr/,49.835163,3.307630
+Q65134185,musees,Villa de Licinius,Villa de Licinius,38,way/158764759,May-Sep We-Su 14:30-18:30,,https://www.isere-tourisme.com/patrimoine-culturel/la-villa-de-licinius,45.413176,4.790743
+Q3558514,musees,Villa Domergue,Villa Domergue,06,way/65073554,2020 Jun 27-Sep 27 11:00-19:00,,https://www.cannes.com/fr/mairie/annuaire-pratique/lieux/eqt_munic/villa-domergue-et-ses-jardins.html,43.559906,7.041216
+Q120298570,monuments,Ventoux Aventure,Ventoux Aventure,84,way/685065468,"Apr-Sep 09:00-13:00,14:30-18:00",,https://www.ventouxaventure.com/,44.067948,5.198374
+Q140187393,grottes,Trou d'Argent (grotte),Trou d'Argent (grotte),04,node/1920331077,24/7,no,,44.198313,5.973799
+Q3533057,monuments,Tour César,Tour César,77,way/113120751,"Mar 29-Nov 02 10:00-18:00; Jan 02-Mar 28,Nov 03-Dec 31 Mo-Fr 14:00-17:00; Jan 02-Mar 28,Nov 03-Dec 31 Sa,Su 10:30-17:00",,https://provins.net/decouvrir-visiter/la-cite-medievale-de-provins/monuments-et-pass-provins/tour-cesar/,48.561360,3.290116
+Q3517659,musees,Temple des Bastides,Temple des Bastides,40,node/3872566758,"Jul,Aug",no,,43.968967,-0.187616
+Q21099822,megalithes,Tasciaca,Tasciaca,41,way/234350546,Jul-Aug We-Su 16:00-18:00,,https://www.tasciaca.com/,47.329597,1.294936
+Q3476795,musees,Seaquarium,Seaquarium,30,relation/12893425,"Apr-Jun Mo-Fr 14:30-19:30; Apr-Jun We,Sa,Su 09:30-19:30; Jul-Aug 08:30-23:30; Oct-Mar 09:30-18:30; Sep 09:30-19:30",,https://www.seaquarium.fr,43.527193,4.140739
+Q15953296,musees,Scierie de La Hallière,Scierie de La Hallière,54,node/4907091808,closed,,http://la-halliere.fr/index.html,48.477684,6.980365
+Q649055,monuments,Saline royale d'Arc-et-Senans,Saline royale d'Arc-et-Senans,25,way/32321984,09:00-18:00,,https://www.salineroyale.com,47.033512,5.777362
+Q3457600,plages,Réserve naturelle du Scamandre,Réserve naturelle du Scamandre,30,way/615822508,Tu-Sa 09:00-18:00; PH off,no,,43.613078,4.341015
+Q3457155,musees,Réserve de bisons d'Europe de Sainte-Eulalie,Réserve de bisons d'Europe de Sainte-Eulalie,48,way/515066762,10:30-16:30,,https://www.bisoneurope.com/,44.803137,3.485866
+,musees,Réserve américaine de Thoiry,Réserve américaine de Thoiry,78,way/366832026,"Mo-Su 10:00-16:30 ""suivant les saisons fermeture des jardins historiques, labyrinthe, et la réserve animalière 16:30, 17h, ou 18h""",,https://www.thoiry.net/,48.856376,1.793233
+,musees,Réserve africaine de Thoiry,Réserve africaine de Thoiry,78,way/366832025,"Mo-Su 10:00-16:30 ""suivant les saisons fermeture des jardins historiques, labyrinthe, et la réserve animalière 16:30, 17h, ou 18h""",,https://www.thoiry.net/,48.860019,1.789508
+Q3279697,musees,Préhistosite de Brassempouy,Préhistosite de Brassempouy,40,way/327810486,"Feb 17-Jul 05,Sep 10-Nov 17 Tu-Su 13:45-18:00; Jul 06-Sep 01 10:45-19:00",,https://prehistoire-brassempouy.fr/,43.634395,-0.693503
+Q3408961,musees,Préhistorama,Préhistorama,30,node/5844916133,Feb-Jun Mo-Su 14:00-18:00; Jul-Aug Mo-Su 10:00-19:00; Sep-Nov Mo-Su 14:00-18:00; Dec-Jan Off,,https://www.prehistorama.com/,44.205124,4.131804
+Q3146071,chateaux,Préfecture de la Charente-Maritime,Préfecture de la Charente-Maritime,17,relation/1645806,"Fr 08:30-12:15,13:30-16:30; Mo-Th 08:30-12:15,13:30-17:00",,http://www.charente-maritime.gouv.fr,46.157251,-1.157231
+Q3373074,musees,Pavillon de Manse,Pavillon de Manse,60,way/131308047,"Tu-Fr 10:00-12:00,14:00-18:00; Sa-Su 14:00-18:00",,https://www.pavillondemanse.com,49.195394,2.466988
+Q8326,monuments,Passage Pommeraye,Passage Pommeraye,44,relation/4016610,Mo-Sa 08:00-20:00; Su 09:00-19:00,,http://www.passagepommeraye.fr,47.213465,-1.559642
+Q3364355,plages,Parc du Vinaigrier,Parc du Vinaigrier,06,way/37288822,07:30-20:00,,https://randoxygene.departement06.fr/parc-du-vinaigrier,43.716252,7.303072
+Q2411496,jardins,Parc du Domaine de Madame Elisabeth,Parc du Domaine de Madame Elisabeth,78,way/127580034,Apr-Sep Mo-Su 11:00-20:00; Oct-Mar Mo-Su 11:00-18:00,no,,48.799726,2.146749
+Q47488973,monuments,Parc des Ateliers,Parc des Ateliers,13,way/488976357,week 13-38 07:00-20:30; week 39-12 07:00-17:30,,https://www.luma-arles.org,43.672995,4.637302
+Q3364788,musees,Parc Zoologique de Fréjus,Parc Zoologique de Fréjus,83,way/627111443,"Jun 01-Aug 31 Mo-Su,PH 10:00-18:00; Mar 01-May 31 Mo-Su,PH 10:00-17:00; Sep 01-Oct 31 Mo-Su,PH 10:00-17:00; Nov 01-Dec 31 Mo-Su,PH 10:00-16:30; Jan 01-Feb 28 Mo-Su,PH 10:00-16:30",,https://zoo-frejus.com/,43.475272,6.736467
+Q3363939,musees,Parc Animalier de Sainte-Croix,Parc Animalier de Sainte-Croix,57,way/61402901,Mo-Su 10:00-18:00,yes,,48.773328,6.902716
+,musees,Parc Animalier de Pradinas,Parc Animalier de Pradinas,12,way/322203423,"Apr-Jun,Sep 10:00-18:00; Jul-Aug 10:00-19:00; Oct 01-18 Sa,Su 10:00-18:00; Oct 19-Nov 02 10:00-18:00",,http://www.parcanimalierdepradinas.com/,44.259239,2.258653
+Q20751541,musees,Palais Lumière,Palais Lumière,74,way/810199000,Mo 14:00-18:00; Tu-Su 10:00-18:00,,https://ville-evian.fr/fr/palais-lumiere,46.401248,6.591608
+Q106833385,musees,Overlord Museum,Overlord Museum,14,way/195196203,"Feb-Mar: 10:00-17:30; Oct-Dec: 10:00-17:30; Apr-May: 10:00-18:30; Sep: 10:00-18:30; Jun-Aug Mo-Su 09:30-19:00; Dec 24,25,31 off",,https://www.overlordmuseum.com,49.347831,-0.856595
+Q3356523,musees,"Ornavik, des Vikings aux Normands","Ornavik, des Vikings aux Normands",14,way/1237221907,Apr-Jun: 10:30-18:00; Jul-Aug: 10:30-18:30; Sep: 10:30-18:00,,https://www.ornavik.fr/,49.216808,-0.311338
+Q26257857,chateaux,Office de Tourisme,Office de Tourisme,57,node/10121402820,"Mo-Th 08:00-12:00,13:30-17:30; Fr 08:00-12:00,13:30-16:30",,http://www.tourisme.forbach.com/,49.185941,6.894809
+Q3349991,musees,OK Corral,OK Corral,13,way/243837809,Apr-Oct 10:00-18:00,,https://www.okcorral.fr/,43.268193,5.730883
+Q130312797,megalithes,Nymphée gallo-romain,Nymphée gallo-romain,78,way/1395997925,24/7,,https://archeologie.yvelines.fr/spip.php?article217,48.897752,1.671287
+Q3333160,musees,Mémorial du débarquement en Provence,Mémorial du débarquement en Provence,83,way/146108873,"Jun-Sep: Mo-Su 10:00-12:30,13:15-18:30; Oct-May: Mo-Su 10:00-12:30,13:15-17:15; May 01 off; off ""fêtes de fin d'année""",yes,,43.149989,5.929310
+Q16011495,musees,Mémorial du Camp de Rivesaltes,Mémorial du Camp de Rivesaltes,66,relation/7243799,"Apr-Oct 10:00-18:00; Nov-Mar Su-Fr 10:00-18:00; Jan 01,May 01,Nov 01,Dec 25 off",,https://www.memorialcamprivesaltes.eu,42.809409,2.892698
+Q3333147,monuments,Mémorial de l’Abolition de l’Esclavage,Mémorial de l’Abolition de l’Esclavage,44,relation/3878573,Sep 16-May 14 09:00-18:00; May 15-Sep 15 Mo-Su 09:00-20:00,,https://memorial.nantes.fr/,47.209479,-1.563842
+Q328579,musees,Mémorial de la Déportation Camp de Royallieu,Mémorial de la Déportation Camp de Royallieu,60,way/220426052,"Tu,Sa,Su 10:00-18:00; We-Fr 14:00-18:00",yes,,49.402095,2.807192
+Q3333111,musees,Mémorial Ascq 1944,Mémorial Ascq 1944,59,way/79064743,Su[1] 14:30-17:30; PH 14:30-17:30; We 13:30-17:00; Aug off; Dec SH off,,https://www.villeneuvedascq.fr/memorial-ascq-1944-2,50.621251,3.167796
+Q2398539,musees,Muséum d'Histoire Naturelle,Muséum d'Histoire Naturelle,44,relation/6742735,"closed; ""Temporarily closed""",,https://museum.nantesmetropole.fr,47.212587,-1.564790
+,musees,Musée-Maison du Patrimoine,Musée-Maison du Patrimoine,38,node/1869973658,Oct 01-Mar 31 Mo-Fr 14:00-18:00; Oct 01-Mar 31 PH off; Apr 01-Sep 30 14:00-18:00,,https://www.isere-tourisme.com/patrimoine-culturel/musee-maison-du-patrimoine-de-hieres-sur-amby,45.797051,5.293209
+Q3330804,musees,Musée social,Musée social,75,node/11209951498,"Mo-Th 09:00-12:00, 14:00-18:00; Fr 09:00-12:00, 14:00-17:00",,https://www.cedias.org/,48.857859,2.321811
+Q60338164,musees,Musée gallo-romain,Musée gallo-romain,67,way/537840270,Su 14:30-17:30,no,,48.967846,7.732928
+Q23640244,musees,Musée forum de l'Aurignacien,Musée forum de l'Aurignacien,31,way/420078229,Tu-Su 14:00-18:00,,http://www.musee-aurignacien.com,43.215536,0.878640
+Q23780781,musees,Musée d’histoire et de céramique biotoises,Musée d’histoire et de céramique biotoises,06,node/4793674909,We-Su 14:00-18:00,,https://musee-de-biot.fr/,43.627363,7.098448
+Q17265872,musees,Musée d’Histoire de la Vie Quotidienne,Musée d’Histoire de la Vie Quotidienne,76,node/13981113331,Tu-Su 14:00-18:00,,https://www.museehistoireviequotidienne.fr/,49.957235,1.223243
+Q3330397,musees,Musée du Vexin français,Musée du Vexin français,95,node/3812297801,"Tu-Fr 09:00-13:30,14:00-18:00; Sa 14:00-18:00; Su 08:00-15:00; Sa 10:00-19:00",,http://ecomusees-vexin-francais.fr/vexin.html,49.086580,1.896055
+Q3556076,musees,Musée du Verre,Musée du Verre,57,way/228213586,Apr 1-Nov 1 Tu-Su 13:30-18:00,,https://site-verrier-meisenthal.fr/,48.965099,7.352594
+Q93445901,musees,Musée du Sel et des Traditions Béarnaises,Musée du Sel et des Traditions Béarnaises,64,node/10155007333,Mo-Sa 13:30-19:00,,https://www.museedusel64.fr,43.472874,-0.933169
+Q3330377,musees,Musée du Rouergue,Musée du Rouergue,12,way/152864630,"Jun-Sep: Tu-Su 10:00-12:30,14:00-18:00",,https://musees.aveyron.fr/,44.521142,2.760630
+Q3330466,musees,Musée du Peigne et de la Plasturgie,Musée du Peigne et de la Plasturgie,01,node/1536396604,"Tu-Sa,Su[1] 14:00-18:00, PH off, Jan off",,https://www.oyonnax.fr/mes-loisirs/culture/musee-du-peigne-et-de-la-plasturgie/,46.260779,5.646525
+Q23013070,musees,Musée du Pays Plougastel,Musée du Pays Plougastel,29,way/42604731,"Mo-Fr 10:30-18:30;Sa 10:00-12:30,14:30-18:30;Su 14:30-28:30",,https://www.museepaysplougastel.fr,48.374631,-4.370633
+Q3330561,musees,Musée du Hiéron,Musée du Hiéron,71,way/121382168,"Mar 17-Jan 07 We-Su 10:30-12:30,14:00-18:00; Jul-Aug Mo-Su 10:30-12:30,14:00-18:00",,https://www.musee-hieron.fr/,46.452010,4.123112
+Q3330428,musees,Musée du Dessin et de l'Estampe originale,Musée du Dessin et de l'Estampe originale,59,way/178161634,"We-Mo 14:00-17:30; PH ""Ouvert/open""; Jan 1, May 1, Jul 13, Nov 1, Dec 24, Dec 25, Dec 31 off",,https://musee-estampe.fr/,50.986066,2.123474
+Q781150,musees,Musée du Beaufort,Musée du Beaufort,73,node/3442946797,Mo-Su 08:00-19:00,yes,,45.719579,6.573353
+Q3330321,musees,Musée du 5 juin 1944 - Message Verlaine,Musée du 5 juin 1944 - Message Verlaine,59,node/2268074792,"Su[1,3] 09:00-18:00",,https://www.museedu5juin1944.asso.fr/,50.711945,3.155037
+Q3330667,musees,Musée des métiers et traditions populaires,Musée des métiers et traditions populaires,17,node/8051717125,"May-Oct Tu,We 14:00-18:30; May-Oct Th-Su 10:00-12:00,14:00-18:30",,https://www.musee-clerac.fr/,45.181402,-0.227124
+Q3330251,musees,Musée des instruments à vent,Musée des instruments à vent,27,way/581537349,"We,Sa 09:30-12:30,14:00-18:00; Su 14:00-18:00; May 01,Nov 01 off; Nov 03-Mar 31 off",,https://www.lemiv.fr,48.897542,1.407700
+Q3330161,musees,Musée des arts asiatiques,Musée des arts asiatiques,83,node/2927924893,Tu-Sa 12:00-18:00,,https://toulon.fr/lieu/musee-des-arts-asiatiques,43.107759,5.937044
+Q3330286,musees,Musée des Traditions,Musée des Traditions,40,node/1508590129,"Apr 15-Jun 30 09:30-12:30,14:00-18:00; Sep Mo 09:30-12:30,14:00-18:00; Jul-Aug 09:30-13:00,14:00-18:30",,https://museedestraditions.fr/,44.389166,-1.180955
+Q3330270,musees,Musée des Sapeurs Pompiers de la Loire,Musée des Sapeurs Pompiers de la Loire,42,way/87565760,"We,Sa,Su 14:00-18:00",yes,,45.394590,4.290921
+Q35626382,musees,Musée des Saintes-Maries-de-la-Mer,Musée des Saintes-Maries-de-la-Mer,13,node/11955693674,"Oct 01-May 31 We-Su 10:00-17:00; Jun 01-Sep 30 10:00-18:00; May 01,Jan 01,Dec 25 off",,https://museedessaintesmariesdelamer.fr,43.450308,4.425623
+Q3330263,musees,Musée des Moulins,Musée des Moulins,59,node/5525293583,"Mo-Fr 10:00-12:00,14:00-17:00",,http://asso.nordnet.fr/aramnord/,50.637504,3.145158
+Q3578606,musees,Musée des Mines de Fer d'Aumetz,Musée des Mines de Fer d'Aumetz,57,way/429894268,May 01-Sep 30 14:00-18:00,,https://www.musee-minesdefer-lorraine.com/,49.422254,5.949797
+Q111972939,musees,Musée des Mines d'argent du fournel,Musée des Mines d'argent du fournel,05,node/286048056,Mo-Su 10:00-15:00,,https://www.mines-argent-fournel.com,44.785234,6.553389
+Q16335530,musees,Musée des Mariniers du Rhône et de la Batellerie,Musée des Mariniers du Rhône et de la Batellerie,07,node/3801510568,Oct-May off,yes,,45.313918,4.769960
+Q3330120,musees,Musée des Bujoliers,Musée des Bujoliers,17,way/123605499,Mo-Sa 08:00-20:00,,http://saintonge-merine.fr/musee-des-bujoliers/,45.765893,-0.495520
+Q3273318,musees,Musée des Beaux-Arts Eugène Leroy,Musée des Beaux-Arts Eugène Leroy,59,way/77538767,13:00-18:00; Tu off; PH off,,https://www.muba-tourcoing.fr/,50.723272,3.162011
+Q18907746,musees,Musée des Beaux-Arts,Musée des Beaux-Arts,21,node/371712800,off,,https://www.beaune.fr/rubrique.php3?id_rubrique=171,47.021496,4.839804
+Q3330157,musees,"Musée des Arts Africains, Océaniens, Amérindiens","Musée des Arts Africains, Océaniens, Amérindiens",13,node/4945717658,May 16-Sep 17 Tu-Mo 13:00-19:00;Sep 18-May 15 Tu-Mo 13:00-18:00;Jan 01 off;May 01 off;Nov 01 off;Nov 11 off;Dec 25-26 off,,https://culture.marseille.fr/node/630,43.301009,5.368114
+Q23936829,musees,Musée de préhistoire régionale,Musée de préhistoire régionale,06,way/137783866,"10:00-12:30,14:00-18:00; Tu off; Jan 01,May 01,Nov 01,Dec 25 off",,https://www.menton.fr/Musee-de-Prehistoire-Regionale.html,43.777018,7.503393
+Q3329802,musees,Musée de l’ardoise Michel Paradon,Musée de l’ardoise Michel Paradon,08,node/11542473518,Mo-Fr 14:30-18:30; Sa 10:00-12:00,,https://www.ville-fumay.net/mus%C3%A9edelardoise,49.995172,4.706966
+Q3330081,musees,Musée de la vie paysanne en Haut-Languedoc,Musée de la vie paysanne en Haut-Languedoc,81,node/3739300817,15:00-19:00,,https://museeviepaysanne.jimdofree.com/,43.649061,2.777134
+Q3330069,musees,Musée de la résistance de Bondues,Musée de la résistance de Bondues,59,node/5525557120,"Sep-Jun: 14:00-16:30; Sep-Jun: Sa[1,3] 14:30-18:00; Sep-Jun: Su[1,3] 14:30-18:00; Jul-Aug: 14:00-18:00; Jul-Aug: Sa-Su off; Tu off; PH off",,https://www.ville-bondues.fr/musee/,50.692586,3.087667
+Q3330035,musees,Musée de la mine Marcel Maulini,Musée de la mine Marcel Maulini,70,way/162903903,off,,https://www.mineronchamp.fr/,47.699804,6.633086
+Q27316038,musees,Musée de la mer,Musée de la mer,34,way/135811128,May-Oct 10:00-19:00; Nov-Apr 09:30-18:00,no,,43.393509,3.691762
+Q3330794,musees,Musée de la céramique,Musée de la céramique,50,node/7767523585,Su-Fr 13:00-18:00,,https://musee-ceramique.manche.fr,48.688703,-0.835780
+Q106728650,musees,Musée de la Vie Rurale en Pays Landais,Musée de la Vie Rurale en Pays Landais,40,way/115546378,"Tu,Fr 15:00-18:00",,https://www.facebook.com/museedelavieruraleenpayslandais/,43.853995,-0.994671
+Q3330076,musees,Musée de la Toile de Jouy,Musée de la Toile de Jouy,78,node/13871025610,Mo off;Tu 14:00-18:00;We-Su 11:00-18:00,,https://www.museedelatoiledejouy.fr/,48.769098,2.151850
+Q116529365,musees,Musée de la Résistance et de la Déportation,Musée de la Résistance et de la Déportation,69,way/80389380,closed,no,,45.700048,4.884557
+,musees,Musée de la Rose (ancienne gare de Grisy-Suisnes),Musée de la Rose (ancienne gare de Grisy-Suisnes),77,way/113398762,Su 14:00-18:00,yes,,48.678763,2.666319
+Q3329951,musees,Musée de la Reddition,Musée de la Reddition,51,way/902808357,"Mo-Su 10:00-12:00,14:00-18:00; PH off",,https://musees-reims.fr/fr/musees/musee-de-la-reddition/,49.262238,4.026163
+Q15651003,musees,Musée de la Lunette,Musée de la Lunette,39,node/486032307,"10:00-12:00,14:00-18:00; PH,Tu off",,http://www.musee-lunette.fr/fr,46.520570,6.022652
+Q23057803,musees,Musée de la Gendarmerie nationale,Musée de la Gendarmerie nationale,77,way/112363959,Mo-Su 10:00-17:30; Apr-Sep 10:00-18:00; Tu off; Jan 1 off; May 1 off; Nov 1 off; Dec 25 off,,https://www.gendarmerie.interieur.gouv.fr/musee/,48.545482,2.652977
+Q23639831,musees,Musée de la Cloche et de la Sonnaille,Musée de la Cloche et de la Sonnaille,34,way/425241849,May-Oct: 14:00-19:00,yes,,43.594580,3.112558
+Q3329854,musees,Musée de l'Éphèbe,Musée de l'Éphèbe,34,relation/1131132,"Mo-Sa 10:00-17:30; Su 10:30-17:00; Jun-Sep 10:00-18:30; Jan 01,May 01 off",,https://www.museecapdagde.com,43.286887,3.513813
+Q7075448,musees,Musée de l'OSUG,Musée de l'OSUG,38,node/13655232772,Mo-Fr 09:00-17:00,,https://hallmuseo.osug.fr/,45.192830,5.761116
+Q3329788,musees,Musée de l'Histoire Vivante,Musée de l'Histoire Vivante,93,node/4247776290,We-Fr 14:00-17:00; Sa-Su 14:00-18:00,,https://www.museehistoirevivante.fr/,48.866013,2.471820
+Q60364402,musees,Musée de l'Enclos,Musée de l'Enclos,29,way/582266516,May-Sep Mo-Sa 09:30-19:00; May-Sep Su 14:00-18:00,no,,48.405926,-4.077790
+Q3329778,musees,Musée de l'Annonciade,Musée de l'Annonciade,83,way/179780946,"10:00-13:00,14:00-18:00",,https://www.saint-tropez.fr/culture/musee-de-lannonciade,43.271072,6.637054
+Q3329817,musees,Musée de l'ALAT et de l'hélicoptère,Musée de l'ALAT et de l'hélicoptère,40,node/4722262590,Mar-Nov Mo-Fr 14:00-17:45; Jul-Aug Mo-Sa 14:00-17:45,,https://www.museehelico-alat.com/index.php/le-musee,43.691944,-1.064352
+Q18693244,musees,Musée de Pontarlier,Musée de Pontarlier,25,way/34418085,"Mo-Fr 10:00-12:00,14:00-18:00; Tu off; Sa,Su 14:00-18:00; Jan 01-02 off; May 01 off; Nov 01 off; Dec 25 off",,https://www.ville-pontarlier.fr/page/activites-et-loisirs/activites-culture/musee-municipal/infos-pratique-2,46.904334,6.354773
+Q60385007,musees,Musée d'Archéologie Vieille Paroisse,Musée d'Archéologie Vieille Paroisse,17,way/90803029,We 08:00-18:00,no,,45.935372,-0.967083
+Q3329530,musees,Musée archéologique de Saint-Raphaël,Musée archéologique de Saint-Raphaël,83,way/130473371,Tu-Sa 10:00-18:00,,https://www.ville-saintraphael.fr/cultivee/musees/musee-archeologique,43.426008,6.769249
+Q3329461,musees,Musée archéologique,Musée archéologique,58,node/9967427074,Th-Su 14:00-18:00,yes,,46.986767,3.153841
+Q3329364,musees,Musée Théodore Deck,Musée Théodore Deck,68,way/70325197,"Fr 14:00-18:00; Sa,Su,PH 10:00-12:00,14:00-18:00",,https://www.ville-guebwiller.fr/culture/lieux-culturels/musee-theodore-deck-des-pays-du-florival/,47.905799,7.215416
+Q22924332,musees,Musée Roybet Fould,Musée Roybet Fould,92,way/82241201,Mo-Su 10:30-18:00; Tu off,no,,48.900427,2.271823
+Q23640615,musees,Musée Raymond Poincaré,Musée Raymond Poincaré,55,node/6051104311,"Apr-Nov: Mo-Fr 10:00-12:00,14:00-17:30; Apr-Nov: Tu off; Apr-Nov: Sa-Su 14:00-18:00; Dec-Mar off",,https://musees-meuse.fr/musee-departemental-raymond-poincare-sampigny,48.827556,5.507779
+Q3330762,musees,Musée Provençal des Transports,Musée Provençal des Transports,13,way/130617902,Mar-Sep Su 14:00-18:00; Mar-Sep PH 14:00-18:00; Oct-Feb Su 14:00-17:30; Oct-Feb PH 14:00-17:30,,https://www.cppva.com/,43.470059,5.548095
+Q23719013,musees,Musée Murat,Musée Murat,46,node/8452507789,closed,,https://musees-occitanie.fr/en/musee/musee-murat/,44.646411,1.567387
+Q3329289,musees,Musée Moissan,Musée Moissan,75,node/1426245253,"""Entrée sur Rdv ou durant les journées du patrimoine""",no,,48.843462,2.336266
+Q66095809,musees,Musée Louis de Funès,Musée Louis de Funès,83,node/8003940185,Mo-Su 10:00-19:00,,https://museedefunes.fr/,43.423059,6.769048
+Q30303348,musees,Musée Louis Braille,Musée Louis Braille,77,node/3415691369,We-Su 10:00-18:00,,https://museelouisbraille.com/,48.894503,2.792034
+Q3329234,musees,Musée Lalique,Musée Lalique,67,node/1773559189,Mo-Su 10:00-19:00,,https://www.musee-lalique.com,48.926592,7.362069
+Q3329215,musees,Musée Jean-Frédéric Oberlin,Musée Jean-Frédéric Oberlin,67,way/185188075,"Apr-Sep 10:00-19:00; Apr-Sep Tu ""Tuesdays by reservation""; Oct-Mar Mo,We-Sa 14:00-18:00 || ""mornings by reservation""; Oct-Mar Tu off; PH off",,http://www.musee-oberlin.com,48.414742,7.214651
+Q107675405,musees,Musée Historique de l'amité Franco-Chinoise,Musée Historique de l'amité Franco-Chinoise,45,way/95075327,Mo-Su 10:00-17:00,,https://www.chinemontargis.fr/fr/musee.php,47.997154,2.734717
+,musees,Musée Hansi,Musée Hansi,68,way/48546266,"Mo-Fr 10:00-12:30,13:30-18:00; Sa 10:00-18:00; Su 10:00-12:30,13:30-18:00",yes,,48.078761,7.354804
+Q3329172,musees,Musée Georgette Dupouy,Musée Georgette Dupouy,40,node/5223344876,"Mo-Sa 14:00-18:00; Su,PH 15:00-18:00",,http://ass.gdupouy.free.fr/,43.709544,-1.053023
+Q25340705,musees,Musée Gallo-Romain d'Aoste,Musée Gallo-Romain d'Aoste,38,way/218199816,"Tu-Sa 14:00-17:00; Su,Mo,PH off",yes,,45.587992,5.606461
+Q110806844,musees,Musée Fragonard,Musée Fragonard,06,node/10168917099,"Mo-Su 10:00-13:00,14:00-18:30",,https://www.fragonard.com/fr-int/magasins/-06/grasse-hotel-de-villeneuve-29.htm,43.657912,6.922866
+Q3329276,musees,Musée Dufresne,Musée Dufresne,37,node/2361236906,Apr-Aug 09:30-19:00; Sep-Oct 10:00-18:00,,https://www.musee-dufresne.com/,47.279106,0.394886
+Q3329126,musees,Musée Delta,Musée Delta,91,way/166705994,"Apr-Jul We,Sa 14:00-18:00; Apr-Jul Su 09:00-18:00; We,Sa 14:00-18:00",,https://museedelta.wixsite.com/musee-delta,48.715636,2.371922
+Q105988788,musees,Musée Daubigny,Musée Daubigny,95,node/4805558117,"Sep-Jun: Tu,Th,Fr 14:00-17:30; We 14:00-18:30; Sa,Su 10:30-12:30,14:00-17:30; Jul-Aug: Tu,Th,Fr,Sa,Su 10:30-12:30,14:00-17:30, We 10:30-12:30, 14:00-18:30; Dec 25 off; Jan 1 off",,https://museedaubigny.com/,49.071331,2.171417
+Q427665,musees,Musée Charles de Bruyères,Musée Charles de Bruyères,88,node/5390940587,Tu off; Oct off; Dec 25 off; Jan 01 off; May 01 off,,https://www.remiremont.fr/culture/musees-de-remiremont/musee-charles-de-bruyeres/,48.016121,6.593241
+Q3329108,musees,Musée Charles Friry,Musée Charles Friry,88,node/2582715284,Tu off; Oct off; Dec 25 off; Jan 01 off; May 01 off,,https://www.remiremont.fr/culture/musees-de-remiremont/musee-charles-friry/,48.015107,6.589779
+Q60832377,musees,Musée Aristide Maillol,Musée Aristide Maillol,66,node/13334138801,"May-Sep Mo-Fr 10:00-12:00,14:00-18:00; Oct-Apr Mo-Fr 10:00-12:00,14:00-17:00",,https://museemaillol.com/musee-maillol-de-banuyls-sur-mer/,42.461886,3.106721
+Q2854179,musees,Musée Antoine Lécuyer,Musée Antoine Lécuyer,02,node/447567433,"Su, Tu, Th-Fr 14:00-18:00; We, Sa 10:30-12:30, 14:00-18:00",,https://www.saint-quentin.fr/109-musee-lecuyer.htm,49.849936,3.284959
+Q31157401,musees,Musée Alpin,Musée Alpin,74,way/97313427,"closed ""pour travaux jusqu'au 2e trimestre 2026""",,https://musee-alpin-chamonix.fr,45.924022,6.871348
+Q23006259,musees,Musée Alice Taverne,Musée Alice Taverne,42,node/3667424925,"Feb-Nov: Mo-Su,PH 10:00-12:00,14:00-18:00",,https://museealicetaverne.fr/,46.105491,3.895856
+Q3330026,musees,Mus'Énergie,Mus'Énergie,63,way/82519204,"Mo-Fr,Su 10:00-12:30,14:00-18:30",,https://www.mus-energie.fr/,45.544517,3.736797
+Q2397999,musees,Montagne des Singes,Montagne des Singes,67,way/238039757,"Mar 23-Apr 30, Sep 10:00-17:30; May 1-Aug 31 10:00-18:00; Oct 10:00-17:00",yes,,48.263858,7.376953
+Q17327772,monuments,Mini World Lyon,Mini World Lyon,69,node/4417200595,We-Fr 11:00-18:00; Sa-Su 10:00-19:00,,https://miniworldlyon.com,45.764788,4.923236
+Q1898465,musees,Marineland (closed),Marineland (closed),06,way/24014232,closed,,https://www.marineland.fr/,43.615378,7.125459
+Q22942683,chateaux,Manoir de Beaupré,Manoir de Beaupré,37,way/69785588,"13:00-19:00; Jul 1-31, Aug 1-14",,https://www.mairie-veigne.com/decouvrir-veigne/visites-balades-a-veigne/manoir-de-beaupre,47.287518,0.686362
+Q26257792,musees,Maison du Patrimoine,Maison du Patrimoine,38,way/54051565,"Dec 25 - Mar 30 Mo-Sa 15:00-18:00; Jul-Aug Mo-Sa 15:00-18:00; Jul-Aug Su 10:00-12:00, 15:00-18:00; Apr 1 - Jun 30 We-Su 15:00-18:00; Sep 1 - Dec 24 We-Su 15:00-18:00; Tu off",no,,45.070779,5.551372
+Q136130430,musees,Maison du Pain,Maison du Pain,95,node/2893591172,"Mo,Tu,Th,Fr 09:00-12:00, 14:00-16:00; ""Sur rendez-vous""; Aug: Off",,https://commeny95.fr/maison-du-pain,49.126440,1.891542
+Q2348375,musees,Maison des Jardies,Maison des Jardies,92,way/146288184,Th-Su 14:00-18:30; Jan 15-Sep 01 off,yes,,48.827128,2.198735
+Q2744339,musees,Maison de la Culture du Japon,Maison de la Culture du Japon,75,way/151074455,Tu-Sa 11:00-19:00; PH off,,https://www.mcjp.fr/,48.854730,2.289764
+Q3279675,musees,Maison de la Baie du Marais Poitevin,Maison de la Baie du Marais Poitevin,17,way/81375628,Mo-Su 14:00-18:00,yes,,46.249221,-1.109924
+Q109037402,musees,Maison de la Baie de Somme et de l'Oiseau,Maison de la Baie de Somme et de l'Oiseau,80,relation/3914231,"Apr-Sep 10:00-18:30; Oct 01-Nov 13 10:00-17:30; Nov 14-Dec 18 Sa,Su 10:00-17:30; Dec 19-31 10:00-17:30",,https://www.baiedesomme.fr/lieu/1-16-0-maison-de-la-baie-de-somme,50.197969,1.552431
+Q22923740,musees,Maison de Fer,Maison de Fer,78,way/847280223,"We,Sa,Su 13:00-18:00",yes,,48.926341,2.032216
+Q3279049,musees,Maison Vauban,Maison Vauban,89,node/4078472670,"""De 10h à 13h et de 14h à 18h :
+
+– Du 4 avril au 11 novembre 2026, du jeudi au dimanche et jours fériés
+
+– Du 14 juillet au 23 août 2026, du mercredi au dimanche et jours fériés""",yes,,47.385257,4.046143
+Q16303828,musees,Maison Ravier,Maison Ravier,38,node/3656691933,We-Su 14:00-18:00; May 01 off,,https://www.maisonravier.fr/,45.675273,5.470202
+Q2415168,musees,Maison Jules Verne,Maison Jules Verne,80,way/140370514,"We-Mo 10:30-12:00, 14:00-18:00",yes,,49.887732,2.301773
+Q22966352,chateaux,Mairie de Trie-Château,Mairie de Trie-Château,60,way/271421854,"Mo 08:30-12:00,13:30-17:30; Tu 08:30-12:00; We 08:30-12:00,13:30-17:30; Th 08:30-12:00; Fr 08:30-12:00,13:30-17:30; Sa 08:30-12:00",,http://www.trie-chateau.fr,49.285090,1.821762
+Q22938852,chateaux,Mairie de Tournefeuille,Mairie de Tournefeuille,31,way/74787690,Mo-Fr 08:30-17:30,,https://www.mairie-tournefeuille.fr/,43.582849,1.346603
+Q22954644,chateaux,Mairie de Sireuil,Mairie de Sireuil,16,way/129552267,"Mo-We 08:30-12:00,14:00-17:30; Th 08:30-12:00; Fr 08:30-12:00,14:00-17:30",,https://www.ville-sireuil.fr/,45.615232,0.008967
+Q22920278,chateaux,Mairie de Pujols,Mairie de Pujols,33,way/176803882,"Mo 09:00-12:30; Tu 09:00-12:30,13:00-16:30; Fr 09:00-12:30,13:00-16:30; We-Th 08:00-12:30",,http://www.communepujols33.fr,44.808359,-0.031261
+Q22992348,chateaux,Mairie de Pont-du-Château,Mairie de Pont-du-Château,63,way/770438827,"Mo-Th 08:30-12:00,13:30-17:00; Fr 08:30-12:00,13:30-16:30",,https://www.pontduchateau.fr/,45.796983,3.248496
+Q22954201,chateaux,Mairie de Montferrier-sur-Lez,Mairie de Montferrier-sur-Lez,34,way/99851762,"Mo-Fr 08:30-12:00,13:30-18:00",,https://ville-montferrier-sur-lez.fr/,43.666736,3.861187
+Q2968946,chateaux,Mairie de Château-Arnoux-Saint-Auban,Mairie de Château-Arnoux-Saint-Auban,04,way/112537022,"Mo-Fr 08:30-12:00,13:30-17:00",,https://www.chateau-arnoux-saint-auban.fr,44.093378,6.009034
+Q119339302,chateaux,Mairie de Château de Villiers en Plaine,Mairie de Château de Villiers en Plaine,79,way/40811249,Mo-Fr 14:00-18:00,,https://www.villiersenplaine.fr/,46.406549,-0.538925
+Q3373053,chateaux,Mairie de Charenton-le-Pont,Mairie de Charenton-le-Pont,94,way/149276228,Mo-Fr 08:30-17:15,,http://www.charentonlepont.fr,48.819718,2.416127
+Q119296825,monuments,Mairie d'Éguilles,Mairie d'Éguilles,13,way/53383787,"Mo-Fr 08:30-12:30,13:30-17:30",,https://www.mairie-eguilles.fr/fr/,43.568613,5.354207
+Q22963472,monuments,Mairie d'Alençon,Mairie d'Alençon,61,way/124791696,"Mo-Fr 08:30-12:00,13:30-17:30",,https://www.alencon.fr/,48.430149,0.082061
+Q3258029,chateaux,Logis du Maine-Giraud,Logis du Maine-Giraud,16,node/5509042675,"Mo-Sa 09:00-12:00,14:00-18:00",,https://www.mainegiraud.com/,45.496927,0.029202
+Q112929404,chateaux,Les Jardins d'Hugo,Les Jardins d'Hugo,10,way/83067592,Mo-Su 00:00-24:00,,https://www.korian.fr/maisons-retraite/grand-est/aube-10/la-riviere-de-corps-10440/ehpad-korian-jardins-d-hugo,48.284620,4.028066
+,musees,Les Forges des Salles,Les Forges des Salles,56,node/2339663958,"May,Jun,Sep: Sa, Su 14:00-18:30; Jul,Aug: Mo-Su14:00-18:30",,https://www.lesforgesdessalles.fr,48.199538,-3.126597
+Q86724818,monuments,Les Buissonnets,Les Buissonnets,14,way/130316835,"Mo-Sa 10:00-12:30, 13:30-18:00; Su 13:30-18:00",,https://www.therese-de-lisieux.catholique.fr/decouvrir-le-sanctuaire/les-buissonnets/,49.150979,0.229267
+,musees,"Lens' 14-18, Centre d'Histoire Guerre et Paix","Lens' 14-18, Centre d'Histoire Guerre et Paix",62,way/765196596,10:00-18:00,,https://memorial1418.com/fr/centre-dinterpretation/,50.401443,2.739541
+Q104828829,musees,"Le Toueur V, Centre d'Interprétation Touristique et Culturel","Le Toueur V, Centre d'Interprétation Touristique et Culturel",58,node/2185851788,Tu-Sa 14:00-17:00,,https://www1.musee-maritime-rouen.asso.fr/,46.838636,3.449332
+Q15918460,monuments,Le Petit Bouillon Pharamond,Le Petit Bouillon Pharamond,75,node/681283199,Mo-Su 12:00-24:00,,https://www.petitbouillonpharamond.com/,48.863006,2.348511
+Q3329885,musees,Le Musée de la Chalosse,Le Musée de la Chalosse,40,way/102618114,"Mar-Oct Tu-Su 10:00-18:00; Nov-Feb Mo-Fr; Nov-Feb Sa,Su off ""Sur Rendez-Vous""",,https://www.museedelachalosse.fr,43.715700,-0.833641
+Q3329704,musees,Le Musée de Cerdagne,Le Musée de Cerdagne,66,node/1874518307,"Jul-Aug 10:00-13:30,14:30-18:30; Sep 10:00-12:30,14:00-17:30; Oct Tu-Sa 14:00-17:00; Nov-Mar Mo-Fr 14:00-17:00; Apr-Jun Mo-Sa 10:00-12:30,14:00-17:30",,http://www.museedecerdagne.com/,42.436436,2.002985
+Q3330630,musees,La maison de Marie-Jeanne,La maison de Marie-Jeanne,02,node/5794423640,We-Su 14:00-18:00; Apr 10-15 off; Jun 08:00-14:00; Dec 25-Jan 1 off,,https://la-maison-de-marie-jeanne.fr/,49.766263,3.375155
+Q1583780,monuments,La Samaritaine,La Samaritaine,75,relation/3075632,Mo-Su 10:00-20:00,,https://www.dfs.com/,48.859267,2.342435
+Q111972971,musees,La Maison du Soleil,La Maison du Soleil,05,way/699022003,"Mo-Fr 10:00-12:00,13:30-17:30",,https://www.saintveran-maisondusoleil.com/,44.702195,6.866681
+Q3330454,musees,La Maison du Pain d'épices,La Maison du Pain d'épices,67,way/86046667,"Mo-Fr 08:00-12:00,13:30-18:30; Sa 08:00-12:00,13:30-18:00; Su 09:30-12:00,14:00-18:00",yes,,48.411269,7.467932
+Q16303822,musees,La Maison du Charolais,La Maison du Charolais,71,way/144260442,Mar 01-Oct 31 10:00-18:00; Nov 02-Feb 28 11:00-17:00; Nov 01 off; Dec 24-Jan 01 off,,https://www.maison-charolais.com/espace-museographique.html,46.440492,4.298230
+Q123261626,musees,La Maison de Barberine,La Maison de Barberine,74,way/63749619,Jul-Aug: 14:00-17:00,,https://maisonbarberine.over-blog.com/,46.050251,6.942191
+Q106713648,musees,La Filaventure,La Filaventure,84,node/7066635580,"Mo-Sa 10:00-12:30, 14:30-19:00; Su 12:00-19:00",,https://www.lafilaventure.com/,43.918599,5.047979
+Q60341500,musees,La Chapelle des Pénitents,La Chapelle des Pénitents,15,way/197942082,Mo-Su 15:00-19:00,no,,44.853006,3.003373
+Q2940800,monuments,La Casamaures,La Casamaures,38,way/66917347,Jan-Dec Sa[1] 14:00-17:00,,https://casamaures.org/,45.200588,5.717197
+Q3080032,musees,La Bâtisse,La Bâtisse,89,node/4435437090,"Tu-Sa 10:00-12:00,14:00-18:00; Jun-Aug Su 15:00-18:00; Nov-Feb Su 10:00-12:00,14:00-17:00; Mo off; Jan off; Dec 25 off",,http://poterie-batisse.com/,47.616101,3.178373
+Q3206723,monuments,La Boisserie,La Boisserie,52,way/64831255,"We-Mo 10:00-12:30,14:00-17:30",,http://www.charles-de-gaulle.org/les-lieux-gaulliens/la-boisserie/,48.218733,4.883209
+Q3200331,musees,Kulmino,Kulmino,85,way/704601663,"week 15-44 Mo-Tu off, We-Su 14:00-18:00; week 27-37 Mo-Fr 10:00-19:00, Sa-Su 14:00-19:00; PH Mo 14:00-18:00",yes,,46.838843,-2.099817
+Q120926616,jardins,Jardin des Grottes,Jardin des Grottes,59,way/1448684351,24/7,no,,50.170209,3.241036
+Q3162529,musees,Jardin de sculpture romane de Lozay,Jardin de sculpture romane de Lozay,17,node/4075042781,Mo-Su 09:00-19:00,no,,46.025275,-0.541980
+Q3090513,musees,Jardin d'Acclimatation,Jardin d'Acclimatation,92,way/13792377,Apr-Sep: 10:00-19:00; Oct-Mar: 10:00-18:00,,https://www.jardindacclimatation.fr/,48.878145,2.264684
+Q105710427,jardins,Jardin collectif « Jard’in Noues »,Jardin collectif « Jard’in Noues »,44,node/4461934618,Sa 11:00-12:00,,http://jardinnoues.free.fr/,47.192191,-1.544487
+Q22980309,musees,Institut Giacometti,Institut Giacometti,75,relation/1213090,Tu-Su 10:00-18:00; Mo off; Dec 25 off; May 1 off; Jan 1 off,,https://www.fondation-giacometti.fr,48.836201,2.331071
+,megalithes,Iliz Coz,Iliz Coz,29,node/2396638536,Jun 15-Sep 15 14:30-18:00,yes,,48.628357,-4.522330
+Q119307809,chateaux,Hôtel de ville de Crépy-en-Valois,Hôtel de ville de Crépy-en-Valois,60,way/92233344,"Mo-Th 08:30-12:00,13:30-17:30; Fr 08:30-12:00,13:30-17:00; Sa 09:00-12:00",,http://www.crepyenvalois.fr,49.236167,2.890147
+Q119302277,chateaux,Hôtel de Ville de Blanquefort,Hôtel de Ville de Blanquefort,33,way/119248474,"Mo 13:30-18:00; Tu-Fr 08:30-12:30,13:30-18:00; Sa 09:00-12:00",,https://www.ville-blanquefort.fr/,44.908666,-0.629510
+Q26257857,chateaux,Hôtel de Ville,Hôtel de Ville,57,node/10121384349,"Mo-Th 08:00-12:00,13:30-17:30; Fr 08:00-12:00,13:30-16:30",,https://www.mairie-forbach.fr/,49.186530,6.895431
+Q3145837,musees,Hôtel Fontfreyde Centre Photographique,Hôtel Fontfreyde Centre Photographique,63,way/67518704,Tu-Sa 14:00-19:00,no,,45.778896,3.083270
+Q3145455,musees,Hôtel Coignard,Hôtel Coignard,94,way/120421846,Tu-Su 15:00-19:00,no,,48.837785,2.488792
+Q3138340,musees,Historial du Saint-Curé d'Ars,Historial du Saint-Curé d'Ars,01,way/143835284,"Mo-Sa 10:00-12:30,14:00-18:00; PH,Su 14:00-18:00",yes,,45.992269,4.824369
+Q3117279,musees,Grottes du Mont Cornadore,Grottes du Mont Cornadore,63,node/4823754250,Mo-Su 10:00-18:00,,https://www.grottes-du-cornadore.fr/,45.587960,2.990737
+Q94441548,grottes,Grotte du Saint-Sépulcre,Grotte du Saint-Sépulcre,46,node/5443951102,24/7,no,,44.800472,1.616713
+Q48756067,grottes,Grotte de Labeil,Grotte de Labeil,34,node/1731253366,Mar-Oct 10:00-19:00; Nov-Feb 11:00-17:00,,http://www.grotte-de-labeil.com,43.805460,3.268741
+Q1543065,monuments,Grange aux Dîmes,Grange aux Dîmes,77,way/113126456,"Mar 29-Aug 31 10:00-18:00; Sep 01-Nov 02 Mo-Fr 14:00-18:00; Sep 01-Nov 02 Sa,Su 10:00-18:00; Jan 02-Mar 28,Nov 03-Dec 31 Sa,Su 14:00-17:00",,https://provins.net/decouvrir-visiter/la-cite-medievale-de-provins/monuments-et-pass-provins/la-grange-aux-dimes/,48.562686,3.286727
+,musees,Frac Grand Large — Hauts-de-France,Frac Grand Large — Hauts-de-France,59,way/239167315,"We-Fr 14:00-18:00; Sa,Su 11:00-19:00; Mo,Tu off",yes,,51.048046,2.375823
+Q3077762,chateaux,Fort Pélissier,Fort Pélissier,54,way/620129963,Mo-Fr 09:00-17:00,,https://fort-pelissier.com/,48.597408,6.090624
+Q3075583,musees,Fondation Vasarely,Fondation Vasarely,13,relation/3934665,Mo-Su 10:00-18:00,,http://www.fondationvasarely.fr,43.521394,5.424864
+Q22932009,musees,Ferme à toit de chaume dite Ferme Perrel,Ferme à toit de chaume dite Ferme Perrel,43,node/1803211150,"Mo-Su 10:00-11:00,14:00-15:00,16:00-17:00",yes,,44.955734,4.101686
+Q3058132,musees,Espace Georges Brassens,Espace Georges Brassens,34,way/135811740,Mo-Su 10:00-18:00,yes,,43.405939,3.664824
+Q30140515,monuments,Espace EDF Bazacle,Espace EDF Bazacle,31,node/5955826168,"Jan-Apr, Nov-Dec Tu-Su 11:00-18:00; May-Oct Tu-Su 11:00-19:00",,http://bazacle.edf.com/,43.604175,1.431971
+,musees,Espace EDF Bazacle,Espace EDF Bazacle,31,relation/8776305,"Jan-Apr, Nov-Dec Tu-Su 11:00-18:00; May-Oct Tu-Su 11:00-19:00",,http://bazacle.edf.com/,43.603165,1.432001
+Q112929882,chateaux,Ehpad Korian,Ehpad Korian,91,way/145982762,Mo-Su 00:00-24:00,,https://www.korian.fr/maisons-retraite/ile-de-france/essonne-91/longpont-sur-orge-91310/ehpad-korian-chateau-de-lormoy,48.636511,2.290560
+Q28398844,musees,Ecomusée du Véron,Ecomusée du Véron,37,way/207799176,"10:00-12:30, 14:00-18:00",,https://www.ecomusee-veron.fr/,47.209435,0.124400
+Q16629194,monuments,Distillerie Pierre Guy,Distillerie Pierre Guy,25,way/33909742,"Tu-Fr 08:30-11:30,14:00-17:30; Sa 08:30-11:30; week 01,42 off",,https://www.pontarlier-anis.com,46.906080,6.364415
+Q2344875,monuments,D51 : Plateau Astronomique de La Couronne (PALC),D51 : Plateau Astronomique de La Couronne (PALC),81,node/12471082507,"""by appointment""",,https://sna.international,44.082879,1.948435
+Q26257919,chateaux,Communauté d'Agglomération Sarreguemines Confluences,Communauté d'Agglomération Sarreguemines Confluences,57,way/86920446,"Mo-Th 08:15-12:00,13:30-17:00; Fr 08:15-12:00,13:30-16:30; PH off",,https://www.agglo-sarreguemines.fr/,49.118093,7.081958
+Q2985944,chateaux,Commanderie des Templiers de La Villedieu,Commanderie des Templiers de La Villedieu,78,way/28565367,"09:00-12:00, 14:00-17:00",,https://lacommanderie.sqy.fr/,48.765002,1.965136
+Q2782334,monuments,Colonne de la Grande Armée,Colonne de la Grande Armée,62,way/123297767,"Oct 01-Jun 14 Fr-Su 10:00-12:00, 14:00-16:00; Jun 15-Sep 30 We-Su 10:00-12:30, 14:30-18:30; Jan 01 off; May 01 off; Nov 01 off; Dec 25 off; Nov 08-Dec 18 off",yes,,50.741261,1.617444
+Q960165,monuments,Collège des Bernardins,Collège des Bernardins,75,way/26584053,Mo-Sa 10:00-18:00; Su 14:00-18:00,,https://www.collegedesbernardins.fr/,48.848829,2.352034
+Q109018531,musees,Cité des Climats et vins de Bourgogne,Cité des Climats et vins de Bourgogne,21,node/10691048870,"Jun-Sep Mo-Su 10:00-18:00; Mar-May,Oct-Nov Tu-Su 10:00-18:00; Dec-Feb We-Su 10:00-18:00; Jan week 03-04 off",,https://www.citeclimatsvins-bourgogne.com/la-cite-a-beaune/,47.009521,4.848187
+Q567074,monuments,Cimetière militaire allemand de La Cambe,Cimetière militaire allemand de La Cambe,14,relation/13120965,sunrise-sunset,,https://www.volksbund.de/kriegsgraeberstaette/la-cambe.html,49.341778,-1.026669
+Q311,monuments,Cimetière du Père-Lachaise,Cimetière du Père-Lachaise,75,way/13859706,Mo-Fr 08:00-17:30; Sa 08:30-17:30; Su 09:00-17:30,,https://www.paris.fr/equipements/cimetiere-du-pere-lachaise-4080,48.861144,2.394185
+Q2969668,chateaux,Château-Mairie de Launaguet,Château-Mairie de Launaguet,31,way/72262869,"Mo-Th 08:30-12:00,13:30-17:30; Fr 08:30-12:00,13:30-16:00; Sa 09:30-12:15",,http://www.mairie-launaguet.fr,43.674026,1.458035
+Q2971798,musees,Château du Prieuré - Musée de la Batellerie,Château du Prieuré - Musée de la Batellerie,78,way/77980890,"Mo-Fr 09:00-12:00,13:00-18:00; Sa,Su 14:00-17:00",,https://www.mairie-conflans-sainte-honorine.fr/,48.992494,2.095909
+Q22940540,chateaux,Château de la Chapelle d'Angillon,Château de la Chapelle d'Angillon,18,way/43088015,"Mo-Sa 09:00-12:00,14:00-18:00; Su 14:00-18:00",,https://www.chateau-angillon.fr/,47.360921,2.435406
+Q2971111,chateaux,Château de l'Islette,Château de l'Islette,37,way/317804783,May-Sep 10:00-19:00,,https://www.chateaudelislette.fr/,47.267521,0.434275
+Q2971013,chateaux,Château de Villeneuve,Château de Villeneuve,06,way/129667034,"Tu-Su 10:00-12:30, 14:00-18:00",,http://www.museedevence.com/,43.722929,7.112623
+Q2970878,chateaux,Château de Valseille,Château de Valseille,84,way/76244085,"Mo-Fr 08:30-12:00,13:30-17:00; Sa 09:00-12:00",,https://www.courthezon.fr/,44.090384,4.883072
+Q15944310,chateaux,Château de Sommières,Château de Sommières,30,way/541081004,"Jun,Sep Mo-Fr 10:00-13:00,14:00-17:00; Jul-Aug Mo-Fr 10:00-13:00,15:00-19:00; Jul-Aug Tu off; Jul-Aug Sa,Su 15:00-19:00",,http://chateau-sommieres.fr,43.782560,4.091984
+Q2970560,chateaux,Château de Saint-Mesmin,Château de Saint-Mesmin,79,relation/18408477,Mo-Su 14:30-18:30,,https://www.chateau-saintmesmin.com/,46.799731,-0.717851
+Q2968493,chateaux,Château de Saint-Jean de Beauregard,Château de Saint-Jean de Beauregard,91,way/310017684,Mar 15-Nov 15: Su 14:00-18:00,,https://www.chateaudesaintjeandebeauregard.com/,48.661316,2.163680
+Q2969869,chateaux,Château de Merville,Château de Merville,31,way/480861422,Mo-Su 10:00-17:00,,http://www.chateau-merville.com/,43.719124,1.300784
+Q2969365,chateaux,Château de Grouchy,Château de Grouchy,95,way/101168198,"Mo-We 09:00-12:00,13:30-17:00; Th 13:30-17:00; Fr 09:00-12:00,13:30-17:00",,https://osny.fr/,49.066197,2.061524
+Q19406874,chateaux,Château de Fourques,Château de Fourques,34,way/322512909,"Mo-Sa 10:00-12:00,15:00-19:00",,https://www.chateaudefourques.com/,43.601085,3.805869
+Q2969174,chateaux,Château de Désaignes,Château de Désaignes,07,way/396793983,Mar-Jun Sa-Su 14:00-18:00;Jul-Aug Tu-Su 14:00-18:00;Sep-Oct Sa-Su 14:00-18:00;Nov-Apr off,,https://chateaudesaignes.org/,44.994426,4.516870
+Q119319128,chateaux,Château de Chaillot,Château de Chaillot,77,way/273697292,Mo-Fr 08:45-12:00; Sa 10:00-12:00,,https://moncourt-fromonville.fr/fr/,48.299997,2.697608
+Q19980621,chateaux,Château de Blancafort,Château de Blancafort,18,way/356106124,"May-Jun Mo,We-Su 10:00-12:00,14:00-18:30; May-Jun Mo,We-Su 10:00-19:00",,https://chateau-blancafort.com/,47.531745,2.534117
+Q22939001,chateaux,Château de Bassoues,Château de Bassoues,32,node/13922473298,"13:30-18h low season, 10-19hr Jul-Aug, [Closed X1-II] in 2011",,https://chateaubassoues.com/,43.579359,0.247821
+Q79501011,chateaux,Château Comtal,Château Comtal,11,way/1416120409,Mo-Su 09:30-18:30,,https://monuments-nationaux.fr/,43.207189,2.363195
+Q2969083,chateaux,Château Chanorier,Château Chanorier,78,way/150246001,Tu-Su 10:00-18:00,,https://www.croissy.com/culture-sport-et-loisirs/chanorier.html,48.877877,2.152042
+Q195052,monuments,Chapelle des Cordeliers,Chapelle des Cordeliers,57,way/44639066,"Jan-Mar, Nov-Dec: Mo, We-Su, SH 14:00-17:00; Tu off; Apr-Oct: Mo, We-Sa 10:00-18:00; Su, SH 14:00-18:00; Tu off",,http://www.ville-sarrebourg.fr/Chapelle-des-Cordeliers,48.735276,7.053187
+Q59638100,musees,Chapelle Bellini,Chapelle Bellini,06,way/65074083,Mo-Fr 14:00-17:00,,https://museechapellebellini.com/,43.560392,7.032374
+Q65153095,chateaux,Centre international d'art contemporain,Centre international d'art contemporain,06,way/141550678,"Jul-Aug: Tu-Su 10:00-12:30, 14:30-18:30; Sep-Jun: Tu-Su 10:00-12:30, 14:00-17:30",,https://www.ciac-carros.fr/,43.792588,7.187040
+Q19950918,musees,Centre de Création Contemporaine Olivier Debré,Centre de Création Contemporaine Olivier Debré,37,way/383108810,We-Su 10:00-18:00,,http://www.cccod.fr,47.395664,0.685248
+Q20669745,musees,Centre Minier de Faymoreau,Centre Minier de Faymoreau,85,way/620726971,Mo-Sa 10:00-13:00; Mo-Sa 14:00-19:00,,https://centreminier-vendee.fr/,46.555093,-0.631127
+Q125685096,musees,Caves de Chartreuse,Caves de Chartreuse,38,way/363997991,10:00-18:00,yes,,45.361833,5.598000
+,musees,Caves Roquefort Société,Caves Roquefort Société,12,node/2242124020,Mo-Su 09:30-17:30,,http://www.visite-roquefort-societe.com,43.974598,2.992712
+Q21511922,musees,Casa Xanxo CIAP,Casa Xanxo CIAP,66,way/81693188,Oct-May Tu-Su 11:00-17:30; Jun-Sep Mo-Su 10:30-18:30,,https://www.perpignantourisme.com/activite/casa-xanxo-ciap-centre-d-interpretation-de-l-architecture-et-du-patrimoine/,42.698937,2.897026
+Q2936946,musees,Cap'Découverte,Cap'Découverte,81,way/382867419,Mo-Su 10:00-20:00,,https://www.capdecouverte.com/,44.017992,2.141572
+Q3079574,musees,CMCF Oignies,CMCF Oignies,62,way/240781259,"Apr-Oct Su[2] 14:00-18:00; Aug Su[-1] -1 day,Su[-1] 10:00-18:00",,https://www.cmcf-oignies.fr/,50.472454,2.996551
+Q22921405,monuments,Brasserie Bofinger,Brasserie Bofinger,75,node/968153548,"Mo-Sa 12:00-15:00, 18:30-00:00; Su 12:00-15:00, 18:30-23:00",,https://www.bofingerparis.com/,48.853910,2.368043
+Q3329099,musees,Boucher de Perthes,Boucher de Perthes,80,node/638296084,"Mo,We-Su 14:00-18:00",,https://www.abbeville.fr/loisirs/musee-boucher-de-perthes.html,50.107174,1.833389
+Q3364778,musees,Bioparc - Zoo de Doué La Fontaine,Bioparc - Zoo de Doué La Fontaine,49,way/165088239,"Feb,Mar 10:00-18:00; Apr-Jun 09:00-19:00; Jul-Aug 09:00-19:30; Sep 09:00-19:00",,https://www.bioparc-zoo.fr/,47.188618,-0.297553
+Q60377376,monuments,Bibliothèque municipale,Bibliothèque municipale,12,way/80618754,"Tu 15:00-18:30; We 10:00-12:00,14:30-18:30; Th 10:00-12:00,15:00-18:30; Fr 14:30-18:30; Sa 10:00-16:30",,http://vdr.opac3d.fr,44.350727,2.038909
+Q15154172,musees,Batterie de Peyras,Batterie de Peyras,83,node/12289637901,24/7,,https://www.la-seyne.fr/decouvrir-la-ville/patrimoine/militaire/batterie-de-peyras/,43.063060,5.860944
+Q3363781,musees,Bagatelle,Bagatelle,62,way/41840415,Sa 11:00-21:30; Su 11:00-18:00,,https://www.parcbagatelle.com/,50.429505,1.603301
+,musees,Auditoire de Joinville,Auditoire de Joinville,52,way/672308999,"May-Sep Mo-Sa 15:00-17:00, Jul-Aug PH,Sa,Su 15:00-17:00",yes,,48.442776,5.137538
+Q60058273,musees,Atelier Brancusi,Atelier Brancusi,75,way/55503399,"Mo,We,Th,Fr,Sa,Su 14:00-18:00",yes,,48.861403,2.351990
+Q16303874,musees,Art Ludique - Le Musée,Art Ludique - Le Musée,75,node/2486352415,"Mo-Th 11:00-19:00; Fr 11:00-22:00; Sa,Su 10:00-20:00",,http://www.artludique.com,48.840518,2.370328
+Q131369409,monuments,Ancien camp de prisonniers de Buglose,Ancien camp de prisonniers de Buglose,40,way/337430839,"""Sur demande""",no,,43.801963,-1.001444
+Q3486031,musees,Accueil du château de Termes,Accueil du château de Termes,11,way/188151245,Mo-Su 10:00-18:00,,https://chateau-termes.com,43.000262,2.561354
+Q76125450,monuments,Église Saint-André,Église Saint-André,74,way/367224092,24/7,,,45.932581,5.891905
+Q18328132,monuments,Église Notre-Dame d'Ay,Église Notre-Dame d'Ay,07,way/58604922,Mo-Fr 08:30-20:00,,,45.160397,4.665104
+Q13517713,musees,Écomusée du Pays de la Cerise,Écomusée du Pays de la Cerise,70,way/192995465,,yes,https://ecomusee-fougerolles.fr/,47.906428,6.402203
+Q23498481,musees,Écomusée de Saint-Dégan,Écomusée de Saint-Dégan,56,node/449218730,,yes,https://www.ecomusee-st-degan.fr/,47.709047,-2.993743
+Q3578613,musees,Écomusée Daviaud du Marais vendéen,Écomusée Daviaud du Marais vendéen,85,way/65007878,,yes,https://www.ledaviaud.fr/,46.874324,-2.102668
+Q3578598,musees,Écomusée,Écomusée,44,way/120513260,,yes,https://www.saint-nazaire-tourisme.com/les-visites/les-sites-de-visite/ecomusee/,47.274161,-2.198580
+Q108293337,musees,institut culturel du judaïsme,institut culturel du judaïsme,69,node/9039823524,,no,https://www.icj-lyon.org/,45.751812,4.851126
+Q3576057,musees,Zooparc de Trégomeur,Zooparc de Trégomeur,22,way/233662241,10:00-19:00,,,48.584213,-2.882066
+Q3576031,musees,Zoo de la Bourbansais,Zoo de la Bourbansais,35,way/384680317,,yes,https://www.labourbansais.com/,48.401363,-1.900330
+Q220123,musees,Zoo d'Amnéville,Zoo d'Amnéville,57,way/207502381,,yes,http://www.zoo-amneville.com,49.246033,6.140095
+Q1721757,musees,Walygator Grand Est,Walygator Grand Est,57,way/74760997,,yes,https://www.walygatorparc.com/grandest/,49.228034,6.156512
+Q108331675,musees,Villa du Temps retrouvé,Villa du Temps retrouvé,14,node/10050978317,,yes,https://villadutempsretrouve.com/,49.291870,-0.112760
+Q3558616,musees,Villa Kérylos,Villa Kérylos,06,relation/3681896,,yes,https://www.villakerylos.fr,43.703305,7.333873
+Q3558548,monuments,Villa Gabrielle,Villa Gabrielle,59,node/7856832107,"Mo-Fr 09:00-12:00,13:30-17:30; Sa 09:00-12:00",,,50.626655,3.152687
+Q13415118,musees,Villa Carmignac,Villa Carmignac,83,node/6024697186,,yes,https://www.fondationcarmignac.com,42.999409,6.211957
+Q18507238,musees,Vieille Église Saint-Vincent,Vieille Église Saint-Vincent,33,way/164301449,Th-Su 14:00-19:00,,,44.840438,-0.647580
+Q22964802,monuments,Vieille porte,Vieille porte,21,way/119334424,24/7,,,47.669905,5.024425
+Q3075754,monuments,Vestiges de l'ancienne fonderie,Vestiges de l'ancienne fonderie,07,way/376764357,,no,https://www.patrimoine-ardeche.com/visites/la_voulte_n.htm,44.801810,4.777766
+Q3535513,musees,Tours Broërec'h,Tours Broërec'h,56,way/71249364,"10:30-12:30, 13:30-18:30",,,47.805707,-3.278536
+Q3535500,musees,Touroparc Zoo,Touroparc Zoo,71,relation/15981538,,yes,https://www.touroparc.com/,46.181165,4.751607
+Q323767,monuments,Tour Montparnasse,Tour Montparnasse,75,way/16406633,Mo-Su 09:30-23:30,,,48.842113,2.321980
+,monuments,Tour Luma,Tour Luma,13,relation/12721662,10:00-19:30,,,43.674210,4.636822
+Q2446014,monuments,Tour Gloriette,Tour Gloriette,39,way/121753647,"Mo-Su 14:00-18:00, ""ou sur RDV. D’autres plages horaires sont disponibles en fonction de la saison""",,,46.901458,5.773687
+Q124675973,monuments,Sentier des Ocres,Sentier des Ocres,84,way/1073510475,,yes,https://otroussillon.pagesperso-orange.fr/sentier.html,43.899619,5.297803
+Q3226982,musees,Scriptorial,Scriptorial,50,way/135532926,,yes,https://www.scriptorial.fr/,48.688134,-1.361206
+Q22997811,musees,Scierie du Lançoir,Scierie du Lançoir,88,way/177258967,,yes,https://lelancoir.wixsite.com/lelancoir/visites-individuelles-lancoir,48.115470,6.958488
+Q22941646,monuments,Sanctuaire Carolingien,Sanctuaire Carolingien,37,way/123872306,,yes,https://www.cravant-les-coteaux.fr/,47.166375,0.349508
+Q805255,musees,Salle du Jeu de Paume,Salle du Jeu de Paume,78,way/55697735,"Mo off; Tu-Su,PH 12:30-18:30; May 01 off",,,48.801000,2.123870
+Q67582838,plages,Réserve naturelle du Lez,Réserve naturelle du Lez,34,way/22752845,"Sep-Oct Tu-Su 10:00-17:30, Nov-Jan Tu-Su 10:00-16:30, Feb-May Tu-Su 10:00-17:30, Jun-Aug Tu-Su 10:00-18:00; Sep-Oct PH 10:00-17:30, Nov-Jan PH 10:00-16:30, Feb-May PH 10:00-17:30, Jun-Aug PH 10:00-17:30",,,43.643371,3.887159
+Q1479980,musees,Réserve Africaine de Sigean,Réserve Africaine de Sigean,11,way/311460695,,yes,https://www.reserveafricainesigean.fr/,43.064668,2.957423
+Q3424007,musees,Relais de Poste aux chevaux de Launois sur Vence,Relais de Poste aux chevaux de Launois sur Vence,08,node/13594880585,,no,https://posteauxchevaux.com,49.654999,4.539876
+Q18328185,chateaux,Redoute de Merville,Redoute de Merville,14,relation/19424278,"We-Mo 11:00-13:00,13:45-18:00",,,49.282510,-0.218825
+Q753011,chateaux,Porte des Allemands,Porte des Allemands,57,way/35214195,Oct-Apr Tu-Su 14:00-17:00; May-Sep Tu-Su 14:00-19:00,,,49.117880,6.185568
+Q15953118,monuments,Porte de la Cavalerie,Porte de la Cavalerie,13,relation/13102892,24/7,,,43.681148,4.631336
+,musees,Port-musée,Port-musée,29,node/12925564342,,yes,https://www.port-musee.org/,48.092446,-4.332478
+Q99471,monuments,Plan Incliné de Saint-Louis-Arzviller,Plan Incliné de Saint-Louis-Arzviller,57,node/10280615324,,yes,https://www.plan-incline.com,48.714947,7.216202
+Q30061303,monuments,Plage de Dieppe,Plage de Dieppe,76,way/176438492,Mo-Su 07:00-19:00,,,49.929225,1.072488
+Q3149084,monuments,Piscine des Amiraux,Piscine des Amiraux,75,way/78020880,,yes,https://www.paris.fr/equipements/piscine-des-amiraux-2944,48.894349,2.351036
+Q2351981,monuments,Parlement de Bretagne,Parlement de Bretagne,35,relation/4027,Mo-Fr 09:45-17:00,,,48.112820,-1.677813
+Q16833479,musees,Parc du Petit Prince,Parc du Petit Prince,68,way/37343125,,yes,https://www.parcdupetitprince.com/,47.861478,7.297369
+Q3363902,musees,Parc Saint-Paul,Parc Saint-Paul,60,way/113811085,,yes,https://www.parcsaintpaul.fr/,49.422350,1.983082
+Q377592,musees,Parc Astérix,Parc Astérix,60,way/19627882,,yes,https://www.parcasterix.fr/,49.132921,2.571813
+Q3363946,megalithes,Parc Archéologique Asnapio,Parc Archéologique Asnapio,59,way/621566237,,yes,https://asnapio.villeneuvedascq.fr,50.636407,3.157018
+Q3361743,musees,Paléospace,Paléospace,14,way/367285600,,yes,https://www.paleospace-villers.fr/,49.327867,0.013359
+Q3360832,chateaux,Palais Bénédictine,Palais Bénédictine,76,way/135950056,,yes,https://www.benedictinedom.com,49.759033,0.367758
+Q22925934,musees,Ossuaire Saint-Cadou,Ossuaire Saint-Cadou,29,way/89703235,Jun 24-Jul 07 14:00-18:00; Jul 08-Sep 03 Mo-Su 11:00-19:00; Sep 04-Nov 05 14:00-18:00,,,48.448768,-4.249332
+Q3349063,musees,Océanopolis,Océanopolis,29,way/998872051,,yes,https://www.oceanopolis.com/,48.389971,-4.436154
+Q21294414,musees,Naia Museum,Naia Museum,56,node/6225991472,,yes,https://www.naiamuseum.com/,47.699366,-2.338795
+Q3333151,musees,Mémorial de la Résistance et de la Déportation de la Loire,Mémorial de la Résistance et de la Déportation de la Loire,42,node/1474396735,,yes,http://memorial-loire42.fr/,45.435677,4.386366
+Q3333109,musees,Mémorial 1939-1945,Mémorial 1939-1945,35,node/686512484,,yes,https://www.saint-malo.fr/accueil/sortir/musees/memorial-39-45/,48.637280,-2.029230
+Q48760862,musees,Muséum de l'Ardèche,Muséum de l'Ardèche,07,way/437578816,,yes,https://museum-ardeche.fr/,44.506676,4.372675
+Q3329472,musees,Musée municipal de Sanguinet - Musée de France,Musée municipal de Sanguinet - Musée de France,40,way/231604670,,yes,https://musee-lac-sanguinet.fr/,44.482753,-1.075223
+Q3330609,musees,Musée industriel de la Corderie Vallois,Musée industriel de la Corderie Vallois,76,way/121934820,,no,https://corderievallois.fr/fr,49.495181,1.047923
+Q3330570,musees,Musée français de la brasserie,Musée français de la brasserie,54,way/138970193,,yes,https://www.passionbrasserie.com/,48.633973,6.296842
+Q3330523,musees,Musée départemental de l'École de Barbizon,Musée départemental de l'École de Barbizon,77,way/113288014,,yes,https://www.musee-peintres-barbizon.fr,48.446174,2.602685
+Q16335747,musees,Musée départemental,Musée départemental,05,node/1255767096,,no,https://museum.hautes-alpes.fr/,44.562265,6.085837
+Q3330491,musees,Musée du train miniature,Musée du train miniature,01,node/1779572572,,yes,http://trainchatillon.com,46.118481,4.957214
+Q19845673,musees,Musée du charronnage au car,Musée du charronnage au car,07,node/3491958153,,yes,https://www.lavanaude.org/,45.226418,4.552120
+Q35761635,musees,Musée du Léon,Musée du Léon,29,node/5173669780,,yes,https://www.museeduleon.com/,48.571079,-4.322781
+Q3330439,musees,Musée du Jouet,Musée du Jouet,78,way/86269059,,yes,https://www.ville-poissy.fr/index.php/sport-culture/equipements-culturels/musee-du-jouet.html,48.928472,2.037969
+Q2947613,musees,Musée du Chai de Lardimalie,Musée du Chai de Lardimalie,24,node/2428942123,,yes,https://www.chaidelardimalie.com/,45.136371,0.866609
+Q28216487,musees,Musée du Chablais,Musée du Chablais,74,node/5537445278,,yes,https://www.thononlesbains.com/fr/patrimoine-culturel/1/163042-musee-du-chablais.html,46.373587,6.478219
+Q3330575,musees,Musée des sciences médicales,Musée des sciences médicales,38,way/150133815,,no,http://musee-sciences-medicales.fr/,45.200010,5.748845
+Q55738970,musees,Musée des machines à nourrir le monde,Musée des machines à nourrir le monde,39,node/7530208115,,yes,https://www.museemaquettebois.fr/,46.585372,5.738636
+,musees,Musée des dentelles et broderies de Caudry,Musée des dentelles et broderies de Caudry,59,way/1116384318,,yes,https://musee-dentelle.caudry.fr/,50.125191,3.411585
+Q15406293,musees,Musée des Verts,Musée des Verts,42,node/2591216030,,yes,https://www.museedesverts.fr/,45.460182,4.389261
+Q48757267,musees,Musée des Pêcheries,Musée des Pêcheries,76,node/340028020,,yes,https://www.musee-fecamp.fr/,49.761678,0.368255
+Q15627675,musees,Musée des Papeteries Canson et Montgolfier,Musée des Papeteries Canson et Montgolfier,07,node/3387925621,,yes,https://musee-papeteries-canson-montgolfier.fr/,45.254480,4.679797
+Q15260437,musees,Musée des Merveilles,Musée des Merveilles,06,node/769232481,,no,http://www.museedesmerveilles.com,44.090258,7.592377
+Q3280333,musees,Musée des Maisons comtoises,Musée des Maisons comtoises,25,way/33921375,,yes,https://www.maisons-comtoises.org/,47.237312,6.184544
+,musees,Musée des Ivoires d'Yvetot,Musée des Ivoires d'Yvetot,76,way/122011226,,no,https://www.yvetot.fr/le-musee-des-ivoires/,49.617382,0.755101
+Q113125216,musees,Musée des Frères Caudron,Musée des Frères Caudron,80,node/4534542515,,yes,https://www.tourisme-baiedesomme.fr/patrimoine-culturel-baie-de-somme/musee-des-freres-caudron-pionniers-de-laviation-en-picardie/,50.273388,1.667845
+,musees,Musée des Fortifications Alpines Fort Saint-Roch,Musée des Fortifications Alpines Fort Saint-Roch,06,way/245222565,"Mo-Fr 09:00-12:00,14:00-18:00; Sa09:30-12:30,13:00-17:00",,,43.874164,7.442336
+Q3330240,musees,Musée des Croyances populaires,Musée des Croyances populaires,43,node/2964361557,,yes,https://www.museedescroyancespopulaires.com,44.939827,3.995696
+Q3330127,musees,Musée des Commerces d'autrefois,Musée des Commerces d'autrefois,17,node/6279392889,,yes,https://www.museedescommerces.com/,45.936460,-0.960130
+Q15818383,musees,Musée des Civilisations - Daniel Pouget,Musée des Civilisations - Daniel Pouget,42,node/2471969138,,yes,https://www.stjust-strambert.fr/sorties-et-loisirs/culture-et-evenements/musee-des-civilisations-daniel-pouget/,45.500862,4.242652
+Q3330185,musees,Musée des Beaux-Arts d'Agen,Musée des Beaux-Arts d'Agen,47,node/11117710771,,yes,https://musee-agen.fr,44.203562,0.616187
+Q3330203,musees,Musée des Beaux-Arts,Musée des Beaux-Arts,39,node/946483217,,no,https://www.doledujura.fr/musee-des-beaux-arts,47.089639,5.489147
+Q3279205,musees,Musée des Arts et Traditions Populaires,Musée des Arts et Traditions Populaires,67,way/132552292,Jun-Sep: Su 14:00-18:00,,,48.909784,7.541924
+Q124622979,musees,Musée de la musique mécanique,Musée de la musique mécanique,74,way/218150956,,yes,http://www.musicmecalesgets.org/,46.160879,6.672789
+Q3330028,musees,Musée de la lutherie et de l’archèterie,Musée de la lutherie et de l’archèterie,88,node/1371279463,,yes,https://www.musee-mirecourt.fr/,48.301502,6.135633
+Q3330086,musees,Musée de la Viscose,Musée de la Viscose,38,way/81098331,,no,https://www.le-trace.fr/le-trace/musee-de-la-viscose/,45.157369,5.702776
+Q13405476,musees,Musée de la Vigne et du Vin,Musée de la Vigne et du Vin,39,node/2637893946,,yes,https://www.arbois.fr/musee/musee-de-la-vigne-et-du-vin-du-jura/,46.903547,5.775144
+Q3329960,musees,Musée de la Résistance et de la Déportation,Musée de la Résistance et de la Déportation,25,node/6354947603,,yes,https://www.citadelle.com/a-voir-a-faire/musee-de-la-resistance-et-de-la-deportation/,47.229032,6.034911
+Q3330064,musees,Musée de la Pêche,Musée de la Pêche,29,relation/3986935,,yes,https://www.musee-peche.fr/,47.872183,-3.915781
+Q26257881,musees,Musée de la Préhistoire de Vassieux-en-Vercors,Musée de la Préhistoire de Vassieux-en-Vercors,26,way/79026615,,yes,https://www.prehistoire-vercors.fr,44.865018,5.356007
+,musees,Musée de la Préhistoire,Musée de la Préhistoire,07,node/11746808687,,yes,https://www.orgnac.com/,44.318851,4.413297
+Q26252333,musees,Musée de la Poëslerie et Maison de la Dentellière,Musée de la Poëslerie et Maison de la Dentellière,50,way/218157369,,yes,http://www.museesvilledieu.sitew.com,48.840730,-1.221661
+Q3329932,musees,Musée de la Nacre et de la Tabletterie,Musée de la Nacre et de la Tabletterie,60,way/147861398,"Mo,We-Su 14:30-18:30",,,49.238463,2.138435
+Q16665632,musees,Musée de la Loire,Musée de la Loire,58,way/153863024,,yes,https://www.museedelaloire.fr/,47.410316,2.923425
+Q130052430,musees,Musée de la Lauze,Musée de la Lauze,38,node/4294269741,,no,https://www.aubergedelarina.fr/mus%C3%A9e-de-la-lauze,45.774260,5.308039
+Q3330002,musees,Musée de la Chimie,Musée de la Chimie,38,node/2032356271,,yes,https://www.ville-jarrie.fr/musee-de-la-chimie/,45.096893,5.742356
+Q3330262,musees,Musée de la Chaussure,Musée de la Chaussure,49,node/799904972,,yes,https://www.museedelachaussure.fr,47.099564,-0.993418
+Q3001838,musees,Musée de la Chartreuse,Musée de la Chartreuse,59,way/83720907,,yes,https://www.museedelachartreuse.fr,50.374648,3.075744
+Q107621538,musees,Musée de la Chapellerie,Musée de la Chapellerie,11,node/7918046809,,no,https://musee-chapellerie.fr/,42.935571,2.217412
+Q3329857,musees,Musée de l'Île d'Oléron,Musée de l'Île d'Oléron,17,node/1846520665,,yes,https://www.ile-oleron-marennes.com/preparer-mes-vacances/loisirs/patrimoine-et-musees/le-musee-de-l-ile-d-oleron-111708,45.942811,-1.306652
+Q23639738,musees,Musée de l'Étang de Thau – Louis Higounet,Musée de l'Étang de Thau – Louis Higounet,34,way/277812836,,yes,http://www.bouzigues.fr/musee/,43.446867,3.661798
+Q8323,musees,Musée de l'Imprimerie et de la communication graphique,Musée de l'Imprimerie et de la communication graphique,69,way/62271798,,yes,http://www.imprimerie.lyon.fr/,45.764282,4.834767
+Q23571290,musees,Musée de l'Hôtel de Ville,Musée de l'Hôtel de Ville,37,node/1517051946,,no,https://www.ville-amboise.fr/97/musee-hotel-morin.htm,47.413197,0.983992
+Q23641217,musees,Musée de l'Ecole Rurale en Bretagne,Musée de l'Ecole Rurale en Bretagne,29,node/1458523215,,yes,http://www.musee-ecole.fr,48.244885,-4.226337
+Q3329821,musees,Musée de l'Eau,Musée de l'Eau,38,node/1747484133,,yes,https://musee-eau.fr/,45.060679,5.344169
+Q3330091,musees,Musée de l'Ardoise,Musée de l'Ardoise,49,way/125991770,,yes,https://www.lemuseedelardoise.fr/,47.446911,-0.489194
+Q3330091,musees,Musée de l'Ardoise,Musée de l'Ardoise,49,way/1069340250,,yes,https://www.lemuseedelardoise.fr/,47.446782,-0.488870
+Q23640303,musees,Musée de Sologne,Musée de Sologne,41,relation/13812205,,yes,https://museedesologne.romorantin.com/,47.357338,1.743354
+Q3330101,musees,Musée de Minéralogie,Musée de Minéralogie,67,node/6482311825,,no,https://musee-mineralogie.unistra.fr/,48.583475,7.762773
+Q26678232,musees,Musée de Feurs,Musée de Feurs,42,node/346317680,,yes,https://www.feurs.org/culture,45.744290,4.219576
+Q3329629,musees,Musée d'Art et d'Industrie,Musée d'Art et d'Industrie,42,way/63340891,,yes,https://mai.saint-etienne.fr/,45.431455,4.386882
+Q3329609,musees,Musée d'Art et d'Histoire Romain Rolland,Musée d'Art et d'Histoire Romain Rolland,58,node/2627307760,,yes,http://www.musees-bourgogne.org/les_musees/musee_bourgogne_resultat.php?id=33&theme=ethnologie,47.460239,3.520565
+Q3329600,musees,Musée d'Art,Musée d'Art,83,node/2196651226,,yes,https://toulon.fr/envie-bouger/article/musee-d-art-de-toulon-mat,43.126303,5.927211
+Q13397967,musees,Musée d'Archéologie,Musée d'Archéologie,06,way/68074824,,yes,https://www.antibes-juanlespins.com/culture/musee-d-archeologie,43.577376,7.126091
+Q26678297,musees,Musée d'Allard,Musée d'Allard,42,way/163997717,,yes,https://ville-montbrison.fr/annuaire/musee-dallard/,45.608232,4.061744
+Q86724295,musees,Musée archéologique du lac de Paladru,Musée archéologique du lac de Paladru,38,way/958808688,,yes,https://www.museearcheologiquelacdepaladru.fr/,45.473602,5.552207
+Q3329424,musees,Musée archéologique d'Izernore,Musée archéologique d'Izernore,01,node/1357668479,,yes,https://archeologie-izernore.com/,46.220134,5.554812
+Q23599806,musees,Musée archéologique,Musée archéologique,39,node/9429212525,,yes,https://www.champagnole.fr/item/musee-archeologique/,46.746301,5.907246
+Q43688220,musees,Musée Yves Saint Laurent,Musée Yves Saint Laurent,75,way/79219238,,yes,https://museeyslparis.com,48.865598,2.299317
+Q3329392,musees,Musée Würth,Musée Würth,67,way/77512589,,no,https://www.musee-wurth.fr,48.417924,7.629587
+Q3329386,musees,Musée Vivant Denon,Musée Vivant Denon,71,way/121570791,,no,https://www.museedenon.com/,46.781192,4.852260
+,musees,Musée Soulages,Musée Soulages,12,way/228699419,,yes,http://musee-soulages.grand-rodez.com/,44.352181,2.567925
+Q3329329,musees,Musée Robert Tatin,Musée Robert Tatin,53,way/1305635795,,yes,https://patrimoine.lamayenne.fr/robert-tatin/le-musee/,47.932758,-0.896359
+Q23906124,musees,Musée Rignault,Musée Rignault,46,way/198659373,,yes,http://musees.lot.fr/index.php/musee-rignault,44.464931,1.670896
+Q3329316,musees,Musée Pierre-de-Luxembourg,Musée Pierre-de-Luxembourg,30,node/908930249,,yes,http://www.musees.gard.fr,43.963731,4.796826
+Q134489286,musees,Musée Novera Ahmed,Musée Novera Ahmed,95,node/12844809985,"Th,Fr,Su 14:00-18:30; Sa 14:00-18:00",,,49.080281,1.631156
+Q26402785,musees,Musée Mémorial des Combats de la Poche de Colmar,Musée Mémorial des Combats de la Poche de Colmar,68,way/78043070,,yes,https://musee.turckheim-alsace.com,48.088372,7.276619
+Q125699734,musees,Musée Mémorial d'Omaha Beach,Musée Mémorial d'Omaha Beach,14,way/219918509,,yes,https://www.musee-memorial-omaha.com,49.367067,-0.882140
+Q26678276,musees,Musée Matheysin,Musée Matheysin,38,node/1654912102,,yes,https://musee-matheysin.fr/,44.904693,5.784592
+Q115244231,musees,Musée Maritime,Musée Maritime,50,node/9932144762,,yes,https://www.ot-montsaintmichel.com/patrimoine-culturel/musee-maritime/,48.635437,-1.509991
+Q3329259,musees,Musée Mainssieux,Musée Mainssieux,38,way/79832646,,yes,https://www.paysvoironnais.info/musee-mainssieux/voiron/musee.html,45.367031,5.593980
+Q110677837,musees,Musée Jean-Marie Somet,Musée Jean-Marie Somet,42,way/63485817,,no,https://www.histoire-patrimoine-villars.fr/,45.464279,4.355287
+Q41705004,musees,Musée Jean-Claude Colin,Musée Jean-Claude Colin,69,node/6237848171,May-Sep Su 15:00-17:00,,,46.084497,4.427916
+Q21559215,musees,Musée International de la Parfumerie,Musée International de la Parfumerie,06,way/67332908,,yes,https://www.museesdegrasse.com,43.658039,6.921868
+Q3329194,musees,Musée Henri Barré,Musée Henri Barré,79,way/64211578,,yes,http://www.thouars.fr/vah/musee/indexmusee.htm,46.973631,-0.218123
+Q3329195,musees,Musée Géo-Charles,Musée Géo-Charles,38,way/81099317,,no,https://www.le-trace.fr/le-trace/musee-geo-charles/,45.149288,5.699503
+Q3329157,musees,Musée Fenaille,Musée Fenaille,12,way/124625026,,yes,https://musee-fenaille.rodezagglo.fr,44.349084,2.576596
+Q3329149,musees,Musée Ernest Cognacq,Musée Ernest Cognacq,17,node/4200451910,,yes,https://www.musee-ernest-cognacq.fr/,46.205408,-1.365022
+Q26675422,musees,Musée EDF Hydrélec,Musée EDF Hydrélec,38,way/171257717,,no,https://www.musee-edf-hydrelec.com/,45.146373,6.049607
+Q3330502,musees,Musée Départemental Georges de la Tour,Musée Départemental Georges de la Tour,57,way/227335819,,yes,https://moselle-culture.fr/site/musee-departemental-georges-de-la-tour/,48.781873,6.531056
+Q3329527,musees,Musée Comtois,Musée Comtois,25,node/7345774098,,yes,http://www.citadelle.com/fr/le-musee-comtois.html,47.229809,6.034391
+,musees,Musée Benoît-de-Puydt,Musée Benoît-de-Puydt,59,way/81168271,,no,https://www.musee-bailleul.fr,50.740719,2.734522
+Q3329068,musees,Musée Autrefois,Musée Autrefois,38,node/1419018520,,yes,https://www.ville-champsurdrac.fr/associations-culture/musee/,45.086117,5.730547
+Q38397482,musees,Musée Archéologique d'Audun-le-Tiche,Musée Archéologique d'Audun-le-Tiche,57,way/238716208,Sa-Su 14:00-17:30,,,49.473710,5.957634
+Q24932124,musees,Musée Archéologique,Musée Archéologique,54,node/6771134896,,no,https://shs-nancy.univ-lorraine.fr/le-musee-archeologique/,48.695357,6.165740
+Q24931083,musees,Mundolingua,Mundolingua,75,node/8100021822,,no,https://www.mundolingua.org,48.850185,2.334649
+Q28177520,monuments,Moulin de Pen Castel,Moulin de Pen Castel,56,way/171120629,We-Sa 14:00-18:00,,,47.551712,-2.869280
+Q56777310,musees,Mo.Co Hôtel des Collections,Mo.Co Hôtel des Collections,34,way/75278752,,yes,https://www.moco.art,43.606421,3.879128
+Q3079574,musees,Mine-image de la fosse n° 2 de Oignies (également sur commune de Oignies),Mine-image de la fosse n° 2 de Oignies (également sur commune de Oignies),62,way/190273042,"Apr-Oct Su[2] 14:00-18:00; Aug Su[-1] -1 day,Su[-1] 10:00-18:00",,,50.473883,2.997079
+Q3286385,musees,Manoir des Sciences de Réaumur,Manoir des Sciences de Réaumur,85,way/94576372,,yes,https://www.manoirdessciencesdereaumur.fr/,46.718216,-0.800675
+Q2969674,chateaux,Manoir de Launay,Manoir de Launay,49,way/239650725,,yes,http://www.manoirdelaunay.com/,47.264304,-0.040090
+Q22925296,chateaux,Manoir de Coatelan,Manoir de Coatelan,22,way/252008070,,yes,https://www.guide-tourisme-france.com/VISITER/manoir-coadelan--prat-28438.htm,48.695091,-3.290358
+Q22926043,musees,Maison à Pondalez,Maison à Pondalez,29,node/4250874982,,yes,https://monumentum.fr/monument-historique/pa00090133/morlaix-maison-dite-a-lanterne,48.576997,-3.827028
+Q22968794,musees,Maison du Marquisat,Maison du Marquisat,29,node/4232411213,"Jul-Aug 09:00-12:30,14:00-18:00",,,48.040955,-4.488005
+Q106725805,musees,Maison du Costume Comtadin,Maison du Costume Comtadin,84,node/1332513215,,no,https://www.costumescomtadin.com/,43.997978,5.056876
+Q112882772,musees,Maison de la Céramique du Pays de Dieulefit,Maison de la Céramique du Pays de Dieulefit,26,way/116656224,,yes,http://maisondelaceramique.fr/,44.521585,5.066979
+Q3279523,musees,Maison de Pierre Loti,Maison de Pierre Loti,17,relation/14610749,,yes,https://www.maisondepierreloti.fr/,45.934148,-0.962932
+Q54301387,musees,Maison de Jeanne d'Arc,Maison de Jeanne d'Arc,45,way/113998135,,yes,https://www.orleans-metropole.fr/histoire-patrimoine/lieux-celebres/maison-de-jeanne-darc,47.900815,1.902724
+Q3279371,musees,Maison de Clemenceau,Maison de Clemenceau,85,way/47158848,,yes,http://maison-clemenceau.monuments-nationaux.fr/,46.406365,-1.547525
+Q3333154,musees,"Maison d'Izieu, mémorial des enfants juifs exterminés","Maison d'Izieu, mémorial des enfants juifs exterminés",01,way/983076095,,yes,https://www.memorializieu.eu/,45.649202,5.631990
+Q3278803,musees,Maison Jean Cocteau,Maison Jean Cocteau,91,way/115079374,,yes,http://maisoncocteau.net/informations-pratiques,48.402299,2.464600
+Q59680518,musees,Maison Gainsbourg,Maison Gainsbourg,75,node/11081169654,,yes,https://www.maisongainsbourg.fr,48.857446,2.331143
+Q3576025,musees,Les Terres de Nataé,Les Terres de Nataé,56,way/28234842,,yes,https://www.lesterresdenatae.fr/,47.810300,-3.407535
+Q65127146,jardins,Les Jardins du Loriot,Les Jardins du Loriot,85,node/5855862215,,yes,https://jardinsduloriot.fr/,46.646505,-1.540650
+Q96758069,jardins,Les Jardins de Brocéliande,Les Jardins de Brocéliande,35,way/856145993,,yes,https://www.jardinsdebroceliande.fr/,48.056549,-1.889012
+Q116759146,monuments,Les Halles,Les Halles,11,way/92085860,"PH,Mo-Su 07:00-14:00; Sa 06:30-14:00",,,43.181186,3.005112
+Q22928501,megalithes,Les Bains Romains,Les Bains Romains,63,node/4402829613,24/7,,,45.768973,3.057738
+,monuments,Le Vieux Noyers,Le Vieux Noyers,04,node/6855150892,24/7,,,44.187150,5.827873
+,musees,Le Vallon du Villaret,Le Vallon du Villaret,48,way/332405001,,yes,http://www.levallon.fr/,44.526133,3.683116
+Q22926478,musees,Le Presidial,Le Presidial,29,node/1734985942,,no,https://www.quimperle.bzh/fiche-annuaire/presidial/,47.873502,-3.545636
+Q3330445,musees,Le Musée du Loup,Le Musée du Loup,29,node/2628944132,,yes,http://www.museeduloup.fr/,48.479792,-3.796498
+Q107630194,jardins,Le Jardin du Calvaire,Le Jardin du Calvaire,11,way/304113075,"Jul-Aug 09:00-12:00,14:00-19:00; Sep-Jun 10:00-12:00,14:00-18:00",,,43.210804,2.347532
+Q91473149,jardins,Le Jardin des Herbes,Le Jardin des Herbes,26,way/238351600,,no,https://la-garde-adhemar.com/fr/rb/1003368/jardin-des-herbes,44.392816,4.752179
+Q115325801,musees,Le Grand Parc d'Andilly,Le Grand Parc d'Andilly,74,way/1223737554,,yes,https://www.grandparc-andilly.com,46.063446,6.068401
+Q1025704,monuments,Le Café la Nuit,Le Café la Nuit,13,node/1416388849,off,,,43.677481,4.627241
+Q3214276,musees,Labanque,Labanque,62,way/136658202,,yes,http://www.lab-labanque.fr/,50.528714,2.639900
+Q3212448,musees,La Rotonde,La Rotonde,42,way/63275866,,yes,https://www.larotonde-sciences.com/,45.423370,4.407812
+Q3151503,megalithes,La Pierre-Écrite,La Pierre-Écrite,04,node/440449057,24/7,,,44.235061,6.010394
+Q55114821,musees,La Mine Image,La Mine Image,38,node/9780122098,,yes,https://www.mine-image.com,44.960653,5.742367
+Q3210673,musees,La Mer de Sable,La Mer de Sable,60,way/57773929,,yes,https://www.merdesable.fr/,49.144459,2.676954
+,monuments,La Main de Massiges,La Main de Massiges,51,way/246285706,,no,https://centenaire.org/fr/lassociation-la-main-de-massiges,49.194465,4.755484
+Q2262801,musees,La Ferme aux Crocodiles,La Ferme aux Crocodiles,26,way/172625595,,yes,https://www.lafermeauxcrocodiles.com/,44.356458,4.705223
+Q107150897,jardins,Jardin du Sacré Coeur,Jardin du Sacré Coeur,31,way/60091397,Nov-Jan 07:45-18:00; Feb 07:45-18:30; Mar 1-15 07:45-19:00; Mar 16-31 07:45-19:30;Apr 07:45-20:00;May 07:45-20:30;Jun-Aug 07:45-21:00;Sep 1-15 07:45-20:30; Sep 16-30 07:45-19:30;Oct 1-15 07:45-19:00;Oct 16-31 07:45-18:30,,,43.572176,1.459852
+Q3391936,monuments,Jardin du Plateau des Poètes,Jardin du Plateau des Poètes,34,way/38068439,Mo-Su 07:00-20:00,,,43.338383,3.220358
+Q125930615,jardins,Jardin des Nénuphars Latour-Marliac,Jardin des Nénuphars Latour-Marliac,47,way/179665780,,yes,https://latour-marliac.com/,44.377758,0.525563
+Q15975956,jardins,Jardin des Ambassadeurs - Line Renaud,Jardin des Ambassadeurs - Line Renaud,75,relation/10142347,24/7,,,48.866867,2.319007
+Q125450667,jardins,Jardin de la Préfecture,Jardin de la Préfecture,56,way/1012814709,Mo-Fr 09:00-17:00,,,47.657843,-2.754358
+Q22985128,jardins,Jardin de Silière,Jardin de Silière,52,way/727654365,,yes,http://www.siliere.fr/,47.791093,5.349108
+Q17630747,jardins,Jardin de Saint-Adrien,Jardin de Saint-Adrien,34,way/127446018,,yes,https://www.jardindesaintadrien.com/,43.397811,3.325268
+Q19606799,jardins,Jardin Zen d'Erik Borja,Jardin Zen d'Erik Borja,26,way/1078066832,,yes,https://www.erikborja.fr/,45.042847,4.949224
+Q106900752,jardins,Jardin Niel,Jardin Niel,31,way/352286083,Mar-May 08:00-20:00; Jun-Aug 08:00-21:00; Sep-Oct 08:00-20:00; Nov-Feb 08:00-18:00,,,43.578135,1.445360
+Q23641129,musees,Hôtel-Dieu - Musée Greuze,Hôtel-Dieu - Musée Greuze,71,node/7419064527,,yes,https://tournus.fr/,46.561954,4.910925
+Q22988010,musees,Hôtel de Maleville,Hôtel de Maleville,24,way/376198210,Mo-Su 11:00-18:00,,,44.889637,1.216398
+Q3145788,musees,Hôtel de Caumont - Centre d'Art,Hôtel de Caumont - Centre d'Art,13,way/88613610,,yes,https://www.caumont-centredart.com/,43.526020,5.449145
+Q3145725,musees,Hôtel d'Estienne de Saint-Jean,Hôtel d'Estienne de Saint-Jean,13,way/88614075,,yes,https://www.aixenprovence.fr/Presentation-du-Musee-du-Vieil-Aix,43.530771,5.447271
+Q21009083,monuments,Halle aux Grains,Halle aux Grains,82,way/75734200,24/7,,,44.070381,0.899710
+Q22979290,monuments,Halle Sainte-Claire,Halle Sainte-Claire,38,way/32500864,Tu-Su 07:00-13:00,,,45.190801,5.730841
+Q3126082,monuments,Halle,Halle,82,way/255016449,24/7,,,43.882735,0.988603
+Q24933507,grottes,Grottes de la Balme,Grottes de la Balme,38,node/906792687,,yes,https://www.grotteslabalme.com,45.852362,5.339477
+,monuments,Grotte de la Salamandre,Grotte de la Salamandre,30,node/8147111932,,yes,https://www.grottedelasalamandre.com/,44.258684,4.335661
+Q48756083,monuments,Grotte Saint-Vit,Grotte Saint-Vit,67,node/1295446652,24/7,,,48.729230,7.322807
+Q82508367,musees,Galerie du Montparnasse,Galerie du Montparnasse,75,node/9868201870,14:00-20:00,,,48.842122,2.325740
+Q950545,musees,Fraispertuis-City,Fraispertuis-City,88,way/38587547,,yes,https://www.fraispertuis-city.fr/,48.323989,6.728727
+Q3080015,monuments,Four solaire de Mont-Louis,Four solaire de Mont-Louis,66,node/974277876,"Sep-Jun Mo-Fr 11:00-12:00,14:00-17:00; Jul-Aug Mo-Su 10:00-13:00,14:00-18:00",,,42.507446,2.121087
+Q3078346,chateaux,Fort du Mont Vaudois,Fort du Mont Vaudois,70,way/66502137,,yes,https://www.fort-montvaudois.com/,47.596504,6.759630
+Q22950089,chateaux,Fort de Vivario,Fort de Vivario,2B,way/71522909,24/7,,,42.181141,9.161817
+Q21294354,musees,Fonds Hélène & Édouard Leclerc pour la Culture,Fonds Hélène & Édouard Leclerc pour la Culture,29,node/8826272182,,yes,https://www.fonds-culturel-leclerc.fr/,48.453024,-4.253794
+Q140201265,monuments,Falaise de la Baume,Falaise de la Baume,04,node/8292672417,24/7,,,44.199619,5.947941
+Q65153259,musees,FRAC Bourgogne,FRAC Bourgogne,21,way/41443862,,no,http://www.frac-bourgogne.org,47.319502,5.030446
+Q3330067,musees,Espace mémoriel de la Résistance et de la Déportation,Espace mémoriel de la Résistance et de la Déportation,16,node/8129035703,,no,http://musee.delaresistance.free.fr/,45.650103,0.156436
+Q2879075,musees,Espace Lympia,Espace Lympia,06,way/137195056,,no,https://espacelympia.departement06.fr/,43.694891,7.286248
+Q65133586,musees,Espace Giono,Espace Giono,38,node/5204439132,,yes,https://lalley.fr/index.php/espace-giono/,44.756948,5.676348
+Q1162474,monuments,Escalier du roi d'Aragon,Escalier du roi d'Aragon,2A,way/125300735,,yes,https://www.bonifacio.fr/lescalier-du-roy-daragon.html,41.386257,9.156176
+Q3578609,musees,Ecomusée du cheminot Veynois,Ecomusée du cheminot Veynois,05,node/2744979748,,yes,https://www.ecomusee-cheminot.com,44.534671,5.823541
+Q3059038,musees,ESTRAN Cité de la mer,ESTRAN Cité de la mer,76,way/149594135,,yes,http://www.estrancitedelamer.fr/,49.930645,1.083670
+Q134086129,musees,Droguier de Lyon,Droguier de Lyon,69,node/12794810298,"""Sur rendez-vous""",,,45.741196,4.881313
+Q112182497,monuments,Dinoplagne,Dinoplagne,01,way/435453256,,yes,https://www.dinoplagne.fr/,46.189837,5.711556
+Q3023222,musees,Dennlys parc,Dennlys parc,62,way/231334083,,yes,https://www.dennlys-parc.com/,50.571761,2.154095
+Q135790425,monuments,Cétautomatix,Cétautomatix,60,node/12777266663,,no,https://www.parcasterix.fr/parc/attractions/famille/cetautomatix,49.134298,2.568939
+Q21099762,monuments,Cuves de Sassenage,Cuves de Sassenage,38,node/3682817979,"Jun 01-Jun 30: Sa,Su 14:00,15:30,17:00; Jul 01-Aug 31: Mo-Su 14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30; Sep 01-Sep 30: Sa,Su 14:00,15:30,17:00; Oct 01-Oct 31: Sa,Su 15:00,16:30",,,45.208359,5.651328
+Q3221643,musees,Compa,Compa,28,way/137143724,,yes,https://lecompa.fr/,48.446872,1.476316
+Q2985796,musees,Commanderie templière d'Avalleur,Commanderie templière d'Avalleur,10,node/4345679189,Tu-Su 10:00-18:00,,,48.098400,4.350409
+,musees,Collégiale Saint-Martin,Collégiale Saint-Martin,49,way/145220928,,yes,https://www.collegiale-saint-martin.fr/,47.469008,-0.551970
+Q2974792,musees,Cité des télécoms,Cité des télécoms,22,way/126131523,,yes,https://www.cite-telecoms.com/,48.786482,-3.524864
+Q2561236,musees,Cigoland,Cigoland,67,way/303758476,,yes,https://cigoland.fr/,48.257340,7.417938
+Q2970527,chateaux,Château fort de Saint-Jean-d'Angle,Château fort de Saint-Jean-d'Angle,17,way/239210392,,yes,https://www.rochefort-ocean.com/organiser/agenda/agenda-complet/journees-europeennes-du-patrimoine-au-chateau-fort-de-la-fee-melusine-3777891,45.820626,-0.950825
+Q2983428,chateaux,Château des Nassau,Château des Nassau,84,way/247458167,24/7,,,44.134743,4.808434
+Q97841538,chateaux,Château de la Roque,Château de la Roque,81,way/1057726895,,yes,https://www.castelroc.net/,43.766849,2.315150
+Q2971095,chateaux,Château de l'Engarran,Château de l'Engarran,34,way/97705896,Mo-Su 10:00-19:00,,,43.597838,3.807201
+Q2971055,chateaux,Château de Waldeck,Château de Waldeck,57,way/164226095,24/7,,,49.017399,7.526558
+Q58806255,chateaux,Château de Tronjoly,Château de Tronjoly,56,way/251924774,,no,https://gourin.fr/ch%C3%A2teau-de-tronjoly.html,48.144658,-3.609768
+Q2970734,chateaux,Château de Sédières,Château de Sédières,19,way/391143508,,yes,https://www.correze.fr/nos-missions/culture-patrimoine-sports/le-chateau-de-sedieres/,45.291750,1.949721
+Q2970676,chateaux,Château de Septmonts,Château de Septmonts,02,way/223973912,"May-Sep Mo-Su 09:00-19:00; Oct-Apr Sa,Su 09:00-17:30",,,49.335247,3.359929
+Q2970404,chateaux,Château de Rochemaure,Château de Rochemaure,07,way/443092140,,yes,https://www.sud-ardeche-tourisme.com/decouvrir/terre-dhistoire/chateaux-et-bourgs/chateau-de-rochemaure/,44.588056,4.699370
+Q21156923,chateaux,Château de Nogent le Roi,Château de Nogent le Roi,28,way/310333648,Mo-Su 08:00-18:00,,,48.646762,1.531655
+Q22966383,chateaux,Château de Mont-l'Évêque,Château de Mont-l'Évêque,60,way/165994003,Mo-Su 09:00-19:00,,,49.193546,2.629609
+Q20830925,chateaux,Château de Margon,Château de Margon,34,way/421991610,,yes,http://www.chateaudemargon.com,43.486363,3.306159
+Q18215061,chateaux,Château de Lacaze,Château de Lacaze,81,way/420294471,,yes,https://www.amisduchateau-lacaze81.org/,43.737338,2.520300
+Q2968587,chateaux,Château de Bon Repos,Château de Bon Repos,38,way/78575047,"Su[3] 10:00-12:00,14:00-18:00; Aug off",,,45.110343,5.756488
+Q22966936,monuments,Château de Beauvoir - Donjon,Château de Beauvoir - Donjon,38,node/1957514820,24/7,,,45.122901,5.338838
+Q22966936,monuments,Château de Beauvoir,Château de Beauvoir,38,relation/14002451,24/7,,,45.122537,5.338937
+Q22986503,chateaux,Château d'Oppède,Château d'Oppède,84,way/176341985,24/7,,,43.827014,5.160527
+Q2969406,chateaux,Château,Château,83,way/204415155,24/7,,,43.123986,6.124377
+Q2957493,monuments,Chapelle monolythe de Caudon,Chapelle monolythe de Caudon,24,node/9383208744,24/7,,,44.820919,1.252279
+Q60341796,musees,Chapelle des Visitandines,Chapelle des Visitandines,89,way/62634569,Jul-Aug,,,47.798900,3.569341
+Q20575963,monuments,Chapelle de la Fontaine Blanche,Chapelle de la Fontaine Blanche,29,way/42612200,"""voir Office du Tourisme""",,,48.372554,-4.351725
+Q167623,monuments,Chapelle Saint-Louis de la Salpêtrière,Chapelle Saint-Louis de la Salpêtrière,75,way/78535716,Mo-Su 08:30-18:30,,,48.838939,2.364141
+Q2945654,musees,Centre Historique Minier de Lewarde,Centre Historique Minier de Lewarde,59,way/314567878,,yes,https://www.chm-lewarde.com/,50.331789,3.172197
+Q20971896,monuments,Carrousel des Mondes Marins,Carrousel des Mondes Marins,44,way/304978710,,yes,https://www.lesmachines-nantes.fr/fr/les-machines-de-l-ile/le-carrousel-des-mondes-marins/,47.205903,-1.567784
+,monuments,Carrière des Fusillés,Carrière des Fusillés,44,way/969598609,Mo-Su 09:00-18:00,,,47.724245,-1.347296
+,musees,Carrière Wellington,Carrière Wellington,62,way/240632378,,yes,http://www.explorearras.com,50.279825,2.783636
+,megalithes,Capitole,Capitole,84,way/242579083,24/7,,,44.134862,4.807812
+Q2935536,monuments,Campo Santo,Campo Santo,45,node/6895034394,Feb-Mar 07:30-18:30; Apr-Sep 07:30-20:00; Oct 07:30-18:30; Nov-Jan 08:00-18:30,,,47.903276,1.910717
+,musees,Buron de Belles-Aigues,Buron de Belles-Aigues,15,way/370089812,,yes,https://maisonduburonnier.wordpress.com,45.103716,2.767942
+,monuments,Blockhaus de Pelousette,Blockhaus de Pelousette,06,way/68665830,24/7,,,44.343118,6.855542
+Q3631797,musees,Base Sous-Marine de Bordeaux,Base Sous-Marine de Bordeaux,33,way/27589401,,yes,https://www.bordeaux.fr/o271,44.870318,-0.558567
+Q97170606,musees,Backslash,Backslash,75,node/10289834511,"Mo,Su off; Tu-Sa 14:00-19:00",,,48.867285,2.358892
+Q2876188,monuments,Aître Saint-Maclou,Aître Saint-Maclou,76,node/1038277900,09:00-19:00,,,49.440265,1.099846
+Q109265407,musees,Aquarium Oniria,Aquarium Oniria,66,way/961962000,,yes,https://www.oniria.fr/,42.701852,3.035703
+Q16010419,musees,Apothicairerie de l'hôtel-Dieu,Apothicairerie de l'hôtel-Dieu,01,node/2427436141,,yes,https://www.bourgenbressedestinations.fr/explorer/bourg-en-bresse-lesprit-citadin/se-laisser-seduireun-heritage-riche/apothicairerie-pharmacie-depoque-aux-milles-secrets/,46.200840,5.233557
+Q114147172,musees,Apothicairerie de Montluel,Apothicairerie de Montluel,01,node/2601095426,,yes,https://patrimoinedemontluel.wixsite.com/histoireetpatrimoine/les-lieux---d-couvrir,45.850223,5.055726
+Q22968462,monuments,Ancienne entrée Monumentale du Tunnel Ferroviaire du Mont Cenis,Ancienne entrée Monumentale du Tunnel Ferroviaire du Mont Cenis,73,way/100870158,Jul-Aug,,,45.190316,6.659069
+Q2970052,chateaux,Ancien château de Montréal,Ancien château de Montréal,89,node/13555679534,24/7,,,47.546843,4.036588
+Q3402357,chateaux,Ancien Château,Ancien Château,07,way/103737108,"Mo-We 08:00-12:00; Th-Fr 08:00-12:00,13:30-17:00",,,45.150584,4.613870
+Q55595468,musees,Alligator Bay,Alligator Bay,50,way/976942523,,yes,https://www.alligator-bay.com/,48.601120,-1.511234
+Q116966264,musees,70.8,70.8,29,way/910137897,,yes,https://www.70point8.com,48.390163,-4.498191
+Q14628584,monuments,rempart romain d'Orange,rempart romain d'Orange,84,node/2071576562,,no,,44.132130,4.804332
+Q64577817,chateaux,Vestiges du Château d'Hautpoul,Vestiges du Château d'Hautpoul,81,way/702354176,,no,,43.476633,2.378754
+Q24739,monuments,Trou de mine de La Boisselle (Lochnagar Crater),Trou de mine de La Boisselle (Lochnagar Crater),80,way/117446413,,no,,50.015488,2.697358
+Q16681305,grottes,Trou Qui Souffle,Trou Qui Souffle,38,node/3523419802,,no,,45.150199,5.517461
+Q2788328,monuments,Trace du Hourra,Trace du Hourra,60,node/7762407211,,no,,49.135535,2.568157
+Q99509434,monuments,Toutatis,Toutatis,60,node/9512066306,,no,,49.136251,2.569647
+Q115631925,musees,Temple de la Nature,Temple de la Nature,74,way/97322736,,no,,45.932913,6.917130
+Q115606062,jardins,Square Jolion,Square Jolion,01,way/258870827,,no,,45.851722,5.061484
+Q3111595,grottes,Spélonque de Dions,Spélonque de Dions,30,node/3517907744,,no,,43.928736,4.301734
+Q19444538,musees,Site Hillman,Site Hillman,14,way/229519959,,no,,49.265442,-0.309749
+Q3279145,musees,Samten Dzong,Samten Dzong,04,way/112484900,,yes,,44.081566,6.224016
+Q61748984,monuments,Porte Saint-Michel,Porte Saint-Michel,44,way/71775452,,yes,,47.327275,-2.427124
+Q3378424,musees,Phare de Tréhiguier,Phare de Tréhiguier,56,way/429896031,,yes,,47.492859,-2.441732
+Q3360454,monuments,Pagode Hông Hiên Tu,Pagode Hông Hiên Tu,83,way/575373182,,yes,,43.444826,6.750505
+Q3333156,monuments,Mémorial des guerres d'Indochine,Mémorial des guerres d'Indochine,83,way/575373187,,no,,43.445590,6.751947
+Q23936770,musees,Musée-Bibliothèque François Pétrarque,Musée-Bibliothèque François Pétrarque,84,way/83561732,,yes,,43.921920,5.128855
+Q22916252,musees,Musée lapidaire,Musée lapidaire,13,way/114835494,,yes,,43.789629,4.831056
+Q23826238,musees,Musée d’art et d’histoire,Musée d’art et d’histoire,84,way/219528069,,yes,,44.136133,4.807873
+Q1273261,musees,Musée du costume,Musée du costume,89,node/3157626261,,yes,,47.488105,3.908249
+Q3330372,musees,Musée du Quercob,Musée du Quercob,11,way/368051744,,yes,,42.920057,2.048015
+,musees,Musée du Corps de Garde,Musée du Corps de Garde,59,relation/19355602,,no,,50.281226,3.973778
+Q3329796,musees,Musée du Château,Musée du Château,11,way/166444538,,yes,,43.207290,2.363011
+Q21552809,musees,Musée des épaves sous-marines,Musée des épaves sous-marines,14,way/1059593837,,yes,,49.334054,-0.756468
+Q47486159,musees,Musée des Santons,Musée des Santons,13,way/446697908,,no,,43.744741,4.794996
+Q23936797,musees,Musée des Cultures et du Paysage,Musée des Cultures et du Paysage,83,way/192110519,,yes,,43.119769,6.130594
+Q113509751,musees,Musée des Cristaux - Espace Tairraz,Musée des Cristaux - Espace Tairraz,74,node/3644533827,,yes,,45.924480,6.867331
+Q80337516,musees,Musée de la boulangerie,Musée de la boulangerie,84,node/6025253505,,yes,,43.822611,5.307908
+Q3329744,musees,Musée de Royan,Musée de Royan,17,way/72969737,,yes,,45.626917,-1.048565
+Q22998459,musees,Musée d'art sacré,Musée d'art sacré,05,way/34610620,,no,,44.975856,6.507520
+Q3329433,musees,Musée archéologique de Javols,Musée archéologique de Javols,48,way/320369351,,yes,,44.693720,3.342401
+Q60193124,musees,Musée Peynet,Musée Peynet,06,relation/1074415,,yes,,43.580932,7.125905
+Q3330555,musees,Musée Napoléon Ier,Musée Napoléon Ier,21,way/480527098,,no,,47.245421,4.962397
+Q106689444,musees,Musée Juin 44,Musée Juin 44,61,node/11429216160,,yes,,48.765148,0.628861
+Q106925666,musees,Musée Joseph-Fau,Musée Joseph-Fau,12,way/219774732,,no,,44.599029,2.397609
+Q2435525,musees,Musée Jeanne Devos,Musée Jeanne Devos,59,way/98448046,,yes,,50.880696,2.466216
+Q28973562,musees,Musée Jean Couty,Musée Jean Couty,69,node/5297358221,,yes,,45.797918,4.829385
+Q3330574,musees,Musée Gallo-Romain de Saint-Romain-en-Gal,Musée Gallo-Romain de Saint-Romain-en-Gal,69,way/131339005,,yes,,45.529606,4.871091
+Q15630778,musees,Musée Emmanuel de la Villéon,Musée Emmanuel de la Villéon,35,way/687804448,,yes,,48.352593,-1.204196
+Q106697381,musees,"Musée ""Village de santons""","Musée ""Village de santons""",84,node/13311039934,,yes,,43.922297,5.129728
+Q3280037,musees,Maison du Patrimoine,Maison du Patrimoine,17,way/122313205,,no,,45.880406,-0.682934
+Q22993379,musees,Maison du Doyenné,Maison du Doyenné,43,way/292127879,,yes,,45.293657,3.385572
+Q22939752,musees,Maison des Consuls,Maison des Consuls,46,way/75740654,,no,,44.861182,1.889755
+Q4165365,musees,Maison de Pauline Jaricot,Maison de Pauline Jaricot,69,way/1228133941,,no,,45.761573,4.823910
+Q3279404,monuments,Maison de Jean Prouvé,Maison de Jean Prouvé,54,way/148698043,,yes,,48.700769,6.161454
+Q22959787,musees,Maison Natale de Verlaine,Maison Natale de Verlaine,57,node/12556486358,,yes,,49.117218,6.171675
+Q1613242,musees,Maison Maurice Leblanc,Maison Maurice Leblanc,76,way/619187095,,yes,,49.706278,0.206798
+Q22995702,musees,Logis du Bras d'Or,Logis du Bras d'Or,13,way/87742365,,no,,43.526918,5.443267
+Q22963314,musees,Logis Tiphaine-de-Raguenel,Logis Tiphaine-de-Raguenel,50,way/41665649,,yes,,48.636281,-1.510276
+Q56697740,monuments,Les espions de César,Les espions de César,60,node/8684214541,,no,,49.134244,2.571540
+Q24048363,musees,Les Baraques du 14,Les Baraques du 14,39,node/448680666,,yes,,47.054881,5.640321
+Q98108997,monuments,Le Twist,Le Twist,03,way/828531125,,no,,46.510816,3.628870
+Q28177264,musees,Le Moulin de Berno,Le Moulin de Berno,56,relation/8690474,,no,,47.596588,-2.804923
+Q2648376,monuments,La Revanche des Pirates - Le Grand Splatch,La Revanche des Pirates - Le Grand Splatch,60,node/1732018730,,no,,49.134865,2.569941
+Q13518393,monuments,La Lieutenance,La Lieutenance,14,way/136765051,,yes,,49.421011,0.233524
+,musees,La Halle aux Vivres,La Halle aux Vivres,17,way/121151859,,yes,,45.867277,-1.067988
+,grottes,La Cave de Nankia,La Cave de Nankia,39,node/8684355787,,no,,46.870314,5.788176
+Q111305182,jardins,Jardin de la Légion d'Honneur,Jardin de la Légion d'Honneur,06,way/1041885426,,no,,43.695079,7.259050
+Q106983403,jardins,Jardin de l'Archevéché,Jardin de l'Archevéché,05,way/34350298,,no,,44.562349,6.496053
+Q94408754,jardins,Jardin de Cantù,Jardin de Cantù,69,way/259555707,,no,,45.987873,4.719862
+Q958440,musees,Hôtel Dieu,Hôtel Dieu,02,way/159776329,,yes,,49.046010,3.404499
+Q3145461,musees,Hôtel Condé (ancien),Hôtel Condé (ancien),89,node/7538920900,,yes,,47.488006,3.908394
+Q16040879,musees,Horloge astronomique,Horloge astronomique,56,node/4306276596,,no,,47.931369,-2.399581
+,monuments,Grottes du Régulus,Grottes du Régulus,17,node/2268694682,,yes,,45.555685,-0.958122
+Q3117269,grottes,Grottes de Saint-Cézaire,Grottes de Saint-Cézaire,06,node/4381560280,,yes,,43.658801,6.810957
+Q24933640,grottes,Grotte inférieure de Saint-Christophe,Grotte inférieure de Saint-Christophe,73,node/10132806127,,yes,,45.449560,5.788058
+,grottes,Grotte du Père Leleu,Grotte du Père Leleu,89,node/3731071096,,no,,47.586399,3.768840
+Q93991563,grottes,Grotte du Curé,Grotte du Curé,74,node/7006451510,,no,,45.964740,6.055834
+Q55597136,grottes,Grotte des Fées,Grotte des Fées,89,node/3731050051,,no,,47.590239,3.761430
+Q22996387,grottes,Grotte de la Coscia,Grotte de la Coscia,2B,node/4941773941,,no,,42.966298,9.456824
+Q93882550,grottes,Grotte de l'Autel,Grotte de l'Autel,29,node/6190038226,,no,,48.235061,-4.485027
+Q133270154,grottes,Grotte de Solborde,Grotte de Solborde,70,node/8889693300,,no,,47.588181,6.129231
+Q93876023,grottes,Grotte de Plaisir Fontaine,Grotte de Plaisir Fontaine,25,node/4466964792,,no,,47.139531,6.163155
+Q3117155,grottes,Grotte de Néron,Grotte de Néron,07,node/2812423777,,yes,,44.882913,4.847491
+Q56312606,grottes,Grotte de Nermont,Grotte de Nermont,89,node/3731070124,,no,,47.586382,3.768450
+Q3117131,grottes,Grotte de Lamartine,Grotte de Lamartine,73,node/270604681,,no,,45.687359,5.858880
+Q86725962,grottes,Grotte de Lacalm,Grotte de Lacalm,81,node/6402591590,,no,,43.500646,2.328263
+Q11915922,grottes,Grotte de Fontrabiouse,Grotte de Fontrabiouse,66,node/1855868123,,yes,,42.634210,2.097761
+Q125198027,grottes,Grotte de Chérence,Grotte de Chérence,95,node/11769891723,,no,,49.082611,1.673259
+Q123670650,grottes,Grotte de Cabias,Grotte de Cabias,30,node/6387496115,,no,,44.027039,4.679063
+Q16533500,grottes,Grotte de Bouche Rolland,Grotte de Bouche Rolland,12,node/4269936228,,no,,44.473138,2.507829
+Q50966301,grottes,Grotte d'Orjobet,Grotte d'Orjobet,74,node/3242376269,,no,,46.131431,6.168906
+Q93881840,grottes,Grotte d'Artus,Grotte d'Artus,29,node/1877539250,,no,,48.368859,-3.736011
+Q3117106,grottes,Grotte Saint-Léon,Grotte Saint-Léon,57,node/3231621682,,no,,48.642259,7.146841
+Q48760483,grottes,Grande fontaine de Saint-Christophe,Grande fontaine de Saint-Christophe,79,node/3113339518,,no,,46.445632,-0.346867
+,grottes,Gouffre de Grimo Santé,Gouffre de Grimo Santé,54,node/7738294611,,no,,48.863998,5.942303
+Q828509,monuments,Goudurix,Goudurix,60,node/715907595,,no,,49.131995,2.570890
+Q93865580,grottes,Glacière de la Grâce-Dieu,Glacière de la Grâce-Dieu,25,node/3687217687,,yes,,47.247848,6.363468
+Q108689030,musees,Galerie Jules Salles,Galerie Jules Salles,30,way/40174617,,no,,43.837248,4.362436
+Q1816468,monuments,Fontaine de Vaucluse,Fontaine de Vaucluse,84,node/1676344039,,no,,43.917670,5.132844
+Q49136156,grottes,Fontaine d'Orchaise,Fontaine d'Orchaise,41,node/3018408320,,no,,47.588449,1.202438
+Q3076018,monuments,Fontaine Cuvier,Fontaine Cuvier,75,node/530585154,,no,,48.843996,2.355031
+Q86678569,musees,Donation Albers-Honegger,Donation Albers-Honegger,06,way/64746008,,yes,,43.621228,6.969406
+Q2974372,chateaux,Citadelle Saint-Elme,Citadelle Saint-Elme,06,relation/10116067,,no,,43.701368,7.310589
+Q22932537,chateaux,Château de l'Espinasse,Château de l'Espinasse,43,way/292127864,,yes,,45.264721,3.280259
+Q22967175,chateaux,Château de Vaugirard,Château de Vaugirard,42,way/410954331,,yes,,45.639266,4.073030
+Q2970778,musees,Château de Thierry,Château de Thierry,92,way/129454734,,no,,48.827570,2.186429
+Q15940043,chateaux,Château Bouchet,Château Bouchet,01,way/251261483,,no,,46.020147,4.763561
+Q2957403,musees,Chapelle des Pénitents bleus,Chapelle des Pénitents bleus,13,way/155884844,,no,,43.177065,5.609893
+Q17177229,musees,Chapelle des Climats,Chapelle des Climats,21,way/114351778,,no,,47.316759,5.029876
+Q60374799,musees,Chapelle Saint-Jacques,Chapelle Saint-Jacques,41,way/127704647,,no,,47.793538,1.067493
+Q953954,musees,Chapelle Saint-Blaise (ancienne),Chapelle Saint-Blaise (ancienne),13,way/446697759,,no,,43.742873,4.794598
+Q7111011,monuments,Chapelle Notre-Dame-des-Fontaines,Chapelle Notre-Dame-des-Fontaines,06,way/178969261,,2,,44.062328,7.654375
+Q94294310,grottes,Caborne du Bœuf,Caborne du Bœuf,39,node/4313458021,,no,,46.355730,5.543244
+Q1018638,musees,Byrrh,Byrrh,66,way/64070647,,yes,,42.634350,2.756838
+Q120293758,monuments,Bollène Aventure,Bollène Aventure,84,way/456590341,,yes,,44.294486,4.787947
+Q14628685,grottes,Baume Latrone,Baume Latrone,30,node/6525192929,,no,,43.930047,4.334603
+Q1170063,monuments,Bac Seltz - Plittersdorf;Rheinfähre Plittersdorf - Seltz,Bac Seltz - Plittersdorf;Rheinfähre Plittersdorf - Seltz,67,way/39604833,,no,,48.887412,8.135588
+Q98012894,monuments,Azteka,Azteka,03,way/1161217979,,no,,46.509442,3.630388
+Q4784854,jardins,Arboretum de l'Étoile des Andaines,Arboretum de l'Étoile des Andaines,61,node/8374937925,,no,,48.589262,-0.496805
+Q4784818,jardins,Arboretum de Cazebonne,Arboretum de Cazebonne,30,node/7589654634,,no,,44.001854,3.456753
+Q93268558,grottes,Abîme de Rabanel,Abîme de Rabanel,34,node/1667293785,,no,,43.885559,3.684844

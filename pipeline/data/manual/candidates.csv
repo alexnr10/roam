@@ -1,0 +1,895 @@
+# Candidats adoptés depuis OpenStreetMap.
+#
+# Trouvés parce qu'un lieu porte des horaires ou un tarif — un fait de terrain
+# — là où Wikidata ne le classait dans aucune des classes interrogées. Ils
+# n'ont aucun privilège : ils sont scorés, soumis au plancher de notoriété et
+# dédoublonnés comme les autres. Ce fichier existe pour que `fetch` les
+# retrouve, et pour qu'une ligne retirée à la main le reste.
+#
+wikidata_id,theme_id,note
+Q10143,musees,Demeure du Chaos
+Q1018638,musees,caves Byrrh de Thuir
+Q1025704,monuments,Terrasse du café le soir
+Q104828829,musees,musée de la marine fluviale
+Q105707154,musees,Le Chronographe
+Q105710427,jardins,jardin collectif « Jard'in Noues »
+Q105988788,musees,Musée Daubigny
+Q106689444,musees,
+Q106691374,musees,Le monde souterrain et spéléologie
+Q106695295,musees,musée de la Tour des Prisons
+Q106697381,musees,écomusée des santons et traditions provencales
+Q106713648,musees,Musée de la filature Brun de Vian-Tiran
+Q106725712,musees,Musée Comtadin du Cycle
+Q106725805,musees,conservatoire du costume comtadin
+Q106728650,musees,musée de la vie rurale de Laluque
+Q106785113,musees,musée de l'Imprimerie de Nantes
+Q106833385,musees,Overlord Museum
+Q106847327,musees,musée du tissage et de la soierie
+Q106854845,musees,musée de la machine à bois et de l'outillage à main
+Q106860201,musees,musée D-Day Omaha
+Q106900752,jardins,jardin Niel
+Q106925666,musees,Musée Joseph Fau
+Q106963760,musees,Musée de la photographie Charles Nègre
+Q106983403,jardins,jardin de l'Archevéché
+Q107150897,jardins,jardin du Sacré-Cœur
+Q107621538,musees,Musée de la Chapellerie
+Q107630194,jardins,jardin du Calvaire
+Q107675405,musees,musée historique de l'Amitié franco-chinoise
+Q108293274,musees,musée de l'Illusion
+Q108293337,musees,institut culturel du judaïsme
+Q108331675,musees,villa du Temps retrouvé
+Q108689030,musees,galerie Jules-Salles
+Q108854328,musees,musée conserverie Le Gall
+Q108857106,musees,maison Bergès
+Q109018531,musees,
+Q109037402,musees,
+Q109046481,musees,villa du Châtelet
+Q109265407,musees,Oniria
+Q109310760,musees,Lieu de mémoire du Chambon-sur-Lignon
+Q110677837,musees,musée de la mine Jean-Marie Somet
+Q110806844,musees,musée Jean-Honoré-Fragonard
+Q110929543,musees,musée Escoffier de l'art culinaire
+Q111305182,jardins,jardin de la Légion d’Honneur
+Q111874022,musees,musée des minéraux de Sorbonne Université
+Q111972939,musees,Musée des Mines d'Argent de L'Argentière-la-Bessée
+Q111972971,musees,maison du soleil de Saint-Véran
+Q112182497,monuments,Dinoplagne
+Q112882772,musees,maison de la céramique du Pays de Dieulefit
+Q112929404,chateaux,EHPAD Korian Jardins d'hugo
+Q112929882,chateaux,EHPAD Korian Château de Lormoy
+Q113125216,musees,
+Q113509751,musees,Musée des christaux à Chamonix
+Q113625316,musees,musée Motobécane
+Q113834124,musees,Centre de sciences Cosmocité
+Q114059646,monuments,Super Constellation F-BGNJ
+Q114147172,musees,apothicairerie de Montluel
+Q115244231,musees,Musée de la Mer et de l'Ecologie
+Q115325801,musees,Grand Parc d'Andilly
+Q115556757,musees,musée archéologique de la bataille de Gergovie
+Q115606062,jardins,square Jolion
+Q115631925,musees,Temple de la Nature
+Q116024970,musees,Micro Zoo de Saint Malo
+Q1162474,monuments,escalier du roi d'Aragon
+Q116529365,musees,musée communal de la Résistance et de la Déportation de Vénissieux
+Q116759146,monuments,Les Halles de Narbonne
+Q116966264,musees,Galerie de l'océan
+Q116994847,musees,musée des soieries Brochier
+Q1170063,monuments,Bac de Seltz
+Q117083225,musees,Parrot World
+Q11915922,grottes,grotte de Fontrabiouse
+Q119296825,monuments,mairie d'Éguilles
+Q119302277,chateaux,mairie de Blanquefort
+Q119307809,chateaux,mairie de Crépy-en-Valois
+Q119319128,chateaux,mairie de Moncourt-Fromonville
+Q119339302,chateaux,mairie de Villiers-en-Plaine
+Q120293758,monuments,Bollene aventure
+Q120298570,monuments,Ventoux aventure
+Q12060923,musees,Centre Juno Beach
+Q120926616,jardins,Jardin des Grottes
+Q122878457,musees,Sciences ACO
+Q122971944,musees,Musée de la musique mécanique
+Q123261626,musees,maison de Barberine
+Q123670650,grottes,Grotte de Cabias
+Q124622979,musees,Musée de la musique mécanique
+Q124675973,monuments,Le sentier des ocres
+Q125198027,grottes,grotte de Chérence
+Q125450667,jardins,jardin de la Préfecture
+Q125685096,musees,caves de la Chartreuse
+Q125699734,musees,Musée Mémorial d'Omaha Beach
+Q125729763,musees,
+Q125930615,jardins,
+Q125936049,musees,
+Q126281470,musees,
+Q1269923,musees,musée de l’Avallonnais
+Q1273261,musees,musée du Costume
+Q1284848,musees,hospices de Beaune
+Q130052430,musees,Musée de la lauze
+Q130240187,musees,Centre d’Interprétation de l’Architecture et du Patrimoine d'Annecy
+Q130312797,megalithes,Mithraeum de Septeuil
+Q130344226,musees,musée de l’informatique du Centre de calcul de l'IN2P3
+Q131369409,monuments,camp de prisonniers de Buglose
+Q131399137,musees,
+Q133270154,grottes,grotte de Solborde
+Q13397967,musees,musée d'archéologie d'Antibes
+Q13405476,musees,musée de la vigne et du vin du Jura
+Q13405482,chateaux,musée Sarret de Grozon
+Q134086129,musees,Droguier de l'Institut des Sciences Pharmaceutiques et Biologiques
+Q13415118,musees,Fondation Carmignac
+Q134489286,musees,musée Novera Ahmed
+Q13517713,musees,ferme-distillerie du Petit-Fahys
+Q13518393,monuments,lieutenance de Honfleur
+Q135790425,monuments,
+Q136099548,musees,
+Q136130430,musees,Maison du Pain
+Q136812623,musees,maison des Mémoires
+Q1378218,musees,Centre européen du résistant déporté
+Q140187393,grottes,Trou d'Argent
+Q140201265,monuments,Falaise de la Baume
+Q1423719,musees,musée Jean-Lurçat et de la Tapisserie contemporaine
+Q14628584,monuments,rempart romain d'Orange
+Q14628685,grottes,Baume-Latrone
+Q1479980,musees,réserve africaine de Sigean
+Q14912870,musees,musée Rodin
+Q1495869,musees,musée d'Art Roger-Quilliot
+Q15154172,musees,batterie de Peyras
+Q15260437,musees,musée des Merveilles
+Q15406293,musees,musée des Verts
+Q1543065,monuments,grange aux dîmes
+Q15490321,musees,muséum d'histoire naturelle de Dijon
+Q15627675,musees,musée des Papeteries Canson et Montgolfier
+Q15630778,musees,
+Q15650989,musees,musée du jouet de Moirans-en-Montagne
+Q15651003,musees,musée de la lunette
+Q15818174,musees,musée de Gajac
+Q15818381,musees,musée d'art et d'histoire de Saint-Lô
+Q15818383,musees,musée des civilisations de Saint-Just-Saint-Rambert
+Q1583780,monuments,La Samaritaine
+Q15918460,monuments,Pharamond
+Q15940043,chateaux,château Bouchet
+Q15944310,chateaux,château de Sommières
+Q15953118,monuments,porte de la Cavalerie
+Q15953296,musees,scierie de la Hallière
+Q15953415,musees,tour des échevins
+Q15968440,musees,CCSTI de Grenoble
+Q15971985,musees,musée Automobile Reims-Champagne
+Q15975956,jardins,carré des Ambassadeurs
+Q16010419,musees,apothicairerie de l'hôtel-Dieu de Bourg-en-Bresse
+Q16011234,musees,Fonds régional d'art contemporain de Franche-Comté
+Q16011495,musees,mémorial du Camp de Rivesaltes
+Q16040879,musees,horloge astronomique de Ploërmel
+Q1613242,musees,"Le Clos Arsène Lupin, Maison Maurice Leblanc"
+Q16303680,musees,Collection Bemberg
+Q16303707,musees,Lab71
+Q16303822,musees,maison du Charolais
+Q16303828,musees,maison Ravier
+Q16303874,musees,
+Q16335530,musees,musée des mariniers
+Q16335720,musees,musée du vieux Lacaune
+Q16335746,musees,musée Paul-Dini de Villefranche-sur-Saône
+Q16335747,musees,musée Muséum départemental des Hautes-Alpes
+Q1637288,monuments,tour LU
+Q16533500,grottes,Bouche-Rolland
+Q16535900,musees,Cap Sciences
+Q16629194,monuments,distillerie Pierre Guy de Pontarlier
+Q16665630,musees,musée de la Guerre de 1870 et de l'Annexion
+Q16665632,musees,musée de la Loire
+Q16665658,musees,muséum d'histoire naturelle de Chambéry
+Q16681305,grottes,trou qui souffle
+Q167623,monuments,chapelle Saint-Louis de la Salpêtrière
+Q16833479,musees,parc du Petit Prince
+Q16964856,chateaux,villa Majorelle
+Q17177229,musees,grande chapelle de l'hôpital du Saint-Esprit de Dijon
+Q1721757,musees,Walygator Grand-Est
+Q17265872,musees,musée d'Histoire de la vie quotidienne
+Q17327772,monuments,Mini World Lyon
+Q17347148,musees,musée d'Histoire maritime de Saint-Tropez
+Q17373215,musees,Guiscriff
+Q17504432,musees,écomusée de la Bresse bourguignonne
+Q17630747,jardins,jardin de Saint-Adrien
+Q17635463,musees,musée Arcabas en Chartreuse
+Q1777602,musees,
+Q1816468,monuments,fontaine de Vaucluse
+Q18215061,chateaux,château de Lacaze
+Q18324694,musees,centre Jean-Moulin de Bordeaux
+Q18328132,monuments,sanctuaire Notre-Dame d'Ay
+Q18328185,chateaux,redoute de Merville
+Q18507238,musees,ancienne église Saint-Vincent de Mérignac
+Q18607845,musees,musée du textile des Vosges
+Q18693244,musees,musée de Pontarlier
+Q187483,musees,Tapisserie de Bayeux
+Q1885892,musees,maison de Louis Pasteur à Arbois
+Q188856,monuments,Panthéon
+Q18907746,musees,musée des beaux-arts de Beaune
+Q18923550,musees,parc de l'Auxois
+Q1898465,musees,Marineland d'Antibes
+Q193193,monuments,Sainte-Chapelle
+Q19406874,chateaux,château de Fourques
+Q19444538,musees,Site Hillman
+Q195052,monuments,chapelle des Cordeliers de Sarrebourg
+Q1955748,musees,"La Piscine, musée d'art et d'industrie"
+Q19606799,jardins,jardin zen d'Erik Borja
+Q1966959,musees,maison Picassiette
+Q19845673,musees,musée du car
+Q19950918,musees,centre de création contemporaine Olivier-Debré
+Q19980621,chateaux,château de Blancafort
+Q2042,musees,
+Q20575963,monuments,chapelle Notre-Dame-de-la-Fontaine-Blanche de Plougastel-Daoulas
+Q206260,chateaux,citadelle de Sisteron
+Q20669745,musees,Centre minier de Faymoreau
+Q20738307,musees,Couriot - Musée de la Mine
+Q20751523,musees,Fonds régional d’art contemporain de Lorraine
+Q20751541,musees,palais Lumière
+Q20830925,chateaux,château de Margon
+Q20971751,musees,musée départemental de préhistoire corse et d'archéologie de Sartène
+Q20971885,musees,galerie Vrais Rêves
+Q20971896,monuments,Carrousel des mondes marins
+Q20972508,musees,bains-douches de Laval
+Q21009083,monuments,halle aux grains d'Auvillar
+Q21027396,musees,musée de la mer et de la marine
+Q21099762,monuments,cuves de Sassenage
+Q21099822,megalithes,site antique de Thésée-Pouillé
+Q21156923,chateaux,château de Nogent-le-Roi
+Q21294354,musees,
+Q21294414,musees,Naïa museum
+Q21511922,musees,Casa Xanxo
+Q21552809,musees,musée des épaves sous-marines
+Q21559215,musees,musée international de la parfumerie
+Q2180449,musees,parc zoologique de Lille
+Q220047,musees,parc animalier de La Barben
+Q220123,musees,parc zoologique d'Amnéville
+Q220125,musees,zoo de la Palmyre
+Q2262801,musees,La Ferme aux crocodiles
+Q22915876,musees,villa Médicis
+Q22916181,musees,villa-musée Jean-Honoré-Fragonard
+Q22916252,musees,hôtel de Sade
+Q22920278,chateaux,château de Pujols
+Q22920838,musees,prison des Évêques de Saint-Jean-Pied-de-Port
+Q22921405,monuments,brasserie Bofinger
+Q22922306,musees,maison-atelier de Jean-François Millet
+Q22923740,musees,maison de Fer
+Q22924332,musees,pavillon de la Suède et la Norvège
+Q22925296,chateaux,manoir de Coadelan
+Q22925934,musees,ossuaire Saint-Cadou de Landerneau
+Q22926043,musees,maison à pondalez
+Q22926478,musees,présidial de Quimperlé
+Q22928501,megalithes,thermes antiques de Royat
+Q22932009,musees,ferme Perrel
+Q22932537,chateaux,château de l'Espinasse
+Q22938008,chateaux,château de Thégra
+Q22938852,chateaux,château de Gramart
+Q22939001,chateaux,château de Bassoues
+Q22939752,musees,maison consulaire
+Q22940540,chateaux,château de Béthune
+Q22940636,musees,maison Farnault
+Q22941646,monuments,église Saint-Léger du Vieux-Bourg
+Q22942683,chateaux,manoir de Beaupré
+Q22950089,chateaux,fortin de Pasciolo
+Q22953451,musees,Horreum de Narbonne
+Q22954201,chateaux,château de Montferrier-sur-Lez
+Q22954644,chateaux,Vieux logis
+Q22959787,musees,maison natale de Paul Verlaine
+Q22963314,musees,logis Tiphaine de Raguenel
+Q22963472,monuments,hôtel de ville d'Alençon
+Q22963942,musees,église Saint-Étienne de Honfleur
+Q22964802,monuments,porte de ville
+Q22966352,chateaux,hôtel de ville de Trie-Château
+Q22966383,chateaux,château de Mont-l'Évêque
+Q22966936,monuments,château de Beauvoir
+Q22966993,musees,muséum d'histoire naturelle de Grenoble
+Q22967175,chateaux,château de Vaugirard
+Q22968462,monuments,tunnel ferroviaire du Fréjus
+Q22968794,musees,maison du Marquisat
+Q22979290,monuments,halle Sainte-Claire
+Q22980309,musees,"immeuble, 5 rue Victor-Schœlcher"
+Q22985128,jardins,jardin de Silière et sa demeure
+Q22986503,chateaux,château d'Oppède
+Q22988010,musees,hôtel de Vienne
+Q22992348,chateaux,château de Pont-du-Château
+Q22993254,musees,moulin à vent de Pargeat
+Q22993379,musees,maison du Doyenné
+Q22995702,musees,logis du Bras d'Or
+Q22996387,grottes,grotte de la Coscia
+Q22997811,musees,scierie du Lançoir
+Q22998459,musees,chapelle Saint-Pierre du Monêtier-les-Bains
+Q22999521,musees,hôtel Paul Arbaud
+Q23006259,musees,Musée Alice Taverne
+Q23013069,musees,musée de la Faïence de Quimper
+Q23013070,musees,musée de la Fraise et du Patrimoine
+Q23057803,musees,musée de la Gendarmerie nationale de Melun
+Q2310474,musees,maison folie de Wazemmes
+Q2344875,monuments,liste des observatoires astronomiques
+Q2348375,musees,maison des Jardies
+Q23498481,musees,écomusée de Saint-Dégan
+Q23498487,musees,musée des Beaux-Arts et d'Histoire Naturelle de Châteaudun
+Q23498495,musees,musée d'Art et d'Histoire de Dreux
+Q2351981,monuments,palais du parlement de Bretagne
+Q23571290,musees,Musée-Hôtel Morin
+Q23599806,musees,musée archéologique de Champagnole
+Q23600664,musees,musée de Provins et du Provinois
+Q23639738,musees,musée de l'étang de Thau
+Q23639831,musees,musée de la cloche et de sonnaille
+Q23640244,musees,musée forum de l'Aurignacien
+Q23640267,musees,musée Jules Bastien-Lepage et de la Fortification
+Q23640303,musees,musée de Sologne
+Q23640606,musees,musée des arts et métiers traditionnels
+Q23640615,musees,musée départemental Raymond Poincaré
+Q23640730,musees,musée de la faïence de Sarreguemines
+Q23641129,musees,musée Greuze
+Q23641217,musees,musée de l'école rurale en Bretagne
+Q23646108,musees,musée du poiré
+Q2371874,musees,musée maritime de La Rochelle
+Q23719013,musees,musée Murat
+Q23727155,musees,musée du vignoble nantais
+Q23780781,musees,musée d'histoire et de céramique biotoises
+Q23780987,musees,musée de traditions populaires et d'archéologie
+Q23826238,musees,musée d'art et d'histoire d'Orange
+Q2387471,musees,jardin zoologique de la ville de Lyon
+Q23906124,musees,musée départemental Rignault
+Q2391572,musees,musée des Avelines
+Q23936770,musees,musée-bibliothèque François Pétrarque
+Q23936797,musees,"La Banque, Musée des Cultures et du Paysage"
+Q23936829,musees,musée de préhistoire Stanislas Bonfils
+Q2397999,musees,La Montagne des singes
+Q2398539,musees,Muséum de Nantes
+Q24006488,musees,Musée Prieuré du Vieux-Logis
+Q2403516,musees,logis Pincé
+Q24048363,musees,
+Q2411496,jardins,domaine de Madame Élisabeth
+Q2415168,musees,maison de Jules Verne
+Q2435525,musees,musée Jeanne-Devos de Wormhout
+Q2446014,monuments,tour Gloriette
+Q24649065,musees,musée Louis-Vouland
+Q24739,monuments,cratère Lochnagar
+Q24931083,musees,Mundolingua
+Q24932124,musees,musée archéologique de l'Université de Lorraine
+Q24933507,grottes,grottes de la Balme
+Q24933640,grottes,grottes de Saint-Christophe
+Q24940461,musees,espace des mondes polaires
+Q25340705,musees,musée gallo-romain d'Aoste
+Q2561236,musees,Cigoland
+Q2603171,musees,salines de Salins-les-Bains
+Q26252333,musees,Musée de La Poëslerie
+Q26257792,musees,maison du patrimoine de Villard-de-Lans
+Q26257857,chateaux,château Barrabino
+Q26257881,musees,musée de la Préhistoire du Vercors
+Q26257919,chateaux,Château Utzschneider
+Q2638057,musees,Argonaute
+Q26402785,musees,musée mémorial des combats de la poche de Colmar
+Q2648376,monuments,La Revanche des Pirates - Le Grand Splatch
+Q26493376,musees,Mémorial de la Shoah à Drancy
+Q26675422,musees,musée EDF Hydrélec
+Q26678177,musees,musée de Bourgoin-Jallieu
+Q26678232,musees,musée d'archéologie de Feurs
+Q26678276,musees,musée matheysin
+Q26678297,musees,musée d'Allard
+Q27316038,musees,musée de la mer de Sète
+Q2744339,musees,maison de la culture du Japon à Paris
+Q2782334,monuments,colonne de la Grande Armée
+Q2788328,monuments,Trace du Hourra
+Q28177264,musees,moulin de Berno
+Q28177520,monuments,moulin de Pen Castel
+Q2820503,musees,abbaye d'Arthous
+Q28216487,musees,musée du Chablais
+Q28398844,musees,Ecomusée du Véron
+Q2854179,musees,musée Antoine-Lécuyer
+Q2858640,musees,appartement du docteur Gagnon
+Q2859173,musees,aquarium de La Rochelle
+Q2859190,musees,Aquarium marin de Trégastel
+Q2876188,monuments,aître Saint-Maclou
+Q2879075,musees,bagne de Nice
+Q28952482,musees,MM Park France
+Q28973562,musees,musée Jean-Couty
+Q290621,monuments,
+Q2935536,monuments,Campo Santo d'Orléans
+Q2936946,musees,Cap'Découverte
+Q2940800,monuments,La Casamaures
+Q2945212,musees,centre d'études et musée Edmond-Michelet
+Q2945654,musees,centre historique minier de Lewarde
+Q2947613,musees,chai de Lardimalie
+Q2957369,monuments,chapelle des Carmélites de Toulouse
+Q2957403,musees,chapelle des Pénitents bleus de La Ciotat
+Q2957493,monuments,chapelle monolithe de Caudon
+Q2968493,chateaux,château de Beauregard
+Q2968587,chateaux,château de Bon Repos
+Q2968946,chateaux,château de Château-Arnoux-Saint-Auban
+Q2969083,chateaux,château de Croissy
+Q2969174,chateaux,château de Désaignes
+Q2969365,chateaux,château de Grouchy
+Q2969406,chateaux,château de Hyères
+Q2969668,chateaux,château de Launaguet
+Q2969674,chateaux,château de Launay
+Q2969869,chateaux,château de Merville
+Q2970052,chateaux,château de Montréal
+Q2970404,chateaux,château de Rochemaure
+Q2970527,chateaux,château de Saint-Jean-d'Angle
+Q2970560,chateaux,château de Saint-Mesmin
+Q2970676,chateaux,château de Septmonts
+Q2970734,chateaux,château de Sédières
+Q2970778,musees,château de Thierry
+Q2970878,chateaux,château de Val-Seille
+Q2971013,chateaux,château de Villeneuve
+Q2971055,chateaux,château de Waldeck
+Q2971095,chateaux,château de l'Engarran
+Q2971111,chateaux,château de l'Islette
+Q2971798,musees,château du Prieuré
+Q2974372,chateaux,citadelle Saint-Elme
+Q2974403,musees,citadelle souterraine de Verdun
+Q2974758,musees,cité de l'économie et de la monnaie
+Q2974767,musees,Cité de la voile Éric-Tabarly
+Q2974792,musees,cité des télécoms
+Q2983428,chateaux,colline Saint-Eutrope
+Q2985796,musees,commanderie d'Avalleur
+Q2985944,chateaux,commanderie de la Villedieu
+Q3001655,musees,couvent de la Visitation de Romans-sur-Isère
+Q3001838,musees,musée de la Chartreuse
+Q30061303,monuments,plage de Dieppe
+Q30140515,monuments,Espace EDF Bazacle
+Q30218775,musees,musée Bernard-d'Agesci
+Q3023222,musees,Dennlys Parc
+Q30256552,musees,hôtel de Pégayrolles
+Q3028372,musees,Dino-Zoo du Doubs
+Q30303348,musees,
+Q3058122,musees,Espace Découverte du sous-marin Flore
+Q3058132,musees,espace Georges-Brassens
+Q3059038,musees,Estran Cité de la mer
+Q3068935,musees,ferme du Clos Parchet
+Q30738411,musees,Narbo Via
+Q3073855,musees,
+Q30739605,musees,
+Q3075583,musees,fondation Vasarely
+Q3075615,chateaux,Fondation de Coubertin
+Q3075738,musees,
+Q3075754,monuments,fonderie de La Voulte-sur-Rhône
+Q3075903,musees,
+Q3076018,monuments,fontaine Cuvier
+Q3077762,chateaux,fort Pélissier
+Q3077922,chateaux,fort Liédot
+Q3078346,chateaux,fort du Mont Vaudois
+Q3078640,musees,Forum départemental des sciences de Villeneuve-d'Ascq
+Q3079574,musees,fosse n° 2 des mines d'Ostricourt
+Q3080015,monuments,four solaire de Mont-Louis
+Q3080032,musees,four à poterie de La Bâtisse
+Q3090513,musees,jardin d'acclimatation
+Q311,monuments,cimetière du Père-Lachaise
+Q3111595,grottes,spélonque de Dions
+Q31157401,musees,Musée alpin de Chamonix
+Q3117106,grottes,grotte Saint-Léon
+Q3117131,grottes,grotte de Lamartine
+Q3117155,grottes,grotte de Néron
+Q3117269,grottes,grotte de Saint-Cézaire
+Q3117274,grottes,grottes des Moidons
+Q3117279,musees,grottes du Mont Cornadore
+Q31203264,musees,musée de paléontologie de Chilhac
+Q3126082,monuments,halle de Beaumont-de-Lomagne
+Q3138340,musees,Historial du Saint Curé d'Ars
+Q3145455,musees,hôtel Coignard
+Q3145461,musees,hôtel Condé
+Q3145715,musees,hôtel d'Assézat
+Q3145725,musees,hôtel d'Estienne-de-Saint-Jean
+Q3145788,musees,hôtel de Caumont
+Q3145837,musees,hôtel Fontfreyde
+Q3145940,musees,musée du Gévaudan
+Q3146071,chateaux,hôtel de préfecture de la Charente-Maritime
+Q3149084,monuments,immeuble et piscine des Amiraux
+Q3151503,megalithes,inscription de la Pierre Écrite
+Q3151912,musees,institut d'art contemporain de Villeurbanne
+Q3162529,musees,
+Q3166916,musees,
+Q3200331,musees,Kulmino
+Q3206723,monuments,La Boisserie
+Q3210673,musees,La Mer de sable
+Q3212448,musees,La Rotonde
+Q3214276,musees,
+Q3221643,musees,"Compa, le musée de l'agriculture"
+Q3226982,musees,"Le Scriptorial, musée des manuscrits du Mont-Saint-Michel"
+Q3228523,musees,Le Rocher des Aigles
+Q323767,monuments,Tour Montparnasse
+Q3238257,musees,Lieu d'art et action contemporaine de Dunkerque
+Q3258029,chateaux,logis du Maine-Giraud
+Q3273318,musees,MUba Eugène-Leroy
+Q3278803,musees,maison Jean-Cocteau
+Q3279049,musees,maison Vauban
+Q3279145,musees,maison d'Alexandra David-Néel
+Q3279205,musees,maison d'Offwiller
+Q3279371,musees,maison de Georges Clemenceau
+Q3279402,musees,maison de Jean Monnet
+Q3279404,monuments,maison de Jean Prouvé
+Q3279523,musees,Maison de Pierre Loti à Rochefort
+Q3279544,musees,maison de Robert Schuman
+Q3279654,musees,maison de l'armateur
+Q3279675,musees,maison de la Baie du Marais poitevin
+Q3279697,musees,maison de la Dame de Brassempouy
+Q3279836,musees,maison des Canuts
+Q3280037,musees,Maison du patrimoine de Saint-Savinien
+Q3280333,musees,musée des Maisons comtoises de Nancray
+Q328579,musees,camp de Royallieu
+Q3286305,musees,manoir de l'automobile
+Q3286385,musees,manoir des Sciences de Réaumur
+Q3290344,monuments,Planet Ocean Montpellier
+Q3314814,monuments,La Mine bleue
+Q3329021,musees,musée-bibliothèque de Grenoble
+Q3329028,musees,musée 39-45 de Dinan
+Q3329030,musees,musée-librairie du compagnonnage
+Q3329042,musees,musée Albert-Schweitzer
+Q3329050,musees,musée Blanche Hoschedé-Monet
+Q3329068,musees,musée Autrefois
+Q3329099,musees,musée Boucher-de-Perthes
+Q3329102,musees,musée Calbet
+Q3329106,musees,musée Champollion
+Q3329108,musees,musée Charles-Friry
+Q3329117,musees,musée Colette
+Q3329126,musees,musée Delta
+Q3329134,musees,musée EDF Electropolis
+Q3329144,musees,musée Ernest-Renan
+Q3329149,musees,musée Ernest-Cognacq
+Q3329157,musees,musée Fenaille
+Q3329160,musees,musée Flaubert et d'Histoire de la médecine
+Q3329172,musees,musée Georgette-Dupouy
+Q3329193,musees,musée Hector-Berlioz
+Q3329194,musees,musée Henri-Barré
+Q3329195,musees,musée Géo-Charles
+Q3329205,musees,musée Hébert
+Q3329215,musees,musée Jean-Frédéric-Oberlin
+Q3329234,musees,musée Lalique
+Q3329259,musees,musée Mainssieux
+Q3329270,musees,musée Masséna
+Q3329274,musees,musée Matra
+Q3329276,musees,musée Maurice-Dufresne
+Q3329287,musees,musée Mémorial de la Bataille de Normandie
+Q3329289,musees,musée Moissan
+Q3329303,musees,musée Paul-Belmondo
+Q3329305,musees,musée des arts précieux Paul-Dupuy
+Q3329310,musees,musée Petiet
+Q3329313,musees,musée Pierre-Corneille
+Q3329316,musees,musée Pierre-de-Luxembourg
+Q3329324,musees,"musée Rabelais, Maison La Devinière"
+Q3329327,musees,musée Robert-Dubois-Corneau
+Q3329329,musees,musée Robert-Tatin
+Q3329364,musees,musée Théodore-Deck
+Q3329380,musees,musée Vert
+Q3329386,musees,Musée Denon
+Q3329392,musees,musée Würth France Erstein
+Q3329394,musees,musée Zervos
+Q3329424,musees,musée archéologique d'Izernore
+Q3329433,musees,musée archéologique de Javols
+Q3329436,musees,musée archéologique Saint-Laurent
+Q3329461,musees,musée archéologique du Nivernais
+Q3329472,musees,musée archéologique municipal de Sanguinet
+Q3329495,musees,musée automobile de Vendée
+Q3329526,musees,musée colombophile militaire
+Q3329527,musees,musée comtois
+Q3329530,musees,musée d'archéologie sous-marine de Saint-Raphaël
+Q3329532,musees,musée d'Argenteuil
+Q3329537,musees,musée d'Art sacré du Gard
+Q3329555,musees,musée d'archéologie et d'histoire du Mans
+Q3329600,musees,musée d'Art de Toulon
+Q3329609,musees,musée d'art et d'histoire Romain-Rolland
+Q3329626,musees,musée d'art et d'histoire de Toul
+Q3329629,musees,musée d'Art et d'Industrie de Saint-Étienne
+Q3329687,musees,musée d’initiation à la nature
+Q3329700,musees,musée de Borda
+Q3329702,musees,musée de Cahors Henri-Martin
+Q3329704,musees,musée de Cerdagne
+Q3329716,musees,musée de Die
+Q3329734,musees,musée de Nogent-sur-Marne
+Q3329743,musees,musée de Préhistoire des gorges du Verdon
+Q3329744,musees,musée de Royan
+Q3329778,musees,musée de l'Annonciade
+Q3329779,musees,musée de l'Ardenne
+Q3329788,musees,Musée de l'Histoire vivante
+Q3329796,musees,musée de l'Inquisition de Carcassonne
+Q3329802,musees,
+Q3329811,musees,musée de l'automobile Henri-Malartre
+Q3329817,musees,musée de l'aviation légère de l'armée de Terre et de l'hélicoptère
+Q3329821,musees,musée de l'eau de Pont-en-Royans
+Q3329826,musees,Féru des Sciences
+Q3329838,musees,musée de l'Image
+Q3329839,musees,musée de l'impression sur étoffes
+Q3329854,musees,musée de l'Éphèbe et d'archéologie sous-marine
+Q3329857,musees,musée de l'Île d'Oléron
+Q3329859,musees,musée de l'école de Carcassonne
+Q3329885,musees,musée de la Chalosse
+Q3329886,musees,musée des Explorations du monde
+Q3329892,musees,musée de la Compagnie des Indes
+Q3329906,musees,musée de la Grande Chartreuse
+Q3329932,musees,musée de la Nacre et de la Tabletterie
+Q3329945,musees,musée de la Poupée et du Jouet Ancien de Wambrechies
+Q3329951,musees,musée de la Reddition
+Q3329960,musees,musée de la Résistance et de la Déportation
+Q3329983,musees,musée de la Vilaine maritime
+Q3330002,musees,musée de la chimie
+Q3330013,musees,musée de la Céramique de Rouen
+Q3330026,musees,musée de la machine agricole et à vapeur
+Q3330028,musees,musée de la Lutherie et de l'Archèterie françaises
+Q3330033,musees,MuséoSeine
+Q3330035,musees,musée de la mine Marcel-Maulini
+Q3330044,musees,musée de la mécanographie de Bourg-en-Bresse
+Q3330064,musees,musée de la pêche de Concarneau
+Q3330067,musees,musée de la résistance et de la déportation d'Angoulême
+Q3330069,musees,musée de la Résistance de Bondues
+Q3330075,musees,musée de la boisson
+Q3330076,musees,musée de la toile de Jouy
+Q3330081,musees,musée de la vie paysanne en Haut-Languedoc
+Q3330086,musees,musée de la viscose
+Q3330091,musees,musée de l’ardoise de Trélazé
+Q3330101,musees,musée de minéralogie de Strasbourg
+Q3330104,musees,musée de sismologie et de magnétisme terrestre
+Q3330120,musees,musée des Bujoliers
+Q3330127,musees,musée des Commerces d'autrefois
+Q3330128,musees,musée des Cordeliers
+Q3330147,musees,musée des Transmissions – espace Ferrié
+Q3330157,musees,"musée des Arts africains, océaniens et amérindiens"
+Q3330161,musees,musée des arts asiatiques de Toulon
+Q3330185,musees,musée des Beaux-Arts d'Agen
+Q3330192,musees,musée des Beaux-Arts de Brest
+Q3330195,musees,musée des Beaux-Arts de Carcassonne
+Q3330203,musees,musée des Beaux-Arts de Dole
+Q3330229,musees,musée des Beaux-Arts de Lons-le-Saunier
+Q3330235,musees,musée des Canonniers
+Q3330240,musees,musée des croyances populaires
+Q3330251,musees,musée des Instruments à vent
+Q3330257,musees,musée Miniature et Cinéma
+Q3330262,musees,musée des métiers de la chaussure
+Q3330263,musees,musée des moulins de Villeneuve-d'Ascq
+Q3330270,musees,musée des pompiers de Firminy
+Q3330272,musees,musée des sapeurs-pompiers de France
+Q3330286,musees,musée des traditions et de l'histoire de Biscarrosse
+Q3330302,musees,musée des transports urbains de Saint-Étienne et sa région
+Q3330317,musees,musée du 34e régiment d'infanterie
+Q3330321,musees,musée du 5 juin 1944
+Q3330333,musees,musée du Chocolat
+Q3330353,musees,musée du Fumeur
+Q3330355,musees,musée du Hurepoix
+Q3330357,musees,musée du Nouveau Monde
+Q3330372,musees,musée du Quercorb
+Q3330377,musees,musée du Rouergue
+Q3330379,musees,musée du Sabotier
+Q3330396,musees,musée du Veinazès
+Q3330397,musees,musée du Vexin français
+Q3330398,musees,musée du Vieil-Aix
+Q3330411,musees,musée du bonbon Haribo
+Q3330428,musees,musée du Dessin et de l'Estampe originale de Gravelines
+Q3330433,musees,musée du génie
+Q3330439,musees,musée du jouet
+Q3330441,musees,musée du jouet de Colmar
+Q3330445,musees,musée du loup
+Q3330452,musees,musée du moteur
+Q3330454,musees,musée du pain d'épices et de l'art populaire alsacien
+Q3330466,musees,musée du peigne et de la plasturgie d'Oyonnax
+Q3330491,musees,musée du train miniature de Châtillon-sur-Chalaronne
+Q3330502,musees,musée départemental Georges-de-La-Tour
+Q3330506,musees,musée départemental Maurice-Denis
+Q3330515,musees,musée départemental d'Art ancien et contemporain
+Q3330521,musees,musée départemental de l'Oise
+Q3330523,musees,musée des Peintres de Barbizon
+Q3330527,musees,musée départemental de la Résistance et de la Déportation
+Q3330530,musees,Musée départemental de la Faïence et des Arts de la table
+Q3330543,musees,musée départemental du sel
+Q3330555,musees,musée et Parc Noisot
+Q3330561,musees,musée du Hiéron
+Q3330563,musees,musée européen d'art campanaire
+Q3330570,musees,musée français de la brasserie
+Q3330574,musees,musée gallo-romain de Saint-Romain-en-Gal
+Q3330575,musees,musée grenoblois des sciences médicales
+Q3330593,musees,musée de l'hydraviation
+Q3330609,musees,musée industriel de la corderie Vallois
+Q3330617,musees,musée international des arts modestes
+Q3330630,musees,musée la maison de Marie-Jeanne
+Q3330643,musees,musée militaire du Périgord
+Q3330651,musees,musée de la faïence et des beaux-arts
+Q3330653,musees,musée municipal d'Étampes
+Q3330667,musees,musée municipal des anciens métiers et traditions populaires
+Q3330694,musees,musée national de Port-Royal des Champs
+Q3330703,musees,musée national de l'Éducation
+Q3330709,musees,musée national de la Marine de Brest
+Q3330710,musees,musée national de la Marine de Port-Louis
+Q3330716,musees,musée national de la Marine de Rochefort
+Q3330717,musees,musée national des Douanes
+Q3330762,musees,musée provençal des transports
+Q3330794,musees,musée de la céramique
+Q3330804,musees,musée social
+Q3330816,musees,musée urbain Tony Garnier
+Q3330821,musees,musée vivant du chemin de fer
+Q3330857,musees,MuséoParc Alésia
+Q3330860,musees,muséum Henri-Lecoq
+Q3330865,musees,muséum d'histoire naturelle d'Autun
+Q3330889,musees,muséum d'histoire naturelle de Tours
+Q3330894,musees,muséum d'histoire naturelle de Nice
+Q3333109,musees,mémorial 39/45 de Saint-Malo
+Q3333111,musees,mémorial Ascq 1944
+Q3333135,monuments,mémorial de Coudehard-Montormel
+Q3333140,musees,Mémorial de l'Alsace-Moselle
+Q3333147,monuments,mémorial de l'abolition de l'esclavage
+Q3333151,musees,mémorial de la Résistance et de la Déportation de la Loire
+Q3333154,musees,mémorial des enfants d'Izieu
+Q3333155,musees,mémorial des déportations
+Q3333156,monuments,mémorial des guerres en Indochine
+Q3333160,musees,mémorial du débarquement en Provence
+Q3337173,musees,Nausicaá - Centre national de la mer
+Q334141,musees,abbaye de Charlieu
+Q3341433,musees,Nigloland
+Q3349063,musees,Océanopolis
+Q3349991,musees,Ok Corral
+Q3356523,musees,Ornavik
+Q3360454,monuments,pagode Hông Hiên Tu
+Q3360832,chateaux,palais Bénédictine
+Q3361743,musees,Paléospace l’Odyssée
+Q3363781,musees,Parc Bagatelle
+Q3363902,musees,parc Saint-Paul
+Q3363937,musees,parc animalier de Merlet
+Q3363939,musees,parc animalier de Sainte-Croix
+Q3363946,megalithes,parc archéologique Asnapio
+Q3364322,musees,parc des Félins
+Q3364355,plages,parc du Vinaigrier
+Q3364777,musees,parc zoologique de Champrepus
+Q3364778,musees,
+Q3364784,musees,parc zoologique de Jurques
+Q3364787,musees,parc zoologique de Lisieux
+Q3364788,musees,parc zoologique de Fréjus
+Q3364790,musees,Wow Safari Thoiry
+Q3373050,musees,pavillon Vendôme
+Q3373053,chateaux,pavillon d'Antoine de Navarre
+Q3373074,musees,pavillon de Manse
+Q3373119,musees,pavillon Populaire
+Q3378424,musees,phare de Tréhiguier
+Q3391936,monuments,plateau des poètes
+Q3402357,chateaux,presbytère de Satillieu
+Q3403051,musees,prieuré de Saint-Rémy
+Q3408961,musees,Préhistorama
+Q3424007,musees,relais de poste à chevaux de Launois-sur-Vence
+Q3457155,musees,réserve de bisons d'Europe de Sainte-Eulalie
+Q3457600,plages,réserve naturelle régionale du Scamandre
+Q3471001,musees,pavillon de l'eau
+Q3476795,musees,Seaquarium du Grau-du-Roi
+Q3486031,musees,siège de Termes
+Q3517659,musees,temple des Bastides
+Q3533057,monuments,tour César
+Q3535500,musees,Touroparc Zoo
+Q3535513,musees,tours Bro-Erec'h
+Q3538637,musees,Tri Postal
+Q35556695,musees,Château du Pin
+Q3556076,musees,verrerie de Meisenthal
+Q3558514,musees,villa Domergue
+Q3558548,monuments,villa Gabrielle
+Q3558616,musees,villa Kérylos
+Q35626382,musees,Musée Baroncelli
+Q35676653,musees,musée de la bataille de Fromelles
+Q3576022,musees,zoo de La Flèche
+Q3576023,musees,zoo de Maubeuge
+Q3576025,musees,Les Terres de Nataé
+Q3576031,musees,zoo de la Bourbansais
+Q3576057,musees,Zooparc de Trégomeur
+Q35761635,musees,musée du Léon
+Q3578598,musees,écomusée de Saint-Nazaire
+Q3578601,musees,écomusée de l'île de Groix
+Q3578606,musees,écomusée des mines de fer de Lorraine
+Q3578609,musees,écomusée du cheminot Veynois
+Q3578611,musees,écomusée du haut-pays et des transports
+Q3578613,musees,écomusée du marais vendéen - Le Daviaud
+Q3578617,musees,écomusée du pays de la Roudoule
+Q36078579,musees,musée de Bibracte
+Q3631797,musees,base sous-marine de Bordeaux
+Q377592,musees,parc Astérix
+Q38380201,monuments,église de l'hospice de La Grave de Toulouse
+Q38397482,musees,église réformée d'Audun-le-Tiche
+Q38492901,musees,église Saint-Cyr du Vaudreuil
+Q40002294,musees,association pour un conservatoire de l'informatique et de la télématique
+Q40041199,musees,Quai des Savoirs
+Q40772746,musees,Espace des Sciences Pierre-Gilles de Gennes
+Q41010745,musees,ancienne église Saint-Jean-Baptiste d'Espalion
+Q4165365,musees,maison de Pauline Jaricot
+Q41705004,musees,musée Jean-Claude-Colin
+Q427665,musees,musée Charles-de-Bruyères
+Q43688220,musees,musée Yves Saint Laurent Paris
+Q47486159,musees,musée des Santons
+Q47488973,monuments,Luma Arles
+Q4784818,jardins,arboretum de Cazebonne
+Q4784854,jardins,arboretum de l'Étoile des Andaines
+Q48756067,grottes,grotte de Labeil
+Q48756083,monuments,Vitsgrotte
+Q48757267,musees,musée des Pêcheries
+Q48760483,grottes,Grande fontaine de Saint-Christophe
+Q48760862,musees,Muséum de l'Ardèche
+Q49136156,grottes,fontaine d'Orchaise
+Q50603042,musees,Musée du Débarquement
+Q50966301,grottes,grotte d'Orjobet
+Q518747,musees,villa Cavrois
+Q53838245,musees,Maison de la Crau
+Q54301387,musees,maison de Jeanne d'Arc à Orléans
+Q55065447,musees,Appartement - Atelier de Le Corbusier
+Q55114817,musees,musée de la mine de Brassac-les-Mines
+Q55114821,musees,La Mine image
+Q55206209,musees,Aubette 1928
+Q55519883,musees,Historial franco-allemand du Hartmannswillerkopf
+Q55595468,musees,Alligator Bay
+Q55597136,grottes,grotte des Fées
+Q55597579,musees,Cité des couteliers
+Q55598705,musees,musée des moulages de Lyon
+Q55738970,musees,musée des machines à nourrir et courir le monde
+Q56312606,grottes,grotte de Nermont
+Q56550293,musees,Histo Bus Dauphinois
+Q56697740,monuments,
+Q567074,monuments,cimetière militaire allemand de La Cambe
+Q56716213,musees,
+Q56777310,musees,hôtel Montcalm
+Q58806255,chateaux,château de Tronjoly
+Q58836709,musees,Centre international du Vitrail
+Q59638100,musees,chapelle Bellini de Cannes
+Q59680518,musees,maison Gainsbourg
+Q60058273,musees,Atelier Brancusi
+Q60193124,musees,musée Peynet et du Dessin Humoristique
+Q60338164,musees,chapelle de Langensoultzbach
+Q60341500,musees,chapelle des Pénitents de Chaudes-Aigues
+Q60341796,musees,chapelle des Visitandines d'Auxerre
+Q60364402,musees,chapelle ossuaire de Sizun
+Q60374799,musees,chapelle Saint-Jacques de Vendôme
+Q60377376,monuments,chapelle Saint-Jérôme de Villefranche-de-Rouergue
+Q60382589,musees,chapelle Saint-Louis de La Petite-Pierre
+Q60385007,musees,ancienne église Notre-Dame de Rochefort
+Q60832377,musees,musée Maillol de Banyuls-sur-Mer
+Q611062,musees,musée de la Grande Guerre du pays de Meaux
+Q6159866,jardins,Jardins ethnobotaniques de la Gardie
+Q61748984,monuments,porte Saint-Michel
+Q627266,musees,villa E-1027
+Q64052728,musees,"La Manufacture, musée de la mémoire et de la création textile"
+Q64061311,musees,musée de l'Institut Pasteur de Lille
+Q64577817,chateaux,château d'Hautpoul
+Q649055,monuments,saline royale d'Arc-et-Senans
+Q65127146,jardins,Les Jardins du Loriot
+Q65128339,musees,Le Comœdia
+Q65132337,musees,Zoo d'Upie - Le jardin aux oiseaux
+Q65133586,musees,Espace Giono
+Q65134185,musees,La Villa de Licinius
+Q65153095,chateaux,Château de Carros
+Q65153259,musees,Fonds régional d'art contemporain de Bourgogne
+Q66095809,musees,musée Louis-de-Funès
+Q6737061,musees,maison de la photographie Robert-Doisneau
+Q67582838,plages,réserve naturelle de Lunaret
+Q7075448,musees,Observatoire des sciences de l'Univers de Grenoble
+Q7111011,monuments,chapelle Notre-Dame-des-Fontaines de la Brigue
+Q739957,musees,Le Vaisseau
+Q74017785,musees,cité internationale de la gastronomie de Lyon
+Q753011,chateaux,porte des Allemands
+Q76125450,monuments,ancienne église Saint-André de Val-de-Fier
+Q781150,musees,
+Q79501011,chateaux,château comtal de Carcassonne
+Q80337516,musees,musée de la boulangerie de Bonnieux
+Q805255,musees,salle du Jeu de paume
+Q82508367,musees,Galerie du Montparnasse
+Q828509,monuments,Goudurix
+Q8294,musees,Aquarium de Lyon
+Q8298179,musees,centre du patrimoine arménien de Valence
+Q8323,musees,musée de l'Imprimerie et de la Communication graphique
+Q8326,monuments,passage Pommeraye
+Q86678569,musees,Espace de l'art concret
+Q86724295,musees,musée archéologique du lac de Paladru
+Q86724818,monuments,Les Buissonnets
+Q86725962,grottes,grotte de Lacalm
+Q88645574,musees,musée Jean Garcin 39-45 : l'appel de la liberté
+Q91473149,jardins,jardin des Herbes
+Q93143364,musees,Maison des Minéraux
+Q93268558,grottes,abîme de Rabanel
+Q93445901,musees,musée du Sel et des Traditions Béarnaises
+Q93865580,grottes,glacière de la Grâce-Dieu
+Q93876023,grottes,grotte de Plaisir-Fontaine
+Q93881840,grottes,grotte d'Artus
+Q93882550,grottes,grotte de l'Autel
+Q93991563,grottes,grotte du Curé
+Q940746,musees,villa Savoye
+Q94294310,grottes,caborne du Bœuf
+Q94408754,jardins,jardin de Cantù
+Q94441548,grottes,
+Q948051,musees,musée de Louviers
+Q950545,musees,Fraispertuis-City
+Q953954,musees,chapelle Saint-Blaise des Baux-de-Provence
+Q958440,musees,hôtel-Dieu de Château-Thierry
+Q960165,monuments,collège des Bernardins
+Q967049,musees,Les Charmettes
+Q96758069,jardins,jardins de Brocéliande
+Q97170606,musees,Backslash gallery
+Q97841538,chateaux,château de la Roque
+Q98012894,monuments,Azteka
+Q98076048,musees,maison de Nostradamus
+Q98108997,monuments,Twist
+Q99471,monuments,plan incliné de Saint-Louis-Arzviller
+Q99509434,monuments,Toutatis
