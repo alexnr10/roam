@@ -487,7 +487,10 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
 
     write_json(retained, collections, args.out)
     write_review_csv(retained, collections, args.out / "review.csv", config, changes)
-    write_review_html(retained, collections, config, args.out / "review.html", changes)
+    write_review_html(
+        retained, collections, config, args.out / "review.html", changes,
+        decided={qid: verdict for qid, (verdict, _note) in decisions.items()},
+    )
     write_seed_sql(retained, collections, config, args.out / "seed.sql")
 
     _report_tier_changes(changes, gone, before, retained)
@@ -742,8 +745,24 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
             for c in json.loads(collections_path.read_text(encoding="utf-8"))
         ]
         finales = _load_places(args.out / "places.json")
+        snapshot_path = args.manual / "tiers.csv"
+        # Photographier un catalogue plus maigre que le précédent effacerait la
+        # trace des lieux que cette machine n'a pas collectés : au prochain
+        # `build` sur la machine complète, des centaines de lieux déjà relus
+        # reviendraient marqués « nouveau ». Les décisions, elles, s'ajoutent
+        # sans rien détruire — on les écrit dans tous les cas.
+        ancien = read_snapshot(snapshot_path)
+        manque = len(ancien) - len(finales)
+        if ancien and manque > max(20, len(ancien) // 50):
+            print(f"⚠ Niveaux NON enregistrés : ce catalogue compte {len(finales)} "
+                  f"lieux contre {len(ancien)} dans le dernier instantané. "
+                  "Cette machine n'a pas tout collecté ; réécrire les niveaux "
+                  "ferait passer les lieux manquants pour disparus.")
+            print("  Tes décisions, elles, sont bien enregistrées dans "
+                  "decisions.csv — pense à les committer.")
+            return status
         write_snapshot(
-            args.manual / "tiers.csv",
+            snapshot_path,
             review_state(finales, rebuilt),
             {p.wikidata_id: p.name for p in finales},
         )
@@ -1331,6 +1350,7 @@ def cmd_review(args: argparse.Namespace, config: Config) -> int:
                   + (f" (+{len(manquants) - 8})" if len(manquants) > 8 else ""))
             print("  Cette machine ne les a jamais collectés. Tu relirais un "
                   "catalogue partiel.")
+        _compare_to_snapshot(len(places), args.manual / "tiers.csv")
 
     print(f"Revue ouverte sur {url}")
     print("Les décisions sont mémorisées dans le navigateur.")
@@ -1343,6 +1363,27 @@ def cmd_review(args: argparse.Namespace, config: Config) -> int:
     finally:
         server.server_close()
     return 0
+
+
+def _compare_to_snapshot(built: int, snapshot_path: Path) -> None:
+    """Dit si CE catalogue est plus maigre que celui qu'on a déjà relu.
+
+    Le catalogue lui-même ne passe pas par git : chaque machine le reconstruit
+    depuis sa propre collecte. `tiers.csv`, lui, est versionné — c'est la seule
+    trace de la taille qu'avait le catalogue sur la machine qui a committé en
+    dernier. La comparaison ne coûte rien et évite de relire un cinquième du
+    travail en croyant le relire en entier.
+    """
+    snapshot = read_snapshot(snapshot_path)
+    if not snapshot:
+        return
+    ecart = len(snapshot) - built
+    print(f"Dernier catalogue relu et committé : {len(snapshot)} lieux.")
+    # 2 % : le catalogue bouge d'une poignée de lieux entre deux revues sans
+    # que rien n'aille mal. Au-delà, c'est une collecte qui manque.
+    if ecart > max(20, len(snapshot) // 50):
+        print(f"⚠ Il en manque {ecart} ici. Cette machine n'a pas tout collecté "
+              "— relance `fetch` sur les thèmes concernés avant de relire.")
 
 
 def cmd_stats(args: argparse.Namespace, config: Config) -> int:

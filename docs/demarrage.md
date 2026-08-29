@@ -54,6 +54,41 @@ réseau au lieu de rester à l'intérieur.
 Garde Termux au premier plan, ou pose un `termux-wake-lock` avant : Android tue
 volontiers les processus en arrière-plan, et le serveur avec.
 
+### Ce qui voyage, et ce qui ne voyage pas
+
+Deux fichiers seulement portent le travail éditorial, et ils sont versionnés :
+`data/manual/decisions.csv` (les verdicts) et `data/manual/tiers.csv` (les
+niveaux déjà vus). **Le catalogue, lui, ne passe pas par git** : `places_raw.json`
+et `places.json` sont ignorés, chaque machine les reconstruit depuis sa propre
+collecte. Un clone qui n'a lancé `fetch` que sur trois thèmes relit trois thèmes,
+et rien dans la page ne ressemble à une erreur.
+
+D'où la marche à suivre avant toute revue sur un second appareil :
+
+```bash
+git pull                       # récupérer les décisions déjà prises
+python -m roam_pipeline fetch  # tous les thèmes, sinon le catalogue est partiel
+python -m roam_pipeline enrich
+python -m roam_pipeline build  # c'est `build` qui écrit review.html
+```
+
+`review` annonce ensuite ce qu'il sert : le nombre de lieux, les thèmes absents,
+et la taille du dernier catalogue committé. Si l'écart dépasse 2 %, il le dit —
+mieux vaut relancer une collecte que passer une soirée sur un cinquième du
+catalogue.
+
+Les verdicts déjà pris sont écrits **dans la page** par `build` : un lieu gardé
+la semaine dernière sur le Mac apparaît gardé sur le téléphone, et le filtre
+« à trancher » ne le propose plus. Le navigateur n'ajoute que le travail de la
+soirée en cours — pense donc toujours à **télécharger le fichier de décisions**
+puis à le passer à `apply-review` avant de fermer l'onglet, sinon ce travail-là
+reste dans ce navigateur, et lui seul.
+
+> `apply-review` refuse de réécrire `tiers.csv` depuis un catalogue nettement
+> plus maigre que le dernier : sans ce garde-fou, une revue faite sur un clone
+> incomplet ferait passer pour disparus des centaines de lieux déjà relus. Les
+> décisions, elles, s'enregistrent dans tous les cas.
+
 ## Avant de commencer
 
 | Sur l'ordinateur | Sur le téléphone |

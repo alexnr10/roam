@@ -375,6 +375,7 @@ def write_review_html(
     config: Config,
     out_path: Path,
     changes: dict[str, str] | None = None,
+    decided: dict[str, str] | None = None,
 ) -> None:
     """Page de revue avec vignettes.
 
@@ -382,8 +383,12 @@ def write_review_html(
     Une photo, si. La page est écrite en local et charge les images depuis
     Wikimedia Commons — c'est aussi pour cela qu'elle n'est pas un simple CSV.
 
-    Les décisions sont conservées dans le navigateur et se réexportent en CSV
-    compatible avec `apply-review`.
+    Les décisions déjà prises sont écrites DANS la page. Sans cela, la mémoire
+    de la curation vit dans le `localStorage` d'un navigateur : elle ne suit ni
+    le dépôt, ni la machine, ni même l'adresse — ouvrir la même revue sur
+    `127.0.0.1` puis sur l'adresse Wi-Fi de l'appareil suffit à repartir de
+    zéro. La page part donc de `decisions.csv`, et le navigateur n'ajoute que
+    ce qui n'y est pas encore.
     """
     membership, best_tier = _membership(collections)
     depts = departements()
@@ -422,15 +427,23 @@ def write_review_html(
 
     themes = sorted({row["theme"] for row in rows})
     payload = json.dumps(rows, ensure_ascii=False)
+    # Seules les décisions qui portent sur un lieu de la page : un `drop` a fait
+    # disparaître son lieu du catalogue, le rappeler ici n'aurait aucun sens.
+    known = {row["id"] for row in rows}
+    already = {q: d for q, d in (decided or {}).items() if q in known}
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(
         _REVIEW_TEMPLATE.replace("__DATA__", payload)
         .replace("__THEMES__", json.dumps(themes, ensure_ascii=False))
+        .replace("__DECIDED__", json.dumps(already, ensure_ascii=False))
         .replace("__TITLE__", REVIEW_PAGE_TITLE),
         encoding="utf-8",
     )
-    LOG.info("page de revue : %s (%s lieux)", out_path, len(rows))
+    LOG.info(
+        "page de revue : %s (%s lieux, %s déjà tranchés)",
+        out_path, len(rows), len(already),
+    )
 
 
 _REVIEW_TEMPLATE = """<!doctype html>
@@ -463,6 +476,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
           overflow: hidden; display: flex; flex-direction: column; }
   .card.keep { border-color: var(--keep); box-shadow: inset 0 0 0 1px var(--keep); }
   .card.drop { opacity: .45; border-color: var(--drop); }
+  .card.promote, .card.demote { border-color: var(--muted); }
   .thumb { aspect-ratio: 4/3; background: var(--alt); object-fit: cover; width: 100%;
            display: block; }
   .noimg { aspect-ratio: 4/3; background: var(--alt); display: grid; place-items: center;
@@ -492,6 +506,8 @@ _REVIEW_TEMPLATE = """<!doctype html>
   .actions button { flex: 1; padding: 7px 0; font-size: 13px; }
   .actions button[data-on="keep"] { background: var(--keep); color: #fff; border-color: var(--keep); }
   .actions button[data-on="drop"] { background: var(--drop); color: #fff; border-color: var(--drop); }
+  .actions button[data-on="promote"], .actions button[data-on="demote"] {
+    background: var(--text); color: #fff; border-color: var(--text); }
   a { color: var(--primary); }
   .warn { background: #FBEEE6; border: 1px solid var(--primary); color: var(--primary);
           padding: 8px 12px; border-radius: 8px; font-size: 13px; margin: 12px 20px 0; }
@@ -530,11 +546,20 @@ _REVIEW_TEMPLATE = """<!doctype html>
 <script>
 const DATA = __DATA__;
 const THEMES = __THEMES__;
+// Les décisions déjà enregistrées dans `decisions.csv`, écrites dans la page
+// par `build`. C'est la mémoire qui voyage avec le dépôt ; le navigateur ne
+// garde que le travail de la soirée en cours.
+const DECIDED = __DECIDED__;
 const KEY = "roam.review.v1";
 
 let decisions = {};
-try { decisions = JSON.parse(localStorage.getItem(KEY) || "{}"); }
-catch (e) { decisions = {}; }
+try {
+  // Le fichier d'abord, le navigateur par-dessus : une décision prise ici,
+  // pas encore committée, prime sur celle qu'on relit. Une valeur vide dans
+  // le stockage est une décision RETIRÉE à la main — elle doit rester vide,
+  // sinon un clic pour annuler serait défait au prochain rechargement.
+  decisions = Object.assign({}, DECIDED, JSON.parse(localStorage.getItem(KEY) || "{}"));
+} catch (e) { decisions = Object.assign({}, DECIDED); }
 
 let persistent = true;
 try { localStorage.setItem(KEY + ".probe", "1"); localStorage.removeItem(KEY + ".probe"); }
@@ -636,15 +661,17 @@ function card(p) {
     <div class="actions">
       <button data-act="keep"${d === "keep" ? ' data-on="keep"' : ""}>Garder</button>
       <button data-act="drop"${d === "drop" ? ' data-on="drop"' : ""}>Écarter</button>
-      <button data-act="promote" title="Faire remonter">↑</button>
-      <button data-act="demote" title="Faire descendre">↓</button>
+      <button data-act="promote"${d === "promote" ? ' data-on="promote"' : ""}
+              title="Faire remonter">↑</button>
+      <button data-act="demote"${d === "demote" ? ' data-on="demote"' : ""}
+              title="Faire descendre">↓</button>
     </div>`;
 
   el.querySelectorAll("[data-act]").forEach(btn => {
     btn.onclick = () => {
       const act = btn.dataset.act;
       decisions[p.id] = decisions[p.id] === act ? "" : act;
-      if (!decisions[p.id]) delete decisions[p.id];
+      if (!decisions[p.id] && !(p.id in DECIDED)) delete decisions[p.id];
       save();
       render();
     };
@@ -655,7 +682,7 @@ function card(p) {
 function render() {
   const list = visible();
   grid.replaceChildren(...list.map(card));
-  const done = Object.keys(decisions).length;
+  const done = Object.values(decisions).filter(Boolean).length;
   document.getElementById("count").textContent =
     `${list.length} affichés · ${done}/${DATA.length} décidés`;
 }

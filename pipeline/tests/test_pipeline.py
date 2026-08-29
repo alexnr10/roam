@@ -2203,6 +2203,40 @@ class TestTierChanges(unittest.TestCase):
         self.assertIn('value="bouge"', body)
         self.assertIn("descendu depuis ta dernière revue", body)
 
+    def test_the_page_carries_the_decisions_already_taken(self):
+        # La mémoire de la curation vit dans `decisions.csv`, versionné. Si elle
+        # ne descend pas dans la page, elle n'existe que dans le navigateur qui
+        # l'a produite : ouvrir la revue ailleurs — un autre appareil, une autre
+        # adresse — repart de zéro et fait relire un travail déjà fait.
+        with _capture():
+            places = self._catalogue()
+            _retained, collections = build_all(places, CONFIG)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.html"
+            write_review_html(
+                places, collections, CONFIG, path, None,
+                decided={"Q3": "keep", "Q404": "drop"},
+            )
+            body = path.read_text(encoding="utf-8")
+        decided = json.loads(
+            body.split("const DECIDED = ", 1)[1].split(";\n", 1)[0]
+        )
+        self.assertEqual(decided, {"Q3": "keep"})
+
+    def test_a_decision_on_an_absent_place_is_not_carried(self):
+        # Un `drop` a fait disparaître son lieu du catalogue : le rappeler à une
+        # page qui ne l'affiche pas ne servirait qu'à fausser le compteur.
+        with _capture():
+            places = self._catalogue()
+            _retained, collections = build_all(places, CONFIG)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.html"
+            write_review_html(
+                places, collections, CONFIG, path, None, decided={"Q404": "drop"},
+            )
+            body = path.read_text(encoding="utf-8")
+        self.assertIn("const DECIDED = {};", body)
+
 
 class TestGapCensus(unittest.TestCase):
     """Le recensement des portes qu'on n'a pas ouvertes.
