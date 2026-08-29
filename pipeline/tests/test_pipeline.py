@@ -691,6 +691,10 @@ class TestThemeOrder(unittest.TestCase):
         ("dunes-marais", "plages"),   # une dune est une formation littorale
         ("volcans", "sommets"),       # un puy est un sommet
         ("cirques", "gorges"),        # un cirque est une vallée encaissée
+        # « basilique mineure » est un TITRE, accordé à quantité d'églises
+        # abbatiales : l'ajouter aux cathédrales a envoyé Saint-Victor de
+        # Marseille et ses semblables hors de leur thème.
+        ("abbayes", "cathedrales"),
     ]
 
     def test_the_more_specific_theme_is_declared_first(self):

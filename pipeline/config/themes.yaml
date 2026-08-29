@@ -76,6 +76,24 @@ themes:
     wikidata_classes: []
     from_labels: [plus-beaux-villages, plus-beaux-detours]
 
+  # AVANT `cathedrales`, et c'est « basilique mineure » qui l'impose : ce
+  # titre canonique est accordé à quantité d'églises abbatiales. Saint-Victor
+  # de Marseille, Saint-Vincent de Metz, Alet-les-Bains partaient donc dans
+  # « Cathédrales et basiliques » alors qu'ils s'appellent « Abbaye de ».
+  #
+  # Une abbaye qui reçoit le titre de basilique reste une abbaye : c'est ce
+  # qu'on est venu voir, et c'est ce que dit son nom.
+  - id: abbayes
+    name: Abbayes et monastères
+    name_singular: Abbaye
+    icon: abbey
+    kind: culture
+    radius_m: 150
+    min_sitelinks: 8
+    fetch_min_sitelinks: 3
+    cap: 60
+    wikidata_classes: [Q160742, Q44613]              # abbaye, monastère
+
   - id: cathedrales
     name: Cathédrales et basiliques
     name_singular: Cathédrale
@@ -99,17 +117,6 @@ themes:
 
   # Pas de classe Wikidata : « commune française » ramènerait les 35 000 communes.
   # Les labels sont ici la seule sélection défendable — et ils sont déjà finis.
-
-  - id: abbayes
-    name: Abbayes et monastères
-    name_singular: Abbaye
-    icon: abbey
-    kind: culture
-    radius_m: 150
-    min_sitelinks: 8
-    fetch_min_sitelinks: 3
-    cap: 60
-    wikidata_classes: [Q160742, Q44613]              # abbaye, monastère
 
   - id: chateaux
     name: Châteaux
