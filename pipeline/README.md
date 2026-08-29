@@ -290,6 +290,47 @@ plutôt que l'intérêt des lieux.
 Le malus fait reculer, il n'exclut pas : un château qu'on ne visite pas peut se
 photographier depuis la route, et une alerte prévient déjà le relecteur.
 
+### Un département ne doit pas occuper une collection nationale
+
+La collection « Ponts et viaducs » comptait **vingt-cinq ponts parisiens sur
+quarante**. Ce n'est pas un fait de géographie mais un fait d'écriture : le
+score mesure la documentation, et Paris est documenté comme nulle part
+ailleurs. Un pont de Dordogne vaut souvent mieux le détour qu'un pont du
+huitième arrondissement, et ne l'emportera jamais sur ce critère-là.
+
+Un thème peut donc borner ce qu'un même département occupe **dans sa
+collection nationale** :
+
+```yaml
+  - id: ponts
+    cap: 40
+    max_per_departement: 8
+```
+
+Le quota s'applique dans l'ordre du score — le meilleur de chaque territoire
+avant d'en reprendre un deuxième — et il ne **rétrécit jamais** la collection :
+s'il ne suffit pas à remplir le plafond, on complète avec les meilleurs
+écartés. Mieux vaut une collection un peu parisienne qu'une collection trop
+courte pour exister.
+
+Mesuré sur le catalogue réel :
+
+| | Paris | départements représentés |
+|---|---|---|
+| ponts, avant | 25 / 40 | 14 |
+| ponts, après | 10 / 40 | **25** |
+
+> **Le quota n'agit que s'il y a de quoi substituer.** Sur `maisons`, cinquante
+> huit lieux pour un plafond de cinquante : le repli remet aussitôt les
+> Parisiens écartés, et la part parisienne ne bouge quasiment pas. Là, seule la
+> revue éditoriale corrige — écarter une maison parisienne sans intérêt libère
+> une place ET retire un Parisien.
+
+Les thèmes que la géographie concentre pour de bon n'ont **pas** de quota : les
+volcans sont vraiment en Auvergne, les phares en Bretagne, les grottes ornées
+en Dordogne. Y imposer une diversité abîmerait une vérité au lieu de corriger
+un biais.
+
 ### Nature et culture : un équilibre à surveiller
 
 Roam promet des **paysages** autant que du patrimoine. Or rien dans les sources ne

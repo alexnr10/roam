@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import logging
 import math
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 from .config import Config
 from .geo import FRANCE, area, departements, regions
@@ -53,8 +53,47 @@ def dedupe(places: list[Place]) -> list[Place]:
     return kept
 
 
+def _spread(ordered: list[Place], limit: int, max_per_dept: int) -> list[Place]:
+    """Choisit `limit` lieux sans laisser un département occuper la collection.
+
+    Le score mesure la documentation d'un lieu, et Paris est documenté comme
+    nulle part ailleurs : la collection nationale des ponts comptait vingt-cinq
+    ponts parisiens sur quarante. Ce n'est pas un fait de géographie mais un
+    fait d'écriture — les volcans sont vraiment en Auvergne, les ponts ne sont
+    pas vraiment à Paris.
+
+    Le quota s'applique dans l'ordre du score : on prend le meilleur de chaque
+    territoire avant de revenir en prendre un deuxième. Et il ne RÉTRÉCIT
+    jamais la collection — si le quota ne suffit pas à remplir le plafond, on
+    complète avec les meilleurs écartés. Mieux vaut une collection un peu
+    parisienne qu'une collection trop courte pour exister.
+    """
+    retenus: list[Place] = []
+    reportes: list[Place] = []
+    par_dept: Counter[str] = Counter()
+
+    for place in ordered:
+        dept = place.departement_code or "?"
+        if len(retenus) >= limit:
+            break
+        if par_dept[dept] >= max_per_dept:
+            reportes.append(place)
+            continue
+        par_dept[dept] += 1
+        retenus.append(place)
+
+    if len(retenus) < limit:
+        retenus.extend(reportes[: limit - len(retenus)])
+        retenus.sort(key=lambda p: (-p.score, p.name))
+    return retenus
+
+
 def _finalize(
-    collection: Collection, members: list[Place], config: Config, cap: int | None = None
+    collection: Collection,
+    members: list[Place],
+    config: Config,
+    cap: int | None = None,
+    max_per_dept: int | None = None,
 ) -> Collection | None:
     """Applique plancher, plafond et niveaux. Renvoie None si la collection n'existe pas."""
     rules = config.collections
@@ -62,7 +101,10 @@ def _finalize(
         return None
 
     limit = cap or rules.max_places
-    ordered = sorted(members, key=lambda p: (-p.score, p.name))[:limit]
+    ordered = sorted(members, key=lambda p: (-p.score, p.name))
+    ordered = (
+        _spread(ordered, limit, max_per_dept) if max_per_dept else ordered[:limit]
+    )
 
     collection.places = [
         CollectionPlace(place_id=place.wikidata_id, tier=tier, rank=rank)
@@ -86,7 +128,10 @@ def build_theme_collections(places: list[Place], config: Config) -> list[Collect
             theme_id=theme.id,
         )
         members = by_theme.get(theme.id, [])
-        built = _finalize(collection, members, config, cap=theme.cap)
+        built = _finalize(
+            collection, members, config,
+            cap=theme.cap, max_per_dept=theme.max_per_departement,
+        )
         if built:
             out.append(built)
         else:

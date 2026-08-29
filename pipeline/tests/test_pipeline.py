@@ -12,12 +12,14 @@ import tempfile
 from contextlib import contextmanager
 from io import StringIO
 import unittest
+from collections import Counter
 from dataclasses import replace
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from roam_pipeline.collections import (
+    _spread,
     apply_class_exclusion,
     apply_geographic_scope,
     apply_notoriety_floor,
@@ -2461,6 +2463,84 @@ class TestUnknownAccessReview(unittest.TestCase):
         ouvert.visitable = True
         body = self._page([ouvert])
         self.assertIn('"visitable":true', body.replace(" ", ""))
+
+
+class TestGeographicSpread(unittest.TestCase):
+    """Un département ne doit pas occuper une collection nationale.
+
+    Le score mesure la documentation, et Paris est documenté comme nulle part
+    ailleurs : vingt-cinq des quarante ponts de la collection nationale étaient
+    parisiens. Ce n'est pas un fait de géographie mais un fait d'écriture — les
+    volcans sont vraiment en Auvergne, les ponts ne sont pas vraiment à Paris.
+    """
+
+    @staticmethod
+    def _lieux(par_dept):
+        places, score = [], 100.0
+        for dept, combien in par_dept:
+            for i in range(combien):
+                p = make_place(f"Pont {dept}-{i}", theme="ponts", wikidata_id=f"Q{dept}{i}")
+                p.departement_code, p.score = dept, score
+                score -= 1
+                places.append(p)
+        return sorted(places, key=lambda p: (-p.score, p.name))
+
+    def test_one_department_cannot_fill_the_collection(self):
+        # Trois départements, quota de sept : vingt et une places possibles
+        # pour vingt à pourvoir, donc le quota tient sans repli.
+        ordre = self._lieux([("75", 20), ("33", 10), ("13", 10)])
+        retenus = _spread(ordre, limit=20, max_per_dept=7)
+        compte = Counter(p.departement_code for p in retenus)
+        self.assertEqual(compte["75"], 7)
+        self.assertEqual(len(retenus), 20)
+
+    def test_a_quota_too_tight_to_fill_falls_back_rather_than_shrink(self):
+        # Trois départements, quota de cinq : quinze places seulement pour
+        # vingt à pourvoir. Le repli complète avec les meilleurs écartés — donc
+        # des Parisiens — plutôt que de rendre une collection amputée.
+        ordre = self._lieux([("75", 20), ("33", 10), ("13", 10)])
+        retenus = _spread(ordre, limit=20, max_per_dept=5)
+        self.assertEqual(len(retenus), 20)
+        self.assertGreater(Counter(p.departement_code for p in retenus)["75"], 5)
+
+    def test_the_best_of_each_territory_comes_first(self):
+        # Le quota s'applique dans l'ordre du score : on prend le meilleur de
+        # chaque département avant d'y revenir pour un deuxième.
+        ordre = self._lieux([("75", 3), ("33", 3)])
+        retenus = _spread(ordre, limit=2, max_per_dept=1)
+        self.assertEqual({p.departement_code for p in retenus}, {"75", "33"})
+
+    def test_it_never_shrinks_the_collection(self):
+        # Sans ce repli, un thème concentré perdrait des lieux au lieu d'en
+        # échanger : mieux vaut une collection un peu parisienne qu'une
+        # collection trop courte pour exister.
+        ordre = self._lieux([("75", 18), ("33", 2)])
+        retenus = _spread(ordre, limit=15, max_per_dept=5)
+        self.assertEqual(len(retenus), 15)
+        self.assertGreater(Counter(p.departement_code for p in retenus)["75"], 5)
+
+    def test_the_fallback_keeps_the_ranking(self):
+        ordre = self._lieux([("75", 18), ("33", 2)])
+        retenus = _spread(ordre, limit=15, max_per_dept=5)
+        self.assertEqual(retenus, sorted(retenus, key=lambda p: (-p.score, p.name)))
+
+    def test_only_the_biased_themes_carry_a_quota(self):
+        # Les volcans SONT en Auvergne et les phares en Bretagne : leur imposer
+        # un quota abîmerait une vérité géographique au lieu de corriger un
+        # biais d'écriture.
+        avec = {t.id for t in CONFIG.themes if t.max_per_departement}
+        self.assertIn("ponts", avec)
+        for nature in ("volcans", "phares", "grottes", "cascades", "sommets"):
+            self.assertNotIn(nature, avec)
+
+    def test_a_geographic_collection_keeps_no_quota(self):
+        # « Ponts de Paris » doit évidemment être parisienne de bout en bout.
+        with _capture():
+            places = self._lieux([("75", 12)])
+            _retained, collections = build_all(places, CONFIG)
+        paris = [c for c in collections if c.geo_code == "75" and c.theme_id == "ponts"]
+        if paris:
+            self.assertEqual(len(paris[0].places), 12)
 
 
 if __name__ == "__main__":

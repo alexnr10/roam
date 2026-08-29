@@ -143,6 +143,12 @@ themes:
     min_sitelinks: 4
     fetch_min_sitelinks: 2
     cap: 50
+    # Diversité géographique : vingt-neuf des cinquante-huit maisons sont parisiennes.
+    # Ce n'est pas un fait de géographie mais un fait d'écriture — les
+    # volcans sont vraiment en Auvergne, les ponts ne sont pas vraiment à
+    # Paris. Les thèmes que la géographie concentre pour de bon (volcans,
+    # phares, grottes, cascades) n'ont donc pas de quota.
+    max_per_departement: 8
     wikidata_classes: [Q2087181, Q11982370, Q5755620, Q24906026, Q2072285, Q746628]
     # maison-musée (le bâtiment), maison-musée d'artiste, maison-musée
     # (l'institution), maison d'écrivain, atelier (le bâtiment), atelier (le lieu)
@@ -188,6 +194,12 @@ themes:
     min_sitelinks: 12
     fetch_min_sitelinks: 4
     cap: 50
+    # Diversité géographique : soixante-douze musées sur deux cent quatre-vingt-cinq sont parisiens.
+    # Ce n'est pas un fait de géographie mais un fait d'écriture — les
+    # volcans sont vraiment en Auvergne, les ponts ne sont pas vraiment à
+    # Paris. Les thèmes que la géographie concentre pour de bon (volcans,
+    # phares, grottes, cascades) n'ont donc pas de quota.
+    max_per_departement: 12
     wikidata_classes: [Q33506, Q207694]              # musée, musée d'art
     # « musée d'art » devrait être une sous-classe de « musée » et remonter
     # toute seule ; dans les faits elle ne le fait pas, et `gaps` a compté 55
@@ -206,6 +218,12 @@ themes:
     min_sitelinks: 8
     fetch_min_sitelinks: 4
     cap: 60
+    # Diversité géographique : dix-sept monuments sur soixante et onze sont à Paris.
+    # Ce n'est pas un fait de géographie mais un fait d'écriture — les
+    # volcans sont vraiment en Auvergne, les ponts ne sont pas vraiment à
+    # Paris. Les thèmes que la géographie concentre pour de bon (volcans,
+    # phares, grottes, cascades) n'ont donc pas de quota.
+    max_per_departement: 10
     wikidata_classes: [Q143912, Q170980, Q7362268, Q19757, Q16560, Q12518, Q815448]
     # arc de triomphe, obélisque, amphithéâtre romain, théâtre romain, palais,
     # tour, beffroi
@@ -254,6 +272,12 @@ themes:
     min_sitelinks: 5
     fetch_min_sitelinks: 3
     cap: 50
+    # Diversité géographique : cinquante-deux jardins sur cent vingt-trois sont à Paris.
+    # Ce n'est pas un fait de géographie mais un fait d'écriture — les
+    # volcans sont vraiment en Auvergne, les ponts ne sont pas vraiment à
+    # Paris. Les thèmes que la géographie concentre pour de bon (volcans,
+    # phares, grottes, cascades) n'ont donc pas de quota.
+    max_per_departement: 10
     wikidata_classes: [Q1107656, Q167346]            # jardin, jardin botanique
     # « jardin public » (Q22746) écarté volontairement : il ramènerait tous les
     # squares municipaux de France. Le label Jardin remarquable est le filtre.
@@ -278,6 +302,13 @@ themes:
     min_sitelinks: 8
     fetch_min_sitelinks: 3
     cap: 40
+    # Diversité géographique : trente-cinq des soixante-cinq ponts retenus sont à Paris, et
+    # vingt-cinq occupaient les quarante places de la collection nationale.
+    # Ce n'est pas un fait de géographie mais un fait d'écriture — les
+    # volcans sont vraiment en Auvergne, les ponts ne sont pas vraiment à
+    # Paris. Les thèmes que la géographie concentre pour de bon (volcans,
+    # phares, grottes, cascades) n'ont donc pas de quota.
+    max_per_departement: 8
     wikidata_classes: [Q12280, Q181348, Q13218676]   # pont, viaduc, aqueduc romain
     # « aqueduc » au sens large (Q474) écarté : c'est l'ouvrage d'adduction
     # d'eau, y compris les canalisations modernes. L'aqueduc romain, lui, se

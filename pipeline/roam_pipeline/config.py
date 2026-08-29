@@ -55,6 +55,9 @@ class Theme:
     search: list[str] = field(default_factory=list)
     # Classes génériques, collectées à un plancher qui leur est propre.
     broad_classes: list[BroadClass] = field(default_factory=list)
+    # Nombre maximum de lieux d'un même département dans la collection
+    # NATIONALE du thème. `None` ne borne rien.
+    max_per_departement: int | None = None
 
     @property
     def collected_classes(self) -> list[tuple[str, int]]:
@@ -211,6 +214,9 @@ def load_config(config_dir: Path | None = None) -> Config:
             wikidata_classes=[str(q) for q in (t.get("wikidata_classes") or [])],
             from_labels=list(t.get("from_labels") or []),
             search=list(t.get("search") or []),
+            max_per_departement=(
+                int(t["max_per_departement"]) if t.get("max_per_departement") else None
+            ),
             broad_classes=[
                 BroadClass(qid=str(b["qid"]), fetch_min_sitelinks=int(b["fetch_min_sitelinks"]))
                 for b in (t.get("broad_classes") or [])
