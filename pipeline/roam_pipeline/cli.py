@@ -61,7 +61,7 @@ from .review import (
     read_decisions, read_names, read_themes, theme_claims, write_themes,
     read_snapshot, vanished, write_decisions, write_names, write_snapshot,
 )
-from .score import score_all
+from .score import rescued, score_all
 
 LOG = logging.getLogger("roam")
 
@@ -751,7 +751,6 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
         apply_access_filter, apply_alpine_filter, apply_class_exclusion,
         apply_geographic_scope, apply_notoriety_floor, dedupe, dedupe_across_themes,
     )
-    from .score import rescued
 
     raw_path = args.out / "places_raw.json"
     if not raw_path.exists():
@@ -1417,27 +1416,33 @@ def cmd_weigh(args: argparse.Namespace, config: Config) -> int:
     renseignes = [p for p in base if p.pageviews_per_month]
     print(f"Consultations connues : {len(renseignes)} lieux sur {len(base)} "
           f"({len(renseignes) / len(base) * 100:.0f} %)")
-    if not renseignes:
+    # La donnée n'est indispensable que si on lui donne du poids : peser les
+    # seules langues doit rester possible sur un catalogue non enrichi.
+    if not renseignes and any(args.weights):
         print("\nAucune donnée. Lance d'abord :\n"
               "    python -m roam_pipeline enrich --pageviews", file=sys.stderr)
         return 1
 
     vues = sorted(p.pageviews_per_month for p in renseignes)
     for nom, rang in (("médiane", 0.5), ("9ᵉ décile", 0.9), ("maximum", 1.0)):
-        print(f"  {nom:<12} {vues[min(int(rang * len(vues)), len(vues) - 1)]:>9} vues/mois")
+        if vues:
+            print(f"  {nom:<12} {vues[min(int(rang * len(vues)), len(vues) - 1)]:>9} vues/mois")
 
     # Le signal des consultations recoupe largement celui des langues : les
     # ajouter l'un à l'autre renforce ce qu'ils ont en commun — la célébrité —
     # au lieu de corriger ce qui les sépare. D'où `--sitelinks`, qui permet de
     # DÉPLACER du poids de l'un vers l'autre au lieu d'en empiler.
     classements: dict[tuple[float, float], list[tuple[int, str, float, int | None]]] = {}
-    couples = [(v, s) for v in args.weights
-               for s in (args.sitelinks or [config.scoring.sitelinks_weight])]
-    for poids, langues in couples:
+    globaux: dict[tuple[float, float], tuple[int, int, int, int, int]] = {}
+    couples = [(v, s, r) for v in args.weights
+               for s in (args.sitelinks or [config.scoring.sitelinks_weight])
+               for r in (args.rescue or [config.scoring.rescue_score])]
+    for poids, langues, repechage in couples:
         essai = replace(
             config,
             pageviews=replace(config.pageviews, weight=poids),
-            scoring=replace(config.scoring, sitelinks_weight=langues),
+            scoring=replace(config.scoring, sitelinks_weight=langues,
+                            rescue_score=repechage),
         )
         places = _load_places(raw_path)
         apply_names(places, read_names(args.manual / "names.csv"))
@@ -1458,18 +1463,30 @@ def cmd_weigh(args: argparse.Namespace, config: Config) -> int:
         if nationale is None:
             print(f"\nAucune collection nationale pour « {args.theme} ».", file=sys.stderr)
             return 1
-        classements[(poids, langues)] = [
+        # Baisser le poids des langues ne réordonne pas : ça baisse TOUS les
+        # scores, donc déplace chaque seuil absolu de `scoring.yaml` — le
+        # repêchage à 85 points, les planchers de niveau à 45 et 25. Un
+        # classement plus juste qui vide le catalogue n'est pas un progrès.
+        niveaux = Counter(m.tier for c in collections for m in c.places)
+        globaux[(poids, langues, repechage)] = (
+            len(retenus),
+            len([p for p in retenus if rescued(p, essai)]),
+            niveaux[1], niveaux[2], niveaux[3],
+        )
+        classements[(poids, langues, repechage)] = [
             (m.tier, par_id[m.place_id].name, par_id[m.place_id].score,
              par_id[m.place_id].pageviews_per_month)
             for m in nationale.places[: args.top]
         ]
 
     reference = {nom for _t, nom, _s, _v in classements[couples[0]]}
-    for (poids, langues), lignes in classements.items():
+    for (poids, langues, repechage), lignes in classements.items():
         actuel = (" (réglage actuel)"
                   if poids == config.pageviews.weight
-                  and langues == config.scoring.sitelinks_weight else "")
-        print(f"\n── consultations {poids:g} · langues {langues:g}{actuel} ──")
+                  and langues == config.scoring.sitelinks_weight
+                  and repechage == config.scoring.rescue_score else "")
+        print(f"\n── consultations {poids:g} · langues {langues:g} · "
+              f"repêchage {repechage:g}{actuel} ──")
         for rang, (tier, nom, score, vues_m) in enumerate(lignes, start=1):
             v = f"{vues_m:>7} vues" if vues_m else "      —     "
             marque = " " if nom in reference else "▲"
@@ -1478,8 +1495,20 @@ def cmd_weigh(args: argparse.Namespace, config: Config) -> int:
         if partis:
             print(f"     sortis du haut du classement : {', '.join(sorted(partis))}")
 
-    print(f"\nRien n'a été modifié. Pour adopter un poids, écris-le dans "
-          f"`config/scoring.yaml`, bloc `pageviews`.")
+    print("\n── effet sur TOUT le catalogue ──")
+    print(f'{"consult":>8}{"langues":>8}{"repêch.":>9}{"lieux":>8}{"écart":>9}'
+          f'{"repêchés":>10}{"niveau 1":>10}{"niveau 2":>10}')
+    base = globaux[couples[0]]
+    for (poids, langues, rep), (lieux, repeches, n1, n2, _n3) in globaux.items():
+        ecart = f"{lieux - base[0]:+d}" if lieux != base[0] else "—"
+        print(f"{poids:>8g}{langues:>8g}{rep:>9g}{lieux:>8}{ecart:>9}"
+              f"{repeches:>10}{n1:>10}{n2:>10}")
+    print("\n  Un classement plus juste qui vide le catalogue n'est pas un progrès :")
+    print("  `rescue_score`, `tier1_min_score` et `tier2_min_score` sont des seuils")
+    print("  ABSOLUS. Baisser un poids les déplace tous.")
+
+    print(f"\nRien n'a été modifié. Pour adopter un réglage, écris-le dans "
+          f"`config/scoring.yaml`.")
     return 0
 
 
@@ -2161,6 +2190,10 @@ def build_parser() -> argparse.ArgumentParser:
     balance.add_argument("--sitelinks", type=float, nargs="+",
                          help="poids de notoriété à comparer, pour en DÉPLACER "
                               "vers les consultations plutôt qu'en empiler")
+    balance.add_argument("--rescue", type=float, nargs="+",
+                         help="seuils de repêchage à comparer : baisser un poids "
+                              "baisse tous les scores, donc vide le catalogue "
+                              "si ce seuil ABSOLU ne suit pas")
     balance.add_argument("--top", type=int, default=12, help="lieux affichés par poids")
     add_decision_args(balance)
 
