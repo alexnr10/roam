@@ -91,6 +91,31 @@ visitors:
   # Versailles.
   scale: 10000
 
+# Consultations de l'article francophone, médiane des douze derniers mois.
+#
+# Le décompte de langues mesure ce que le MONDE écrit d'un lieu ; celui-ci, ce
+# que le public d'ICI va y chercher. Le Champ-de-Mars figure dans cinquante-six
+# langues parce que la tour Eiffel s'y trouve, et les jardins de la Fontaine
+# dans six : le premier classement n'en est pas un.
+#
+# Ce n'est pas « ça vaut le détour ». Aucune donnée gratuite ne le mesure — les
+# notes Google, qui s'en approcheraient, ne peuvent être ni stockées ni
+# affichées hors d'une carte Google. C'est la curiosité, son plus proche parent
+# gratuit et légal.
+#
+# Même règle à trois états que la fréquentation : un lieu sans article, ou sans
+# consultation enregistrée, ne perd RIEN.
+pageviews:
+  # Poids NUL : le signal se collecte et s'observe avant de peser. `weigh`
+  # montre ce que chaque poids ferait au classement réel, sans rien changer.
+  #     python -m roam_pipeline enrich --pageviews
+  #     python -m roam_pipeline weigh --theme jardins --weights 0 8 16 24
+  weight: 0.0
+  # Le score suit log1p(vues / scale). Cinq cents vues par mois valent un
+  # demi-poids : c'est l'ordre de grandeur d'un lieu que le public connaît
+  # sans qu'il soit national.
+  scale: 500
+
 tiers:
   # Le niveau est RELATIF à chaque collection : les meilleurs scores prennent
   # le niveau 1, quel que soit leur score absolu.

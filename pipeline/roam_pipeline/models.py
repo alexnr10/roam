@@ -100,6 +100,14 @@ class Place:
     # renseignée », ce qui ne vaut RIEN — ni bonus ni malus. Wikidata ne la
     # documente que pour une minorité de sites.
     visitors_per_year: int | None = None
+    # Consultations mensuelles typiques de l'article francophone (médiane des
+    # douze derniers mois). `None` signifie « pas de données » et ne vaut RIEN.
+    #
+    # Le décompte de langues mesure ce que le MONDE écrit d'un lieu ; celui-ci,
+    # ce que le public FRANCOPHONE va y chercher. Le Champ-de-Mars est dans
+    # cinquante-six langues parce que la tour Eiffel s'y trouve, et les jardins
+    # de la Fontaine dans six — ce que personne n'irait appeler un classement.
+    pageviews_per_month: int | None = None
     # Entré par une classe GÉNÉRIQUE (`broad_classes`) et non par une classe
     # propre au thème. Une porte large ne vaut pas une porte précise : le
     # dédoublonnage inter-thèmes s'en sert pour trancher.

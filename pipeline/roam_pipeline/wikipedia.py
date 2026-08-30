@@ -14,13 +14,17 @@ from __future__ import annotations
 
 import logging
 import time
-from urllib.parse import unquote
+from datetime import date, timedelta
+from urllib.parse import quote, unquote
 
 import requests
 
 LOG = logging.getLogger(__name__)
 
 API = "https://fr.wikipedia.org/w/api.php"
+# Les consultations d'articles, servies par l'API REST de la Wikimedia
+# Foundation. Libre, sans clé, sans quota déclaré pour un usage raisonnable.
+PAGEVIEWS = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
 USER_AGENT = "RoamCatalogBot/0.1 (https://github.com/alexnr10/roam) python-requests"
 # L'API MediaWiki accepte cinquante titres par appel pour les clients anonymes.
 BATCH = 50
@@ -51,6 +55,43 @@ class WikipediaClient:
         if elapsed < self.min_interval_s:
             time.sleep(self.min_interval_s - elapsed)
         self._last_call = time.monotonic()
+
+    def pageviews(self, title: str, months: int = 12) -> int | None:
+        """Consultations mensuelles TYPIQUES de l'article, ou `None`.
+
+        La médiane des douze derniers mois complets, pas la moyenne : un lieu
+        qui passe au journal télévisé, ou qu'un incendie met à la une, gagne un
+        pic qui écraserait tout. La médiane décrit le mois ordinaire, qui est
+        ce qu'on veut mesurer — l'intérêt durable, pas l'actualité.
+
+        `agent=user` exclut les robots et les moissonneurs, qui représentent une
+        part considérable du trafic et ne disent rien de l'intérêt du public.
+
+        `None` signifie « pas de données » et ne vaudra RIEN au score : ni
+        bonus, ni malus. Même règle que la fréquentation et que l'accueil du
+        public, et pour la même raison.
+        """
+        fin = date.today().replace(day=1) - timedelta(days=1)
+        debut = (fin.replace(day=1) - timedelta(days=1)).replace(day=1)
+        for _ in range(months - 1):
+            debut = (debut - timedelta(days=1)).replace(day=1)
+
+        url = (f"{PAGEVIEWS}/fr.wikipedia/all-access/user/{quote(title.replace(' ', '_'), safe='')}"
+               f"/monthly/{debut:%Y%m%d}/{fin:%Y%m%d}")
+        self._throttle()
+        response = self._session.get(url, timeout=self.timeout_s)
+        if response.status_code == 404:
+            # L'article existe peut-être, mais aucune consultation n'est
+            # enregistrée sur la période. Ce n'est pas zéro, c'est inconnu.
+            return None
+        response.raise_for_status()
+        counts = sorted(item["views"] for item in response.json().get("items", []))
+        if not counts:
+            return None
+        milieu = len(counts) // 2
+        if len(counts) % 2:
+            return counts[milieu]
+        return (counts[milieu - 1] + counts[milieu]) // 2
 
     def article_sizes(self, titles: list[str]) -> dict[str, int]:
         """Taille en octets de chaque article, indexée par le titre demandé."""

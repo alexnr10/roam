@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import io
+from contextlib import contextmanager, redirect_stdout
+from dataclasses import replace
 import csv
 import json
 import logging
@@ -39,6 +42,7 @@ from .fetch import (
     enrich_exclusions,
     enrich_visitors,
     enrich_article_sizes,
+    enrich_pageviews,
     enrich_communes,
     enrich_departements,
     enrich_flags,
@@ -310,6 +314,11 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     enrich_communes(places)
     if not args.skip_summaries:
         enrich_summaries(places)
+    # Une requête par article : la passe la plus longue, et la seule dont le
+    # résultat ne pèse encore rien au score. On ne la lance donc que si on la
+    # demande.
+    if args.pageviews:
+        enrich_pageviews(places)
     _save_raw(args, places)
     print(f"{found} tailles d'articles ajoutées → {raw_path}")
     print("Relance `build` pour en tenir compte dans le classement.")
@@ -1391,6 +1400,94 @@ def cmd_rename(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def cmd_weigh(args: argparse.Namespace, config: Config) -> int:
+    """Montre ce qu'un poids ferait au catalogue, sans rien adopter.
+
+    Un signal nouveau ne se règle pas au jugé : on le collecte, on le regarde
+    peser sur les lieux qu'on connaît, et on choisit le poids en voyant qui
+    monte et qui descend. Le poids réel reste celui de `scoring.yaml` tant
+    qu'on ne l'y écrit pas.
+    """
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `sync` ou `fetch`.", file=sys.stderr)
+        return 1
+
+    base = _load_places(raw_path)
+    renseignes = [p for p in base if p.pageviews_per_month]
+    print(f"Consultations connues : {len(renseignes)} lieux sur {len(base)} "
+          f"({len(renseignes) / len(base) * 100:.0f} %)")
+    if not renseignes:
+        print("\nAucune donnée. Lance d'abord :\n"
+              "    python -m roam_pipeline enrich --pageviews", file=sys.stderr)
+        return 1
+
+    vues = sorted(p.pageviews_per_month for p in renseignes)
+    for nom, rang in (("médiane", 0.5), ("9ᵉ décile", 0.9), ("maximum", 1.0)):
+        print(f"  {nom:<12} {vues[min(int(rang * len(vues)), len(vues) - 1)]:>9} vues/mois")
+
+    classements: dict[float, list[tuple[int, str, float, int | None]]] = {}
+    for poids in args.weights:
+        essai = replace(config, pageviews=replace(config.pageviews, weight=poids))
+        places = _load_places(raw_path)
+        apply_names(places, read_names(args.manual / "names.csv"))
+        places, _ = apply_themes(places, read_themes(args.manual / "themes.csv"),
+                                 {t.id for t in essai.themes})
+        scored = score_all(places, essai)
+        kept, _counts = apply_decisions(scored, read_decisions(args.manual / "decisions.csv"),
+                                        args.adjust, strict=args.strict)
+        score_all(kept, essai)
+        with _silence():
+            retenus, collections = build_all(kept, essai)
+        par_id = {p.wikidata_id: p for p in retenus}
+        nationale = next(
+            (c for c in collections
+             if c.kind == "theme" and c.theme_id == args.theme and not c.geo_code),
+            None,
+        )
+        if nationale is None:
+            print(f"\nAucune collection nationale pour « {args.theme} ».", file=sys.stderr)
+            return 1
+        classements[poids] = [
+            (m.tier, par_id[m.place_id].name, par_id[m.place_id].score,
+             par_id[m.place_id].pageviews_per_month)
+            for m in nationale.places[: args.top]
+        ]
+
+    reference = {nom for _t, nom, _s, _v in classements[args.weights[0]]}
+    for poids, lignes in classements.items():
+        actuel = " (poids actuel)" if poids == config.pageviews.weight else ""
+        print(f"\n── poids {poids:g}{actuel} ──")
+        for rang, (tier, nom, score, vues_m) in enumerate(lignes, start=1):
+            v = f"{vues_m:>7} vues" if vues_m else "      —     "
+            marque = " " if nom in reference else "▲"
+            print(f"  {marque} {rang:>2}. niveau {tier}  {score:>6.1f}  {v}  {nom}")
+        partis = reference - {nom for _t, nom, _s, _v in lignes}
+        if partis:
+            print(f"     sortis du haut du classement : {', '.join(sorted(partis))}")
+
+    print(f"\nRien n'a été modifié. Pour adopter un poids, écris-le dans "
+          f"`config/scoring.yaml`, bloc `pageviews`.")
+    return 0
+
+
+@contextmanager
+def _silence():
+    """Coupe le bruit d'une construction d'essai.
+
+    Le tableau d'entonnoir et les avertissements de périmètre, répétés une fois
+    par poids comparé, noieraient la mesure. Ils passent par le journal, donc
+    par la sortie d'erreur : rediriger la sortie standard ne suffit pas.
+    """
+    tampon = io.StringIO()
+    logging.disable(logging.CRITICAL)
+    try:
+        with redirect_stdout(tampon):
+            yield
+    finally:
+        logging.disable(logging.NOTSET)
+
+
 def cmd_merge(args: argparse.Namespace, config: Config) -> int:
     """Résout les conflits git des fichiers de curation.
 
@@ -1912,6 +2009,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="complète tailles d'articles, descriptions, signaux et départements",
     )
     enrich.add_argument(
+        "--pageviews",
+        action="store_true",
+        help="ajouter les consultations Wikipédia (une requête par article)",
+    )
+    enrich.add_argument(
         "--skip-summaries",
         action="store_true",
         help="ne pas récupérer les descriptions (la passe la plus longue)",
@@ -2039,6 +2141,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="dossier de GeoJSON déjà téléchargés (region.geojson, departement.geojson)",
     )
 
+    balance = sub.add_parser(
+        "weigh", help="montre ce qu'un poids de consultations ferait au classement")
+    balance.add_argument("--theme", default="jardins", help="thème à observer")
+    balance.add_argument("--weights", type=float, nargs="+", default=[0, 8, 16, 24],
+                         help="poids à comparer")
+    balance.add_argument("--top", type=int, default=12, help="lieux affichés par poids")
+    add_decision_args(balance)
+
     fusion = sub.add_parser(
         "merge", help="résout les conflits git des fichiers de curation")
     fusion.add_argument("files", nargs="*", type=Path,
@@ -2094,6 +2204,7 @@ def main(argv: list[str] | None = None) -> int:
         "sync": cmd_sync,
         "retheme": cmd_retheme,
         "merge": cmd_merge,
+        "weigh": cmd_weigh,
         "check-lists": cmd_check_lists,
         "gaps": cmd_gaps,
         "probe": cmd_probe,

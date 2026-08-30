@@ -106,6 +106,34 @@ reste dans ce navigateur, et lui seul.
 > incomplet ferait passer pour disparus des centaines de lieux déjà relus. Les
 > décisions, elles, s'enregistrent dans tous les cas.
 
+## Peser les consultations Wikipédia
+
+Le nombre de langues d'un article mesure ce que le **monde** écrit d'un lieu.
+Le Champ-de-Mars figure dans 56 langues parce que la tour Eiffel s'y trouve ;
+les jardins de la Fontaine, à Nîmes, dans 6. Ce n'est pas un classement de
+jardins, c'est un classement de célébrité internationale.
+
+Les consultations de l'article francophone disent autre chose : combien de gens
+d'ici s'y intéressent. La donnée vient de l'API de la Wikimedia Foundation —
+libre, sans clé — et c'est la médiane des douze derniers mois, pas la moyenne :
+un lieu qui passe au journal télévisé gagne un pic qui écraserait tout.
+
+```bash
+python -m roam_pipeline enrich --pageviews          # une requête par article
+python -m roam_pipeline weigh --theme jardins --weights 0 8 16 24
+```
+
+`weigh` ne modifie rien. Il reconstruit le catalogue à chaque poids et montre
+qui monte, qui descend et qui sort du haut du classement. Le poids réel reste
+celui de `config/scoring.yaml`, bloc `pageviews`, **à zéro** tant que tu n'y as
+pas écrit autre chose.
+
+> Ce signal ne mesure pas « ça vaut le détour ». Aucune donnée gratuite ne le
+> mesure : les notes Google, qui s'en approcheraient, ne peuvent être ni
+> stockées durablement ni affichées hors d'une carte Google, et leur API est
+> payante. Les consultations mesurent la curiosité, son plus proche parent
+> gratuit et légal. Le reste est ton jugement.
+
 ## Avant de commencer
 
 | Sur l'ordinateur | Sur le téléphone |

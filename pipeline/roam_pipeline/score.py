@@ -62,6 +62,9 @@ def score_breakdown(place: Place, config: Config) -> dict[str, float]:
         # Le seul poste qui mesure l'AFFLUENCE. Les autres mesurent ce qu'on
         # écrit d'un lieu ; celui-ci, combien de gens s'y rendent.
         "visiteurs": _visitors_score(place, config),
+        # Ce que le public FRANCOPHONE va chercher sur un lieu, quand les
+        # langues ne disent que ce que le monde en écrit.
+        "consultations": _pageviews_score(place, config),
         "ajustement": round(place.curator_adjustment, 1),
     }
     parts["total"] = round(sum(parts.values()), 1)
@@ -84,6 +87,24 @@ def _visitors_score(place: Place, config: Config) -> float:
     if not rule.active or not place.visitors_per_year:
         return 0.0
     return round(rule.weight * math.log1p(place.visitors_per_year / rule.scale), 1)
+
+
+def _pageviews_score(place: Place, config: Config) -> float:
+    """Bonus de consultation. Jamais de malus, et nul tant qu'il n'est pas pesé.
+
+    Le décompte de langues mesure la documentation INTERNATIONALE d'un lieu.
+    Le Champ-de-Mars figure dans cinquante-six langues parce que la tour Eiffel
+    s'y trouve ; les jardins de la Fontaine, un des plus beaux jardins
+    classiques d'Europe, dans six. Les consultations de l'article francophone
+    disent autre chose : combien de gens d'ici s'y intéressent.
+
+    Ce n'est pas « ça vaut le détour » — aucune donnée gratuite ne le mesure.
+    C'est la curiosité, qui en est le plus proche parent gratuit.
+    """
+    rule = config.pageviews
+    if not rule.active or not place.pageviews_per_month:
+        return 0.0
+    return round(rule.weight * math.log1p(place.pageviews_per_month / rule.scale), 1)
 
 
 def _access_score(place: Place, s: Scoring) -> float:

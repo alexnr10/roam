@@ -135,6 +135,23 @@ class Visitors:
 
 
 @dataclass(frozen=True)
+class Pageviews:
+    """Consultations de l'article francophone : l'intérêt du public d'ici.
+
+    Poids nul = signal inactif. C'est volontaire : la donnée se collecte, se
+    regarde et se calibre AVANT de peser sur un classement. `weigh` montre ce
+    que chaque poids ferait au catalogue réel.
+    """
+
+    weight: float = 0.0
+    scale: int = 500
+
+    @property
+    def active(self) -> bool:
+        return bool(self.weight)
+
+
+@dataclass(frozen=True)
 class Tiers:
     tier1_size: int
     tier2_size: int
@@ -181,6 +198,7 @@ class Config:
     alerts: Alerts
     exclusions: Exclusions = field(default_factory=Exclusions)
     visitors: Visitors = field(default_factory=Visitors)
+    pageviews: Pageviews = field(default_factory=Pageviews)
 
     def theme(self, theme_id: str) -> Theme:
         for t in self.themes:
@@ -276,6 +294,14 @@ def load_config(config_dir: Path | None = None) -> Config:
         search=list(excluded.get("search") or []),
     )
 
+    seen_views = raw.get("pageviews") or {}
+    pageviews = Pageviews(
+        weight=float(seen_views.get("weight", 0.0)),
+        scale=int(seen_views.get("scale", 500)),
+    )
+    if pageviews.scale < 1:
+        raise ValueError("`pageviews.scale` doit être positif")
+
     _validate(themes, labels, exclusions, visitors)
     return Config(
         themes=themes,
@@ -286,6 +312,7 @@ def load_config(config_dir: Path | None = None) -> Config:
         alerts=alerts,
         exclusions=exclusions,
         visitors=visitors,
+        pageviews=pageviews,
     )
 
 

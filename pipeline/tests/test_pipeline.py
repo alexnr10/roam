@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from roam_pipeline.raw import EXTRA_SHARD, read_raw, shards, write_raw
 from roam_pipeline.merge import merge_file, merge_text, split_conflict
+from roam_pipeline.wikipedia import WikipediaClient
 from roam_pipeline.review import (
     apply_themes, name_hints, read_themes, theme_claims, theme_from_name, write_themes,
 )
@@ -2961,6 +2962,82 @@ class TestCurationMerge(unittest.TestCase):
         # compris.
         with self.assertRaises(ValueError):
             merge_text("a,b\n1,2\n", "a,b\n3,4\n")
+
+
+class TestPageviews(unittest.TestCase):
+    """L'intérêt du public d'ici, quand les langues ne disent que celui du monde.
+
+    Le Champ-de-Mars figure dans cinquante-six langues parce que la tour Eiffel
+    s'y trouve, les jardins de la Fontaine dans six. Le décompte de langues
+    mesure la documentation internationale d'un lieu, pas l'envie d'y aller.
+    """
+
+    @staticmethod
+    def _config(weight, scale=500):
+        return replace(CONFIG, pageviews=replace(CONFIG.pageviews,
+                                                 weight=weight, scale=scale))
+
+    def test_a_signal_collected_is_not_a_signal_adopted(self):
+        # Poids nul par défaut : la donnée se collecte, s'observe, et ne pèse
+        # que le jour où on l'écrit dans `scoring.yaml`. C'est ce qui permet de
+        # mesurer avant d'adopter.
+        place = make_place("Un jardin", pageviews_per_month=50_000)
+        self.assertEqual(score_breakdown(place, self._config(0))["consultations"], 0.0)
+        self.assertGreater(score_breakdown(place, self._config(16))["consultations"], 0)
+
+    def test_no_data_costs_nothing(self):
+        # Même règle que l'accueil du public et la fréquentation : l'absence de
+        # donnée noterait le zèle des contributeurs, pas l'intérêt des lieux.
+        for value in (None, 0):
+            place = make_place("Un jardin", pageviews_per_month=value)
+            self.assertEqual(
+                score_breakdown(place, self._config(16))["consultations"], 0.0)
+
+    def test_ten_times_the_views_is_not_ten_times_the_score(self):
+        # L'écart qui compte est entre le jardin qu'on ignore et celui qu'on
+        # cherche, pas entre le Luxembourg et Versailles.
+        config = self._config(16)
+        petit = score_breakdown(make_place("A", pageviews_per_month=500), config)
+        grand = score_breakdown(make_place("B", pageviews_per_month=5_000), config)
+        self.assertLess(grand["consultations"], petit["consultations"] * 4)
+        self.assertGreater(grand["consultations"], petit["consultations"])
+
+    def test_a_spike_does_not_decide(self):
+        # Un lieu qui passe au journal télévisé gagne un pic. La médiane décrit
+        # le mois ordinaire ; la moyenne aurait retenu l'actualité.
+        client = _FakeViews([100, 120, 110, 90, 130, 100,
+                             115, 105, 95, 125, 108, 40_000])
+        self.assertEqual(client.pageviews("Un lieu"), 109)
+
+    def test_no_recorded_view_is_unknown_not_zero(self):
+        # 404 : l'article existe peut-être, mais rien n'est enregistré. Le
+        # traiter comme zéro le pénaliserait pour un trou de données.
+        self.assertIsNone(_FakeViews(None, status=404).pageviews("Un lieu"))
+
+
+class _FakeViews(WikipediaClient):
+    """Un client qui ne sort pas sur le réseau, pour éprouver la médiane."""
+
+    class _Response:
+        def __init__(self, counts, status):
+            self._counts, self.status_code = counts, status
+
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"items": [{"views": v} for v in self._counts or []]}
+
+    class _Session:
+        def __init__(self, counts, status):
+            self._counts, self._status = counts, status
+
+        def get(self, url, timeout=None):
+            return _FakeViews._Response(self._counts, self._status)
+
+    def __init__(self, counts, status=200):
+        super().__init__(min_interval_s=0)
+        self._session = self._Session(counts, status)
 
 
 if __name__ == "__main__":

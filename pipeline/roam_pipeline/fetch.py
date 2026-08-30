@@ -449,6 +449,48 @@ def enrich_article_sizes(places: list[Place], client: WikipediaClient | None = N
     return found
 
 
+def enrich_pageviews(places: list[Place], client: WikipediaClient | None = None) -> int:
+    """Consultations mensuelles typiques de l'article francophone.
+
+    L'API ne sert qu'un article à la fois : c'est la passe la plus longue du
+    pipeline, d'où l'annonce préalable et la reprise. Un lieu déjà renseigné
+    n'est pas redemandé — relancer après une interruption ne recommence pas.
+    """
+    client = client or WikipediaClient()
+    by_title: dict[str, list[Place]] = defaultdict(list)
+    for place in places:
+        title = title_from_url(place.wikipedia_url)
+        if title and place.pageviews_per_month is None:
+            by_title[title].append(place)
+
+    titles = sorted(by_title)
+    if not titles:
+        LOG.info("consultations : rien à récupérer")
+        return 0
+
+    LOG.info(
+        "consultations : %s articles, une requête chacun (~%s min)",
+        len(titles), max(1, round(len(titles) * client.min_interval_s / 60)),
+    )
+    found = 0
+    for index, title in enumerate(titles, start=1):
+        try:
+            views = client.pageviews(title)
+        except Exception as exc:
+            # Un article qui échoue ne doit pas coûter les neuf mille autres.
+            LOG.warning("consultations : %s échoué (%s)", title, exc)
+            continue
+        if views is None:
+            continue
+        for place in by_title[title]:
+            place.pageviews_per_month = views
+        found += 1
+        if index % 500 == 0:
+            LOG.info("consultations : %s/%s articles", index, len(titles))
+    LOG.info("consultations : %s articles renseignés sur %s", found, len(titles))
+    return found
+
+
 def enrich_summaries(places: list[Place], client: WikipediaClient | None = None) -> int:
     """Récupère une description courte pour chaque lieu.
 
