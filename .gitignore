@@ -23,6 +23,7 @@ pipeline/data/out/seed.sql
 # La PAGE de revue se reconstruit à l'identique depuis le catalogue et les
 # décisions. `review.csv`, lui, reste hors de cette liste : une feuille remplie
 # à la main est du travail humain, et le dépôt doit pouvoir la sauver.
+pipeline/data/out/review.html
 # `fetch-state.json` est en revanche PETIT et utile à conserver : il dit quels
 # thèmes ont une collecte en échec, et `build` le rappelle à chaque passage.
 
