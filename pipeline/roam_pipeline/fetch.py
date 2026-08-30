@@ -15,6 +15,7 @@ from .config import Config, Label, Theme
 from .geo import normalize_dept_code, region_of
 from .geocode import AddressClient, CommuneClient, departement_from_insee
 from .models import Place
+from .raw import EXTRA_SHARD, NO_THEME_SHARD, read_raw, shards, write_raw
 
 LOG = logging.getLogger(__name__)
 
@@ -324,7 +325,7 @@ def fetch_adopted_places(
     return places
 
 
-def carry_osm_signals(places: list[Place], raw_path: Path) -> int:
+def carry_osm_signals(places: list[Place], raw_dir: Path, raw_path: Path) -> int:
     """Reprend l'ouverture au public de la collecte précédente.
 
     Wikidata ne sait rien de l'accueil du public : ces champs ne viennent que
@@ -333,13 +334,19 @@ def carry_osm_signals(places: list[Place], raw_path: Path) -> int:
     trace — le catalogue perdrait silencieusement la seule donnée qui dise si
     un lieu se visite.
     """
-    if not raw_path.exists():
-        return 0
-
-    try:
-        previous = json.loads(raw_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        LOG.warning("collecte précédente illisible (%s) — ouverture au public perdue", exc)
+    # Le dépôt d'abord : sur un clone frais, `places_raw.json` n'existe pas
+    # encore alors que la collecte, elle, est là — et avec elle l'ouverture au
+    # public que personne ne veut recollecter.
+    previous: list[dict] = [p.to_dict() for p in read_raw(raw_dir)]
+    if not previous and raw_path.exists():
+        try:
+            previous = json.loads(raw_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            LOG.warning(
+                "collecte précédente illisible (%s) — ouverture au public perdue", exc
+            )
+            return 0
+    if not previous:
         return 0
 
     known = {
@@ -795,15 +802,23 @@ def run_fetch(
     out_dir: Path,
     manual_dir: Path,
     only: list[str] | None = None,
+    raw_dir: Path | None = None,
 ) -> list[Place]:
     """Collecte les candidats. `only` limite aux thèmes nommés.
 
     Une collecte complète dure une demi-heure ; quand un thème échoue, on doit
     pouvoir le reprendre seul plutôt que tout refaire. Les thèmes non demandés
-    sont donc conservés depuis la collecte précédente.
+    — et ceux qui ont échoué — sont donc conservés depuis la collecte
+    précédente, thème par thème.
+
+    C'est le découpage par fichier qui rend cette garantie solide : on ne
+    réécrit QUE les thèmes réellement collectés. Un thème qui expire ne peut
+    donc plus vider sa propre collecte, ce qu'un fichier unique réécrit d'un
+    bloc faisait sans le dire.
     """
     out_dir.mkdir(parents=True, exist_ok=True)
     raw_path = out_dir / "places_raw.json"
+    raw_dir = raw_dir if raw_dir is not None else out_dir.parent / "raw"
 
     themes = [t for t in config.themes if not only or t.id in only]
     if only:
@@ -848,43 +863,37 @@ def run_fetch(
     resolve_admin(client, places)
     apply_labels(places, label_members)
 
-    # Reprise partielle : on réinjecte les thèmes qu'on n'a pas recollectés.
-    if only and raw_path.exists():
-        recollected = {t.id for t in themes}
-        configured = {t.id for t in config.themes}
-        previous = json.loads(raw_path.read_text(encoding="utf-8"))
-        kept = [
-            Place(**{k: v for k, v in item.items() if k != "slug"})
-            for item in previous
-            if item.get("theme_id") not in recollected
-            and item.get("theme_id") in configured
-            # Ajouts manuels et candidats adoptés sont recollectés à chaque
-            # passage, quels que soient les thèmes demandés : les conserver ici
-            # les compterait deux fois.
-            and not item.get("pinned")
-            and item.get("source") != "osm"
-        ]
-        LOG.info("%s lieux conservés des thèmes non recollectés", len(kept))
+    # L'ouverture au public ne vient que d'OpenStreetMap, donc de `discover`,
+    # qui coûte vingt minutes : une nouvelle collecte l'écraserait sans trace.
+    carry_osm_signals(places, raw_dir, raw_path)
 
-        # Un thème retiré de la configuration laissait ses lieux dans
-        # `places_raw.json` pour toujours : la reprise partielle ne recollecte
-        # pas son thème, donc elle le reconduisait. Ils ne sortaient dans
-        # aucune collection mais faussaient chaque tableau de diagnostic.
-        stale = Counter(
-            item["theme_id"]
-            for item in previous
-            if item.get("theme_id") not in configured and item.get("theme_id")
+    # On ne réécrit que ce qu'on a collecté. Les thèmes non demandés gardent
+    # leur fichier ; ceux qui ont échoué aussi — leur dernière collecte réussie
+    # vaut mieux que rien, et l'échec est déjà signalé par ailleurs.
+    collected = {t.id for t in themes} - set(failed)
+    written = write_raw(raw_dir, places, replacing=collected | {EXTRA_SHARD})
+    LOG.info(
+        "collecte écrite dans %s : %s",
+        raw_dir,
+        ", ".join(f"{name} {count}" for name, count in sorted(written.items())),
+    )
+
+    # Un thème retiré de la configuration garderait son fichier pour toujours :
+    # aucune collecte ne le recouvre. Ses lieux ne sortaient dans aucune
+    # collection mais faussaient chaque tableau de diagnostic.
+    configured = {t.id for t in config.themes} | {EXTRA_SHARD, NO_THEME_SHARD}
+    stale = [name for name in shards(raw_dir) if name not in configured]
+    for name in stale:
+        (raw_dir / f"{name}.json").unlink(missing_ok=True)
+    if stale:
+        LOG.warning(
+            "thèmes disparus de la configuration, collectes abandonnées : %s",
+            ", ".join(stale),
         )
-        if stale:
-            LOG.warning(
-                "thèmes disparus de la configuration, %s lieux abandonnés : %s",
-                sum(stale.values()),
-                ", ".join(f"{theme} {count}" for theme, count in sorted(stale.items())),
-            )
-        places = kept + places
 
-    carry_osm_signals(places, raw_path)
-
+    # La copie de travail, reconstituée : elle porte donc aussi les thèmes que
+    # cette collecte n'a pas touchés.
+    places = read_raw(raw_dir)
     raw_path.write_text(
         json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),
         encoding="utf-8",

@@ -5,10 +5,15 @@ __pycache__/
 venv/
 .pytest_cache/
 
+# `pipeline/data/raw/` est VERSIONNÉ, à dessein : la collecte ne se régénère pas
+# à l'identique (Wikidata bouge, une requête expire), et les décisions
+# éditoriales portent sur des Q-id précis. Sans elle dans le dépôt, deux
+# machines relisent deux catalogues différents.
+#
 # Sorties du pipeline : volumineuses et régénérables.
 # `review.csv` est en revanche versionné dès qu'il contient des décisions
 # éditoriales — c'est du travail humain, pas une sortie de machine.
-pipeline/data/out/places_raw.json
+pipeline/data/out/places_raw.json     # copie de travail, reconstituée par `sync`
 pipeline/data/out/places.json
 pipeline/data/out/collections.json
 pipeline/data/out/seed.sql

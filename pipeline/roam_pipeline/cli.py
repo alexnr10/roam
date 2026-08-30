@@ -27,6 +27,7 @@ from .export import (
     write_review_html,
     write_seed_sql,
 )
+from .raw import EXTRA_SHARD, read_raw, shard_of, shards, write_raw
 from .fetch import (
     REMEDIES,
     read_fetch_state,
@@ -60,6 +61,9 @@ LOG = logging.getLogger("roam")
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_OUT = BASE_DIR / "data" / "out"
 DEFAULT_MANUAL = BASE_DIR / "data" / "manual"
+# La collecte, versionnée et découpée par thème. Ce n'est pas une sortie de
+# construction : c'est la donnée sur laquelle portent les décisions.
+DEFAULT_RAW = BASE_DIR / "data" / "raw"
 
 
 def _fold(text: str) -> str:
@@ -75,6 +79,21 @@ def _load_places(path: Path) -> list[Place]:
         item.pop("slug", None)
         places.append(Place(**item))
     return places
+
+
+def _save_raw(args: argparse.Namespace, places: list[Place]) -> None:
+    """Écrit la collecte dans le dépôt ET dans la copie de travail.
+
+    Toute commande qui modifie les candidats passe par ici. Écrire seulement
+    `places_raw.json` laisserait l'enrichissement — résumés, départements,
+    fréquentation — sur une seule machine, et l'autre relirait un catalogue
+    appauvri sans qu'aucune erreur ne le dise.
+    """
+    write_raw(args.raw, places, replacing={shard_of(place) for place in places})
+    (args.out / "places_raw.json").write_text(
+        json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
 
 
 def cmd_verify_qids(args: argparse.Namespace, config: Config) -> int:
@@ -190,8 +209,61 @@ def cmd_suggest_qids(args: argparse.Namespace, config: Config) -> int:
 
 def cmd_fetch(args: argparse.Namespace, config: Config) -> int:
     client = wd.SparqlClient(min_interval_s=args.min_interval)
-    places = run_fetch(client, config, args.out, args.manual, only=args.only or None)
+    places = run_fetch(client, config, args.out, args.manual,
+                       only=args.only or None, raw_dir=args.raw)
     print(f"{len(places)} lieux candidats collectés → {args.out / 'places_raw.json'}")
+    return 0
+
+
+def cmd_sync(args: argparse.Namespace, config: Config) -> int:
+    """Aligne la copie de travail sur la collecte du dépôt, ou l'inverse.
+
+    C'est la commande qui rend les décisions transportables. Sans elle, chaque
+    machine reconstruit son catalogue depuis sa propre collecte : deux
+    catalogues différents, et des verdicts qui portent sur des lieux que
+    l'autre machine n'a jamais vus.
+
+    `--depuis-la-copie` sert une fois, pour verser dans le dépôt une collecte
+    déjà faite. Ensuite le sens normal est l'autre : `git pull` puis `sync`
+    remplacent une demi-heure de collecte.
+    """
+    raw_path = args.out / "places_raw.json"
+
+    if args.from_working_copy:
+        if not raw_path.exists():
+            print(f"{raw_path} absent — rien à verser.", file=sys.stderr)
+            return 1
+        places = _load_places(raw_path)
+        written = write_raw(args.raw, places, replacing={shard_of(p) for p in places})
+        print(f"{len(places)} lieux versés dans {args.raw} :")
+        for name, count in sorted(written.items()):
+            print(f"  {name:<16} {count:>5}")
+        print("\nCommitte ce dossier : c'est lui qui rendra le catalogue identique "
+              "sur tes deux machines.")
+        return 0
+
+    places = read_raw(args.raw)
+    if not places:
+        print(f"{args.raw} ne contient aucune collecte. Sur la machine qui en a "
+              "une : `python -m roam_pipeline sync --depuis-la-copie`, puis "
+              "committe le dossier.", file=sys.stderr)
+        return 1
+
+    args.out.mkdir(parents=True, exist_ok=True)
+    raw_path.write_text(
+        json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    par_theme = Counter(place.theme_id for place in places)
+    print(f"{len(places)} lieux repris du dépôt → {raw_path}")
+    absents = [t.id for t in config.themes if not par_theme.get(t.id)]
+    if absents:
+        print(f"⚠ {len(absents)} thèmes sans aucun candidat dans le dépôt : "
+              + ", ".join(absents[:8])
+              + (f" (+{len(absents) - 8})" if len(absents) > 8 else ""))
+        print("  Personne ne les a encore collectés — `fetch --only "
+              + " ".join(absents[:3]) + "` sur la machine de ton choix.")
+    print("Enchaîne avec `build` : aucune collecte n'est nécessaire.")
     return 0
 
 
@@ -221,10 +293,7 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     enrich_communes(places)
     if not args.skip_summaries:
         enrich_summaries(places)
-    raw_path.write_text(
-        json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    _save_raw(args, places)
     print(f"{found} tailles d'articles ajoutées → {raw_path}")
     print("Relance `build` pour en tenir compte dans le classement.")
     return 0
@@ -270,10 +339,7 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
 
     places = _load_places(raw_path)
     apply_visit_info(places, osm)
-    raw_path.write_text(
-        json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    _save_raw(args, places)
 
     candidates = find_candidates(places, osm)
     # Deuxième garde-fou, indépendant de la requête Overpass : le rectangle de
@@ -439,10 +505,7 @@ def cmd_adopt(args: argparse.Namespace, config: Config) -> int:
     _write_candidate_list(list_path, merged, names)
 
     places += adopted
-    raw_path.write_text(
-        json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    _save_raw(args, places)
     print(f"\n{len(adopted)} lieux ajoutés à {raw_path.name} ({len(places)} en tout).")
     print("Ils ne sont pas épinglés : le plancher de notoriété s'y applique.")
     print("Lance `build` puis `review` — ils y porteront la mention « OpenStreetMap ».")
@@ -458,8 +521,16 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     """
     raw_path = args.out / "places_raw.json"
     if not raw_path.exists():
-        print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
-        return 1
+        # Le dépôt porte peut-être déjà la collecte : la reprendre coûte une
+        # seconde là où `fetch` coûte une demi-heure.
+        if read_raw(args.raw):
+            print(f"{raw_path} absent — reprise de la collecte versionnée.")
+            cmd_sync(argparse.Namespace(**{**vars(args), "from_working_copy": False}),
+                     config)
+        else:
+            print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
+            return 1
+    _warn_if_behind_repo(args)
 
     # `scored` garde TOUS les candidats : c'est lui qui alimente la distribution,
     # qui ne sert à régler le plancher que si elle porte sur l'avant-filtre.
@@ -506,6 +577,23 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def _warn_if_behind_repo(args: argparse.Namespace) -> None:
+    """Dit si la copie de travail a pris du retard sur la collecte du dépôt.
+
+    Un `git pull` amène des lieux que cette machine n'a jamais collectés ; sans
+    `sync`, `build` continue de travailler sur l'ancienne copie et l'écart
+    reste invisible — c'est exactement ainsi qu'un catalogue peut différer
+    d'une machine à l'autre sans qu'aucune commande ne proteste.
+    """
+    repo = {place.wikidata_id for place in read_raw(args.raw)}
+    if not repo:
+        return
+    local = _known_qids(args.out / "places_raw.json")
+    manquants = repo - local
+    if manquants:
+        print(f"⚠ {len(manquants)} lieux présents dans le dépôt manquent à cette "
+              "copie de travail. Lance `sync` avant de construire.")
+
 def empty_themes(config: Config, raw) -> list[str]:
     """Thèmes configurés dont le catalogue brut ne contient AUCUN lieu.
 
@@ -539,7 +627,8 @@ def _report_stale_themes(out_dir: Path, config: Config, raw=()) -> None:
         print("    " + ", ".join(vides))
         print("    Ils n'ont jamais été collectés ici. Le catalogue construit est")
         print("    PARTIEL — ne le publie pas en l'état.")
-        print("    `fetch --only " + ",".join(vides) + "`")
+        print("    Si une autre machine les a collectés : `git pull` puis `sync`.")
+        print("    Sinon : `fetch --only " + " ".join(vides) + "`")
 
     stale = [
         (theme_id, raison)
@@ -1350,6 +1439,7 @@ def cmd_review(args: argparse.Namespace, config: Config) -> int:
                   + (f" (+{len(manquants) - 8})" if len(manquants) > 8 else ""))
             print("  Cette machine ne les a jamais collectés. Tu relirais un "
                   "catalogue partiel.")
+            print("  `git pull` puis `sync` les reprend du dépôt sans recollecter.")
         _compare_to_snapshot(len(places), args.manual / "tiers.csv")
 
     print(f"Revue ouverte sur {url}")
@@ -1621,6 +1711,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--config", type=Path, default=CONFIG_DIR, help="dossier de configuration")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help="dossier de sortie")
     parser.add_argument("--manual", type=Path, default=DEFAULT_MANUAL, help="listes manuelles")
+    parser.add_argument("--raw", type=Path, default=DEFAULT_RAW,
+                        help="collecte versionnée, un fichier par thème")
     parser.add_argument("-v", "--verbose", action="store_true")
 
     sub = parser.add_subparsers(dest="command", required=True)
@@ -1781,6 +1873,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="dossier de GeoJSON déjà téléchargés (region.geojson, departement.geojson)",
     )
 
+    synchro = sub.add_parser(
+        "sync", help="aligne la copie de travail sur la collecte versionnée")
+    synchro.add_argument(
+        "--depuis-la-copie", dest="from_working_copy", action="store_true",
+        help="sens inverse : verse places_raw.json dans le dépôt")
+
     serve = sub.add_parser("review", help="ouvre la page de revue dans le navigateur")
     serve.add_argument("--port", type=int, default=8765)
     serve.add_argument(
@@ -1814,6 +1912,7 @@ def main(argv: list[str] | None = None) -> int:
         "apply-review": cmd_apply_review,
         "stats": cmd_stats,
         "review": cmd_review,
+        "sync": cmd_sync,
         "check-lists": cmd_check_lists,
         "gaps": cmd_gaps,
         "probe": cmd_probe,

@@ -18,6 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from roam_pipeline.raw import EXTRA_SHARD, read_raw, shards, write_raw
 from roam_pipeline.collections import (
     _spread,
     apply_class_exclusion,
@@ -2575,6 +2576,123 @@ class TestGeographicSpread(unittest.TestCase):
         paris = [c for c in collections if c.geo_code == "75" and c.theme_id == "ponts"]
         if paris:
             self.assertEqual(len(paris[0].places), 12)
+
+
+class TestVersionedCollection(unittest.TestCase):
+    """La collecte est une donnée, pas un produit de construction.
+
+    Wikidata bouge, les requêtes expirent, un thème échoue sans rien arrêter :
+    deux machines qui lancent la même commande le même jour n'obtiennent pas le
+    même catalogue. Or les décisions éditoriales portent sur des Q-id précis —
+    une décision prise sur un lieu que l'autre machine n'a pas collecté ne veut
+    rien dire. D'où un fichier par thème, versionné.
+    """
+
+    @staticmethod
+    def _place(qid, theme="chateaux", **kwargs):
+        return make_place(f"Lieu {qid}", theme=theme, wikidata_id=qid, **kwargs)
+
+    def test_a_failed_theme_keeps_its_previous_collection(self):
+        # Le fichier unique était réécrit d'un bloc : un thème qui expirait au
+        # milieu d'une collecte complète perdait ses lieux, et seul le journal
+        # le disait. Le mont Blanc a disparu de cette façon.
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            write_raw(raw, [self._place("Q1", "sommets")], replacing={"sommets"})
+            # Collecte suivante : `chateaux` réussit, `sommets` échoue et n'est
+            # donc pas dans `replacing`.
+            write_raw(raw, [self._place("Q2", "chateaux")], replacing={"chateaux"})
+            recompose = {p.wikidata_id for p in read_raw(raw)}
+        self.assertEqual(recompose, {"Q1", "Q2"})
+
+    def test_a_theme_that_returns_nothing_loses_its_file(self):
+        # Un thème retiré de la configuration, ou vidé volontairement, ne doit
+        # pas revivre à chaque lecture.
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            write_raw(raw, [self._place("Q1", "sommets")], replacing={"sommets"})
+            write_raw(raw, [], replacing={"sommets"})
+            self.assertEqual(read_raw(raw), [])
+            self.assertEqual(shards(raw), [])
+
+    def test_manual_additions_survive_a_partial_fetch(self):
+        # Les ajouts épinglés appartiennent à des thèmes variés mais sont
+        # recollectés à chaque passage : rangés dans le fichier de leur thème,
+        # ceux des thèmes non recollectés disparaîtraient.
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            write_raw(
+                raw,
+                [self._place("Q1", "sommets"), self._place("Q9", "abbayes", pinned=True)],
+                replacing={"sommets", EXTRA_SHARD},
+            )
+            write_raw(raw, [self._place("Q2", "sommets")], replacing={"sommets"})
+            recompose = {p.wikidata_id for p in read_raw(raw)}
+        self.assertEqual(recompose, {"Q2", "Q9"})
+
+    def test_an_addition_wins_over_the_automatic_attachment(self):
+        # Un lieu épinglé l'emporte sur le rattachement automatique — c'est la
+        # règle de la collecte, la lecture doit la respecter aussi.
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            write_raw(raw, [self._place("Q1", "chateaux")], replacing={"chateaux"})
+            write_raw(raw, [self._place("Q1", "maisons", pinned=True)],
+                      replacing={EXTRA_SHARD})
+            places = read_raw(raw)
+        self.assertEqual(len(places), 1)
+        self.assertEqual(places[0].theme_id, "maisons")
+
+    def test_the_enrichment_survives_the_round_trip(self):
+        # Ce qui coûte cher à obtenir — résumés, ouverture au public — doit
+        # traverser le dépôt intact, sinon l'autre machine relit un catalogue
+        # appauvri sans qu'aucune erreur ne le dise.
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            write_raw(
+                raw,
+                [self._place("Q1", summary="Deux phrases.", visitable=True,
+                             opening_hours="Tu-Su 10:00-18:00", visitors_per_year=42_000)],
+                replacing={"chateaux"},
+            )
+            place = read_raw(raw)[0]
+        self.assertEqual(place.summary, "Deux phrases.")
+        self.assertIs(place.visitable, True)
+        self.assertEqual(place.opening_hours, "Tu-Su 10:00-18:00")
+        self.assertEqual(place.visitors_per_year, 42_000)
+
+    def test_two_identical_collections_write_identical_bytes(self):
+        # Un fichier réécrit dans un autre ordre à chaque collecte rendrait
+        # tout `git diff` illisible, et donc inutile.
+        with tempfile.TemporaryDirectory() as tmp:
+            un, deux = Path(tmp) / "un", Path(tmp) / "deux"
+            places = [self._place("Q3"), self._place("Q1"), self._place("Q2")]
+            write_raw(un, places, replacing={"chateaux"})
+            write_raw(deux, list(reversed(places)), replacing={"chateaux"})
+            self.assertEqual(
+                (un / "chateaux.json").read_text(encoding="utf-8"),
+                (deux / "chateaux.json").read_text(encoding="utf-8"),
+            )
+
+    def test_the_file_holds_one_place_per_line(self):
+        # C'est ce qui fait qu'un ajout de trois lieux se lit comme trois
+        # lignes ajoutées, et non comme un fichier entier réécrit.
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            write_raw(raw, [self._place("Q1"), self._place("Q2")], replacing={"chateaux"})
+            body = (raw / "chateaux.json").read_text(encoding="utf-8")
+        self.assertEqual(len(body.strip().splitlines()), 4)  # [ + 2 lieux + ]
+        self.assertEqual(len(json.loads(body)), 2)
+
+    def test_an_unreadable_file_does_not_take_the_rest_down(self):
+        # Un fichier tronqué par une interruption ne doit pas rendre tout le
+        # catalogue illisible.
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            write_raw(raw, [self._place("Q1", "sommets")], replacing={"sommets"})
+            (raw / "chateaux.json").write_text("[{tronqu", encoding="utf-8")
+            with _capture():
+                places = read_raw(raw)
+        self.assertEqual([p.wikidata_id for p in places], ["Q1"])
 
 
 if __name__ == "__main__":

@@ -56,26 +56,43 @@ volontiers les processus en arrière-plan, et le serveur avec.
 
 ### Ce qui voyage, et ce qui ne voyage pas
 
-Deux fichiers seulement portent le travail éditorial, et ils sont versionnés :
-`data/manual/decisions.csv` (les verdicts) et `data/manual/tiers.csv` (les
-niveaux déjà vus). **Le catalogue, lui, ne passe pas par git** : `places_raw.json`
-et `places.json` sont ignorés, chaque machine les reconstruit depuis sa propre
-collecte. Un clone qui n'a lancé `fetch` que sur trois thèmes relit trois thèmes,
-et rien dans la page ne ressemble à une erreur.
+Trois choses portent le travail et sont **versionnées** :
 
-D'où la marche à suivre avant toute revue sur un second appareil :
+| Dossier | Contenu | Écrit par |
+|---|---|---|
+| `pipeline/data/raw/` | la collecte, un fichier par thème | `fetch`, `enrich`, `discover`, `adopt` |
+| `pipeline/data/manual/decisions.csv` | les verdicts éditoriaux | `apply-review` |
+| `pipeline/data/manual/tiers.csv` | les niveaux déjà vus | `apply-review` |
+
+Le reste — `places_raw.json`, `places.json`, `collections.json`, `review.html` —
+est une **copie de travail**, ignorée par git et reconstruite à la demande.
+
+La collecte est dans le dépôt à dessein. Elle ne se régénère pas à l'identique :
+Wikidata évolue d'un jour à l'autre, une requête expire, un thème échoue et son
+message se perd dans le journal. Deux machines qui lancent la même commande le
+même jour n'obtiennent pas le même catalogue — et une décision prise sur un lieu
+que l'autre machine n'a jamais collecté ne veut rien dire.
+
+D'où, sur la seconde machine, **aucune collecte à lancer** :
 
 ```bash
-git pull                       # récupérer les décisions déjà prises
-python -m roam_pipeline fetch  # tous les thèmes, sinon le catalogue est partiel
-python -m roam_pipeline enrich
-python -m roam_pipeline build  # c'est `build` qui écrit review.html
+git pull
+python -m roam_pipeline sync    # reprend la collecte du dépôt (une seconde)
+python -m roam_pipeline build   # c'est build qui écrit review.html
+python -m roam_pipeline review --host 0.0.0.0
 ```
 
-`review` annonce ensuite ce qu'il sert : le nombre de lieux, les thèmes absents,
-et la taille du dernier catalogue committé. Si l'écart dépasse 2 %, il le dit —
-mieux vaut relancer une collecte que passer une soirée sur un cinquième du
-catalogue.
+`fetch` ne sert plus qu'à **rafraîchir** la collecte, sur la machine de ton
+choix, quand tu veux voir ce que Wikidata a changé. Le résultat se committe et
+l'autre machine le reprend par `sync`.
+
+> Une collecte qui échoue sur un thème ne peut plus le vider : `fetch` ne
+> réécrit que les fichiers des thèmes qu'il a réellement obtenus. C'est ainsi
+> que le mont Blanc avait disparu — un thème expiré, un fichier unique réécrit
+> d'un bloc, et aucun compteur pour le dire.
+
+`review` annonce ce qu'il sert : le nombre de lieux, les thèmes absents, et la
+taille du dernier catalogue committé. Un écart de plus de 2 % est signalé.
 
 Les verdicts déjà pris sont écrits **dans la page** par `build` : un lieu gardé
 la semaine dernière sur le Mac apparaît gardé sur le téléphone, et le filtre
