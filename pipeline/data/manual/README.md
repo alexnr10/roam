@@ -28,6 +28,11 @@ travail éditorial. Ils sont relus à **chaque** construction :
 | `tiers.csv` | photographie du niveau ET du thème tels qu'ils ont été VUS à la dernière revue |
 | `candidates.csv` | candidats adoptés depuis OpenStreetMap — une ligne retirée à la main le reste |
 
+`data/out/review.csv` en revanche NE se committe pas : c'est une sortie de
+`build`, réécrite à chaque construction avec une colonne `decision` vide. Tes
+décisions vont du navigateur à `decisions.csv` par `apply-review`, jamais par
+là.
+
 `data/out/candidates.csv`, la sortie de `discover`, se committe aussi. Ce n'est
 pas une sortie comme les autres : elle coûte vingt minutes de requêtes Overpass
 et elle porte les seuls faits de terrain du catalogue — horaires, tarifs, accès
