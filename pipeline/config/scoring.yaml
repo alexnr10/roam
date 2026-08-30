@@ -4,9 +4,22 @@
 
 scoring:
   # Notoriété : log du nombre de versions linguistiques de l'article Wikipédia.
-  # C'est le meilleur signal gratuit disponible — il sépare le lieu réellement
-  # remarquable du clocher de village, et il n'est pas manipulable comme un avis Google.
-  sitelinks_weight: 22.0
+  # Il sépare le lieu réellement remarquable du clocher de village, et il n'est
+  # manipulable par personne. Mais il mesure la documentation INTERNATIONALE
+  # d'un lieu, pas l'envie d'y aller : le Champ-de-Mars figure dans 56 langues
+  # parce que la tour Eiffel s'y trouve, les jardins de la Fontaine à Nîmes
+  # dans 6. À 22, il faisait 63 % du score des jardins parisiens et plaçait des
+  # parcs de traversée devant un des plus beaux jardins classiques d'Europe.
+  #
+  # Abaissé de 22 à 16, mesuré sur le catalogue réel : les Parisiens passent de
+  # 6 à 5 dans les dix premiers jardins, la Fontaine prend la tête, Salagon
+  # entre, et le classement des cascades — où les langues sont déjà plates — ne
+  # bouge pas d'une ligne. 97 % du catalogue garde son niveau.
+  #
+  # Les consultations Wikipédia ont été mesurées comme remplacement (cf. bloc
+  # `pageviews`) : corrélation de rang +0,84 avec les langues, elles disent la
+  # même chose en français. Elles restent collectées et à poids nul.
+  sitelinks_weight: 16.0
 
   # Bonus si une image est disponible sur Wikimedia Commons.
   # Un lieu sans aucune image exploitable est un mauvais lieu de collection :
@@ -56,7 +69,11 @@ scoring:
   # Le score sert de second filtre, pour ne pas repêcher tout ce qui ouvre une
   # billetterie. Le tableau imprimé par `build` donne le nombre de lieux
   # concernés à chaque seuil : c'est là qu'on choisit ce chiffre, pas ailleurs.
-  rescue_score: 85.0
+  # Abaissé de 85 à 74 EN MÊME TEMPS que le poids des langues, et pour cette
+  # seule raison : c'est un seuil ABSOLU. Baisser un poids baisse tous les
+  # scores, donc vide le repêchage sans que personne ne l'ait demandé — à 16 et
+  # 85, le catalogue perdait 211 lieux. À 16 et 74, il en gagne 18.
+  rescue_score: 74.0
 
 
   # Les bonus de label sont définis dans labels.yaml (`score_bonus`).
