@@ -1426,9 +1426,19 @@ def cmd_weigh(args: argparse.Namespace, config: Config) -> int:
     for nom, rang in (("médiane", 0.5), ("9ᵉ décile", 0.9), ("maximum", 1.0)):
         print(f"  {nom:<12} {vues[min(int(rang * len(vues)), len(vues) - 1)]:>9} vues/mois")
 
-    classements: dict[float, list[tuple[int, str, float, int | None]]] = {}
-    for poids in args.weights:
-        essai = replace(config, pageviews=replace(config.pageviews, weight=poids))
+    # Le signal des consultations recoupe largement celui des langues : les
+    # ajouter l'un à l'autre renforce ce qu'ils ont en commun — la célébrité —
+    # au lieu de corriger ce qui les sépare. D'où `--sitelinks`, qui permet de
+    # DÉPLACER du poids de l'un vers l'autre au lieu d'en empiler.
+    classements: dict[tuple[float, float], list[tuple[int, str, float, int | None]]] = {}
+    couples = [(v, s) for v in args.weights
+               for s in (args.sitelinks or [config.scoring.sitelinks_weight])]
+    for poids, langues in couples:
+        essai = replace(
+            config,
+            pageviews=replace(config.pageviews, weight=poids),
+            scoring=replace(config.scoring, sitelinks_weight=langues),
+        )
         places = _load_places(raw_path)
         apply_names(places, read_names(args.manual / "names.csv"))
         places, _ = apply_themes(places, read_themes(args.manual / "themes.csv"),
@@ -1448,16 +1458,18 @@ def cmd_weigh(args: argparse.Namespace, config: Config) -> int:
         if nationale is None:
             print(f"\nAucune collection nationale pour « {args.theme} ».", file=sys.stderr)
             return 1
-        classements[poids] = [
+        classements[(poids, langues)] = [
             (m.tier, par_id[m.place_id].name, par_id[m.place_id].score,
              par_id[m.place_id].pageviews_per_month)
             for m in nationale.places[: args.top]
         ]
 
-    reference = {nom for _t, nom, _s, _v in classements[args.weights[0]]}
-    for poids, lignes in classements.items():
-        actuel = " (poids actuel)" if poids == config.pageviews.weight else ""
-        print(f"\n── poids {poids:g}{actuel} ──")
+    reference = {nom for _t, nom, _s, _v in classements[couples[0]]}
+    for (poids, langues), lignes in classements.items():
+        actuel = (" (réglage actuel)"
+                  if poids == config.pageviews.weight
+                  and langues == config.scoring.sitelinks_weight else "")
+        print(f"\n── consultations {poids:g} · langues {langues:g}{actuel} ──")
         for rang, (tier, nom, score, vues_m) in enumerate(lignes, start=1):
             v = f"{vues_m:>7} vues" if vues_m else "      —     "
             marque = " " if nom in reference else "▲"
@@ -2145,7 +2157,10 @@ def build_parser() -> argparse.ArgumentParser:
         "weigh", help="montre ce qu'un poids de consultations ferait au classement")
     balance.add_argument("--theme", default="jardins", help="thème à observer")
     balance.add_argument("--weights", type=float, nargs="+", default=[0, 8, 16, 24],
-                         help="poids à comparer")
+                         help="poids de consultations à comparer")
+    balance.add_argument("--sitelinks", type=float, nargs="+",
+                         help="poids de notoriété à comparer, pour en DÉPLACER "
+                              "vers les consultations plutôt qu'en empiler")
     balance.add_argument("--top", type=int, default=12, help="lieux affichés par poids")
     add_decision_args(balance)
 
