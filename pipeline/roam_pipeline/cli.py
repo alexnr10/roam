@@ -29,6 +29,7 @@ from .export import (
     write_seed_sql,
 )
 from .raw import EXTRA_SHARD, read_raw, shard_of, shards, write_raw
+from .merge import conflicted, merge_file
 from .fetch import (
     REMEDIES,
     read_fetch_state,
@@ -1376,6 +1377,45 @@ def cmd_rename(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def cmd_merge(args: argparse.Namespace, config: Config) -> int:
+    """Résout les conflits git des fichiers de curation.
+
+    Deux soirées de relecture menées sur deux machines produisent deux versions
+    du même fichier, et git ne sait pas les départager : il pose des marqueurs
+    au milieu d'un travail que personne n'a perdu. Ces fichiers ne sont pas du
+    texte mais des tables dont la clé est le Q-id — la fusion juste est l'union
+    des deux côtés.
+    """
+    cibles = args.files or conflicted(args.manual)
+    if not cibles:
+        print(f"Aucun conflit dans {args.manual}.")
+        return 0
+
+    desaccords = 0
+    for path in cibles:
+        try:
+            report = merge_file(path)
+        except (OSError, ValueError) as exc:
+            print(f"{path.name} : {exc}", file=sys.stderr)
+            return 1
+        if report is None:
+            print(f"{path.name} : aucun marqueur de conflit, laissé tel quel.")
+            continue
+        print(f"{path.name} : {report.kept} lignes, dont {report.added} venues de l'autre "
+              "machine.")
+        for qid, mien, autre in report.disagreements:
+            desaccords += 1
+            print(f"  ⚠ {qid} : ici « {mien} », là-bas « {autre} » — j'ai gardé le tien.")
+
+    if desaccords:
+        # Ne pas fondre un désaccord dans un décompte : c'est le seul cas où la
+        # machine a choisi à la place du curateur, il doit pouvoir y revenir.
+        print(f"\n{desaccords} lieu(x) tranché(s) différemment des deux côtés. "
+              "Relis-les si le doute demeure.")
+    print("\nRelance `build` pour vérifier, puis `git add` et termine la fusion.")
+    return 0
+
+
 def cmd_retheme(args: argparse.Namespace, config: Config) -> int:
     """Rattache un lieu au thème que le curateur juge juste.
 
@@ -1985,6 +2025,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="dossier de GeoJSON déjà téléchargés (region.geojson, departement.geojson)",
     )
 
+    fusion = sub.add_parser(
+        "merge", help="résout les conflits git des fichiers de curation")
+    fusion.add_argument("files", nargs="*", type=Path,
+                        help="fichiers à fusionner ; par défaut ceux de data/manual")
+
     retheme = sub.add_parser(
         "retheme", help="rattache un lieu au thème choisi par le curateur")
     retheme.add_argument("wikidata_id", nargs="?")
@@ -2034,6 +2079,7 @@ def main(argv: list[str] | None = None) -> int:
         "review": cmd_review,
         "sync": cmd_sync,
         "retheme": cmd_retheme,
+        "merge": cmd_merge,
         "check-lists": cmd_check_lists,
         "gaps": cmd_gaps,
         "probe": cmd_probe,

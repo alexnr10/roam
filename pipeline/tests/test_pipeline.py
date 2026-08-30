@@ -19,6 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from roam_pipeline.raw import EXTRA_SHARD, read_raw, shards, write_raw
+from roam_pipeline.merge import merge_file, merge_text, split_conflict
 from roam_pipeline.review import (
     apply_themes, name_hints, read_themes, theme_claims, theme_from_name, write_themes,
 )
@@ -2857,6 +2858,80 @@ class TestThemeDoubt(unittest.TestCase):
             )
             self.assertEqual(read_review_themes(path), {"Q2": "musees"})
             self.assertEqual(read_review_csv(path), {"Q1": ("keep", "")})
+
+
+class TestCurationMerge(unittest.TestCase):
+    """Deux soirées de relecture menées chacune de son côté.
+
+    Les fichiers de curation sont réécrits en entier, triés par identifiant :
+    git ne sait pas les départager et pose des marqueurs au milieu d'un travail
+    que personne n'a perdu. Ce ne sont pourtant pas des textes mais des tables
+    dont la clé est le Q-id — la fusion juste est l'union des deux côtés.
+    """
+
+    ENTETE = "# Décisions.\n#\nwikidata_id,decision,name,note\n"
+
+    def _conflit(self, nous, eux):
+        return (self.ENTETE + "<<<<<<< HEAD\n" + nous + "=======\n" + eux
+                + ">>>>>>> telephone\n")
+
+    def test_the_two_versions_are_recovered_whole(self):
+        # Les parties communes appartiennent aux deux versions : les oublier
+        # amputerait le fichier de tout ce sur quoi les deux machines
+        # s'accordent.
+        texte = (self.ENTETE + "Q0,keep,Commun,\n<<<<<<< HEAD\nQ1,drop,A,\n"
+                 "=======\nQ2,keep,B,\n>>>>>>> telephone\n")
+        nous, eux = split_conflict(texte)
+        self.assertIn("Q0,keep,Commun,", nous)
+        self.assertIn("Q0,keep,Commun,", eux)
+        self.assertIn("Q1,drop,A,", nous)
+        self.assertNotIn("Q1,drop,A,", eux)
+
+    def test_nothing_is_lost_from_either_side(self):
+        fusion, rapport = merge_text(
+            *split_conflict(self._conflit("Q1,keep,A,\n", "Q2,drop,B,\n"))
+        )
+        self.assertIn("Q1,keep,A,", fusion)
+        self.assertIn("Q2,drop,B,", fusion)
+        self.assertEqual(rapport.kept, 2)
+        self.assertEqual(rapport.added, 1)
+
+    def test_a_disagreement_is_named_not_silently_settled(self):
+        # Le seul cas où la machine choisit à la place du curateur. Il doit
+        # pouvoir y revenir, donc il doit le lire.
+        fusion, rapport = merge_text(
+            *split_conflict(self._conflit("Q1,drop,A,\n", "Q1,keep,A,\n"))
+        )
+        self.assertEqual(rapport.disagreements, [("Q1", "drop", "keep")])
+        self.assertIn("Q1,drop,A,", fusion)
+
+    def test_the_ancestor_section_is_ignored(self):
+        # `merge.conflictStyle = diff3` ajoute une troisième version, celle
+        # d'avant les deux revues : la reprendre ressusciterait des verdicts
+        # que les deux machines ont changés.
+        texte = (self.ENTETE + "<<<<<<< HEAD\nQ1,drop,A,\n|||||||\nQ1,keep,A,\n"
+                 "=======\nQ2,keep,B,\n>>>>>>> telephone\n")
+        nous, eux = split_conflict(texte)
+        self.assertIn("Q1,drop,A,", nous)
+        self.assertNotIn("Q1", eux)
+
+    def test_the_comment_header_survives(self):
+        # C'est lui qui explique le fichier à qui l'ouvre six mois plus tard.
+        fusion, _ = merge_text(*split_conflict(self._conflit("Q1,keep,A,\n", "Q2,keep,B,\n")))
+        self.assertTrue(fusion.startswith("# Décisions."))
+
+    def test_a_file_without_conflict_is_left_alone(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "decisions.csv"
+            path.write_text(self.ENTETE + "Q1,keep,A,\n", encoding="utf-8")
+            self.assertIsNone(merge_file(path))
+            self.assertIn("Q1,keep,A,", path.read_text(encoding="utf-8"))
+
+    def test_a_table_without_the_key_is_refused(self):
+        # Mieux vaut s'arrêter que fusionner au hasard un fichier qu'on n'a pas
+        # compris.
+        with self.assertRaises(ValueError):
+            merge_text("a,b\n1,2\n", "a,b\n3,4\n")
 
 
 if __name__ == "__main__":

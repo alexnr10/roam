@@ -91,6 +91,27 @@ qui ne sortent plus dans aucune collection, et `explain` dit à quelle étape.
 Quand le lieu mérite d'y rester malgré tout, un `keep` dans la revue l'épingle
 et le plancher ne s'y applique plus.
 
+### Quand deux revues se croisent
+
+Ces fichiers sont réécrits en entier, triés par identifiant. Deux soirées de
+relecture menées sur deux machines produisent donc deux versions du même
+fichier, et git ne sait pas les départager : il pose des marqueurs de conflit au
+milieu d'un travail que personne n'a perdu.
+
+Ce ne sont pourtant pas des textes mais des tables dont la clé est le Q-id, et
+la fusion juste est l'union des deux côtés :
+
+```bash
+git pull                        # git signale le conflit
+python -m roam_pipeline merge   # fusionne data/manual/
+python -m roam_pipeline build   # vérifie
+git add pipeline/data/manual && git commit
+```
+
+Le seul cas qui demande un humain est le lieu tranché **différemment** des deux
+côtés. La commande garde alors ta version locale et **nomme le lieu**, plutôt
+que d'inventer une règle qui déciderait à ta place.
+
 ### Ces fichiers se committent
 
 C'est plusieurs soirées de relecture, et ce sont des fichiers texte de quelques
