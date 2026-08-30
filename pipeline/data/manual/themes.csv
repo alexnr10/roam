@@ -1,0 +1,33 @@
+# Thème choisi par le curateur, quand le rattachement automatique se trompe.
+#
+# Le pipeline range un lieu d'après ses classes Wikidata. C'est juste la plupart
+# du temps et faux parfois : le musée Christian-Dior est classé « jardin » parce
+# que sa villa en a un remarquable, et se retrouvait donc parmi les jardins.
+# Aucune règle générale ne rattrape cela — Wikidata dit vrai, c'est la
+# hiérarchie des classes qui ne dit pas ce qu'on vient voir.
+#
+# Une ligne ici l'emporte sur tout : le lieu quitte ses autres rattachements et
+# n'appartient plus qu'au thème indiqué.
+#
+# Ce n'est PAS un verdict d'inclusion. Un lieu redirigé doit encore franchir le
+# plancher de notoriété de son nouveau thème ; `build` le dit s'il n'y arrive
+# pas.
+#
+# Pour trouver un identifiant : python -m roam_pipeline explain "musée Dior"
+#
+wikidata_id,theme_id,note
+Q1561438,monuments,
+Q1643144,monuments,
+Q1822513,monuments,
+Q1906882,monuments,
+Q2111621,monuments,
+Q3097795,musees,
+Q3145715,musees,
+Q3278824,musees,
+Q3287427,dunes-marais,
+Q3329113,musees,
+Q3360877,musees,
+Q3360882,musees,
+Q3361032,monuments,
+Q9026818,musees,
+Q917337,musees,
