@@ -28,6 +28,11 @@ from .models import Place, display_name
 LOG = logging.getLogger(__name__)
 
 DECISIONS = ("keep", "drop", "promote", "demote")
+# Retirer un verdict est un geste à part : ce n'est pas une décision qu'on
+# enregistre, c'est une décision qu'on efface. Sans lui, revenir sur un `demote`
+# demandait d'éditer le fichier à la main — et un curateur qui doit ouvrir un CSV
+# pour se dédire finit par ne plus se dédire.
+CLEAR = "clear"
 
 HEADER = """# Décisions éditoriales, cumulées au fil des revues.
 #

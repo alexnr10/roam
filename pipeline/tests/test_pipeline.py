@@ -22,8 +22,8 @@ from roam_pipeline.raw import EXTRA_SHARD, read_raw, shards, write_raw
 from roam_pipeline.merge import merge_file, merge_text, split_conflict
 from roam_pipeline.wikipedia import WikipediaClient
 from roam_pipeline.review import (
-    apply_decisions, apply_themes, name_hints, read_themes, theme_claims,
-    theme_from_name, write_themes,
+    CLEAR, DECISIONS, apply_decisions, apply_themes, name_hints, read_decisions,
+    read_themes, theme_claims, theme_from_name, write_decisions, write_themes,
 )
 from roam_pipeline.collections import (
     _spread,
@@ -3014,6 +3014,41 @@ class TestCuratorAdjustments(unittest.TestCase):
         place = self._repeche()
         place.curator_adjustment = -60.0
         self.assertEqual(place.sitelinks, 6)
+
+    def test_a_sidelined_place_is_rejoined_to_the_review(self):
+        # Un lieu écarté par son propre malus n'apparaît plus nulle part : ni au
+        # catalogue, ni dans la revue qui en est tirée. Le curateur ne pouvait
+        # donc plus revenir sur une décision dont il ne voyait plus l'effet.
+        with _capture():
+            places = score_all(self._catalogue(), CONFIG)
+            retenus, collections = build_all(places, CONFIG)
+        exile = self._repeche()
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.html"
+            write_review_html(retenus, collections, CONFIG, path, sidelined=[exile])
+            body = path.read_text(encoding="utf-8")
+        data = json.loads(body.split("const DATA = ", 1)[1].split(";\nconst THEMES", 1)[0])
+        ligne = next(row for row in data if row["id"] == "Q999")
+        self.assertTrue(ligne["sidelined"])
+        # En tête : c'est le seul lieu qu'on ne peut voir nulle part ailleurs.
+        self.assertEqual(data[0]["id"], "Q999")
+        self.assertFalse(next(r for r in data if r["id"] != "Q999")["sidelined"])
+        self.assertIn('value="sidelined"', body)
+
+    def test_a_verdict_can_be_withdrawn(self):
+        # `clear` n'est pas un verdict qu'on enregistre, c'est un verdict qu'on
+        # efface. Sans lui, se dédire demandait d'ouvrir le CSV à la main — et
+        # un curateur qui doit éditer un fichier pour revenir sur une décision
+        # finit par ne plus revenir sur ses décisions.
+        self.assertNotIn(CLEAR, DECISIONS)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "decisions.csv"
+            write_decisions(path, {"Q1": ("demote", ""), "Q2": ("keep", "")},
+                            {"Q1": "Un pont", "Q2": "Une abbaye"})
+            gardees = read_decisions(path)
+            gardees.pop("Q1")
+            write_decisions(path, gardees, {"Q2": "Une abbaye"})
+            self.assertEqual(set(read_decisions(path)), {"Q2"})
 
     def test_a_null_adjustment_neutralises_the_decision(self):
         # C'est sur quoi repose tout l'audit : reconstruire à zéro donne le

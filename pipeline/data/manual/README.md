@@ -91,6 +91,34 @@ qui ne sortent plus dans aucune collection, et `explain` dit à quelle étape.
 Quand le lieu mérite d'y rester malgré tout, un `keep` dans la revue l'épingle
 et le plancher ne s'y applique plus.
 
+### Revenir sur une décision
+
+Chaque vignette de la revue porte un bouton **✕** dès qu'un verdict a été pris.
+Il retire la décision : le lieu retrouve son classement automatique, et
+`apply-review` **efface la ligne** de `decisions.csv`. Sans lui, se dédire
+demandait d'éditer le CSV à la main — et un curateur qui doit ouvrir un fichier
+pour revenir sur une décision finit par ne plus revenir sur ses décisions.
+
+### Le malus qui écarte sans le dire
+
+`drop` rejette un lieu, `demote` le fait seulement reculer. Ce sont deux gestes
+distincts, et un malus assez fort efface la distinction : le score passe sous le
+seuil ABSOLU du repêchage, le lieu retombe sous le plancher de son thème et
+disparaît du catalogue. Il ne s'affiche alors nulle part — pas même dans la
+revue, qui est tirée du catalogue.
+
+`build` les nomme, et les **rejoint à la feuille de revue**, en tête et bordés de
+pointillés rouges. Le filtre **« Sortis du catalogue par ton malus »** ne montre
+qu'eux. Deux issues : confirmer en `drop`, ou retirer le malus avec ✕.
+
+```bash
+python -m roam_pipeline adjustments   # l'audit complet, hors revue
+```
+
+Il reconstruit le catalogue deux fois, avec et sans ajustements, et dit ce que
+chaque décision change vraiment : celles qui écartent, et celles que le
+classement a rattrapées et qui ne servent plus à rien.
+
 ### Quand deux revues se croisent
 
 Ces fichiers sont réécrits en entier, triés par identifiant. Deux soirées de

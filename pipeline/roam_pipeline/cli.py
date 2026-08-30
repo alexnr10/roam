@@ -57,7 +57,7 @@ from .models import Collection, CollectionPlace, Place
 from .outlines import ATTRIBUTION as OUTLINE_ATTRIBUTION, DEFAULT_TOLERANCE_KM2
 from .outlines import export as export_outlines
 from .review import (
-    DECISIONS, apply_decisions, apply_names, apply_themes, diff_tiers,
+    CLEAR, DECISIONS, apply_decisions, apply_names, apply_themes, diff_tiers,
     read_decisions, read_names, read_themes, theme_claims, write_themes,
     read_snapshot, vanished, write_decisions, write_names, write_snapshot,
 )
@@ -590,6 +590,8 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     changes = diff_tiers(before, current)
     gone = vanished(before, current)
 
+    ecartes = _sidelined_by_malus(args, config, decisions, retained)
+
     write_json(retained, collections, args.out)
     write_review_csv(retained, collections, args.out / "review.csv", config, changes)
     write_review_html(
@@ -599,11 +601,23 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
         # le lieu n'a plus qu'un thème et la contestation ne se voit plus.
         claims=theme_claims(scored),
         rethemed={qid: theme for qid, (theme, _note) in themes.items()},
+        sidelined=ecartes,
     )
     write_seed_sql(retained, collections, config, args.out / "seed.sql")
 
     _report_tier_changes(changes, gone, before, retained)
     _report_stale_themes(args.out, config, scored)
+
+    if ecartes:
+        print(f"\n⚠ {len(ecartes)} lieux écartés par TON PROPRE malus, "
+              "et non par un filtre :")
+        for place in ecartes[:8]:
+            print(f"    {place.name}")
+        if len(ecartes) > 8:
+            print(f"    (+{len(ecartes) - 8})")
+        print("    Faire reculer n'est pas écarter. Ils sont joints à la revue, "
+              "marqués,")
+        print("    pour que tu puisses confirmer en `drop` ou retirer le malus.")
 
     if renamed:
         print(f"Renommages appliqués : {renamed}")
@@ -627,6 +641,42 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     _print_stats(retained, collections, raw=scored, config=config)
     return 0
 
+
+def _sidelined_by_malus(
+    args: argparse.Namespace, config: Config, decisions, retained: list[Place]
+) -> list[Place]:
+    """Les lieux que LEUR PROPRE malus a fait sortir du catalogue.
+
+    Un lieu écarté par un malus n'apparaît plus nulle part : ni au catalogue,
+    ni dans la revue qui en est tirée. Le curateur ne peut donc plus revenir sur
+    une décision dont il ne voit plus l'effet.
+
+    La seule façon honnête de l'établir est de reconstruire le catalogue sans
+    aucun ajustement et de comparer. Un lieu peut manquer pour dix raisons —
+    accès refusé, classe écartée, sommet alpin, dédoublonnage — et les attribuer
+    toutes au malus ferait dire au diagnostic n'importe quoi. Un premier essai
+    par test local accusait ainsi le malus d'avoir écarté la Grotte des Fées,
+    dont l'accès est simplement refusé.
+    """
+    malus = {qid for qid, (verdict, _n) in decisions.items() if verdict == "demote"}
+    if not malus:
+        return []
+
+    temoins = score_all(_load_places(args.out / "places_raw.json"), config)
+    apply_names(temoins, read_names(args.manual / "names.csv"))
+    temoins, _ = apply_themes(temoins, read_themes(args.manual / "themes.csv"),
+                              {theme.id for theme in config.themes})
+    # Ajustement nul : le catalogue tel qu'il serait sans aucune correction.
+    sans, _counts = apply_decisions(temoins, decisions, 0.0, strict=args.strict)
+    score_all(sans, config)
+    with _silence():
+        survivants, _cols = build_all(sans, config)
+
+    gardes = {place.wikidata_id for place in retained}
+    return [
+        place for place in survivants
+        if place.wikidata_id in malus and place.wikidata_id not in gardes
+    ]
 
 def _warn_if_behind_repo(args: argparse.Namespace) -> None:
     """Dit si la copie de travail a pris du retard sur la collecte du dépôt.
@@ -854,10 +904,17 @@ def cmd_build(args: argparse.Namespace, config: Config) -> int:
 def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
     """Enregistre les décisions d'une revue, puis reconstruit."""
     fresh = read_review_csv(args.review)
-    unknown = {d for d, _ in fresh.values()} - set(DECISIONS)
+    unknown = {d for d, _ in fresh.values()} - set(DECISIONS) - {CLEAR}
     if unknown:
         print(f"Décisions inconnues, ignorées : {', '.join(sorted(unknown))}", file=sys.stderr)
-        fresh = {q: v for q, v in fresh.items() if v[0] in DECISIONS}
+        fresh = {q: v for q, v in fresh.items() if v[0] in DECISIONS or v[0] == CLEAR}
+
+    # `clear` n'est pas un verdict qu'on enregistre : c'est un verdict qu'on
+    # efface. Sans lui, revenir sur un `demote` demandait d'ouvrir le CSV à la
+    # main — et un curateur qui doit éditer un fichier pour se dédire finit par
+    # ne plus se dédire.
+    effaces = {qid for qid, (verdict, _n) in fresh.items() if verdict == CLEAR}
+    fresh = {qid: v for qid, v in fresh.items() if v[0] != CLEAR}
 
     # Les redressements de thème voyagent dans la même feuille mais dans leur
     # propre colonne : ranger et écarter sont deux gestes différents.
@@ -868,7 +925,7 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
         print(f"Thèmes inconnus, ignorés : {', '.join(sorted(inconnus))}", file=sys.stderr)
         fresh_themes = {q: t for q, t in fresh_themes.items() if t in valides}
 
-    if not fresh and not fresh_themes:
+    if not fresh and not fresh_themes and not effaces:
         print("Aucune décision renseignée dans la feuille de revue.", file=sys.stderr)
         return 1
 
@@ -879,11 +936,15 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
     # La revue la plus récente l'emporte : revenir sur un verdict doit se faire
     # en relisant le lieu, pas en éditant un fichier.
     decisions.update(fresh)
+    retires = [qid for qid in effaces if decisions.pop(qid, None) is not None]
 
     names = {p.wikidata_id: p.name for p in _load_places(args.out / "places_raw.json")}
     write_decisions(path, decisions, names)
     print(f"{len(fresh)} décisions lues, {changed} nouvelles ou modifiées "
           f"({before} → {len(decisions)} au total dans {path.name}).")
+    if retires:
+        print(f"{len(retires)} décisions RETIRÉES : le lieu retrouve son "
+              "classement automatique.")
 
     if fresh_themes:
         themes_path = args.manual / "themes.csv"
