@@ -100,30 +100,57 @@ def write_raw(
     return written
 
 
+def _load(path: Path) -> list[Place]:
+    try:
+        items = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        LOG.error("%s illisible (%s) — thème ignoré", path.name, exc)
+        return []
+    places = []
+    for item in items:
+        item.pop("slug", None)
+        try:
+            places.append(Place(**item))
+        except TypeError as exc:
+            LOG.error("%s : lieu illisible (%s)", path.name, exc)
+    return places
+
+
 def read_raw(raw_dir: Path) -> list[Place]:
-    """Recompose le catalogue brut depuis les fichiers du dépôt."""
+    """Recompose le catalogue brut depuis les fichiers du dépôt.
+
+    **Un même lieu peut figurer sous plusieurs thèmes**, et il le doit : le
+    Louvre est un palais et un musée, Versailles est un château et un palais.
+    C'est `dedupe_across_themes` qui tranche, à la construction, avec la règle
+    du plus spécifique. Réduire ici à un lieu par Q-id lui retirerait le choix
+    et laisserait l'ordre alphabétique des fichiers décider du thème.
+
+    Les ajouts, eux, se comportent comme à la collecte : un lieu épinglé
+    remplace tous ses rattachements automatiques, un candidat adopté ne comble
+    que ce qui manque.
+    """
     if not raw_dir.is_dir():
         return []
 
-    by_id: dict[str, Place] = {}
-    # Les ajouts en dernier : un lieu épinglé l'emporte sur le rattachement
-    # automatique, c'est la règle de la collecte comme de la lecture.
-    files = sorted(raw_dir.glob("*.json"), key=lambda p: (p.stem == EXTRA_SHARD, p.stem))
-    for path in files:
-        try:
-            items = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as exc:
-            LOG.error("%s illisible (%s) — thème ignoré", path.name, exc)
-            continue
-        for item in items:
-            item.pop("slug", None)
-            try:
-                place = Place(**item)
-            except TypeError as exc:
-                LOG.error("%s : lieu illisible (%s)", path.name, exc)
-                continue
-            by_id[place.wikidata_id] = place
-    return list(by_id.values())
+    par_theme: dict[tuple[str, str], Place] = {}
+    extras: list[Place] = []
+    for path in sorted(raw_dir.glob("*.json")):
+        for place in _load(path):
+            if path.stem == EXTRA_SHARD:
+                extras.append(place)
+            else:
+                par_theme[(place.theme_id, place.wikidata_id)] = place
+
+    pinned = {place.wikidata_id for place in extras if place.pinned}
+    places = [p for p in par_theme.values() if p.wikidata_id not in pinned]
+    places += [p for p in extras if p.pinned]
+
+    # Les candidats adoptés ne complètent que ce qui manque : quand une requête
+    # par classe a déjà trouvé le lieu, c'est ce rattachement-là qui vaut, pas
+    # le thème deviné depuis une balise OpenStreetMap.
+    known = {place.wikidata_id for place in places}
+    places += [p for p in extras if not p.pinned and p.wikidata_id not in known]
+    return places
 
 
 def shards(raw_dir: Path) -> list[str]:

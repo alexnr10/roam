@@ -181,6 +181,99 @@ def apply_names(places: list[Place], names: dict[str, str]) -> int:
 
 
 # ---------------------------------------------------------------------------
+# Rattachement au thème
+# ---------------------------------------------------------------------------
+
+THEMES_HEADER = """# Thème choisi par le curateur, quand le rattachement automatique se trompe.
+#
+# Le pipeline range un lieu d'après ses classes Wikidata. C'est juste la plupart
+# du temps et faux parfois : le musée Christian-Dior est classé « jardin » parce
+# que sa villa en a un remarquable, et se retrouvait donc parmi les jardins.
+# Aucune règle générale ne rattrape cela — Wikidata dit vrai, c'est la
+# hiérarchie des classes qui ne dit pas ce qu'on vient voir.
+#
+# Une ligne ici l'emporte sur tout : le lieu quitte ses autres rattachements et
+# n'appartient plus qu'au thème indiqué.
+#
+# Ce n'est PAS un verdict d'inclusion. Un lieu redirigé doit encore franchir le
+# plancher de notoriété de son nouveau thème ; `build` le dit s'il n'y arrive
+# pas.
+#
+# Pour trouver un identifiant : python -m roam_pipeline explain "musée Dior"
+#
+wikidata_id,theme_id,note
+"""
+
+
+def read_themes(path: Path) -> dict[str, tuple[str, str]]:
+    """`{qid: (thème choisi, note)}`. Fichier absent = aucun redressement."""
+    themes: dict[str, tuple[str, str]] = {}
+    if not path.exists():
+        return themes
+
+    lines = [
+        line
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    for row in csv.DictReader(lines):
+        qid = (row.get("wikidata_id") or "").strip()
+        theme = (row.get("theme_id") or "").strip()
+        if qid and theme:
+            themes[qid] = (theme, (row.get("note") or "").strip())
+    return themes
+
+
+def write_themes(path: Path, themes: dict[str, tuple[str, str]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as fh:
+        fh.write(THEMES_HEADER)
+        writer = csv.writer(fh)
+        for qid in sorted(themes):
+            theme, note = themes[qid]
+            writer.writerow([qid, theme, note])
+    LOG.info("thèmes : %s redressements conservés dans %s", len(themes), path)
+
+
+def apply_themes(
+    places: list[Place], themes: dict[str, tuple[str, str]], known: set[str]
+) -> tuple[list[Place], list[str]]:
+    """Rattache un lieu au thème choisi par le curateur.
+
+    Renvoie le catalogue redressé et les Q-id qu'il n'a pas pu redresser.
+
+    Un lieu peut être collecté sous plusieurs thèmes : le Louvre est un palais
+    et un musée. Redresser ne consiste donc pas à changer une étiquette mais à
+    **supprimer les autres rattachements** — sinon la règle du plus spécifique
+    continuerait de trancher toute seule et la décision humaine n'aurait aucun
+    effet.
+    """
+    if not themes:
+        return places, []
+
+    redressed: dict[str, Place] = {}
+    reste: list[Place] = []
+    inconnus = sorted(qid for qid, (theme, _) in themes.items() if theme not in known)
+
+    for place in places:
+        cible = themes.get(place.wikidata_id)
+        if cible is None or cible[0] not in known:
+            reste.append(place)
+            continue
+        # Le premier rencontré fait foi : les doublons inter-thèmes ne diffèrent
+        # que par le rattachement, qu'on est précisément en train de remplacer.
+        if place.wikidata_id in redressed:
+            continue
+        place.theme_id = cible[0]
+        # Une décision humaine est le rattachement le plus spécifique qui soit :
+        # elle ne doit pas céder devant une entrée « par classe précise ».
+        place.via_broad_class = False
+        redressed[place.wikidata_id] = place
+
+    return reste + list(redressed.values()), inconnus
+
+
+# ---------------------------------------------------------------------------
 # Photographie des niveaux
 # ---------------------------------------------------------------------------
 

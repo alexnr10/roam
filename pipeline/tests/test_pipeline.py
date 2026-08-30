@@ -19,6 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from roam_pipeline.raw import EXTRA_SHARD, read_raw, shards, write_raw
+from roam_pipeline.review import apply_themes, read_themes, write_themes
 from roam_pipeline.collections import (
     _spread,
     apply_class_exclusion,
@@ -2683,6 +2684,29 @@ class TestVersionedCollection(unittest.TestCase):
         self.assertEqual(len(body.strip().splitlines()), 4)  # [ + 2 lieux + ]
         self.assertEqual(len(json.loads(body)), 2)
 
+    def test_a_place_stays_in_every_theme_that_claimed_it(self):
+        # Le Louvre est un palais ET un musée : la collecte le rend deux fois,
+        # et c'est `dedupe_across_themes` qui tranche, avec la règle du plus
+        # spécifique. Réduire à un lieu par Q-id à la lecture lui retirerait le
+        # choix et laisserait l'ordre alphabétique des fichiers décider.
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            write_raw(raw, [self._place("Q1", "musees")], replacing={"musees"})
+            write_raw(raw, [self._place("Q1", "jardins")], replacing={"jardins"})
+            themes = sorted(p.theme_id for p in read_raw(raw))
+        self.assertEqual(themes, ["jardins", "musees"])
+
+    def test_an_adopted_candidate_only_fills_a_gap(self):
+        # Quand une requête par classe a déjà trouvé le lieu, c'est ce
+        # rattachement-là qui vaut, pas le thème deviné depuis OpenStreetMap.
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            write_raw(raw, [self._place("Q1", "musees")], replacing={"musees"})
+            write_raw(raw, [self._place("Q1", "jardins", source="osm")],
+                      replacing={EXTRA_SHARD})
+            places = read_raw(raw)
+        self.assertEqual([p.theme_id for p in places], ["musees"])
+
     def test_an_unreadable_file_does_not_take_the_rest_down(self):
         # Un fichier tronqué par une interruption ne doit pas rendre tout le
         # catalogue illisible.
@@ -2693,6 +2717,67 @@ class TestVersionedCollection(unittest.TestCase):
             with _capture():
                 places = read_raw(raw)
         self.assertEqual([p.wikidata_id for p in places], ["Q1"])
+
+
+class TestCuratorTheme(unittest.TestCase):
+    """Le rattachement automatique se trompe quand la classe décrit une PARTIE.
+
+    Le musée Christian-Dior est classé « jardin » parce que sa villa en a un
+    remarquable. Wikidata n'a pas tort : c'est la hiérarchie des classes qui ne
+    dit pas ce qu'on vient voir. Aucune règle générale ne rattrape cela.
+    """
+
+    KNOWN = {"musees", "jardins", "maisons"}
+
+    @staticmethod
+    def _place(theme, qid="Q1", **kwargs):
+        return make_place(f"Musée {qid}", theme=theme, wikidata_id=qid, **kwargs)
+
+    def test_the_place_leaves_its_other_attachments(self):
+        # Changer l'étiquette d'un seul exemplaire ne suffirait pas : le
+        # doublon inter-thèmes resterait, et la règle du plus spécifique
+        # continuerait de trancher toute seule.
+        places = [self._place("jardins"), self._place("musees")]
+        redressed, inconnus = apply_themes(places, {"Q1": ("musees", "")}, self.KNOWN)
+        self.assertEqual(inconnus, [])
+        self.assertEqual([(p.wikidata_id, p.theme_id) for p in redressed],
+                         [("Q1", "musees")])
+
+    def test_it_wins_against_the_declaration_order(self):
+        # `musees` est déclaré avant `jardins` : sans le retrait des autres
+        # rattachements, un lieu qu'on veut en jardins y resterait piégé.
+        places = [self._place("musees"), self._place("jardins")]
+        redressed, _ = apply_themes(places, {"Q1": ("jardins", "")}, self.KNOWN)
+        with _capture():
+            survivants = dedupe_across_themes(score_all(redressed, CONFIG), CONFIG)
+        self.assertEqual([p.theme_id for p in survivants], ["jardins"])
+
+    def test_a_human_decision_is_the_most_specific_attachment(self):
+        # Entré par une classe générique, le lieu cédait devant n'importe quelle
+        # entrée précise. Une décision humaine ne doit pas céder.
+        places = [self._place("maisons", via_broad_class=True)]
+        redressed, _ = apply_themes(places, {"Q1": ("maisons", "")}, self.KNOWN)
+        self.assertFalse(redressed[0].via_broad_class)
+
+    def test_an_unknown_theme_is_reported_and_changes_nothing(self):
+        # Une faute de frappe dans le fichier ne doit pas faire disparaître un
+        # lieu dans un thème qui n'existe pas.
+        places = [self._place("jardins")]
+        redressed, inconnus = apply_themes(places, {"Q1": ("musée", "")}, self.KNOWN)
+        self.assertEqual(inconnus, ["Q1"])
+        self.assertEqual([p.theme_id for p in redressed], ["jardins"])
+
+    def test_the_choice_survives_a_round_trip(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "themes.csv"
+            write_themes(path, {"Q1": ("musees", "le jardin n'est pas le sujet")})
+            relu = read_themes(path)
+        self.assertEqual(relu, {"Q1": ("musees", "le jardin n'est pas le sujet")})
+
+    def test_a_place_nobody_redirected_is_left_alone(self):
+        places = [self._place("jardins", qid="Q9")]
+        redressed, _ = apply_themes(places, {"Q1": ("musees", "")}, self.KNOWN)
+        self.assertEqual([p.theme_id for p in redressed], ["jardins"])
 
 
 if __name__ == "__main__":

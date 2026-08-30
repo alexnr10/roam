@@ -51,7 +51,8 @@ from .models import Collection, CollectionPlace, Place
 from .outlines import ATTRIBUTION as OUTLINE_ATTRIBUTION, DEFAULT_TOLERANCE_KM2
 from .outlines import export as export_outlines
 from .review import (
-    DECISIONS, apply_decisions, apply_names, diff_tiers, read_decisions, read_names,
+    DECISIONS, apply_decisions, apply_names, apply_themes, diff_tiers,
+    read_decisions, read_names, read_themes, write_themes,
     read_snapshot, vanished, write_decisions, write_names, write_snapshot,
 )
 from .score import score_all
@@ -538,6 +539,14 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     # Avant tout le reste : le nom choisi par le curateur doit valoir partout,
     # jusque dans la feuille de revue où il relira la ligne.
     renamed = apply_names(scored, read_names(args.manual / "names.csv"))
+    # Le rattachement choisi par le curateur, avant tout le reste : il change
+    # la collection d'appartenance, donc les voisins, donc le rang.
+    themes = read_themes(args.manual / "themes.csv")
+    scored, inconnus = apply_themes(scored, themes, {t.id for t in config.themes})
+    if inconnus:
+        print(f"⚠ themes.csv : thème inconnu pour {', '.join(inconnus)} — ligne "
+              "ignorée. Thèmes valides : "
+              + ", ".join(t.id for t in config.themes), file=sys.stderr)
     decisions = read_decisions(args.manual / "decisions.csv")
     kept, counts = apply_decisions(scored, decisions, args.adjust, strict=args.strict)
     # Rescoré après ajustement : la correction du relecteur fait partie du score,
@@ -569,6 +578,19 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
 
     if renamed:
         print(f"Renommages appliqués : {renamed}")
+
+    if themes:
+        gardes = {place.wikidata_id for place in retained}
+        perdus = [qid for qid in themes if qid not in gardes]
+        print(f"Thèmes redressés : {len(themes) - len(perdus)}/{len(themes)}")
+        if perdus:
+            # Le nouveau thème a son propre plancher de notoriété : un lieu
+            # peut le rater alors qu'il passait celui de l'ancien. Sans ce
+            # message, il disparaîtrait du catalogue en silence.
+            print(f"⚠ {len(perdus)} lieux redressés ne sortent dans AUCUNE "
+                  f"collection : {', '.join(perdus)}")
+            print("    Le plancher de leur nouveau thème les écarte. "
+                  "`explain <nom>` dit lequel.")
 
     if decisions:
         print("Décisions reprises :",
@@ -785,6 +807,8 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
 
     if len(found) > args.limit:
         print(f"\n({len(found) - args.limit} autres correspondances non affichées)")
+
+    print("\nThème faux ? `retheme <Q-id> <thème>` le redresse durablement.")
     return 0
 
 
@@ -1317,6 +1341,62 @@ def cmd_rename(args: argparse.Namespace, config: Config) -> int:
     write_names(path, names)
     print(f"{qid} s'affichera « {read_names(path)[qid]} ».")
     print("Relance `build` : le nom vaudra partout, y compris dans la revue.")
+    return 0
+
+
+def cmd_retheme(args: argparse.Namespace, config: Config) -> int:
+    """Rattache un lieu au thème que le curateur juge juste.
+
+    Le pipeline range d'après les classes Wikidata. C'est juste la plupart du
+    temps, et faux quand la classe décrit une PARTIE du lieu : le musée
+    Christian-Dior est classé « jardin » parce que la villa en a un remarquable.
+    Wikidata n'a pas tort — c'est la hiérarchie des classes qui ne dit pas ce
+    qu'on vient voir. Aucune règle générale ne rattrape cela, seul un humain le
+    sait.
+    """
+    path = args.manual / "themes.csv"
+    themes = read_themes(path)
+    valides = {theme.id for theme in config.themes}
+
+    if args.wikidata_id is None:
+        if not themes:
+            print("Aucun redressement. Usage : retheme Q123456 musees")
+            print("Thèmes : " + ", ".join(sorted(valides)))
+            return 0
+        for qid in sorted(themes):
+            theme, note = themes[qid]
+            print(f"  {qid:<12} → {theme}" + (f"   ({note})" if note else ""))
+        print(f"\n{len(themes)} redressement(s) dans {path}")
+        return 0
+
+    qid = args.wikidata_id.strip()
+    if not qid.startswith("Q") or not qid[1:].isdigit():
+        print(f"« {qid} » n'est pas un identifiant Wikidata.", file=sys.stderr)
+        return 1
+
+    if args.clear:
+        if themes.pop(qid, None) is None:
+            print(f"{qid} n'avait pas de thème choisi.")
+            return 0
+        write_themes(path, themes)
+        print(f"{qid} reprend son rattachement automatique.")
+        return 0
+
+    if not args.theme_id:
+        print("Il manque le thème. Usage : retheme Q123456 musees", file=sys.stderr)
+        print("Thèmes : " + ", ".join(sorted(valides)), file=sys.stderr)
+        return 1
+
+    if args.theme_id not in valides:
+        print(f"« {args.theme_id} » n'est pas un thème configuré.", file=sys.stderr)
+        print("Thèmes : " + ", ".join(sorted(valides)), file=sys.stderr)
+        return 1
+
+    themes[qid] = (args.theme_id, args.note or "")
+    write_themes(path, themes)
+    print(f"{qid} appartiendra au thème « {args.theme_id} ».")
+    print("Relance `build` : il quittera ses autres rattachements. La revue le "
+          "signalera comme ayant CHANGÉ DE THÈME.")
     return 0
 
 
@@ -1873,6 +1953,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="dossier de GeoJSON déjà téléchargés (region.geojson, departement.geojson)",
     )
 
+    retheme = sub.add_parser(
+        "retheme", help="rattache un lieu au thème choisi par le curateur")
+    retheme.add_argument("wikidata_id", nargs="?")
+    retheme.add_argument("theme_id", nargs="?")
+    retheme.add_argument("--note", help="pourquoi ce rattachement")
+    retheme.add_argument("--clear", action="store_true",
+                         help="revenir au rattachement automatique")
+
     synchro = sub.add_parser(
         "sync", help="aligne la copie de travail sur la collecte versionnée")
     synchro.add_argument(
@@ -1913,6 +2001,7 @@ def main(argv: list[str] | None = None) -> int:
         "stats": cmd_stats,
         "review": cmd_review,
         "sync": cmd_sync,
+        "retheme": cmd_retheme,
         "check-lists": cmd_check_lists,
         "gaps": cmd_gaps,
         "probe": cmd_probe,

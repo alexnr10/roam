@@ -24,6 +24,7 @@ travail éditorial. Ils sont relus à **chaque** construction :
 |---|---|
 | `decisions.csv` | verdicts d'inclusion — `keep`, `drop`, `promote`, `demote` |
 | `names.csv` | noms d'affichage choisis, quand le libellé de Wikidata ne convient pas |
+| `themes.csv` | rattachements redressés, quand la classe Wikidata décrit une partie du lieu |
 | `tiers.csv` | photographie du niveau ET du thème tels qu'ils ont été VUS à la dernière revue |
 | `candidates.csv` | candidats adoptés depuis OpenStreetMap — une ligne retirée à la main le reste |
 
@@ -46,6 +47,25 @@ python -m roam_pipeline rename                    # liste les renommages
 python -m roam_pipeline rename Q3330248 --clear   # revenir au libellé Wikidata
 ```
 
+`themes.csv` de même. Le pipeline range d'après les classes Wikidata, et se
+trompe quand la classe décrit une **partie** du lieu : le musée Christian-Dior
+est classé « jardin » parce que la villa en a un remarquable. Wikidata n'a pas
+tort — c'est la hiérarchie des classes qui ne dit pas ce qu'on vient voir.
+
+```bash
+python -m roam_pipeline explain "christian dior"   # trouver le Q-id et voir son thème
+python -m roam_pipeline retheme Q123456 musees --note "le jardin n'est pas le sujet"
+python -m roam_pipeline retheme                    # liste les redressements
+python -m roam_pipeline retheme Q123456 --clear    # revenir au rattachement automatique
+```
+
+Un lieu redressé **quitte ses autres rattachements** : changer l'étiquette d'un
+seul exemplaire ne suffirait pas, le doublon inter-thèmes resterait et la règle
+du plus spécifique continuerait de trancher toute seule.
+
+Ce n'est pas un verdict d'inclusion : le lieu doit encore franchir le plancher
+de notoriété de son nouveau thème. `build` le dit quand il n'y arrive pas.
+
 ### Ces fichiers se committent
 
 C'est plusieurs soirées de relecture, et ce sont des fichiers texte de quelques
@@ -54,7 +74,7 @@ mieux à inventer :
 
 ```bash
 git add pipeline/data/manual/decisions.csv pipeline/data/manual/names.csv \
-        pipeline/data/manual/tiers.csv
+        pipeline/data/manual/themes.csv pipeline/data/manual/tiers.csv
 git commit -m "Revue du <date>"
 ```
 
