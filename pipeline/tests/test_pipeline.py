@@ -2857,6 +2857,23 @@ class TestThemeDoubt(unittest.TestCase):
         self.assertEqual(dior["disputed"], ["Musées"])
         self.assertIn('data-role="theme"', body)
 
+    def test_a_theme_gone_from_the_configuration_does_not_break_the_page(self):
+        # Une collecte antérieure peut porter des lieux d'un thème retiré de
+        # `themes.yaml`. Lui demander son nom d'affichage pour une mention de
+        # confort faisait tomber toute la construction.
+        with _capture():
+            places = [make_place(f"Jardin {i}", theme="jardins", wikidata_id=f"Q{i}",
+                                 sitelinks=9, lat=45 + i * 0.1) for i in range(9)]
+            scored = score_all(places, CONFIG)
+            retained, collections = build_all(scored, CONFIG)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.html"
+            write_review_html(retained, collections, CONFIG, path,
+                              claims={"Q1": ["jardins", "sources"]})
+            body = path.read_text(encoding="utf-8")
+        data = json.loads(body.split("const DATA = ", 1)[1].split(";\nconst THEMES", 1)[0])
+        self.assertEqual(next(r for r in data if r["id"] == "Q1")["disputed"], [])
+
     def test_the_sheet_carries_only_the_themes_that_changed(self):
         # Réécrire les deux mille autres ferait de `themes.csv` une copie du
         # catalogue, et de chaque revue un diff illisible.

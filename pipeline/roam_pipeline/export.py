@@ -415,6 +415,7 @@ def write_review_html(
     depts = departements()
     hints = name_hints(config)
     claims = claims or {}
+    connus = {theme.id for theme in config.themes}
 
     rows = []
     for place in sorted(
@@ -424,7 +425,13 @@ def write_review_html(
         parts = score_breakdown(place, config)
         # Deux raisons de douter du rattachement, et une seule d'entre elles
         # suffit à mériter un second regard.
-        disputed = [t for t in claims.get(place.wikidata_id, []) if t != place.theme_id]
+        # Un thème retiré de `themes.yaml` peut encore avoir des lieux dans une
+        # collecte antérieure. Lui demander son nom d'affichage fait tomber
+        # toute la construction, pour une mention de confort.
+        disputed = [
+            t for t in claims.get(place.wikidata_id, [])
+            if t != place.theme_id and t in connus
+        ]
         annonce = theme_from_name(place.name, hints)
         rows.append(
             {
