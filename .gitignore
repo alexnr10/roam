@@ -13,10 +13,16 @@ venv/
 # Sorties du pipeline : volumineuses et régénérables.
 # `review.csv` est en revanche versionné dès qu'il contient des décisions
 # éditoriales — c'est du travail humain, pas une sortie de machine.
-pipeline/data/out/places_raw.json     # copie de travail, reconstituée par `sync`
+# `places_raw.json` est la copie de travail, reconstituée par `sync` depuis
+# `pipeline/data/raw/`. Un commentaire en FIN de ligne ne fonctionne pas ici :
+# git prend la ligne entière comme motif, et le fichier cesse d'être ignoré.
+pipeline/data/out/places_raw.json
 pipeline/data/out/places.json
 pipeline/data/out/collections.json
 pipeline/data/out/seed.sql
+# La PAGE de revue se reconstruit à l'identique depuis le catalogue et les
+# décisions. `review.csv`, lui, reste hors de cette liste : une feuille remplie
+# à la main est du travail humain, et le dépôt doit pouvoir la sauver.
 # `fetch-state.json` est en revanche PETIT et utile à conserver : il dit quels
 # thèmes ont une collecte en échec, et `build` le rappelle à chaque passage.
 
