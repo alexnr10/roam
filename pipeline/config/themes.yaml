@@ -67,6 +67,7 @@ themes:
   - id: villages
     name: Villages de caractère
     name_singular: Village
+    name_hints: [village]
     icon: village
     kind: culture
     radius_m: 600
@@ -86,6 +87,7 @@ themes:
   - id: abbayes
     name: Abbayes et monastères
     name_singular: Abbaye
+    name_hints: [abbaye, prieuré, chartreuse, monastère, couvent]
     icon: abbey
     kind: culture
     radius_m: 150
@@ -97,6 +99,7 @@ themes:
   - id: cathedrales
     name: Cathédrales et basiliques
     name_singular: Cathédrale
+    name_hints: [cathédrale, basilique, collégiale]
     icon: cathedral
     kind: culture
     radius_m: 120
@@ -121,6 +124,7 @@ themes:
   - id: chateaux
     name: Châteaux
     name_singular: Château
+    name_hints: [château, forteresse, citadelle, donjon]
     icon: castle
     kind: culture
     radius_m: 200
@@ -137,6 +141,7 @@ themes:
   - id: maisons
     name: Maisons d'artistes et d'écrivains
     name_singular: Maison
+    name_hints: [maison, villa, atelier, demeure]
     icon: house
     kind: culture
     radius_m: 150
@@ -188,6 +193,7 @@ themes:
   - id: musees
     name: Musées
     name_singular: Musée
+    name_hints: [musée, muséum, fondation, écomusée]
     icon: museum
     kind: culture
     radius_m: 120
@@ -239,6 +245,7 @@ themes:
   - id: grottes
     name: Grottes et gouffres
     name_singular: Grotte
+    name_hints: [grotte, gouffre, aven, caverne]
     icon: cave
     kind: nature
     radius_m: 200
@@ -250,6 +257,7 @@ themes:
   - id: megalithes
     name: Mégalithes et sites antiques
     name_singular: Site
+    name_hints: [dolmen, menhir, alignement, cairn, cromlech]
     icon: megalith
     kind: culture
     radius_m: 200
@@ -266,6 +274,7 @@ themes:
   - id: jardins
     name: Jardins remarquables
     name_singular: Jardin
+    name_hints: [jardin, parc, arboretum, roseraie]
     icon: garden
     kind: nature
     radius_m: 200
@@ -285,6 +294,7 @@ themes:
   - id: phares
     name: Phares
     name_singular: Phare
+    name_hints: [phare]
     icon: lighthouse
     kind: culture
     radius_m: 200
@@ -296,6 +306,7 @@ themes:
   - id: ponts
     name: Ponts et viaducs
     name_singular: Pont
+    name_hints: [pont, viaduc, aqueduc, passerelle]
     icon: bridge
     kind: culture
     radius_m: 300
@@ -317,6 +328,7 @@ themes:
   - id: cascades
     name: Cascades
     name_singular: Cascade
+    name_hints: [cascade, chute, saut]
     icon: waterfall
     kind: nature
     radius_m: 300
@@ -328,6 +340,7 @@ themes:
   - id: cirques
     name: Cirques naturels
     name_singular: Cirque
+    name_hints: [cirque]
     icon: cirque
     kind: nature
     radius_m: 500
@@ -339,6 +352,7 @@ themes:
   - id: gorges
     name: Gorges et canyons
     name_singular: Gorges
+    name_hints: [gorges, canyon, défilé]
     icon: canyon
     kind: nature
     # Site étendu : le point est celui de l'entrée, le rayon porte la taille.
@@ -352,6 +366,7 @@ themes:
   - id: lacs
     name: Lacs
     name_singular: Lac
+    name_hints: [lac, étang, réservoir]
     icon: lake
     kind: nature
     radius_m: 1500
@@ -367,6 +382,7 @@ themes:
   - id: iles
     name: Îles
     name_singular: Île
+    name_hints: [île, îlot, archipel]
     icon: island
     kind: nature
     radius_m: 2000
@@ -384,6 +400,7 @@ themes:
   - id: volcans
     name: Volcans et sites volcaniques
     name_singular: Volcan
+    name_hints: [volcan, puy]
     icon: volcan
     kind: nature
     radius_m: 400
@@ -399,6 +416,7 @@ themes:
   - id: sommets
     name: Sommets
     name_singular: Sommet
+    name_hints: [mont, pic, aiguille, crête, dent]
     icon: mountain
     kind: nature
     radius_m: 1000
@@ -418,6 +436,7 @@ themes:
   - id: dunes-marais
     name: Dunes et marais
     name_singular: Site
+    name_hints: [dune, marais]
     icon: dune
     kind: nature
     radius_m: 600
@@ -436,6 +455,7 @@ themes:
   - id: plages
     name: Littoral et plages
     name_singular: Site
+    name_hints: [plage, anse, crique]
     icon: beach
     kind: nature
     radius_m: 500
@@ -474,6 +494,7 @@ themes:
   - id: forets
     name: Forêts remarquables
     name_singular: Forêt
+    name_hints: [forêt, bois, futaie]
     icon: foret
     kind: nature
     radius_m: 800
@@ -489,6 +510,7 @@ themes:
   - id: rochers
     name: Curiosités géologiques
     name_singular: Curiosité
+    name_hints: [rocher, roche, roque]
     icon: rocher
     kind: nature
     radius_m: 300

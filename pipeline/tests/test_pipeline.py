@@ -19,7 +19,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from roam_pipeline.raw import EXTRA_SHARD, read_raw, shards, write_raw
-from roam_pipeline.review import apply_themes, read_themes, write_themes
+from roam_pipeline.review import (
+    apply_themes, name_hints, read_themes, theme_claims, theme_from_name, write_themes,
+)
 from roam_pipeline.collections import (
     _spread,
     apply_class_exclusion,
@@ -32,7 +34,7 @@ from roam_pipeline.collections import (
 )
 from roam_pipeline.config import CONFIG_DIR, Exclusions, Visitors, load_config
 from roam_pipeline.export import (
-    _sql_str, write_review_csv, write_review_html, write_seed_sql,
+    _sql_str, read_review_csv, read_review_themes, write_review_csv, write_review_html, write_seed_sql,
 )
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
 from roam_pipeline.models import Place, display_name, slugify
@@ -2778,6 +2780,83 @@ class TestCuratorTheme(unittest.TestCase):
         places = [self._place("jardins", qid="Q9")]
         redressed, _ = apply_themes(places, {"Q1": ("musees", "")}, self.KNOWN)
         self.assertEqual([p.theme_id for p in redressed], ["jardins"])
+
+
+class TestThemeDoubt(unittest.TestCase):
+    """Attirer l'œil là où le rattachement mérite un second regard.
+
+    Deux signaux, et un seul suffit : plusieurs thèmes ont réclamé le lieu, ou
+    son NOM annonce autre chose que son thème. Ni l'un ni l'autre ne range quoi
+    que ce soit — la revue reste le lieu de la décision, mais elle sait
+    désormais où regarder.
+    """
+
+    HINTS = None
+
+    def setUp(self):
+        self.HINTS = name_hints(CONFIG)
+
+    def test_the_name_carries_the_type_of_the_place(self):
+        # Le nom français d'un lieu commence par son type. C'est le seul signal
+        # que Wikidata ne donne pas quand la classe décrit une PARTIE du lieu.
+        self.assertEqual(theme_from_name("Musée Christian Dior", self.HINTS), "musees")
+        self.assertEqual(theme_from_name("Abbaye Saint-Victor", self.HINTS), "abbayes")
+
+    def test_an_article_does_not_hide_the_type(self):
+        self.assertEqual(theme_from_name("Le Pont du Gard", self.HINTS), "ponts")
+
+    def test_a_name_that_announces_nothing_stays_silent(self):
+        # Pas d'indice plutôt qu'un mauvais indice : « monuments » est le thème
+        # fourre-tout, son nom ne prouve rien.
+        self.assertIsNone(theme_from_name("Arc de Triomphe", self.HINTS))
+
+    def test_a_word_claimed_by_two_themes_proves_nothing(self):
+        # « Site » nomme trois thèmes : il ne peut désigner personne.
+        self.assertNotIn("site", self.HINTS)
+
+    def test_a_contested_place_is_flagged(self):
+        # Le Louvre réclamé par « musées » et « châteaux » est un arbitrage du
+        # pipeline, pas un fait. Après dédoublonnage il n'en reste aucune trace.
+        places = [make_place("Palais du Louvre", theme="musees", wikidata_id="Q1"),
+                  make_place("Palais du Louvre", theme="chateaux", wikidata_id="Q1")]
+        self.assertEqual(theme_claims(places), {"Q1": ["chateaux", "musees"]})
+
+    def test_a_place_one_theme_claimed_is_not_contested(self):
+        places = [make_place("Château seul", theme="chateaux", wikidata_id="Q1")]
+        self.assertEqual(theme_claims(places), {})
+
+    def test_the_page_carries_both_signals(self):
+        with _capture():
+            places = [make_place(f"Jardin {i}", theme="jardins", wikidata_id=f"Q{i}",
+                                 sitelinks=9, lat=45 + i * 0.1) for i in range(9)]
+            places.append(make_place("Musée Christian Dior", theme="jardins",
+                                     wikidata_id="Q99", sitelinks=9, lat=48.8))
+            scored = score_all(places, CONFIG)
+            retained, collections = build_all(scored, CONFIG)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.html"
+            write_review_html(retained, collections, CONFIG, path,
+                              claims={"Q99": ["jardins", "musees"]})
+            body = path.read_text(encoding="utf-8")
+        data = json.loads(body.split("const DATA = ", 1)[1].split(";\nconst THEMES", 1)[0])
+        dior = next(row for row in data if row["id"] == "Q99")
+        self.assertEqual(dior["suggests"], "musees")
+        self.assertEqual(dior["disputed"], ["Musées"])
+        self.assertIn('data-role="theme"', body)
+
+    def test_the_sheet_carries_only_the_themes_that_changed(self):
+        # Réécrire les deux mille autres ferait de `themes.csv` une copie du
+        # catalogue, et de chaque revue un diff illisible.
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "decisions.csv"
+            path.write_text(
+                "decision,curator_note,theme_id,name,wikidata_id\n"
+                "keep,,,\"Un jardin\",Q1\n"
+                ",,musees,\"Musée Christian Dior\",Q2\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(read_review_themes(path), {"Q2": "musees"})
+            self.assertEqual(read_review_csv(path), {"Q1": ("keep", "")})
 
 
 if __name__ == "__main__":

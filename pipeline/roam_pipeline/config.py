@@ -58,6 +58,12 @@ class Theme:
     # Nombre maximum de lieux d'un même département dans la collection
     # NATIONALE du thème. `None` ne borne rien.
     max_per_departement: int | None = None
+    # Mots qui, en tête d'un nom de lieu, désignent ce thème. Le nom français
+    # d'un lieu commence par son type — « Musée Christian-Dior », « Abbaye
+    # Saint-Victor » — et c'est le seul signal que Wikidata ne donne pas :
+    # quand la classe décrit une partie du lieu (le jardin de la villa), le nom,
+    # lui, dit ce qu'on vient voir. `name_singular` sert de mot par défaut.
+    name_hints: list[str] = field(default_factory=list)
 
     @property
     def collected_classes(self) -> list[tuple[str, int]]:
@@ -214,6 +220,7 @@ def load_config(config_dir: Path | None = None) -> Config:
             wikidata_classes=[str(q) for q in (t.get("wikidata_classes") or [])],
             from_labels=list(t.get("from_labels") or []),
             search=list(t.get("search") or []),
+            name_hints=[str(h) for h in (t.get("name_hints") or [])],
             max_per_departement=(
                 int(t["max_per_departement"]) if t.get("max_per_departement") else None
             ),

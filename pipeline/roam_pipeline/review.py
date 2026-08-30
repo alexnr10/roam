@@ -17,6 +17,8 @@ la colonne `decision` deviendrait ambiguë.
 from __future__ import annotations
 
 import csv
+import re
+import unicodedata
 import logging
 from collections import Counter
 from pathlib import Path
@@ -271,6 +273,63 @@ def apply_themes(
         redressed[place.wikidata_id] = place
 
     return reste + list(redressed.values()), inconnus
+
+
+def name_hints(config) -> dict[str, str]:
+    """`{mot: thème}` — les mots qui, en tête d'un nom, ne désignent qu'un thème.
+
+    Un mot revendiqué par deux thèmes ne prouve rien et n'est pas retenu.
+    """
+    owners: dict[str, set[str]] = {}
+    for theme in config.themes:
+        mots = theme.name_hints or [theme.name_singular]
+        for mot in mots:
+            owners.setdefault(_fold(mot), set()).add(theme.id)
+    return {mot: next(iter(ids)) for mot, ids in owners.items() if len(ids) == 1}
+
+
+# Articles et qualificatifs : « Le Mont-Saint-Michel » commence par « le », et
+# c'est le mot suivant qui porte le type du lieu.
+_ARTICLES = {"le", "la", "les", "l", "du", "de", "des", "d", "un", "une", "grand",
+             "grande", "petit", "petite", "vieux", "vieille", "ancien", "ancienne"}
+
+
+def _fold(value: str) -> str:
+    """Minuscules sans accents : « Île » et « ile » doivent se rencontrer."""
+    decomposed = unicodedata.normalize("NFKD", value)
+    return "".join(c for c in decomposed if not unicodedata.combining(c)).lower()
+
+
+def theme_from_name(name: str, hints: dict[str, str]) -> str | None:
+    """Le thème que le NOM du lieu annonce, s'il en annonce un.
+
+    Le nom français d'un lieu commence par son type — « Musée Christian-Dior »,
+    « Abbaye Saint-Victor », « Pont de Normandie ». C'est le seul signal que
+    Wikidata ne donne pas : quand la classe décrit une PARTIE du lieu (le jardin
+    remarquable de la villa), le nom, lui, dit ce qu'on vient voir.
+
+    Un indice, pas un verdict : il sert à attirer l'œil du relecteur, jamais à
+    ranger tout seul. « Maison Carrée » est un temple romain.
+    """
+    for mot in re.split(r"[^\w]+", _fold(name)):
+        if not mot or mot in _ARTICLES:
+            continue
+        return hints.get(mot)
+    return None
+
+
+def theme_claims(places: list[Place]) -> dict[str, list[str]]:
+    """`{qid: thèmes qui ont réclamé ce lieu}`, avant tout arbitrage.
+
+    À calculer sur le catalogue BRUT : après `dedupe_across_themes`, le lieu n'a
+    plus qu'un thème et la contestation a disparu sans laisser de trace. Or
+    c'est exactement là qu'un relecteur doit regarder — le Louvre réclamé par
+    « musées » et « châteaux », c'est un arbitrage, pas un fait.
+    """
+    claims: dict[str, set[str]] = {}
+    for place in places:
+        claims.setdefault(place.wikidata_id, set()).add(place.theme_id)
+    return {qid: sorted(themes) for qid, themes in claims.items() if len(themes) > 1}
 
 
 # ---------------------------------------------------------------------------

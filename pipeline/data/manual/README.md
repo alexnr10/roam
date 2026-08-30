@@ -59,12 +59,37 @@ python -m roam_pipeline retheme                    # liste les redressements
 python -m roam_pipeline retheme Q123456 --clear    # revenir au rattachement automatique
 ```
 
+La revue le fait aussi, et c'est la voie normale : chaque vignette porte un
+**sélecteur de thème**, déjà positionné sur le rattachement du pipeline. Une
+revue interrompue au milieu laisse donc un catalogue rangé, pas un catalogue en
+attente — le sélecteur ne sert qu'à contredire.
+
+Deux signaux marquent les vignettes qui méritent un second regard, et le filtre
+**« Thème douteux — à trancher »** ne montre qu'elles :
+
+- **plusieurs thèmes ont réclamé le lieu.** Le pipeline a tranché avec la règle
+  du plus spécifique ; c'est un arbitrage, pas un fait. Après le dédoublonnage
+  il n'en reste aucune trace, d'où le calcul sur le catalogue brut.
+- **le nom annonce autre chose.** Le nom français d'un lieu commence par son
+  type — « Musée Christian-Dior », « Abbaye Saint-Victor ». C'est le seul signal
+  que Wikidata ne donne pas quand la classe décrit une *partie* du lieu. Les
+  mots reconnus sont dans `config/themes.yaml`, champ `name_hints` ; un mot que
+  deux thèmes revendiquent ne prouve rien et n'est pas retenu.
+
+C'est un indice, pas un verdict : « Maison Carrée » est un temple romain, et
+« Le Mont-Saint-Michel » n'est pas un sommet. Le défaut reste le bon dans ces
+cas-là, il suffit de ne rien toucher.
+
 Un lieu redressé **quitte ses autres rattachements** : changer l'étiquette d'un
 seul exemplaire ne suffirait pas, le doublon inter-thèmes resterait et la règle
 du plus spécifique continuerait de trancher toute seule.
 
 Ce n'est pas un verdict d'inclusion : le lieu doit encore franchir le plancher
-de notoriété de son nouveau thème. `build` le dit quand il n'y arrive pas.
+de notoriété de son nouveau thème, qui est souvent plus haut — `musees` demande
+douze langues là où `jardins` en demande cinq. `build` nomme les redressements
+qui ne sortent plus dans aucune collection, et `explain` dit à quelle étape.
+Quand le lieu mérite d'y rester malgré tout, un `keep` dans la revue l'épingle
+et le plancher ne s'y applique plus.
 
 ### Ces fichiers se committent
 

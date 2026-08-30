@@ -21,6 +21,7 @@ from .export import (
     review_state,
     review_tiers,
     read_review_csv,
+    read_review_themes,
     write_json,
     write_review_csv,
     write_app_catalog,
@@ -52,7 +53,7 @@ from .outlines import ATTRIBUTION as OUTLINE_ATTRIBUTION, DEFAULT_TOLERANCE_KM2
 from .outlines import export as export_outlines
 from .review import (
     DECISIONS, apply_decisions, apply_names, apply_themes, diff_tiers,
-    read_decisions, read_names, read_themes, write_themes,
+    read_decisions, read_names, read_themes, theme_claims, write_themes,
     read_snapshot, vanished, write_decisions, write_names, write_snapshot,
 )
 from .score import score_all
@@ -570,6 +571,10 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     write_review_html(
         retained, collections, config, args.out / "review.html", changes,
         decided={qid: verdict for qid, (verdict, _note) in decisions.items()},
+        # Calculée sur le catalogue AVANT arbitrage : après le dédoublonnage,
+        # le lieu n'a plus qu'un thème et la contestation ne se voit plus.
+        claims=theme_claims(scored),
+        rethemed={qid: theme for qid, (theme, _note) in themes.items()},
     )
     write_seed_sql(retained, collections, config, args.out / "seed.sql")
 
@@ -732,6 +737,13 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
     needle = _fold(args.name)
     everything = score_all(_load_places(raw_path), config)
     apply_names(everything, read_names(args.manual / "names.csv"))
+    # Le redressement de thème aussi : sans lui, `explain` annonce le thème que
+    # le pipeline aurait choisi et non celui qui vaut, ce qui est exactement le
+    # contraire de son rôle.
+    everything, _inconnus = apply_themes(
+        everything, read_themes(args.manual / "themes.csv"),
+        {theme.id for theme in config.themes},
+    )
     found = [p for p in everything if needle in _fold(p.name)]
 
     if not found:
@@ -823,7 +835,17 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
     if unknown:
         print(f"Décisions inconnues, ignorées : {', '.join(sorted(unknown))}", file=sys.stderr)
         fresh = {q: v for q, v in fresh.items() if v[0] in DECISIONS}
-    if not fresh:
+
+    # Les redressements de thème voyagent dans la même feuille mais dans leur
+    # propre colonne : ranger et écarter sont deux gestes différents.
+    valides = {theme.id for theme in config.themes}
+    fresh_themes = read_review_themes(args.review)
+    inconnus = {t for t in fresh_themes.values()} - valides
+    if inconnus:
+        print(f"Thèmes inconnus, ignorés : {', '.join(sorted(inconnus))}", file=sys.stderr)
+        fresh_themes = {q: t for q, t in fresh_themes.items() if t in valides}
+
+    if not fresh and not fresh_themes:
         print("Aucune décision renseignée dans la feuille de revue.", file=sys.stderr)
         return 1
 
@@ -839,6 +861,16 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
     write_decisions(path, decisions, names)
     print(f"{len(fresh)} décisions lues, {changed} nouvelles ou modifiées "
           f"({before} → {len(decisions)} au total dans {path.name}).")
+
+    if fresh_themes:
+        themes_path = args.manual / "themes.csv"
+        themes = read_themes(themes_path)
+        bouge = sum(1 for q, t in fresh_themes.items() if themes.get(q, ("",))[0] != t)
+        for qid, theme in fresh_themes.items():
+            themes[qid] = (theme, themes.get(qid, ("", ""))[1])
+        write_themes(themes_path, themes)
+        print(f"{len(fresh_themes)} thèmes redressés, {bouge} nouveaux ou modifiés "
+              f"({len(themes)} au total dans {themes_path.name}).")
 
     status = _build_and_write(args, config)
 

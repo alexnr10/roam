@@ -13,6 +13,7 @@ from .geo import FRANCE, departements, regions
 from .alerts import alerts_for
 from .score import score_breakdown
 from .models import Collection, Place
+from .review import name_hints, theme_from_name
 
 LOG = logging.getLogger(__name__)
 
@@ -228,6 +229,24 @@ def read_review_csv(path: Path) -> dict[str, tuple[str, str]]:
     return decisions
 
 
+def read_review_themes(path: Path) -> dict[str, str]:
+    """Relit les redressements de thème d'une feuille de revue : qid → thème.
+
+    La colonne s'appelle `theme_id` et n'est écrite par la page que lorsqu'elle
+    DIFFÈRE du rattachement automatique. La colonne `theme` de la grande feuille
+    `review.csv`, elle, est informative — deux colonnes éditables portant le
+    même sens rendraient toute correction ambiguë.
+    """
+    themes: dict[str, str] = {}
+    with path.open(encoding="utf-8") as fh:
+        for row in csv.DictReader(fh):
+            qid = (row.get("wikidata_id") or "").strip()
+            theme = (row.get("theme_id") or "").strip()
+            if qid and theme:
+                themes[qid] = theme
+    return themes
+
+
 def _sql_str(value: str | None) -> str:
     if value is None or value == "":
         return "null"
@@ -376,6 +395,8 @@ def write_review_html(
     out_path: Path,
     changes: dict[str, str] | None = None,
     decided: dict[str, str] | None = None,
+    claims: dict[str, list[str]] | None = None,
+    rethemed: dict[str, str] | None = None,
 ) -> None:
     """Page de revue avec vignettes.
 
@@ -392,6 +413,8 @@ def write_review_html(
     """
     membership, best_tier = _membership(collections)
     depts = departements()
+    hints = name_hints(config)
+    claims = claims or {}
 
     rows = []
     for place in sorted(
@@ -399,6 +422,10 @@ def write_review_html(
     ):
         dept = depts.get(place.departement_code or "")
         parts = score_breakdown(place, config)
+        # Deux raisons de douter du rattachement, et une seule d'entre elles
+        # suffit à mériter un second regard.
+        disputed = [t for t in claims.get(place.wikidata_id, []) if t != place.theme_id]
+        annonce = theme_from_name(place.name, hints)
         rows.append(
             {
                 "id": place.wikidata_id,
@@ -422,6 +449,11 @@ def write_review_html(
                 # Ce qui a bougé depuis la dernière revue. Le niveau est un
                 # rang, pas une propriété : il change sans que le lieu change.
                 "changed": (changes or {}).get(place.wikidata_id, ""),
+                # Les autres thèmes qui ont réclamé ce lieu. Le pipeline a
+                # tranché — c'est un arbitrage, pas un fait.
+                "disputed": [config.theme(t).name for t in disputed],
+                # Le thème que le NOM annonce, quand ce n'est pas celui-ci.
+                "suggests": annonce if annonce and annonce != place.theme_id else "",
             }
         )
 
@@ -431,12 +463,23 @@ def write_review_html(
     # disparaître son lieu du catalogue, le rappeler ici n'aurait aucun sens.
     known = {row["id"] for row in rows}
     already = {q: d for q, d in (decided or {}).items() if q in known}
+    catalogue = [{"id": t.id, "name": t.name} for t in config.themes]
+    # Les redressements déjà enregistrés, pour que la page les montre déjà faits.
+    # Un thème mal orthographié dans le fichier n'a pas d'option dans le
+    # sélecteur : le navigateur retomberait alors sur la première du menu et
+    # afficherait un rattachement que personne n'a choisi.
+    valides = {theme["id"] for theme in catalogue}
+    corrected = {
+        q: t for q, t in (rethemed or {}).items() if q in known and t in valides
+    }
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(
         _REVIEW_TEMPLATE.replace("__DATA__", payload)
         .replace("__THEMES__", json.dumps(themes, ensure_ascii=False))
         .replace("__DECIDED__", json.dumps(already, ensure_ascii=False))
+        .replace("__RETHEMED__", json.dumps(corrected, ensure_ascii=False))
+        .replace("__THEME_LIST__", json.dumps(catalogue, ensure_ascii=False))
         .replace("__TITLE__", REVIEW_PAGE_TITLE),
         encoding="utf-8",
     )
@@ -477,6 +520,13 @@ _REVIEW_TEMPLATE = """<!doctype html>
   .card.keep { border-color: var(--keep); box-shadow: inset 0 0 0 1px var(--keep); }
   .card.drop { opacity: .45; border-color: var(--drop); }
   .card.promote, .card.demote { border-color: var(--muted); }
+  .card.rethemed { border-color: var(--primary); }
+  .theme-pick { display: flex; align-items: center; gap: 6px; font-size: 12px;
+                color: var(--muted); padding: 0 14px 10px; }
+  .theme-pick select { flex: 1; font-size: 12px; padding: 5px 8px; }
+  .theme-pick select.moved { border-color: var(--primary); color: var(--primary); }
+  .doubt { background: #FBEEE6; color: var(--primary); border-radius: 6px;
+           padding: 5px 8px; font-size: 12px; }
   .thumb { aspect-ratio: 4/3; background: var(--alt); object-fit: cover; width: 100%;
            display: block; }
   .noimg { aspect-ratio: 4/3; background: var(--alt); display: grid; place-items: center;
@@ -531,6 +581,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
       <option value="alert">À vérifier — disparu, accès, photo</option>
       <option value="open">Ouverts au public</option>
       <option value="doute">Accueil du public NON RENSEIGNÉ</option>
+      <option value="theme">Thème douteux — à trancher</option>
       <option value="osm">Découverts sur OpenStreetMap</option>
       <option value="relief">Entrés par la remise « ouvert au public »</option>
       <option value="keep">Gardés</option>
@@ -550,7 +601,13 @@ const THEMES = __THEMES__;
 // par `build`. C'est la mémoire qui voyage avec le dépôt ; le navigateur ne
 // garde que le travail de la soirée en cours.
 const DECIDED = __DECIDED__;
+// Les redressements de thème : même logique que les décisions, mémoire séparée.
+// Ranger et écarter sont deux gestes différents — un lieu peut être redressé ET
+// gardé, redressé ET écarté.
+const RETHEMED = __RETHEMED__;
+const THEME_LIST = __THEME_LIST__;
 const KEY = "roam.review.v1";
+const THEME_KEY = "roam.review.themes.v1";
 
 let decisions = {};
 try {
@@ -560,6 +617,11 @@ try {
   // sinon un clic pour annuler serait défait au prochain rechargement.
   decisions = Object.assign({}, DECIDED, JSON.parse(localStorage.getItem(KEY) || "{}"));
 } catch (e) { decisions = Object.assign({}, DECIDED); }
+
+let themeOf = {};
+try {
+  themeOf = Object.assign({}, RETHEMED, JSON.parse(localStorage.getItem(THEME_KEY) || "{}"));
+} catch (e) { themeOf = Object.assign({}, RETHEMED); }
 
 let persistent = true;
 try { localStorage.setItem(KEY + ".probe", "1"); localStorage.removeItem(KEY + ".probe"); }
@@ -573,8 +635,23 @@ if (!persistent) {
 
 function save() {
   if (!persistent) return;
-  try { localStorage.setItem(KEY, JSON.stringify(decisions)); } catch (e) {}
+  try {
+    localStorage.setItem(KEY, JSON.stringify(decisions));
+    localStorage.setItem(THEME_KEY, JSON.stringify(themeOf));
+  } catch (e) {}
 }
+
+// Le thème qui vaut pour ce lieu : celui du curateur s'il a tranché, sinon
+// celui du pipeline. Il y a TOUJOURS une réponse — une revue interrompue au
+// milieu laisse un catalogue rangé, pas un catalogue en attente.
+function themeNow(p) { return themeOf[p.id] || p.themeId; }
+
+function doubtful(p) {
+  return (p.disputed && p.disputed.length > 0) || !!p.suggests;
+}
+
+const THEME_NAMES = Object.fromEntries(THEME_LIST.map(t => [t.id, t.name]));
+function nameOf(id) { return THEME_NAMES[id] || id; }
 
 const grid = document.getElementById("grid");
 const themeSel = document.getElementById("theme");
@@ -602,6 +679,7 @@ function visible() {
     // château qui n'ouvre que pour des mariages, la demeure qu'on ne visite
     // pas. Seul un humain peut trancher, encore faut-il savoir où regarder.
     if (state === "doute") return p.visitable === null || p.visitable === undefined;
+    if (state === "theme") return doubtful(p);
     if (state === "osm") return p.source === "osm";
     if (state === "relief") return p.underFloor;
     if (state && d !== state) return false;
@@ -612,7 +690,8 @@ function visible() {
 function card(p) {
   const el = document.createElement("article");
   const d = decisions[p.id] || "";
-  el.className = "card" + (d ? " " + d : "");
+  const theme = themeNow(p);
+  el.className = "card" + (d ? " " + d : "") + (theme !== p.themeId ? " rethemed" : "");
 
   const img = p.image
     ? `<img class="thumb" loading="lazy" src="${p.image}" alt=""
@@ -641,6 +720,13 @@ function card(p) {
         ? `<div class="doute">Accueil du public non renseigné — rien ne prouve
              qu'on puisse y entrer</div>`
         : ""}
+      ${p.disputed && p.disputed.length
+        ? `<div class="doubt">Aussi réclamé par ${p.disputed.join(", ")} — le
+             pipeline a tranché, à toi de confirmer</div>`
+        : ""}
+      ${p.suggests
+        ? `<div class="doubt">Son NOM annonce plutôt « ${nameOf(p.suggests)} »</div>`
+        : ""}
       <div class="parts">${p.score.toFixed(0)} pts =
         ${parts.notoriete} notoriété (${p.sitelinks} langues)
         ${parts.labels ? " + " + parts.labels + " labels" : ""}
@@ -658,6 +744,13 @@ function card(p) {
       <div class="tags">${p.labels.map(l => `<span class="tag">${l}</span>`).join("")}</div>
       ${p.wikipedia ? `<a href="${p.wikipedia}" target="_blank" rel="noopener">Voir sur Wikipédia →</a>` : ""}
     </div>
+    <div class="theme-pick">
+      <span>Thème</span>
+      <select data-role="theme" class="${theme !== p.themeId ? "moved" : ""}">
+        ${THEME_LIST.map(t => `<option value="${t.id}"${
+          t.id === theme ? " selected" : ""}>${t.name}</option>`).join("")}
+      </select>
+    </div>
     <div class="actions">
       <button data-act="keep"${d === "keep" ? ' data-on="keep"' : ""}>Garder</button>
       <button data-act="drop"${d === "drop" ? ' data-on="drop"' : ""}>Écarter</button>
@@ -666,6 +759,16 @@ function card(p) {
       <button data-act="demote"${d === "demote" ? ' data-on="demote"' : ""}
               title="Faire descendre">↓</button>
     </div>`;
+
+  const picker = el.querySelector("[data-role=theme]");
+  picker.onchange = () => {
+    // Revenir au thème du pipeline efface le redressement : garder une ligne
+    // qui dit « range-le là où il est déjà » n'aurait aucun sens.
+    if (picker.value === p.themeId) delete themeOf[p.id];
+    else themeOf[p.id] = picker.value;
+    save();
+    render();
+  };
 
   el.querySelectorAll("[data-act]").forEach(btn => {
     btn.onclick = () => {
@@ -683,8 +786,10 @@ function render() {
   const list = visible();
   grid.replaceChildren(...list.map(card));
   const done = Object.values(decisions).filter(Boolean).length;
+  const doutes = DATA.filter(p => doubtful(p) && !themeOf[p.id]).length;
   document.getElementById("count").textContent =
-    `${list.length} affichés · ${done}/${DATA.length} décidés`;
+    `${list.length} affichés · ${done}/${DATA.length} décidés`
+    + (doutes ? ` · ${doutes} thème${doutes > 1 ? "s" : ""} à trancher` : "");
 }
 
 for (const id of ["theme", "tier", "state"]) {
@@ -692,12 +797,15 @@ for (const id of ["theme", "tier", "state"]) {
 }
 
 document.getElementById("export").onclick = () => {
-  const header = ["decision", "curator_note", "name", "wikidata_id"];
+  const header = ["decision", "curator_note", "theme_id", "name", "wikidata_id"];
   const lines = [header.join(",")];
   for (const p of DATA) {
-    const d = decisions[p.id];
-    if (!d) continue;
-    lines.push([d, "", `"${p.name.replace(/"/g, '""')}"`, p.id].join(","));
+    const d = decisions[p.id] || "";
+    // Le thème n'est exporté QUE s'il diffère de celui du pipeline : réécrire
+    // les deux mille autres ferait de `themes.csv` une copie du catalogue.
+    const t = themeOf[p.id] && themeOf[p.id] !== p.themeId ? themeOf[p.id] : "";
+    if (!d && !t) continue;
+    lines.push([d, "", t, `"${p.name.replace(/"/g, '""')}"`, p.id].join(","));
   }
   const blob = new Blob([lines.join("\\n")], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a");
