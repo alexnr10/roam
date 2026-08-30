@@ -2710,6 +2710,18 @@ class TestVersionedCollection(unittest.TestCase):
             places = read_raw(raw)
         self.assertEqual([p.theme_id for p in places], ["musees"])
 
+    def test_a_theme_gone_from_the_configuration_is_not_published(self):
+        # Un thème retiré de la configuration n'est plus recollecté par
+        # personne : son fichier resterait dans le dépôt indéfiniment, et ses
+        # lieux fausseraient chaque diagnostic sans sortir dans aucune
+        # collection. C'est ainsi que « sources » a survécu à sa suppression.
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            write_raw(raw, [self._place("Q1", "sources")], replacing={"sources"})
+            configures = {"chateaux", "musees", EXTRA_SHARD}
+            oublies = [nom for nom in shards(raw) if nom not in configures]
+            self.assertEqual(oublies, ["sources"])
+
     def test_an_unreadable_file_does_not_take_the_rest_down(self):
         # Un fichier tronqué par une interruption ne doit pas rendre tout le
         # catalogue illisible.

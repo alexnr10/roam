@@ -238,6 +238,20 @@ def cmd_sync(args: argparse.Namespace, config: Config) -> int:
             return 1
         places = _load_places(raw_path)
         written = write_raw(args.raw, places, replacing={shard_of(p) for p in places})
+
+        # Un thème retiré de la configuration n'est plus recollecté par personne :
+        # son fichier resterait dans le dépôt indéfiniment, et ses lieux
+        # fausseraient chaque tableau de diagnostic sans jamais sortir dans une
+        # collection. `fetch` fait déjà ce ménage ; le versement doit aussi.
+        configures = {t.id for t in config.themes} | {EXTRA_SHARD, "sans-theme"}
+        oublies = [name for name in shards(args.raw) if name not in configures]
+        for name in oublies:
+            (args.raw / f"{name}.json").unlink(missing_ok=True)
+            written.pop(name, None)
+        if oublies:
+            print(f"⚠ thèmes disparus de la configuration, non versés : "
+                  f"{', '.join(oublies)}")
+
         print(f"{len(places)} lieux versés dans {args.raw} :")
         for name, count in sorted(written.items()):
             print(f"  {name:<16} {count:>5}")
