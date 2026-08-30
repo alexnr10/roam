@@ -1399,6 +1399,94 @@ def cmd_rename(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def cmd_adjustments(args: argparse.Namespace, config: Config) -> int:
+    """Audite les `promote` et `demote` : servent-ils encore, et à quoi ?
+
+    Un `promote` corrige un RANG, mais s'écrit en POINTS, et les points restent
+    quand la raison disparaît. Le curateur monte un lieu que le classement
+    maltraite ; si le classement s'améliore, le lieu monterait tout seul et
+    l'ajustement le sur-classe sans que rien ne le dise.
+
+    Le `demote` a le défaut symétrique, et plus grave : il peut pousser un lieu
+    sous le plancher de son thème et le faire DISPARAÎTRE du catalogue. Écarter
+    et faire reculer sont deux gestes différents — c'est tout l'objet de la
+    distinction entre `drop` et `demote`, et un malus trop fort l'efface.
+    """
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `sync` ou `fetch`.", file=sys.stderr)
+        return 1
+
+    decisions = read_decisions(args.manual / "decisions.csv")
+    bouges = {q: d for q, (d, _n) in decisions.items() if d in ("promote", "demote")}
+    if not bouges:
+        print("Aucun `promote` ni `demote` enregistré.")
+        return 0
+
+    def construire(ajustement: float):
+        places = _load_places(raw_path)
+        apply_names(places, read_names(args.manual / "names.csv"))
+        places, _ = apply_themes(places, read_themes(args.manual / "themes.csv"),
+                                 {t.id for t in config.themes})
+        scored = score_all(places, config)
+        kept, _counts = apply_decisions(scored, decisions, ajustement,
+                                        strict=args.strict)
+        score_all(kept, config)
+        with _silence():
+            retenus, collections = build_all(kept, config)
+        return ({p.wikidata_id: p for p in retenus}, review_tiers(collections))
+
+    avec, niveaux_avec = construire(args.adjust)
+    # Le même catalogue, ajustements neutralisés : c'est le seul moyen de savoir
+    # ce que chaque décision change VRAIMENT.
+    sans, niveaux_sans = construire(0.0)
+
+    def nom(qid: str) -> str:
+        lieu = avec.get(qid) or sans.get(qid)
+        return lieu.name if lieu else qid
+
+    inutiles, exclus, agissants = [], [], 0
+    for qid, verdict in sorted(bouges.items(), key=lambda kv: nom(kv[0])):
+        a, s = niveaux_avec.get(qid), niveaux_sans.get(qid)
+        if qid not in avec and qid in sans:
+            exclus.append((qid, s))
+        elif qid not in avec and qid not in sans:
+            # Écarté par un plancher, pas par l'ajustement : la décision porte
+            # sur un lieu que le catalogue ne montre de toute façon pas.
+            inutiles.append((qid, verdict, None))
+        elif a == s:
+            inutiles.append((qid, verdict, a))
+        else:
+            agissants += 1
+
+    print(f"{len(bouges)} ajustements enregistrés, dont {agissants} qui déplacent "
+          "effectivement un lieu.\n")
+
+    if exclus:
+        print(f"⚠ {len(exclus)} lieux SORTENT DU CATALOGUE par leur seul malus :")
+        for qid, niveau in exclus:
+            print(f"    {nom(qid)[:48]:<50} serait niveau {niveau} sans lui")
+        print("    Faire reculer n'est pas écarter. Si c'est bien un rejet, "
+              "note-les `drop` —")
+        print("    la décision sera lisible. Sinon, baisse `--adjust`.\n")
+
+    if inutiles:
+        print(f"{len(inutiles)} ajustements SANS EFFET — le lieu serait au même "
+              "niveau sans eux :")
+        for qid, verdict, niveau in inutiles:
+            etat = (f"niveau {niveau} dans les deux cas" if niveau
+                    else "hors du catalogue de toute façon")
+            print(f"    {nom(qid)[:48]:<50} {verdict}, {etat}")
+        print("    Le classement les a rattrapés. Les retirer de decisions.csv "
+              "ne changerait rien\n    au catalogue et rendrait la mémoire "
+              "éditoriale plus honnête.\n")
+
+    if not exclus and not inutiles:
+        print("Aucun ajustement redondant ni excluant : ils font tous ce qu'on "
+              "leur demande.")
+    return 0
+
+
 def cmd_weigh(args: argparse.Namespace, config: Config) -> int:
     """Montre ce qu'un poids ferait au catalogue, sans rien adopter.
 
@@ -2182,6 +2270,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="dossier de GeoJSON déjà téléchargés (region.geojson, departement.geojson)",
     )
 
+    audit = sub.add_parser(
+        "adjustments", help="audite les promote/demote : servent-ils encore ?")
+    add_decision_args(audit)
+
     balance = sub.add_parser(
         "weigh", help="montre ce qu'un poids de consultations ferait au classement")
     balance.add_argument("--theme", default="jardins", help="thème à observer")
@@ -2253,6 +2345,7 @@ def main(argv: list[str] | None = None) -> int:
         "retheme": cmd_retheme,
         "merge": cmd_merge,
         "weigh": cmd_weigh,
+        "adjustments": cmd_adjustments,
         "check-lists": cmd_check_lists,
         "gaps": cmd_gaps,
         "probe": cmd_probe,

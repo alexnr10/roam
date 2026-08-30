@@ -22,7 +22,8 @@ from roam_pipeline.raw import EXTRA_SHARD, read_raw, shards, write_raw
 from roam_pipeline.merge import merge_file, merge_text, split_conflict
 from roam_pipeline.wikipedia import WikipediaClient
 from roam_pipeline.review import (
-    apply_themes, name_hints, read_themes, theme_claims, theme_from_name, write_themes,
+    apply_decisions, apply_themes, name_hints, read_themes, theme_claims,
+    theme_from_name, write_themes,
 )
 from roam_pipeline.collections import (
     _spread,
@@ -2962,6 +2963,72 @@ class TestCurationMerge(unittest.TestCase):
         # compris.
         with self.assertRaises(ValueError):
             merge_text("a,b\n1,2\n", "a,b\n3,4\n")
+
+
+class TestCuratorAdjustments(unittest.TestCase):
+    """Faire reculer n'est pas écarter.
+
+    `drop` et `demote` sont deux gestes distincts, et c'est voulu : l'un rejette
+    un lieu, l'autre le fait seulement reculer. Un malus assez fort efface la
+    distinction — le lieu passe sous le plancher de son thème et disparaît, sans
+    que personne ait décidé de l'écarter.
+    """
+
+    @staticmethod
+    def _catalogue():
+        return [make_place(f"Château {i}", sitelinks=20 - i, lat=45 + i * 0.1,
+                           wikidata_id=f"Q{i}") for i in range(1, 15)]
+
+    @staticmethod
+    def _repeche():
+        """Un lieu SOUS le plancher de son thème, sauvé par le repêchage.
+
+        Le repêchage exige deux choses : un accueil du public attesté, et un
+        score au-dessus d'un seuil ABSOLU. C'est par là que le malus fait
+        sortir un lieu — il ne touche pas au plancher de notoriété, qui compte
+        des langues, mais il fait passer le score sous le seuil de repêchage.
+        """
+        return make_place("Île Saint-Louis", sitelinks=6, wikidata_id="Q999",
+                          lat=48.85, lon=2.35, visitable=True, has_frwiki=True,
+                          article_bytes=30_000, image_url="https://exemple/img.jpg")
+
+    def test_a_demote_can_push_a_place_out_of_the_catalogue(self):
+        # Le constat qui a motivé la commande `adjustments` : sept lieux du vrai
+        # catalogue sortaient par leur seul malus, dont l'île Saint-Louis, qui
+        # serait niveau 1 sans lui. Faire reculer n'est pas écarter.
+        with _capture():
+            places = score_all(self._catalogue() + [self._repeche()], CONFIG)
+            avant, _ = build_all(places, CONFIG)
+        self.assertIn("Q999", {p.wikidata_id for p in avant})
+
+        with _capture():
+            places = score_all(self._catalogue() + [self._repeche()], CONFIG)
+            kept, _ = apply_decisions(places, {"Q999": ("demote", "")}, 60.0)
+            score_all(kept, CONFIG)
+            apres, _ = build_all(kept, CONFIG)
+        self.assertNotIn("Q999", {p.wikidata_id for p in apres})
+
+    def test_the_notoriety_floor_itself_is_untouched_by_a_malus(self):
+        # Le plancher compte des LANGUES : aucun ajustement de score ne le
+        # déplace. C'est bien le repêchage, et lui seul, que le malus annule.
+        place = self._repeche()
+        place.curator_adjustment = -60.0
+        self.assertEqual(place.sitelinks, 6)
+
+    def test_a_null_adjustment_neutralises_the_decision(self):
+        # C'est sur quoi repose tout l'audit : reconstruire à zéro donne le
+        # catalogue tel qu'il serait sans aucune correction humaine.
+        places = score_all(self._catalogue(), CONFIG)
+        kept, _ = apply_decisions(places, {"Q1": ("promote", "")}, 0.0)
+        self.assertEqual(
+            next(p for p in kept if p.wikidata_id == "Q1").curator_adjustment, 0.0)
+
+    def test_a_keep_survives_a_null_adjustment(self):
+        # `keep` épingle, il n'ajoute pas de points : neutraliser les
+        # ajustements ne doit pas faire disparaître un lieu validé.
+        places = score_all(self._catalogue(), CONFIG)
+        kept, _ = apply_decisions(places, {"Q1": ("keep", "")}, 0.0)
+        self.assertTrue(next(p for p in kept if p.wikidata_id == "Q1").pinned)
 
 
 class TestPageviews(unittest.TestCase):
