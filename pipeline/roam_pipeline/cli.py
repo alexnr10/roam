@@ -894,6 +894,7 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
         print(f"{len(retires)} décisions RETIRÉES : le lieu retrouve son "
               "classement automatique.")
 
+    bouge = 0
     if fresh_themes:
         themes_path = args.manual / "themes.csv"
         themes = read_themes(themes_path)
@@ -903,6 +904,28 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
         write_themes(themes_path, themes)
         print(f"{len(fresh_themes)} thèmes redressés, {bouge} nouveaux ou modifiés "
               f"({len(themes)} au total dans {themes_path.name}).")
+
+    apporte = changed + len(retires) + bouge
+    if not apporte:
+        # Une feuille qui n'apporte rien n'est pas anodine : c'est presque
+        # toujours qu'on a rejoué un ANCIEN téléchargement. Chrome numérote les
+        # doublons — « review-decisions (1).csv » — et le premier de la liste
+        # est le plus vieux. Photographier les niveaux dans ce cas effacerait
+        # le repère qui aurait permis de s'en apercevoir.
+        print(f"\n⚠ {args.review.name} n'apporte AUCUNE décision nouvelle.",
+              file=sys.stderr)
+        recents = sorted(args.review.parent.glob("*.csv"),
+                         key=lambda f: f.stat().st_mtime, reverse=True)[:4]
+        if recents:
+            print("  Fichiers du dossier, du plus récent au plus ancien :",
+                  file=sys.stderr)
+            for f in recents:
+                age = datetime.fromtimestamp(f.stat().st_mtime).strftime("%d/%m à %H:%M")
+                print(f"      {age}   {f.name}", file=sys.stderr)
+        print("  Les niveaux ne sont PAS photographiés : le repère de ta "
+              "dernière revue reste\n  en place, et tu peux réessayer avec le "
+              "bon fichier.", file=sys.stderr)
+        return _build_and_write(args, config)
 
     status = _build_and_write(args, config)
 

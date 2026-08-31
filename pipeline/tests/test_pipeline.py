@@ -3072,6 +3072,20 @@ class TestCuratorAdjustments(unittest.TestCase):
             write_decisions(path, gardees, {"Q2": "Une abbaye"})
             self.assertEqual(set(read_decisions(path)), {"Q2"})
 
+    def test_a_sheet_that_brings_nothing_is_recognisable(self):
+        # Rejouer un ANCIEN téléchargement ne change rien à `decisions.csv` :
+        # c'est le seul signe, et il faut le voir. Chrome numérote les doublons
+        # — « review-decisions (1).csv » — et le premier de la liste est le plus
+        # vieux. Une revue entière a été perdue ainsi.
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "decisions.csv"
+            write_decisions(path, {"Q1": ("keep", "")}, {"Q1": "Un château"})
+            avant = read_decisions(path)
+            rejoue = {"Q1": ("keep", "")}
+            changed = sum(1 for q, d in rejoue.items()
+                          if avant.get(q, ("", ""))[0] != d[0])
+        self.assertEqual(changed, 0)
+
     def test_a_keep_still_pins(self):
         places = score_all(self._collection(), CONFIG)
         kept, _ = apply_decisions(places, {"Q1": ("keep", "")})
