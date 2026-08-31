@@ -96,6 +96,31 @@ qui ne sortent plus dans aucune collection, et `explain` dit à quelle étape.
 Quand le lieu mérite d'y rester malgré tout, un `keep` dans la revue l'épingle
 et le plancher ne s'y applique plus.
 
+### Le trajet d'une décision
+
+```
+navigateur  →  data/out/review-decisions.csv  →  apply-review  →  decisions.csv
+   clic            écrit à chaque clic              relit           versionné
+```
+
+Le serveur de `review` recueille les décisions **au fil des clics** et les écrit
+sur le disque. Le témoin « enregistré à 12:02 » en haut de la page le confirme ;
+s'il passe au rouge, c'est que le serveur ne répond plus et qu'il faut
+télécharger avant de fermer.
+
+`apply-review` sans argument reprend ce fichier. Plus rien à nommer :
+
+```bash
+python -m roam_pipeline apply-review
+```
+
+> Faire dépendre une soirée de relecture d'un bouton qu'il faut penser à
+> cliquer, puis d'un fichier qu'il faut reconnaître parmi ses homonymes
+> numérotés par le navigateur (`review-decisions (1).csv`), ne pouvait que
+> casser. C'est arrivé deux fois, et la seconde a coûté une heure de travail.
+> Le bouton de téléchargement reste, comme secours quand la page est ouverte
+> sans serveur.
+
 ### Revenir sur une décision
 
 Chaque vignette de la revue porte un bouton **✕** dès qu'un verdict a été pris.

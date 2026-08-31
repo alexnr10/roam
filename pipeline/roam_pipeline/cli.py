@@ -71,6 +71,10 @@ DEFAULT_MANUAL = BASE_DIR / "data" / "manual"
 # La collecte, versionnée et découpée par thème. Ce n'est pas une sortie de
 # construction : c'est la donnée sur laquelle portent les décisions.
 DEFAULT_RAW = BASE_DIR / "data" / "raw"
+# Le brouillon de revue, écrit par le serveur à chaque clic et relu par
+# `apply-review`. Il vit dans le dossier de sortie, donc hors de git : ce n'est
+# pas une mémoire, c'est le trajet entre le navigateur et `decisions.csv`.
+AUTOSAVE = "review-decisions.csv"
 
 
 def _fold(text: str) -> str:
@@ -1811,20 +1815,49 @@ def cmd_review(args: argparse.Namespace, config: Config) -> int:
         print(f"{page} absent — lance d'abord `build`.", file=sys.stderr)
         return 1
 
-    class Sans_cache(http.server.SimpleHTTPRequestHandler):
-        """Interdit au navigateur de garder la page.
+    brouillon = args.out / AUTOSAVE
 
-        La revue se sert toujours à la même adresse, et son fichier change à
-        chaque `build`. Sans en-tête, Chrome peut resservir la version d'avant
-        sans rien demander — le curateur relit alors un classement périmé en
-        croyant voir le nouveau, et rien ne le lui dit.
+    class Revue(http.server.SimpleHTTPRequestHandler):
+        """Sert la page, et RECUEILLE ce qu'elle décide.
+
+        Faire dépendre une soirée de relecture d'un bouton qu'il faut penser à
+        cliquer, puis d'un fichier qu'il faut reconnaître parmi ses homonymes
+        numérotés par le navigateur, ne pouvait que casser. C'est arrivé deux
+        fois, et la seconde a coûté une heure de travail.
+
+        La page renvoie donc ses décisions au serveur à chaque clic. Elles sont
+        écrites sur le disque, dans le dossier de sortie, et `apply-review` les
+        y trouve sans qu'on ait à les nommer.
         """
 
         def end_headers(self):
+            # La revue se sert toujours à la même adresse et son fichier change
+            # à chaque `build` : sans cet en-tête, Chrome peut resservir la
+            # version d'avant sans rien demander.
             self.send_header("Cache-Control", "no-store, must-revalidate")
             super().end_headers()
 
-    handler = functools.partial(Sans_cache, directory=str(args.out))
+        def do_POST(self):  # noqa: N802 — nom imposé par http.server
+            if self.path != "/decisions":
+                self.send_error(404)
+                return
+            taille = int(self.headers.get("Content-Length") or 0)
+            if not 0 < taille <= 8_000_000:
+                self.send_error(413)
+                return
+            corps = self.rfile.read(taille).decode("utf-8", errors="replace")
+            # Écriture atomique : une coupure de Wi-Fi au mauvais moment ne doit
+            # pas laisser un fichier tronqué à la place du travail de la soirée.
+            temporaire = brouillon.with_suffix(".part")
+            temporaire.write_text(corps, encoding="utf-8")
+            temporaire.replace(brouillon)
+            self.send_response(204)
+            self.end_headers()
+
+        def log_message(self, *_args):
+            return  # une ligne par clic noierait les messages utiles
+
+    handler = functools.partial(Revue, directory=str(args.out))
     server = http.server.ThreadingHTTPServer((args.host, args.port), handler)
     url = f"http://127.0.0.1:{args.port}/review.html"
 
@@ -1873,8 +1906,8 @@ def cmd_review(args: argparse.Namespace, config: Config) -> int:
         print("reprend donc là où tu t'es arrêté, et non au début.")
 
     print(f"Revue ouverte sur {url}")
-    print("Les décisions sont mémorisées dans le navigateur.")
-    print("Ctrl+C pour arrêter, après avoir téléchargé le fichier de décisions.")
+    print(f"Tes décisions s'écrivent au fil des clics dans {brouillon.name}.")
+    print("À l'arrêt : `apply-review` les reprendra sans que tu aies à les nommer.")
     threading.Timer(0.5, lambda: webbrowser.open(url)).start()
     try:
         server.serve_forever()
@@ -2355,7 +2388,10 @@ def main(argv: list[str] | None = None) -> int:
         format="%(levelname)-7s %(message)s",
     )
     if getattr(args, "review", None) is None and args.command == "apply-review":
-        args.review = args.out / "review.csv"
+        # Le brouillon écrit par `review` au fil des clics. La grande feuille
+        # `review.csv` faisait un mauvais défaut : sa colonne `decision` est
+        # vide, elle n'apporte donc jamais rien.
+        args.review = args.out / AUTOSAVE
 
     config = load_config(args.config)
     handlers = {

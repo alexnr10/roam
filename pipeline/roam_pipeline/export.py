@@ -522,6 +522,8 @@ _REVIEW_TEMPLATE = """<!doctype html>
                    color: var(--text); cursor: pointer; }
   button.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
   .count { color: var(--muted); font-size: 13px; margin-left: auto; }
+  .depot { color: var(--keep); font-size: 12px; }
+  .depot.rate { color: var(--drop); font-weight: 600; }
   main { display: grid; gap: 14px; padding: 20px;
          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
@@ -597,6 +599,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
       <option value="drop">Écartés</option>
     </select>
     <button class="primary" id="export">Télécharger les décisions</button>
+    <span class="depot" id="depot"></span>
     <span class="count" id="count"></span>
   </div>
 </header>
@@ -644,6 +647,7 @@ if (!persistent) {
 }
 
 function save() {
+  deposer();
   if (!persistent) return;
   try {
     localStorage.setItem(KEY, JSON.stringify(decisions));
@@ -826,7 +830,7 @@ for (const id of ["theme", "tier", "state"]) {
   document.getElementById(id).onchange = render;
 }
 
-document.getElementById("export").onclick = () => {
+function feuille() {
   const header = ["decision", "curator_note", "theme_id", "name", "wikidata_id"];
   const lines = [header.join(",")];
   for (const p of DATA) {
@@ -841,7 +845,34 @@ document.getElementById("export").onclick = () => {
     if (!d && !t) continue;
     lines.push([d, "", t, `"${p.name.replace(/"/g, '""')}"`, p.id].join(","));
   }
-  const blob = new Blob([lines.join("\\n")], { type: "text/csv;charset=utf-8" });
+  return lines.join("\\n");
+}
+
+// Renvoi au serveur à chaque clic, groupé pour ne pas écrire mille fois. C'est
+// ce qui permet de ne plus dépendre d'un bouton qu'on oublie et d'un fichier
+// qu'on confond : le travail est sur le disque avant qu'on y pense.
+let enAttente = null;
+function deposer() {
+  if (location.protocol === "file:") return;   // pas de serveur à qui parler
+  clearTimeout(enAttente);
+  enAttente = setTimeout(() => {
+    const etat = document.getElementById("depot");
+    fetch("/decisions", { method: "POST", body: feuille() })
+      .then(r => {
+        const heure = new Date().toLocaleTimeString("fr-FR",
+          { hour: "2-digit", minute: "2-digit" });
+        etat.textContent = r.ok ? `enregistré à ${heure}` : "ENREGISTREMENT REFUSÉ";
+        etat.className = r.ok ? "depot" : "depot rate";
+      })
+      .catch(() => {
+        etat.textContent = "SERVEUR INJOIGNABLE — télécharge avant de fermer";
+        etat.className = "depot rate";
+      });
+  }, 800);
+}
+
+document.getElementById("export").onclick = () => {
+  const blob = new Blob([feuille()], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "review-decisions.csv";

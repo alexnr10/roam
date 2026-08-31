@@ -33,6 +33,11 @@ pipeline/data/out/seed.sql
 # décisions. `review.csv`, lui, reste hors de cette liste : une feuille remplie
 # à la main est du travail humain, et le dépôt doit pouvoir la sauver.
 pipeline/data/out/review.html
+# Le brouillon écrit par le serveur de revue à chaque clic, et relu par
+# `apply-review`. Ce n'est pas une mémoire : c'est le trajet entre le navigateur
+# et `decisions.csv`, qui lui est versionné.
+pipeline/data/out/review-decisions.csv
+pipeline/data/out/review-decisions.part
 pipeline/data/out/review.csv
 # `fetch-state.json` est en revanche PETIT et utile à conserver : il dit quels
 # thèmes ont une collecte en échec, et `build` le rappelle à chaque passage.
