@@ -1788,9 +1788,20 @@ def cmd_review(args: argparse.Namespace, config: Config) -> int:
         print(f"{page} absent — lance d'abord `build`.", file=sys.stderr)
         return 1
 
-    handler = functools.partial(
-        http.server.SimpleHTTPRequestHandler, directory=str(args.out)
-    )
+    class Sans_cache(http.server.SimpleHTTPRequestHandler):
+        """Interdit au navigateur de garder la page.
+
+        La revue se sert toujours à la même adresse, et son fichier change à
+        chaque `build`. Sans en-tête, Chrome peut resservir la version d'avant
+        sans rien demander — le curateur relit alors un classement périmé en
+        croyant voir le nouveau, et rien ne le lui dit.
+        """
+
+        def end_headers(self):
+            self.send_header("Cache-Control", "no-store, must-revalidate")
+            super().end_headers()
+
+    handler = functools.partial(Sans_cache, directory=str(args.out))
     server = http.server.ThreadingHTTPServer((args.host, args.port), handler)
     url = f"http://127.0.0.1:{args.port}/review.html"
 
@@ -1833,6 +1844,10 @@ def cmd_review(args: argparse.Namespace, config: Config) -> int:
                   "catalogue partiel.")
             print("  `git pull` puis `sync` les reprend du dépôt sans recollecter.")
         _compare_to_snapshot(len(places), args.manual / "tiers.csv")
+        decidees = len(read_decisions(args.manual / "decisions.csv"))
+        print(f"{decidees} décisions déjà prises y sont reportées : le filtre "
+              "« À décider »")
+        print("reprend donc là où tu t'es arrêté, et non au début.")
 
     print(f"Revue ouverte sur {url}")
     print("Les décisions sont mémorisées dans le navigateur.")
