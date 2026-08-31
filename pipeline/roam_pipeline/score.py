@@ -171,12 +171,19 @@ def assign_tiers(ranked: list[Place], tiers: Tiers) -> list[tuple[Place, int, in
     avoir moins de 10 lieux au niveau 1 si le vivier ne suit pas. On ne remplit
     pas pour remplir.
 
-    Puis la décision du curateur déplace le lieu d'EXACTEMENT un cran, dans la
-    limite des trois niveaux. Elle s'applique après le classement, et c'est tout
-    ce qui la rend fiable : un lieu monté monte, un lieu descendu descend, quel
-    que soit son voisinage. Elle peut porter une collection à onze lieux de
-    niveau 1 — le plafond est une heuristique, la décision est un jugement, et
-    faire redescendre quelqu'un d'autre en silence serait pire.
+    La décision du curateur déplace le lieu d'EXACTEMENT un cran, dans la limite
+    des trois niveaux, et c'est ce qui la rend fiable : un lieu monté monte, un
+    lieu descendu descend, quel que soit son voisinage.
+
+    Le décompte des places porte sur le niveau FINAL, jamais sur celui qu'on
+    aurait donné sans la décision. Un lieu descendu libère donc sa place de
+    niveau 1 pour le suivant — sans quoi il l'occuperait sans y figurer, et le
+    lieu d'après reculerait sans que personne l'ait voulu.
+
+    Un `promote` peut en revanche porter une collection à onze lieux de niveau 1,
+    quand il remonte un lieu que le plafond avait déjà refoulé. C'est assumé :
+    le plafond est une heuristique, la décision est un jugement, et faire
+    redescendre quelqu'un d'autre en silence serait pire.
     """
     ordered = sorted(ranked, key=lambda p: (-p.score, p.name))
     juges: list[tuple[Place, int]] = []
@@ -186,13 +193,21 @@ def assign_tiers(ranked: list[Place], tiers: Tiers) -> list[tuple[Place, int, in
     for place in ordered:
         if tier1_used < tiers.tier1_size and place.score >= tiers.tier1_min_score:
             tier = 1
-            tier1_used += 1
         elif tier2_used < tiers.tier2_size and place.score >= tiers.tier2_min_score:
             tier = 2
-            tier2_used += 1
         else:
             tier = 3
-        juges.append((place, min(3, max(1, tier + place.tier_shift))))
+        tier = min(3, max(1, tier + place.tier_shift))
+        # Les places se comptent sur le niveau FINAL, pas sur celui qu'on aurait
+        # donné sans la décision. Autrement un lieu descendu occuperait une
+        # place de niveau 1 sans y figurer, et le lieu suivant se retrouverait
+        # au niveau 2 sans que personne l'ait voulu : cinquante-huit lieux
+        # gardés reculaient ainsi d'un cran à la première mesure.
+        if tier == 1:
+            tier1_used += 1
+        elif tier == 2:
+            tier2_used += 1
+        juges.append((place, tier))
 
     # Renumérotés dans l'ordre des niveaux : sans cela, un lieu descendu
     # garderait son rang et la liste afficherait un niveau 3 avant un niveau 1.

@@ -3024,6 +3024,26 @@ class TestCuratorAdjustments(unittest.TestCase):
         apres = self._niveaux({vise: ("demote", "")})
         self.assertEqual(apres[vise], 3)
 
+    def test_a_demoted_place_frees_its_slot(self):
+        # Le décompte porte sur le niveau FINAL. Sinon un lieu descendu occupe
+        # une place de niveau 1 sans y figurer, et le lieu suivant recule sans
+        # que personne l'ait voulu : cinquante-huit lieux gardés reculaient
+        # ainsi d'un cran sur le catalogue réel.
+        avant = self._niveaux({})
+        premiers = [q for q, t in sorted(avant.items()) if t == 1]
+        apres = self._niveaux({premiers[0]: ("demote", "")})
+        self.assertEqual(sum(1 for t in avant.values() if t == 1),
+                         sum(1 for t in apres.values() if t == 1))
+
+    def test_no_one_else_moves_when_a_place_is_demoted(self):
+        avant = self._niveaux({})
+        vise = next(q for q, t in avant.items() if t == 1)
+        apres = self._niveaux({vise: ("demote", "")})
+        bouges = {q for q in avant if avant[q] != apres.get(q)}
+        # Le lieu visé descend, et un seul autre monte pour prendre sa place.
+        self.assertIn(vise, bouges)
+        self.assertLessEqual(len(bouges), 2)
+
     def test_the_list_stays_ordered_by_tier(self):
         # Un lieu descendu garde son score : sans renumérotation, la collection
         # afficherait un niveau 3 avant un niveau 1.
