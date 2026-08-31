@@ -88,7 +88,7 @@ Q106581845,3,cascades,Cascade de la Reculaz
 Q1067494,3,chateaux,Tour du Temple
 Q106934,1,cathedrales,Cathédrale Notre-Dame d'Amiens
 Q1069352,2,sommets,Chemin des Révoires
-Q1073098,3,ponts,Pont des Invalides
+Q1073098,2,ponts,Pont des Invalides
 Q1075988,2,chateaux,Palais du Louvre
 Q1083336,3,cathedrales,Cathédrale Saint-Pierre d'Annecy
 Q1084011,3,cathedrales,Cathédrale Sainte-Réparate de Nice
@@ -134,7 +134,6 @@ Q1136951,3,cathedrales,Cathédrale Notre-Dame-de-l'Annonciation de Nancy
 Q1137837,3,sommets,Montagne de Céüse
 Q1137944,3,abbayes,Abbaye d'Aubazine
 Q1138519,2,plages,Sword Beach
-Q1140060,2,ponts,Pont Saint-Louis
 Q1141846,2,chateaux,Château de Cheverny
 Q1142363,2,chateaux,Château de Valençay
 Q1142554,1,sommets,Crêt de la Neige
@@ -162,9 +161,9 @@ Q1191209,3,cathedrales,Cathédrale Saint-Maurice d'Angers
 Q1192381,3,chateaux,Château de Menars
 Q11937330,3,abbayes,Abbatiale Saint-Volusien
 Q11938382,3,megalithes,Narbo Martius
-Q1196667,3,ponts,Pont Louis-Philippe
-Q1196669,2,ponts,Pont Amont
-Q1196688,3,ponts,Pont de Sully
+Q1196667,2,ponts,Pont Louis-Philippe
+Q1196676,3,ponts,Pont Charles-de-Gaulle
+Q1196688,2,ponts,Pont de Sully
 Q1200500,3,cathedrales,Cathédrale Notre-Dame-des-Doms d'Avignon
 Q121068983,3,lacs,Stade nautique municipal Florence Arthaud
 Q122281,2,grottes,Abri de Cap Blanc
@@ -267,7 +266,7 @@ Q1412839,3,sommets,Monte Incudine
 Q1413346,3,lacs,Lac de Madine
 Q1414059,1,jardins,Parc Monceau
 Q1414641,2,lacs,Lac de Longemer
-Q1418458,3,ponts,Pont d'Arcole
+Q1418458,2,ponts,Pont d'Arcole
 Q1418854,3,musees,Ouvrage de Schoenenbourg
 Q1419562,3,megalithes,Tumulus Saint-Michel
 Q1419757,2,cathedrales,Cathédrale Sainte-Marie-Majeure
@@ -302,7 +301,7 @@ Q1462683,3,chateaux,Château des Réaux
 Q14628539,3,megalithes,Temple de Mars à Corseul
 Q1464908,3,abbayes,Basilique Saint-Martin de Tours
 Q1468594,3,cathedrales,Cathédrale Notre-Dame de Coutances
-Q1469250,2,ponts,Pont au Double
+Q1469250,3,ponts,Pont au Double
 Q1470842,2,chateaux,Château de Sully-sur-Loire
 Q1473446,1,maisons,Fondation Claude-Monet
 Q1476342,3,villages,Hell-Bourg
@@ -321,7 +320,7 @@ Q1500472,1,plages,Pointe du Raz
 Q1503331,2,monuments,Obélisque de Louxor
 Q15056170,3,musees,Maison des Lumières Denis Diderot
 Q1510,2,megalithes,Théâtre antique de Lyon
-Q1513866,3,ponts,Pont de Bercy
+Q1513866,2,ponts,Pont de Bercy
 Q1514062,3,cathedrales,Basilique Sainte-Clotilde
 Q1514576,2,ponts,Pont du Diable
 Q1516,2,cathedrales,Basilique Notre-Dame de Fourvière
@@ -387,7 +386,7 @@ Q15952779,3,abbayes,Tour-monastère de l'abbaye de Lérins
 Q15952870,3,musees,Musée lapidaire d'Avignon
 Q15972919,3,jardins,Jardin Jungle Karlostachys
 Q15992417,3,chateaux,Château du Louvre
-Q1604334,2,ponts,Pont de la Basse-Chaîne
+Q1604334,3,ponts,Pont de la Basse-Chaîne
 Q1607765,2,musees,"Lille Métropole Musée d'Art moderne, d'Art contemporain et d'Art brut"
 Q1609139,3,lacs,Lac des Bouillouses
 Q1617779,3,megalithes,Alignements de Kerzérho
@@ -659,6 +658,7 @@ Q2068180,3,chateaux,Château de Trévarez
 Q206823,1,cathedrales,Cathédrale Notre-Dame de Reims
 Q20724462,3,chateaux,Château de Creil
 Q2073282,3,ponts,Pont aval
+Q2073308,3,ponts,Pont de l'Archevêché
 Q2073423,3,jardins,Labyrinthe de Versailles
 Q207985,1,cathedrales,Cathédrale Saint-Étienne de Bourges
 Q2083316,2,iles,Bréhat
@@ -752,7 +752,6 @@ Q2259452,3,chateaux,Château d'Annecy
 Q2262571,3,iles,Île Saint-Joseph
 Q2262676,3,lacs,Grand Canal de Versailles
 Q2269718,3,plages,Calanque de Sormiou
-Q2271703,2,ponts,Viaduc d'Austerlitz
 Q2273181,3,plages,Cap Lardier
 Q2273701,3,ponts,Pont de Grenelle-Cadets-de-Saumur
 Q2274186,3,ponts,Passerelle Debilly
@@ -773,8 +772,8 @@ Q23013104,3,plages,Plage de Sainte-Marguerite
 Q2306676,3,chateaux,Vieux-château de l'Île d'Yeu
 Q2307584,3,ponts,Pont Rouelle
 Q2307670,3,ponts,Pont de Tolbiac
-Q2307685,2,ponts,Pont National
-Q2307722,2,ponts,Pont d'Austerlitz
+Q2307685,3,ponts,Pont National
+Q2307722,3,ponts,Pont d'Austerlitz
 Q2308353,2,plages,Pointe Saint-Mathieu
 Q2310816,3,cathedrales,Cathédrale Sainte-Marie d'Oloron
 Q2315399,3,abbayes,Abbaye de Saint-Antoine-l'Abbaye
@@ -1616,10 +1615,10 @@ Q3388433,3,megalithes,Piliers de Tutelle
 Q3388631,3,megalithes,Pincevent
 Q3389075,3,sommets,Pique d'Endron
 Q3389197,2,cascades,Piscia di Gallo
-Q3389357,2,volcans,Piton Babet
-Q3389367,2,volcans,Piton Hyacinthe
+Q3389357,3,volcans,Piton Babet
+Q3389367,3,volcans,Piton Hyacinthe
 Q3389386,2,volcans,Piton de Takamaka
-Q3389388,2,volcans,Piton Villers
+Q3389388,3,volcans,Piton Villers
 Q3390093,3,jardins,Square Suzanne-Buisson
 Q3390839,3,plages,Plage de Boucan Canot
 Q3390845,3,plages,Plage de Grande Anse
@@ -1655,15 +1654,15 @@ Q3403034,3,abbayes,Prieuré de Saint-Cosme
 Q3403076,3,abbayes,Chartreuse de Molsheim
 Q3406130,3,cathedrales,Pro-cathédrale Sainte-Marie de Bastia
 Q3411078,1,volcans,Puy Pariou
-Q3411084,2,volcans,Puy de Chalard
+Q3411084,3,volcans,Puy de Chalard
 Q3411087,2,volcans,Puy de Côme
 Q3411089,2,volcans,Puy de Gravenoire
 Q3411091,2,volcans,Puy de Louchadière
 Q3411093,2,volcans,Puy de Mercœur
 Q3411094,2,volcans,Puy de Montiroir
 Q3411095,2,volcans,Puy de Lassolas
-Q3411096,2,volcans,Puy de Paugnat
-Q3411100,2,volcans,Puy de la Nugère
+Q3411096,3,volcans,Puy de Paugnat
+Q3411100,3,volcans,Puy de la Nugère
 Q3411102,2,volcans,Puy de la Vache
 Q3411104,2,volcans,Puy des Goules
 Q3411645,3,sommets,Mont Pécloz
@@ -1886,7 +1885,7 @@ Q584590,3,cathedrales,Cathédrale Saint-Pierre de Lisieux
 Q585947,2,cathedrales,Cathédrale Notre-Dame de Laon
 Q586471,3,cathedrales,Cathédrale Saint-Étienne de Meaux
 Q588604,3,plages,Pointe de la Grande Vigie
-Q589000,2,ponts,Pont du Carrousel
+Q589000,3,ponts,Pont du Carrousel
 Q589336,3,musees,Musée Curie
 Q590012,3,sommets,Urkulu
 Q591,3,abbayes,Abbaye Notre-Dame de Fontgombault
@@ -1902,7 +1901,7 @@ Q603214,2,lacs,Lac de Gérardmer
 Q60429288,2,dunes-marais,Dunes de Donnant
 Q604550,2,jardins,Jardin des serres d'Auteuil
 Q605024,3,lacs,Lac de Remoray
-Q605912,3,ponts,Passerelle Léopold-Sédar-Senghor
+Q605912,2,ponts,Passerelle Léopold-Sédar-Senghor
 Q607372,1,volcans,Puy de Dôme
 Q60850205,3,dunes-marais,Salins de Gruissan
 Q608624,3,chateaux,Château de Courtanvaux
@@ -2048,7 +2047,7 @@ Q747588,1,megalithes,Trophée des Alpes
 Q748241,3,sommets,Grand Colombier
 Q74824372,2,cascades,Cascade de Syratu
 Q749158,3,villages,Sainte-Eulalie-d'Olt
-Q749491,3,ponts,Viaduc des Arts
+Q749491,2,ponts,Viaduc des Arts
 Q749525,3,cathedrales,Cathédrale de la Résurrection d'Évry
 Q749865,3,sommets,Capu Tafunatu
 Q751961,3,villages,Saint-Cirq-Lapopie
@@ -2242,5 +2241,5 @@ Q991088,2,sommets,Plomb du Cantal
 Q99236,1,ponts,Viaduc de Millau
 Q99471,3,monuments,Plan incliné de Saint-Louis-Arzviller
 Q995023,1,ponts,Pont du Diable
-Q996255,3,ponts,Pont sur l'Oyapock
+Q996255,2,ponts,Pont sur l'Oyapock
 Q998451,3,cathedrales,Cathédrale Saint-Étienne
