@@ -169,6 +169,23 @@ geo:
   # et les COM, pas entre métropole et outre-mer.
   require_departement: true
 
+  # Nombre de lieux visé dans CHAQUE département. En dessous, les meilleurs
+  # candidats que le plancher de notoriété avait écartés sont repêchés.
+  #
+  # Le plancher compte les langues d'un article : il mesure la notoriété
+  # INTERNATIONALE d'un lieu, et la France rurale n'en a pas. La Creuse gardait
+  # un lieu sur seize, les Ardennes trois sur vingt-neuf, pendant que Paris en
+  # gardait deux cent dix-huit. Ce qu'il écartait n'était pas du remplissage :
+  # le château d'Oiron, les boiseries de Moutier-d'Ahun, les Pierres Jaumâtres.
+  #
+  # C'est le pendant géographique du quota par département des collections
+  # nationales — là on empêche Paris d'occuper toute la place, ici on empêche un
+  # département de n'en avoir aucune.
+  #
+  # Les repêchés sont MARQUÉS dans la revue : c'est le pari le plus fragile du
+  # catalogue, il doit se relire comme tel.
+  min_per_departement: 12
+
 alerts:
   # Au-dessus, un sommet demande souvent bien plus qu'une randonnée. Certains
   # ont pourtant un téléphérique : c'est un signal de revue, pas une exclusion.

@@ -520,6 +520,64 @@ def _funnel(stages: list[tuple[str, list[Place]]], config: Config) -> None:
     LOG.info("\n".join(lines))
 
 
+def rescue_thin_departements(
+    au_dessus: list[Place], sous_le_plancher: list[Place], config: Config
+) -> list[Place]:
+    """Repêche les meilleurs lieux des départements que le plancher a vidés.
+
+    Le plancher compte les langues d'un article : il mesure la notoriété
+    INTERNATIONALE d'un lieu, et la France rurale n'en a pas. La Creuse gardait
+    un lieu sur seize, les Ardennes trois sur vingt-neuf — pendant que Paris en
+    gardait deux cent dix-huit. Ce qu'il écartait n'était pas du remplissage :
+    le château d'Oiron, les boiseries de Moutier-d'Ahun, les Pierres Jaumâtres.
+
+    C'est le pendant géographique du quota par département des collections
+    nationales. Là on empêchait Paris d'occuper toute la place ; ici on empêche
+    un département de n'en avoir aucune.
+
+    Deux garanties. Les mieux notés d'abord, jamais au-delà du compte visé.
+    Et aucun sosie : une seconde fiche Wikidata du même site — « abbaye royale
+    de Saint-Denis » à côté de « basilique Saint-Denis » — échappe au
+    dédoublonnage, qui ne compare qu'à l'intérieur d'un thème.
+    """
+    cible = config.collections.min_per_departement
+    if not cible:
+        return au_dessus
+
+    compte: Counter[str] = Counter(
+        place.departement_code for place in au_dessus if place.departement_code
+    )
+    deja = [(place.lat, place.lon) for place in au_dessus]
+    candidats: dict[str, list[Place]] = defaultdict(list)
+    for place in sorted(sous_le_plancher, key=lambda p: -p.score):
+        if place.departement_code and compte[place.departement_code] < cible:
+            candidats[place.departement_code].append(place)
+
+    repeches: list[Place] = []
+    for code, lot in candidats.items():
+        manque = cible - compte[code]
+        for place in lot:
+            if manque <= 0:
+                break
+            if any(haversine_m(place.lat, place.lon, lat, lon) < DUPLICATE_DISTANCE_M
+                   for lat, lon in deja):
+                continue
+            place.geo_rescued = True
+            repeches.append(place)
+            deja.append((place.lat, place.lon))
+            manque -= 1
+
+    if repeches:
+        par_dept = Counter(p.departement_code for p in repeches)
+        LOG.info(
+            "repêchage géographique : %s lieux dans %s départements sous %s "
+            "(les plus fournis : %s)",
+            len(repeches), len(par_dept), cible,
+            ", ".join(f"{c} {n}" for c, n in par_dept.most_common(5)),
+        )
+    return au_dessus + repeches
+
+
 def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Collection]]:
     # L'ordre compte : on fixe d'abord le thème de chaque lieu, puis on lui
     # applique le plancher de CE thème, puis on écarte les doublons de lieu.
@@ -533,7 +591,13 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
     accessible = apply_access_filter(dans_le_sujet, config)
     non_alpin = apply_alpine_filter(accessible, config)
     au_dessus = apply_notoriety_floor(non_alpin, config)
-    kept = dedupe(au_dessus)
+    # Le plancher mesure la documentation, qui est très inégalement répartie sur
+    # le territoire. On rend leur part aux départements qu'il a vidés.
+    gardes = {place.wikidata_id for place in au_dessus}
+    complete = rescue_thin_departements(
+        au_dessus, [p for p in non_alpin if p.wikidata_id not in gardes], config
+    )
+    kept = dedupe(complete)
 
     _funnel(
         [
@@ -544,6 +608,7 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
             ("accès", accessible),
             ("non alpin", non_alpin),
             ("plancher", au_dessus),
+            ("dépt pauvre", complete),
             ("dédoublé", kept),
         ],
         config,

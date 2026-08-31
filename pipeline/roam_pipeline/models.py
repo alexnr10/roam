@@ -90,6 +90,10 @@ class Place:
     # deux et 15 disparaissaient purement et simplement du catalogue — alors
     # qu'écarter un lieu, c'est `drop`, et que ce sont deux gestes distincts.
     tier_shift: int = 0
+    # Conservé parce que son département était vide, non parce qu'il franchit le
+    # plancher de son thème. La revue doit le dire : c'est le pari le plus
+    # fragile du catalogue, et le relecteur doit pouvoir le juger comme tel.
+    geo_rescued: bool = False
     # Ajouté à la main par le curateur : échappe au plancher de notoriété et
     # l'emporte sur le rattachement automatique à un thème.
     pinned: bool = False

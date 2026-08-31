@@ -186,6 +186,9 @@ class CollectionRules:
     geo_levels: list[str]
     cross_theme_levels: list[str]
     require_departement: bool
+    # Nombre de lieux visé dans CHAQUE département. En dessous, les meilleurs
+    # candidats sous le plancher de leur thème sont repêchés. `0` désactive.
+    min_per_departement: int = 0
 
 
 @dataclass(frozen=True)
@@ -275,6 +278,7 @@ def load_config(config_dir: Path | None = None) -> Config:
         geo_levels=list(raw["geo"]["levels"]),
         cross_theme_levels=list(raw["geo"]["cross_theme_levels"]),
         require_departement=bool(raw["geo"].get("require_departement", True)),
+        min_per_departement=int(raw["geo"].get("min_per_departement", 0)),
     )
 
     alerts = Alerts(**raw.get("alerts", {"alpine_elevation_m": 2500}))

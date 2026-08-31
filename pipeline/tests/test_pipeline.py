@@ -26,6 +26,7 @@ from roam_pipeline.review import (
     read_themes, theme_claims, theme_from_name, write_decisions, write_themes,
 )
 from roam_pipeline.collections import (
+    rescue_thin_departements,
     _spread,
     apply_class_exclusion,
     apply_geographic_scope,
@@ -770,9 +771,11 @@ class TestBuildFunnel(unittest.TestCase):
         table = "\n".join(logs.output)
 
         self.assertIn("étape par étape", table)
-        # Six dunes au départ, quatre après le périmètre, deux après le plancher.
+        # Six dunes au départ, quatre après le périmètre, deux après le plancher
+        # — puis quatre de nouveau : leur département est pauvre et le repêchage
+        # géographique leur rend leur place.
         ligne = next(l for l in table.splitlines() if l.strip().startswith("dunes-marais"))
-        self.assertEqual([int(n) for n in ligne.split()[1:]], [6, 4, 4, 4, 4, 4, 2, 2])
+        self.assertEqual([int(n) for n in ligne.split()[1:]], [6, 4, 4, 4, 4, 4, 2, 4, 4])
 
     def test_a_theme_without_any_place_is_left_out_of_the_funnel(self):
         from roam_pipeline.collections import build_all
@@ -3199,6 +3202,79 @@ class _FakeViews(WikipediaClient):
     def __init__(self, counts, status=200):
         super().__init__(min_interval_s=0)
         self._session = self._Session(counts, status)
+
+
+class TestThinDepartements(unittest.TestCase):
+    """Le plancher mesure la documentation, très inégalement répartie.
+
+    La Creuse gardait un lieu sur seize, les Ardennes trois sur vingt-neuf,
+    pendant que Paris en gardait deux cent dix-huit. Ce que le plancher écartait
+    n'était pas du remplissage : le château d'Oiron, les boiseries de
+    Moutier-d'Ahun, les Pierres Jaumâtres.
+    """
+
+    @staticmethod
+    def _lieu(nom, dept, sitelinks, score=50.0, **kwargs):
+        place = make_place(nom, theme="chateaux", sitelinks=sitelinks,
+                           departement_code=dept,
+                           wikidata_id=f"Q{abs(hash(nom)) % 999999}", **kwargs)
+        place.score = score
+        return place
+
+    def _repecher(self, au_dessus, sous_le_plancher, cible=12):
+        essai = replace(CONFIG, collections=replace(CONFIG.collections,
+                                                    min_per_departement=cible))
+        with _capture():
+            return rescue_thin_departements(au_dessus, sous_le_plancher, essai)
+
+    def test_a_thin_departement_gets_its_best_candidates_back(self):
+        au_dessus = [self._lieu("Gardé", "23", 20, 90.0, lat=46.0, lon=2.0)]
+        sous = [self._lieu("Moutier-d Ahun", "23", 4, 71.0, lat=46.3, lon=2.1),
+                self._lieu("Pierres Jaumâtres", "23", 3, 60.0, lat=46.4, lon=2.2)]
+        repeches = self._repecher(au_dessus, sous)
+        self.assertEqual(len(repeches), 3)
+        self.assertTrue(all(p.geo_rescued for p in sous))
+
+    def test_a_rich_departement_gets_nothing(self):
+        # La Dordogne compte soixante-quatre lieux : la tour de Vésone, sous son
+        # plancher, n y sera pas repêchée. Le mécanisme corrige la géographie,
+        # pas les planchers.
+        au_dessus = [self._lieu(f"Château {i}", "24", 20, 90.0, lat=45 + i * 0.01)
+                     for i in range(12)]
+        vesone = self._lieu("Tour de Vésone", "24", 4, 73.0, lat=45.18, lon=0.7)
+        repeches = self._repecher(au_dessus, [vesone])
+        self.assertEqual(len(repeches), 12)
+        self.assertFalse(vesone.geo_rescued)
+
+    def test_a_second_wikidata_entry_for_the_same_site_is_refused(self):
+        # « Abbaye royale de Saint-Denis » à vingt mètres de « basilique
+        # Saint-Denis » : le dédoublonnage ne les voit pas, il ne compare qu à
+        # l intérieur d un thème.
+        basilique = self._lieu("Basilique Saint-Denis", "93", 60, 158.0,
+                               lat=48.9358, lon=2.3597)
+        sosie = self._lieu("Abbaye royale de Saint-Denis", "93", 4, 96.0,
+                           lat=48.9359, lon=2.3598)
+        loin = self._lieu("Fort d Aubervilliers", "93", 3, 73.0, lat=48.91, lon=2.40)
+        noms = {p.name for p in self._repecher([basilique], [sosie, loin])}
+        self.assertNotIn("Abbaye royale de Saint-Denis", noms)
+        self.assertIn("Fort d Aubervilliers", noms)
+
+    def test_the_target_is_a_ceiling_not_a_quota(self):
+        # On complète jusqu à la cible, jamais au-delà : le repêchage comble un
+        # trou, il ne fabrique pas un catalogue.
+        au_dessus = [self._lieu(f"Gardé {i}", "23", 20, 90.0, lat=46 + i * 0.02)
+                     for i in range(10)]
+        sous = [self._lieu(f"Repêchable {i}", "23", 3, 80.0 - i, lat=47 + i * 0.02)
+                for i in range(8)]
+        repeches = self._repecher(au_dessus, sous, cible=12)
+        self.assertEqual(len(repeches), 12)
+        self.assertEqual({p.name for p in repeches if p.geo_rescued},
+                         {"Repêchable 0", "Repêchable 1"})
+
+    def test_a_target_of_zero_disables_it(self):
+        au_dessus = [self._lieu("Gardé", "23", 20)]
+        sous = [self._lieu("Sous le plancher", "23", 3)]
+        self.assertEqual(self._repecher(au_dessus, sous, cible=0), au_dessus)
 
 
 if __name__ == "__main__":

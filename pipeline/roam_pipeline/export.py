@@ -461,6 +461,9 @@ def write_review_html(
                 "hours": place.opening_hours,
                 "source": place.source,
                 "underFloor": under_floor(place, config),
+                # Conservé parce que son département était vide, pas parce qu'il
+                # franchit son plancher. Le pari le plus fragile du catalogue.
+                "geoRescued": place.geo_rescued,
                 # Le déplacement décidé par le curateur, en NIVEAUX.
                 "shift": place.tier_shift,
                 # Dans la collection nationale de son thème, ou seulement dans
@@ -611,6 +614,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
       <option value="theme">Thème douteux — à trancher</option>
       <option value="osm">Découverts sur OpenStreetMap</option>
       <option value="relief">Entrés par la remise « ouvert au public »</option>
+      <option value="geo">Entrés parce que leur département était vide</option>
       <option value="keep">Gardés</option>
       <option value="drop">Écartés</option>
     </select>
@@ -715,7 +719,8 @@ function visible() {
     if (state === "doute") return p.visitable === null || p.visitable === undefined;
     if (state === "theme") return doubtful(p);
     if (state === "osm") return p.source === "osm";
-    if (state === "relief") return p.underFloor;
+    if (state === "relief") return p.underFloor && !p.geoRescued;
+    if (state === "geo") return p.geoRescued;
     if (state && d !== state) return false;
     return true;
   });
@@ -749,7 +754,11 @@ function card(p) {
       ${p.source === "osm"
         ? `<div class="found">Trouvé sur OpenStreetMap — Wikidata ne le classait nulle part</div>`
         : ""}
-      ${p.underFloor
+      ${p.geoRescued
+        ? `<div class="doubt">Sous le plancher de son thème (${p.sitelinks} langues) —
+             gardé parce que son DÉPARTEMENT était presque vide. À juger comme
+             tel : vaut-il le détour ?</div>`
+        : p.underFloor
         ? `<div class="found">Sous le plancher de son thème (${p.sitelinks} langues) —
              repêché parce qu'il accueille du public</div>`
         : ""}
