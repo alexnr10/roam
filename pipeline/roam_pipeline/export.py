@@ -87,7 +87,9 @@ def under_floor(place: Place, config: Config) -> bool:
         return False
 
 
-def _membership(collections: list[Collection]) -> tuple[dict[str, list[str]], dict[str, int]]:
+def _membership(
+    collections: list[Collection],
+) -> tuple[dict[str, list[str]], dict[str, int], set[str]]:
     """Collections de chaque lieu, et son niveau de priorité de revue.
 
     Le niveau retenu est celui de la COLLECTION THÉMATIQUE NATIONALE, pas le
@@ -109,11 +111,15 @@ def _membership(collections: list[Collection]) -> tuple[dict[str, list[str]], di
         for cp in collection.places:
             review_tier[cp.place_id] = cp.tier
 
-    # Hors de la collection nationale de son thème : à relire en dernier.
+    # Hors de la collection nationale de son thème : à relire en dernier. Mais
+    # « niveau 3 » et « pas dans la collection » sont deux états différents, et
+    # les confondre rend la revue interminable : sur les abbayes, 23 lieux sont
+    # au niveau 3 de la collection nationale, et 99 n'y sont pas du tout.
+    dans_nationale = set(review_tier)
     for place_id in membership:
         review_tier.setdefault(place_id, 3)
 
-    return membership, review_tier
+    return membership, review_tier, dans_nationale
 
 
 def review_state(
@@ -157,7 +163,7 @@ def write_review_csv(
     Triée par niveau puis par thème : le travail est trop long pour être fait
     d'un bloc, il doit pouvoir être fait par tranches utiles.
     """
-    membership, best_tier = _membership(collections)
+    membership, best_tier, _nationale = _membership(collections)
     depts = departements()
     # Les niveaux 1 en tête, groupés par thème. Relire 1 900 lignes d'un bloc
     # est décourageant ; relire d'abord les 200 incontournables donne déjà un
@@ -411,7 +417,7 @@ def write_review_html(
     zéro. La page part donc de `decisions.csv`, et le navigateur n'ajoute que
     ce qui n'y est pas encore.
     """
-    membership, best_tier = _membership(collections)
+    membership, best_tier, nationale = _membership(collections)
     depts = departements()
     hints = name_hints(config)
     claims = claims or {}
@@ -419,7 +425,9 @@ def write_review_html(
 
     rows = []
     for place in sorted(
-        places, key=lambda p: (best_tier.get(p.wikidata_id, 9), p.theme_id, -p.score, p.name)
+        places,
+        key=lambda p: (p.wikidata_id not in nationale,
+                       best_tier.get(p.wikidata_id, 9), p.theme_id, -p.score, p.name),
     ):
         dept = depts.get(place.departement_code or "")
         parts = score_breakdown(place, config)
@@ -455,6 +463,11 @@ def write_review_html(
                 "underFloor": under_floor(place, config),
                 # Le déplacement décidé par le curateur, en NIVEAUX.
                 "shift": place.tier_shift,
+                # Dans la collection nationale de son thème, ou seulement dans
+                # une collection géographique. « Niveau 3 » et « pas dans la
+                # collection » sont deux états différents : les confondre a
+                # transformé la revue des abbayes en liste sans fin.
+                "national": place.wikidata_id in nationale,
                 # Ce qui a bougé depuis la dernière revue. Le niveau est un
                 # rang, pas une propriété : il change sans que le lieu change.
                 "changed": (changes or {}).get(place.wikidata_id, ""),
@@ -532,6 +545,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
   .card.drop { opacity: .45; border-color: var(--drop); }
   .card.promote, .card.demote { border-color: var(--muted); }
   .card.rethemed { border-color: var(--primary); }
+  .hors { color: var(--primary); }
   .theme-pick { display: flex; align-items: center; gap: 6px; font-size: 12px;
                 color: var(--muted); padding: 0 14px 10px; }
   .theme-pick select { flex: 1; font-size: 12px; padding: 5px 8px; }
@@ -582,6 +596,8 @@ _REVIEW_TEMPLATE = """<!doctype html>
     <select id="tier">
       <option value="">Tous les niveaux</option>
       <option value="bouge">— ce qui a changé de niveau ou de thème —</option>
+      <option value="nationale">— la collection nationale du thème seulement —</option>
+      <option value="hors">Hors collection nationale</option>
       <option value="1">Niveau 1 — les incontournables</option>
       <option value="2">Niveau 2</option>
       <option value="3">Niveau 3</option>
@@ -683,6 +699,10 @@ function visible() {
     // « bouge » n'est pas un niveau mais une raison de relire : un lieu validé
     // qui a changé de rang mérite un second regard, quel que soit son niveau.
     if (tier === "bouge") { if (!p.changed) return false; }
+    // Ce que l'application montre vraiment : le reste n'existe que dans les
+    // collections départementales, et peut attendre.
+    else if (tier === "nationale") { if (!p.national) return false; }
+    else if (tier === "hors") { if (p.national) return false; }
     else if (tier && String(p.tier) !== tier) return false;
     const d = decisions[p.id] || "";
     if (state === "todo") return !d;
@@ -715,7 +735,10 @@ function card(p) {
   const parts = p.parts;
   el.innerHTML = img + `
     <div class="body">
-      <div class="tier">NIVEAU ${p.tier} · ${p.collections} collection${p.collections > 1 ? "s" : ""}
+      <div class="tier">${p.national
+          ? `NIVEAU ${p.tier}`
+          : `<span class="hors">HORS COLLECTION NATIONALE</span>`
+        } · ${p.collections} collection${p.collections > 1 ? "s" : ""}
         ${p.changed ? `<span class="moved ${p.changed}">${
           p.changed === "theme" ? "◆ a CHANGÉ DE THÈME depuis ta dernière revue"
           : p.changed === "monte" ? "▲ monté depuis ta dernière revue"
@@ -812,6 +835,8 @@ function render() {
   const critere = document.getElementById("tier").value;
   const parNiveau = DATA.filter(p =>
     critere === "bouge" ? !!p.changed
+    : critere === "nationale" ? p.national
+    : critere === "hors" ? !p.national
     : critere ? String(p.tier) === critere : true).length;
   const masques = parNiveau - list.length;
   document.getElementById("count").textContent =

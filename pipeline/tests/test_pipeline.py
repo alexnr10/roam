@@ -3057,6 +3057,28 @@ class TestCuratorAdjustments(unittest.TestCase):
         niveaux = [m.tier for m in nationale.places]
         self.assertEqual(niveaux, sorted(niveaux))
 
+    def test_outside_the_national_collection_is_not_a_level(self):
+        # « Niveau 3 » et « pas dans la collection nationale » sont deux états
+        # différents. Les confondre a rendu la revue des abbayes interminable :
+        # 23 lieux au niveau 3 de la collection, et 99 qui n'y sont pas du tout,
+        # tous affichés « NIVEAU 3 ».
+        with _capture():
+            places = score_all(self._collection(60), CONFIG)
+            retenus, collections = build_all(places, CONFIG)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.html"
+            write_review_html(retenus, collections, CONFIG, path)
+            body = path.read_text(encoding="utf-8")
+        data = json.loads(body.split("const DATA = ", 1)[1].split(";\nconst THEMES", 1)[0])
+        nationale = next(c for c in collections
+                         if c.kind == "theme" and not c.geo_code)
+        membres = {m.place_id for m in nationale.places}
+        for row in data:
+            self.assertEqual(row["national"], row["id"] in membres)
+        # La collection nationale vient en tête : c'est elle que l'app montre.
+        self.assertTrue(data[0]["national"])
+        self.assertIn('value="nationale"', body)
+
     def test_a_verdict_can_be_withdrawn(self):
         # `clear` n'est pas un verdict qu'on enregistre, c'est un verdict qu'on
         # efface. Sans lui, se dédire demandait d'ouvrir le CSV à la main — et
