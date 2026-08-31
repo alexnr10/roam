@@ -853,7 +853,12 @@ function feuille() {
 // qu'on confond : le travail est sur le disque avant qu'on y pense.
 let enAttente = null;
 function deposer() {
-  if (location.protocol === "file:") return;   // pas de serveur à qui parler
+  if (location.protocol === "file:") {
+    const etat = document.getElementById("depot");
+    etat.textContent = "page ouverte sans serveur — télécharge avant de fermer";
+    etat.className = "depot rate";
+    return;
+  }
   clearTimeout(enAttente);
   enAttente = setTimeout(() => {
     const etat = document.getElementById("depot");
@@ -881,6 +886,30 @@ document.getElementById("export").onclick = () => {
 };
 
 render();
+
+// Dire l'état AVANT le premier clic. Un témoin vide se lit comme « je n'ai rien
+// cliqué » aussi bien que comme « l'enregistrement ne marche pas », et c'est
+// exactement l'ambiguïté qui a coûté une heure de relecture.
+(() => {
+  const etat = document.getElementById("depot");
+  if (location.protocol === "file:") {
+    etat.textContent = "sans serveur — pense à télécharger";
+    etat.className = "depot rate";
+    return;
+  }
+  etat.textContent = "enregistrement automatique : en attente du premier clic";
+  // Une requête à vide vérifie le circuit tout de suite, sans rien écrire.
+  fetch("/decisions", { method: "OPTIONS" })
+    .then(r => {
+      if (r.ok) return;
+      etat.textContent = "ENREGISTREMENT INDISPONIBLE — télécharge avant de fermer";
+      etat.className = "depot rate";
+    })
+    .catch(() => {
+      etat.textContent = "SERVEUR INJOIGNABLE — télécharge avant de fermer";
+      etat.className = "depot rate";
+    });
+})();
 </script>
 </body>
 </html>

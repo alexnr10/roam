@@ -1837,6 +1837,11 @@ def cmd_review(args: argparse.Namespace, config: Config) -> int:
             self.send_header("Cache-Control", "no-store, must-revalidate")
             super().end_headers()
 
+        def do_OPTIONS(self):  # noqa: N802 — nom imposé par http.server
+            """Sonde de la page : le circuit répond-il, avant tout clic ?"""
+            self.send_response(204 if self.path == "/decisions" else 404)
+            self.end_headers()
+
         def do_POST(self):  # noqa: N802 — nom imposé par http.server
             if self.path != "/decisions":
                 self.send_error(404)
@@ -1846,6 +1851,14 @@ def cmd_review(args: argparse.Namespace, config: Config) -> int:
                 self.send_error(413)
                 return
             corps = self.rfile.read(taille).decode("utf-8", errors="replace")
+            # Un navigateur ne connaît que SA mémoire. Passer de Chrome au
+            # navigateur Samsung, c'est repartir des seules décisions écrites
+            # dans la page — et écraser le brouillon plus fourni qu'avait laissé
+            # l'autre. On garde donc toujours la version la plus riche à côté.
+            if brouillon.exists():
+                ancien = brouillon.read_text(encoding="utf-8").count("\n")
+                if ancien > corps.count("\n"):
+                    brouillon.replace(brouillon.with_name("review-decisions.precedent.csv"))
             # Écriture atomique : une coupure de Wi-Fi au mauvais moment ne doit
             # pas laisser un fichier tronqué à la place du travail de la soirée.
             temporaire = brouillon.with_suffix(".part")
