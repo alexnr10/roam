@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import logging
 import math
+import re
+import unicodedata
 from collections import Counter, defaultdict
 
 from .config import Config
@@ -51,6 +53,104 @@ def dedupe(places: list[Place]) -> list[Place]:
 
     LOG.info("déduplication : %s lieux gardés sur %s", len(kept), len(places))
     return kept
+
+
+MOTS_GENERIQUES = frozenset(
+    """musee musees museum cathedrale basilique eglise abbaye abbatiale palais chateau
+    chateaux maison tour pont place square jardin jardins parc hotel des les aux
+    saint sainte saints notre dame royale royal ancien ancienne national nationale
+    beaux arts art histoire archeologique archeologie memorial crypte antique romain
+    romaine ile village plage grotte theatre amphitheatre thermes porte arc fort
+    prieure couvent sur ville cite site vieux grand petit naturelle""".split()
+)
+# En deçà, deux fiches ne sont plus voisines : elles décrivent la même emprise
+# au sol. « Musée Toulouse-Lautrec » et « palais de la Berbie » sont à 4 m.
+SAME_FOOTPRINT_M = 30.0
+
+
+def _mots_distinctifs(nom: str, commune: str | None) -> set[str]:
+    """Les mots d'un nom qui désignent CE monument et pas sa catégorie.
+
+    Le nom de la commune en est retiré, et c'est tout le sel : sans cela,
+    « musée des Beaux-Arts de Tours » et « cathédrale Saint-Gatien de Tours »
+    partagent un mot et passent pour la même visite, alors que le seul point
+    commun est la ville.
+    """
+    ville = set(_decoupe(commune or ""))
+    return {
+        mot
+        for mot in _decoupe(nom)
+        if len(mot) > 2 and mot not in MOTS_GENERIQUES and mot not in ville
+    }
+
+
+def _decoupe(texte: str) -> list[str]:
+    sans_accents = (
+        unicodedata.normalize("NFD", texte.lower()).encode("ascii", "ignore").decode()
+    )
+    return [mot for mot in re.split(r"[^a-z0-9]+", sans_accents) if mot]
+
+
+def cross_theme_twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
+    """Les paires de lieux proches que `dedupe` ne peut pas voir.
+
+    `dedupe` ne compare qu'à l'intérieur d'un thème, et il a raison : un musée
+    et la cathédrale d'en face sont deux visites. Mais la même règle laisse
+    passer « palais du Louvre » (châteaux) et « musée du Louvre » (musées) à
+    dix mètres — une seule visite, deux fiches Wikidata, deux entrées dans le
+    catalogue.
+
+    On ne tranche pas ici : distinguer « le musée EST le monument » de « le
+    musée est en face » demande de savoir ce qu'on visite, ce qu'aucune donnée
+    ne dit. On signale, avec le motif du soupçon, et le curateur décide.
+
+    Renvoie, par identifiant, les jumeaux trouvés : (l'autre lieu, la distance,
+    le motif).
+    """
+    grille: dict[tuple[float, float], list[Place]] = defaultdict(list)
+    for place in places:
+        grille[(round(place.lat, 2), round(place.lon, 2))].append(place)
+
+    jumeaux: dict[str, list[tuple[Place, float, str]]] = defaultdict(list)
+    vus: set[tuple[str, str]] = set()
+    for place in places:
+        for dlat in (-0.01, 0.0, 0.01):
+            for dlon in (-0.01, 0.0, 0.01):
+                voisins = grille.get(
+                    (round(place.lat + dlat, 2), round(place.lon + dlon, 2)), []
+                )
+                for autre in voisins:
+                    if autre.theme_id == place.theme_id:
+                        continue  # déjà l'affaire de `dedupe`
+                    couple = tuple(sorted((place.wikidata_id, autre.wikidata_id)))
+                    if couple in vus or couple[0] == couple[1]:
+                        continue
+                    distance = haversine_m(place.lat, place.lon, autre.lat, autre.lon)
+                    if distance >= DUPLICATE_DISTANCE_M:
+                        continue
+                    vus.add(couple)
+                    communs = _mots_distinctifs(
+                        place.name, place.commune_name
+                    ) & _mots_distinctifs(autre.name, autre.commune_name)
+                    if communs:
+                        motif = "nom partagé : " + ", ".join(sorted(communs))
+                    elif distance < SAME_FOOTPRINT_M:
+                        motif = "même emplacement"
+                    else:
+                        motif = "à quelques pas"
+                    jumeaux[place.wikidata_id].append((autre, distance, motif))
+                    jumeaux[autre.wikidata_id].append((place, distance, motif))
+
+    if jumeaux:
+        LOG.info(
+            "sosies inter-thèmes : %s lieux concernés, %s paires — à trancher "
+            "en revue",
+            len(jumeaux),
+            len(vus),
+        )
+    for lot in jumeaux.values():
+        lot.sort(key=lambda t: t[1])
+    return dict(jumeaux)
 
 
 def _spread(ordered: list[Place], limit: int, max_per_dept: int) -> list[Place]:

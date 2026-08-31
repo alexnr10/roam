@@ -14,6 +14,7 @@ from .alerts import alerts_for
 from .score import score_breakdown
 from .models import Collection, Place
 from .review import name_hints, theme_from_name
+from .collections import cross_theme_twins
 
 LOG = logging.getLogger(__name__)
 
@@ -394,6 +395,16 @@ def _thumbnail(image_url: str | None, width: int = 400) -> str:
     return f"{image_url}{separator}width={width}"
 
 
+def _twin_key(qid: str, jumeaux: dict) -> str:
+    """Clef de tri partagée par les deux membres de la paire la plus serrée."""
+    lot = jumeaux.get(qid)
+    if not lot:
+        return ""
+    autre, distance, _motif = lot[0]
+    couple = "|".join(sorted((qid, autre.wikidata_id)))
+    return f"{round(distance):04d}|{couple}"
+
+
 def write_review_html(
     places: list[Place],
     collections: list[Collection],
@@ -422,6 +433,10 @@ def write_review_html(
     hints = name_hints(config)
     claims = claims or {}
     connus = {theme.id for theme in config.themes}
+    # Ce que le dédoublonnage ne peut pas voir : il ne compare qu'à l'intérieur
+    # d'un thème. « Palais du Louvre » et « musée du Louvre » sont à dix mètres
+    # et dans deux thèmes différents ; aucune règle ne dit lequel garder.
+    jumeaux = cross_theme_twins(places)
 
     rows = []
     for place in sorted(
@@ -479,6 +494,22 @@ def write_review_html(
                 "disputed": [config.theme(t).name for t in disputed],
                 # Le thème que le NOM annonce, quand ce n'est pas celui-ci.
                 "suggests": annonce if annonce and annonce != place.theme_id else "",
+                # Les fiches voisines d'un AUTRE thème. Le dédoublonnage ne les
+                # a pas vues ; c'est au curateur de dire si c'est une visite ou
+                # deux.
+                "twins": [
+                    {
+                        "name": autre.name,
+                        "theme": config.theme(autre.theme_id).name,
+                        "metres": round(distance),
+                        "why": motif,
+                    }
+                    for autre, distance, motif in jumeaux.get(place.wikidata_id, [])
+                ],
+                # De quoi ranger les deux membres d'une paire côte à côte, la
+                # plus serrée d'abord : juger un sosie sans voir l'autre fiche
+                # est impossible, et le tri normal les sépare de cent pages.
+                "twinKey": _twin_key(place.wikidata_id, jumeaux),
             }
         )
 
@@ -576,6 +607,8 @@ _REVIEW_TEMPLATE = """<!doctype html>
   .moved.theme { background: #3B4A6B; color: #FFFFFF; }
   .doute { background: #FBF2E4; color: #7A5A22; border-radius: 6px;
            padding: 4px 8px; margin-top: 6px; font-size: 12px; }
+  .twin { background: #EDE7F3; color: #4A3A63; border: 1px solid #D3C6E0;
+          border-radius: 6px; padding: 5px 8px; font-size: 12px; line-height: 1.45; }
   .found { background: #EAEDF4; color: #3B4A6B; border-radius: 6px;
            padding: 4px 8px; font-size: 12px; }
   .alerts { display: flex; flex-direction: column; gap: 4px; }
@@ -615,6 +648,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
       <option value="osm">Découverts sur OpenStreetMap</option>
       <option value="relief">Entrés par la remise « ouvert au public »</option>
       <option value="geo">Entrés parce que leur département était vide</option>
+      <option value="sosie">Sosies — deux fiches pour une seule visite ?</option>
       <option value="keep">Gardés</option>
       <option value="drop">Écartés</option>
     </select>
@@ -698,7 +732,7 @@ function visible() {
   const theme = themeSel.value;
   const tier = document.getElementById("tier").value;
   const state = document.getElementById("state").value;
-  return DATA.filter(p => {
+  const retenus = DATA.filter(p => {
     if (theme && p.theme !== theme) return false;
     // « bouge » n'est pas un niveau mais une raison de relire : un lieu validé
     // qui a changé de rang mérite un second regard, quel que soit son niveau.
@@ -721,9 +755,18 @@ function visible() {
     if (state === "osm") return p.source === "osm";
     if (state === "relief") return p.underFloor && !p.geoRescued;
     if (state === "geo") return p.geoRescued;
+    // Les DEUX membres de chaque paire apparaissent : on ne peut trancher
+    // qu'en les voyant l'un et l'autre.
+    if (state === "sosie") return p.twins.length > 0;
     if (state && d !== state) return false;
     return true;
   });
+  // Une paire ne se juge qu'entière : ses deux fiches se suivent, et les plus
+  // serrées passent devant.
+  if (state === "sosie") {
+    retenus.sort((a, b) => a.twinKey.localeCompare(b.twinKey));
+  }
+  return retenus;
 }
 
 function card(p) {
@@ -772,6 +815,13 @@ function card(p) {
         : ""}
       ${p.suggests
         ? `<div class="doubt">Son NOM annonce plutôt « ${nameOf(p.suggests)} »</div>`
+        : ""}
+      ${p.twins.length
+        ? `<div class="twin"><b>Une visite, ou deux ?</b> ${p.twins.map(t =>
+             `${t.name} (${t.theme}) est à ${t.metres} m — ${t.why}`
+           ).join(" ; ")}. Les deux sont au catalogue : le dédoublonnage ne
+           compare qu'à l'intérieur d'un thème. Écarte celui qui fait doublon,
+           ou garde les deux si ce sont vraiment deux visites.</div>`
         : ""}
       <div class="parts">${p.score.toFixed(0)} pts =
         ${parts.notoriete} notoriété (${p.sitelinks} langues)

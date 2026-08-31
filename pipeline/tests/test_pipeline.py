@@ -26,6 +26,7 @@ from roam_pipeline.review import (
     read_themes, theme_claims, theme_from_name, write_decisions, write_themes,
 )
 from roam_pipeline.collections import (
+    cross_theme_twins,
     rescue_thin_departements,
     _spread,
     apply_class_exclusion,
@@ -3275,6 +3276,73 @@ class TestThinDepartements(unittest.TestCase):
         au_dessus = [self._lieu("Gardé", "23", 20)]
         sous = [self._lieu("Sous le plancher", "23", 3)]
         self.assertEqual(self._repecher(au_dessus, sous, cible=0), au_dessus)
+
+
+class TestCrossThemeTwins(unittest.TestCase):
+    """Ce que le dédoublonnage ne peut pas voir.
+
+    `dedupe` ne compare qu'à l'intérieur d'un thème, et il a raison : un musée
+    et la cathédrale d'en face sont deux visites. Mais la même règle laisse
+    « palais du Louvre » et « musée du Louvre » cohabiter à dix mètres.
+    """
+
+    @staticmethod
+    def _lieu(nom, theme, lat, lon, commune):
+        return make_place(nom, theme=theme, lat=lat, lon=lon, commune_name=commune,
+                          wikidata_id=f"Q{abs(hash(nom)) % 999999}")
+
+    def _paires(self, lieux):
+        with _capture():
+            jumeaux = cross_theme_twins(lieux)
+        return jumeaux
+
+    def test_two_entries_for_the_same_monument_are_flagged(self):
+        palais = self._lieu("Palais du Louvre", "chateaux", 48.8606, 2.3376, "Paris")
+        musee = self._lieu("Musée du Louvre", "musees", 48.8607, 2.3376, "Paris")
+        jumeaux = self._paires([palais, musee])
+        # Les DEUX membres sont signalés : on ne tranche qu'en voyant les deux.
+        self.assertIn(palais.wikidata_id, jumeaux)
+        self.assertIn(musee.wikidata_id, jumeaux)
+        autre, distance, motif = jumeaux[palais.wikidata_id][0]
+        self.assertEqual(autre.wikidata_id, musee.wikidata_id)
+        self.assertLess(distance, 30)
+        self.assertIn("louvre", motif)
+
+    def test_the_commune_name_is_not_a_shared_name(self):
+        # « Musée des Beaux-Arts de Tours » et « cathédrale Saint-Gatien de
+        # Tours » partagent un mot, et ce mot est la ville. La paire reste
+        # signalée — elles sont à cinquante mètres — mais le motif ne doit pas
+        # prétendre qu'elles portent le même nom, sinon tous les musées de
+        # France remontent avec leur cathédrale.
+        musee = self._lieu("Musée des Beaux-Arts de Tours", "musees",
+                           47.3947, 0.6944, "Tours")
+        cathedrale = self._lieu("Cathédrale Saint-Gatien de Tours", "cathedrales",
+                                47.3951, 0.6947, "Tours")
+        jumeaux = self._paires([musee, cathedrale])
+        _autre, _distance, motif = jumeaux[musee.wikidata_id][0]
+        self.assertEqual(motif, "à quelques pas")
+
+    def test_same_theme_pairs_are_left_to_dedupe(self):
+        a = make_place("Dolmen A", theme="megalithes", lat=45.0, lon=2.0)
+        b = make_place("Dolmen B", theme="megalithes", lat=45.0001, lon=2.0)
+        self.assertEqual(self._paires([a, b]), {})
+
+    def test_distant_pairs_are_not_flagged(self):
+        musee = self._lieu("Musée Machin", "musees", 45.0, 2.0, "Ici")
+        chateau = self._lieu("Château Machin", "chateaux", 45.02, 2.0, "Ici")
+        self.assertEqual(self._paires([musee, chateau]), {})
+
+    def test_a_place_can_have_several_twins_closest_first(self):
+        # Saint-Remi à Reims : le musée, l'abbaye et la basilique.
+        musee = self._lieu("Musée Saint-Remi", "musees", 49.2408, 4.0397, "Reims")
+        abbaye = self._lieu("Abbaye Royale de Saint-Remi", "abbayes",
+                            49.2408, 4.0397, "Reims")
+        basilique = self._lieu("Basilique Saint-Remi", "cathedrales",
+                               49.2413, 4.0400, "Reims")
+        jumeaux = self._paires([musee, abbaye, basilique])
+        lot = jumeaux[musee.wikidata_id]
+        self.assertEqual(len(lot), 2)
+        self.assertLessEqual(lot[0][1], lot[1][1])
 
 
 if __name__ == "__main__":
