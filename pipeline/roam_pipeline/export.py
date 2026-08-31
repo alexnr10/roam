@@ -397,7 +397,6 @@ def write_review_html(
     decided: dict[str, str] | None = None,
     claims: dict[str, list[str]] | None = None,
     rethemed: dict[str, str] | None = None,
-    sidelined: list[Place] | None = None,
 ) -> None:
     """Page de revue avec vignettes.
 
@@ -418,14 +417,9 @@ def write_review_html(
     claims = claims or {}
     connus = {theme.id for theme in config.themes}
 
-    # Les lieux qu'un malus a fait sortir du catalogue viennent en tête : ce
-    # sont les seuls que le curateur ne peut voir nulle part ailleurs.
-    ecartes = {place.wikidata_id for place in (sidelined or [])}
     rows = []
     for place in sorted(
-        list(sidelined or []) + list(places),
-        key=lambda p: (p.wikidata_id not in ecartes,
-                       best_tier.get(p.wikidata_id, 9), p.theme_id, -p.score, p.name),
+        places, key=lambda p: (best_tier.get(p.wikidata_id, 9), p.theme_id, -p.score, p.name)
     ):
         dept = depts.get(place.departement_code or "")
         parts = score_breakdown(place, config)
@@ -459,6 +453,8 @@ def write_review_html(
                 "hours": place.opening_hours,
                 "source": place.source,
                 "underFloor": under_floor(place, config),
+                # Le déplacement décidé par le curateur, en NIVEAUX.
+                "shift": place.tier_shift,
                 # Ce qui a bougé depuis la dernière revue. Le niveau est un
                 # rang, pas une propriété : il change sans que le lieu change.
                 "changed": (changes or {}).get(place.wikidata_id, ""),
@@ -467,9 +463,6 @@ def write_review_html(
                 "disputed": [config.theme(t).name for t in disputed],
                 # Le thème que le NOM annonce, quand ce n'est pas celui-ci.
                 "suggests": annonce if annonce and annonce != place.theme_id else "",
-                # Sorti du catalogue par le malus du curateur, pas par un
-                # filtre. Il n'existe plus nulle part ailleurs.
-                "sidelined": place.wikidata_id in ecartes,
             }
         )
 
@@ -537,9 +530,6 @@ _REVIEW_TEMPLATE = """<!doctype html>
   .card.drop { opacity: .45; border-color: var(--drop); }
   .card.promote, .card.demote { border-color: var(--muted); }
   .card.rethemed { border-color: var(--primary); }
-  .card.sidelined { border-color: var(--drop); border-style: dashed; }
-  .sidelined-note { background: #FBEAEA; color: var(--drop); border-radius: 6px;
-                    padding: 6px 8px; font-size: 12px; }
   .theme-pick { display: flex; align-items: center; gap: 6px; font-size: 12px;
                 color: var(--muted); padding: 0 14px 10px; }
   .theme-pick select { flex: 1; font-size: 12px; padding: 5px 8px; }
@@ -601,7 +591,6 @@ _REVIEW_TEMPLATE = """<!doctype html>
       <option value="open">Ouverts au public</option>
       <option value="doute">Accueil du public NON RENSEIGNÉ</option>
       <option value="theme">Thème douteux — à trancher</option>
-      <option value="sidelined">Sortis du catalogue par ton malus</option>
       <option value="osm">Découverts sur OpenStreetMap</option>
       <option value="relief">Entrés par la remise « ouvert au public »</option>
       <option value="keep">Gardés</option>
@@ -700,7 +689,6 @@ function visible() {
     // pas. Seul un humain peut trancher, encore faut-il savoir où regarder.
     if (state === "doute") return p.visitable === null || p.visitable === undefined;
     if (state === "theme") return doubtful(p);
-    if (state === "sidelined") return p.sidelined;
     if (state === "osm") return p.source === "osm";
     if (state === "relief") return p.underFloor;
     if (state && d !== state) return false;
@@ -712,8 +700,7 @@ function card(p) {
   const el = document.createElement("article");
   const d = decisions[p.id] || "";
   const theme = themeNow(p);
-  el.className = "card" + (d ? " " + d : "")
-    + (theme !== p.themeId ? " rethemed" : "") + (p.sidelined ? " sidelined" : "");
+  el.className = "card" + (d ? " " + d : "") + (theme !== p.themeId ? " rethemed" : "");
 
   const img = p.image
     ? `<img class="thumb" loading="lazy" src="${p.image}" alt=""
@@ -742,10 +729,6 @@ function card(p) {
         ? `<div class="doute">Accueil du public non renseigné — rien ne prouve
              qu'on puisse y entrer</div>`
         : ""}
-      ${p.sidelined
-        ? `<div class="sidelined-note">Sorti du catalogue par TON malus, pas par un
-             filtre. Confirme en « Écarter », ou retire le malus avec « Annuler ».</div>`
-        : ""}
       ${p.disputed && p.disputed.length
         ? `<div class="doubt">Aussi réclamé par ${p.disputed.join(", ")} — le
              pipeline a tranché, à toi de confirmer</div>`
@@ -761,8 +744,9 @@ function card(p) {
         ${parts.frwiki ? " + " + parts.frwiki + " fr" : ""}
         ${parts.acces ? (parts.acces > 0 ? " + " : " − ") + Math.abs(parts.acces) + " accès" : ""}
         ${parts.visiteurs ? " + " + parts.visiteurs + " fréquentation" : ""}
-        ${parts.ajustement ? (parts.ajustement > 0 ? " + " : " − ")
-          + Math.abs(parts.ajustement) + " curation" : ""}</div>
+        </div>
+      ${p.shift ? `<div class="found">Déplacé par toi :
+        ${p.shift < 0 ? "monté" : "descendu"} d'un niveau</div>` : ""}
       ${p.visitable === true
         ? `<div class="open">✓ ouvert au public${p.hours ? ` · ${p.hours}` : ""}</div>`
         : ""}

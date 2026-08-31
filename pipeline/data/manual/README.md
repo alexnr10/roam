@@ -104,25 +104,35 @@ Il retire la décision : le lieu retrouve son classement automatique, et
 demandait d'éditer le CSV à la main — et un curateur qui doit ouvrir un fichier
 pour revenir sur une décision finit par ne plus revenir sur ses décisions.
 
-### Le malus qui écarte sans le dire
+### Monter ou descendre d'un niveau
 
-`drop` rejette un lieu, `demote` le fait seulement reculer. Ce sont deux gestes
-distincts, et un malus assez fort efface la distinction : le score passe sous le
-seuil ABSOLU du repêchage, le lieu retombe sous le plancher de son thème et
-disparaît du catalogue. Il ne s'affiche alors nulle part — pas même dans la
-revue, qui est tirée du catalogue.
+`promote` et `demote` déplacent un lieu d'**exactement un niveau**, dans la
+limite des trois. Ils s'appliquent APRÈS le classement, et c'est ce qui les rend
+fiables : un lieu monté monte, un lieu descendu descend, quel que soit son
+voisinage.
 
-`build` les nomme, et les **rejoint à la feuille de revue**, en tête et bordés de
-pointillés rouges. Le filtre **« Sortis du catalogue par ton malus »** ne montre
-qu'eux. Deux issues : confirmer en `drop`, ou retirer le malus avec ✕.
+Ils ne retirent JAMAIS un lieu du catalogue. Écarter, c'est `drop` — deux gestes
+distincts, et qui le restent.
+
+> La première version corrigeait le SCORE de soixante points. Un décalage de
+> score ne peut pas exprimer une intention de rang : deux lieux au même score ne
+> sont pas dans le même voisinage. Mesuré sur le catalogue réel, seuls 25
+> `demote` sur 73 descendaient d'un cran — 27 en perdaient deux, et 15
+> disparaissaient du catalogue sans que personne ait décidé de les écarter.
+> Baisser le montant ne réglait rien : à 15 points, 25 lieux ne bougeaient plus
+> du tout et les `promote` cessaient de fonctionner.
+
+Un déplacement peut porter une collection à onze lieux de niveau 1. Le plafond
+est une heuristique, ta décision est un jugement : faire redescendre quelqu'un
+d'autre en silence serait pire.
 
 ```bash
-python -m roam_pipeline adjustments   # l'audit complet, hors revue
+python -m roam_pipeline adjustments
 ```
 
-Il reconstruit le catalogue deux fois, avec et sans ajustements, et dit ce que
-chaque décision change vraiment : celles qui écartent, et celles que le
-classement a rattrapées et qui ne servent plus à rien.
+Signale les déplacements qui ne produisent rien : un `promote` sur un lieu déjà
+au niveau 1, un `demote` sur un niveau 3, ou une décision portant sur un lieu
+qu'un plancher écarte de toute façon.
 
 ### Quand deux revues se croisent
 

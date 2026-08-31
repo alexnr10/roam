@@ -108,9 +108,8 @@ def _load(path: Path) -> list[Place]:
         return []
     places = []
     for item in items:
-        item.pop("slug", None)
         try:
-            places.append(Place(**item))
+            places.append(Place.from_dict(item))
         except TypeError as exc:
             LOG.error("%s : lieu illisible (%s)", path.name, exc)
     return places

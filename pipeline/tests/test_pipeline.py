@@ -37,6 +37,7 @@ from roam_pipeline.collections import (
 )
 from roam_pipeline.config import CONFIG_DIR, Exclusions, Visitors, load_config
 from roam_pipeline.export import (
+    review_tiers,
     _sql_str, read_review_csv, read_review_themes, write_review_csv, write_review_html, write_seed_sql,
 )
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
@@ -1051,7 +1052,6 @@ class TestDurableDecisions(unittest.TestCase):
         kept, counts = apply_decisions(
             [ecarte, garde, ignore],
             {"Q1": ("drop", ""), "Q2": ("keep", "")},
-            adjust=60.0,
         )
         self.assertEqual([p.name for p in kept], ["Gardé", "Non relu"])
         # Un lieu validé par un humain ne doit pas disparaître si un plancher bouge.
@@ -1059,17 +1059,17 @@ class TestDurableDecisions(unittest.TestCase):
         self.assertFalse(ignore.pinned)
         self.assertEqual(counts["pending"], 1)
 
-    def test_promote_corrects_the_score_without_removing_anything(self):
+    def test_promote_moves_a_tier_without_removing_anything(self):
         from roam_pipeline.review import apply_decisions
 
         haut = make_place("Remonté", wikidata_id="Q1")
         bas = make_place("Descendu", wikidata_id="Q2")
         kept, _ = apply_decisions(
-            [haut, bas], {"Q1": ("promote", ""), "Q2": ("demote", "")}, adjust=60.0
+            [haut, bas], {"Q1": ("promote", ""), "Q2": ("demote", "")}
         )
         self.assertEqual(len(kept), 2)
-        self.assertEqual(haut.curator_adjustment, 60.0)
-        self.assertEqual(bas.curator_adjustment, -60.0)
+        self.assertEqual(haut.tier_shift, -1)
+        self.assertEqual(bas.tier_shift, 1)
 
 
 class TestAdoptedCandidates(unittest.TestCase):
@@ -2966,74 +2966,76 @@ class TestCurationMerge(unittest.TestCase):
 
 
 class TestCuratorAdjustments(unittest.TestCase):
-    """Faire reculer n'est pas écarter.
+    """Un déplacement d'un niveau, pas un décalage de points.
 
-    `drop` et `demote` sont deux gestes distincts, et c'est voulu : l'un rejette
-    un lieu, l'autre le fait seulement reculer. Un malus assez fort efface la
-    distinction — le lieu passe sous le plancher de son thème et disparaît, sans
-    que personne ait décidé de l'écarter.
+    La première version ajoutait ou retirait soixante points. Un décalage de
+    score ne peut pas exprimer une intention de rang : deux lieux au même score
+    ne sont pas dans le même voisinage, et la même correction en déplaçait un de
+    deux niveaux, un autre d'aucun. Mesuré sur le catalogue réel, seuls 25
+    `demote` sur 73 descendaient d'un cran ; 27 en perdaient deux et 15
+    disparaissaient du catalogue — alors qu'écarter, c'est `drop`.
     """
 
     @staticmethod
-    def _catalogue():
-        return [make_place(f"Château {i}", sitelinks=20 - i, lat=45 + i * 0.1,
-                           wikidata_id=f"Q{i}") for i in range(1, 15)]
+    def _collection(n=45):
+        # Tous au-dessus du plancher du thème : il faut plus de 35 lieux pour
+        # que le niveau 3 existe, et donc pour éprouver le bout de l'échelle.
+        return [make_place(f"Château {i:02d}", sitelinks=60 - i // 2,
+                           lat=45 + i * 0.1, wikidata_id=f"Q{i}")
+                for i in range(1, n + 1)]
 
-    @staticmethod
-    def _repeche():
-        """Un lieu SOUS le plancher de son thème, sauvé par le repêchage.
-
-        Le repêchage exige deux choses : un accueil du public attesté, et un
-        score au-dessus d'un seuil ABSOLU. C'est par là que le malus fait
-        sortir un lieu — il ne touche pas au plancher de notoriété, qui compte
-        des langues, mais il fait passer le score sous le seuil de repêchage.
-        """
-        return make_place("Île Saint-Louis", sitelinks=6, wikidata_id="Q999",
-                          lat=48.85, lon=2.35, visitable=True, has_frwiki=True,
-                          article_bytes=30_000, image_url="https://exemple/img.jpg")
-
-    def test_a_demote_can_push_a_place_out_of_the_catalogue(self):
-        # Le constat qui a motivé la commande `adjustments` : sept lieux du vrai
-        # catalogue sortaient par leur seul malus, dont l'île Saint-Louis, qui
-        # serait niveau 1 sans lui. Faire reculer n'est pas écarter.
+    def _niveaux(self, decisions):
         with _capture():
-            places = score_all(self._catalogue() + [self._repeche()], CONFIG)
-            avant, _ = build_all(places, CONFIG)
-        self.assertIn("Q999", {p.wikidata_id for p in avant})
-
-        with _capture():
-            places = score_all(self._catalogue() + [self._repeche()], CONFIG)
-            kept, _ = apply_decisions(places, {"Q999": ("demote", "")}, 60.0)
+            places = score_all(self._collection(), CONFIG)
+            kept, _ = apply_decisions(places, decisions)
             score_all(kept, CONFIG)
-            apres, _ = build_all(kept, CONFIG)
-        self.assertNotIn("Q999", {p.wikidata_id for p in apres})
+            _retenus, collections = build_all(kept, CONFIG)
+        return review_tiers(collections)
 
-    def test_the_notoriety_floor_itself_is_untouched_by_a_malus(self):
-        # Le plancher compte des LANGUES : aucun ajustement de score ne le
-        # déplace. C'est bien le repêchage, et lui seul, que le malus annule.
-        place = self._repeche()
-        place.curator_adjustment = -60.0
-        self.assertEqual(place.sitelinks, 6)
+    def test_a_demote_moves_exactly_one_tier(self):
+        # L'intention du curateur est « descends-le d'un cran », pas « retire-lui
+        # soixante points ». Le déplacement s'applique APRÈS le classement,
+        # donc il vaut quel que soit le voisinage du lieu.
+        avant = self._niveaux({})
+        vise = next(q for q, t in avant.items() if t == 1)
+        apres = self._niveaux({vise: ("demote", "")})
+        self.assertEqual(apres[vise], avant[vise] + 1)
 
-    def test_a_sidelined_place_is_rejoined_to_the_review(self):
-        # Un lieu écarté par son propre malus n'apparaît plus nulle part : ni au
-        # catalogue, ni dans la revue qui en est tirée. Le curateur ne pouvait
-        # donc plus revenir sur une décision dont il ne voyait plus l'effet.
+    def test_a_promote_moves_exactly_one_tier(self):
+        avant = self._niveaux({})
+        vise = next(q for q, t in avant.items() if t == 2)
+        apres = self._niveaux({vise: ("promote", "")})
+        self.assertEqual(apres[vise], 1)
+
+    def test_a_demote_never_removes_a_place(self):
+        # C'est toute la distinction entre `drop` et `demote`, et le malus en
+        # points l'effaçait : quinze lieux du catalogue réel disparaissaient
+        # sans que personne ait décidé de les écarter.
+        avant = self._niveaux({})
+        vise = next(q for q, t in avant.items() if t == 1)
+        apres = self._niveaux({vise: ("demote", "")})
+        self.assertIn(vise, apres)
+
+    def test_the_scale_has_ends(self):
+        # Un `demote` sur un niveau 3 ne peut rien faire. C'est honnête : il n'y
+        # a pas de niveau 4, et écarter reste un geste distinct.
+        avant = self._niveaux({})
+        vise = next(q for q, t in avant.items() if t == 3)
+        apres = self._niveaux({vise: ("demote", "")})
+        self.assertEqual(apres[vise], 3)
+
+    def test_the_list_stays_ordered_by_tier(self):
+        # Un lieu descendu garde son score : sans renumérotation, la collection
+        # afficherait un niveau 3 avant un niveau 1.
         with _capture():
-            places = score_all(self._catalogue(), CONFIG)
-            retenus, collections = build_all(places, CONFIG)
-        exile = self._repeche()
-        with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / "review.html"
-            write_review_html(retenus, collections, CONFIG, path, sidelined=[exile])
-            body = path.read_text(encoding="utf-8")
-        data = json.loads(body.split("const DATA = ", 1)[1].split(";\nconst THEMES", 1)[0])
-        ligne = next(row for row in data if row["id"] == "Q999")
-        self.assertTrue(ligne["sidelined"])
-        # En tête : c'est le seul lieu qu'on ne peut voir nulle part ailleurs.
-        self.assertEqual(data[0]["id"], "Q999")
-        self.assertFalse(next(r for r in data if r["id"] != "Q999")["sidelined"])
-        self.assertIn('value="sidelined"', body)
+            places = score_all(self._collection(), CONFIG)
+            kept, _ = apply_decisions(places, {"Q1": ("demote", "")})
+            score_all(kept, CONFIG)
+            _retenus, collections = build_all(kept, CONFIG)
+        nationale = next(c for c in collections
+                         if c.kind == "theme" and not c.geo_code)
+        niveaux = [m.tier for m in nationale.places]
+        self.assertEqual(niveaux, sorted(niveaux))
 
     def test_a_verdict_can_be_withdrawn(self):
         # `clear` n'est pas un verdict qu'on enregistre, c'est un verdict qu'on
@@ -3050,20 +3052,21 @@ class TestCuratorAdjustments(unittest.TestCase):
             write_decisions(path, gardees, {"Q2": "Une abbaye"})
             self.assertEqual(set(read_decisions(path)), {"Q2"})
 
-    def test_a_null_adjustment_neutralises_the_decision(self):
-        # C'est sur quoi repose tout l'audit : reconstruire à zéro donne le
-        # catalogue tel qu'il serait sans aucune correction humaine.
-        places = score_all(self._catalogue(), CONFIG)
-        kept, _ = apply_decisions(places, {"Q1": ("promote", "")}, 0.0)
-        self.assertEqual(
-            next(p for p in kept if p.wikidata_id == "Q1").curator_adjustment, 0.0)
-
-    def test_a_keep_survives_a_null_adjustment(self):
-        # `keep` épingle, il n'ajoute pas de points : neutraliser les
-        # ajustements ne doit pas faire disparaître un lieu validé.
-        places = score_all(self._catalogue(), CONFIG)
-        kept, _ = apply_decisions(places, {"Q1": ("keep", "")}, 0.0)
+    def test_a_keep_still_pins(self):
+        places = score_all(self._collection(), CONFIG)
+        kept, _ = apply_decisions(places, {"Q1": ("keep", "")})
         self.assertTrue(next(p for p in kept if p.wikidata_id == "Q1").pinned)
+
+    def test_a_field_the_model_no_longer_knows_is_ignored(self):
+        # La collecte versionnée survit à ses lecteurs : les fichiers du dépôt
+        # portent encore `curator_adjustment`. Le refuser rendrait tout le
+        # catalogue illisible d'un coup.
+        place = Place.from_dict({
+            "wikidata_id": "Q1", "name": "Un château", "theme_id": "chateaux",
+            "lat": 45.0, "lon": 2.0, "curator_adjustment": 60.0, "slug": "un-chateau",
+        })
+        self.assertEqual(place.name, "Un château")
+        self.assertEqual(place.tier_shift, 0)
 
 
 class TestPageviews(unittest.TestCase):

@@ -87,15 +87,16 @@ def write_decisions(path: Path, decisions: dict[str, tuple[str, str]],
 
 
 def apply_decisions(
-    places: list[Place], decisions: dict[str, tuple[str, str]], adjust: float,
+    places: list[Place], decisions: dict[str, tuple[str, str]],
     strict: bool = False,
 ) -> tuple[list[Place], Counter[str]]:
     """Applique les verdicts. Renvoie les lieux conservés et le décompte.
 
-    `drop` retire. `promote` et `demote` ne retirent rien : ils corrigent le
-    score, parce qu'un relecteur qui trouve un lieu mal classé n'a pas dit
-    qu'il ne valait rien. `keep` épingle — un lieu explicitement validé ne doit
-    pas disparaître parce qu'un plancher a bougé depuis.
+    `drop` retire. `promote` et `demote` ne retirent rien : ils déplacent le
+    lieu d'exactement un niveau, parce qu'un relecteur qui trouve un lieu mal
+    classé n'a pas dit qu'il ne valait rien. `keep` épingle — un lieu
+    explicitement validé ne doit pas disparaître parce qu'un plancher a bougé
+    depuis.
     """
     kept: list[Place] = []
     counts: Counter[str] = Counter()
@@ -112,9 +113,9 @@ def apply_decisions(
         if decision == "drop":
             continue
         if decision == "promote":
-            place.curator_adjustment = adjust
+            place.tier_shift = -1
         elif decision == "demote":
-            place.curator_adjustment = -adjust
+            place.tier_shift = 1
         elif decision == "keep":
             place.pinned = True
         elif strict:

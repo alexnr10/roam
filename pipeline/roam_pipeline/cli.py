@@ -81,11 +81,7 @@ def _fold(text: str) -> str:
 
 def _load_places(path: Path) -> list[Place]:
     raw = json.loads(path.read_text(encoding="utf-8"))
-    places = []
-    for item in raw:
-        item.pop("slug", None)
-        places.append(Place(**item))
-    return places
+    return [Place.from_dict(item) for item in raw]
 
 
 def _save_raw(args: argparse.Namespace, places: list[Place]) -> None:
@@ -573,9 +569,10 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
               "ignorée. Thèmes valides : "
               + ", ".join(t.id for t in config.themes), file=sys.stderr)
     decisions = read_decisions(args.manual / "decisions.csv")
-    kept, counts = apply_decisions(scored, decisions, args.adjust, strict=args.strict)
-    # Rescoré après ajustement : la correction du relecteur fait partie du score,
-    # elle n'est pas plaquée par-dessus.
+    kept, counts = apply_decisions(scored, decisions, strict=args.strict)
+    # Rescoré après les décisions : `drop` retire des lieux, donc la
+    # distribution change. Le déplacement de niveau, lui, ne touche pas au
+    # score — il s'applique au classement, une fois celui-ci établi.
     score_all(kept, config)
 
     retained, collections = build_all(kept, config)
@@ -590,8 +587,6 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     changes = diff_tiers(before, current)
     gone = vanished(before, current)
 
-    ecartes = _sidelined_by_malus(args, config, decisions, retained)
-
     write_json(retained, collections, args.out)
     write_review_csv(retained, collections, args.out / "review.csv", config, changes)
     write_review_html(
@@ -601,23 +596,11 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
         # le lieu n'a plus qu'un thème et la contestation ne se voit plus.
         claims=theme_claims(scored),
         rethemed={qid: theme for qid, (theme, _note) in themes.items()},
-        sidelined=ecartes,
     )
     write_seed_sql(retained, collections, config, args.out / "seed.sql")
 
     _report_tier_changes(changes, gone, before, retained)
     _report_stale_themes(args.out, config, scored)
-
-    if ecartes:
-        print(f"\n⚠ {len(ecartes)} lieux écartés par TON PROPRE malus, "
-              "et non par un filtre :")
-        for place in ecartes[:8]:
-            print(f"    {place.name}")
-        if len(ecartes) > 8:
-            print(f"    (+{len(ecartes) - 8})")
-        print("    Faire reculer n'est pas écarter. Ils sont joints à la revue, "
-              "marqués,")
-        print("    pour que tu puisses confirmer en `drop` ou retirer le malus.")
 
     if renamed:
         print(f"Renommages appliqués : {renamed}")
@@ -642,41 +625,6 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
-def _sidelined_by_malus(
-    args: argparse.Namespace, config: Config, decisions, retained: list[Place]
-) -> list[Place]:
-    """Les lieux que LEUR PROPRE malus a fait sortir du catalogue.
-
-    Un lieu écarté par un malus n'apparaît plus nulle part : ni au catalogue,
-    ni dans la revue qui en est tirée. Le curateur ne peut donc plus revenir sur
-    une décision dont il ne voit plus l'effet.
-
-    La seule façon honnête de l'établir est de reconstruire le catalogue sans
-    aucun ajustement et de comparer. Un lieu peut manquer pour dix raisons —
-    accès refusé, classe écartée, sommet alpin, dédoublonnage — et les attribuer
-    toutes au malus ferait dire au diagnostic n'importe quoi. Un premier essai
-    par test local accusait ainsi le malus d'avoir écarté la Grotte des Fées,
-    dont l'accès est simplement refusé.
-    """
-    malus = {qid for qid, (verdict, _n) in decisions.items() if verdict == "demote"}
-    if not malus:
-        return []
-
-    temoins = score_all(_load_places(args.out / "places_raw.json"), config)
-    apply_names(temoins, read_names(args.manual / "names.csv"))
-    temoins, _ = apply_themes(temoins, read_themes(args.manual / "themes.csv"),
-                              {theme.id for theme in config.themes})
-    # Ajustement nul : le catalogue tel qu'il serait sans aucune correction.
-    sans, _counts = apply_decisions(temoins, decisions, 0.0, strict=args.strict)
-    score_all(sans, config)
-    with _silence():
-        survivants, _cols = build_all(sans, config)
-
-    gardes = {place.wikidata_id for place in retained}
-    return [
-        place for place in survivants
-        if place.wikidata_id in malus and place.wikidata_id not in gardes
-    ]
 
 def _warn_if_behind_repo(args: argparse.Namespace) -> None:
     """Dit si la copie de travail a pris du retard sur la collecte du dépôt.
@@ -836,7 +784,7 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
     previous_level = pipeline_log.level
     pipeline_log.setLevel(logging.ERROR)
     try:
-        kept, _counts = apply_decisions(everything, decisions, args.adjust, strict=args.strict)
+        kept, _counts = apply_decisions(everything, decisions, strict=args.strict)
         score_all(kept, config)
         stages = [("décision du curateur", kept)]
         stages.append(("périmètre français", apply_geographic_scope(stages[-1][1], config)))
@@ -1461,17 +1409,16 @@ def cmd_rename(args: argparse.Namespace, config: Config) -> int:
 
 
 def cmd_adjustments(args: argparse.Namespace, config: Config) -> int:
-    """Audite les `promote` et `demote` : servent-ils encore, et à quoi ?
+    """Audite les `promote` et `demote` : lesquels ne produisent rien ?
 
-    Un `promote` corrige un RANG, mais s'écrit en POINTS, et les points restent
-    quand la raison disparaît. Le curateur monte un lieu que le classement
-    maltraite ; si le classement s'améliore, le lieu monterait tout seul et
-    l'ajustement le sur-classe sans que rien ne le dise.
+    Un déplacement d'un niveau ne peut rien faire quand il n'y a plus de place
+    pour bouger : un `promote` sur un lieu déjà au niveau 1, un `demote` sur un
+    niveau 3. La décision reste enregistrée et ne change rien.
 
-    Le `demote` a le défaut symétrique, et plus grave : il peut pousser un lieu
-    sous le plancher de son thème et le faire DISPARAÎTRE du catalogue. Écarter
-    et faire reculer sont deux gestes différents — c'est tout l'objet de la
-    distinction entre `drop` et `demote`, et un malus trop fort l'efface.
+    Il faut construire DEUX fois pour le savoir, avec et sans les déplacements.
+    Regarder le seul niveau final ne suffit pas : un lieu descendu de 2 à 3 s'y
+    lit comme un lieu bloqué, et l'audit annonçait alors soixante-dix-sept
+    décisions inutiles là où il y en avait seize.
     """
     raw_path = args.out / "places_raw.json"
     if not raw_path.exists():
@@ -1484,67 +1431,59 @@ def cmd_adjustments(args: argparse.Namespace, config: Config) -> int:
         print("Aucun `promote` ni `demote` enregistré.")
         return 0
 
-    def construire(ajustement: float):
+    def construire(deci):
         places = _load_places(raw_path)
         apply_names(places, read_names(args.manual / "names.csv"))
         places, _ = apply_themes(places, read_themes(args.manual / "themes.csv"),
-                                 {t.id for t in config.themes})
+                                 {theme.id for theme in config.themes})
         scored = score_all(places, config)
-        kept, _counts = apply_decisions(scored, decisions, ajustement,
-                                        strict=args.strict)
+        kept, _counts = apply_decisions(scored, deci, strict=args.strict)
         score_all(kept, config)
         with _silence():
             retenus, collections = build_all(kept, config)
-        return ({p.wikidata_id: p for p in retenus}, review_tiers(collections))
+        return ({p.wikidata_id: p.name for p in retenus}, review_tiers(collections))
 
-    avec, niveaux_avec = construire(args.adjust)
-    # Le même catalogue, ajustements neutralisés : c'est le seul moyen de savoir
-    # ce que chaque décision change VRAIMENT.
-    sans, niveaux_sans = construire(0.0)
+    # Les noms viennent du catalogue BRUT : un lieu qu'un plancher écarte n'est
+    # dans aucune des deux constructions, et l'audit affichait alors son Q-id.
+    noms = {place.wikidata_id: place.name for place in _load_places(raw_path)}
+    apply_names_ok, apres = construire(decisions)
+    noms.update(apply_names_ok)
+    # Sans les déplacements, mais AVEC les `drop` : sinon la comparaison
+    # porterait sur deux catalogues de tailles différentes.
+    immobiles = {q: v for q, v in decisions.items() if v[0] in ("drop", "keep")}
+    noms_sans, avant = construire(immobiles)
+    noms = {**noms, **noms_sans, **apply_names_ok}
 
-    def nom(qid: str) -> str:
-        lieu = avec.get(qid) or sans.get(qid)
-        return lieu.name if lieu else qid
-
-    inutiles, exclus, agissants = [], [], 0
-    for qid, verdict in sorted(bouges.items(), key=lambda kv: nom(kv[0])):
-        a, s = niveaux_avec.get(qid), niveaux_sans.get(qid)
-        if qid not in avec and qid in sans:
-            exclus.append((qid, s))
-        elif qid not in avec and qid not in sans:
-            # Écarté par un plancher, pas par l'ajustement : la décision porte
-            # sur un lieu que le catalogue ne montre de toute façon pas.
-            inutiles.append((qid, verdict, None))
-        elif a == s:
-            inutiles.append((qid, verdict, a))
-        else:
+    bloques, hors, agissants = [], [], 0
+    for qid, verdict in sorted(bouges.items(), key=lambda kv: noms.get(kv[0], kv[0])):
+        if qid not in apres:
+            hors.append((qid, verdict))
+        elif apres[qid] != avant.get(qid):
             agissants += 1
+        else:
+            bloques.append((qid, verdict, apres[qid]))
 
-    print(f"{len(bouges)} ajustements enregistrés, dont {agissants} qui déplacent "
-          "effectivement un lieu.\n")
+    print(f"{len(bouges)} déplacements enregistrés "
+          f"({sum(1 for v in bouges.values() if v == 'promote')} promote, "
+          f"{sum(1 for v in bouges.values() if v == 'demote')} demote), "
+          f"dont {agissants} qui déplacent effectivement un lieu.\n")
 
-    if exclus:
-        print(f"⚠ {len(exclus)} lieux SORTENT DU CATALOGUE par leur seul malus :")
-        for qid, niveau in exclus:
-            print(f"    {nom(qid)[:48]:<50} serait niveau {niveau} sans lui")
-        print("    Faire reculer n'est pas écarter. Si c'est bien un rejet, "
-              "note-les `drop` —")
-        print("    la décision sera lisible. Sinon, baisse `--adjust`.\n")
+    if hors:
+        print(f"{len(hors)} portent sur un lieu ABSENT du catalogue :")
+        for qid, verdict in hors:
+            print(f"    {noms.get(qid, qid)[:48]:<50} {verdict}")
+        print("    Un plancher ou un filtre les écarte. La décision ne produit "
+              "rien.\n")
 
-    if inutiles:
-        print(f"{len(inutiles)} ajustements SANS EFFET — le lieu serait au même "
-              "niveau sans eux :")
-        for qid, verdict, niveau in inutiles:
-            etat = (f"niveau {niveau} dans les deux cas" if niveau
-                    else "hors du catalogue de toute façon")
-            print(f"    {nom(qid)[:48]:<50} {verdict}, {etat}")
-        print("    Le classement les a rattrapés. Les retirer de decisions.csv "
-              "ne changerait rien\n    au catalogue et rendrait la mémoire "
-              "éditoriale plus honnête.\n")
+    if bloques:
+        print(f"{len(bloques)} sont AU BOUT de l'échelle et n'ont pas bougé :")
+        for qid, verdict, niveau in bloques:
+            print(f"    {noms.get(qid, qid)[:48]:<50} {verdict}, niveau {niveau}")
+        print("    Il n'y a pas de niveau 4. Si c'est un rejet, c'est `drop` "
+              "qu'il faut écrire.\n")
 
-    if not exclus and not inutiles:
-        print("Aucun ajustement redondant ni excluant : ils font tous ce qu'on "
-              "leur demande.")
+    if not hors and not bloques:
+        print("Tous déplacent effectivement un lieu d'un niveau.")
     return 0
 
 
@@ -1599,7 +1538,7 @@ def cmd_weigh(args: argparse.Namespace, config: Config) -> int:
                                  {t.id for t in essai.themes})
         scored = score_all(places, essai)
         kept, _counts = apply_decisions(scored, read_decisions(args.manual / "decisions.csv"),
-                                        args.adjust, strict=args.strict)
+                                        strict=args.strict)
         score_all(kept, essai)
         with _silence():
             retenus, collections = build_all(kept, essai)
@@ -2241,15 +2180,6 @@ def build_parser() -> argparse.ArgumentParser:
         `build` applique les décisions déjà enregistrées, `apply-review` en
         ajoute d'abord de nouvelles : les deux ont besoin des mêmes réglages.
         """
-        target.add_argument(
-            "--adjust",
-            type=float,
-            default=60.0,
-            # Doit dépasser le plus gros bonus de label (UNESCO, 40 points) :
-            # sans cela, une décision humaine ne pourrait pas rattraper un lieu
-            # que Wikidata documente mal.
-            help="ajustement de score pour promote/demote",
-        )
         target.add_argument(
             "--strict",
             action="store_true",

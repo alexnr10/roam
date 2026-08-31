@@ -65,7 +65,7 @@ def score_breakdown(place: Place, config: Config) -> dict[str, float]:
         # Ce que le public FRANCOPHONE va chercher sur un lieu, quand les
         # langues ne disent que ce que le monde en écrit.
         "consultations": _pageviews_score(place, config),
-        "ajustement": round(place.curator_adjustment, 1),
+
     }
     parts["total"] = round(sum(parts.values()), 1)
     return parts
@@ -170,13 +170,20 @@ def assign_tiers(ranked: list[Place], tiers: Tiers) -> list[tuple[Place, int, in
     Un plancher de score absolu s'applique quand même — une collection peut
     avoir moins de 10 lieux au niveau 1 si le vivier ne suit pas. On ne remplit
     pas pour remplir.
+
+    Puis la décision du curateur déplace le lieu d'EXACTEMENT un cran, dans la
+    limite des trois niveaux. Elle s'applique après le classement, et c'est tout
+    ce qui la rend fiable : un lieu monté monte, un lieu descendu descend, quel
+    que soit son voisinage. Elle peut porter une collection à onze lieux de
+    niveau 1 — le plafond est une heuristique, la décision est un jugement, et
+    faire redescendre quelqu'un d'autre en silence serait pire.
     """
     ordered = sorted(ranked, key=lambda p: (-p.score, p.name))
-    out: list[tuple[Place, int, int]] = []
+    juges: list[tuple[Place, int]] = []
     tier1_used = 0
     tier2_used = 0
 
-    for index, place in enumerate(ordered, start=1):
+    for place in ordered:
         if tier1_used < tiers.tier1_size and place.score >= tiers.tier1_min_score:
             tier = 1
             tier1_used += 1
@@ -185,5 +192,9 @@ def assign_tiers(ranked: list[Place], tiers: Tiers) -> list[tuple[Place, int, in
             tier2_used += 1
         else:
             tier = 3
-        out.append((place, tier, index))
-    return out
+        juges.append((place, min(3, max(1, tier + place.tier_shift))))
+
+    # Renumérotés dans l'ordre des niveaux : sans cela, un lieu descendu
+    # garderait son rang et la liste afficherait un niveau 3 avant un niveau 1.
+    juges.sort(key=lambda couple: (couple[1], -couple[0].score, couple[0].name))
+    return [(place, tier, index) for index, (place, tier) in enumerate(juges, start=1)]

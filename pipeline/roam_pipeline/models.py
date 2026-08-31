@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field, asdict, fields
 from typing import Any
 
 
@@ -79,10 +79,17 @@ class Place:
     labels: list[str] = field(default_factory=list)
     validation_radius_m: int = 150
     score: float = 0.0
-    # Correction manuelle issue de la feuille de revue. Doit peser plus lourd
-    # qu'un bonus de label, sans quoi une décision humaine ne pourrait pas
-    # rattraper un lieu que Wikidata documente mal.
-    curator_adjustment: float = 0.0
+    # Correction manuelle issue de la revue : −1 pour un `promote`, +1 pour un
+    # `demote`. Un DÉCALAGE DE NIVEAU, pas de points.
+    #
+    # La première version ajoutait ou retirait soixante points. Un décalage de
+    # score ne peut pas exprimer une intention de rang : deux lieux au même
+    # score ne sont pas dans le même voisinage, et la même correction en
+    # déplaçait un de deux niveaux, un autre d'aucun. Mesuré sur le catalogue
+    # réel, seuls 25 `demote` sur 73 descendaient d'un cran ; 27 en perdaient
+    # deux et 15 disparaissaient purement et simplement du catalogue — alors
+    # qu'écarter un lieu, c'est `drop`, et que ce sont deux gestes distincts.
+    tier_shift: int = 0
     # Ajouté à la main par le curateur : échappe au plancher de notoriété et
     # l'emporte sur le rattachement automatique à un thème.
     pinned: bool = False
@@ -127,6 +134,18 @@ class Place:
         payload = asdict(self)
         payload["slug"] = self.slug
         return payload
+
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> "Place":
+        """Reconstruit un lieu en IGNORANT les champs qu'on ne connaît plus.
+
+        Une collecte versionnée survit à ses lecteurs : les fichiers du dépôt
+        portent les champs du jour où ils ont été écrits. Retirer un champ du
+        modèle rendrait alors tout le catalogue illisible d'un coup, pour une
+        donnée dont plus personne ne veut.
+        """
+        connus = {champ.name for champ in fields(cls)}
+        return cls(**{clef: valeur for clef, valeur in payload.items() if clef in connus})
 
 
 @dataclass
