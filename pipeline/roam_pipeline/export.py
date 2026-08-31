@@ -601,6 +601,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
   </div>
 </header>
 <div class="warn" id="warn" hidden></div>
+<div class="warn" id="masques" hidden></div>
 <main id="grid"></main>
 
 <script>
@@ -800,9 +801,25 @@ function render() {
   grid.replaceChildren(...list.map(card));
   const done = Object.values(decisions).filter(Boolean).length;
   const doutes = DATA.filter(p => doubtful(p) && !themeOf[p.id]).length;
+  // Les trois filtres se combinent, et le sélecteur d'état reste sur « À
+  // décider » sans qu'on y pense. Un lieu qu'on a soi-même fait descendre est
+  // décidé : il disparaît alors du filtre « ce qui a changé », qui semble ne
+  // rien contenir. Dire ce que les AUTRES filtres masquent lève le doute.
+  const critere = document.getElementById("tier").value;
+  const parNiveau = DATA.filter(p =>
+    critere === "bouge" ? !!p.changed
+    : critere ? String(p.tier) === critere : true).length;
+  const masques = parNiveau - list.length;
   document.getElementById("count").textContent =
-    `${list.length} affichés · ${done}/${DATA.length} décidés`
+    `${list.length} affichés` + (masques > 0 ? ` sur ${parNiveau}` : "")
+    + ` · ${done}/${DATA.length} décidés`
     + (doutes ? ` · ${doutes} thème${doutes > 1 ? "s" : ""} à trancher` : "");
+  const avis = document.getElementById("masques");
+  avis.hidden = masques <= 0;
+  if (masques > 0) {
+    avis.textContent = `${masques} lieux correspondent aussi, masqués par les `
+      + `autres filtres. Mets « Tout » et « Tous les thèmes » pour les voir.`;
+  }
 }
 
 for (const id of ["theme", "tier", "state"]) {
