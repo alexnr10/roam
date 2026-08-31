@@ -905,7 +905,13 @@ document.getElementById("export").onclick = () => {
   const blob = new Blob([feuille()], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "review-decisions.csv";
+  // Horodaté : le navigateur numérote les homonymes — « review-decisions-7.csv »
+  // — et rien ne dit lequel est le plus récent. Une revue entière a été perdue
+  // en rejouant le plus ancien.
+  const t = new Date();
+  const p2 = (n) => String(n).padStart(2, "0");
+  a.download = `review-decisions-${t.getFullYear()}-${p2(t.getMonth() + 1)}-`
+    + `${p2(t.getDate())}-${p2(t.getHours())}h${p2(t.getMinutes())}.csv`;
   a.click();
   URL.revokeObjectURL(a.href);
 };
