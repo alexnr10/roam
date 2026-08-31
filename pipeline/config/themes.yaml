@@ -221,7 +221,16 @@ themes:
     icon: monument
     kind: culture
     radius_m: 150
-    min_sitelinks: 8
+    # Abaissé de 8 à 6. `monuments` est le thème fourre-tout : il accueille ce
+    # qu'aucun autre ne range, donc des édifices très hétérogènes, et un
+    # plancher de 8 langues y était le deuxième plus sévère du catalogue. Il
+    # écartait le passage Pommeraye (7 langues, score 92,5), le palais Gallien,
+    # le théâtre romain d'Autun, les arènes de Besançon — des monuments majeurs
+    # dont le seul tort est d'être à Nantes, Bordeaux, Autun ou Besançon
+    # plutôt qu'à Paris. Mesuré sur le catalogue réel : 8 -> 6 fait entrer
+    # 30 lieux, tous soumis à la revue ; 8 -> 4 en ferait entrer 114 et c'est
+    # le premier palier où le haut de la liste devient douteux.
+    min_sitelinks: 6
     fetch_min_sitelinks: 4
     cap: 60
     # Diversité géographique : dix-sept monuments sur soixante et onze sont à Paris.
