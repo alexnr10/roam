@@ -233,7 +233,14 @@ def _finalize(
     ordered = (
         _spread(ordered, limit, max_per_dept) if max_per_dept else ordered[:limit]
     )
-    ordered, forces = _force_promoted(ordered, members)
+    # Seules les collections THÉMATIQUES : c'est d'elles que parle la revue
+    # quand elle annonce « HORS COLLECTION NATIONALE », et c'est là que le
+    # curateur veut faire entrer le lieu. Forcer partout gonflait « Le meilleur
+    # de France » à 125 lieux pour un plafond de 80.
+    ordered, forces = (
+        _force_promoted(ordered, members) if collection.kind == "theme"
+        else (ordered, set())
+    )
 
     collection.places = [
         CollectionPlace(place_id=place.wikidata_id, tier=tier, rank=rank,

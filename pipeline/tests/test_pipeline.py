@@ -3407,8 +3407,8 @@ class TestPromoteAgainstTheCap(unittest.TestCase):
     """
 
     @staticmethod
-    def _collection(places, cap):
-        collection = Collection(slug="essai", name="Essai", kind="theme",
+    def _collection(places, cap, kind="theme"):
+        collection = Collection(slug="essai", name="Essai", kind=kind,
                                 theme_id="chateaux")
         with _capture():
             return _finalize(collection, places, CONFIG, cap=cap)
@@ -3426,6 +3426,18 @@ class TestPromoteAgainstTheCap(unittest.TestCase):
         dedans = {cp.place_id for cp in self._collection(lieux, 10).places}
         self.assertIn(dernier.wikidata_id, dedans)
         self.assertEqual(len(dedans), 11)  # onze pour un plafond de dix, assumé
+
+    def test_only_theme_collections_are_forced(self):
+        # La revue annonce « HORS COLLECTION NATIONALE » : c'est de la
+        # collection THÉMATIQUE qu'elle parle. Forcer partout gonflait « Le
+        # meilleur de France » à 125 lieux pour un plafond de 80.
+        lieux = [make_place(f"Château {i}", sitelinks=40 - i, lat=45 + i * 0.1,
+                            wikidata_id=f"Q{i}") for i in range(12)]
+        score_all(lieux, CONFIG)
+        lieux[-1].tier_shift = -1
+        geo = {cp.place_id for cp in self._collection(lieux, 10, kind="geo").places}
+        self.assertNotIn(lieux[-1].wikidata_id, geo)
+        self.assertEqual(len(geo), 10)
 
     def test_a_demoted_place_is_not_forced_in(self):
         # Descendre un lieu n'est pas demander qu'il entre.
