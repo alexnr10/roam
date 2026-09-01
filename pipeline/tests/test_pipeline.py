@@ -5,6 +5,8 @@ Aucune requête réseau — ces tests valident la logique métier, pas Wikidata.
 
 from __future__ import annotations
 
+import argparse
+import contextlib
 import json
 import re
 import sys
@@ -53,7 +55,8 @@ from roam_pipeline.fetch import (
 )
 from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from_insee
 from roam_pipeline.cli import (
-    _known_qids, _pending_terms, _probe_verdict, census, empty_themes,
+    _known_qids, _pending_terms, _probe_verdict, census, cmd_retention,
+    empty_themes,
 )
 from roam_pipeline.wikipedia import title_from_url
 from roam_pipeline.wikidata import (
@@ -3397,6 +3400,55 @@ class TestRethemeLosses(unittest.TestCase):
             apres, _ = build_all(assemblee, CONFIG)
         self.assertNotIn("Q181189", {p.wikidata_id for p in apres})
         self.assertIn("Q1279597", {p.wikidata_id for p in apres})
+
+
+class TestRetention(unittest.TestCase):
+    """Deux causes opposées produisent le même symptôme : un thème maigre.
+
+    Un thème qui garde neuf dixièmes de sa collecte n'est pas trié, il est
+    affamé : la requête ne lui a rien apporté de plus. Un thème qui en garde un
+    dixième est richement pourvu, et ses absents ont été écartés.
+    """
+
+    @staticmethod
+    def _run(brut, catalogue, **extra):
+        with tempfile.TemporaryDirectory() as tmp:
+            racine = Path(tmp)
+            (racine / "raw").mkdir()
+            (racine / "out").mkdir()
+            write_raw(racine / "raw", brut, {p.theme_id for p in brut})
+            (racine / "out" / "places.json").write_text(
+                json.dumps([{"theme_id": p.theme_id} for p in catalogue]),
+                encoding="utf-8")
+            args = argparse.Namespace(
+                raw=racine / "raw", out=racine / "out",
+                seuil=extra.get("seuil", 0.6), rare=extra.get("rare", 120))
+            sortie = StringIO()
+            with contextlib.redirect_stdout(sortie):
+                cmd_retention(args, CONFIG)
+            return sortie.getvalue()
+
+    def test_a_theme_the_query_starves_is_named(self):
+        brut = [make_place(f"Cascade {i}", theme="cascades",
+                           wikidata_id=f"Q{i}") for i in range(20)]
+        texte = self._run(brut, brut[:18])  # 90 % gardés
+        self.assertIn("affamé", texte)
+        self.assertIn("Cascades", texte)
+
+    def test_a_richly_supplied_theme_is_not_named(self):
+        brut = [make_place(f"Château {i}", theme="chateaux",
+                           wikidata_id=f"Q{i}") for i in range(200)]
+        texte = self._run(brut, brut[:20])  # 10 % gardés
+        self.assertNotIn("affamé", texte)
+
+    def test_a_theme_fed_by_curated_lists_is_never_starved(self):
+        # Les Plus Beaux Villages gardent 99 % : leur source est déjà une
+        # curation humaine, finie et triée. Ce n'est pas une famine.
+        brut = [make_place(f"Village {i}", theme="villages",
+                           wikidata_id=f"Q{i}") for i in range(20)]
+        texte = self._run(brut, brut[:20])
+        self.assertNotIn("affamé", texte)
+        self.assertIn("(listes)", texte)
 
 
 class TestGatedThemes(unittest.TestCase):

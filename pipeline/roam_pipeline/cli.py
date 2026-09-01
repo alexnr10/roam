@@ -1262,6 +1262,83 @@ def census(rows, counts: dict[str, int], known: set[str], owned: set[str]) -> li
 THRESHOLDS = [2, 3, 4, 6, 8, 10, 12, 15, 20]
 
 
+def cmd_retention(args: argparse.Namespace, config: Config) -> int:
+    """La collecte a-t-elle manqué un thème, ou est-ce le tri qui l'a vidé ?
+
+    Deux causes très différentes produisent le même symptôme — un thème
+    maigre — et elles appellent des remèdes opposés. Le TAUX DE RÉTENTION les
+    sépare : ce que le catalogue garde de ce que la collecte a trouvé.
+
+    Un thème qui garde neuf dixièmes de sa collecte n'est pas trié, il est
+    affamé : la requête SPARQL ne lui a rien apporté de plus, et c'est en
+    amont qu'il faut chercher — une classe Wikidata manquante, un plancher de
+    collecte trop haut. Un thème qui en garde un dixième est richement
+    pourvu ; ses absents ont été écartés, et `explain` dira par quoi.
+
+    Cette commande ne demande pas le réseau : elle compare la collecte
+    versionnée au catalogue construit. Le recensement des classes qui nous
+    échappent, lui, est le travail de `gaps`.
+    """
+    from .raw import read_raw
+
+    brut = read_raw(args.raw)
+    if not brut:
+        print(f"{args.raw} vide — lance d'abord `fetch` puis `sync`.", file=sys.stderr)
+        return 1
+    places_path = args.out / "places.json"
+    if not places_path.exists():
+        print(f"{places_path} absent — lance d'abord `build`.", file=sys.stderr)
+        return 1
+
+    collectes = Counter(place.theme_id for place in brut)
+    retenus = Counter(
+        place["theme_id"] for place in json.loads(places_path.read_text("utf-8"))
+    )
+
+    lignes = []
+    for theme in config.themes:
+        n = collectes.get(theme.id, 0)
+        if not n:
+            continue
+        garde = retenus.get(theme.id, 0)
+        lignes.append((garde / n, theme, n, garde))
+
+    print(f"{'thème':16s} {'genre':8s} {'collectés':>10s} {'retenus':>8s} "
+          f"{'gardés':>8s} {'plancher':>9s} {'classes':>8s}")
+    for taux, theme, n, garde in sorted(lignes, key=lambda t: -t[0]):
+        affame = (taux >= args.seuil and n < args.rare and not theme.from_labels)
+        alerte = "  ← affamé" if affame else (
+            "  (listes)" if theme.from_labels else "")
+        print(f"{theme.id:16s} {theme.kind:8s} {n:10d} {garde:8d} "
+              f"{100 * taux:7.0f} % {theme.fetch_min_sitelinks:9d} "
+              f"{len(theme.wikidata_classes):8d}{alerte}")
+
+    # Un thème alimenté par des listes officielles garde forcément presque tout
+    # ce qu'on lui apporte : sa source est une curation humaine, finie et déjà
+    # triée. Les Plus Beaux Villages gardent 99 % — ce n'est pas une famine,
+    # c'est le principe.
+    affames = [
+        (theme, n) for taux, theme, n, _g in sorted(lignes, key=lambda t: -t[0])
+        if taux >= args.seuil and n < args.rare and not theme.from_labels
+    ]
+    if affames:
+        print(f"\n{len(affames)} thème(s) où c'est la COLLECTE qui limite, pas le "
+              f"tri — le catalogue garde {args.seuil:.0%} ou plus de ce qu'on lui "
+              f"apporte :\n")
+        for theme, n in affames:
+            classes = ", ".join(theme.wikidata_classes) or "aucune"
+            print(f"    {theme.name} — {n} candidats, {len(theme.wikidata_classes)} "
+                  f"classe(s) : {classes}")
+        print("\n  Une seule classe déclarée est le premier suspect : Wikidata ne "
+              "\n  fait pas remonter ses sous-classes de façon fiable — c'est ainsi "
+              "\n  que 55 musées d'art sur 62 manquaient, dont le Petit Palais."
+              "\n\n  Pour chercher les classes voisines, puis vérifier :"
+              "\n      python -m roam_pipeline suggest-qids \"cirque glaciaire\""
+              "\n      python -m roam_pipeline verify-qids"
+              "\n      python -m roam_pipeline gaps --min-sitelinks 4")
+    return 0
+
+
 def cmd_gaps(args: argparse.Namespace, config: Config) -> int:
     """Quelles classes de lieux nous échappent ?
 
@@ -2371,6 +2448,16 @@ def build_parser() -> argparse.ArgumentParser:
     review.add_argument("--review", type=Path, help="chemin de review.csv")
     add_decision_args(review)
 
+    tenue = sub.add_parser(
+        "retention",
+        help="la collecte a-t-elle manqué un thème, ou le tri l'a-t-il vidé ?")
+    tenue.add_argument(
+        "--seuil", type=float, default=0.6,
+        help="taux de rétention au-delà duquel un thème est dit affamé (défaut 0,6)")
+    tenue.add_argument(
+        "--rare", type=int, default=120,
+        help="nombre de candidats en deçà duquel le thème est jugé maigre")
+
     gaps = sub.add_parser(
         "gaps",
         help="quelles classes de lieux nous échappent ? (réseau requis, long)",
@@ -2517,6 +2604,7 @@ def main(argv: list[str] | None = None) -> int:
         "adjustments": cmd_adjustments,
         "check-lists": cmd_check_lists,
         "gaps": cmd_gaps,
+        "retention": cmd_retention,
         "probe": cmd_probe,
         "rename": cmd_rename,
         "export-app": cmd_export_app,
