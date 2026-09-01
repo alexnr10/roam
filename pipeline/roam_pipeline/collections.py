@@ -691,12 +691,20 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
     accessible = apply_access_filter(dans_le_sujet, config)
     non_alpin = apply_alpine_filter(accessible, config)
     au_dessus = apply_notoriety_floor(non_alpin, config)
+    # Les sosies partent AVANT le comptage par département. Compter d'abord
+    # faisait croire un département complet alors qu'une de ses douze fiches
+    # était un doublon promis à disparaître : les Ardennes et le Val-de-Marne
+    # finissaient à onze, sans que rien ne le dise.
+    sans_sosie = dedupe(au_dessus)
     # Le plancher mesure la documentation, qui est très inégalement répartie sur
-    # le territoire. On rend leur part aux départements qu'il a vidés.
+    # le territoire. On rend leur part aux départements qu'il a vidés. Les
+    # candidats sont ceux que le PLANCHER a écartés — pas les sosies, qui ont
+    # déjà leur représentant au catalogue.
     gardes = {place.wikidata_id for place in au_dessus}
     complete = rescue_thin_departements(
-        au_dessus, [p for p in non_alpin if p.wikidata_id not in gardes], config
+        sans_sosie, [p for p in non_alpin if p.wikidata_id not in gardes], config
     )
+    # Second passage : les repêchés peuvent se doublonner entre eux.
     kept = dedupe(complete)
 
     _funnel(
@@ -708,6 +716,7 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
             ("accès", accessible),
             ("non alpin", non_alpin),
             ("plancher", au_dessus),
+            ("sosies", sans_sosie),
             ("dépt pauvre", complete),
             ("dédoublé", kept),
         ],

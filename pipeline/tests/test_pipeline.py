@@ -772,11 +772,13 @@ class TestBuildFunnel(unittest.TestCase):
         table = "\n".join(logs.output)
 
         self.assertIn("étape par étape", table)
-        # Six dunes au départ, quatre après le périmètre, deux après le plancher
-        # — puis quatre de nouveau : leur département est pauvre et le repêchage
-        # géographique leur rend leur place.
+        # Six dunes au départ, quatre après le périmètre, deux après le plancher,
+        # deux encore après les sosies — puis quatre de nouveau : leur
+        # département est pauvre et le repêchage géographique leur rend leur
+        # place.
         ligne = next(l for l in table.splitlines() if l.strip().startswith("dunes-marais"))
-        self.assertEqual([int(n) for n in ligne.split()[1:]], [6, 4, 4, 4, 4, 4, 2, 4, 4])
+        self.assertEqual([int(n) for n in ligne.split()[1:]],
+                         [6, 4, 4, 4, 4, 4, 2, 2, 4, 4])
 
     def test_a_theme_without_any_place_is_left_out_of_the_funnel(self):
         from roam_pipeline.collections import build_all
@@ -3246,6 +3248,30 @@ class TestThinDepartements(unittest.TestCase):
         repeches = self._repecher(au_dessus, [vesone])
         self.assertEqual(len(repeches), 12)
         self.assertFalse(vesone.geo_rescued)
+
+    def test_a_twin_that_dedupe_will_remove_does_not_count_as_a_place(self):
+        # Le défaut trouvé en Ardennes et en Val-de-Marne : « château-bas de
+        # Sedan » à 143 m du « château de Sedan », tous deux au-dessus du
+        # plancher. Le comptage voyait douze lieux, le dédoublonnage en retirait
+        # un juste après, et le département finissait à onze sans que rien ne
+        # le dise. Le comptage doit donc porter sur une population déjà
+        # dédoublonnée.
+        catalogue = [
+            self._lieu(f"Château {i}", "08", 20, 90.0, lat=49.0 + i * 0.01, lon=4.9)
+            for i in range(10)
+        ]
+        sedan = self._lieu("Château de Sedan", "08", 20, 101.0,
+                           lat=49.7020, lon=4.9430)
+        sosie = self._lieu("Château-bas de Sedan", "08", 20, 76.9,
+                           lat=49.7031, lon=4.9430)
+        candidat = self._lieu("Sous le plancher", "08", 3, 70.0,
+                              lat=49.5, lon=4.5)
+        # Douze fiches, mais onze lieux : le sosie part au dédoublonnage.
+        propre = dedupe(catalogue + [sedan, sosie])
+        self.assertEqual(len(propre), 11)
+        repeches = self._repecher(propre, [candidat])
+        self.assertEqual(len(repeches), 12)
+        self.assertIn("Sous le plancher", {p.name for p in repeches})
 
     def test_a_second_wikidata_entry_for_the_same_site_is_refused(self):
         # « Abbaye royale de Saint-Denis » à vingt mètres de « basilique
