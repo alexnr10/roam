@@ -59,6 +59,8 @@ from roam_pipeline.cli import (
     empty_themes,
 )
 from roam_pipeline.wikipedia import title_from_url
+from roam_pipeline.discover import _atteste
+from roam_pipeline.overpass import OsmPlace
 from roam_pipeline.wikidata import (
     class_ancestry_query, class_census_query, class_members_query,
     class_thresholds_query, probe_query, visitors_query,
@@ -3465,6 +3467,42 @@ class TestRetention(unittest.TestCase):
         texte = self._run(brut, brut[:20])
         self.assertNotIn("affamé", texte)
         self.assertIn("(listes)", texte)
+
+
+class TestNatureCandidates(unittest.TestCase):
+    """`discover` ne pouvait structurellement pas trouver une cascade.
+
+    Son premier filtre exige un site « géré » — horaires, tarif ou site web —
+    et rien de tout cela ne se pose sur une chute d'eau. Résultat : zéro des
+    quatre-vingt-six cascades du catalogue ne vient d'OpenStreetMap, alors que
+    `natural=waterfall` est demandé à Overpass depuis le début.
+    """
+
+    SANS_PORTES = {"cascades", "sommets", "lacs"}
+
+    @staticmethod
+    def _site(**kwargs):
+        defaults = dict(osm_id="node/1", name="Cascade du Test",
+                        lat=45.0, lon=2.0, tags={"natural": "waterfall"})
+        defaults.update(kwargs)
+        return OsmPlace(**defaults)
+
+    def test_a_managed_site_still_qualifies(self):
+        musee = self._site(tags={"tourism": "museum"}, opening_hours="Mo-Su 10:00-18:00")
+        self.assertTrue(_atteste(musee, self.SANS_PORTES))
+
+    def test_a_waterfall_with_a_wikidata_item_qualifies(self):
+        self.assertTrue(_atteste(self._site(wikidata_id="Q12345"), self.SANS_PORTES))
+
+    def test_a_waterfall_without_any_source_is_refused(self):
+        # Sinon tout ruisseau cartographié entrerait dans la feuille.
+        self.assertFalse(_atteste(self._site(), self.SANS_PORTES))
+
+    def test_a_gated_theme_still_needs_to_be_managed(self):
+        # Un musée sans horaires ni site web reste un point d'intérêt : la
+        # porte encyclopédique ne vaut que là où « géré » ne veut rien dire.
+        musee = self._site(tags={"tourism": "museum"}, wikidata_id="Q12345")
+        self.assertFalse(_atteste(musee, self.SANS_PORTES))
 
 
 class TestGatedThemes(unittest.TestCase):

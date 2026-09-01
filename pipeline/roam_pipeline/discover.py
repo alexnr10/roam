@@ -206,13 +206,48 @@ def apply_visit_info(places: list[Place], osm: list[OsmPlace]) -> int:
     return matched
 
 
-def find_candidates(places: list[Place], osm: list[OsmPlace]) -> list[OsmPlace]:
+def _atteste(site: OsmPlace, sans_portes: set[str]) -> bool:
+    """Ce site mérite-t-il d'être proposé au curateur ?
+
+    Deux preuves possibles, et il en faut une.
+
+    Un site GÉRÉ — horaires, tarif, site web — accueille manifestement du
+    public. C'est le signal qu'aucune source encyclopédique ne donne, et il
+    a ramené neuf cents lieux.
+
+    Mais il ne se pose que là où quelqu'un ouvre et ferme, et il écartait
+    donc la totalité des cascades : zéro sur les quatre-vingt-six du
+    catalogue ne vient d'OpenStreetMap, alors que `natural=waterfall` est
+    demandé à Overpass depuis le début. Une chute d'eau n'a ni guichet ni
+    horaires — c'est le même biais que le bonus d'accueil du public dans le
+    score, et il se corrige de la même façon.
+
+    Sur un thème sans portes, la preuve devient donc encyclopédique : une fiche
+    Wikidata. Elle n'ouvre pas la porte à tout ruisseau cartographié — il faut
+    que quelqu'un ait écrit sur ce lieu — et elle ne dispense de rien ensuite :
+    le candidat entre dans la revue comme les autres, non épinglé.
+
+    Wikidata et non Wikipédia, pour une raison pratique : `adopt` exige un
+    Q-id, et un candidat qu'on ne peut pas adopter n'a rien à faire dans la
+    feuille. Ce que cette porte vise, ce sont les lieux qui ONT une fiche
+    Wikidata mais trop peu de langues pour franchir le plancher de collecte —
+    précisément la population que le plancher rend invisible.
+    """
+    if site.managed:
+        return True
+    theme_id = guess_theme(site.tags)
+    return bool(theme_id in sans_portes and site.wikidata_id)
+
+
+def find_candidates(
+    places: list[Place], osm: list[OsmPlace], sans_portes: set[str] | None = None
+) -> list[OsmPlace]:
     """Sites de visite qu'OpenStreetMap connaît et que le catalogue ignore.
 
-    Seuls les sites manifestement gérés sont retenus : sans horaires, sans site
-    web et sans mention de tarif, rien ne distingue un lieu de visite d'un
-    simple point d'intérêt.
+    Un site géré est retenu d'office. Sur les thèmes sans portes ni horaires,
+    où « géré » ne veut rien dire, un lien encyclopédique en tient lieu.
     """
+    sans_portes = sans_portes or set()
     known_qids = {p.wikidata_id for p in places}
     index = _Index(places, lambda p: (p.lat, p.lon))
     candidates: list[OsmPlace] = []
@@ -222,7 +257,7 @@ def find_candidates(places: list[Place], osm: list[OsmPlace]) -> list[OsmPlace]:
     funnel = {"lus": len(osm), "gérés": 0, "absents": 0, "documentés": 0}
 
     for site in osm:
-        if not site.managed:
+        if not _atteste(site, sans_portes):
             continue
         funnel["gérés"] += 1
         if site.wikidata_id and site.wikidata_id in known_qids:

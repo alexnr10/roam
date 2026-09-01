@@ -367,7 +367,10 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     apply_visit_info(places, osm)
     _save_raw(args, places)
 
-    candidates = find_candidates(places, osm)
+    # Les thèmes sans portes ne peuvent pas produire de site « géré » : là,
+    # un lien encyclopédique tient lieu de preuve.
+    sans_portes = {theme.id for theme in config.themes if not theme.gated}
+    candidates = find_candidates(places, osm, sans_portes)
     # Deuxième garde-fou, indépendant de la requête Overpass : le rectangle de
     # collecte déborde sur les pays voisins, et une zone mal résolue par un
     # miroir Overpass repeuplerait la feuille de musées bâlois ou milanais.
