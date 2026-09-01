@@ -189,6 +189,8 @@ class CollectionRules:
     # Nombre de lieux visé dans CHAQUE département. En dessous, les meilleurs
     # candidats sous le plancher de leur thème sont repêchés. `0` désactive.
     min_per_departement: int = 0
+    # Part maximale d'un seul thème dans un « Le meilleur de… ». `0` désactive.
+    max_theme_share: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -279,6 +281,7 @@ def load_config(config_dir: Path | None = None) -> Config:
         cross_theme_levels=list(raw["geo"]["cross_theme_levels"]),
         require_departement=bool(raw["geo"].get("require_departement", True)),
         min_per_departement=int(raw["geo"].get("min_per_departement", 0)),
+        max_theme_share=float(raw["collections"].get("max_theme_share", 0.0)),
     )
 
     alerts = Alerts(**raw.get("alerts", {"alpine_elevation_m": 2500}))

@@ -216,12 +216,53 @@ def _force_promoted(
     )
 
 
+def _mix_themes(ordered: list[Place], limit: int, part: float) -> list[Place]:
+    """Empêche un seul thème d'occuper tout un « Le meilleur de… ».
+
+    « Le meilleur de Paris » comptait quarante et un musées sur quatre-vingts.
+    Le quota par département, lui, ne peut rien y faire : dans une collection
+    géographique, tous les lieux sont du même département par construction.
+    C'est son symétrique qui manquait.
+
+    Le plafond se calcule sur le PLAFOND de la collection, jamais sur le nombre
+    de lieux présents. Calculé sur les lieux présents, il coupait la Creuse de
+    douze à huit — quatre lieux retirés qu'aucun autre thème ne pouvait
+    remplacer, et tout le travail du repêchage annulé. Une collection de douze
+    lieux n'a rien à sélectionner : elle les prend tous.
+
+    Et il MONTE d'un cran tant qu'il reste des places, comme celui du
+    repêchage : le Centre-Val de Loire n'a pas soixante lieux hors châteaux à
+    offrir, alors son plafond s'établit à trente et un. Mieux vaut une région
+    un peu châtelaine qu'une collection trop courte.
+    """
+    plafond = max(3, int(limit * part))
+    limite = max(plafond, limit)
+    retenus: list[Place] = []
+    par_theme: Counter[str] = Counter()
+    vus: set[str] = set()
+
+    while len(retenus) < limit and plafond <= limite:
+        avant = len(retenus)
+        for place in ordered:
+            if len(retenus) >= limit:
+                break
+            if place.wikidata_id in vus or par_theme[place.theme_id] >= plafond:
+                continue
+            retenus.append(place)
+            vus.add(place.wikidata_id)
+            par_theme[place.theme_id] += 1
+        if len(retenus) == avant:
+            plafond += 1
+    return retenus
+
+
 def _finalize(
     collection: Collection,
     members: list[Place],
     config: Config,
     cap: int | None = None,
     max_per_dept: int | None = None,
+    theme_share: float = 0.0,
 ) -> Collection | None:
     """Applique plancher, plafond et niveaux. Renvoie None si la collection n'existe pas."""
     rules = config.collections
@@ -230,9 +271,12 @@ def _finalize(
 
     limit = cap or rules.max_places
     ordered = sorted(members, key=lambda p: (-p.score, p.name))
-    ordered = (
-        _spread(ordered, limit, max_per_dept) if max_per_dept else ordered[:limit]
-    )
+    if max_per_dept:
+        ordered = _spread(ordered, limit, max_per_dept)
+    elif theme_share:
+        ordered = _mix_themes(ordered, limit, theme_share)
+    else:
+        ordered = ordered[:limit]
     # Seules les collections THÉMATIQUES : c'est d'elles que parle la revue
     # quand elle annonce « HORS COLLECTION NATIONALE », et c'est là que le
     # curateur veut faire entrer le lieu. Forcer partout gonflait « Le meilleur
@@ -331,7 +375,14 @@ def build_geo_collections(places: list[Place], config: Config) -> list[Collectio
                 geo_level=level,
                 geo_code=code,
             )
-            built = _finalize(collection, members, config)
+            # Le brassage ne vaut QUE pour les « Le meilleur de… ». Un
+            # croisement thème × géographie est mono-thème par construction :
+            # lui appliquer la règle ramènerait « Châteaux de Bretagne » à
+            # vingt châteaux. Les deux portent pourtant le même `kind` ; c'est
+            # l'absence de `theme_id` qui distingue les vraies collections
+            # géographiques.
+            built = _finalize(collection, members, config,
+                              theme_share=config.collections.max_theme_share)
             if built:
                 out.append(built)
     return out

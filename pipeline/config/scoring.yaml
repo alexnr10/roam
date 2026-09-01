@@ -148,6 +148,21 @@ collections:
   min_places: 8
   # Plafond par défaut, surchargé par `cap` dans themes.yaml.
   max_places: 80
+  # Part maximale d'un seul thème dans un « Le meilleur de… ». Le quota par
+  # département ne peut rien pour ces collections : par construction tous leurs
+  # lieux sont du même territoire. C'est son symétrique.
+  #
+  # « Le meilleur de Paris » comptait 41 musées sur 80 — l'embouteillage
+  # parisien avait simplement déménagé depuis la collection nationale des
+  # musées. À 25 % : musées 20, monuments 14, jardins 13, ponts 11.
+  #
+  # La part porte sur le PLAFOND (80), jamais sur les lieux présents : calculée
+  # sur les lieux présents, elle coupait la Creuse de douze à huit. Et le
+  # plafond monte d'un cran tant qu'il reste des places — le Centre-Val de
+  # Loire n'a pas soixante lieux hors châteaux, son plafond s'établit donc à
+  # trente et un et la collection reste pleine. Aucune des 256 collections ne
+  # rétrécit.
+  max_theme_share: 0.25
 
 geo:
   # Niveaux géographiques pour lesquels on dérive des collections.

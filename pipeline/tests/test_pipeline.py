@@ -27,6 +27,7 @@ from roam_pipeline.review import (
 )
 from roam_pipeline.collections import (
     _finalize,
+    _mix_themes,
     cross_theme_twins,
     rescue_thin_departements,
     _spread,
@@ -3395,6 +3396,66 @@ class TestRethemeLosses(unittest.TestCase):
             apres, _ = build_all(assemblee, CONFIG)
         self.assertNotIn("Q181189", {p.wikidata_id for p in apres})
         self.assertIn("Q1279597", {p.wikidata_id for p in apres})
+
+
+class TestThemeShareInGeoCollections(unittest.TestCase):
+    """« Le meilleur de Paris » comptait 41 musées sur 80.
+
+    Le quota par département ne peut rien pour ces collections : par
+    construction tous leurs lieux sont du même territoire. C'est son symétrique
+    qui manquait.
+    """
+
+    @staticmethod
+    def _lot(compte: dict[str, int]):
+        lieux, i = [], 0
+        for theme, combien in compte.items():
+            for n in range(combien):
+                lieux.append(make_place(
+                    f"{theme} {n}", theme=theme, sitelinks=40 - n,
+                    lat=45 + i * 0.05, lon=2.0, wikidata_id=f"Q{i}"))
+                i += 1
+        score_all(lieux, CONFIG)
+        return sorted(lieux, key=lambda p: (-p.score, p.name))
+
+    def test_no_theme_takes_more_than_its_share(self):
+        # Quatre thèmes bien pourvus : le quart de quatre-vingts suffit à
+        # remplir la collection, donc le plafond de vingt tient. Avec trois
+        # thèmes seulement il monterait — c'est la garantie « jamais plus
+        # court », vérifiée par le test suivant.
+        lot = self._lot({"musees": 60, "jardins": 30, "ponts": 30,
+                         "cathedrales": 30})
+        retenus = _mix_themes(lot, 80, 0.25)
+        self.assertEqual(len(retenus), 80)
+        self.assertEqual(Counter(p.theme_id for p in retenus)["musees"], 20)
+
+    def test_the_share_never_shrinks_a_collection(self):
+        # Le Centre-Val de Loire n'a pas soixante lieux hors châteaux : son
+        # plafond monte jusqu'à ce que la collection soit pleine.
+        lot = self._lot({"chateaux": 70, "abbayes": 10, "musees": 8})
+        retenus = _mix_themes(lot, 80, 0.25)
+        self.assertEqual(len(retenus), 80)
+        self.assertGreater(Counter(p.theme_id for p in retenus)["chateaux"], 20)
+
+    def test_a_thin_collection_is_untouched(self):
+        # La Creuse a douze lieux : elle n'a rien à sélectionner. Une part
+        # calculée sur les lieux PRÉSENTS la ramenait à huit.
+        lot = self._lot({"chateaux": 5, "megalithes": 5, "ponts": 1, "forets": 1})
+        retenus = _mix_themes(lot, 80, 0.25)
+        self.assertEqual(len(retenus), 12)
+
+    def test_cross_collections_keep_their_single_theme(self):
+        # « Châteaux de Bretagne » est mono-thème par construction. Les deux
+        # sortes portent le même `kind` ; c'est `theme_id` qui les distingue.
+        with _capture():
+            _retenus, cols = build_all(
+                self._lot({"chateaux": 40, "abbayes": 12}), CONFIG)
+        croises = [c for c in cols if c.kind == "geo" and c.theme_id]
+        self.assertTrue(croises)
+        for collection in croises:
+            self.assertGreater(len(collection.places), 0)
+        chateaux = [c for c in croises if c.theme_id == "chateaux"]
+        self.assertTrue(any(len(c.places) > 20 for c in chateaux))
 
 
 class TestPromoteAgainstTheCap(unittest.TestCase):
