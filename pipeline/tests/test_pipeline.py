@@ -26,6 +26,7 @@ from roam_pipeline.review import (
     read_themes, theme_claims, theme_from_name, write_decisions, write_themes,
 )
 from roam_pipeline.collections import (
+    _finalize,
     cross_theme_twins,
     rescue_thin_departements,
     _spread,
@@ -43,7 +44,7 @@ from roam_pipeline.export import (
     _sql_str, read_review_csv, read_review_themes, write_review_csv, write_review_html, write_seed_sql,
 )
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
-from roam_pipeline.models import Place, display_name, slugify
+from roam_pipeline.models import Collection, Place, display_name, slugify
 from roam_pipeline import outlines
 from roam_pipeline.fetch import (
     REMEDIES, diagnose_missing, enrich_departements, stale_themes,
@@ -3354,6 +3355,47 @@ class TestThinDepartements(unittest.TestCase):
         au_dessus = [self._lieu("Gardé", "23", 20)]
         sous = [self._lieu("Sous le plancher", "23", 3)]
         self.assertEqual(self._repecher(au_dessus, sous, cible=0), au_dessus)
+
+
+class TestPromoteAgainstTheCap(unittest.TestCase):
+    """L'appartenance se décidait avant que le niveau n'existe.
+
+    Le plafond coupait au score, et le verdict du curateur n'arrivait qu'ensuite
+    pour ranger ce qui restait. Un `promote` sur un lieu hors collection ne
+    faisait donc rien de ce qu'on lui demandait : Camon était 81e sur 154 pour
+    un plafond de 80, et le promouvoir le laissait dehors.
+    """
+
+    @staticmethod
+    def _collection(places, cap):
+        collection = Collection(slug="essai", name="Essai", kind="theme",
+                                theme_id="chateaux")
+        with _capture():
+            return _finalize(collection, places, CONFIG, cap=cap)
+
+    def test_a_promoted_place_enters_despite_the_cap(self):
+        lieux = [make_place(f"Château {i}", sitelinks=40 - i, lat=45 + i * 0.1,
+                            wikidata_id=f"Q{i}") for i in range(12)]
+        score_all(lieux, CONFIG)
+        dernier = lieux[-1]  # le moins bien noté, coupé par un plafond de 10
+        self.assertNotIn(
+            dernier.wikidata_id,
+            {cp.place_id for cp in self._collection(lieux, 10).places},
+        )
+        dernier.tier_shift = -1
+        dedans = {cp.place_id for cp in self._collection(lieux, 10).places}
+        self.assertIn(dernier.wikidata_id, dedans)
+        self.assertEqual(len(dedans), 11)  # onze pour un plafond de dix, assumé
+
+    def test_a_demoted_place_is_not_forced_in(self):
+        # Descendre un lieu n'est pas demander qu'il entre.
+        lieux = [make_place(f"Château {i}", sitelinks=40 - i, lat=45 + i * 0.1,
+                            wikidata_id=f"Q{i}") for i in range(12)]
+        score_all(lieux, CONFIG)
+        lieux[-1].tier_shift = 1
+        dedans = {cp.place_id for cp in self._collection(lieux, 10).places}
+        self.assertNotIn(lieux[-1].wikidata_id, dedans)
+        self.assertEqual(len(dedans), 10)
 
 
 class TestCrossThemeTwins(unittest.TestCase):

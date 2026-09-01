@@ -188,6 +188,34 @@ def _spread(ordered: list[Place], limit: int, max_per_dept: int) -> list[Place]:
     return retenus
 
 
+def _force_promoted(
+    retenus: list[Place], members: list[Place]
+) -> tuple[list[Place], set[str]]:
+    """Un lieu remonté par le curateur entre, même si le plafond l'avait coupé.
+
+    L'appartenance à une collection se décidait AVANT que le niveau n'existe :
+    le plafond coupait au score, et le verdict du curateur n'arrivait qu'ensuite,
+    pour ranger ce qui restait. Un `promote` sur un lieu hors collection ne
+    faisait donc rien de ce qu'on lui demandait — Camon était 81e sur 154 pour
+    un plafond de 80, et le promouvoir le laissait dehors.
+
+    C'est la même règle que le `keep` face au plancher de notoriété, et que le
+    déplacement de niveau face au plafond du niveau 1 : le seuil est une
+    heuristique, la décision est un jugement.
+    """
+    dedans = {place.wikidata_id for place in retenus}
+    forces = [
+        place for place in members
+        if place.tier_shift < 0 and place.wikidata_id not in dedans
+    ]
+    if not forces:
+        return retenus, set()
+    return (
+        sorted(retenus + forces, key=lambda p: (-p.score, p.name)),
+        {place.wikidata_id for place in forces},
+    )
+
+
 def _finalize(
     collection: Collection,
     members: list[Place],
@@ -205,9 +233,11 @@ def _finalize(
     ordered = (
         _spread(ordered, limit, max_per_dept) if max_per_dept else ordered[:limit]
     )
+    ordered, forces = _force_promoted(ordered, members)
 
     collection.places = [
-        CollectionPlace(place_id=place.wikidata_id, tier=tier, rank=rank)
+        CollectionPlace(place_id=place.wikidata_id, tier=tier, rank=rank,
+                        forced=place.wikidata_id in forces)
         for place, tier, rank in assign_tiers(ordered, config.tiers)
     ]
     return collection

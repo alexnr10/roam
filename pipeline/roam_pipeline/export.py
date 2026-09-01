@@ -90,7 +90,7 @@ def under_floor(place: Place, config: Config) -> bool:
 
 def _membership(
     collections: list[Collection],
-) -> tuple[dict[str, list[str]], dict[str, int], set[str]]:
+) -> tuple[dict[str, list[str]], dict[str, int], set[str], set[str]]:
     """Collections de chaque lieu, et son niveau de priorité de revue.
 
     Le niveau retenu est celui de la COLLECTION THÉMATIQUE NATIONALE, pas le
@@ -120,7 +120,19 @@ def _membership(
     for place_id in membership:
         review_tier.setdefault(place_id, 3)
 
-    return membership, review_tier, dans_nationale
+    # Entrés dans leur collection nationale parce que le curateur les a
+    # remontés, alors que le plafond les avait coupés. La carte doit le dire :
+    # sinon la décision agit sans laisser de trace, et la collection dépasse
+    # son plafond sans que personne sache pourquoi.
+    forces = {
+        cp.place_id
+        for collection in collections
+        if collection.kind == "theme"
+        for cp in collection.places
+        if cp.forced
+    }
+
+    return membership, review_tier, dans_nationale, forces
 
 
 def review_state(
@@ -164,7 +176,7 @@ def write_review_csv(
     Triée par niveau puis par thème : le travail est trop long pour être fait
     d'un bloc, il doit pouvoir être fait par tranches utiles.
     """
-    membership, best_tier, _nationale = _membership(collections)
+    membership, best_tier, _nationale, _forces = _membership(collections)
     depts = departements()
     # Les niveaux 1 en tête, groupés par thème. Relire 1 900 lignes d'un bloc
     # est décourageant ; relire d'abord les 200 incontournables donne déjà un
@@ -428,7 +440,7 @@ def write_review_html(
     zéro. La page part donc de `decisions.csv`, et le navigateur n'ajoute que
     ce qui n'y est pas encore.
     """
-    membership, best_tier, nationale = _membership(collections)
+    membership, best_tier, nationale, forces = _membership(collections)
     depts = departements()
     hints = name_hints(config)
     claims = claims or {}
@@ -492,6 +504,9 @@ def write_review_html(
                 "geoRescued": place.geo_rescued,
                 # Le déplacement décidé par le curateur, en NIVEAUX.
                 "shift": place.tier_shift,
+                # Entré dans sa collection nationale par cette décision, malgré
+                # le plafond.
+                "forced": place.wikidata_id in forces,
                 # Dans la collection nationale de son thème, ou seulement dans
                 # une collection géographique. « Niveau 3 » et « pas dans la
                 # collection » sont deux états différents : les confondre a
@@ -873,7 +888,10 @@ function card(p) {
         ${parts.acces ? (parts.acces > 0 ? " + " : " − ") + Math.abs(parts.acces) + " accès" : ""}
         ${parts.visiteurs ? " + " + parts.visiteurs + " fréquentation" : ""}
         </div>
-      ${p.shift ? `<div class="found">Déplacé par toi :
+      ${p.forced
+        ? `<div class="found">Entré dans la collection nationale par ta
+             décision : son score le laissait sous le plafond du thème.</div>`
+        : p.shift ? `<div class="found">Déplacé par toi :
         ${p.shift < 0 ? "monté" : "descendu"} d'un niveau</div>` : ""}
       ${p.visitable === true
         ? `<div class="open">✓ ouvert au public${p.hours ? ` · ${p.hours}` : ""}</div>`

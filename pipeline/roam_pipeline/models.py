@@ -157,6 +157,10 @@ class CollectionPlace:
     place_id: str          # wikidata_id
     tier: int
     rank: int
+    # Entré parce que le curateur l'a remonté, alors que le plafond de la
+    # collection l'avait coupé. La collection dépasse alors son plafond, et
+    # c'est assumé : le plafond est une heuristique, la décision un jugement.
+    forced: bool = False
 
 
 @dataclass
