@@ -444,22 +444,16 @@ def write_review_html(
     # que six pour cent du catalogue. Chaque lieu prend son rang DANS son
     # thème, et on lit tous les premiers, puis tous les deuxièmes : un écran
     # montre le catalogue, et tous les thèmes avancent du même pas.
-    rang_dans_le_theme: dict[str, int] = {}
-    par_theme: dict[str, list[Place]] = defaultdict(list)
-    for place in places:
-        par_theme[place.theme_id].append(place)
-    for lot in par_theme.values():
-        lot.sort(key=lambda p: (best_tier.get(p.wikidata_id, 9), -p.score, p.name))
-        for rang, place in enumerate(lot):
-            rang_dans_le_theme[place.wikidata_id] = rang
-
+    # L'ordre d'écriture reste simple et stable. L'alternance des thèmes se
+    # joue dans la page, APRÈS le filtre : la calculer ici la calculerait sur
+    # le catalogue entier, et un thème déjà revu y laisserait des trous que le
+    # filtre « à décider » rend béants — c'est ainsi que trois petits thèmes
+    # défilaient en boucle avant le premier château.
     rows = []
     for place in sorted(
         places,
         key=lambda p: (p.wikidata_id not in nationale,
-                       best_tier.get(p.wikidata_id, 9),
-                       rang_dans_le_theme[p.wikidata_id],
-                       p.theme_id, -p.score, p.name),
+                       best_tier.get(p.wikidata_id, 9), p.theme_id, -p.score, p.name),
     ):
         dept = depts.get(place.departement_code or "")
         parts = score_breakdown(place, config)
@@ -782,8 +776,38 @@ function visible() {
   // serrées passent devant.
   if (state === "sosie") {
     retenus.sort((a, b) => a.twinKey.localeCompare(b.twinKey));
+    return retenus;
   }
-  return retenus;
+  return alterner(retenus);
+}
+
+// Les thèmes s'alternent au lieu de se suivre : un écran montre le catalogue,
+// et tous les thèmes avancent du même pas.
+//
+// Le rang se calcule sur ce qui est RÉELLEMENT affiché, et par niveau. Le
+// calculer sur le catalogue entier a produit deux travers successifs : rangés
+// par identifiant de thème, deux cents abbayes ouvraient chaque niveau ; rangés
+// par rang dans leur thème, les lieux déjà décidés laissaient des trous et
+// seuls les petits thèmes — îles, grottes, musées — défilaient avant le premier
+// château.
+function alterner(lieux) {
+  const lots = new Map();
+  for (const p of lieux) {
+    const clef = themeNow(p) + "|" + p.tier;
+    if (!lots.has(clef)) lots.set(clef, []);
+    lots.get(clef).push(p);
+  }
+  const rang = new Map();
+  for (const lot of lots.values()) {
+    lot.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+    lot.forEach((p, i) => rang.set(p.id, i));
+  }
+  return lieux.slice().sort((a, b) =>
+    (a.national === b.national ? 0 : a.national ? -1 : 1)
+    || a.tier - b.tier
+    || rang.get(a.id) - rang.get(b.id)
+    || b.score - a.score
+    || a.name.localeCompare(b.name));
 }
 
 function card(p) {

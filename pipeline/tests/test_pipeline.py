@@ -2216,29 +2216,23 @@ class TestTierChanges(unittest.TestCase):
         self.assertIn('value="bouge"', body)
         self.assertIn("descendu depuis ta dernière revue", body)
 
-    def test_the_page_alternates_themes_instead_of_stacking_them(self):
+    def test_the_page_alternates_themes_after_filtering(self):
         # Rangées par identifiant, les abbayes ouvraient chaque niveau — deux
-        # cents d'affilée avant la première cathédrale — et la revue paraissait
-        # interminable alors qu'elles ne font que six pour cent du catalogue.
-        places = []
-        for rang, theme in enumerate(("abbayes", "cathedrales", "chateaux")):
-            for i in range(12):
-                places.append(make_place(
-                    f"{theme} {i}", theme=theme, sitelinks=40 - i,
-                    lat=45 + rang + i * 0.1, lon=2.0,
-                    wikidata_id=f"Q{rang}{i:02d}"))
-        score_all(places, CONFIG)
+        # cents d'affilée avant la première cathédrale. Rangées par rang dans
+        # leur thème, les lieux déjà décidés laissaient des trous et seuls les
+        # petits thèmes défilaient. L'alternance doit donc se calculer sur ce
+        # qui est RÉELLEMENT affiché, donc après le filtre, donc dans la page.
         with _capture():
+            places = self._catalogue()
             _retained, collections = build_all(places, CONFIG)
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "review.html"
             write_review_html(places, collections, CONFIG, path)
             body = path.read_text(encoding="utf-8")
-        lignes = json.loads(
-            re.search(r"const DATA = (\[.*?\]);\n", body, re.S).group(1)
-        )
-        tetes = [ligne["themeId"] for ligne in lignes[:3]]
-        self.assertEqual(len(set(tetes)), 3)
+        self.assertIn("function alterner(lieux)", body)
+        self.assertIn("return alterner(retenus);", body)
+        # Les sosies gardent leur propre tri : une paire ne se juge qu'entière.
+        self.assertIn('if (state === "sosie") {', body)
 
     def test_the_page_carries_the_decisions_already_taken(self):
         # La mémoire de la curation vit dans `decisions.csv`, versionné. Si elle
