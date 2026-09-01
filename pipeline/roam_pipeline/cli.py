@@ -409,7 +409,14 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
         candidates = [s for s in candidates if guess_theme(s.tags) in vises]
     confident = [site for site in candidates if is_confident(site, sans_portes)]
     retained = candidates if args.all else confident
-    out_path = args.out / "candidates.csv"
+    # Une collecte restreinte écrit dans SA feuille. La feuille complète coûte
+    # vingt minutes de requêtes Overpass et porte les seuls faits de terrain du
+    # catalogue — horaires, tarifs, accès refusé ; l'écraser avec le résultat
+    # d'un essai sur un thème la détruirait sans un mot, et `discover --only
+    # cascades` l'a bel et bien ramenée à sa seule ligne d'en-tête.
+    out_path = args.out / (
+        f"candidates-{'-'.join(sorted(vises))}.csv" if vises else "candidates.csv"
+    )
     with out_path.open("w", encoding="utf-8", newline="") as fh:
         writer = csv.writer(fh)
         # Les trois premières colonnes se recopient telles quelles dans

@@ -52,3 +52,7 @@ dist/
 .env
 .env.local
 .DS_Store
+# Feuilles d'un essai restreint (`discover --only`). La feuille complète,
+# elle, est versionnée : elle coûte vingt minutes de requêtes Overpass et
+# porte les seuls faits de terrain du catalogue.
+pipeline/data/out/candidates-*.csv

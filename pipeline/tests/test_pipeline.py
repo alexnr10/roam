@@ -3586,6 +3586,22 @@ class TestNatureCandidates(unittest.TestCase):
         self.assertEqual(guess_theme({"waterway": "waterfall"}), "cascades")
         self.assertEqual(guess_theme({"natural": "waterfall"}), "cascades")
 
+    def test_a_narrowed_run_writes_its_own_sheet(self):
+        # La feuille complète coûte vingt minutes de requêtes Overpass et porte
+        # les seuls faits de terrain du catalogue. `discover --only cascades`
+        # l'a ramenée à sa seule ligne d'en-tête.
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            complete = out / "candidates.csv"
+            complete.write_text("wikidata_id,theme_id\nQ1,musees\n", encoding="utf-8")
+            args = argparse.Namespace(out=out, only="cascades")
+            vises = {t.strip() for t in (args.only or "").split(",") if t.strip()}
+            chemin = out / (f"candidates-{'-'.join(sorted(vises))}.csv"
+                            if vises else "candidates.csv")
+            self.assertNotEqual(chemin, complete)
+            self.assertEqual(chemin.name, "candidates-cascades.csv")
+            self.assertIn("Q1", complete.read_text(encoding="utf-8"))
+
     def test_a_theme_with_no_osm_tag_yields_nothing(self):
         # Les sommets sont mieux servis par Wikidata et ne sont pas demandés à
         # Overpass. La commande doit le dire plutôt que rendre zéro résultat.
