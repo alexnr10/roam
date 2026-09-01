@@ -199,13 +199,26 @@ themes:
     radius_m: 120
     min_sitelinks: 12
     fetch_min_sitelinks: 4
-    cap: 50
+    # Le thème le plus embouteillé du catalogue : 274 candidats se
+    # présentaient pour 50 places, si bien que chaque redressement vers les
+    # musées en éjectait un autre en silence — le château de Guédelon et
+    # l'hôtel-Dieu de Carpentras sont sortis sans qu'aucune décision ne les
+    # vise.
+    cap: 80
     # Diversité géographique : soixante-douze musées sur deux cent quatre-vingt-cinq sont parisiens.
     # Ce n'est pas un fait de géographie mais un fait d'écriture — les
     # volcans sont vraiment en Auvergne, les ponts ne sont pas vraiment à
     # Paris. Les thèmes que la géographie concentre pour de bon (volcans,
     # phares, grottes, cascades) n'ont donc pas de quota.
-    max_per_departement: 12
+    #
+    # Abaissé de 12 à 8, la valeur des autres thèmes concentrés par
+    # l'écriture. C'est le levier OBJECTIF contre l'embouteillage parisien :
+    # il ne demande à personne de trancher entre un musée d'art moderne et un
+    # musée des sciences — question de goût, sur laquelle un seul avis ne
+    # peut pas faire loi — mais seulement de ne pas laisser une ville occuper
+    # le quart de la collection. Paris passe de 23 % à 10 %, et la collection
+    # de 23 à 36 départements représentés.
+    max_per_departement: 8
     wikidata_classes: [Q33506, Q207694]              # musée, musée d'art
     # « musée d'art » devrait être une sous-classe de « musée » et remonter
     # toute seule ; dans les faits elle ne le fait pas, et `gaps` a compté 55

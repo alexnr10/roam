@@ -3357,6 +3357,46 @@ class TestThinDepartements(unittest.TestCase):
         self.assertEqual(self._repecher(au_dessus, sous, cible=0), au_dessus)
 
 
+class TestRethemeLosses(unittest.TestCase):
+    """Ranger un lieu ailleurs peut le faire DISPARAÎTRE.
+
+    Le nouveau thème a son plancher et ses voisins. Les arènes d'Arles,
+    passées de `monuments` à `megalithes`, se sont retrouvées à vingt-deux
+    mètres de « Monuments romains et romans d'Arles » — une inscription
+    UNESCO, pas une visite — qui score plus haut et les a évincées. C'est le
+    seul geste de la revue dont l'effet peut être destructeur sans être
+    visible.
+    """
+
+    def test_a_retheme_can_remove_a_place_from_the_catalogue(self):
+        from roam_pipeline.collections import build_all
+        arenes = make_place("Arènes d'Arles", theme="monuments", sitelinks=20,
+                            lat=43.6777, lon=4.6310, wikidata_id="Q181189")
+        # Sur le catalogue réel la fiche UNESCO l'emportait à 126 contre 107,
+        # sur la longueur de l'article et non sur les langues (19 contre 20).
+        # Ici on lui donne l'avantage par les langues : ce qu'on verrouille est
+        # le mécanisme, pas la pondération.
+        unesco = make_place("Monuments romains et romans d'Arles",
+                            theme="megalithes", sitelinks=30,
+                            lat=43.6779, lon=4.6310, wikidata_id="Q1279597")
+        autres = [make_place(f"Menhir {i}", theme="megalithes", sitelinks=15,
+                             lat=44 + i * 0.1, lon=3.0, wikidata_id=f"Q90{i}")
+                  for i in range(10)]
+        assemblee = [arenes, unesco, *autres]
+        score_all(assemblee, CONFIG)
+
+        with _capture():
+            avant, _ = build_all(assemblee, CONFIG)
+        self.assertIn("Q181189", {p.wikidata_id for p in avant})
+
+        # Le même catalogue, les arènes rangées en mégalithes.
+        arenes.theme_id = "megalithes"
+        with _capture():
+            apres, _ = build_all(assemblee, CONFIG)
+        self.assertNotIn("Q181189", {p.wikidata_id for p in apres})
+        self.assertIn("Q1279597", {p.wikidata_id for p in apres})
+
+
 class TestPromoteAgainstTheCap(unittest.TestCase):
     """L'appartenance se décidait avant que le niveau n'existe.
 

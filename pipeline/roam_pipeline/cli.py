@@ -18,7 +18,7 @@ from typing import Any
 from pathlib import Path
 
 from . import wikidata as wd
-from .collections import build_all
+from .collections import DUPLICATE_DISTANCE_M, build_all, haversine_m
 from .config import CONFIG_DIR, Config, load_config
 from .export import (
     review_state,
@@ -1435,6 +1435,93 @@ def cmd_rename(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def cmd_pertes(args: argparse.Namespace, config: Config) -> int:
+    """Quels redressements de thème ont fait DISPARAÎTRE un lieu ?
+
+    Ranger un lieu ailleurs, c'est le soumettre au plancher de son nouveau
+    thème et le mettre en concurrence avec de nouveaux voisins. Les arènes
+    d'Arles, passées de `monuments` à `megalithes`, se sont retrouvées à
+    vingt-deux mètres de la fiche « Monuments romains et romans d'Arles » —
+    une inscription UNESCO, pas une visite — qui score plus haut et les a
+    évincées. Vingt langues, un des monuments les plus fréquentés de France,
+    disparu du catalogue sans un mot.
+
+    C'est le seul geste de la revue dont l'effet peut être destructeur sans
+    être visible : un `drop` retire un lieu et le curateur le sait.
+
+    Deux constructions, avec et sans `themes.csv`, et la comparaison nomme le
+    rival qui a gagné la place.
+    """
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `sync` ou `fetch`.", file=sys.stderr)
+        return 1
+
+    themes = read_themes(args.manual / "themes.csv")
+    if not themes:
+        print("Aucun redressement de thème enregistré.")
+        return 0
+
+    decisions = read_decisions(args.manual / "decisions.csv")
+    valides = {theme.id for theme in config.themes}
+
+    def construire(avec_themes):
+        places = _load_places(raw_path)
+        apply_names(places, read_names(args.manual / "names.csv"))
+        places, _ = apply_themes(places, themes if avec_themes else {}, valides)
+        scored = score_all(places, config)
+        kept, _counts = apply_decisions(scored, decisions)
+        score_all(kept, config)
+        with _silence():
+            retenus, _collections = build_all(kept, config)
+        return {p.wikidata_id: p for p in retenus}, {p.wikidata_id: p for p in kept}
+
+    apres, candidats = construire(True)
+    avant, _ = construire(False)
+
+    perdus = [qid for qid in themes if qid in avant and qid not in apres]
+    if not perdus:
+        print(f"{len(themes)} redressements, aucun n'écarte de lieu du catalogue.")
+        return 0
+
+    print(f"{len(themes)} redressements, dont {len(perdus)} qui ÉCARTENT le lieu "
+          f"du catalogue :\n")
+    for qid in sorted(perdus, key=lambda q: -avant[q].score):
+        perdu = candidats.get(qid) or avant[qid]
+        theme_avant = avant[qid].theme_id
+        theme_apres = themes[qid][0]
+        print(f"  {perdu.name}  ({perdu.sitelinks} langues, score "
+              f"{perdu.score:.0f})")
+        print(f"      {theme_avant} → {theme_apres}")
+        # Le rival : le lieu du NOUVEAU thème, à portée de dédoublonnage, qui
+        # est resté. C'est presque toujours lui la cause.
+        rivaux = [
+            place for place in apres.values()
+            if place.theme_id == theme_apres
+            and haversine_m(perdu.lat, perdu.lon, place.lat, place.lon)
+            < DUPLICATE_DISTANCE_M
+        ]
+        if rivaux:
+            for rival in sorted(rivaux, key=lambda p: -p.score):
+                distance = haversine_m(perdu.lat, perdu.lon, rival.lat, rival.lon)
+                print(f"      évincé par « {rival.name} » à {distance:.0f} m "
+                      f"(score {rival.score:.0f})")
+        else:
+            plancher = config.theme(theme_apres).min_sitelinks
+            if perdu.sitelinks < plancher:
+                print(f"      sous le plancher de {theme_apres} "
+                      f"({perdu.sitelinks} langues pour {plancher})")
+            else:
+                print("      cause à chercher : `explain` donnera l'étape")
+        print()
+
+    print("Trois issues, au choix :")
+    print("    retheme <Q-id> --clear        revenir au rattachement d'avant")
+    print("    decisions.csv : drop <rival>  écarter la fiche qui a gagné")
+    print("    places.csv : épingler         le lieu passe outre le plancher")
+    return 0
+
+
 def cmd_adjustments(args: argparse.Namespace, config: Config) -> int:
     """Audite les `promote` et `demote` : lesquels ne produisent rien ?
 
@@ -2369,6 +2456,9 @@ def build_parser() -> argparse.ArgumentParser:
     fusion.add_argument("files", nargs="*", type=Path,
                         help="fichiers à fusionner ; par défaut ceux de data/manual")
 
+    sub.add_parser(
+        "pertes", help="quels redressements de thème écartent un lieu du catalogue")
+
     retheme = sub.add_parser(
         "retheme", help="rattache un lieu au thème choisi par le curateur")
     retheme.add_argument("wikidata_id", nargs="?")
@@ -2421,6 +2511,7 @@ def main(argv: list[str] | None = None) -> int:
         "review": cmd_review,
         "sync": cmd_sync,
         "retheme": cmd_retheme,
+        "pertes": cmd_pertes,
         "merge": cmd_merge,
         "weigh": cmd_weigh,
         "adjustments": cmd_adjustments,
