@@ -332,7 +332,8 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     se visite-t-il, et que manque-t-il au catalogue.
     """
     from .discover import (
-        apply_visit_info, find_candidates, guess_theme, is_confident, keep_in_france,
+        THEME_BY_TAG, apply_visit_info, find_candidates, guess_theme, is_confident,
+        keep_in_france, tag_filters_for,
     )
     from .geocode import departements_for
     from .overpass import PROBE_CELL, OverpassClient, cells
@@ -351,11 +352,33 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
               "n'a pas été résolue par Overpass. Collecte interrompue.", file=sys.stderr)
         return 1
 
+    vises = {t.strip() for t in (args.only or "").split(",") if t.strip()}
+    inconnus = vises - {theme.id for theme in config.themes}
+    if inconnus:
+        print(f"Thème(s) inconnu(s) : {', '.join(sorted(inconnus))}", file=sys.stderr)
+        return 1
+    tags = tag_filters_for(vises) if vises else None
+    if vises:
+        # Un thème sans tag dans la table ne produirait rien, et le silence
+        # passerait pour un résultat : « aucune cascade trouvée » et « on n'a
+        # jamais demandé les cascades » se ressemblent trop.
+        couverts = {t for _k, _v, t in THEME_BY_TAG}
+        muets = sorted(vises - couverts)
+        if muets:
+            print(f"⚠ aucun tag OpenStreetMap ne correspond à {', '.join(muets)} — "
+                  "ce(s) thème(s) ne seront pas cherchés.", file=sys.stderr)
+    if vises and not tags:
+        print(f"Aucun tag OpenStreetMap ne correspond à {', '.join(sorted(vises))} — "
+              "la table des correspondances est dans discover.THEME_BY_TAG.",
+              file=sys.stderr)
+        return 1
+
     grid = list(cells())
-    print(f"Interrogation d'OpenStreetMap : {len(grid)} cellules, compte ~{len(grid) // 4} min.")
+    print(f"Interrogation d'OpenStreetMap : {len(grid)} cellules, compte ~{len(grid) // 4} min."
+          + (f"\nRestreinte à {', '.join(sorted(vises))}." if vises else ""))
     osm = []
     for index, cell in enumerate(grid, start=1):
-        found = client.fetch_cell(cell)
+        found = client.fetch_cell(cell, tags)
         osm.extend(found)
         LOG.info("cellule %s/%s : %s sites (%s au total)", index, len(grid), len(found), len(osm))
 
@@ -364,8 +387,13 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
         return 1
 
     places = _load_places(raw_path)
-    apply_visit_info(places, osm)
-    _save_raw(args, places)
+    # Une collecte restreinte ne doit PAS réécrire l'ouverture au public : elle
+    # n'a vu qu'une catégorie d'objets, et un lieu du catalogue rapproché d'une
+    # cascade voisine perdrait les horaires qu'une collecte complète lui avait
+    # trouvés.
+    if not vises:
+        apply_visit_info(places, osm)
+        _save_raw(args, places)
 
     # Les thèmes sans portes ne peuvent pas produire de site « géré » : là,
     # un lien encyclopédique tient lieu de preuve.
@@ -375,7 +403,9 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     # collecte déborde sur les pays voisins, et une zone mal résolue par un
     # miroir Overpass repeuplerait la feuille de musées bâlois ou milanais.
     candidates = keep_in_france(candidates, departements_for)
-    confident = [site for site in candidates if is_confident(site)]
+    if vises:
+        candidates = [s for s in candidates if guess_theme(s.tags) in vises]
+    confident = [site for site in candidates if is_confident(site, sans_portes)]
     retained = candidates if args.all else confident
     out_path = args.out / "candidates.csv"
     with out_path.open("w", encoding="utf-8", newline="") as fh:
@@ -403,13 +433,21 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
 
     ready = sum(1 for s in retained[: args.limit] if s.wikidata_id)
     print(f"\n{len(osm)} sites lus sur OpenStreetMap.")
-    print(f"{len(candidates)} en France et absents du catalogue, dont {len(confident)} avec un signe "
-          f"d'accueil du public ET un lien encyclopédique.")
+    # Le critère n'est pas le même partout, et l'annoncer faux vaut moins que
+    # ne rien annoncer : sur un thème sans portes, une fiche Wikidata suffit.
+    preuve = ("une fiche Wikidata" if vises and vises <= sans_portes
+              else "un signe d'accueil du public ET un lien encyclopédique")
+    print(f"{len(candidates)} en France et absents du catalogue, "
+          f"dont {len(confident)} avec {preuve}.")
     print(f"{min(len(retained), args.limit)} écrits dans {out_path}, "
           f"dont {ready} directement recopiables dans data/manual/places.csv.")
     if not args.all and len(candidates) > len(confident):
         print(f"Ajoute --all pour voir les {len(candidates) - len(confident)} autres.")
-    print("Relance `build` pour tenir compte de l'ouverture au public.")
+    if vises:
+        print("Collecte restreinte : l'ouverture au public du catalogue n'a PAS été "
+              "mise à jour.")
+    else:
+        print("Relance `build` pour tenir compte de l'ouverture au public.")
     return 0
 
 
@@ -2438,6 +2476,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--all",
         action="store_true",
         help="inclure les candidats moins sûrs (sans lien encyclopédique)",
+    )
+    discover.add_argument(
+        "--only", metavar="THÈMES",
+        help="ne demander à Overpass que les tags de ces thèmes, séparés par des "
+             "virgules (ex. cascades). Vérifier une hypothèse sur les cascades ne "
+             "demande pas de rapporter neuf cents musées. L'ouverture au public du "
+             "catalogue n'est alors PAS mise à jour : la collecte n'a vu qu'une "
+             "catégorie d'objets.",
     )
 
     adopt = sub.add_parser(

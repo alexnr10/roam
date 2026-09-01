@@ -105,6 +105,22 @@ def names_match(left: str, right: str) -> bool:
     return bool(distinctive_a & distinctive_b)
 
 
+def tag_filters_for(theme_ids: set[str]) -> list[str]:
+    """Filtres Overpass qui correspondent à ces thèmes, et à eux seuls.
+
+    Dérivés de `THEME_BY_TAG` pour qu'il n'y ait qu'une table à tenir : ce que
+    la requête demande et ce que `guess_theme` sait reconnaître ne peuvent pas
+    diverger.
+    """
+    par_cle: dict[str, list[str]] = {}
+    for key, value, theme_id in THEME_BY_TAG:
+        if theme_id in theme_ids:
+            par_cle.setdefault(key, []).append(value)
+    return [
+        f'{key}~"^({"|".join(values)})$"' for key, values in sorted(par_cle.items())
+    ]
+
+
 def guess_theme(tags: dict[str, str]) -> str | None:
     """Thème Roam le plus plausible pour un objet OpenStreetMap."""
     for key, value, theme_id in THEME_BY_TAG:
@@ -320,7 +336,7 @@ def keep_in_france(
     return kept
 
 
-def is_confident(site: OsmPlace) -> bool:
+def is_confident(site: OsmPlace, sans_portes: set[str] | None = None) -> bool:
     """Candidat assez solide pour être proposé sans réserve.
 
     Un site web ne prouve pas grand-chose — beaucoup de lieux privés en ont un.
@@ -328,7 +344,13 @@ def is_confident(site: OsmPlace) -> bool:
     encyclopédique dit qu'il y a quelque chose à voir. Les deux ensemble
     décrivent exactement ce qui manquait au catalogue : très visité, peu
     documenté par les classes Wikidata.
+
+    Sur un thème sans portes, exiger des horaires reviendrait à n'avoir jamais
+    aucun candidat sûr — et une collecte de vingt minutes rendrait une feuille
+    vide. La fiche Wikidata y suffit, comme pour l'admission.
     """
+    if guess_theme(site.tags) in (sans_portes or set()):
+        return bool(site.wikidata_id)
     return bool((site.opening_hours or site.fee) and (site.wikidata_id or site.wikipedia))
 
 

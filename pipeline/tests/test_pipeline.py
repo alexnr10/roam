@@ -59,8 +59,8 @@ from roam_pipeline.cli import (
     empty_themes,
 )
 from roam_pipeline.wikipedia import title_from_url
-from roam_pipeline.discover import _atteste
-from roam_pipeline.overpass import OsmPlace
+from roam_pipeline.discover import _atteste, is_confident, tag_filters_for
+from roam_pipeline.overpass import OsmPlace, cell_query
 from roam_pipeline.wikidata import (
     class_ancestry_query, class_census_query, class_members_query,
     class_thresholds_query, probe_query, visitors_query,
@@ -3497,6 +3497,30 @@ class TestNatureCandidates(unittest.TestCase):
     def test_a_waterfall_without_any_source_is_refused(self):
         # Sinon tout ruisseau cartographié entrerait dans la feuille.
         self.assertFalse(_atteste(self._site(), self.SANS_PORTES))
+
+    def test_a_waterfall_is_a_confident_candidate(self):
+        # Sans cela, une collecte restreinte aux cascades rendrait une feuille
+        # VIDE : `is_confident` exigeait des horaires, et vingt minutes de
+        # requêtes n'auraient rien produit.
+        self.assertTrue(is_confident(self._site(wikidata_id="Q1"), self.SANS_PORTES))
+        self.assertFalse(is_confident(self._site(), self.SANS_PORTES))
+
+    def test_the_query_can_be_narrowed_to_one_theme(self):
+        filtres = tag_filters_for({"cascades"})
+        self.assertEqual(filtres, ['natural~"^(waterfall)$"'])
+        requete = cell_query((45.0, 2.0, 45.5, 2.5), tags=filtres)
+        clauses = [l for l in requete.splitlines() if "nwr" in l]
+        self.assertEqual(len(clauses), 1)
+        self.assertIn("waterfall", clauses[0])
+        # Sans restriction, les quatre catégories sont demandées.
+        self.assertEqual(
+            len([l for l in cell_query((45.0, 2.0, 45.5, 2.5)).splitlines()
+                 if "nwr" in l]), 4)
+
+    def test_a_theme_with_no_osm_tag_yields_nothing(self):
+        # Les sommets sont mieux servis par Wikidata et ne sont pas demandés à
+        # Overpass. La commande doit le dire plutôt que rendre zéro résultat.
+        self.assertEqual(tag_filters_for({"sommets"}), [])
 
     def test_a_gated_theme_still_needs_to_be_managed(self):
         # Un musée sans horaires ni site web reste un point d'intérêt : la

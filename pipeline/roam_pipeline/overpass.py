@@ -124,16 +124,24 @@ def cells(bbox: tuple[float, float, float, float] = FRANCE_BBOX, size: float = C
         lat += size
 
 
-def cell_query(cell: tuple[float, float, float, float], timeout_s: int = 180) -> str:
+def cell_query(
+    cell: tuple[float, float, float, float],
+    timeout_s: int = 180,
+    tags: list[str] | None = None,
+) -> str:
     """Requête Overpass pour une cellule.
 
     Seuls les objets NOMMÉS sont demandés : un site de visite sans nom n'est
     pas exploitable, et l'écarter tôt divise le volume par plusieurs. Et seuls
     ceux qui tombent en France : la cellule découpe, la zone délimite.
+
+    `tags` restreint la requête. Vérifier une hypothèse sur les cascades ne
+    demande pas de rapporter neuf cents musées : la question se juge sur trente
+    lignes, pas sur mille.
     """
     box = f"{cell[0]},{cell[1]},{cell[2]},{cell[3]}"
     clauses = "\n  ".join(
-        f'nwr[{tag}]["name"](area.fr)({box});' for tag in TAG_FILTERS
+        f'nwr[{tag}]["name"](area.fr)({box});' for tag in (tags or TAG_FILTERS)
     )
     return f"""[out:json][timeout:{timeout_s}];
 {FRANCE_AREA}
@@ -161,14 +169,17 @@ class OverpassClient:
             time.sleep(self.min_interval_s - elapsed)
         self._last_call = time.monotonic()
 
-    def fetch_cell(self, cell: tuple[float, float, float, float]) -> list[OsmPlace]:
+    def fetch_cell(
+        self, cell: tuple[float, float, float, float], tags: list[str] | None = None
+    ) -> list[OsmPlace]:
         delay = 5.0
         for attempt in range(1, self.max_retries + 1):
             self._throttle()
             endpoint = ENDPOINTS[self._endpoint % len(ENDPOINTS)]
             try:
                 response = self._session.post(
-                    endpoint, data={"data": cell_query(cell)}, timeout=self.timeout_s
+                    endpoint, data={"data": cell_query(cell, tags=tags)},
+                    timeout=self.timeout_s
                 )
             except requests.RequestException as exc:
                 LOG.warning("Overpass %s : %s", endpoint, exc)
