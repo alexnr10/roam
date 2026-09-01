@@ -1923,6 +1923,87 @@ def cmd_merge(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def cmd_pin(args: argparse.Namespace, config: Config) -> int:
+    """Épingle un lieu déjà collecté : il passe outre les planchers.
+
+    `places.csv` désigne les lieux à ALLER CHERCHER, et n'est lu que par
+    `fetch`. Y inscrire un lieu déjà collecté ne produit donc rien tant qu'on
+    ne relance pas une demi-heure de collecte — le drapeau `pinned` vit dans
+    `data/raw/`, pas dans la feuille.
+
+    Cette commande le pose directement, comme `rename` pose un nom et
+    `retheme` un rattachement. Le lieu franchit alors le plancher de notoriété
+    ET le filtre alpin, et il l'emporte dans l'arbitrage entre thèmes.
+
+    La ligne est aussi ajoutée à `places.csv` : sans elle, la prochaine
+    collecte complète écraserait le drapeau sans un mot.
+    """
+    from .raw import read_raw, shard_of, shards, write_raw
+
+    qid = (args.wikidata_id or "").strip()
+    if not qid.startswith("Q") or not qid[1:].isdigit():
+        print(f"« {qid} » n'est pas un identifiant Wikidata.", file=sys.stderr)
+        return 1
+
+    places = read_raw(args.raw)
+    if not places:
+        print(f"{args.raw} vide — lance d'abord `fetch` puis `sync`.", file=sys.stderr)
+        return 1
+
+    vises = [place for place in places if place.wikidata_id == qid]
+    if not vises:
+        print(f"{qid} n'est pas dans la collecte. Pour l'y faire entrer, "
+              f"inscris-le dans {args.manual / 'places.csv'} puis relance "
+              "`fetch`.", file=sys.stderr)
+        return 1
+
+    if args.theme:
+        if args.theme not in {theme.id for theme in config.themes}:
+            print(f"Thème inconnu : {args.theme}. Thèmes valides : "
+                  + ", ".join(t.id for t in config.themes), file=sys.stderr)
+            return 1
+        vises = [place for place in vises if place.theme_id == args.theme] or vises
+
+    if args.clear:
+        touches = [place for place in vises if place.pinned]
+        for place in touches:
+            place.pinned = False
+        if not touches:
+            print(f"{qid} n'était pas épinglé.")
+            return 0
+    else:
+        touches = [place for place in vises if not place.pinned]
+        for place in touches:
+            place.pinned = True
+        if not touches:
+            print(f"{qid} était déjà épinglé ({vises[0].name}).")
+            return 0
+
+    # `replacing` désigne les FICHIERS à réécrire, pas les thèmes. Épingler
+    # déplace le lieu vers la réserve des ajouts — c'est la règle de
+    # `shard_of` — et ne nommer que les thèmes le retirait de son fichier sans
+    # jamais l'écrire ailleurs : le lieu disparaissait de la collecte.
+    write_raw(args.raw, places,
+              set(shards(args.raw)) | {shard_of(place) for place in places})
+    verbe = "désépinglé" if args.clear else "épinglé"
+    themes = ", ".join(sorted({place.theme_id for place in touches}))
+    print(f"{vises[0].name} ({qid}) {verbe} dans {themes}.")
+
+    if not args.clear:
+        liste = args.manual / "places.csv"
+        contenu = liste.read_bytes() if liste.exists() else b""
+        if qid.encode() not in contenu:
+            fin = b"" if contenu.endswith((b"\n", b"")) else b"\n"
+            note = (args.note or "epingle a la main").replace(",", " ")
+            ligne = f"{qid},{touches[0].theme_id},{note}\n".encode()
+            with liste.open("ab") as fh:
+                fh.write(fin + ligne)
+            print(f"Inscrit dans {liste} — sans quoi la prochaine collecte "
+                  "complète effacerait le drapeau.")
+    print("Relance `build` pour en tenir compte.")
+    return 0
+
+
 def cmd_retheme(args: argparse.Namespace, config: Config) -> int:
     """Rattache un lieu au thème que le curateur juge juste.
 
@@ -2633,6 +2714,13 @@ def build_parser() -> argparse.ArgumentParser:
     fusion.add_argument("files", nargs="*", type=Path,
                         help="fichiers à fusionner ; par défaut ceux de data/manual")
 
+    epingle = sub.add_parser(
+        "pin", help="épingle un lieu déjà collecté : il passe outre les planchers")
+    epingle.add_argument("wikidata_id")
+    epingle.add_argument("--theme", help="n'épingler que ce rattachement")
+    epingle.add_argument("--note", help="pourquoi cet épinglage")
+    epingle.add_argument("--clear", action="store_true", help="retirer l'épinglage")
+
     sub.add_parser(
         "pertes", help="quels redressements de thème écartent un lieu du catalogue")
 
@@ -2688,6 +2776,7 @@ def main(argv: list[str] | None = None) -> int:
         "review": cmd_review,
         "sync": cmd_sync,
         "retheme": cmd_retheme,
+        "pin": cmd_pin,
         "pertes": cmd_pertes,
         "merge": cmd_merge,
         "weigh": cmd_weigh,

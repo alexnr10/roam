@@ -55,7 +55,7 @@ from roam_pipeline.fetch import (
 )
 from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from_insee
 from roam_pipeline.cli import (
-    _known_qids, _pending_terms, _probe_verdict, census, cmd_retention,
+    _known_qids, _pending_terms, _probe_verdict, census, cmd_pin, cmd_retention,
     empty_themes,
 )
 from roam_pipeline.wikipedia import title_from_url
@@ -3364,6 +3364,65 @@ class TestThinDepartements(unittest.TestCase):
         au_dessus = [self._lieu("Gardé", "23", 20)]
         sous = [self._lieu("Sous le plancher", "23", 3)]
         self.assertEqual(self._repecher(au_dessus, sous, cible=0), au_dessus)
+
+
+class TestPin(unittest.TestCase):
+    """`places.csv` désigne les lieux à ALLER CHERCHER, et n'est lu que par
+    `fetch`. Y inscrire un lieu déjà collecté ne produit rien tant qu'on ne
+    relance pas une demi-heure de collecte : le drapeau vit dans `data/raw/`.
+    """
+
+    def _run(self, brut, qid, **extra):
+        with tempfile.TemporaryDirectory() as tmp:
+            racine = Path(tmp)
+            (racine / "raw").mkdir()
+            (racine / "manual").mkdir()
+            write_raw(racine / "raw", brut, {p.theme_id for p in brut})
+            args = argparse.Namespace(
+                raw=racine / "raw", manual=racine / "manual", wikidata_id=qid,
+                theme=extra.get("theme"), note=extra.get("note"),
+                clear=extra.get("clear", False))
+            sortie = StringIO()
+            with contextlib.redirect_stdout(sortie):
+                code = cmd_pin(args, CONFIG)
+            relu = read_raw(racine / "raw")
+            liste = racine / "manual" / "places.csv"
+            return code, sortie.getvalue(), relu, (
+                liste.read_text(encoding="utf-8") if liste.exists() else "")
+
+    def test_pinning_keeps_the_place_in_the_collection(self):
+        # Le lieu change de FICHIER en étant épinglé — c'est la règle de
+        # `shard_of`. Ne réécrire que les thèmes le retirait du sien sans
+        # jamais l'écrire ailleurs : il disparaissait de la collecte.
+        brut = [make_place(f"Sommet {i}", theme="sommets", wikidata_id=f"Q{i}")
+                for i in range(5)]
+        code, _texte, relu, liste = self._run(brut, "Q2")
+        self.assertEqual(code, 0)
+        self.assertEqual(len(relu), 5)
+        vise = [p for p in relu if p.wikidata_id == "Q2"]
+        self.assertEqual([p.pinned for p in vise], [True])
+        self.assertIn("Q2", liste)
+
+    def test_an_unknown_place_is_refused(self):
+        brut = [make_place("Sommet", theme="sommets", wikidata_id="Q1")]
+        code, texte, _relu, _liste = self._run(brut, "Q404")
+        self.assertEqual(code, 1)
+
+    def test_clearing_gives_the_flag_back(self):
+        brut = [make_place("Sommet", theme="sommets", wikidata_id="Q1")]
+        with tempfile.TemporaryDirectory() as tmp:
+            racine = Path(tmp)
+            (racine / "raw").mkdir()
+            (racine / "manual").mkdir()
+            write_raw(racine / "raw", brut, {"sommets"})
+            base = argparse.Namespace(raw=racine / "raw", manual=racine / "manual",
+                                      wikidata_id="Q1", theme=None, note=None)
+            with contextlib.redirect_stdout(StringIO()):
+                cmd_pin(argparse.Namespace(**vars(base), clear=False), CONFIG)
+                cmd_pin(argparse.Namespace(**vars(base), clear=True), CONFIG)
+            relu = read_raw(racine / "raw")
+        self.assertEqual(len(relu), 1)
+        self.assertFalse(relu[0].pinned)
 
 
 class TestRethemeLosses(unittest.TestCase):
