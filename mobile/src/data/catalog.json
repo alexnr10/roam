@@ -25072,6 +25072,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pont_d%27Arcole"
   },
   {
+   "id": "Q1646064",
+   "slug": "abbaye-de-clermont",
+   "name": "Abbaye de Clermont",
+   "themeId": "abbayes",
+   "lat": 48.098056,
+   "lon": -0.934167,
+   "radiusM": 150,
+   "score": 80.2,
+   "departement": "Mayenne",
+   "departementCode": "53",
+   "regionCode": "52",
+   "communeCode": "53169",
+   "communeName": "Olivet",
+   "summary": "L'abbaye Notre-Dame de Clermont (ou de Clairmont) est une ancienne abbaye cistercienne située à quatre kilomètres du bourg d’Olivet dans le département de la Mayenne. Elle a été fondée en 1150 par Guy IV de Laval et fut longtemps la nécropole de la famille de Laval.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Clermont%20%28Olivet%29%2C%20abbaye.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Clermont"
+  },
+  {
    "id": "Q1918916",
    "slug": "grotte-de-massabielle",
    "name": "Grotte de Massabielle",
@@ -25124,24 +25142,6 @@
    "summary": "La maison Pfister est un monument historique situé à Colmar, dans le département français du Haut-Rhin.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Maison%20Pfister%20Colmar%202011-04.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Maison_Pfister"
-  },
-  {
-   "id": "Q1646064",
-   "slug": "abbaye-de-clermont",
-   "name": "Abbaye de Clermont",
-   "themeId": "abbayes",
-   "lat": 48.098056,
-   "lon": -0.934167,
-   "radiusM": 150,
-   "score": 80.2,
-   "departement": "Mayenne",
-   "departementCode": "53",
-   "regionCode": "52",
-   "communeCode": "53169",
-   "communeName": "Olivet",
-   "summary": "L'abbaye Notre-Dame de Clermont (ou de Clairmont) est une ancienne abbaye cistercienne située à quatre kilomètres du bourg d’Olivet dans le département de la Mayenne. Elle a été fondée en 1150 par Guy IV de Laval et fut longtemps la nécropole de la famille de Laval.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Clermont%20%28Olivet%29%2C%20abbaye.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Clermont"
   },
   {
    "id": "Q2886926",
@@ -27376,42 +27376,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_du_papier_peint_de_Rixheim"
   },
   {
-   "id": "Q2820782",
-   "slug": "abbaye-notre-dame-des-fontenelles",
-   "name": "Abbaye Notre-Dame des Fontenelles",
-   "themeId": "abbayes",
-   "lat": 46.664279,
-   "lon": -1.486545,
-   "radiusM": 150,
-   "score": 77.5,
-   "departement": "Vendée",
-   "departementCode": "85",
-   "regionCode": "52",
-   "communeCode": "85191",
-   "communeName": "La Roche-sur-Yon",
-   "summary": "L'abbaye Notre-Dame des Fontenelles (latin Fontenellae, Fintanelum, Fontenacum ou encore Fontenaeum) est une ancienne abbaye augustinienne d'hommes située sur le territoire de la commune de Saint-André-d'Ornay (absorbée par La Roche-sur-Yon en 1964), dans le département français de la Vendée en région Pays de la Loire. C'est un monument gothique angevin.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Abbaye%20des%20Fontenelles%20%28vue%20d%27ensemble%29%20-%20La%20Roche-sur-Yon.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Notre-Dame_des_Fontenelles"
-  },
-  {
-   "id": "Q306107",
-   "slug": "abbaye-aux-bois",
-   "name": "Abbaye-aux-Bois",
-   "themeId": "abbayes",
-   "lat": 48.8522,
-   "lon": 2.3276,
-   "radiusM": 150,
-   "score": 77.4,
-   "departement": "Paris",
-   "departementCode": "75",
-   "regionCode": "11",
-   "communeCode": "75107",
-   "communeName": "Paris",
-   "summary": "L'abbaye-aux-Bois est un ancien couvent de Bernardines situé à Paris au 16, rue de Sèvres et au 11, rue de la Chaise dans le 7e arrondissement.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Abbaye-aux-Bois%20-%2001.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye-aux-Bois"
-  },
-  {
    "id": "Q3584450",
    "slug": "eglise-saint-sauveur-de-figeac",
    "name": "Église Saint-Sauveur de Figeac",
@@ -27610,24 +27574,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pont_levant_de_la_rue_de_Crim%C3%A9e"
   },
   {
-   "id": "Q1232140",
-   "slug": "abbaye-notre-dame-de-bonneval",
-   "name": "Abbaye Notre-Dame de Bonneval",
-   "themeId": "abbayes",
-   "lat": 44.562897,
-   "lon": 2.79387,
-   "radiusM": 150,
-   "score": 77.2,
-   "departement": "Aveyron",
-   "departementCode": "12",
-   "regionCode": "76",
-   "communeCode": "12064",
-   "communeName": "Le Cayrol",
-   "summary": "L'abbaye Notre-Dame de Bonneval est une abbaye cistercienne fondée en 1147, située sur la commune française du Cayrol dans le département de l’Aveyron, ainsi que dans le diocèse de Rodez.\nDes bâtiments primitifs, vendus comme bien national à la Révolution française, restent une partie de l'église, les bases des bâtiments claustraux, quelques pièces (sacristie, celliers, ancienne infirmerie, pièces autour du cloître), les pavillons d'entrée avec une statue de la Vierge à l'Enfant datant du XIIe siècle, le système d'adduction et d'évacuation des eaux, et les remparts (XIVe – XVIe siècle).",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Abbaye%20de%20Bonneval%20juin%202013.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Notre-Dame_de_Bonneval"
-  },
-  {
    "id": "Q1765935",
    "slug": "chateau-de-madrid",
    "name": "Château de Madrid",
@@ -27770,24 +27716,6 @@
    "summary": "Le musée des Beaux-Arts d'Agen est un des musées de la ville d'Agen, en Lot-et-Garonne (France).",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/%28Agen%29%20Mus%C3%A9e%20des%20Beaux-Arts%20vu%20de%20la%20place%20du%20Dr%20Esquirol.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_des_Beaux-Arts_d%27Agen"
-  },
-  {
-   "id": "Q661154",
-   "slug": "abbaye-de-villers-bettnach",
-   "name": "Abbaye de Villers-Bettnach",
-   "themeId": "abbayes",
-   "lat": 49.233747,
-   "lon": 6.361392,
-   "radiusM": 150,
-   "score": 77.1,
-   "departement": "Moselle",
-   "departementCode": "57",
-   "regionCode": "44",
-   "communeCode": "57612",
-   "communeName": "Saint-Hubert",
-   "summary": "L’abbaye de Villers-Bettnach est une ancienne abbaye cistercienne dont il reste encore quelques vestiges et ruines. Elle se trouve à Villers-Bettnach, petit village sur la commune de Saint-Hubert, en Moselle (France).",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Portail%20d%27entr%C3%A9e%20de%20l%27abbaye%20de%20Villers-Bettnach%2001.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Villers-Bettnach"
   },
   {
    "id": "Q13518426",
@@ -28204,24 +28132,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Maison_de_Georges_Clemenceau"
   },
   {
-   "id": "Q334221",
-   "slug": "abbaye-saint-vanne-de-verdun",
-   "name": "Abbaye Saint-Vanne de Verdun",
-   "themeId": "abbayes",
-   "lat": 49.159299,
-   "lon": 5.373419,
-   "radiusM": 150,
-   "score": 76.7,
-   "departement": "Meuse",
-   "departementCode": "55",
-   "regionCode": "44",
-   "communeCode": "55545",
-   "communeName": "Verdun",
-   "summary": "L'abbaye Saint-Vanne était une abbaye bénédictine située à Verdun, dans le département de la Meuse en région Grand Est.\nFondée en 952, l'abbaye devient sous l'abbatiat de Richard de Saint-Vanne, un foyer de la réforme monastique du XIe siècle en Lorraine.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Verdun%20vanne.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Saint-Vanne_de_Verdun"
-  },
-  {
    "id": "Q2968163",
    "slug": "chateau-d-augerville",
    "name": "Château d'Augerville",
@@ -28382,24 +28292,6 @@
    "summary": "La basilique Saint-Jean-Baptiste de Chaumont est le principal édifice religieux de la ville de Chaumont en France. De style gothique, la basilique catholique domine avec ses deux tours la partie la plus ancienne de la commune, située en bordure Nord-Ouest du plateau chaumontais.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Chaumont%20Basilique%20Saint%20Jean%20Baptiste.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Basilique_Saint-Jean-Baptiste_de_Chaumont"
-  },
-  {
-   "id": "Q2820618",
-   "slug": "abbaye-sainte-rictrude-et-saint-pierre-de-marchiennes",
-   "name": "Abbaye Sainte-Rictrude et Saint-Pierre de Marchiennes",
-   "themeId": "abbayes",
-   "lat": 50.40803,
-   "lon": 3.28105,
-   "radiusM": 150,
-   "score": 76.4,
-   "departement": "Nord",
-   "departementCode": "59",
-   "regionCode": "32",
-   "communeCode": "59375",
-   "communeName": "Marchiennes",
-   "summary": "L’abbaye de Marchiennes est une abbaye bénédictine située sur la Scarpe, à Marchiennes, dans le département du Nord (France) fondée vers 630, et qui resta active durant onze siècles. \nÀ l'origine de la naissance de la ville de Marchiennes, elle en fut le moteur économique, avant d’être fermée en 1791, durant la Révolution.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Abbaye%20Sainte-Rictrude%20et%20Saint-Pierre%20de%20Marchiennes.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Sainte-Rictrude_et_Saint-Pierre_de_Marchiennes"
   },
   {
    "id": "Q2415426",
@@ -28654,24 +28546,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Verrerie_de_Meisenthal"
   },
   {
-   "id": "Q964638",
-   "slug": "chateau-de-ripaille",
-   "name": "Château de Ripaille",
-   "themeId": "abbayes",
-   "lat": 46.3881,
-   "lon": 6.48667,
-   "radiusM": 150,
-   "score": 76.1,
-   "departement": "Haute-Savoie",
-   "departementCode": "74",
-   "regionCode": "84",
-   "communeCode": "74281",
-   "communeName": "Thonon-les-Bains",
-   "summary": "Le château de Ripaille est un ancien manoir de la fin du XIIIe siècle ou du début du XIVe siècle qui se dresse sur le territoire de la commune de Thonon-les-Bains, une commune française dans le département de la Haute-Savoie en région Auvergne-Rhône-Alpes.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Thonon-les-Bains%20Ripaille.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Ripaille"
-  },
-  {
    "id": "Q2942475",
    "slug": "cathedrale-sainte-croix-saint-jean-des-armeniens",
    "name": "Cathédrale Sainte-Croix-Saint-Jean-des-Arméniens",
@@ -28706,6 +28580,42 @@
    "summary": "Le château de la Caze est un château de style Renaissance, situé dans les gorges du Tarn, en Lozère, et aujourd'hui utilisé comme hôtel.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/FR-48-Ch%C3%A2teau%20de%20la%20Caze.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_la_Caze"
+  },
+  {
+   "id": "Q964638",
+   "slug": "chateau-de-ripaille",
+   "name": "Château de Ripaille",
+   "themeId": "chateaux",
+   "lat": 46.3881,
+   "lon": 6.48667,
+   "radiusM": 150,
+   "score": 76.1,
+   "departement": "Haute-Savoie",
+   "departementCode": "74",
+   "regionCode": "84",
+   "communeCode": "74281",
+   "communeName": "Thonon-les-Bains",
+   "summary": "Le château de Ripaille est un ancien manoir de la fin du XIIIe siècle ou du début du XIVe siècle qui se dresse sur le territoire de la commune de Thonon-les-Bains, une commune française dans le département de la Haute-Savoie en région Auvergne-Rhône-Alpes.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Thonon-les-Bains%20Ripaille.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Ripaille"
+  },
+  {
+   "id": "Q2970772",
+   "slug": "chateau-de-terre-neuve",
+   "name": "Château de Terre Neuve",
+   "themeId": "chateaux",
+   "lat": 46.4628,
+   "lon": -0.814722,
+   "radiusM": 200,
+   "score": 76.1,
+   "departement": "Vendée",
+   "departementCode": "85",
+   "regionCode": "52",
+   "communeCode": "85092",
+   "communeName": "Fontenay-le-Comte",
+   "summary": "Le château de Terre-Neuve est un château de la Renaissance situé à Fontenay-le-Comte. Il est le témoin du rayonnement économique et intellectuel du Bas-Poitou.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Ch%C3%A2teau%20de%20Terre%20Neuve.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Terre-Neuve"
   },
   {
    "id": "Q1798794",
@@ -28906,6 +28816,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Tour_Tanguy"
   },
   {
+   "id": "Q334150",
+   "slug": "abbaye-saint-jean-de-sorde",
+   "name": "Abbaye Saint-Jean de Sorde",
+   "themeId": "abbayes",
+   "lat": 43.528889,
+   "lon": -1.054722,
+   "radiusM": 150,
+   "score": 75.8,
+   "departement": "Landes",
+   "departementCode": "40",
+   "regionCode": "75",
+   "communeCode": "40306",
+   "communeName": "Sorde-l'Abbaye",
+   "summary": "L'abbaye Saint-Jean de Sorde est située dans la commune de Sorde-l'Abbaye, dans le département français des Landes. Il s'agit d'une ancienne abbaye bénédictine fondée au moins au Xe siècle (acte de donation daté de 975), dépendant du diocèse de Dax, et classée monument historique le 31 janvier 2008.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Sorde%201%20new.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Saint-Jean_de_Sorde"
+  },
+  {
    "id": "Q3078420",
    "slug": "forteresse-de-mornas",
    "name": "Forteresse de Mornas",
@@ -28958,24 +28886,6 @@
    "summary": "Le phare du Stiff est un des phares de l'île d'Ouessant en Finistère. Il fait l’objet d’un classement au titre des monuments historiques depuis le 12 juillet 2011.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Phare%20du%20Stiff-Ouessant.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Phare_du_Stiff"
-  },
-  {
-   "id": "Q334150",
-   "slug": "abbaye-saint-jean-de-sorde",
-   "name": "Abbaye Saint-Jean de Sorde",
-   "themeId": "abbayes",
-   "lat": 43.528889,
-   "lon": -1.054722,
-   "radiusM": 150,
-   "score": 75.8,
-   "departement": "Landes",
-   "departementCode": "40",
-   "regionCode": "75",
-   "communeCode": "40306",
-   "communeName": "Sorde-l'Abbaye",
-   "summary": "L'abbaye Saint-Jean de Sorde est située dans la commune de Sorde-l'Abbaye, dans le département français des Landes. Il s'agit d'une ancienne abbaye bénédictine fondée au moins au Xe siècle (acte de donation daté de 975), dépendant du diocèse de Dax, et classée monument historique le 31 janvier 2008.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Sorde%201%20new.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Saint-Jean_de_Sorde"
   },
   {
    "id": "Q2968762",
@@ -29284,24 +29194,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Notre-Dame-de-l%27Assomption_de_Ch%C3%A2tres"
   },
   {
-   "id": "Q3001695",
-   "slug": "couvent-des-cordeliers-de-dinan",
-   "name": "Couvent des Cordeliers de Dinan",
-   "themeId": "abbayes",
-   "lat": 48.4543,
-   "lon": -2.04474,
-   "radiusM": 150,
-   "score": 75.3,
-   "departement": "Côtes-d'Armor",
-   "departementCode": "22",
-   "regionCode": "53",
-   "communeCode": "22050",
-   "communeName": "Dinan",
-   "summary": "Le couvent des cordeliers est un monument religieux datant du XIIIe siècle bâti par Henry d'Avaugour seigneur de Dinan . Cet édifice est situé dans la ville de Dinan, dans les Côtes-d'Armor.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Dinan%20Couvent%20des%20Cordeliers%20Portail%28WLM2017%29.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Couvent_des_Cordeliers_de_Dinan"
-  },
-  {
    "id": "Q2240685",
    "slug": "chateau-de-durtal",
    "name": "Château de Durtal",
@@ -29482,6 +29374,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Villemolin"
   },
   {
+   "id": "Q2820451",
+   "slug": "abbaye-saint-vincent-de-metz",
+   "name": "Abbaye Saint-Vincent de Metz",
+   "themeId": "abbayes",
+   "lat": 49.12359,
+   "lon": 6.17288,
+   "radiusM": 150,
+   "score": 75.2,
+   "departement": "Moselle",
+   "departementCode": "57",
+   "regionCode": "44",
+   "communeCode": "57463",
+   "communeName": "Metz",
+   "summary": "L’abbaye Saint-Vincent de Metz est une abbaye fondée à Metz au Xe siècle. Ses bâtiments subsistent aujourd’hui et abritent le lycée Fabert.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Basilique%20Saint-Vincent.JPG?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Saint-Vincent_de_Metz"
+  },
+  {
    "id": "Q2804460",
    "slug": "chateau-de-hac",
    "name": "Château de Hac",
@@ -29606,24 +29516,6 @@
    "summary": "La basilique Notre-Dame-des-Miracles de Mauriac est une église française de style roman auvergnat située à Mauriac, dans le département du Cantal et la région Auvergne-Rhône-Alpes.\nL'église est classée au titre des monuments historiques  depuis 1840.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Mauriac%20-%20Basilique%20-10.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Basilique_Notre-Dame-des-Miracles_de_Mauriac"
-  },
-  {
-   "id": "Q3001696",
-   "slug": "couvent-des-cordeliers-d-angers",
-   "name": "Couvent des Cordeliers d'Angers",
-   "themeId": "abbayes",
-   "lat": 47.4507,
-   "lon": -0.5876,
-   "radiusM": 150,
-   "score": 74.9,
-   "departement": "Maine-et-Loire",
-   "departementCode": "49",
-   "regionCode": "52",
-   "communeCode": "49007",
-   "communeName": "Angers",
-   "summary": "L'ancien couvent des Cordeliers d'Angers appelé également ancien couvent des Cordeliers de la Baumette ou ancient Couvent de la Baumette, est un édifice religieux fondé au XVe siècle par le roi René et situé à la limite sud de la commune d'Angers.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Le%20couvent%20de%20la%20Baumette%20vu%20depuis%20la%20berge%20de%20la%20Maine%20-%20Angers%20-%2020090919.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Couvent_des_Cordeliers_d%27Angers"
   },
   {
    "id": "Q581818",
@@ -29842,24 +29734,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Tour_de_la_Babotte"
   },
   {
-   "id": "Q19324488",
-   "slug": "abbaye-de-l-ile-barbe",
-   "name": "Abbaye de l'Île Barbe",
-   "themeId": "abbayes",
-   "lat": 45.797222,
-   "lon": 4.831667,
-   "radiusM": 150,
-   "score": 74.6,
-   "departement": "Rhône",
-   "departementCode": "69",
-   "regionCode": "84",
-   "communeCode": "69389",
-   "communeName": "Lyon",
-   "summary": "L'abbaye de l'Île-Barbe est une ancienne abbaye bénédictine, située dans le 9e arrondissement de Lyon, dans le quartier de Saint-Rambert-l'Île-Barbe.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/%C3%8Ele%20Barbe%201616.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_l%27%C3%8Ele-Barbe"
-  },
-  {
    "id": "Q2975544",
    "slug": "grotte-de-clamouse",
    "name": "Grotte de Clamouse",
@@ -29948,6 +29822,24 @@
    "summary": "Le château de Villette est un édifice construit au XVIIe siècle, pour Jean II Dyel, comte d'Auffay. Il est situé dans la commune de Condécourt, dans le département français du Val-d'Oise en région Île-de-France.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Chateau%20de%20Villette.png?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Villette_(Cond%C3%A9court)"
+  },
+  {
+   "id": "Q1696035",
+   "slug": "abbaye-de-lachalade",
+   "name": "Abbaye de Lachalade",
+   "themeId": "abbayes",
+   "lat": 49.165,
+   "lon": 4.959167,
+   "radiusM": 150,
+   "score": 74.5,
+   "departement": "Meuse",
+   "departementCode": "55",
+   "regionCode": "44",
+   "communeCode": "55266",
+   "communeName": "Lachalade",
+   "summary": "L’ancienne abbaye de Lachalade (historiquement, La Chalade, venant du latin Scala Dei, ce qui signifie « Échelle de Dieu » ) dans le département de la Meuse (France) était de tradition cistercienne. Fondée en 1120, elle fut supprimée lors de la Révolution française.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Abbaye%20de%20la%20Chalade.JPG?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Lachalade"
   },
   {
    "id": "Q1438857",
@@ -30074,24 +29966,6 @@
    "summary": "Le cap Sizun est l'extrémité occidentale de la Cornouaille, dans le sud-ouest du Finistère en Bretagne, dont la capitale est Pont-Croix.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Pointe%20du%20Raz%20SPOT%201278.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cap_Sizun"
-  },
-  {
-   "id": "Q1696035",
-   "slug": "abbaye-de-lachalade",
-   "name": "Abbaye de Lachalade",
-   "themeId": "abbayes",
-   "lat": 49.165,
-   "lon": 4.959167,
-   "radiusM": 150,
-   "score": 74.5,
-   "departement": "Meuse",
-   "departementCode": "55",
-   "regionCode": "44",
-   "communeCode": "55266",
-   "communeName": "Lachalade",
-   "summary": "L’ancienne abbaye de Lachalade (historiquement, La Chalade, venant du latin Scala Dei, ce qui signifie « Échelle de Dieu » ) dans le département de la Meuse (France) était de tradition cistercienne. Fondée en 1120, elle fut supprimée lors de la Révolution française.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Abbaye%20de%20la%20Chalade.JPG?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Lachalade"
   },
   {
    "id": "Q2982097",
@@ -30236,24 +30110,6 @@
    "summary": "Le château d'Ô est une folie montpelliéraine du milieu du XVIIIe siècle située avenue des Moulins, rond-point du château d'Ô et accessible via la rue de la Carrièrasse, au nord-ouest de Montpellier, dans l’Hérault.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Chateaudo%28Montpellier%29.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_d%27%C3%94_(Montpellier)"
-  },
-  {
-   "id": "Q1552859",
-   "slug": "couvent-des-jacobins-de-paris-de-la-rue-saint-honore",
-   "name": "Couvent des Jacobins de Paris de la rue Saint-Honoré",
-   "themeId": "abbayes",
-   "lat": 48.866944,
-   "lon": 2.331944,
-   "radiusM": 150,
-   "score": 74.2,
-   "departement": "Paris",
-   "departementCode": "75",
-   "regionCode": "11",
-   "communeCode": "75101",
-   "communeName": "Paris",
-   "summary": "Le couvent de l'Annonciation ou couvent des Jacobins de la rue Saint-Honoré était un couvent dominicain situé rue Saint-Honoré, à Paris. Son emplacement correspond à la place du Marché-Saint-Honoré.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/JacobinClubDoor.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Couvent_des_Jacobins_(rue_Saint-Honor%C3%A9)"
   },
   {
    "id": "Q3420134",
@@ -30580,24 +30436,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Col_de_Joux_Plane"
   },
   {
-   "id": "Q1132377",
-   "slug": "abbaye-de-dalon",
-   "name": "Abbaye de Dalon",
-   "themeId": "abbayes",
-   "lat": 45.273517,
-   "lon": 1.225258,
-   "radiusM": 150,
-   "score": 73.7,
-   "departement": "Dordogne",
-   "departementCode": "24",
-   "regionCode": "75",
-   "communeCode": "24507",
-   "communeName": "Sainte-Trie",
-   "summary": "L'abbaye de Dalon est une abbaye cistercienne située à Sainte-Trie, dans le département français de la Dordogne.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Sainte-Trie%20Dalon%20ruines%20abbaye%20%281%29.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Dalon"
-  },
-  {
    "id": "Q614979",
    "slug": "grotte-du-visage",
    "name": "Grotte du Visage",
@@ -30722,24 +30560,6 @@
    "summary": "Le pont romain de Saint-Thibéry est un pont supposé d'origine romaine mais plus certainement médiéval, situé à Saint-Thibéry dans le département français de l'Hérault et la région Occitanie.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/St-Thibery-Pont-Romain1.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pont_romain_de_Saint-Thib%C3%A9ry"
-  },
-  {
-   "id": "Q334260",
-   "slug": "abbaye-de-juvigny",
-   "name": "Abbaye de Juvigny",
-   "themeId": "abbayes",
-   "lat": 49.465844,
-   "lon": 5.339783,
-   "radiusM": 150,
-   "score": 73.6,
-   "departement": "Meuse",
-   "departementCode": "55",
-   "regionCode": "44",
-   "communeCode": "55262",
-   "communeName": "Juvigny-sur-Loison",
-   "summary": "L'abbaye de Juvigny ou abbaye Sainte-Scholastique, aujourd'hui disparue, se situait dans une boucle de la Loison, aux confins de la forêt de Woëvre, aux limites des terres du Saint-Empire romain et du royaume de France, entre les villes de Montmédy, Stenay et Damvillers, sur l'actuelle commune de Juvigny-sur-Loison (actuels département de la Meuse et région du Grand Est).",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Abbaye%20de%20Juvigny.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Juvigny"
   },
   {
    "id": "Q1569125",
@@ -30940,24 +30760,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pont_Jacques-Gabriel"
   },
   {
-   "id": "Q334110",
-   "slug": "abbaye-de-premontre",
-   "name": "Abbaye de Prémontré",
-   "themeId": "abbayes",
-   "lat": 49.547222,
-   "lon": 3.410556,
-   "radiusM": 150,
-   "score": 73.0,
-   "departement": "Aisne",
-   "departementCode": "02",
-   "regionCode": "32",
-   "communeCode": "02619",
-   "communeName": "Prémontré",
-   "summary": "L'ancienne abbaye de Prémontré, située à une vingtaine de kilomètres à l'ouest de Laon dans l'Aisne, fut fondée par  Norbert de Xanten, en 1120. Elle fut abbaye-mère de l'ordre des chanoines réguliers de Prémontré.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Pr%C3%A9montr%C3%A9%2018th%20c.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Pr%C3%A9montr%C3%A9"
-  },
-  {
    "id": "Q2037477",
    "slug": "plages-du-prado",
    "name": "Plages du Prado",
@@ -31012,22 +30814,22 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ruines_romaines_de_N%C3%A9rac"
   },
   {
-   "id": "Q2961294",
-   "slug": "chartreuse-du-mont-dieu",
-   "name": "Chartreuse du Mont-Dieu",
+   "id": "Q2820614",
+   "slug": "abbaye-de-lonlay",
+   "name": "Abbaye de Lonlay",
    "themeId": "abbayes",
-   "lat": 49.5478,
-   "lon": 4.86639,
+   "lat": 48.645278,
+   "lon": -0.709167,
    "radiusM": 150,
-   "score": 73.0,
-   "departement": "Ardennes",
-   "departementCode": "08",
-   "regionCode": "44",
-   "communeCode": "08439",
-   "communeName": "Tannay-le-Mont-Dieu",
-   "summary": "La chartreuse du Mont-Dieu est un ancien monastère de moines chartreux fondé dans la forêt d'Ardenne, situé aujourd'hui dans le département des Ardennes, en France. Construit à l'origine en 1132, il fut reconstruit au XVIIe siècle.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Ms%201620%201568149%20mont%20dieu.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Chartreuse_du_Mont-Dieu"
+   "score": 72.9,
+   "departement": "Orne",
+   "departementCode": "61",
+   "regionCode": "28",
+   "communeCode": "61232",
+   "communeName": "Lonlay-l'Abbaye",
+   "summary": "L'abbaye Sainte-Marie de Lonlay est une abbaye bénédictine du XIe siècle située à Lonlay-l'Abbaye, dans le département français de l'Orne. Elle est classée au titre des monuments historiques depuis 1931.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Abbaye%20de%20Lonlay%20-%20Fa%C3%A7ade%20ouest.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Lonlay"
   },
   {
    "id": "Q3117121",
@@ -31120,24 +30922,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Marbeaumont"
   },
   {
-   "id": "Q2820614",
-   "slug": "abbaye-de-lonlay",
-   "name": "Abbaye de Lonlay",
-   "themeId": "abbayes",
-   "lat": 48.645278,
-   "lon": -0.709167,
-   "radiusM": 150,
-   "score": 72.9,
-   "departement": "Orne",
-   "departementCode": "61",
-   "regionCode": "28",
-   "communeCode": "61232",
-   "communeName": "Lonlay-l'Abbaye",
-   "summary": "L'abbaye Sainte-Marie de Lonlay est une abbaye bénédictine du XIe siècle située à Lonlay-l'Abbaye, dans le département français de l'Orne. Elle est classée au titre des monuments historiques depuis 1931.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Abbaye%20de%20Lonlay%20-%20Fa%C3%A7ade%20ouest.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Lonlay"
-  },
-  {
    "id": "Q3162322",
    "slug": "jardin-georges-delaselle",
    "name": "Jardin Georges Delaselle",
@@ -31190,24 +30974,6 @@
    "summary": "Le mont d'Or est un sommet du massif du Jura, dans le département du Doubs, en Bourgogne-Franche-Comté, à environ 20 kilomètres au sud de Pontarlier et proche de la frontière suisse. Il s'élève à 1 463 m d'altitude, ce qui en fait le point culminant du département du Doubs.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Mont-d%27Or.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mont_d%27Or_(Doubs)"
-  },
-  {
-   "id": "Q1775054",
-   "slug": "abbaye-de-bonlieu",
-   "name": "Abbaye de Bonlieu",
-   "themeId": "abbayes",
-   "lat": 45.73343,
-   "lon": 4.04331,
-   "radiusM": 150,
-   "score": 72.8,
-   "departement": "Loire",
-   "departementCode": "42",
-   "regionCode": "84",
-   "communeCode": "42197",
-   "communeName": "Sainte-Agathe-la-Bouteresse",
-   "summary": "L’abbaye de Bonlieu est une ancienne abbaye cistercienne, fondée au XIIe siècle par des cisterciennes de l'abbaye Notre-Dame de Bellecombe, et qui était située sur le territoire de l'actuelle commune de Sainte-Agathe-la-Bouteresse, dans le département de la Loire.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Sainte-Agathe-la-Bouteresse%20-%20All%C3%A9e%20de%20Bonlieu%20-%20%C3%89glise%20abbatiale%20de%20Bonlieu%2001.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Bonlieu_(Loire)"
   },
   {
    "id": "Q3210882",
@@ -31300,24 +31066,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Monast%C3%A8re_de_Prouilhe"
   },
   {
-   "id": "Q3215495",
-   "slug": "lac-de-nantua",
-   "name": "Lac de Nantua",
-   "themeId": "lacs",
-   "lat": 46.162117,
-   "lon": 5.588264,
-   "radiusM": 1500,
-   "score": 72.5,
-   "departement": "Ain",
-   "departementCode": "01",
-   "regionCode": "84",
-   "communeCode": "01269",
-   "communeName": "Nantua",
-   "summary": "Le lac de Nantua est un lac du massif du Jura, situé en France sur la commune de Nantua, dans le département de l'Ain en région Auvergne-Rhône-Alpes.\nD'origine glaciaire, le lac s'étend actuellement sur 141 hectares.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Lac%20de%20Nantua%20et%20Nantua%20%28Ain%29.JPG?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Nantua"
-  },
-  {
    "id": "Q22967182",
    "slug": "couvent-des-cordeliers-de-charlieu",
    "name": "Couvent des Cordeliers de Charlieu",
@@ -31334,6 +31082,24 @@
    "summary": "Le couvent des Cordeliers de Charlieu est un ancien couvent de franciscains arrivés à Saint-Nizier-sous-Charlieu (département français de la Loire) en 1250, le couvent fut édifié à partir de 1280. De style gothique, il subsiste encore aujourd'hui le cloître du XIVe siècle, l'église, la bibliothèque, ainsi qu'une chapelle.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Couvent%20des%20Cordeliers.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Couvent_des_Cordeliers_de_Charlieu"
+  },
+  {
+   "id": "Q3215495",
+   "slug": "lac-de-nantua",
+   "name": "Lac de Nantua",
+   "themeId": "lacs",
+   "lat": 46.162117,
+   "lon": 5.588264,
+   "radiusM": 1500,
+   "score": 72.5,
+   "departement": "Ain",
+   "departementCode": "01",
+   "regionCode": "84",
+   "communeCode": "01269",
+   "communeName": "Nantua",
+   "summary": "Le lac de Nantua est un lac du massif du Jura, situé en France sur la commune de Nantua, dans le département de l'Ain en région Auvergne-Rhône-Alpes.\nD'origine glaciaire, le lac s'étend actuellement sur 141 hectares.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Lac%20de%20Nantua%20et%20Nantua%20%28Ain%29.JPG?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Nantua"
   },
   {
    "id": "Q3287393",
@@ -31480,24 +31246,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Temple_romain_de_Ch%C3%A2teau-Bas"
   },
   {
-   "id": "Q2820453",
-   "slug": "abbaye-saint-vincent-du-mans",
-   "name": "Abbaye Saint-Vincent du Mans",
-   "themeId": "abbayes",
-   "lat": 48.0125,
-   "lon": 0.203611,
-   "radiusM": 150,
-   "score": 72.2,
-   "departement": "Sarthe",
-   "departementCode": "72",
-   "regionCode": "52",
-   "communeCode": "72181",
-   "communeName": "Le Mans",
-   "summary": "L'abbaye royale Saint-Vincent est une ancienne abbaye bénédictine française située au Mans dans la Sarthe. Ce qu'il en reste aujourd'hui est occupé par le lycée Bellevue.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Le%20Mans%20-%20Abbaye%20St%20Vincent%20ext%2005.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Saint-Vincent_du_Mans"
-  },
-  {
    "id": "Q3117093",
    "slug": "grotte-duruthy",
    "name": "Grotte Duruthy",
@@ -31514,24 +31262,6 @@
    "summary": "La grotte Duruthy est un abri sous roche à gisement préhistorique, situé dans la commune de Sorde-l'Abbaye, dans le département français des Landes, en Nouvelle-Aquitaine. Occupée au Magdalénien et à l'Azilien, elle est connue notamment pour avoir livré des vestiges humains associés à des dents percées d'ours et de lion.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Lame%20MHNT%20PRE%202009.0.211.2.fond.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Grotte_Duruthy"
-  },
-  {
-   "id": "Q2793745",
-   "slug": "abbaye-de-lure",
-   "name": "Abbaye de Lure",
-   "themeId": "abbayes",
-   "lat": 47.686944,
-   "lon": 6.491111,
-   "radiusM": 150,
-   "score": 72.2,
-   "departement": "Haute-Saône",
-   "departementCode": "70",
-   "regionCode": "27",
-   "communeCode": "70310",
-   "communeName": "Lure",
-   "summary": "L'abbaye de Lure est un monastère dont le centre est situé à Lure (Haute-Saône). Fondée au début du VIIe siècle par saint Desle et relevée par saint Baudran (ou Baltran) au Xe siècle, l'abbaye jouit jusqu'en 1678 d'une très large autonomie, l'abbé portant le titre de prince d'Empire.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Franche-Comt%C3%A9%20%28avril%202011%29%20104.JPG?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Lure"
   },
   {
    "id": "Q16510070",
@@ -31606,24 +31336,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Grotte_des_Demoiselles"
   },
   {
-   "id": "Q1242545",
-   "slug": "arenes-romaines-de-beziers",
-   "name": "Arènes romaines de Béziers",
-   "themeId": "monuments",
-   "lat": 43.339583,
-   "lon": 3.214028,
-   "radiusM": 150,
-   "score": 72.0,
-   "departement": "Hérault",
-   "departementCode": "34",
-   "regionCode": "76",
-   "communeCode": "34032",
-   "communeName": "Béziers",
-   "summary": "Les arènes de Béziers sont un amphithéâtre de la colonie romaine Colonia Vrbs Julia Septimanorum Baeterrae construit au Ier siècle de notre ère, sans plus de précision possible, au sud de la ville romaine de Baeterrae en Gaule narbonnaise (aujourd'hui Béziers, en Occitanie), près du théâtre antique, sur la colline Saint-Jacques.\nSur un site qui a déjà connu une occupation humaine quelques siècles avant sa construction, l'amphithéâtre semble abandonné à la fin du IIIe siècle.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Beziers%20Arenes.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ar%C3%A8nes_romaines_de_B%C3%A9ziers"
-  },
-  {
    "id": "Q7093",
    "slug": "puig-neulos",
    "name": "Puig Neulós",
@@ -31658,24 +31370,6 @@
    "summary": "La Pierre Turquaise ou Pierre Turquoise est une allée couverte située à Saint-Martin-du-Tertre, dans le département du Val-d'Oise. C'est la plus vaste et la plus célèbre de toutes les allées couvertes de la région parisienne devenue l'archétype des sépultures associées à la culture Seine-Oise-Marne.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Foret%20de%20Carnelle%20-%20La%20Pierre%20Turquaise%2001.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pierre_Turquaise"
-  },
-  {
-   "id": "Q3577781",
-   "slug": "ecole-de-brienne",
-   "name": "École de Brienne",
-   "themeId": "abbayes",
-   "lat": 48.389,
-   "lon": 4.52816,
-   "radiusM": 150,
-   "score": 72.0,
-   "departement": "Aube",
-   "departementCode": "10",
-   "regionCode": "44",
-   "communeCode": "10064",
-   "communeName": "Brienne-le-Château",
-   "summary": "L'École de Brienne est un ancien établissement d'enseignement militaire situé à Brienne-le-Château (Aube).",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Muse%20brienne%20le%20chateau.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/%C3%89cole_de_Brienne"
   },
   {
    "id": "Q2969647",
@@ -31804,24 +31498,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/T%C3%AAte_de_Chien"
   },
   {
-   "id": "Q334190",
-   "slug": "abbaye-saint-mesmin-de-micy",
-   "name": "Abbaye Saint-Mesmin de Micy",
-   "themeId": "abbayes",
-   "lat": 47.881944,
-   "lon": 1.868333,
-   "radiusM": 150,
-   "score": 71.8,
-   "departement": "Loiret",
-   "departementCode": "45",
-   "regionCode": "24",
-   "communeCode": "45298",
-   "communeName": "Saint-Pryvé-Saint-Mesmin",
-   "summary": "L'abbaye Saint-Mesmin de Micy était une abbaye bénédictine située sur l'actuel territoire de la commune de Saint-Pryvé-Saint-Mesmin dans le département du Loiret et la région Centre-Val de Loire.\nLe lieu accueille une communauté de carmélites depuis 1939.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Saint-Pryv%C3%A9-Saint-Mesmin%20-%20carmel%20de%20Micy%2001.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Saint-Mesmin_de_Micy"
-  },
-  {
    "id": "Q1945508",
    "slug": "vuache",
    "name": "Vuache",
@@ -31910,6 +31586,24 @@
    "summary": "Le mont de Grange est une montagne de Haute-Savoie qui culmine à 2 432 mètres d'altitude, ce qui en fait le second sommet le plus élevé du massif du Chablais après les Hauts-Forts. Il domine le val d'Abondance entre Abondance, La Chapelle-d'Abondance et Châtel.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Mont%20de%20Grange1.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mont_de_Grange"
+  },
+  {
+   "id": "Q2968228",
+   "slug": "chateau-d-essalois",
+   "name": "Château d'Essalois",
+   "themeId": "chateaux",
+   "lat": 45.462222,
+   "lon": 4.245833,
+   "radiusM": 200,
+   "score": 71.7,
+   "departement": "Loire",
+   "departementCode": "42",
+   "regionCode": "84",
+   "communeCode": "42042",
+   "communeName": "Chambles",
+   "summary": "Le château d'Essalois à Chambles surplombe le lac de Grangent, dans le département de la Loire en Auvergne-Rhône-Alpes (France).",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Ch%C3%A2teau%20d%27Essalois.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_d%27Essalois"
   },
   {
    "id": "Q2278738",
@@ -32018,24 +31712,6 @@
    "summary": "Le pont aval est un pont situé à Paris.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Pont-aval%202.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pont_aval"
-  },
-  {
-   "id": "Q2820438",
-   "slug": "abbaye-saint-pere-en-vallee",
-   "name": "Abbaye Saint-Père-en-Vallée",
-   "themeId": "abbayes",
-   "lat": 48.443504,
-   "lon": 1.49273,
-   "radiusM": 150,
-   "score": 71.6,
-   "departement": "Eure-et-Loir",
-   "departementCode": "28",
-   "regionCode": "24",
-   "communeCode": "28085",
-   "communeName": "Chartres",
-   "summary": "L'abbaye de Saint-Père-en-Vallée  (Monasterium S. Petri Carnotensis - il faut comprendre « Saint-Pierre » et non « Saint Père »), est une abbaye bénédictine, fondée (ou dotée) au milieu du VIIe siècle par la reine Bathilde, à l'origine hors des murs de Chartres. Elle appartint à la congrégation de Saint-Maur à partir de 1650.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Abbaye%20de%20Saint-P%C3%A8re-en-Vall%C3%A9e%20actuelle%20annexe%20du%20lyc%C3%A9e%20Marceau%20Chartres%20Eure-et-Loir%20France.JPG?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Saint-P%C3%A8re-en-Vall%C3%A9e"
   },
   {
    "id": "Q15696502",
@@ -32308,22 +31984,22 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Fort_de_Roppe"
   },
   {
-   "id": "Q2820643",
-   "slug": "abbaye-de-moutier-d-ahun",
-   "name": "Abbaye de Moutier-d'Ahun",
-   "themeId": "abbayes",
-   "lat": 46.090278,
-   "lon": 2.055,
-   "radiusM": 150,
+   "id": "Q2612600",
+   "slug": "chateau-des-ducs-de-bar",
+   "name": "Château des ducs de Bar",
+   "themeId": "chateaux",
+   "lat": 48.7717,
+   "lon": 5.1562,
+   "radiusM": 200,
    "score": 70.7,
-   "departement": "Creuse",
-   "departementCode": "23",
-   "regionCode": "75",
-   "communeCode": "23138",
-   "communeName": "Moutier-d'Ahun",
-   "summary": "L'abbaye de Moutier-d'Ahun est une ancienne abbaye bénédictine  située sur le territoire de la commune française de Moutier-d'Ahun dans le département de la Creuse.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Moutier-d%27Ahun%20-%20Abbaye%20-%20Ensemble.JPG?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Moutier-d%27Ahun"
+   "departement": "Meuse",
+   "departementCode": "55",
+   "regionCode": "44",
+   "communeCode": "55029",
+   "communeName": "Bar-le-Duc",
+   "summary": "Le château des ducs de Bar est un ancien château situé à Bar-le-Duc dans le département de la Meuse en région Grand Est. Perché sur un éperon rocheux au bout de la Ville Haute, il dominait la vallée de l'Ornain et la Ville Basse.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Bar%20le%20duc3.JPG?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_des_ducs_de_Bar"
   },
   {
    "id": "Q3379510",
@@ -32342,6 +32018,24 @@
    "summary": "La tour de Campomoro (en corse : torra di Campumoru) est une tour génoise située dans la commune de Belvédère-Campomoro, dans le département français de la Corse-du-Sud.\nÉdifiée en 1586 par les Génois, la tour de Campomoro fait partie d'un vaste ensemble de tours érigées sur le littoral de l'île afin de prévenir les raids barbaresques.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Corse%20Campomoro%20tour%20genoise.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Tour_de_Campomoro"
+  },
+  {
+   "id": "Q22962887",
+   "slug": "chateau-de-bonnetable",
+   "name": "Château de Bonnétable",
+   "themeId": "chateaux",
+   "lat": 48.17694,
+   "lon": 0.41611,
+   "radiusM": 200,
+   "score": 70.6,
+   "departement": "Sarthe",
+   "departementCode": "72",
+   "regionCode": "52",
+   "communeCode": "72039",
+   "communeName": "Bonnétable",
+   "summary": "Le château de Bonnétable est une demeure seigneuriale dont le domaine se déploie à la fois sur les terres des communes de Bonnétable et de Briosne-lès-Sables, dans le département de la Sarthe, en région Pays de la Loire .\nAu début des années 1990, l'ensemble des autres parties de l'édifice, mais aussi, les communs, le parc, le potager, l'éolienne Bollée et l'enceinte attenants au château de Bonnétable bénéficient également d'une inscription sur la liste des monuments historiques de France par arrêté ministériel du 29 novembre 1991.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Bonn%C3%A9table%20-%20ch%C3%A2teau.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Bonn%C3%A9table"
   },
   {
    "id": "Q3556312",
@@ -32614,24 +32308,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Grand_Colombier_(Ain)"
   },
   {
-   "id": "Q2820631",
-   "slug": "abbaye-de-montigny-les-vesoul",
-   "name": "Abbaye de Montigny-lès-Vesoul",
-   "themeId": "abbayes",
-   "lat": 47.639167,
-   "lon": 6.073611,
-   "radiusM": 150,
-   "score": 70.0,
-   "departement": "Haute-Saône",
-   "departementCode": "70",
-   "regionCode": "27",
-   "communeCode": "70363",
-   "communeName": "Montigny-lès-Vesoul",
-   "summary": "L'abbaye de Montigny-lès-Vesoul dite aussi « abbaye des dames nobles » est une abbaye de clarisses urbanistes, fondée en 1286 à Montigny-lès-Vesoul dans la Haute-Saône. Les bâtiments actuels datent essentiellement du XVIIIe siècle.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Montigny%20l%C3%A8s%20Vesoul%20abbaye.JPG?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Montigny-l%C3%A8s-Vesoul"
-  },
-  {
    "id": "Q2182798",
    "slug": "cirque-de-navacelles",
    "name": "Cirque de Navacelles",
@@ -32720,6 +32396,24 @@
    "summary": "Le lac de Madine est un plan d'eau artificiel du Grand Est, établi à cheval sur les départements de la Meuse et dans une moindre mesure de Meurthe-et-Moselle, sur le cours de la Madine qui est un sous-affluent de la Moselle. S'il est le premier lac de Lorraine du point de vue de la superficie, il se place deuxième derrière le lac de Pierre-Percée concernant le volume d'eau.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Lac%20de%20madine.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Madine"
+  },
+  {
+   "id": "Q16540847",
+   "slug": "colline-de-bourlemont",
+   "name": "Colline de Bourlémont",
+   "themeId": "sommets",
+   "lat": 47.7047,
+   "lon": 6.62,
+   "radiusM": 1000,
+   "score": 69.7,
+   "departement": "Haute-Saône",
+   "departementCode": "70",
+   "regionCode": "27",
+   "communeCode": "70451",
+   "communeName": "Ronchamp",
+   "summary": "La colline de Bourlémont est un sommet du massif des Vosges culminant à 474 mètres d'altitude, situé au-dessus de la commune de Ronchamp dans la vallée du Rahin en Haute-Saône et région Bourgogne-Franche-Comté.\nIntégrée dans le parc naturel régional des Ballons des Vosges, elle est aujourd'hui connue pour le tourisme culturel et pédestre grâce à son patrimoine religieux (chapelle Notre-Dame-du-Haut œuvre de l'architecte franco-suisse Le Corbusier, le campanile de l'architecte français Jean Prouvé, le couvent de l'architecte italien Renzo Piano) et minier (chevalement du puits Sainte-Marie de l’architecte belge Charles Tournay), inscrit et classé au titre des monuments historiques avec le label « Patrimoine du XXe siècle ».",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/2020-08%20-%20Colline%20de%20Bourl%C3%A9mont%20-%2001.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Colline_de_Bourl%C3%A9mont"
   },
   {
    "id": "Q19945094",
@@ -32848,6 +32542,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_Bernard-d%27Agesci"
   },
   {
+   "id": "Q2971000",
+   "slug": "chateau-de-villebon",
+   "name": "Château de Villebon",
+   "themeId": "chateaux",
+   "lat": 48.3908,
+   "lon": 1.20704,
+   "radiusM": 200,
+   "score": 69.5,
+   "departement": "Eure-et-Loir",
+   "departementCode": "28",
+   "regionCode": "24",
+   "communeCode": "28414",
+   "communeName": "Villebon",
+   "summary": "Le château de Villebon est une forteresse du XIVe siècle entourée de douves et agrémentée d’une cour intérieure de style Renaissance située dans la commune de Villebon, à cent quinze kilomètres au sud-ouest de Paris, dans le département d’Eure-et-Loir en région Centre-Val de Loire.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Chateaudevillebon28.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Villebon"
+  },
+  {
    "id": "Q22992063",
    "slug": "menhir-de-men-bras-de-kermar-ker",
    "name": "Menhir de Men-Bras-de-Kermar-Ker",
@@ -32938,24 +32650,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_Kir"
   },
   {
-   "id": "Q2859877",
-   "slug": "arc-de-triomphe-de-glanum",
-   "name": "Arc de triomphe de Glanum",
-   "themeId": "monuments",
-   "lat": 43.776538,
-   "lon": 4.831211,
-   "radiusM": 150,
-   "score": 69.3,
-   "departement": "Bouches-du-Rhône",
-   "departementCode": "13",
-   "regionCode": "93",
-   "communeCode": "13100",
-   "communeName": "Saint-Rémy-de-Provence",
-   "summary": "L'Arc municipal de Glanum est un arc de triomphe romain situé sur la commune de Saint-Rémy-de-Provence dans les Bouches-du-Rhône. Il est très comparable aux arcs romains que l'on trouve dans les villes d'Orange et de Carpentras, dans le Vaucluse.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Monuments%20at%20Glanum.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Arc_de_triomphe_de_Glanum"
-  },
-  {
    "id": "Q448875",
    "slug": "cap-de-la-chevre",
    "name": "Cap de la Chèvre",
@@ -32990,6 +32684,24 @@
    "summary": "Le Monte San Petrone est une montagne située dans le département de la Haute-Corse.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/San%20petrone%201.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Monte_San_Petrone"
+  },
+  {
+   "id": "Q2859877",
+   "slug": "arc-de-triomphe-de-glanum",
+   "name": "Arc de triomphe de Glanum",
+   "themeId": "megalithes",
+   "lat": 43.776538,
+   "lon": 4.831211,
+   "radiusM": 200,
+   "score": 69.3,
+   "departement": "Bouches-du-Rhône",
+   "departementCode": "13",
+   "regionCode": "93",
+   "communeCode": "13100",
+   "communeName": "Saint-Rémy-de-Provence",
+   "summary": "L'Arc municipal de Glanum est un arc de triomphe romain situé sur la commune de Saint-Rémy-de-Provence dans les Bouches-du-Rhône. Il est très comparable aux arcs romains que l'on trouve dans les villes d'Orange et de Carpentras, dans le Vaucluse.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Monuments%20at%20Glanum.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Arc_de_triomphe_de_Glanum"
   },
   {
    "id": "Q6159771",
@@ -33136,6 +32848,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pont_sur_l%27Oyapock"
   },
   {
+   "id": "Q1438859",
+   "slug": "fort-de-souville",
+   "name": "Fort de Souville",
+   "themeId": "chateaux",
+   "lat": 49.18795,
+   "lon": 5.43931,
+   "radiusM": 200,
+   "score": 69.0,
+   "departement": "Meuse",
+   "departementCode": "55",
+   "regionCode": "44",
+   "communeCode": "55189",
+   "communeName": "Fleury-devant-Douaumont",
+   "summary": "Le fort de Souville, appelé brièvement fort Lemoine, est un des forts de la place fortifiée de Verdun, situé sur la commune de Fleury-devant-Douaumont. Construit à partir de 1876 à 396 m d'altitude, c'est un fort de première génération, dont les dessus et environs ont servi de champs de bataille lors de la bataille de Verdun en 1916, durant la Première Guerre mondiale.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Entr%C3%A9e%20souville.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Fort_de_Souville"
+  },
+  {
    "id": "Q18005444",
    "slug": "grotte-du-pape",
    "name": "Grotte du Pape",
@@ -33172,22 +32902,22 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Saint-Ferr%C3%A9ol"
   },
   {
-   "id": "Q2099678",
-   "slug": "village-des-pruniers",
-   "name": "Village des pruniers",
+   "id": "Q1385053",
+   "slug": "abbaye-de-la-charite",
+   "name": "Abbaye de la Charité",
    "themeId": "abbayes",
-   "lat": 44.743636,
-   "lon": 0.343381,
+   "lat": 47.518056,
+   "lon": 5.935833,
    "radiusM": 150,
    "score": 68.8,
-   "departement": "Dordogne",
-   "departementCode": "24",
-   "regionCode": "75",
-   "communeCode": "24549",
-   "communeName": "Thénac",
-   "summary": "Le Village des Pruniers est un centre de méditation et un temple bouddhiste situé dans le sud-ouest de la France. Il a été fondé en 1982 par deux moines vietnamiens, Thích Nhất Hạnh (Thầy) et sœur Chân Không.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/New%20Hamlet%20-%20Plum%20Village4.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Village_des_pruniers"
+   "departement": "Haute-Saône",
+   "departementCode": "70",
+   "regionCode": "27",
+   "communeCode": "70384",
+   "communeName": "Neuvelle-lès-la-Charité",
+   "summary": "L'abbaye Notre-Dame-de-la-Charité de Neuvelle-lès-la-Charité est une abbaye cistercienne d'hommes, fondée  en Franche-Comté en 1133 et disparue en 1791. Elle est située sur les communes actuelles de Neuvelle-lès-la-Charité et Fretigney-et-Velloreille, dans le département français de la Haute-Saône en région Bourgogne-Franche-Comté, alors dans le diocèse de Besançon.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Neuvelle-l%C3%A8s-la-Charit%C3%A9%2C%20l%27abbaye.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Notre-Dame-de-la-Charit%C3%A9_de_Neuvelle-l%C3%A8s-la-Charit%C3%A9"
   },
   {
    "id": "Q3494592",
@@ -33265,10 +32995,10 @@
    "id": "Q109045439",
    "slug": "monument-torreen-de-foce",
    "name": "Monument torréen de Foce",
-   "themeId": "monuments",
+   "themeId": "megalithes",
    "lat": 41.82875,
    "lon": 9.022778,
-   "radiusM": 150,
+   "radiusM": 200,
    "score": 68.7,
    "departement": "Corse-du-Sud",
    "departementCode": "2A",
@@ -33332,24 +33062,6 @@
    "summary": "Le lac de Kruth-Wildenstein  est un lac artificiel du versant alsacien du massif des Vosges. Il s'agit d'un lieu aménagé pour diverses activités telles la baignade, la pêche à la ligne, la nage en eau libre, le canoë-kayak, le pédalo, la plongée en apnée, nage avec palmes ou encore la plongée bouteille.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Lac68Wildenstein.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Kruth-Wildenstein"
-  },
-  {
-   "id": "Q1673878",
-   "slug": "abbaye-notre-dame-de-larrivour",
-   "name": "Abbaye Notre-Dame de Larrivour",
-   "themeId": "abbayes",
-   "lat": 48.275833,
-   "lon": 4.256667,
-   "radiusM": 150,
-   "score": 68.6,
-   "departement": "Aube",
-   "departementCode": "10",
-   "regionCode": "44",
-   "communeCode": "10209",
-   "communeName": "Lusigny-sur-Barse",
-   "summary": "L’abbaye Notre-Dame de Larrivour (ou de l'Arrivour ou encore de la Rivour) est une ancienne abbaye cistercienne de moines située à Lusigny-sur-Barse, sur le bord de la Barse en forêt d'Orient, dans le département français de l'Aube, en région Grand Est, à environ 13 kilomètres à l'est de Troyes.\nElle est fondée au milieu du XIIe siècle sous l'impulsion du comte de Champagne Thibaut II, de Bernard de Clairvaux et de l'évêque de Troyes Atton, qui y envoient des moines de l’abbaye de Clairvaux menés par Alain de Flandre, appelé à devenir leur premier abbé.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Armoiries%20Larrivour.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Notre-Dame_de_Larrivour"
   },
   {
    "id": "Q2968102",
@@ -33566,24 +33278,6 @@
    "summary": "Le Haut-Folin est le point culminant du massif du Morvan, situé sur le territoire de la commune de Saint-Prix (Saône-et-Loire), dans le massif du Bois du Roi. Il s'élève à 901 mètres d'altitude et supporte le relais de télévision Autun-Bois-du-Roi.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/HautFolinVuDuMontBeuvray.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Haut-Folin"
-  },
-  {
-   "id": "Q1775829",
-   "slug": "abbaye-de-prebenoit",
-   "name": "Abbaye de Prébenoît",
-   "themeId": "abbayes",
-   "lat": 46.357583,
-   "lon": 2.040833,
-   "radiusM": 150,
-   "score": 68.2,
-   "departement": "Creuse",
-   "departementCode": "23",
-   "regionCode": "75",
-   "communeCode": "23022",
-   "communeName": "Bétête",
-   "summary": "L’abbaye de Prébenoît est une abbaye cistercienne située dans l'actuel département français de la Creuse en région Nouvelle-Aquitaine, qui fut active du XIIe siècle à la Révolution française, et en grande partie détruite au XIXe siècle.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Abbaye%20Pr%C3%A9beno%C3%AEt.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Pr%C3%A9beno%C3%AEt"
   },
   {
    "id": "Q1535929",
@@ -33820,6 +33514,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/%C3%89paves_de_la_rade_de_Saint-Pierre"
   },
   {
+   "id": "Q3078318",
+   "slug": "fort-des-ayvelles",
+   "name": "Fort des Ayvelles",
+   "themeId": "chateaux",
+   "lat": 49.72667,
+   "lon": 4.7375,
+   "radiusM": 200,
+   "score": 67.8,
+   "departement": "Ardennes",
+   "departementCode": "08",
+   "regionCode": "44",
+   "communeCode": "08480",
+   "communeName": "Villers-Semeuse",
+   "summary": "Le fort des Ayvelles, appelé brièvement fort Dubois-Crancé (du nom de l'homme politique né à Charleville), est un ouvrage militaire de type Séré de Rivières édifié à partir de 1877 sur une crête surplombant la ville de Mézières, sur les territoires des communes de Villers-Semeuse et des Ayvelles dans le département des Ardennes. Il comprend un ouvrage principal, le Fort, et un ouvrage annexe de taille plus réduite, la Batterie, les deux étant reliés par un chemin protégé long de 600 mètres.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Fort%20des%20Ayvelles%2001.JPG?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Fort_des_Ayvelles"
+  },
+  {
    "id": "Q3379520",
    "slug": "tour-de-nonza",
    "name": "Tour de Nonza",
@@ -33836,6 +33548,24 @@
    "summary": "La Tour de Nonza (en corse : Torra di Nonza) ou de Torra, est une tour dite génoise située dans la commune de  Nonza, dans le département français de la Haute-Corse.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Corse-04654-Nonza-tour%20paoline.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Tour_de_Nonza"
+  },
+  {
+   "id": "Q639245",
+   "slug": "abbaye-saint-pierre-de-montieramey",
+   "name": "Abbaye Saint-Pierre de Montiéramey",
+   "themeId": "abbayes",
+   "lat": 48.229199,
+   "lon": 4.30622,
+   "radiusM": 150,
+   "score": 67.7,
+   "departement": "Aube",
+   "departementCode": "10",
+   "regionCode": "44",
+   "communeCode": "10249",
+   "communeName": "Montiéramey",
+   "summary": "L'abbaye de Montiéramey est une abbaye pour hommes fondée au IXe siècle à Montiéramey dans l'Aube, en France.\nElle a été l'un des plus anciens et l'un des plus gros établissements religieux du diocèse de Troyes, et a profondément marqué ses environs.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Monthieramey%20abbaye.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Saint-Pierre_de_Monti%C3%A9ramey"
   },
   {
    "id": "Q2820816",
@@ -33890,6 +33620,24 @@
    "summary": "Le lac de Saint-Andéol est un des nombreux lacs de l'Aubrac, situé sur la commune de Marchastel au nord-ouest du département français de la Lozère.\nD'origine glaciaire, le lac de Saint-Andéol est, depuis la Protohistoire, le lieu de célébrations de différents cultes.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Andeol2.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Saint-And%C3%A9ol"
+  },
+  {
+   "id": "Q18380013",
+   "slug": "chateau-de-villacerf",
+   "name": "Château de Villacerf",
+   "themeId": "chateaux",
+   "lat": 48.3997,
+   "lon": 3.9916,
+   "radiusM": 200,
+   "score": 67.5,
+   "departement": "Aube",
+   "departementCode": "10",
+   "regionCode": "44",
+   "communeCode": "10409",
+   "communeName": "Villacerf",
+   "summary": "Le château de Villacerf, longtemps appelé le château de Saint-Sépulchre ou Saint-Sépulcre, se trouvait à  Villacerf dans l'Aube. Il a été détruit à la Révolution.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Chateau%20de%20Villacerf.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Villacerf"
   },
   {
    "id": "Q392278",
@@ -34828,24 +34576,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Terre-de-Bas_(%C3%AEle_des_Saintes)"
   },
   {
-   "id": "Q2616913",
-   "slug": "abbaye-saint-joseph-de-clairval",
-   "name": "Abbaye Saint-Joseph de Clairval",
-   "themeId": "abbayes",
-   "lat": 47.510716,
-   "lon": 4.530868,
-   "radiusM": 150,
-   "score": 65.3,
-   "departement": "Côte-d'Or",
-   "departementCode": "21",
-   "regionCode": "27",
-   "communeCode": "21271",
-   "communeName": "Flavigny-sur-Ozerain",
-   "summary": "L'abbaye Saint-Joseph de Clairval de Flavigny-sur-Ozerain est une abbaye bénédictine située à Flavigny-sur-Ozerain, en Côte d'Or. Fondée en 1972, l'abbaye n'a pas de rapport direct avec l'abbaye de Flavigny, cette dernière n'étant plus occupée par des moines depuis la Révolution française.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Flavigny-sur-Ozerain%20Abbaye%20Saint%20Joseph.JPG?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Saint-Joseph_de_Clairval_de_Flavigny-sur-Ozerain"
-  },
-  {
    "id": "Q3292683",
    "slug": "palais-cambon",
    "name": "Palais Cambon",
@@ -35006,24 +34736,6 @@
    "summary": "Le cap Ferrat est une presqu’île située sur la Côte d’Azur, dans le département des Alpes-Maritimes. Il sépare Beaulieu-sur-Mer de Villefranche-sur-Mer.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/CapFerrat.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cap_Ferrat"
-  },
-  {
-   "id": "Q1775062",
-   "slug": "abbaye-de-bonlieu",
-   "name": "Abbaye de Bonlieu",
-   "themeId": "abbayes",
-   "lat": 46.0875,
-   "lon": 2.305278,
-   "radiusM": 150,
-   "score": 65.0,
-   "departement": "Creuse",
-   "departementCode": "23",
-   "regionCode": "75",
-   "communeCode": "23151",
-   "communeName": "Peyrat-la-Nonière",
-   "summary": "L'abbaye de Notre Dame de Bonlieu est une ancienne abbaye cistercienne située à Peyrat-la-Nonière, dans la Creuse.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Vue%20a%C3%A9rienne%20Est-Ouest.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Bonlieu_(Limousin)"
   },
   {
    "id": "Q927869",
@@ -35546,6 +35258,24 @@
    "summary": "Le mont Colombier, parfois Grand Colombier ou Colombier d'Aillon, est un sommet du massif des Bauges culminant à 2 045 mètres d'altitude, sur les communes d'Aillon-le-Vieux, Aillon-le-Jeune, École et La Compôte, dans le département français de la Savoie.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Grand%20Colombier%20%28Bauges%29.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mont_Colombier"
+  },
+  {
+   "id": "Q3593481",
+   "slug": "ile-du-grand-connetable",
+   "name": "Île du Grand Connétable",
+   "themeId": "iles",
+   "lat": 4.823611,
+   "lon": -51.936389,
+   "radiusM": 2000,
+   "score": 63.8,
+   "departement": "Guyane",
+   "departementCode": "973",
+   "regionCode": "03",
+   "communeCode": null,
+   "communeName": null,
+   "summary": "L'île du Grand Connétable est située à 18 km au large de l'embouchure de l'Approuague, en Guyane française. Avec l'île du Petit Connétable, elle forme la réserve naturelle nationale de l'Île du Grand Connétable.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/%C3%8Eles%20du%20grand%20et%20du%20petit%20conn%C3%A9table.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/%C3%8Ele_du_Grand_Conn%C3%A9table"
   },
   {
    "id": "Q3078875",
@@ -36158,24 +35888,6 @@
    "summary": "La pointe du Van (nom local en breton Beg ar Vann) est un promontoire rocheux situé à l'ouest du cap Sizun. Elle constitue l'extrême ouest de la commune de Cléden-Cap-Sizun dans le département du Finistère en Bretagne.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Pointe%20du%20Van.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pointe_du_Van"
-  },
-  {
-   "id": "Q2820533",
-   "slug": "abbaye-de-belmont",
-   "name": "Abbaye de Belmont",
-   "themeId": "abbayes",
-   "lat": 47.7225,
-   "lon": 5.545833,
-   "radiusM": 150,
-   "score": 62.4,
-   "departement": "Haute-Marne",
-   "departementCode": "52",
-   "regionCode": "44",
-   "communeCode": "52043",
-   "communeName": "Belmont",
-   "summary": "L'abbaye de Belmont était un monastère fondé en 1127 à Belmont par les cisterciennes de l'abbaye Notre-Dame de Tart. Dédiée à Notre-Dame de l'Assomption, sa fête patronale est donc le 15 août.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Abbaye%20royale%20De%20Belmont%2061729.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Belmont"
   },
   {
    "id": "Q3591678",
@@ -37690,24 +37402,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/La_Citerne"
   },
   {
-   "id": "Q1559820",
-   "slug": "abbaye-d-aubepierre",
-   "name": "Abbaye d'Aubepierre",
-   "themeId": "abbayes",
-   "lat": 46.393056,
-   "lon": 1.765833,
-   "radiusM": 150,
-   "score": 58.7,
-   "departement": "Creuse",
-   "departementCode": "23",
-   "regionCode": "75",
-   "communeCode": "23130",
-   "communeName": "Méasnes",
-   "summary": "L'abbaye d'Aubepierre est une abbaye de moines cisterciens édifiée sur le territoire de l'actuelle commune de Méasnes (Creuse). Fondée en 1149 par saint Bernard et placée dans la filiation directe de Clairvaux, elle est presque entièrement détruite en 1569, lors des guerres de Religion.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Abords%20de%20l%27abbaye.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_d%27Aubepierre"
-  },
-  {
    "id": "Q3214796",
    "slug": "lac-chauvet",
    "name": "Lac Chauvet",
@@ -37922,6 +37616,24 @@
    "summary": "Le Grand Arc est un sommet et un chaînon des Alpes françaises qui se situe en Savoie entre la rive droite de la basse Maurienne et la rive gauche de l'Isère (vallée de la Tarentaise et Combe de Savoie) communément rattaché au massif de la Lauzière, et plus largement au massif de la Vanoise. À ce titre, il en est le plus occidental, faisant face au massif des Bauges.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Grand%20Arc%20%28VII.15%29-4.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Grand_Arc"
+  },
+  {
+   "id": "Q59155226",
+   "slug": "abbaye-du-val-des-ecoliers-de-verbiesles",
+   "name": "Abbaye du Val des Écoliers de Verbiesles",
+   "themeId": "abbayes",
+   "lat": 48.078636,
+   "lon": 5.167116,
+   "radiusM": 150,
+   "score": 58.0,
+   "departement": "Haute-Marne",
+   "departementCode": "52",
+   "regionCode": "44",
+   "communeCode": "52514",
+   "communeName": "Verbiesles",
+   "summary": "L'abbaye Notre-Dame du Val des Écoliers (Vallis Scholarium), fondée au début du XIIIe siècle par les Écoliers du Christ, est située à Verbiesles, près de Chaumont, dans la Haute-Marne, en région Grand Est (ex-région Champagne-Ardenne). Le prieuré est la maison-mère de l'Ordre des Écoliers du Christ et a été promu au rang d'abbaye en 1539.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Chaumont%20val%20des%20%C3%A9coliers%20int%C3%A9rieur%2049449.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_du_Val_des_%C3%89coliers_de_Verbiesles"
   },
   {
    "id": "Q2859718",
@@ -38788,6 +38500,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Parc_du_Mugel"
   },
   {
+   "id": "Q22951440",
+   "slug": "pierre-folle",
+   "name": "Pierre Folle",
+   "themeId": "megalithes",
+   "lat": 46.206266,
+   "lon": 1.539872,
+   "radiusM": 200,
+   "score": 54.6,
+   "departement": "Creuse",
+   "departementCode": "23",
+   "regionCode": "75",
+   "communeCode": "23235",
+   "communeName": "Saint-Priest-la-Feuille",
+   "summary": "La Pierre Folle, appelée aussi dolmen de la Feuille, est un dolmen situé à Saint-Priest-la-Feuille dans le département français de la Creuse.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Dolmen%20de%20St%20Priest%20la%20Feuille.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pierre_Folle_(Saint-Priest-la-Feuille)"
+  },
+  {
    "id": "Q2524946",
    "slug": "cap-taillat",
    "name": "Cap Taillat",
@@ -39076,6 +38806,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Puy_de_Chalard"
   },
   {
+   "id": "Q22951425",
+   "slug": "chateau-de-saint-maixant",
+   "name": "Château de Saint-Maixant",
+   "themeId": "chateaux",
+   "lat": 45.992885,
+   "lon": 2.208515,
+   "radiusM": 200,
+   "score": 53.5,
+   "departement": "Creuse",
+   "departementCode": "23",
+   "regionCode": "75",
+   "communeCode": "23210",
+   "communeName": "Saint-Maixant",
+   "summary": "Le château de Saint-Maixant est situé sur la commune de Saint-Maixant dans le département de la Creuse, en France.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Ch%C3%A2teau%20de%20Saint-Maixant%20%28Creuse%29.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Saint-Maixant"
+  },
+  {
    "id": "Q3162668",
    "slug": "jardins-de-l-imaginaire",
    "name": "Jardins de l'Imaginaire",
@@ -39164,6 +38912,24 @@
    "summary": "Le Fischboedle est un petit lac du versant alsacien des Vosges dans la vallée de la Wormsa. D'origine glaciaire, ce lac a été rehaussé vers 1850 par le manufacturier munstérien Jacques Hartmann pour servir de réserve à poissons, d’où son nom (fisch = poisson, boedle = bourbier ou dépression marécageuse).",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Fischboedle%202%20-1600x1200-.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Fischboedle"
+  },
+  {
+   "id": "Q22951468",
+   "slug": "dolmen-de-saint-hilaire",
+   "name": "Dolmen de Saint-Hilaire",
+   "themeId": "megalithes",
+   "lat": 46.217874,
+   "lon": 1.621401,
+   "radiusM": 200,
+   "score": 53.1,
+   "departement": "Creuse",
+   "departementCode": "23",
+   "regionCode": "75",
+   "communeCode": "23236",
+   "communeName": "Saint-Priest-la-Plaine",
+   "summary": "Le dolmen de Saint-Hilaire est un dolmen français situé à Saint-Priest-la-Plaine, près du lieu-dit Saint-Hilaire, dans le département de la Creuse.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Saint-Priest-la-Plaine%20dolmen.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Dolmen_de_Saint-Hilaire"
   },
   {
    "id": "Q14918218",
@@ -40046,6 +39812,24 @@
    "summary": "Le cap de la Hève est un cap de la falaise du Pays de Caux, situé au nord de la ville du Havre.\nIl marque l'extrémité sud de la Côte d'Albâtre et l'extrémité nord de la baie de Seine.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Cap%20de%20la%20H%C3%A8ve.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cap_de_la_H%C3%A8ve"
+  },
+  {
+   "id": "Q20183901",
+   "slug": "pierre-fade",
+   "name": "Pierre Fade",
+   "themeId": "megalithes",
+   "lat": 46.1579,
+   "lon": 2.0581,
+   "radiusM": 200,
+   "score": 49.0,
+   "departement": "Creuse",
+   "departementCode": "23",
+   "regionCode": "75",
+   "communeCode": "23154",
+   "communeName": "Pionnat",
+   "summary": "La Pierre Fade, appelée aussi dolmen de Ménardeix, est le seul édifice encore visible d'un groupe qui comportait trois dolmens. Elle est située à Pionnat dans le département de la Creuse.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Menhir%20et%20dolmen%20de%20M%C3%A9nardeix.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pierre_Fade"
   },
   {
    "id": "Q2940850",
@@ -42190,24 +41974,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cascade_de_Faymont"
   },
   {
-   "id": "Q33026778",
-   "slug": "cascade-de-courmes",
-   "name": "Cascade de Courmes",
-   "themeId": "cascades",
-   "lat": 43.741861,
-   "lon": 7.000556,
-   "radiusM": 300,
-   "score": 37.9,
-   "departement": "Alpes-Maritimes",
-   "departementCode": "06",
-   "regionCode": "93",
-   "communeCode": "06049",
-   "communeName": "Courmes",
-   "summary": "La cascade de Courmes est une chute d'eau située sur la commune de Courmes dans les Alpes-Maritimes, proche du saut du Loup.\nElle fait partie des sites classés depuis 1913.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Cascade%20de%20Courmes.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cascade_de_Courmes"
-  },
-  {
    "id": "Q55169874",
    "slug": "chute-de-la-druise",
    "name": "Chute de la Druise",
@@ -42496,24 +42262,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Plage_de_Moya"
   },
   {
-   "id": "Q2940864",
-   "slug": "cascade-du-chien",
-   "name": "Cascade du Chien",
-   "themeId": "cascades",
-   "lat": -21.021389,
-   "lon": 55.613333,
-   "radiusM": 300,
-   "score": 36.1,
-   "departement": "La Réunion",
-   "departementCode": "974",
-   "regionCode": "04",
-   "communeCode": "97402",
-   "communeName": "Bras-Panon",
-   "summary": "La cascade du Chien est une chute d'eau de l'île de La Réunion, département d'outre-mer français dans le sud-ouest de l'océan Indien. Formée par le Bras des Lianes, un affluent de la Rivière du Mât, elle relève du territoire de la commune de Bras-Panon et du parc national de La Réunion, dont les limites passent à proximité.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Cascade-du-Chien.JPG?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cascade_du_Chien"
-  },
-  {
    "id": "Q2940869",
    "slug": "cascade-du-trou-noir",
    "name": "Cascade du Trou noir",
@@ -42584,24 +42332,6 @@
    "summary": null,
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Thues%20caranca1.JPG?width=800",
    "wikipediaUrl": null
-  },
-  {
-   "id": "Q25513742",
-   "slug": "saut-niagara",
-   "name": "Saut Niagara",
-   "themeId": "cascades",
-   "lat": 4.57407,
-   "lon": -53.07702,
-   "radiusM": 300,
-   "score": 33.2,
-   "departement": "Guyane",
-   "departementCode": "973",
-   "regionCode": "03",
-   "communeCode": "97358",
-   "communeName": "Saint-Élie",
-   "summary": "Le Saut Niagara est chute d'eau située dans la commune de Saint-Elie en Guyane. Considérée comme l'une des plus belles chutes du département, elle est aussi l'une des plus célèbres.",
-   "imageUrl": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Saut_Niagara"
   },
   {
    "id": "Q49097042",
@@ -44907,32 +44637,32 @@
      "rank": 54
     },
     {
-     "placeId": "Q1242545",
+     "placeId": "Q3379510",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q3379510",
+     "placeId": "Q3080015",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q2859877",
+     "placeId": "Q3379520",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q3080015",
+     "placeId": "Q7826824",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q109045439",
+     "placeId": "Q47488973",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q3379520",
+     "placeId": "Q99509434",
      "tier": 3,
      "rank": 60
     }
@@ -47541,72 +47271,72 @@
      "rank": 46
     },
     {
-     "placeId": "Q3322576",
+     "placeId": "Q16540847",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q4889555",
+     "placeId": "Q3322576",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q8158932",
+     "placeId": "Q4889555",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q2200332",
+     "placeId": "Q8158932",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q1412839",
+     "placeId": "Q2200332",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q2572089",
+     "placeId": "Q1412839",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q2782043",
+     "placeId": "Q2572089",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q2105265",
+     "placeId": "Q2782043",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q3382362",
+     "placeId": "Q2105265",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q3437347",
+     "placeId": "Q3382362",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q3078719",
+     "placeId": "Q3437347",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q3224959",
+     "placeId": "Q3078719",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q1034137",
+     "placeId": "Q3224959",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q3382390",
+     "placeId": "Q1034137",
      "tier": 3,
      "rank": 60
     }
@@ -50095,17 +49825,17 @@
      "rank": 9
     },
     {
-     "placeId": "Q2820438",
+     "placeId": "Q2971232",
      "tier": 1,
      "rank": 10
     },
     {
-     "placeId": "Q2971232",
+     "placeId": "Q2859218",
      "tier": 2,
      "rank": 11
     },
     {
-     "placeId": "Q2859218",
+     "placeId": "Q2971000",
      "tier": 2,
      "rank": 12
     }
@@ -50861,10 +50591,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "34",
-   "placeCount": 37,
+   "placeCount": 36,
    "tierCounts": [
     13,
-    24,
+    23,
     0
    ],
    "places": [
@@ -51029,29 +50759,24 @@
      "rank": 32
     },
     {
-     "placeId": "Q1242545",
+     "placeId": "Q251083",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q251083",
+     "placeId": "Q2182798",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q2182798",
+     "placeId": "Q288930",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q288930",
-     "tier": 2,
-     "rank": 36
-    },
-    {
      "placeId": "Q2974261",
      "tier": 2,
-     "rank": 37
+     "rank": 36
     }
    ]
   },
@@ -51454,10 +51179,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "21",
-   "placeCount": 23,
+   "placeCount": 22,
    "tierCounts": [
     10,
-    12,
+    11,
     1
    ],
    "places": [
@@ -51562,19 +51287,14 @@
      "rank": 20
     },
     {
-     "placeId": "Q2616913",
+     "placeId": "Q14918218",
      "tier": 2,
      "rank": 21
     },
     {
-     "placeId": "Q14918218",
-     "tier": 2,
-     "rank": 22
-    },
-    {
      "placeId": "Q1932488",
      "tier": 3,
-     "rank": 23
+     "rank": 22
     }
    ]
   },
@@ -51586,10 +51306,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "49",
-   "placeCount": 27,
+   "placeCount": 26,
    "tierCounts": [
     10,
-    16,
+    15,
     1
    ],
    "places": [
@@ -51709,24 +51429,19 @@
      "rank": 23
     },
     {
-     "placeId": "Q3001696",
+     "placeId": "Q3890919",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q3890919",
+     "placeId": "Q2739331",
      "tier": 2,
      "rank": 25
     },
     {
-     "placeId": "Q2739331",
-     "tier": 2,
-     "rank": 26
-    },
-    {
      "placeId": "Q1604334",
      "tier": 3,
-     "rank": 27
+     "rank": 26
     }
    ]
   },
@@ -52247,10 +51962,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "69",
-   "placeCount": 24,
+   "placeCount": 23,
    "tierCounts": [
     10,
-    14,
+    13,
     0
    ],
    "places": [
@@ -52365,14 +52080,9 @@
      "rank": 22
     },
     {
-     "placeId": "Q19324488",
-     "tier": 2,
-     "rank": 23
-    },
-    {
      "placeId": "Q3162538",
      "tier": 2,
-     "rank": 24
+     "rank": 23
     }
    ]
   },
@@ -52867,11 +52577,11 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "24",
-   "placeCount": 64,
+   "placeCount": 62,
    "tierCounts": [
     11,
     25,
-    28
+    26
    ],
    "places": [
     {
@@ -53150,49 +52860,39 @@
      "rank": 55
     },
     {
-     "placeId": "Q1132377",
+     "placeId": "Q3533474",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q3533474",
+     "placeId": "Q371062",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q371062",
+     "placeId": "Q2452386",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q2099678",
+     "placeId": "Q17644673",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q2452386",
+     "placeId": "Q845415",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q17644673",
+     "placeId": "Q3111605",
      "tier": 3,
      "rank": 61
     },
     {
-     "placeId": "Q845415",
-     "tier": 3,
-     "rank": 62
-    },
-    {
-     "placeId": "Q3111605",
-     "tier": 3,
-     "rank": 63
-    },
-    {
      "placeId": "Q3162668",
      "tier": 3,
-     "rank": 64
+     "rank": 62
     }
    ]
   },
@@ -54445,10 +54145,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "12",
-   "placeCount": 24,
+   "placeCount": 23,
    "tierCounts": [
     11,
-    13,
+    12,
     0
    ],
    "places": [
@@ -54553,24 +54253,19 @@
      "rank": 20
     },
     {
-     "placeId": "Q1232140",
+     "placeId": "Q3330186",
      "tier": 2,
      "rank": 21
     },
     {
-     "placeId": "Q3330186",
+     "placeId": "Q2051933",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q2051933",
-     "tier": 2,
-     "rank": 23
-    },
-    {
      "placeId": "Q3540827",
      "tier": 2,
-     "rank": 24
+     "rank": 23
     }
    ]
   },
@@ -55621,10 +55316,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "59",
-   "placeCount": 32,
+   "placeCount": 31,
    "tierCounts": [
     10,
-    21,
+    20,
     1
    ],
    "places": [
@@ -55754,39 +55449,34 @@
      "rank": 25
     },
     {
-     "placeId": "Q2820618",
+     "placeId": "Q1438857",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q1438857",
+     "placeId": "Q22960740",
      "tier": 2,
      "rank": 27
     },
     {
-     "placeId": "Q22960740",
+     "placeId": "Q2229969",
      "tier": 2,
      "rank": 28
     },
     {
-     "placeId": "Q2229969",
+     "placeId": "Q2994484",
      "tier": 2,
      "rank": 29
     },
     {
-     "placeId": "Q2994484",
+     "placeId": "Q3378238",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q3378238",
-     "tier": 2,
-     "rank": 31
-    },
-    {
      "placeId": "Q26700542",
      "tier": 3,
-     "rank": 32
+     "rank": 31
     }
    ]
   },
@@ -55846,17 +55536,17 @@
      "rank": 8
     },
     {
-     "placeId": "Q2820782",
+     "placeId": "Q5118853",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q5118853",
+     "placeId": "Q3279371",
      "tier": 1,
      "rank": 10
     },
     {
-     "placeId": "Q3279371",
+     "placeId": "Q2970772",
      "tier": 2,
      "rank": 11
     },
@@ -56768,10 +56458,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "22",
-   "placeCount": 25,
+   "placeCount": 24,
    "tierCounts": [
     12,
-    13,
+    12,
     0
    ],
    "places": [
@@ -56866,39 +56556,34 @@
      "rank": 18
     },
     {
-     "placeId": "Q3001695",
+     "placeId": "Q2804460",
      "tier": 2,
      "rank": 19
     },
     {
-     "placeId": "Q2804460",
+     "placeId": "Q3028305",
      "tier": 2,
      "rank": 20
     },
     {
-     "placeId": "Q3028305",
+     "placeId": "Q14628539",
      "tier": 2,
      "rank": 21
     },
     {
-     "placeId": "Q14628539",
+     "placeId": "Q3078854",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q3078854",
+     "placeId": "Q2085033",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q2085033",
-     "tier": 2,
-     "rank": 24
-    },
-    {
      "placeId": "Q11832360",
      "tier": 2,
-     "rank": 25
+     "rank": 24
     }
    ]
   },
@@ -56953,22 +56638,22 @@
      "rank": 7
     },
     {
-     "placeId": "Q334221",
+     "placeId": "Q1696035",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q1696035",
+     "placeId": "Q2969794",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q334260",
+     "placeId": "Q2612600",
      "tier": 1,
      "rank": 10
     },
     {
-     "placeId": "Q2969794",
+     "placeId": "Q1438859",
      "tier": 2,
      "rank": 11
     },
@@ -57871,12 +57556,12 @@
      "rank": 9
     },
     {
-     "placeId": "Q661154",
+     "placeId": "Q3556076",
      "tier": 1,
      "rank": 10
     },
     {
-     "placeId": "Q3556076",
+     "placeId": "Q2820451",
      "tier": 2,
      "rank": 11
     },
@@ -57895,11 +57580,11 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "06",
-   "placeCount": 50,
+   "placeCount": 49,
    "tierCounts": [
     13,
     25,
-    12
+    11
    ],
    "places": [
     {
@@ -58146,11 +57831,6 @@
      "placeId": "Q2937139",
      "tier": 3,
      "rank": 49
-    },
-    {
-     "placeId": "Q33026778",
-     "tier": 3,
-     "rank": 50
     }
    ]
   },
@@ -58940,12 +58620,12 @@
      "rank": 9
     },
     {
-     "placeId": "Q1775054",
+     "placeId": "Q22967182",
      "tier": 1,
      "rank": 10
     },
     {
-     "placeId": "Q22967182",
+     "placeId": "Q2968228",
      "tier": 2,
      "rank": 11
     },
@@ -59012,17 +58692,17 @@
      "rank": 8
     },
     {
-     "placeId": "Q2793745",
+     "placeId": "Q3330705",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q3330705",
+     "placeId": "Q16540847",
      "tier": 1,
      "rank": 10
     },
     {
-     "placeId": "Q2820631",
+     "placeId": "Q1385053",
      "tier": 2,
      "rank": 11
     },
@@ -59569,10 +59249,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "02",
-   "placeCount": 15,
+   "placeCount": 14,
    "tierCounts": [
     10,
-    5,
+    4,
     0
    ],
    "places": [
@@ -59637,19 +59317,14 @@
      "rank": 12
     },
     {
-     "placeId": "Q334110",
+     "placeId": "Q3556312",
      "tier": 2,
      "rank": 13
     },
     {
-     "placeId": "Q3556312",
-     "tier": 2,
-     "rank": 14
-    },
-    {
      "placeId": "Q3078936",
      "tier": 2,
-     "rank": 15
+     "rank": 14
     }
    ]
   },
@@ -59970,10 +59645,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "45",
-   "placeCount": 17,
+   "placeCount": 16,
    "tierCounts": [
     10,
-    5,
+    4,
     2
    ],
    "places": [
@@ -60048,19 +59723,14 @@
      "rank": 14
     },
     {
-     "placeId": "Q334190",
-     "tier": 2,
-     "rank": 15
-    },
-    {
      "placeId": "Q99319",
      "tier": 3,
-     "rank": 16
+     "rank": 15
     },
     {
      "placeId": "Q48758119",
      "tier": 3,
-     "rank": 17
+     "rank": 16
     }
    ]
   },
@@ -60592,32 +60262,32 @@
      "rank": 6
     },
     {
-     "placeId": "Q3577781",
+     "placeId": "Q2968429",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q2968429",
+     "placeId": "Q2968102",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q1673878",
+     "placeId": "Q3215346",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q2968102",
+     "placeId": "Q2968815",
      "tier": 1,
      "rank": 10
     },
     {
-     "placeId": "Q3215346",
+     "placeId": "Q639245",
      "tier": 2,
      "rank": 11
     },
     {
-     "placeId": "Q2968815",
+     "placeId": "Q18380013",
      "tier": 2,
      "rank": 12
     }
@@ -60806,7 +60476,7 @@
      "rank": 11
     },
     {
-     "placeId": "Q2820453",
+     "placeId": "Q22962887",
      "tier": 2,
      "rank": 12
     }
@@ -60820,11 +60490,11 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "974",
-   "placeCount": 49,
+   "placeCount": 48,
    "tierCounts": [
     10,
     25,
-    14
+    13
    ],
    "places": [
     {
@@ -61063,14 +60733,9 @@
      "rank": 47
     },
     {
-     "placeId": "Q2940864",
-     "tier": 3,
-     "rank": 48
-    },
-    {
      "placeId": "Q2940869",
      "tier": 3,
-     "rank": 49
+     "rank": 48
     }
    ]
   },
@@ -61411,17 +61076,17 @@
      "rank": 7
     },
     {
-     "placeId": "Q2961294",
+     "placeId": "Q4896307",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q4896307",
+     "placeId": "Q2969647",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q2969647",
+     "placeId": "Q3078318",
      "tier": 1,
      "rank": 10
     },
@@ -61575,12 +61240,12 @@
      "rank": 10
     },
     {
-     "placeId": "Q2820533",
+     "placeId": "Q22985151",
      "tier": 2,
      "rank": 11
     },
     {
-     "placeId": "Q22985151",
+     "placeId": "Q59155226",
      "tier": 2,
      "rank": 12
     }
@@ -61959,8 +61624,8 @@
    "geoCode": "973",
    "placeCount": 12,
    "tierCounts": [
-    7,
-    5,
+    8,
+    4,
     0
    ],
    "places": [
@@ -61990,37 +61655,37 @@
      "rank": 5
     },
     {
-     "placeId": "Q3322280",
+     "placeId": "Q3593481",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q3322277",
+     "placeId": "Q3322280",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q24695383",
-     "tier": 2,
+     "placeId": "Q3322277",
+     "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q3593353",
+     "placeId": "Q24695383",
      "tier": 2,
      "rank": 9
     },
     {
-     "placeId": "Q24692552",
+     "placeId": "Q3593353",
      "tier": 2,
      "rank": 10
     },
     {
-     "placeId": "Q7208317",
+     "placeId": "Q24692552",
      "tier": 2,
      "rank": 11
     },
     {
-     "placeId": "Q25513742",
+     "placeId": "Q7208317",
      "tier": 2,
      "rank": 12
     }
@@ -62124,57 +61789,57 @@
      "rank": 1
     },
     {
-     "placeId": "Q2820643",
+     "placeId": "Q67221075",
      "tier": 1,
      "rank": 2
     },
     {
-     "placeId": "Q1775829",
+     "placeId": "Q20182455",
      "tier": 1,
      "rank": 3
     },
     {
-     "placeId": "Q1775062",
+     "placeId": "Q1676387",
      "tier": 1,
      "rank": 4
     },
     {
-     "placeId": "Q67221075",
+     "placeId": "Q3556548",
      "tier": 1,
      "rank": 5
     },
     {
-     "placeId": "Q20182455",
+     "placeId": "Q2968236",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q1676387",
+     "placeId": "Q947479",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q3556548",
+     "placeId": "Q22951440",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q2968236",
+     "placeId": "Q22951425",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q1559820",
+     "placeId": "Q22951468",
      "tier": 1,
      "rank": 10
     },
     {
-     "placeId": "Q947479",
+     "placeId": "Q3078840",
      "tier": 2,
      "rank": 11
     },
     {
-     "placeId": "Q3078840",
+     "placeId": "Q20183901",
      "tier": 2,
      "rank": 12
     }
@@ -64259,7 +63924,7 @@
      "rank": 79
     },
     {
-     "placeId": "Q2820618",
+     "placeId": "Q3246739",
      "tier": 3,
      "rank": 80
     }
@@ -65038,27 +64703,27 @@
      "rank": 68
     },
     {
-     "placeId": "Q2820782",
+     "placeId": "Q5118853",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q5118853",
+     "placeId": "Q2820489",
      "tier": 3,
      "rank": 70
     },
     {
-     "placeId": "Q2820489",
+     "placeId": "Q3279371",
      "tier": 3,
      "rank": 71
     },
     {
-     "placeId": "Q3279371",
+     "placeId": "Q1235906",
      "tier": 3,
      "rank": 72
     },
     {
-     "placeId": "Q1235906",
+     "placeId": "Q2970772",
      "tier": 3,
      "rank": 73
     },
@@ -65068,32 +64733,32 @@
      "rank": 74
     },
     {
-     "placeId": "Q3001696",
+     "placeId": "Q2968078",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q2968078",
+     "placeId": "Q2968413",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q2968413",
+     "placeId": "Q3162498",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q2820453",
+     "placeId": "Q22962887",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q3162498",
+     "placeId": "Q1604334",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q1604334",
+     "placeId": "Q3378441",
      "tier": 3,
      "rank": 80
     }
@@ -67474,11 +67139,11 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "04",
-   "placeCount": 49,
+   "placeCount": 48,
    "tierCounts": [
     10,
     25,
-    14
+    13
    ],
    "places": [
     {
@@ -67717,14 +67382,9 @@
      "rank": 47
     },
     {
-     "placeId": "Q2940864",
-     "tier": 3,
-     "rank": 48
-    },
-    {
      "placeId": "Q2940869",
      "tier": 3,
-     "rank": 49
+     "rank": 48
     }
    ]
   },
@@ -67947,8 +67607,8 @@
    "geoCode": "03",
    "placeCount": 12,
    "tierCounts": [
-    7,
-    5,
+    8,
+    4,
     0
    ],
    "places": [
@@ -67978,37 +67638,37 @@
      "rank": 5
     },
     {
-     "placeId": "Q3322280",
+     "placeId": "Q3593481",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q3322277",
+     "placeId": "Q3322280",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q24695383",
-     "tier": 2,
+     "placeId": "Q3322277",
+     "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q3593353",
+     "placeId": "Q24695383",
      "tier": 2,
      "rank": 9
     },
     {
-     "placeId": "Q24692552",
+     "placeId": "Q3593353",
      "tier": 2,
      "rank": 10
     },
     {
-     "placeId": "Q7208317",
+     "placeId": "Q24692552",
      "tier": 2,
      "rank": 11
     },
     {
-     "placeId": "Q25513742",
+     "placeId": "Q7208317",
      "tier": 2,
      "rank": 12
     }
@@ -70405,10 +70065,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "13",
-   "placeCount": 12,
+   "placeCount": 13,
    "tierCounts": [
     10,
-    2,
+    3,
     0
    ],
    "places": [
@@ -70471,6 +70131,11 @@
      "placeId": "Q516783",
      "tier": 2,
      "rank": 12
+    },
+    {
+     "placeId": "Q2859877",
+     "tier": 2,
+     "rank": 13
     }
    ]
   },
@@ -71888,10 +71553,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "974",
-   "placeCount": 14,
+   "placeCount": 13,
    "tierCounts": [
     5,
-    9,
+    8,
     0
    ],
    "places": [
@@ -71956,14 +71621,9 @@
      "rank": 12
     },
     {
-     "placeId": "Q2940864",
-     "tier": 2,
-     "rank": 13
-    },
-    {
      "placeId": "Q2940869",
      "tier": 2,
-     "rank": 14
+     "rank": 13
     }
    ]
   },
@@ -73370,11 +73030,11 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "24",
-   "placeCount": 61,
+   "placeCount": 62,
    "tierCounts": [
     10,
     25,
-    26
+    27
    ],
    "places": [
     {
@@ -73681,6 +73341,11 @@
      "placeId": "Q2971232",
      "tier": 3,
      "rank": 61
+    },
+    {
+     "placeId": "Q2971000",
+     "tier": 3,
+     "rank": 62
     }
    ]
   },
@@ -74016,10 +73681,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "52",
-   "placeCount": 32,
+   "placeCount": 34,
    "tierCounts": [
     10,
-    22,
+    24,
     0
    ],
    "places": [
@@ -74169,19 +73834,29 @@
      "rank": 29
     },
     {
-     "placeId": "Q2240685",
+     "placeId": "Q2970772",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q2968078",
+     "placeId": "Q2240685",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q2968413",
+     "placeId": "Q2968078",
      "tier": 2,
      "rank": 32
+    },
+    {
+     "placeId": "Q2968413",
+     "tier": 2,
+     "rank": 33
+    },
+    {
+     "placeId": "Q22962887",
+     "tier": 2,
+     "rank": 34
     }
    ]
   },
@@ -74410,10 +74085,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "27",
-   "placeCount": 11,
+   "placeCount": 9,
    "tierCounts": [
-    10,
-    1,
+    9,
+    0,
     0
    ],
    "places": [
@@ -74458,19 +74133,9 @@
      "rank": 8
     },
     {
-     "placeId": "Q2793745",
+     "placeId": "Q1385053",
      "tier": 1,
      "rank": 9
-    },
-    {
-     "placeId": "Q2820631",
-     "tier": 1,
-     "rank": 10
-    },
-    {
-     "placeId": "Q2616913",
-     "tier": 2,
-     "rank": 11
     }
    ]
   },
@@ -74935,10 +74600,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "84",
-   "placeCount": 13,
+   "placeCount": 10,
    "tierCounts": [
     10,
-    3,
+    0,
     0
    ],
    "places": [
@@ -74983,29 +74648,14 @@
      "rank": 8
     },
     {
-     "placeId": "Q964638",
+     "placeId": "Q1229179",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q1229179",
+     "placeId": "Q22967182",
      "tier": 1,
      "rank": 10
-    },
-    {
-     "placeId": "Q19324488",
-     "tier": 2,
-     "rank": 11
-    },
-    {
-     "placeId": "Q1775054",
-     "tier": 2,
-     "rank": 12
-    },
-    {
-     "placeId": "Q22967182",
-     "tier": 2,
-     "rank": 13
     }
    ]
   },
@@ -75362,63 +75012,6 @@
      "placeId": "Q3330705",
      "tier": 2,
      "rank": 14
-    }
-   ]
-  },
-  {
-   "slug": "monuments-region-93",
-   "name": "Monuments et édifices remarquables de Provence-Alpes-Côte d'Azur",
-   "kind": "geo",
-   "themeId": "monuments",
-   "labelId": null,
-   "geoLevel": "region",
-   "geoCode": "93",
-   "placeCount": 8,
-   "tierCounts": [
-    8,
-    0,
-    0
-   ],
-   "places": [
-    {
-     "placeId": "Q958961",
-     "tier": 1,
-     "rank": 1
-    },
-    {
-     "placeId": "Q1777218",
-     "tier": 1,
-     "rank": 2
-    },
-    {
-     "placeId": "Q1619084",
-     "tier": 1,
-     "rank": 3
-    },
-    {
-     "placeId": "Q1906882",
-     "tier": 1,
-     "rank": 4
-    },
-    {
-     "placeId": "Q2243437",
-     "tier": 1,
-     "rank": 5
-    },
-    {
-     "placeId": "Q44218",
-     "tier": 1,
-     "rank": 6
-    },
-    {
-     "placeId": "Q2859877",
-     "tier": 1,
-     "rank": 7
-    },
-    {
-     "placeId": "Q47488973",
-     "tier": 1,
-     "rank": 8
     }
    ]
   },
@@ -75985,11 +75578,11 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "44",
-   "placeCount": 37,
+   "placeCount": 41,
    "tierCounts": [
     10,
     25,
-    2
+    6
    ],
    "places": [
     {
@@ -76163,19 +75756,39 @@
      "rank": 34
     },
     {
-     "placeId": "Q2968102",
+     "placeId": "Q2612600",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q2968815",
+     "placeId": "Q1438859",
      "tier": 3,
      "rank": 36
     },
     {
-     "placeId": "Q2970981",
+     "placeId": "Q2968102",
      "tier": 3,
      "rank": 37
+    },
+    {
+     "placeId": "Q2968815",
+     "tier": 3,
+     "rank": 38
+    },
+    {
+     "placeId": "Q3078318",
+     "tier": 3,
+     "rank": 39
+    },
+    {
+     "placeId": "Q18380013",
+     "tier": 3,
+     "rank": 40
+    },
+    {
+     "placeId": "Q2970981",
+     "tier": 3,
+     "rank": 41
     }
    ]
   },
@@ -77097,73 +76710,6 @@
    ]
   },
   {
-   "slug": "abbayes-region-52",
-   "name": "Abbayes et monastères des Pays de la Loire",
-   "kind": "geo",
-   "themeId": "abbayes",
-   "labelId": null,
-   "geoLevel": "region",
-   "geoCode": "52",
-   "placeCount": 10,
-   "tierCounts": [
-    10,
-    0,
-    0
-   ],
-   "places": [
-    {
-     "placeId": "Q283254",
-     "tier": 1,
-     "rank": 1
-    },
-    {
-     "placeId": "Q672917",
-     "tier": 1,
-     "rank": 2
-    },
-    {
-     "placeId": "Q306131",
-     "tier": 1,
-     "rank": 3
-    },
-    {
-     "placeId": "Q673704",
-     "tier": 1,
-     "rank": 4
-    },
-    {
-     "placeId": "Q334135",
-     "tier": 1,
-     "rank": 5
-    },
-    {
-     "placeId": "Q1646064",
-     "tier": 1,
-     "rank": 6
-    },
-    {
-     "placeId": "Q2820782",
-     "tier": 1,
-     "rank": 7
-    },
-    {
-     "placeId": "Q2820489",
-     "tier": 1,
-     "rank": 8
-    },
-    {
-     "placeId": "Q3001696",
-     "tier": 1,
-     "rank": 9
-    },
-    {
-     "placeId": "Q2820453",
-     "tier": 1,
-     "rank": 10
-    }
-   ]
-  },
-  {
    "slug": "cathedrales-region-28",
    "name": "Cathédrales et basiliques de Normandie",
    "kind": "geo",
@@ -77482,10 +77028,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "76",
-   "placeCount": 28,
+   "placeCount": 27,
    "tierCounts": [
     11,
-    17,
+    16,
     0
    ],
    "places": [
@@ -77620,14 +77166,9 @@
      "rank": 26
     },
     {
-     "placeId": "Q1232140",
-     "tier": 2,
-     "rank": 27
-    },
-    {
      "placeId": "Q1229863",
      "tier": 2,
-     "rank": 28
+     "rank": 27
     }
    ]
   },
@@ -77940,10 +77481,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "93",
-   "placeCount": 20,
+   "placeCount": 21,
    "tierCounts": [
     10,
-    10,
+    11,
     0
    ],
    "places": [
@@ -78046,6 +77587,11 @@
      "placeId": "Q2103675",
      "tier": 2,
      "rank": 20
+    },
+    {
+     "placeId": "Q2859877",
+     "tier": 2,
+     "rank": 21
     }
    ]
   },
@@ -78179,11 +77725,11 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "75",
-   "placeCount": 74,
+   "placeCount": 75,
    "tierCounts": [
     10,
     25,
-    39
+    40
    ],
    "places": [
     {
@@ -78555,6 +78101,11 @@
      "placeId": "Q947479",
      "tier": 3,
      "rank": 74
+    },
+    {
+     "placeId": "Q22951425",
+     "tier": 3,
+     "rank": 75
     }
    ]
   },
@@ -78812,10 +78363,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "44",
-   "placeCount": 17,
+   "placeCount": 13,
    "tierCounts": [
     10,
-    7,
+    3,
     0
    ],
    "places": [
@@ -78860,49 +78411,29 @@
      "rank": 8
     },
     {
-     "placeId": "Q661154",
+     "placeId": "Q334089",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q334221",
+     "placeId": "Q2820451",
      "tier": 1,
      "rank": 10
     },
     {
-     "placeId": "Q334089",
+     "placeId": "Q1696035",
      "tier": 2,
      "rank": 11
     },
     {
-     "placeId": "Q1696035",
+     "placeId": "Q639245",
      "tier": 2,
      "rank": 12
     },
     {
-     "placeId": "Q334260",
+     "placeId": "Q59155226",
      "tier": 2,
      "rank": 13
-    },
-    {
-     "placeId": "Q2961294",
-     "tier": 2,
-     "rank": 14
-    },
-    {
-     "placeId": "Q3577781",
-     "tier": 2,
-     "rank": 15
-    },
-    {
-     "placeId": "Q1673878",
-     "tier": 2,
-     "rank": 16
-    },
-    {
-     "placeId": "Q2820533",
-     "tier": 2,
-     "rank": 17
     }
    ]
   },
@@ -79242,9 +78773,9 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "11",
-   "placeCount": 10,
+   "placeCount": 8,
    "tierCounts": [
-    10,
+    8,
     0,
     0
    ],
@@ -79288,16 +78819,6 @@
      "placeId": "Q334077",
      "tier": 1,
      "rank": 8
-    },
-    {
-     "placeId": "Q306107",
-     "tier": 1,
-     "rank": 9
-    },
-    {
-     "placeId": "Q1552859",
-     "tier": 1,
-     "rank": 10
     }
    ]
   },
@@ -79909,63 +79430,6 @@
    ]
   },
   {
-   "slug": "monuments-region-76",
-   "name": "Monuments et édifices remarquables d'Occitanie",
-   "kind": "geo",
-   "themeId": "monuments",
-   "labelId": null,
-   "geoLevel": "region",
-   "geoCode": "76",
-   "placeCount": 8,
-   "tierCounts": [
-    7,
-    1,
-    0
-   ],
-   "places": [
-    {
-     "placeId": "Q179656",
-     "tier": 1,
-     "rank": 1
-    },
-    {
-     "placeId": "Q2968376",
-     "tier": 1,
-     "rank": 2
-    },
-    {
-     "placeId": "Q3533042",
-     "tier": 1,
-     "rank": 3
-    },
-    {
-     "placeId": "Q832351",
-     "tier": 1,
-     "rank": 4
-    },
-    {
-     "placeId": "Q2092877",
-     "tier": 1,
-     "rank": 5
-    },
-    {
-     "placeId": "Q1242545",
-     "tier": 1,
-     "rank": 6
-    },
-    {
-     "placeId": "Q3080015",
-     "tier": 1,
-     "rank": 7
-    },
-    {
-     "placeId": "Q1518963",
-     "tier": 2,
-     "rank": 8
-    }
-   ]
-  },
-  {
    "slug": "abbayes-region-28",
    "name": "Abbayes et monastères de Normandie",
    "kind": "geo",
@@ -80414,64 +79878,59 @@
    ]
   },
   {
-   "slug": "abbayes-region-24",
-   "name": "Abbayes et monastères du Centre-Val de Loire",
+   "slug": "sommets-region-27",
+   "name": "Sommets de Bourgogne-Franche-Comté",
    "kind": "geo",
-   "themeId": "abbayes",
+   "themeId": "sommets",
    "labelId": null,
    "geoLevel": "region",
-   "geoCode": "24",
-   "placeCount": 9,
+   "geoCode": "27",
+   "placeCount": 8,
    "tierCounts": [
-    9,
+    8,
     0,
     0
    ],
    "places": [
     {
-     "placeId": "Q956741",
+     "placeId": "Q3437539",
      "tier": 1,
      "rank": 1
     },
     {
-     "placeId": "Q776244",
+     "placeId": "Q2098121",
      "tier": 1,
      "rank": 2
     },
     {
-     "placeId": "Q745084",
+     "placeId": "Q924562",
      "tier": 1,
      "rank": 3
     },
     {
-     "placeId": "Q2820549",
+     "placeId": "Q960584",
      "tier": 1,
      "rank": 4
     },
     {
-     "placeId": "Q2820580",
+     "placeId": "Q16540847",
      "tier": 1,
      "rank": 5
     },
     {
-     "placeId": "Q591",
+     "placeId": "Q2200332",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q1775231",
+     "placeId": "Q799744",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q334190",
+     "placeId": "Q16635952",
      "tier": 1,
      "rank": 8
-    },
-    {
-     "placeId": "Q2820438",
-     "tier": 1,
-     "rank": 9
     }
    ]
   },
@@ -80570,10 +80029,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "32",
-   "placeCount": 17,
+   "placeCount": 15,
    "tierCounts": [
     10,
-    7,
+    5,
     0
    ],
    "places": [
@@ -80651,16 +80110,6 @@
      "placeId": "Q834831",
      "tier": 2,
      "rank": 15
-    },
-    {
-     "placeId": "Q2820618",
-     "tier": 2,
-     "rank": 16
-    },
-    {
-     "placeId": "Q334110",
-     "tier": 2,
-     "rank": 17
     }
    ]
   },
@@ -80672,10 +80121,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "84",
-   "placeCount": 28,
+   "placeCount": 30,
    "tierCounts": [
     10,
-    18,
+    20,
     0
    ],
    "places": [
@@ -80818,6 +80267,16 @@
      "placeId": "Q2415426",
      "tier": 2,
      "rank": 28
+    },
+    {
+     "placeId": "Q964638",
+     "tier": 2,
+     "rank": 29
+    },
+    {
+     "placeId": "Q2968228",
+     "tier": 2,
+     "rank": 30
     }
    ]
   },
@@ -81611,10 +81070,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "94",
-   "placeCount": 14,
+   "placeCount": 13,
    "tierCounts": [
     10,
-    4,
+    3,
     0
    ],
    "places": [
@@ -81629,42 +81088,42 @@
      "rank": 2
     },
     {
-     "placeId": "Q109045439",
+     "placeId": "Q3379520",
      "tier": 1,
      "rank": 3
     },
     {
-     "placeId": "Q3379520",
+     "placeId": "Q7826824",
      "tier": 1,
      "rank": 4
     },
     {
-     "placeId": "Q7826824",
+     "placeId": "Q10984637",
      "tier": 1,
      "rank": 5
     },
     {
-     "placeId": "Q10984637",
+     "placeId": "Q2804401",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q2804401",
+     "placeId": "Q7826862",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q7826862",
+     "placeId": "Q3379494",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q3379494",
+     "placeId": "Q7826838",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q7826838",
+     "placeId": "Q3379500",
      "tier": 1,
      "rank": 10
     },
@@ -81674,19 +81133,14 @@
      "rank": 11
     },
     {
-     "placeId": "Q3379500",
+     "placeId": "Q3381597",
      "tier": 2,
      "rank": 12
     },
     {
-     "placeId": "Q3381597",
-     "tier": 2,
-     "rank": 13
-    },
-    {
      "placeId": "Q7826856",
      "tier": 2,
-     "rank": 14
+     "rank": 13
     }
    ]
   },
@@ -81959,10 +81413,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "75",
-   "placeCount": 17,
+   "placeCount": 11,
    "tierCounts": [
     10,
-    7,
+    1,
     0
    ],
    "places": [
@@ -82017,39 +81471,9 @@
      "rank": 10
     },
     {
-     "placeId": "Q1132377",
-     "tier": 2,
-     "rank": 11
-    },
-    {
-     "placeId": "Q2820643",
-     "tier": 2,
-     "rank": 12
-    },
-    {
-     "placeId": "Q2099678",
-     "tier": 2,
-     "rank": 13
-    },
-    {
-     "placeId": "Q1775829",
-     "tier": 2,
-     "rank": 14
-    },
-    {
      "placeId": "Q2820816",
      "tier": 2,
-     "rank": 15
-    },
-    {
-     "placeId": "Q1775062",
-     "tier": 2,
-     "rank": 16
-    },
-    {
-     "placeId": "Q1559820",
-     "tier": 2,
-     "rank": 17
+     "rank": 11
     }
    ]
   },
@@ -82118,10 +81542,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "75",
-   "placeCount": 23,
+   "placeCount": 26,
    "tierCounts": [
     10,
-    13,
+    16,
     0
    ],
    "places": [
@@ -82239,6 +81663,21 @@
      "placeId": "Q1676387",
      "tier": 2,
      "rank": 23
+    },
+    {
+     "placeId": "Q22951440",
+     "tier": 2,
+     "rank": 24
+    },
+    {
+     "placeId": "Q22951468",
+     "tier": 2,
+     "rank": 25
+    },
+    {
+     "placeId": "Q20183901",
+     "tier": 2,
+     "rank": 26
     }
    ]
   },
@@ -83189,10 +82628,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "04",
-   "placeCount": 14,
+   "placeCount": 13,
    "tierCounts": [
     5,
-    9,
+    8,
     0
    ],
    "places": [
@@ -83257,14 +82696,9 @@
      "rank": 12
     },
     {
-     "placeId": "Q2940864",
-     "tier": 2,
-     "rank": 13
-    },
-    {
      "placeId": "Q2940869",
      "tier": 2,
-     "rank": 14
+     "rank": 13
     }
    ]
   },
@@ -84549,11 +83983,6 @@
     "parentCode": "02"
    },
    {
-    "code": "02619",
-    "name": "Prémontré",
-    "parentCode": "02"
-   },
-   {
     "code": "02684",
     "name": "Saint-Michel",
     "parentCode": "02"
@@ -84769,11 +84198,6 @@
     "parentCode": "06"
    },
    {
-    "code": "06049",
-    "name": "Courmes",
-    "parentCode": "06"
-   },
-   {
     "code": "06068",
     "name": "Gourdon",
     "parentCode": "06"
@@ -84929,8 +84353,8 @@
     "parentCode": "08"
    },
    {
-    "code": "08439",
-    "name": "Tannay-le-Mont-Dieu",
+    "code": "08480",
+    "name": "Villers-Semeuse",
     "parentCode": "08"
    },
    {
@@ -85054,23 +84478,18 @@
     "parentCode": "10"
    },
    {
-    "code": "10064",
-    "name": "Brienne-le-Château",
-    "parentCode": "10"
-   },
-   {
     "code": "10071",
     "name": "Chacenay",
     "parentCode": "10"
    },
    {
-    "code": "10209",
-    "name": "Lusigny-sur-Barse",
+    "code": "10238",
+    "name": "Mesnil-Saint-Père",
     "parentCode": "10"
    },
    {
-    "code": "10238",
-    "name": "Mesnil-Saint-Père",
+    "code": "10249",
+    "name": "Montiéramey",
     "parentCode": "10"
    },
    {
@@ -85086,6 +84505,11 @@
    {
     "code": "10387",
     "name": "Troyes",
+    "parentCode": "10"
+   },
+   {
+    "code": "10409",
+    "name": "Villacerf",
     "parentCode": "10"
    },
    {
@@ -85226,11 +84650,6 @@
    {
     "code": "12038",
     "name": "Brousse-le-Château",
-    "parentCode": "12"
-   },
-   {
-    "code": "12064",
-    "name": "Le Cayrol",
     "parentCode": "12"
    },
    {
@@ -86014,11 +85433,6 @@
     "parentCode": "23"
    },
    {
-    "code": "23022",
-    "name": "Bétête",
-    "parentCode": "23"
-   },
-   {
     "code": "23024",
     "name": "Blessac",
     "parentCode": "23"
@@ -86026,21 +85440,6 @@
    {
     "code": "23096",
     "name": "Guéret",
-    "parentCode": "23"
-   },
-   {
-    "code": "23130",
-    "name": "Méasnes",
-    "parentCode": "23"
-   },
-   {
-    "code": "23138",
-    "name": "Moutier-d'Ahun",
-    "parentCode": "23"
-   },
-   {
-    "code": "23151",
-    "name": "Peyrat-la-Nonière",
     "parentCode": "23"
    },
    {
@@ -86061,6 +85460,21 @@
    {
     "code": "23199",
     "name": "Saint-Germain-Beaupré",
+    "parentCode": "23"
+   },
+   {
+    "code": "23210",
+    "name": "Saint-Maixant",
+    "parentCode": "23"
+   },
+   {
+    "code": "23235",
+    "name": "Saint-Priest-la-Feuille",
+    "parentCode": "23"
+   },
+   {
+    "code": "23236",
+    "name": "Saint-Priest-la-Plaine",
     "parentCode": "23"
    },
    {
@@ -86224,11 +85638,6 @@
     "parentCode": "24"
    },
    {
-    "code": "24507",
-    "name": "Sainte-Trie",
-    "parentCode": "24"
-   },
-   {
     "code": "24516",
     "name": "Salignac-Eyvigues",
     "parentCode": "24"
@@ -86246,11 +85655,6 @@
    {
     "code": "24548",
     "name": "Teyjat",
-    "parentCode": "24"
-   },
-   {
-    "code": "24549",
-    "name": "Thénac",
     "parentCode": "24"
    },
    {
@@ -86546,6 +85950,11 @@
    {
     "code": "28280",
     "name": "Nogent-le-Rotrou",
+    "parentCode": "28"
+   },
+   {
+    "code": "28414",
+    "name": "Villebon",
     "parentCode": "28"
    },
    {
@@ -87934,6 +87343,11 @@
     "parentCode": "42"
    },
    {
+    "code": "42042",
+    "name": "Chambles",
+    "parentCode": "42"
+   },
+   {
     "code": "42052",
     "name": "Charlieu",
     "parentCode": "42"
@@ -87941,11 +87355,6 @@
    {
     "code": "42195",
     "name": "Sail-sous-Couzan",
-    "parentCode": "42"
-   },
-   {
-    "code": "42197",
-    "name": "Sainte-Agathe-la-Bouteresse",
     "parentCode": "42"
    },
    {
@@ -88151,11 +87560,6 @@
    {
     "code": "45274",
     "name": "Saint-Denis-en-Val",
-    "parentCode": "45"
-   },
-   {
-    "code": "45298",
-    "name": "Saint-Pryvé-Saint-Mesmin",
     "parentCode": "45"
    },
    {
@@ -88559,11 +87963,6 @@
     "parentCode": "52"
    },
    {
-    "code": "52043",
-    "name": "Belmont",
-    "parentCode": "52"
-   },
-   {
     "code": "52121",
     "name": "Chaumont",
     "parentCode": "52"
@@ -88596,6 +87995,11 @@
    {
     "code": "52482",
     "name": "Soulaucourt-sur-Mouzon",
+    "parentCode": "52"
+   },
+   {
+    "code": "52514",
+    "name": "Verbiesles",
     "parentCode": "52"
    },
    {
@@ -88736,11 +88140,6 @@
    {
     "code": "55189",
     "name": "Fleury-devant-Douaumont",
-    "parentCode": "55"
-   },
-   {
-    "code": "55262",
-    "name": "Juvigny-sur-Loison",
     "parentCode": "55"
    },
    {
@@ -88899,11 +88298,6 @@
     "parentCode": "57"
    },
    {
-    "code": "57612",
-    "name": "Saint-Hubert",
-    "parentCode": "57"
-   },
-   {
     "code": "57623",
     "name": "Saint-Quirin",
     "parentCode": "57"
@@ -89021,11 +88415,6 @@
    {
     "code": "59350",
     "name": "Lille",
-    "parentCode": "59"
-   },
-   {
-    "code": "59375",
-    "name": "Marchiennes",
     "parentCode": "59"
    },
    {
@@ -89959,18 +89348,13 @@
     "parentCode": "70"
    },
    {
-    "code": "70310",
-    "name": "Lure",
-    "parentCode": "70"
-   },
-   {
     "code": "70311",
     "name": "Luxeuil-les-Bains",
     "parentCode": "70"
    },
    {
-    "code": "70363",
-    "name": "Montigny-lès-Vesoul",
+    "code": "70384",
+    "name": "Neuvelle-lès-la-Charité",
     "parentCode": "70"
    },
    {
@@ -89991,6 +89375,11 @@
    {
     "code": "70438",
     "name": "Ray-sur-Saône",
+    "parentCode": "70"
+   },
+   {
+    "code": "70451",
+    "name": "Ronchamp",
     "parentCode": "70"
    },
    {
@@ -90071,6 +89460,11 @@
    {
     "code": "72035",
     "name": "Bessé-sur-Braye",
+    "parentCode": "72"
+   },
+   {
+    "code": "72039",
+    "name": "Bonnétable",
     "parentCode": "72"
    },
    {
@@ -91094,6 +90488,11 @@
     "parentCode": "85"
    },
    {
+    "code": "85092",
+    "name": "Fontenay-le-Comte",
+    "parentCode": "85"
+   },
+   {
     "code": "85113",
     "name": "L'Île-d'Yeu",
     "parentCode": "85"
@@ -91111,11 +90510,6 @@
    {
     "code": "85153",
     "name": "Mouchamps",
-    "parentCode": "85"
-   },
-   {
-    "code": "85191",
-    "name": "La Roche-sur-Yon",
     "parentCode": "85"
    },
    {
@@ -91826,11 +91220,6 @@
    {
     "code": "97353",
     "name": "Maripasoula",
-    "parentCode": "973"
-   },
-   {
-    "code": "97358",
-    "name": "Saint-Élie",
     "parentCode": "973"
    },
    {
