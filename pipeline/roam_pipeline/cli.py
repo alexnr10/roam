@@ -1291,17 +1291,30 @@ def cmd_retention(args: argparse.Namespace, config: Config) -> int:
         return 1
 
     collectes = Counter(place.theme_id for place in brut)
+    # Le plus bas nombre de langues réellement collecté. S'il dépasse le
+    # plancher configuré, la collecte a été faite AVANT que le réglage ne
+    # baisse : le thème est amputé de tout ce qui vit entre les deux, et rien
+    # ne le disait. Les gorges en perdaient vingt-huit sur soixante-deux.
+    plancher_reel: dict[str, int] = {}
+    for place in brut:
+        courant = plancher_reel.get(place.theme_id)
+        if courant is None or place.sitelinks < courant:
+            plancher_reel[place.theme_id] = place.sitelinks
     retenus = Counter(
         place["theme_id"] for place in json.loads(places_path.read_text("utf-8"))
     )
 
     lignes = []
+    perimes: list[tuple[str, int, int]] = []
     for theme in config.themes:
         n = collectes.get(theme.id, 0)
         if not n:
             continue
         garde = retenus.get(theme.id, 0)
         lignes.append((garde / n, theme, n, garde))
+        bas = plancher_reel.get(theme.id)
+        if bas is not None and bas > theme.fetch_min_sitelinks:
+            perimes.append((theme.id, theme.fetch_min_sitelinks, bas))
 
     print(f"{'thème':16s} {'genre':8s} {'collectés':>10s} {'retenus':>8s} "
           f"{'gardés':>8s} {'plancher':>9s} {'classes':>8s}")
@@ -1317,6 +1330,16 @@ def cmd_retention(args: argparse.Namespace, config: Config) -> int:
     # ce qu'on lui apporte : sa source est une curation humaine, finie et déjà
     # triée. Les Plus Beaux Villages gardent 99 % — ce n'est pas une famine,
     # c'est le principe.
+    if perimes:
+        print(f"\n{len(perimes)} thème(s) dont la COLLECTE est plus haute que le "
+              f"réglage actuel — le plancher a baissé depuis, sans recollecte :\n")
+        for theme_id, regle, reel in perimes:
+            print(f"    {theme_id} : réglé à {regle} langues, collecté à partir "
+                  f"de {reel}")
+        print("\n    Tout ce qui vit entre les deux manque, et rien ne le disait."
+              "\n    python -m roam_pipeline fetch --only "
+              + ",".join(t for t, _r, _b in perimes))
+
     affames = [
         (theme, n) for taux, theme, n, _g in sorted(lignes, key=lambda t: -t[0])
         if taux >= args.seuil and n < args.rare and not theme.from_labels
@@ -1329,13 +1352,18 @@ def cmd_retention(args: argparse.Namespace, config: Config) -> int:
             classes = ", ".join(theme.wikidata_classes) or "aucune"
             print(f"    {theme.name} — {n} candidats, {len(theme.wikidata_classes)} "
                   f"classe(s) : {classes}")
-        print("\n  Une seule classe déclarée est le premier suspect : Wikidata ne "
-              "\n  fait pas remonter ses sous-classes de façon fiable — c'est ainsi "
-              "\n  que 55 musées d'art sur 62 manquaient, dont le Petit Palais."
-              "\n\n  Pour chercher les classes voisines, puis vérifier :"
-              "\n      python -m roam_pipeline suggest-qids \"cirque glaciaire\""
-              "\n      python -m roam_pipeline verify-qids"
-              "\n      python -m roam_pipeline gaps --min-sitelinks 4")
+        print("\n  Le premier suspect est le PLANCHER DE COLLECTE, pas les classes :"
+              "\n  la requête suit déjà `P31/P279*`, donc les sous-classes remontent"
+              "\n  toutes seules. Ajouter « chute d'eau côtière » à côté de « chute"
+              "\n  d'eau » ne rapporterait rien."
+              "\n"
+              "\n  Déclarer une classe ne se justifie que là où Wikidata ne pose PAS"
+              "\n  la sous-classe : « musée d'art » n'est pas déclaré sous « musée »,"
+              "\n  et 55 musées sur 62 manquaient, dont le Petit Palais."
+              "\n"
+              "\n  Mesurer avant de recollecter — cette commande dit ce que chaque"
+              "\n  plancher rapporterait, sans rien changer :"
+              "\n      python -m roam_pipeline gaps --class <QID>")
     return 0
 
 

@@ -3441,6 +3441,22 @@ class TestRetention(unittest.TestCase):
         texte = self._run(brut, brut[:20])  # 10 % gardés
         self.assertNotIn("affamé", texte)
 
+    def test_a_collection_made_above_the_configured_floor_is_named(self):
+        # Le plancher des gorges avait baissé de 3 à 2 sans recollecte : le
+        # thème restait amputé de tout ce qui vit entre les deux — vingt-huit
+        # gorges sur soixante-deux — et rien ne le disait.
+        brut = [make_place(f"Gorge {i}", theme="gorges", sitelinks=3 + i,
+                           wikidata_id=f"Q{i}") for i in range(10)]
+        texte = self._run(brut, brut[:3])
+        self.assertIn("plus haute que le réglage actuel", texte)
+        self.assertIn("fetch --only", texte)
+
+    def test_a_collection_at_the_configured_floor_is_silent(self):
+        brut = [make_place(f"Gorge {i}", theme="gorges", sitelinks=2 + i,
+                           wikidata_id=f"Q{i}") for i in range(10)]
+        texte = self._run(brut, brut[:3])
+        self.assertNotIn("plus haute que le réglage actuel", texte)
+
     def test_a_theme_fed_by_curated_lists_is_never_starved(self):
         # Les Plus Beaux Villages gardent 99 % : leur source est déjà une
         # curation humaine, finie et triée. Ce n'est pas une famine.
