@@ -438,11 +438,28 @@ def write_review_html(
     # et dans deux thèmes différents ; aucune règle ne dit lequel garder.
     jumeaux = cross_theme_twins(places)
 
+    # Les thèmes s'alternent au lieu de se suivre. Rangés par identifiant, les
+    # abbayes ouvraient chaque niveau — deux cents d'affilée avant la première
+    # cathédrale — et la revue paraissait interminable alors qu'elles ne font
+    # que six pour cent du catalogue. Chaque lieu prend son rang DANS son
+    # thème, et on lit tous les premiers, puis tous les deuxièmes : un écran
+    # montre le catalogue, et tous les thèmes avancent du même pas.
+    rang_dans_le_theme: dict[str, int] = {}
+    par_theme: dict[str, list[Place]] = defaultdict(list)
+    for place in places:
+        par_theme[place.theme_id].append(place)
+    for lot in par_theme.values():
+        lot.sort(key=lambda p: (best_tier.get(p.wikidata_id, 9), -p.score, p.name))
+        for rang, place in enumerate(lot):
+            rang_dans_le_theme[place.wikidata_id] = rang
+
     rows = []
     for place in sorted(
         places,
         key=lambda p: (p.wikidata_id not in nationale,
-                       best_tier.get(p.wikidata_id, 9), p.theme_id, -p.score, p.name),
+                       best_tier.get(p.wikidata_id, 9),
+                       rang_dans_le_theme[p.wikidata_id],
+                       p.theme_id, -p.score, p.name),
     ):
         dept = depts.get(place.departement_code or "")
         parts = score_breakdown(place, config)

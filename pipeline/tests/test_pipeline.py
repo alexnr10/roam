@@ -2216,6 +2216,30 @@ class TestTierChanges(unittest.TestCase):
         self.assertIn('value="bouge"', body)
         self.assertIn("descendu depuis ta dernière revue", body)
 
+    def test_the_page_alternates_themes_instead_of_stacking_them(self):
+        # Rangées par identifiant, les abbayes ouvraient chaque niveau — deux
+        # cents d'affilée avant la première cathédrale — et la revue paraissait
+        # interminable alors qu'elles ne font que six pour cent du catalogue.
+        places = []
+        for rang, theme in enumerate(("abbayes", "cathedrales", "chateaux")):
+            for i in range(12):
+                places.append(make_place(
+                    f"{theme} {i}", theme=theme, sitelinks=40 - i,
+                    lat=45 + rang + i * 0.1, lon=2.0,
+                    wikidata_id=f"Q{rang}{i:02d}"))
+        score_all(places, CONFIG)
+        with _capture():
+            _retained, collections = build_all(places, CONFIG)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.html"
+            write_review_html(places, collections, CONFIG, path)
+            body = path.read_text(encoding="utf-8")
+        lignes = json.loads(
+            re.search(r"const DATA = (\[.*?\]);\n", body, re.S).group(1)
+        )
+        tetes = [ligne["themeId"] for ligne in lignes[:3]]
+        self.assertEqual(len(set(tetes)), 3)
+
     def test_the_page_carries_the_decisions_already_taken(self):
         # La mémoire de la curation vit dans `decisions.csv`, versionné. Si elle
         # ne descend pas dans la page, elle n'existe que dans le navigateur qui
@@ -3272,6 +3296,40 @@ class TestThinDepartements(unittest.TestCase):
         repeches = self._repecher(propre, [candidat])
         self.assertEqual(len(repeches), 12)
         self.assertIn("Sous le plancher", {p.name for p in repeches})
+
+    def test_no_theme_takes_over_a_departement(self):
+        # Le premier jet donnait sept châteaux sur douze en Seine-Saint-Denis.
+        # Un « meilleur de » qui n'est qu'une liste de châteaux ne donne envie
+        # d'aucun des douze.
+        au_dessus = [self._lieu("Déjà là", "93", 20, 90.0, lat=48.0, lon=2.5)]
+        sous = []
+        for i in range(9):  # neuf châteaux, tous mieux notés que le reste
+            sous.append(self._lieu(f"Château {i}", "93", 4, 80.0 - i,
+                                   lat=48.1 + i * 0.02, lon=2.5))
+        for i in range(9):
+            place = self._lieu(f"Jardin {i}", "93", 4, 60.0 - i,
+                               lat=48.5 + i * 0.02, lon=2.5)
+            place.theme_id = "jardins"
+            sous.append(place)
+        repeches = self._repecher(au_dessus, sous)
+        self.assertEqual(len(repeches), 12)
+        themes = Counter(p.theme_id for p in repeches if p.geo_rescued)
+        # Sans quota, les neuf châteaux — tous mieux notés — prenaient neuf des
+        # onze places. Le plafond monte d'un cran à la fois : les deux thèmes
+        # se partagent le département à une unité près.
+        self.assertLessEqual(abs(themes["chateaux"] - themes["jardins"]), 1)
+        self.assertGreaterEqual(themes["jardins"], 5)
+
+    def test_the_theme_quota_never_leaves_a_departement_short(self):
+        # Si le département n'a vraiment que des châteaux, mieux vaut sept
+        # châteaux qu'un département à neuf lieux. Le second passage lève le
+        # plafond — c'est la règle du quota géographique des collections
+        # nationales, appliquée aux thèmes.
+        au_dessus = [self._lieu("Déjà là", "90", 20, 90.0, lat=47.6, lon=6.8)]
+        sous = [self._lieu(f"Château {i}", "90", 4, 80.0 - i,
+                           lat=47.6 + i * 0.02, lon=6.9) for i in range(15)]
+        repeches = self._repecher(au_dessus, sous)
+        self.assertEqual(len(repeches), 12)
 
     def test_a_second_wikidata_entry_for_the_same_site_is_refused(self):
         # « Abbaye royale de Saint-Denis » à vingt mètres de « basilique

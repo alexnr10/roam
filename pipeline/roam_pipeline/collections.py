@@ -635,10 +635,19 @@ def rescue_thin_departements(
     nationales. Là on empêchait Paris d'occuper toute la place ; ici on empêche
     un département de n'en avoir aucune.
 
-    Deux garanties. Les mieux notés d'abord, jamais au-delà du compte visé.
-    Et aucun sosie : une seconde fiche Wikidata du même site — « abbaye royale
+    Trois garanties. Les mieux notés d'abord, jamais au-delà du compte visé.
+    Aucun sosie : une seconde fiche Wikidata du même site — « abbaye royale
     de Saint-Denis » à côté de « basilique Saint-Denis » — échappe au
-    dédoublonnage, qui ne compare qu'à l'intérieur d'un thème.
+    dédoublonnage, qui ne compare qu'à l'intérieur d'un thème. Et aucun thème
+    ne rafle le département : le premier jet donnait sept châteaux sur douze
+    en Seine-Saint-Denis et sept sur douze au Territoire de Belfort. Un
+    « meilleur de » qui n'est qu'une liste de châteaux ne donne envie d'aucun
+    des douze.
+
+    Comme le quota géographique des collections nationales, celui-ci ne
+    RÉTRÉCIT jamais : si le département n'a vraiment que des châteaux à
+    offrir, un second passage lève le plafond. Mieux vaut sept châteaux qu'un
+    département à neuf lieux.
     """
     cible = config.collections.min_per_departement
     if not cible:
@@ -656,16 +665,47 @@ def rescue_thin_departements(
     repeches: list[Place] = []
     for code, lot in candidats.items():
         manque = cible - compte[code]
-        for place in lot:
-            if manque <= 0:
-                break
+        # Aucun thème au-delà du tiers des places à pourvoir, avec deux comme
+        # plancher : sur trois places à combler, interdire un deuxième château
+        # reviendrait à préférer un lieu médiocre d'un autre thème.
+        plafond = max(2, math.ceil(manque / 3))
+        par_theme: Counter[str] = Counter()
+        retenus: set[str] = set()
+
+        def accepter(place: Place) -> bool:
             if any(haversine_m(place.lat, place.lon, lat, lon) < DUPLICATE_DISTANCE_M
                    for lat, lon in deja):
-                continue
+                return False
             place.geo_rescued = True
             repeches.append(place)
             deja.append((place.lat, place.lon))
-            manque -= 1
+            retenus.add(place.wikidata_id)
+            par_theme[place.theme_id] += 1
+            return True
+
+        # Le plafond MONTE d'un cran tant qu'il reste des places, il ne saute
+        # pas : le supprimer d'un coup rendait la main au score seul, qui
+        # reprenait des châteaux alors que des jardins attendaient. On sert
+        # donc un deuxième château quand chaque thème a eu son premier.
+        # Le plafond borné par le lot garantit la sortie : au-delà, aucun
+        # compteur de thème ne peut plus l'atteindre, donc le dernier passage a
+        # forcément examiné tous les candidats. Un candidat refusé comme sosie
+        # n'entre jamais dans `retenus` — s'en servir comme condition d'arrêt
+        # faisait boucler sans fin.
+        limite = max(plafond, len(lot))
+        while manque > 0 and plafond <= limite:
+            avant = manque
+            for place in lot:
+                if manque <= 0:
+                    break
+                if place.wikidata_id in retenus:
+                    continue
+                if par_theme[place.theme_id] >= plafond:
+                    continue
+                if accepter(place):
+                    manque -= 1
+            if manque == avant:  # plus rien à prendre à ce plafond
+                plafond += 1
 
     if repeches:
         par_dept = Counter(p.departement_code for p in repeches)
