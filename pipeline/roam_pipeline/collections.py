@@ -216,6 +216,36 @@ def _force_promoted(
     )
 
 
+def _rank_within_theme(members: list[Place]) -> dict[str, float]:
+    """Rang de chaque lieu dans son thème, ramené entre 0 et 1.
+
+    Une collection mixte compare des scores bruts d'un thème à l'autre, et le
+    score est bâti sur la documentation — une échelle faite pour les monuments.
+    La MEILLEURE cascade de France score 74 ; le château MÉDIAN, 86. Il n'y a
+    aucune compétition possible, et « Le meilleur de France » ne comptait que
+    trois lieux naturels sur quatre-vingts.
+
+    Le rang, lui, se compare : le premier des cascades vaut le premier des
+    cathédrales. C'est la seule façon de mettre les gorges du Verdon et
+    Notre-Dame sur la même ligne sans toucher au score, qui classe très bien à
+    l'intérieur d'un thème et qu'on casserait en le rééquilibrant de force.
+
+    Le rang RELATIF, pas absolu : avec le rang absolu, le quatrième cirque de
+    France — il n'y en a que onze — vaudrait le quatrième château sur
+    quatre cent vingt-cinq.
+    """
+    par_theme: dict[str, list[Place]] = defaultdict(list)
+    for place in members:
+        par_theme[place.theme_id].append(place)
+    rangs: dict[str, float] = {}
+    for lot in par_theme.values():
+        lot.sort(key=lambda p: (-p.score, p.name))
+        dernier = max(1, len(lot) - 1)
+        for index, place in enumerate(lot):
+            rangs[place.wikidata_id] = index / dernier
+    return rangs
+
+
 def _mix_themes(ordered: list[Place], limit: int, part: float) -> list[Place]:
     """Empêche un seul thème d'occuper tout un « Le meilleur de… ».
 
@@ -270,11 +300,17 @@ def _finalize(
         return None
 
     limit = cap or rules.max_places
+    ordre = None
     ordered = sorted(members, key=lambda p: (-p.score, p.name))
     if max_per_dept:
         ordered = _spread(ordered, limit, max_per_dept)
     elif theme_share:
-        ordered = _mix_themes(ordered, limit, theme_share)
+        # Dans une collection mixte, le rang dans le thème remplace le score :
+        # comparer une cascade et une cathédrale au score brut revient à
+        # comparer leurs documentations, pas leur intérêt.
+        rangs = _rank_within_theme(ordered)
+        ordre = lambda p: (rangs[p.wikidata_id], -p.score, p.name)  # noqa: E731
+        ordered = _mix_themes(sorted(ordered, key=ordre), limit, theme_share)
     else:
         ordered = ordered[:limit]
     # Seules les collections THÉMATIQUES : c'est d'elles que parle la revue
@@ -289,7 +325,7 @@ def _finalize(
     collection.places = [
         CollectionPlace(place_id=place.wikidata_id, tier=tier, rank=rank,
                         forced=place.wikidata_id in forces)
-        for place, tier, rank in assign_tiers(ordered, config.tiers)
+        for place, tier, rank in assign_tiers(ordered, config.tiers, ordre)
     ]
     return collection
 

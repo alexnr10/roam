@@ -7,6 +7,7 @@ humaine (cf. docs/curation-charter.md).
 from __future__ import annotations
 
 import math
+from typing import Any, Callable
 
 from .config import Config, Scoring, Tiers
 from .models import Place
@@ -58,7 +59,7 @@ def score_breakdown(place: Place, config: Config) -> dict[str, float]:
         # Le seul poste qui ne mesure pas la documentation d'un lieu mais sa
         # visitabilité. `None` ne vaut rien : l'absence de balise dans
         # OpenStreetMap ne dit pas qu'un lieu est fermé, elle ne dit rien.
-        "acces": _access_score(place, s),
+        "acces": _access_score(place, config),
         # Le seul poste qui mesure l'AFFLUENCE. Les autres mesurent ce qu'on
         # écrit d'un lieu ; celui-ci, combien de gens s'y rendent.
         "visiteurs": _visitors_score(place, config),
@@ -107,11 +108,26 @@ def _pageviews_score(place: Place, config: Config) -> float:
     return round(rule.weight * math.log1p(place.pageviews_per_month / rule.scale), 1)
 
 
-def _access_score(place: Place, s: Scoring) -> float:
-    if place.visitable is True:
-        return s.visitable_bonus
+def _access_score(place: Place, config: Config) -> float:
+    """Dix points pour un accueil du public attesté — mais pas partout.
+
+    Sur un thème sans portes ni horaires, ce poste ne mesure plus la
+    visitabilité : il mesure la présence fortuite d'une balise. Une cascade est
+    ouverte, toujours, et OpenStreetMap n'a rien à en dire. Accordé quand même,
+    le bonus devenait dix points offerts à la culture et zéro à la nature.
+
+    Le malus, lui, reste : `access=private` sur un lac ou un sommet est un fait
+    de terrain qui vaut pour tous les thèmes — le sentier est fermé.
+    """
+    s = config.scoring
     if place.visitable is False:
         return -s.not_visitable_malus
+    try:
+        gated = config.theme(place.theme_id).gated
+    except KeyError:
+        gated = True
+    if place.visitable is True and gated:
+        return s.visitable_bonus
     return 0.0
 
 
@@ -163,7 +179,9 @@ def derive_criteria(place: Place, config: Config) -> list[str]:
     return criteria
 
 
-def assign_tiers(ranked: list[Place], tiers: Tiers) -> list[tuple[Place, int, int]]:
+def assign_tiers(
+    ranked: list[Place], tiers: Tiers, ordre: Callable[[Place], Any] | None = None
+) -> list[tuple[Place, int, int]]:
     """Attribue un niveau à chaque lieu d'une collection, par rang décroissant.
 
     Le niveau est RELATIF à la collection : les meilleurs prennent le niveau 1.
@@ -182,10 +200,16 @@ def assign_tiers(ranked: list[Place], tiers: Tiers) -> list[tuple[Place, int, in
 
     Un `promote` peut en revanche porter une collection à onze lieux de niveau 1,
     quand il remonte un lieu que le plafond avait déjà refoulé. C'est assumé :
+    `ordre` remplace le classement par score. Une collection mixte range ses
+    membres par leur rang DANS LEUR THÈME, faute de quoi la sélection et les
+    niveaux ne diraient pas la même chose : les vingt-cinq lieux naturels du
+    « meilleur de France » entraient par le rang puis se retrouvaient tous au
+    niveau 3, Puy de Dôme et gorges du Verdon compris.
+
     le plafond est une heuristique, la décision est un jugement, et faire
     redescendre quelqu'un d'autre en silence serait pire.
     """
-    ordered = sorted(ranked, key=lambda p: (-p.score, p.name))
+    ordered = sorted(ranked, key=ordre or (lambda p: (-p.score, p.name)))
     juges: list[tuple[Place, int]] = []
     tier1_used = 0
     tier2_used = 0
@@ -211,5 +235,9 @@ def assign_tiers(ranked: list[Place], tiers: Tiers) -> list[tuple[Place, int, in
 
     # Renumérotés dans l'ordre des niveaux : sans cela, un lieu descendu
     # garderait son rang et la liste afficherait un niveau 3 avant un niveau 1.
-    juges.sort(key=lambda couple: (couple[1], -couple[0].score, couple[0].name))
+    # Le rang d'origine, pas le score : dans une collection mixte, c'est le
+    # rang dans le thème qui a décidé de l'entrée, et les deux doivent dire
+    # la même chose.
+    position = {place.wikidata_id: index for index, place in enumerate(ordered)}
+    juges.sort(key=lambda couple: (couple[1], position[couple[0].wikidata_id]))
     return [(place, tier, index) for index, (place, tier) in enumerate(juges, start=1)]

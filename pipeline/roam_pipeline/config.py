@@ -47,6 +47,13 @@ class Theme:
     # patrimoine ; sans cette étiquette, l'équilibre entre les deux ne se
     # mesure pas, et une dérive vers le bâti passe inaperçue.
     kind: str = "culture"
+    # Ce thème a-t-il des portes et des horaires ? Le bonus « accueil du public
+    # attesté » vaut dix points, et OpenStreetMap ne peut l'attester que là où
+    # quelqu'un ouvre et ferme. Mesuré sur le catalogue : musées 90 %, châteaux
+    # 61 % — mais volcans 0 %, cascades 1 %, lacs 1 %, sommets 3 %. Le bonus
+    # était donc dix points offerts à la culture et zéro à la nature, pour un
+    # fait qui n'a aucun sens sur une cascade : elle est ouverte, toujours.
+    gated: bool = True
     # Thème alimenté par des listes officielles plutôt que par une classe
     # Wikidata : les labels sont déjà une curation humaine, finie et fiable.
     from_labels: list[str] = field(default_factory=list)
@@ -241,6 +248,7 @@ def load_config(config_dir: Path | None = None) -> Config:
             # et la validation ci-dessous — celle qui dit clairement ce qui ne
             # va pas — mourait avant d'avoir pu parler.
             wikidata_classes=[str(q) for q in (t.get("wikidata_classes") or [])],
+            gated=bool(t.get("gated", True)),
             from_labels=list(t.get("from_labels") or []),
             search=list(t.get("search") or []),
             name_hints=[str(h) for h in (t.get("name_hints") or [])],

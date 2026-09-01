@@ -28,6 +28,7 @@ from roam_pipeline.review import (
 from roam_pipeline.collections import (
     _finalize,
     _mix_themes,
+    _rank_within_theme,
     cross_theme_twins,
     rescue_thin_departements,
     _spread,
@@ -3398,6 +3399,36 @@ class TestRethemeLosses(unittest.TestCase):
         self.assertIn("Q1279597", {p.wikidata_id for p in apres})
 
 
+class TestGatedThemes(unittest.TestCase):
+    """Le bonus « ouvert au public » ne peut pas s'appliquer partout.
+
+    Il vaut dix points, et OpenStreetMap ne peut l'attester que là où quelqu'un
+    ouvre et ferme. Mesuré sur le catalogue : musées 90 %, châteaux 61 % — mais
+    volcans 0 %, cascades 1 %, sommets 3 %. C'étaient dix points offerts à la
+    culture et zéro à la nature.
+    """
+
+    def test_the_bonus_applies_to_a_gated_theme(self):
+        avec = make_place("Château ouvert", theme="chateaux", visitable=True)
+        sans = make_place("Château muet", theme="chateaux")
+        ecart = (score_breakdown(avec, CONFIG)["acces"]
+                 - score_breakdown(sans, CONFIG)["acces"])
+        self.assertEqual(ecart, CONFIG.scoring.visitable_bonus)
+
+    def test_the_bonus_is_dropped_where_there_are_no_gates(self):
+        avec = make_place("Cascade balisée", theme="cascades", visitable=True)
+        sans = make_place("Cascade muette", theme="cascades")
+        self.assertEqual(score_breakdown(avec, CONFIG)["acces"], 0.0)
+        self.assertEqual(score_breakdown(sans, CONFIG)["acces"], 0.0)
+
+    def test_the_malus_survives_everywhere(self):
+        # `access=private` sur un sommet est un fait de terrain : le sentier est
+        # fermé. Il vaut pour tous les thèmes.
+        ferme = make_place("Sommet interdit", theme="sommets", visitable=False)
+        self.assertEqual(score_breakdown(ferme, CONFIG)["acces"],
+                         -CONFIG.scoring.not_visitable_malus)
+
+
 class TestThemeShareInGeoCollections(unittest.TestCase):
     """« Le meilleur de Paris » comptait 41 musées sur 80.
 
@@ -3443,6 +3474,34 @@ class TestThemeShareInGeoCollections(unittest.TestCase):
         lot = self._lot({"chateaux": 5, "megalithes": 5, "ponts": 1, "forets": 1})
         retenus = _mix_themes(lot, 80, 0.25)
         self.assertEqual(len(retenus), 12)
+
+    def test_a_mixed_collection_ranks_by_rank_not_by_score(self):
+        # La MEILLEURE cascade de France score 74 ; le château MÉDIAN, 86. Au
+        # score brut, « Le meilleur de France » ne comptait que trois lieux
+        # naturels sur quatre-vingts. Le rang, lui, se compare : le premier des
+        # cascades vaut le premier des cathédrales.
+        lot = self._lot({"chateaux": 40, "cascades": 40})
+        for place in lot:
+            if place.theme_id == "cascades":
+                place.score = 40 - int(place.name.split()[-1])  # tous très bas
+        rangs = _rank_within_theme(lot)
+        ordonne = sorted(lot, key=lambda p: (rangs[p.wikidata_id], -p.score))
+        self.assertEqual(
+            {ordonne[0].theme_id, ordonne[1].theme_id}, {"chateaux", "cascades"})
+
+    def test_the_tiers_follow_the_same_order_as_the_selection(self):
+        # Sélectionner par le rang puis classer par le score mettait les
+        # vingt-cinq lieux naturels du « meilleur de France » au niveau 3, Puy
+        # de Dôme et gorges du Verdon compris.
+        lot = self._lot({"chateaux": 20, "cascades": 20})
+        for place in lot:
+            if place.theme_id == "cascades":
+                place.score = 50 - int(place.name.split()[-1])
+        rangs = _rank_within_theme(lot)
+        ordre = lambda p: (rangs[p.wikidata_id], -p.score, p.name)  # noqa: E731
+        niveaux = assign_tiers(sorted(lot, key=ordre), CONFIG.tiers, ordre)
+        premiers = {place.theme_id for place, tier, _rang in niveaux if tier == 1}
+        self.assertIn("cascades", premiers)
 
     def test_cross_collections_keep_their_single_theme(self):
         # « Châteaux de Bretagne » est mono-thème par construction. Les deux

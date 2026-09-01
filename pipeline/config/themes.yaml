@@ -353,6 +353,10 @@ themes:
     name_hints: [cascade, chute, saut]
     icon: waterfall
     kind: nature
+    # Ni portes ni horaires : 1 % seulement des lieux de ce thème ont
+    # une ouverture attestée dans OpenStreetMap, parce qu'il n'y a rien à
+    # y attester. Le bonus d'accueil du public ne s'y applique pas.
+    gated: false
     radius_m: 300
     min_sitelinks: 2
     fetch_min_sitelinks: 2
@@ -365,6 +369,10 @@ themes:
     name_hints: [cirque]
     icon: cirque
     kind: nature
+    # Ni portes ni horaires : 0 % seulement des lieux de ce thème ont
+    # une ouverture attestée dans OpenStreetMap, parce qu'il n'y a rien à
+    # y attester. Le bonus d'accueil du public ne s'y applique pas.
+    gated: false
     radius_m: 500
     min_sitelinks: 3
     fetch_min_sitelinks: 2
@@ -377,6 +385,10 @@ themes:
     name_hints: [gorges, canyon, défilé]
     icon: canyon
     kind: nature
+    # Ni portes ni horaires : 11 % seulement des lieux de ce thème ont
+    # une ouverture attestée dans OpenStreetMap, parce qu'il n'y a rien à
+    # y attester. Le bonus d'accueil du public ne s'y applique pas.
+    gated: false
     # Site étendu : le point est celui de l'entrée, le rayon porte la taille.
     radius_m: 2000
     min_sitelinks: 3
@@ -391,6 +403,10 @@ themes:
     name_hints: [lac, étang, réservoir]
     icon: lake
     kind: nature
+    # Ni portes ni horaires : 1 % seulement des lieux de ce thème ont
+    # une ouverture attestée dans OpenStreetMap, parce qu'il n'y a rien à
+    # y attester. Le bonus d'accueil du public ne s'y applique pas.
+    gated: false
     radius_m: 1500
     # Abaissé de 8 à 6 : ce plancher compte les versions
     # linguistiques, c'est-à-dire la DOCUMENTATION d'un lieu. Wikidata
@@ -425,6 +441,10 @@ themes:
     name_hints: [volcan, puy]
     icon: volcan
     kind: nature
+    # Ni portes ni horaires : 0 % seulement des lieux de ce thème ont
+    # une ouverture attestée dans OpenStreetMap, parce qu'il n'y a rien à
+    # y attester. Le bonus d'accueil du public ne s'y applique pas.
+    gated: false
     radius_m: 400
     min_sitelinks: 4
     fetch_min_sitelinks: 2
@@ -441,6 +461,10 @@ themes:
     name_hints: [mont, pic, aiguille, crête, dent]
     icon: mountain
     kind: nature
+    # Ni portes ni horaires : 3 % seulement des lieux de ce thème ont
+    # une ouverture attestée dans OpenStreetMap, parce qu'il n'y a rien à
+    # y attester. Le bonus d'accueil du public ne s'y applique pas.
+    gated: false
     radius_m: 1000
     # Abaissé de 12 à 8 : ce plancher compte les versions
     # linguistiques, c'est-à-dire la DOCUMENTATION d'un lieu. Wikidata
@@ -461,6 +485,10 @@ themes:
     name_hints: [dune, marais]
     icon: dune
     kind: nature
+    # Ni portes ni horaires : 0 % seulement des lieux de ce thème ont
+    # une ouverture attestée dans OpenStreetMap, parce qu'il n'y a rien à
+    # y attester. Le bonus d'accueil du public ne s'y applique pas.
+    gated: false
     radius_m: 600
     # Abaissé de 4 à 2, comme les cascades et les curiosités géologiques.
     # L'entonnoir montre que le thème n'a que onze lieux à cette étape : les
@@ -480,6 +508,10 @@ themes:
     name_hints: [plage, anse, crique]
     icon: beach
     kind: nature
+    # Ni portes ni horaires : 7 % seulement des lieux de ce thème ont
+    # une ouverture attestée dans OpenStreetMap, parce qu'il n'y a rien à
+    # y attester. Le bonus d'accueil du public ne s'y applique pas.
+    gated: false
     radius_m: 500
     min_sitelinks: 3
     fetch_min_sitelinks: 2
@@ -519,6 +551,10 @@ themes:
     name_hints: [forêt, bois, futaie]
     icon: foret
     kind: nature
+    # Ni portes ni horaires : 0 % seulement des lieux de ce thème ont
+    # une ouverture attestée dans OpenStreetMap, parce qu'il n'y a rien à
+    # y attester. Le bonus d'accueil du public ne s'y applique pas.
+    gated: false
     radius_m: 800
     min_sitelinks: 4
     fetch_min_sitelinks: 2
@@ -535,6 +571,10 @@ themes:
     name_hints: [rocher, roche, roque]
     icon: rocher
     kind: nature
+    # Ni portes ni horaires : 0 % seulement des lieux de ce thème ont
+    # une ouverture attestée dans OpenStreetMap, parce qu'il n'y a rien à
+    # y attester. Le bonus d'accueil du public ne s'y applique pas.
+    gated: false
     radius_m: 300
     # Plancher à 2 et non 4 : à 4, ce thème tombait à six lieux, sous le
     # minimum de huit exigé pour former une collection. Le vivier est petit,
