@@ -71,6 +71,9 @@ TAG_FILTERS = [
     'historic~"^(castle|fort|manor|monument|ruins|archaeological_site|city_gate|aqueduct)$"',
     'leisure~"^(garden|nature_reserve)$"',
     'natural~"^(cave_entrance|waterfall)$"',
+    # `waterway=waterfall` est l'étiquette réelle des chutes d'eau : demander
+    # `natural=waterfall` seul rendait cinq objets pour toute la France.
+    'waterway~"^(waterfall)$"',
 ]
 
 
@@ -160,6 +163,10 @@ class OverpassClient:
         self.max_retries = max_retries
         self._last_call = 0.0
         self._endpoint = 0
+        # Une cellule abandonnée rend une liste vide, exactement comme une
+        # cellule sans résultat. Sans ce compte, une collecte à moitié tombée
+        # se lit comme une collecte complète et bredouille.
+        self.abandonnees: list[tuple[float, float, float, float]] = []
         self._session = requests.Session()
         self._session.headers.update({"User-Agent": USER_AGENT})
 
@@ -195,6 +202,7 @@ class OverpassClient:
             delay *= 2
 
         LOG.error("Overpass : cellule %s abandonnée", cell)
+        self.abandonnees.append(cell)
         return []
 
 

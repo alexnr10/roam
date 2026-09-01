@@ -72,6 +72,12 @@ THEME_BY_TAG: list[tuple[str, str, str]] = [
     ("leisure", "garden", "jardins"),
     ("leisure", "nature_reserve", "plages"),
     ("natural", "cave_entrance", "grottes"),
+    # Une chute d'eau se pose sur le COURS D'EAU chez OpenStreetMap, pas sur le
+    # relief : `waterway=waterfall`. `natural=waterfall` existe et se rencontre,
+    # mais il est marginal — demandé seul, il a rendu CINQ objets pour toute la
+    # France, là où les grottes en rendaient trente-cinq. Les deux sont donc
+    # demandés : le second ne coûte rien et rattrape les objets mal étiquetés.
+    ("waterway", "waterfall", "cascades"),
     ("natural", "waterfall", "cascades"),
 ]
 

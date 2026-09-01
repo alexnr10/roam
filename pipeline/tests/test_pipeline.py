@@ -59,7 +59,9 @@ from roam_pipeline.cli import (
     empty_themes,
 )
 from roam_pipeline.wikipedia import title_from_url
-from roam_pipeline.discover import _atteste, is_confident, tag_filters_for
+from roam_pipeline.discover import (
+    _atteste, guess_theme, is_confident, tag_filters_for,
+)
 from roam_pipeline.overpass import OsmPlace, cell_query
 from roam_pipeline.wikidata import (
     class_ancestry_query, class_census_query, class_members_query,
@@ -3507,15 +3509,23 @@ class TestNatureCandidates(unittest.TestCase):
 
     def test_the_query_can_be_narrowed_to_one_theme(self):
         filtres = tag_filters_for({"cascades"})
-        self.assertEqual(filtres, ['natural~"^(waterfall)$"'])
+        # Les deux étiquettes d'une chute d'eau, et rien d'autre.
+        self.assertEqual(sorted(filtres),
+                         ['natural~"^(waterfall)$"', 'waterway~"^(waterfall)$"'])
         requete = cell_query((45.0, 2.0, 45.5, 2.5), tags=filtres)
         clauses = [l for l in requete.splitlines() if "nwr" in l]
-        self.assertEqual(len(clauses), 1)
-        self.assertIn("waterfall", clauses[0])
-        # Sans restriction, les quatre catégories sont demandées.
-        self.assertEqual(
+        self.assertEqual(len(clauses), 2)
+        self.assertTrue(all("waterfall" in c for c in clauses))
+        # Sans restriction, toutes les catégories sont demandées.
+        self.assertGreater(
             len([l for l in cell_query((45.0, 2.0, 45.5, 2.5)).splitlines()
-                 if "nwr" in l]), 4)
+                 if "nwr" in l]), len(clauses))
+
+    def test_the_real_waterfall_tag_is_asked_for(self):
+        # `natural=waterfall` seul a rendu CINQ objets pour toute la France :
+        # une chute d'eau se pose sur le cours d'eau, pas sur le relief.
+        self.assertEqual(guess_theme({"waterway": "waterfall"}), "cascades")
+        self.assertEqual(guess_theme({"natural": "waterfall"}), "cascades")
 
     def test_a_theme_with_no_osm_tag_yields_nothing(self):
         # Les sommets sont mieux servis par Wikidata et ne sont pas demandés à

@@ -374,7 +374,9 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
         return 1
 
     grid = list(cells())
-    print(f"Interrogation d'OpenStreetMap : {len(grid)} cellules, compte ~{len(grid) // 4} min."
+    if args.cells:
+        grid = grid[: args.cells]
+    print(f"Interrogation d'OpenStreetMap : {len(grid)} cellules, compte ~{max(1, len(grid) // 4)} min."
           + (f"\nRestreinte à {', '.join(sorted(vises))}." if vises else ""))
     osm = []
     for index, cell in enumerate(grid, start=1):
@@ -433,6 +435,11 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
 
     ready = sum(1 for s in retained[: args.limit] if s.wikidata_id)
     print(f"\n{len(osm)} sites lus sur OpenStreetMap.")
+    if client.abandonnees:
+        # Une cellule abandonnée rend zéro site, comme une cellule vide : sans
+        # ce compte, une collecte à moitié tombée passe pour un résultat.
+        print(f"⚠ {len(client.abandonnees)} cellule(s) sur {len(grid)} abandonnées "
+              "faute de réponse d'Overpass — le compte ci-dessous est PARTIEL.")
     # Le critère n'est pas le même partout, et l'annoncer faux vaut moins que
     # ne rien annoncer : sur un thème sans portes, une fiche Wikidata suffit.
     preuve = ("une fiche Wikidata" if vises and vises <= sans_portes
@@ -2476,6 +2483,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--all",
         action="store_true",
         help="inclure les candidats moins sûrs (sans lien encyclopédique)",
+    )
+    discover.add_argument(
+        "--cells", type=int, metavar="N",
+        help="n'interroger que les N premières cellules. Vérifier qu'une requête "
+             "rapporte quelque chose ne demande pas quarante cellules : deux "
+             "suffisent, et coûtent une minute au lieu de dix.",
     )
     discover.add_argument(
         "--only", metavar="THÈMES",
