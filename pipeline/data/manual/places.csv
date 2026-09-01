@@ -7,3 +7,6 @@
 # Pour trouver un identifiant : python -m roam_pipeline suggest-qids "jardins de Giverny"
 wikidata_id,theme_id,note
 Q3533474,megalithes,tour de Vésone à Périgueux — la fiche « Vesunna » porte les coordonnées du musée
+Q1139060,sommets,telepherique  observatoire
+Q6650,sommets,randonnee tres frequentee
+Q404728,sommets,acces par telepherique
