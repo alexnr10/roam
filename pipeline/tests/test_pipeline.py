@@ -4366,3 +4366,70 @@ class TestCarryEnrichment(unittest.TestCase):
         self._avec([ancien], [neuf])
         self.assertIsNone(neuf.departement_code)
         self.assertEqual(neuf.article_bytes, 0)
+
+
+class TestRelabel(unittest.TestCase):
+    """Rapposer un label ne doit pas demander de recollecter les lieux.
+
+    Les labels sont apposés pendant `fetch`, et sur les seuls thèmes qu'il a
+    recollectés : ajouter un Grand Site à la liste manuelle n'avait aucun effet
+    tant qu'on n'avait pas refait passer son thème — une demi-heure pour
+    changer une ligne de CSV.
+    """
+
+    class _Client:
+        """Wikidata ne connaît qu'un membre ; le reste vient du fichier."""
+
+        def query(self, requete):
+            if "wd:Q1154112" in requete:
+                return [{"item": "http://www.wikidata.org/entity/Q607372"}]
+            return []
+
+    def _run(self, places, manuel=None):
+        from unittest import mock
+        from roam_pipeline.cli import cmd_relabel
+        from roam_pipeline.raw import shard_of, write_raw
+
+        with tempfile.TemporaryDirectory() as dossier:
+            base = Path(dossier)
+            (base / "out").mkdir()
+            (base / "manual").mkdir()
+            write_raw(base / "raw", places, {shard_of(p) for p in places})
+            (base / "out" / "places_raw.json").write_text(
+                json.dumps([p.to_dict() for p in places], ensure_ascii=False),
+                encoding="utf-8")
+            if manuel is not None:
+                (base / "manual" / "grand-site-de-france.csv").write_text(
+                    "wikidata_id,name\r\n" + "".join(f"{q},{n}\r\n" for q, n in manuel),
+                    encoding="utf-8")
+            args = argparse.Namespace(
+                out=base / "out", raw=base / "raw", manual=base / "manual")
+            with mock.patch("roam_pipeline.wikidata.SparqlClient", self._Client), \
+                    _capture() as sortie:
+                cmd_relabel(args, CONFIG)
+            sortie = io.StringIO(sortie.getvalue())
+            relu = json.loads(
+                (base / "out" / "places_raw.json").read_text(encoding="utf-8"))
+        return {p["wikidata_id"]: p.get("labels") or [] for p in relu}, sortie.getvalue()
+
+    def test_a_manual_entry_gets_its_label_without_a_new_collection(self):
+        sainte_victoire = make_place("Montagne Sainte-Victoire", "sommets",
+                                     wikidata_id="Q1518970")
+        etiquettes, texte = self._run(
+            [sainte_victoire], manuel=[("Q1518970", "Concors-Sainte-Victoire")])
+        self.assertIn("grand-site-de-france", etiquettes["Q1518970"])
+        self.assertIn("gagnent un label", texte)
+
+    def test_what_wikidata_says_is_kept_alongside(self):
+        puy = make_place("Puy de Dôme", "volcans", wikidata_id="Q607372")
+        etiquettes, _ = self._run([puy], manuel=[])
+        self.assertIn("grand-site-de-france", etiquettes["Q607372"])
+
+    def test_a_label_removed_from_the_list_is_removed_from_the_place(self):
+        # Le recalcul repart de zéro : retirer une ligne doit retirer le label,
+        # sans quoi une erreur de saisie serait un aller sans retour.
+        ancien = make_place("Lieu déclassé", "sommets", wikidata_id="Q999",
+                            labels=["grand-site-de-france"])
+        etiquettes, texte = self._run([ancien], manuel=[])
+        self.assertEqual(etiquettes["Q999"], [])
+        self.assertIn("en perdent un", texte)

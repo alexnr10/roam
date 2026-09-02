@@ -35,6 +35,8 @@ from .raw import EXTRA_SHARD, read_raw, shard_of, shards, write_raw
 from .merge import conflicted, merge_file
 from .fetch import (
     REMEDIES,
+    apply_labels,
+    fetch_label_members,
     read_fetch_state,
     stale_themes,
     _paged,
@@ -338,6 +340,54 @@ def cmd_sync(args: argparse.Namespace, config: Config) -> int:
         print("  Personne ne les a encore collectés — `fetch --only "
               + " ".join(absents[:3]) + "` sur la machine de ton choix.")
     print("Enchaîne avec `build` : aucune collecte n'est nécessaire.")
+    return 0
+
+
+def cmd_relabel(args: argparse.Namespace, config: Config) -> int:
+    """Rappose les labels sur la collecte, sans la recollecter.
+
+    Les labels sont apposés pendant `fetch`, et sur les seuls thèmes que ce
+    `fetch` a recollectés. Ajouter un identifiant à une liste manuelle — les
+    vingt-cinq Grands Sites de France que Wikidata ignore — n'avait donc aucun
+    effet tant qu'on n'avait pas refait passer leur thème, c'est-à-dire une
+    demi-heure pour changer une ligne de CSV.
+
+    Or apposer un label ne demande pas de recollecter des lieux : il suffit de
+    redemander la liste de ses membres, ce qui coûte une douzaine de requêtes.
+    """
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
+        return 1
+
+    places = _load_places(raw_path)
+    avant = {place.wikidata_id: set(place.labels) for place in places}
+
+    client = wd.SparqlClient()
+    members: dict[str, set[str]] = {}
+    for label in config.labels:
+        try:
+            members[label.id] = fetch_label_members(client, label, args.manual)
+        except Exception as erreur:  # noqa: BLE001 — un label en échec n'est pas fatal
+            LOG.error("label %s : collecte échouée (%s)", label.id, erreur)
+            members[label.id] = set()
+    apply_labels(places, members)
+
+    gagnes = [p for p in places if set(p.labels) - avant[p.wikidata_id]]
+    perdus = [p for p in places if avant[p.wikidata_id] - set(p.labels)]
+    _save_raw(args, places)
+
+    print(f"{len(places)} lieux relus : {len(gagnes)} gagnent un label, "
+          f"{len(perdus)} en perdent un.")
+    for place in gagnes[:20]:
+        neufs = ", ".join(sorted(set(place.labels) - avant[place.wikidata_id]))
+        print(f"    + {place.wikidata_id:<11} {place.name:<44} {neufs}")
+    if len(gagnes) > 20:
+        print(f"    (+{len(gagnes) - 20})")
+    for place in perdus[:10]:
+        partis = ", ".join(sorted(avant[place.wikidata_id] - set(place.labels)))
+        print(f"    − {place.wikidata_id:<11} {place.name:<44} {partis}")
+    print("\n  Enchaîne avec `build`.")
     return 0
 
 
@@ -2821,6 +2871,11 @@ def build_parser() -> argparse.ArgumentParser:
     build = sub.add_parser("build", help="score, construit les collections et exporte")
     add_decision_args(build)
 
+    sub.add_parser(
+        "relabel",
+        help="rappose les labels sur la collecte, sans la recollecter (réseau requis)",
+    )
+
     resolve = sub.add_parser(
         "resolve-list",
         help="retrouve les Q-ids d'une liste de noms dans la collecte",
@@ -2999,6 +3054,7 @@ def main(argv: list[str] | None = None) -> int:
         "adopt": cmd_adopt,
         "build": cmd_build,
         "explain": cmd_explain,
+        "relabel": cmd_relabel,
         "resolve-list": cmd_resolve_list,
         "apply-review": cmd_apply_review,
         "stats": cmd_stats,
