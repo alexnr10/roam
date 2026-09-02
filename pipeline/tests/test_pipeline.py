@@ -3492,9 +3492,20 @@ class TestFloorAgainstOfficialLists(unittest.TestCase):
             gardes = apply_notoriety_floor([sur_liste, hors_liste], self._config())
         self.assertEqual([p.name for p in gardes], ["Maison obscure"])
 
-    def test_only_the_list_that_feeds_the_theme_counts(self):
+    def test_any_finite_official_list_passes_the_floor(self):
+        # Un Grand Site de France rangé en « gorges » ne profitait d'aucune
+        # dispense — le thème n'est alimenté par aucune liste. Or la curation
+        # de l'État ne dépend pas du thème où le lieu atterrit.
+        grand_site = make_place("Gorge labellisée", theme="gorges", sitelinks=2,
+                                labels=["grand-site-de-france"])
+        with _capture():
+            gardes = apply_notoriety_floor([grand_site], self._config())
+        self.assertEqual([p.name for p in gardes], ["Gorge labellisée"])
+
+    def test_a_list_too_large_to_be_a_collection_counts_for_nothing(self):
         # « Monument historique inscrit » compte quarante mille membres : ce
-        # n'est pas une sélection, et il ne doit dispenser de rien.
+        # n'est pas une sélection, et il ne doit dispenser de rien. C'est
+        # `makes_collection: false` qui le dit.
         autre = make_place("Maison classée", theme="maisons", sitelinks=2,
                            labels=["monument-historique-inscrit"])
         with _capture():

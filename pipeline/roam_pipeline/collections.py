@@ -599,6 +599,7 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
     # c'est un arbitrage éditorial, et il doit se voir plutôt que se subir.
     listes: dict[str, int] = defaultdict(int)
     par_theme = {theme.id: set(theme.from_labels) for theme in config.themes}
+    curees = {label.id for label in config.labels if label.makes_collection}
 
     for place in places:
         try:
@@ -617,10 +618,17 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
         # fait le travail de curation ; lui demander d'être ratifié par
         # Wikipédia, c'est renverser l'ordre des autorités.
         #
-        # Seule la liste qui ALIMENTE le thème vaut dispense, pas n'importe
-        # quel label : « monument historique inscrit » compte quarante mille
-        # membres et n'est pas une sélection.
-        sur_liste = bool(par_theme.get(place.theme_id, set()) & set(place.labels))
+        # Toute liste officielle FINIE vaut dispense, pas seulement celle qui
+        # alimente le thème : un Grand Site de France rangé en « gorges » ne
+        # profitait de rien, alors que la même curation d'État le sauvait s'il
+        # tombait en « maisons ». Le critère est `makes_collection` — il dit
+        # déjà, dans labels.yaml, qu'une liste est assez courte et assez choisie
+        # pour être une collection à elle seule. « Monument historique
+        # inscrit », avec ses quarante mille membres, ne l'est pas et ne
+        # dispense de rien.
+        sur_liste = bool(
+            (par_theme.get(place.theme_id, set()) | curees) & set(place.labels)
+        )
         if place.pinned or sur_liste or place.sitelinks >= floor:
             kept.append(place)
             if sur_liste and place.sitelinks < floor:
@@ -633,8 +641,8 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
 
     if listes:
         LOG.info(
-            "%s lieux gardés sous leur plancher parce qu'ils figurent sur la "
-            "liste officielle de leur thème : %s",
+            "%s lieux gardés sous leur plancher parce qu'ils figurent sur une "
+            "liste officielle : %s",
             sum(listes.values()),
             ", ".join(f"{k} {v}" for k, v in sorted(listes.items(), key=lambda x: -x[1])),
         )
