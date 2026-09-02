@@ -8,3 +8,7 @@
 # différents, et les mélanger rendrait `decisions.csv` ambigu. D'où ce fichier.
 #
 wikidata_id,name,note
+Q123437912,Pointe de la Courte Dune,libellé Wikidata avec des tirets bas
+Q2867477,Presqu'île de Quiberon,faute de frappe dans le libellé Wikidata
+Q1798855,La Hague,le Grand Site s'appelle « La Hague »
+Q22939731,Rocamadour,le Grand Site est le site, pas la seule basilique
