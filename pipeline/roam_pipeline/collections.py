@@ -557,6 +557,12 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
     kept: list[Place] = []
     dropped: dict[str, int] = defaultdict(int)
     saved: dict[str, int] = defaultdict(int)
+    # Un lieu que le plancher écarte ALORS QU'IL FIGURE sur la liste officielle
+    # qui alimente son thème. Le plancher mesure la documentation ; la liste est
+    # une curation humaine, finie et motivée. Quand les deux se contredisent,
+    # c'est un arbitrage éditorial, et il doit se voir plutôt que se subir.
+    listes: dict[str, int] = defaultdict(int)
+    par_theme = {theme.id: set(theme.from_labels) for theme in config.themes}
 
     for place in places:
         try:
@@ -574,6 +580,18 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
             saved[place.theme_id] += 1
         else:
             dropped[place.theme_id] += 1
+            if par_theme.get(place.theme_id, set()) & set(place.labels):
+                listes[place.theme_id] += 1
+
+    if listes:
+        LOG.warning(
+            "%s lieux écartés par le plancher ALORS QU'ILS SONT SUR LA LISTE "
+            "officielle de leur thème (%s) — une liste d'État est déjà une "
+            "curation humaine ; si le compte est élevé, c'est le plancher qu'il "
+            "faut revoir, pas la liste",
+            sum(listes.values()),
+            ", ".join(f"{k} {v}" for k, v in sorted(listes.items(), key=lambda x: -x[1])),
+        )
 
     if dropped:
         LOG.info(

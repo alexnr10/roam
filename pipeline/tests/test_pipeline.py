@@ -3465,6 +3465,39 @@ class TestRethemeLosses(unittest.TestCase):
         self.assertIn("Q1279597", {p.wikidata_id for p in apres})
 
 
+class TestFloorAgainstOfficialLists(unittest.TestCase):
+    """Le plancher mesure la documentation ; une liste d'État est une curation.
+
+    Quand les deux se contredisent — une Maison des Illustres à deux langues —
+    c'est un arbitrage éditorial. Il doit se voir plutôt que se subir.
+    """
+
+    def test_a_listed_place_cut_by_the_floor_is_reported(self):
+        essai = replace(CONFIG, themes=[
+            replace(t, from_labels=["maisons-des-illustres"], min_sitelinks=4)
+            if t.id == "maisons" else t
+            for t in CONFIG.themes])
+        sur_liste = make_place("Maison obscure", theme="maisons", sitelinks=2,
+                               labels=["maisons-des-illustres"])
+        hors_liste = make_place("Maison quelconque", theme="maisons", sitelinks=2)
+        with self.assertLogs("roam_pipeline.collections", level="INFO") as logs:
+            apply_notoriety_floor([sur_liste, hors_liste], essai)
+        texte = "\n".join(logs.output)
+        self.assertIn("SUR LA LISTE", texte)
+        self.assertIn("maisons 1", texte)
+
+    def test_nothing_is_said_when_the_lists_pass(self):
+        essai = replace(CONFIG, themes=[
+            replace(t, from_labels=["maisons-des-illustres"], min_sitelinks=4)
+            if t.id == "maisons" else t
+            for t in CONFIG.themes])
+        sur_liste = make_place("Maison connue", theme="maisons", sitelinks=12,
+                               labels=["maisons-des-illustres"])
+        # Douze langues : le plancher ne l'écarte pas, donc rien à signaler.
+        with self.assertNoLogs("roam_pipeline.collections", level="WARNING"):
+            apply_notoriety_floor([sur_liste], essai)
+
+
 class TestRetention(unittest.TestCase):
     """Deux causes opposées produisent le même symptôme : un thème maigre.
 
