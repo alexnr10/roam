@@ -1703,7 +1703,9 @@ def cmd_pertes(args: argparse.Namespace, config: Config) -> int:
         perdu = candidats.get(qid) or avant[qid]
         theme_avant = avant[qid].theme_id
         theme_apres = themes[qid][0]
-        print(f"  {perdu.name}  ({perdu.sitelinks} langues, score "
+        # Le Q-id, sans quoi les trois remèdes proposés plus bas ne sont pas
+        # exécutables : il faut aller le rechercher dans la collecte.
+        print(f"  {perdu.name}  ({qid}, {perdu.sitelinks} langues, score "
               f"{perdu.score:.0f})")
         print(f"      {theme_avant} → {theme_apres}")
         # Le rival : le lieu du NOUVEAU thème, à portée de dédoublonnage, qui
@@ -1717,8 +1719,8 @@ def cmd_pertes(args: argparse.Namespace, config: Config) -> int:
         if rivaux:
             for rival in sorted(rivaux, key=lambda p: -p.score):
                 distance = haversine_m(perdu.lat, perdu.lon, rival.lat, rival.lon)
-                print(f"      évincé par « {rival.name} » à {distance:.0f} m "
-                      f"(score {rival.score:.0f})")
+                print(f"      évincé par « {rival.name} » ({rival.wikidata_id}) "
+                      f"à {distance:.0f} m (score {rival.score:.0f})")
         else:
             plancher = config.theme(theme_apres).min_sitelinks
             if perdu.sitelinks < plancher:
@@ -1729,9 +1731,14 @@ def cmd_pertes(args: argparse.Namespace, config: Config) -> int:
         print()
 
     print("Trois issues, au choix :")
-    print("    retheme <Q-id> --clear        revenir au rattachement d'avant")
-    print("    decisions.csv : drop <rival>  écarter la fiche qui a gagné")
-    print("    places.csv : épingler         le lieu passe outre le plancher")
+    print("    retheme <Q-id> --clear     revenir au rattachement d'avant. C'est")
+    print("                               souvent le bon remède : dans un AUTRE")
+    print("                               thème que son rival, le lieu survit,")
+    print("                               le dédoublonnage ne comparant qu'à")
+    print("                               l'intérieur d'un thème.")
+    print("    decisions.csv : drop       écarter la fiche du rival, quand c'est")
+    print("                               elle qui décrit mal la visite")
+    print("    pin <Q-id>                 le lieu passe outre les planchers")
     return 0
 
 
