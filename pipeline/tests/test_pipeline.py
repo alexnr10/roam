@@ -3472,30 +3472,39 @@ class TestFloorAgainstOfficialLists(unittest.TestCase):
     c'est un arbitrage éditorial. Il doit se voir plutôt que se subir.
     """
 
-    def test_a_listed_place_cut_by_the_floor_is_reported(self):
-        essai = replace(CONFIG, themes=[
+    @staticmethod
+    def _config():
+        return replace(CONFIG, themes=[
             replace(t, from_labels=["maisons-des-illustres"], min_sitelinks=4)
             if t.id == "maisons" else t
             for t in CONFIG.themes])
+
+    def test_the_official_list_passes_the_floor(self):
+        # 147 des 231 Maisons des Illustres étaient écartées sur un décompte de
+        # versions linguistiques de Wikipédia.
         sur_liste = make_place("Maison obscure", theme="maisons", sitelinks=2,
                                labels=["maisons-des-illustres"])
         hors_liste = make_place("Maison quelconque", theme="maisons", sitelinks=2)
-        with self.assertLogs("roam_pipeline.collections", level="INFO") as logs:
-            apply_notoriety_floor([sur_liste, hors_liste], essai)
-        texte = "\n".join(logs.output)
-        self.assertIn("SUR LA LISTE", texte)
-        self.assertIn("maisons 1", texte)
+        with _capture():
+            gardes = apply_notoriety_floor([sur_liste, hors_liste], self._config())
+        self.assertEqual([p.name for p in gardes], ["Maison obscure"])
 
-    def test_nothing_is_said_when_the_lists_pass(self):
-        essai = replace(CONFIG, themes=[
-            replace(t, from_labels=["maisons-des-illustres"], min_sitelinks=4)
-            if t.id == "maisons" else t
-            for t in CONFIG.themes])
+    def test_only_the_list_that_feeds_the_theme_counts(self):
+        # « Monument historique inscrit » compte quarante mille membres : ce
+        # n'est pas une sélection, et il ne doit dispenser de rien.
+        autre = make_place("Maison classée", theme="maisons", sitelinks=2,
+                           labels=["monument-historique-inscrit"])
+        with _capture():
+            gardes = apply_notoriety_floor([autre], self._config())
+        self.assertEqual(gardes, [])
+
+    def test_a_well_documented_listed_place_is_not_counted_as_saved(self):
+        # Douze langues : elle franchissait le plancher toute seule, la liste
+        # n'y est pour rien et le compte ne doit pas la revendiquer.
         sur_liste = make_place("Maison connue", theme="maisons", sitelinks=12,
                                labels=["maisons-des-illustres"])
-        # Douze langues : le plancher ne l'écarte pas, donc rien à signaler.
-        with self.assertNoLogs("roam_pipeline.collections", level="WARNING"):
-            apply_notoriety_floor([sur_liste], essai)
+        with self.assertNoLogs("roam_pipeline.collections", level="INFO"):
+            apply_notoriety_floor([sur_liste], self._config())
 
 
 class TestRetention(unittest.TestCase):

@@ -573,22 +573,32 @@ def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
         # documentation d'un lieu, pas son intérêt. Giverny et le château
         # d'Auvers-sur-Oise attirent le monde entier sans être documentés en
         # dix langues.
-        if place.pinned or place.sitelinks >= floor:
+        #
+        # Une LISTE OFFICIELLE de son thème passe outre pour la même raison, et
+        # celle-là est mesurée : sur les deux cent trente et une Maisons des
+        # Illustres, cent quarante-sept étaient écartées sur un décompte de
+        # versions linguistiques de Wikipédia. Le ministère de la Culture a déjà
+        # fait le travail de curation ; lui demander d'être ratifié par
+        # Wikipédia, c'est renverser l'ordre des autorités.
+        #
+        # Seule la liste qui ALIMENTE le thème vaut dispense, pas n'importe
+        # quel label : « monument historique inscrit » compte quarante mille
+        # membres et n'est pas une sélection.
+        sur_liste = bool(par_theme.get(place.theme_id, set()) & set(place.labels))
+        if place.pinned or sur_liste or place.sitelinks >= floor:
             kept.append(place)
+            if sur_liste and place.sitelinks < floor:
+                listes[place.theme_id] += 1
         elif rescued(place, config):
             kept.append(place)
             saved[place.theme_id] += 1
         else:
             dropped[place.theme_id] += 1
-            if par_theme.get(place.theme_id, set()) & set(place.labels):
-                listes[place.theme_id] += 1
 
     if listes:
-        LOG.warning(
-            "%s lieux écartés par le plancher ALORS QU'ILS SONT SUR LA LISTE "
-            "officielle de leur thème (%s) — une liste d'État est déjà une "
-            "curation humaine ; si le compte est élevé, c'est le plancher qu'il "
-            "faut revoir, pas la liste",
+        LOG.info(
+            "%s lieux gardés sous leur plancher parce qu'ils figurent sur la "
+            "liste officielle de leur thème : %s",
             sum(listes.values()),
             ", ".join(f"{k} {v}" for k, v in sorted(listes.items(), key=lambda x: -x[1])),
         )
