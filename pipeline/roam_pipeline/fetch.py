@@ -498,6 +498,73 @@ def _entity_names(client: wd.SparqlClient, qids: list[str]) -> dict[str, str]:
     return noms
 
 
+def _previous_collection(raw_dir: Path, raw_path: Path) -> list[dict]:
+    """La collecte précédente, telle qu'elle est sur le disque."""
+    # Le dépôt d'abord : sur un clone frais, `places_raw.json` n'existe pas
+    # encore alors que la collecte, elle, est là.
+    previous: list[dict] = [p.to_dict() for p in read_raw(raw_dir)]
+    if not previous and raw_path.exists():
+        try:
+            previous = json.loads(raw_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            LOG.warning("collecte précédente illisible (%s)", exc)
+            return []
+    return previous
+
+
+# Ce qu'`enrich` produit et que Wikidata ne donne pas. Une collecte les
+# écrasait par des valeurs vides : huit mille cent soixante-seize lieux ont
+# perdu d'un coup la taille de leur article et leur fréquentation, cinq cent
+# vingt-trois leur département. Le premier fausse TOUS les scores, donc tous
+# les classements, tous les plafonds et tous les dédoublonnages ; le second
+# vide le catalogue, le filtre « périmètre français » écartant ce qu'il ne sait
+# pas situer. Le lac Léman, Saint-Guilhem-le-Désert et Omaha Beach sont sortis
+# sans qu'une seule ligne du journal le dise.
+ENRICHED_FIELDS = (
+    "departement_code", "region_code", "commune_name", "commune_code",
+    "article_bytes", "summary", "pageviews_per_month", "visitors_per_year",
+)
+
+
+def carry_enrichment(places: list[Place], raw_dir: Path, raw_path: Path) -> int:
+    """Reprend de la collecte précédente ce qu'`enrich` avait ajouté.
+
+    Même raison que pour l'ouverture au public : ces champs ne viennent pas de
+    la collecte, ils viennent d'un enrichissement qui interroge d'autres
+    services et coûte long. Les perdre est silencieux et coûte le catalogue.
+
+    Seules les valeurs ABSENTES sont reprises : un `enrich` ultérieur reste
+    libre de tout rafraîchir, et une collecte qui apporte mieux garde son
+    apport.
+    """
+    previous = _previous_collection(raw_dir, raw_path)
+    if not previous:
+        return 0
+
+    known = {
+        item["wikidata_id"]: item for item in previous if item.get("wikidata_id")
+    }
+    repris = 0
+    for place in places:
+        item = known.get(place.wikidata_id)
+        if item is None:
+            continue
+        touche = False
+        for champ in ENRICHED_FIELDS:
+            if not getattr(place, champ, None) and item.get(champ):
+                setattr(place, champ, item[champ])
+                touche = True
+        # Le département sans sa région ne sert à rien : le repêchage par
+        # territoire et les collections régionales lisent les deux.
+        if place.departement_code and not place.region_code:
+            place.region_code = item.get("region_code")
+        repris += 1 if touche else 0
+
+    if repris:
+        LOG.info("enrichissement repris de la collecte précédente : %s lieux", repris)
+    return repris
+
+
 def carry_osm_signals(places: list[Place], raw_dir: Path, raw_path: Path) -> int:
     """Reprend l'ouverture au public de la collecte précédente.
 
@@ -510,15 +577,7 @@ def carry_osm_signals(places: list[Place], raw_dir: Path, raw_path: Path) -> int
     # Le dépôt d'abord : sur un clone frais, `places_raw.json` n'existe pas
     # encore alors que la collecte, elle, est là — et avec elle l'ouverture au
     # public que personne ne veut recollecter.
-    previous: list[dict] = [p.to_dict() for p in read_raw(raw_dir)]
-    if not previous and raw_path.exists():
-        try:
-            previous = json.loads(raw_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as exc:
-            LOG.warning(
-                "collecte précédente illisible (%s) — ouverture au public perdue", exc
-            )
-            return 0
+    previous = _previous_collection(raw_dir, raw_path)
     if not previous:
         return 0
 
@@ -1131,6 +1190,11 @@ def run_fetch(
     # L'ouverture au public ne vient que d'OpenStreetMap, donc de `discover`,
     # qui coûte vingt minutes : une nouvelle collecte l'écraserait sans trace.
     carry_osm_signals(places, raw_dir, raw_path)
+
+    # Même raison, autres données : le département, la taille de l'article et
+    # la fréquentation viennent d'`enrich`, pas de la collecte. Une collecte
+    # qui les écrase fausse tous les scores et vide le catalogue, en silence.
+    carry_enrichment(places, raw_dir, raw_path)
 
     # On ne réécrit que ce qu'on a collecté. Les thèmes non demandés gardent
     # leur fichier ; ceux qui ont échoué aussi — leur dernière collecte réussie

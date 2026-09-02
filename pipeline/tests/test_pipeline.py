@@ -4311,3 +4311,58 @@ class TestNaturalClassGaps(unittest.TestCase):
 
     def test_the_ardeche_gorges_would_pass_theirs(self):
         self.assertLessEqual(dict(CONFIG.theme("gorges").collected_classes)["Q39816"], 12)
+
+
+class TestCarryEnrichment(unittest.TestCase):
+    """Une collecte ne doit pas écraser ce qu'`enrich` a mis des heures à poser.
+
+    Huit mille cent soixante-seize lieux ont perdu d'un coup la taille de leur
+    article et leur fréquentation, cinq cent vingt-trois leur département. Le
+    premier fausse tous les scores ; le second vide le catalogue, le filtre
+    « périmètre français » écartant ce qu'il ne sait pas situer.
+    """
+
+    def _avec(self, precedent, neuf):
+        from roam_pipeline.fetch import carry_enrichment
+        from roam_pipeline.raw import shard_of, write_raw
+        with tempfile.TemporaryDirectory() as dossier:
+            raw = Path(dossier)
+            write_raw(raw, precedent, {shard_of(p) for p in precedent})
+            with _capture():
+                carry_enrichment(neuf, raw, raw / "places_raw.json")
+        return neuf
+
+    def test_the_departement_survives_a_new_collection(self):
+        ancien = make_place("Saint-Guilhem-le-Désert", "villages", wikidata_id="Q1",
+                            departement_code="34", region_code="76")
+        neuf = make_place("Saint-Guilhem-le-Désert", "villages", wikidata_id="Q1",
+                          departement_code=None, region_code=None)
+        self._avec([ancien], [neuf])
+        self.assertEqual((neuf.departement_code, neuf.region_code), ("34", "76"))
+
+    def test_the_article_and_the_crowd_survive_too(self):
+        ancien = make_place("Léman", "lacs", wikidata_id="Q2",
+                            article_bytes=40_000, pageviews_per_month=9_000,
+                            visitors_per_year=1_200_000)
+        neuf = make_place("Léman", "lacs", wikidata_id="Q2")
+        self._avec([ancien], [neuf])
+        self.assertEqual(neuf.article_bytes, 40_000)
+        self.assertEqual(neuf.pageviews_per_month, 9_000)
+        self.assertEqual(neuf.visitors_per_year, 1_200_000)
+
+    def test_a_fresher_value_wins(self):
+        # Seules les valeurs ABSENTES sont reprises : une collecte qui apporte
+        # mieux garde son apport, et `enrich` reste libre de tout rafraîchir.
+        ancien = make_place("Château", "chateaux", wikidata_id="Q3", departement_code="34")
+        neuf = make_place("Château", "chateaux", wikidata_id="Q3", departement_code="15")
+        self._avec([ancien], [neuf])
+        self.assertEqual(neuf.departement_code, "15")
+
+    def test_an_unknown_place_carries_nothing(self):
+        ancien = make_place("Ailleurs", "chateaux", wikidata_id="Q4",
+                            departement_code="34", article_bytes=9_000)
+        neuf = make_place("Nouveau", "chateaux", wikidata_id="Q5",
+                          departement_code=None)
+        self._avec([ancien], [neuf])
+        self.assertIsNone(neuf.departement_code)
+        self.assertEqual(neuf.article_bytes, 0)
