@@ -36,6 +36,7 @@ from .merge import conflicted, merge_file
 from .fetch import (
     REMEDIES,
     apply_labels,
+    carry_enrichment,
     fetch_label_members,
     read_fetch_state,
     stale_themes,
@@ -98,6 +99,22 @@ def _save_raw(args: argparse.Namespace, places: list[Place]) -> None:
     fréquentation — sur une seule machine, et l'autre relirait un catalogue
     appauvri sans qu'aucune erreur ne le dise.
     """
+    # La copie de travail n'est PAS versionnée : après un `git pull`, elle est
+    # en retard sur le dépôt. Une commande qui la relit et la réécrit efface
+    # alors ce que le dépôt venait d'apporter — c'est ainsi qu'un `relabel` a
+    # annulé la réparation de huit mille lieux, sans un mot.
+    #
+    # Le dépôt fait donc foi pour ce qu'`enrich` a posé : ce qui manque au lot
+    # qu'on écrit est repris de ce qui est déjà là. Cela n'empêche aucune
+    # modification — seules les valeurs ABSENTES sont complétées.
+    repris = carry_enrichment(places, args.raw, args.out / "places_raw.json")
+    if repris > len(places) // 10:
+        LOG.warning(
+            "%s lieux sur %s ont retrouvé dans le dépôt un enrichissement que "
+            "ta copie de travail avait perdu — elle était en retard. Lance "
+            "`sync` après un `git pull` pour éviter ce genre de surprise.",
+            repris, len(places),
+        )
     write_raw(args.raw, places, replacing={shard_of(place) for place in places})
     (args.out / "places_raw.json").write_text(
         json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),

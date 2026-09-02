@@ -4433,3 +4433,44 @@ class TestRelabel(unittest.TestCase):
         etiquettes, texte = self._run([ancien], manuel=[])
         self.assertEqual(etiquettes["Q999"], [])
         self.assertIn("en perdent un", texte)
+
+
+class TestSaveRawGuard(unittest.TestCase):
+    """Le dépôt fait foi sur ce qu'`enrich` a posé.
+
+    `places_raw.json` n'est pas versionné : après un `git pull`, il est en
+    retard. Une commande qui le relit et le réécrit efface alors ce que le
+    dépôt venait d'apporter — c'est ainsi qu'un `relabel` a annulé la
+    réparation de huit mille lieux, sans un mot.
+    """
+
+    def _ecrit(self, depot, lot):
+        from roam_pipeline.cli import _save_raw
+        from roam_pipeline.raw import read_raw, shard_of, write_raw
+        with tempfile.TemporaryDirectory() as dossier:
+            base = Path(dossier)
+            (base / "out").mkdir()
+            write_raw(base / "raw", depot, {shard_of(p) for p in depot})
+            args = argparse.Namespace(raw=base / "raw", out=base / "out")
+            with _capture() as sortie:
+                _save_raw(args, lot)
+            return {p.wikidata_id: p for p in read_raw(base / "raw")}, sortie.getvalue()
+
+    def test_a_stale_copy_cannot_erase_the_repository(self):
+        enrichi = make_place("Léman", "lacs", wikidata_id="Q1",
+                             departement_code="74", article_bytes=40_000)
+        perime = make_place("Léman", "lacs", wikidata_id="Q1",
+                            departement_code=None, article_bytes=0)
+        depot, _ = self._ecrit([enrichi], [perime])
+        self.assertEqual(depot["Q1"].departement_code, "74")
+        self.assertEqual(depot["Q1"].article_bytes, 40_000)
+
+    def test_the_change_being_written_is_kept(self):
+        # Le garde-fou complète, il n'annule pas : un renommage passe.
+        ancien = make_place("Porte d'Aval", "rochers", wikidata_id="Q2",
+                            departement_code="76", article_bytes=9_000)
+        neuf = make_place("Falaises d'Étretat", "rochers", wikidata_id="Q2",
+                          departement_code=None, article_bytes=0)
+        depot, _ = self._ecrit([ancien], [neuf])
+        self.assertEqual(depot["Q2"].name, "Falaises d'Étretat")
+        self.assertEqual(depot["Q2"].departement_code, "76")
