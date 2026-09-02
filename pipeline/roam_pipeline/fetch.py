@@ -878,9 +878,20 @@ def enrich_visitors(
 
 
 def fetch_label_members(client: wd.SparqlClient, label: Label, manual_dir: Path) -> set[str]:
-    """Q-ids des lieux portant un label."""
+    """Q-ids des lieux portant un label.
+
+    La liste manuelle s'AJOUTE toujours à ce que Wikidata rend, au lieu de s'y
+    substituer. Wikidata est parfois en retard sur la liste officielle sans
+    être faux : sur les Grands Sites de France, `label-probe` en compte dix-neuf
+    par la désignation patrimoniale et zéro par l'appartenance au réseau, alors
+    que le ministère en labellise bien davantage. Remplacer les dix-neuf par une
+    liste saisie à la main perdrait ceux que la saisie oublie ; les compléter ne
+    perd rien.
+    """
     if label.is_manual:
         return _read_manual_label(label, manual_dir)
+
+    complement = _read_manual_label(label, manual_dir, quiet=True)
 
     if not label.qid:
         # Label en attente de résolution : mieux vaut l'ignorer bruyamment que
@@ -895,13 +906,26 @@ def fetch_label_members(client: wd.SparqlClient, label: Label, manual_dir: Path)
 
     rows = client.query(wd.label_members_query(label.query_kind, label.qid or ""))
     qids = {qid for qid in (wd.qid_from_uri(r.get("item")) for r in rows) if qid}
-    LOG.info("label %s : %s membres", label.id, len(qids))
-    return qids
+    ajoutes = complement - qids
+    if ajoutes:
+        LOG.info(
+            "label %s : %s membres, plus %s ajoutés à la main",
+            label.id, len(qids), len(ajoutes),
+        )
+    else:
+        LOG.info("label %s : %s membres", label.id, len(qids))
+    return qids | complement
 
 
-def _read_manual_label(label: Label, manual_dir: Path) -> set[str]:
+def _read_manual_label(
+    label: Label, manual_dir: Path, quiet: bool = False
+) -> set[str]:
     path = manual_dir / f"{label.id}.csv"
     if not path.exists():
+        if quiet:
+            # Un label interrogé chez Wikidata n'a pas à posséder un fichier de
+            # complément : son absence est le cas ordinaire.
+            return set()
         LOG.warning(
             "label %s : pas de source Wikidata et %s absent — label ignoré",
             label.id,
@@ -913,7 +937,8 @@ def _read_manual_label(label: Label, manual_dir: Path) -> set[str]:
         for row in read_csv_rows(path)
         if row.get("wikidata_id")
     }
-    LOG.info("label %s : %s membres (liste manuelle)", label.id, len(qids))
+    if not quiet:
+        LOG.info("label %s : %s membres (liste manuelle)", label.id, len(qids))
     return qids
 
 

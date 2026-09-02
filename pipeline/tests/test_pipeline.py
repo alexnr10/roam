@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import io
 import json
 import re
 import sys
@@ -4079,3 +4080,76 @@ class TestCollectingLabels(unittest.TestCase):
         from roam_pipeline.fetch import _theme_of_classes
         theme = _theme_of_classes({"Q23413", "Q160742"}, CONFIG)
         self.assertEqual(theme.id, "abbayes")
+
+
+class TestResolveList(unittest.TestCase):
+    """Retrouver les Q-ids d'une liste officielle dans la collecte.
+
+    Les Grands Sites de France sont dix-neuf chez Wikidata et bien plus au
+    ministère : la différence se saisit à la main, donc se résout par le nom.
+    """
+
+    def _run(self, noms, places, into=None):
+        import argparse
+        from roam_pipeline.cli import cmd_resolve_list
+
+        with tempfile.TemporaryDirectory() as dossier:
+            base = Path(dossier)
+            (base / "out").mkdir()
+            (base / "manual").mkdir()
+            (base / "out" / "places_raw.json").write_text(
+                json.dumps([p.to_dict() for p in places], ensure_ascii=False),
+                encoding="utf-8")
+            liste = base / "noms.txt"
+            liste.write_text("\n".join(noms), encoding="utf-8")
+            args = argparse.Namespace(
+                file=liste, out=base / "out", manual=base / "manual",
+                seuil=0.6, into=into)
+            sortie = io.StringIO()
+            with contextlib.redirect_stdout(sortie):
+                code = cmd_resolve_list(args, CONFIG)
+            csv_path = base / "manual" / f"{into}.csv"
+            ecrit = csv_path.read_text(encoding="utf-8") if csv_path.exists() else ""
+        return code, sortie.getvalue(), ecrit
+
+    def test_an_exact_name_resolves(self):
+        _, texte, _ = self._run(
+            ["Pointe du Raz"], [make_place("Pointe du Raz", "plages")])
+        self.assertIn("1 nom(s) retrouvés mot pour mot", texte)
+
+    def test_a_longer_collected_name_is_only_a_proposal(self):
+        # « Baie de Somme » couvre entièrement « chemin de fer de la baie de
+        # Somme » : couvrir n'est pas désigner.
+        _, texte, _ = self._run(
+            ["Baie de Somme"],
+            [make_place("Chemin de fer de la baie de Somme", "ponts")])
+        self.assertIn("à trancher", texte)
+        self.assertNotIn("mot pour mot", texte)
+
+    def test_the_exact_match_beats_the_longer_one(self):
+        _, texte, _ = self._run(
+            ["Gorges du Verdon"],
+            [make_place("Basses gorges du Verdon", "gorges"),
+             make_place("Gorges du Verdon", "gorges")])
+        self.assertIn("mot pour mot", texte)
+        self.assertNotIn("Basses", texte)
+
+    def test_an_unknown_name_is_named_not_guessed(self):
+        _, texte, _ = self._run(
+            ["Cirque de Mafate"], [make_place("Pointe du Raz", "plages")])
+        self.assertIn("sans correspondance", texte)
+        self.assertIn("suggest-qids", texte)
+
+    def test_only_the_sure_matches_are_written(self):
+        _, _, ecrit = self._run(
+            ["Pointe du Raz", "Baie de Somme"],
+            [make_place("Pointe du Raz", "plages"),
+             make_place("Chemin de fer de la baie de Somme", "ponts")],
+            into="grand-site-de-france")
+        self.assertIn("Pointe du Raz", ecrit)
+        self.assertNotIn("Chemin de fer", ecrit)
+        self.assertNotIn("Baie de Somme", ecrit)
+
+    def test_articles_do_not_count_as_matching_words(self):
+        from roam_pipeline.cli import _mots
+        self.assertEqual(_mots("Le Marais de la Somme"), {"marais", "somme"})

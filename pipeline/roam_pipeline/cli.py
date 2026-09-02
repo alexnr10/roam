@@ -849,6 +849,116 @@ def _report_tier_changes(changes, gone, before, retained) -> None:
     print("  `review` → filtre « ce qui a changé de niveau » pour les relire.")
 
 
+def _mots(nom: str) -> set[str]:
+    """Les mots porteurs d'un nom de lieu, articles et ponctuation ôtés."""
+    vides = {"de", "des", "du", "la", "le", "les", "l", "d", "et", "aux", "au",
+             "sur", "sous", "en", "a", "the", "of"}
+    plain = "".join(c if c.isalnum() else " " for c in _fold(nom))
+    return {m for m in plain.split() if len(m) > 1 and m not in vides}
+
+
+def cmd_resolve_list(args: argparse.Namespace, config: Config) -> int:
+    """Retrouve les Q-ids d'une liste de noms dans la collecte.
+
+    Certaines listes officielles existent sur le site du ministère sans exister
+    chez Wikidata : les Grands Sites de France y sont dix-neuf, alors que le
+    label en compte bien davantage. Il faut donc les saisir à la main — et les
+    saisir veut dire trouver un Q-id par nom, ce qui à cinquante lignes n'est
+    pas une opération manuelle raisonnable.
+
+    La plupart de ces lieux sont DÉJÀ collectés, sous un autre rattachement :
+    l'identifiant se lit dans la collecte plutôt que de s'inventer.
+
+    Le rapprochement par les mots est trompeur, et il faut le dire : « baie de
+    Somme » couvre entièrement « chemin de fer de la baie de Somme », « gorges
+    du Verdon » couvre « basses gorges du Verdon ». Seul un nom retrouvé MOT
+    POUR MOT est écrit sans demander ; tout le reste est proposé, avec ses
+    concurrents, et attend un arbitrage.
+    """
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
+        return 1
+
+    noms = [
+        ligne.strip()
+        for ligne in (args.file.read_text(encoding="utf-8").splitlines()
+                      if args.file else sys.stdin.read().splitlines())
+        if ligne.strip() and not ligne.startswith("#")
+    ]
+    if not noms:
+        print("Aucun nom lu.", file=sys.stderr)
+        return 1
+
+    places = _load_places(raw_path)
+    apply_names(places, read_names(args.manual / "names.csv"))
+
+    surs: list[tuple[str, Place]] = []
+    doutes: list[tuple[str, list[tuple[float, int, Place]]]] = []
+    perdus: list[str] = []
+    for nom in noms:
+        cible = _mots(nom)
+        if not cible:
+            perdus.append(nom)
+            continue
+        classe = []
+        for place in places:
+            mots = _mots(place.name)
+            part = len(cible & mots) / len(cible)
+            if part >= args.seuil:
+                classe.append((part, len(mots - cible), place))
+        classe.sort(key=lambda c: (-c[0], c[1], c[2].name))
+        if not classe:
+            perdus.append(nom)
+        elif classe[0][0] >= 1.0 and classe[0][1] == 0:
+            surs.append((nom, classe[0][2]))
+        else:
+            doutes.append((nom, classe[:3]))
+
+    if surs:
+        print(f"{len(surs)} nom(s) retrouvés mot pour mot :\n")
+        for nom, place in surs:
+            print(f"    {place.wikidata_id:<11} {place.name}")
+
+    if doutes:
+        print(f"\n{len(doutes)} à trancher — le nom collecté n'est pas le même :\n")
+        for nom, candidats in doutes:
+            print(f"    « {nom} »")
+            for part, extra, place in candidats:
+                print(f"        {place.wikidata_id:<11} {place.name:<44} "
+                      f"{part:.0%} du nom, {extra} mot(s) en plus")
+
+    if perdus:
+        print(f"\n{len(perdus)} sans correspondance — jamais collectés :\n")
+        for nom in perdus:
+            print(f"    {nom}")
+        print("\n  Résous-les chez Wikidata :"
+              "\n      python -m roam_pipeline suggest-qids "
+              + " ".join(f'"{n}"' for n in perdus[:3])
+              + (" ..." if len(perdus) > 3 else ""))
+
+    if not args.into:
+        print("\n  Ajoute `--into <identifiant-du-label>` pour écrire les lignes sûres.")
+        return 0
+
+    chemin = args.manual / f"{args.into}.csv"
+    connus = set()
+    if chemin.exists():
+        connus = {r["wikidata_id"] for r in read_csv_rows(chemin) if r.get("wikidata_id")}
+    nouveaux = [(p, n) for n, p in surs if p.wikidata_id not in connus]
+    with chemin.open("a" if chemin.exists() else "w", encoding="utf-8",
+                     newline="") as sortie:
+        if not connus:
+            sortie.write("wikidata_id,name\r\n")
+        for place, nom in nouveaux:
+            sortie.write(f"{place.wikidata_id},{nom}\r\n")
+    print(f"\n{len(nouveaux)} ligne(s) ajoutées à {chemin}.")
+    print("  Cette liste COMPLÈTE ce que Wikidata rend, elle ne le remplace pas.")
+    if doutes:
+        print("  Les cas à trancher n'y sont PAS : ajoute-les toi-même une fois choisis.")
+    return 0
+
+
 def cmd_explain(args: argparse.Namespace, config: Config) -> int:
     """Pourquoi ce lieu est-il dans le catalogue, ou pourquoi n'y est-il pas ?
 
@@ -2675,6 +2785,16 @@ def build_parser() -> argparse.ArgumentParser:
     build = sub.add_parser("build", help="score, construit les collections et exporte")
     add_decision_args(build)
 
+    resolve = sub.add_parser(
+        "resolve-list",
+        help="retrouve les Q-ids d'une liste de noms dans la collecte",
+    )
+    resolve.add_argument("file", nargs="?", type=Path,
+                         help="fichier de noms, un par ligne (défaut : entrée standard)")
+    resolve.add_argument("--into", help="identifiant du label où écrire les lignes trouvées")
+    resolve.add_argument("--seuil", type=float, default=0.6,
+                         help="part des mots du nom à retrouver (défaut 0,6)")
+
     explain = sub.add_parser(
         "explain", help="dit pourquoi un lieu est dans le catalogue, ou pourquoi il n'y est pas"
     )
@@ -2843,6 +2963,7 @@ def main(argv: list[str] | None = None) -> int:
         "adopt": cmd_adopt,
         "build": cmd_build,
         "explain": cmd_explain,
+        "resolve-list": cmd_resolve_list,
         "apply-review": cmd_apply_review,
         "stats": cmd_stats,
         "review": cmd_review,
