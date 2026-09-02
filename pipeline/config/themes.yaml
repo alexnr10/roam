@@ -154,6 +154,13 @@ themes:
     # précision — une curation humaine où la hiérarchie des classes Wikidata
     # faisait entrer le palais des Papes.
     from_labels: [maisons-des-illustres]
+    #
+    # Mesuré une fois la liste collectée : sur 204 maisons au catalogue, 188
+    # portent le label. Des seize restantes, aucune n'est un palais — ce sont
+    # les demeures d'écrivains que l'État n'a pas labellisées (Saché, Nohant,
+    # La Brède, Monte-Cristo, Ferney, Saint-Cosme) et les œuvres d'architecte
+    # (Savoye, Cavrois, maison de verre, La Ruche). Vider `wikidata_classes`
+    # au profit de la seule liste les perdrait toutes les seize.
     # Diversité géographique : vingt-neuf des cinquante-huit maisons sont parisiennes.
     # Ce n'est pas un fait de géographie mais un fait d'écriture — les
     # volcans sont vraiment en Auvergne, les ponts ne sont pas vraiment à
