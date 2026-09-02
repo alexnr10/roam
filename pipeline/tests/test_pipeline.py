@@ -4251,3 +4251,29 @@ class TestLabelOrphansFile(unittest.TestCase):
         self.assertIn("Q1", ecrit)
         self.assertIn("cimetière militaire Germania", ecrit)
         self.assertIn("unesco", ecrit)
+
+
+class TestCompoundOfficialNames(unittest.TestCase):
+    """Une liste officielle nomme le périmètre, pas le lieu.
+
+    « Cap d'Erquy - Cap Fréhel » désigne deux caps, « Chaînes des Puys - Puy de
+    Dôme » un massif et son sommet. Cherchés entiers, aucun ne se retrouve.
+    """
+
+    def test_a_dash_separates_two_places(self):
+        from roam_pipeline.cli import _variantes
+        self.assertEqual(
+            _variantes("Bibracte - Morvan des Sommets"),
+            ["Bibracte - Morvan des Sommets", "Bibracte", "Morvan des Sommets"])
+
+    def test_a_comma_and_an_and_separate_too(self):
+        from roam_pipeline.cli import _variantes
+        self.assertIn("Côte d'Albâtre", _variantes("Falaises d'Etretat, Côte d'Albâtre"))
+        self.assertIn("Vallées de Gavarnie", _variantes("Cirques et Vallées de Gavarnie"))
+
+    def test_a_hyphen_inside_a_name_is_not_a_separator(self):
+        # « Concors-Sainte-Victoire » est un nom, pas une énumération : découper
+        # sur le tiret collé casserait « Sainte-Victoire » en deux.
+        from roam_pipeline.cli import _variantes
+        self.assertEqual(_variantes("Concors-Sainte-Victoire"),
+                         ["Concors-Sainte-Victoire"])

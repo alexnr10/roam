@@ -857,6 +857,28 @@ def _mots(nom: str) -> set[str]:
     return {m for m in plain.split() if len(m) > 1 and m not in vides}
 
 
+def _variantes(nom: str) -> list[str]:
+    """Le nom entier, puis ses morceaux.
+
+    Une liste officielle nomme le PÉRIMÈTRE, pas le lieu : « Cap d'Erquy -
+    Cap Fréhel » désigne deux caps, « Chaînes des Puys - Puy de Dôme » un
+    massif et son sommet, « Falaises d'Étretat, Côte d'Albâtre » une falaise et
+    la côte qui la porte. Cherché entier, aucun ne se retrouve ; cherché par
+    morceaux, presque tous.
+
+    Le tiret n'est découpé qu'entouré d'espaces : « Concors-Sainte-Victoire »
+    est un nom, pas une énumération, et « Sainte-Victoire » n'en est pas un
+    morceau séparable.
+    """
+    morceaux = [nom]
+    reste = nom.replace(" – ", " - ").replace(" — ", " - ")
+    for separateur in (" - ", ",", " et "):
+        reste = reste.replace(separateur, "|")
+    if "|" in reste:
+        morceaux += [m.strip() for m in reste.split("|") if _mots(m.strip())]
+    return morceaux
+
+
 def cmd_resolve_list(args: argparse.Namespace, config: Config) -> int:
     """Retrouve les Q-ids d'une liste de noms dans la collecte.
 
@@ -897,23 +919,37 @@ def cmd_resolve_list(args: argparse.Namespace, config: Config) -> int:
     doutes: list[tuple[str, list[tuple[float, int, Place]]]] = []
     perdus: list[str] = []
     for nom in noms:
-        cible = _mots(nom)
-        if not cible:
-            perdus.append(nom)
-            continue
-        classe = []
-        for place in places:
-            mots = _mots(place.name)
-            part = len(cible & mots) / len(cible)
-            if part >= args.seuil:
-                classe.append((part, len(mots - cible), place))
-        classe.sort(key=lambda c: (-c[0], c[1], c[2].name))
-        if not classe:
-            perdus.append(nom)
-        elif classe[0][0] >= 1.0 and classe[0][1] == 0:
-            surs.append((nom, classe[0][2]))
+        exacts: list[Place] = []
+        proches: list[tuple[float, int, Place]] = []
+        vus: set[str] = set()
+        for variante in _variantes(nom):
+            cible = _mots(variante)
+            if not cible:
+                continue
+            classe = []
+            for place in places:
+                mots = _mots(place.name)
+                part = len(cible & mots) / len(cible)
+                if part >= args.seuil:
+                    classe.append((part, len(mots - cible), place))
+            classe.sort(key=lambda c: (-c[0], c[1], c[2].name))
+            # Un périmètre peut désigner PLUSIEURS lieux — « Cap d'Erquy - Cap
+            # Fréhel » en désigne deux, et le label vaut pour les deux.
+            if classe and classe[0][0] >= 1.0 and classe[0][1] == 0:
+                if classe[0][2].wikidata_id not in vus:
+                    vus.add(classe[0][2].wikidata_id)
+                    exacts.append(classe[0][2])
+            for candidat in classe[:3]:
+                if candidat[2].wikidata_id not in vus:
+                    vus.add(candidat[2].wikidata_id)
+                    proches.append(candidat)
+        if exacts:
+            surs.extend((nom, place) for place in exacts)
+        elif proches:
+            proches.sort(key=lambda c: (-c[0], c[1], c[2].name))
+            doutes.append((nom, proches[:3]))
         else:
-            doutes.append((nom, classe[:3]))
+            perdus.append(nom)
 
     if surs:
         print(f"{len(surs)} nom(s) retrouvés mot pour mot :\n")

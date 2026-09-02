@@ -198,7 +198,13 @@ def fetch_listed_places(
     if not wanted:
         return []
 
-    places: list[Place] = []
+    # Une entité rend AUTANT DE LIGNES que de combinaisons de ses valeurs
+    # facultatives : deux images et deux entités administratives font quatre
+    # lignes. Sans regroupement par identifiant, `ajouts.json` gardait le même
+    # lieu deux ou trois fois — soixante doublons sur huit cent quatre-vingt-
+    # six. La construction n'en souffrait pas, mais tous les diagnostics
+    # comptaient faux.
+    by_qid: dict[str, Place] = {}
     for batch in wd.chunked(sorted(wanted), 150):
         try:
             rows = client.query(wd.items_query(batch))
@@ -215,9 +221,12 @@ def fetch_listed_places(
                 continue
             place.pinned = pinned
             place.source = source
-            places.append(place)
+            existing = by_qid.get(qid)
+            if existing is None or _completeness(place) > _completeness(existing):
+                by_qid[qid] = place
 
-    missing = set(wanted) - {p.wikidata_id for p in places}
+    places = list(by_qid.values())
+    missing = set(wanted) - set(by_qid)
     if missing:
         report_missing(client, missing)
     return places
@@ -404,7 +413,9 @@ def fetch_labelled_places(
         if theme is not None:
             par_theme[theme.id].append(qid)
 
-    places: list[Place] = []
+    # Regroupé par identifiant : une entité rend autant de lignes que de
+    # combinaisons de ses valeurs facultatives.
+    by_qid: dict[str, Place] = {}
     for theme_id, qids in par_theme.items():
         theme = config.theme(theme_id)
         for batch in wd.chunked(sorted(qids), 150):
@@ -417,7 +428,10 @@ def fetch_labelled_places(
                 # quelle entrée qu'un thème a collectée pour lui-même. Voir
                 # `dedupe_across_themes`.
                 place.via_broad_class = True
-                places.append(place)
+                existing = by_qid.get(place.wikidata_id)
+                if existing is None or _completeness(place) > _completeness(existing):
+                    by_qid[place.wikidata_id] = place
+    places = list(by_qid.values())
 
     ranges = {qid for qids in par_theme.values() for qid in qids}
     orphelins = sorted(set(voulus) - ranges)
