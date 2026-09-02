@@ -103,6 +103,59 @@ def _save_raw(args: argparse.Namespace, places: list[Place]) -> None:
     )
 
 
+def cmd_label_probe(args: argparse.Namespace, config: Config) -> int:
+    """Par quelle propriété Wikidata ce label rattache-t-il ses membres ?
+
+    `labels.yaml` propose trois façons de poser la question — désignation
+    patrimoniale (P1435), appartenance à une organisation (P463), instance
+    d'une classe — et rien ne dit laquelle convient à un label donné. Se
+    tromper ne lève aucune erreur : la requête rend zéro membre, le label
+    n'apporte rien, et il faut une demi-heure de collecte pour s'en apercevoir.
+
+    Trois requêtes bornées répondent avant qu'on écrive la moindre ligne de
+    configuration. Un seul compte non nul désigne la bonne propriété ; aucun
+    signifie que Wikidata ne porte pas ce label, et que la liste devra être
+    saisie à la main (`kind: manual`).
+    """
+    qid = (args.wikidata_id or "").strip()
+    if not qid.startswith("Q") or not qid[1:].isdigit():
+        print(f"« {qid} » n'est pas un identifiant Wikidata.", file=sys.stderr)
+        return 1
+
+    client = wd.SparqlClient()
+    for ligne in client.query(wd.entity_labels_query([qid])):
+        libelle = ligne.get("itemLabel") or qid
+        description = ligne.get("itemDescription") or ""
+        print(f"{qid} — {libelle}" + (f" ({description})" if description else ""))
+
+    print("\nMembres français, par façon d'interroger :\n")
+    trouve = False
+    for kind, explication in (
+        ("heritage", "désignation patrimoniale (P1435) — celle des sites classés"),
+        ("member_of", "membre d'une organisation (P463) — celle des Plus Beaux Villages"),
+        ("instance", "instance de cette classe (P31/P279*)"),
+    ):
+        try:
+            membres = list(client.query(wd.label_members_query(kind, qid)))
+        except Exception as erreur:  # noqa: BLE001 — un miroir en panne n'est pas un verdict
+            print(f"    {kind:10s} : requête en échec ({erreur})")
+            continue
+        marque = "  ← c'est celle-là" if membres else ""
+        if membres:
+            trouve = True
+        print(f"    {kind:10s} : {len(membres):5d} membres   {explication}{marque}")
+
+    if trouve:
+        print("\n  Reporte le `kind` retenu dans config/labels.yaml, puis :"
+              "\n      python -m roam_pipeline verify-qids"
+              "\n      python -m roam_pipeline fetch --only <thème>")
+    else:
+        print("\n  Wikidata ne rattache aucun lieu français à ce label. La liste"
+              "\n  doit être saisie à la main : `kind: manual` dans labels.yaml,"
+              "\n  puis data/manual/<identifiant-du-label>.csv.")
+    return 0
+
+
 def cmd_verify_qids(args: argparse.Namespace, config: Config) -> int:
     """Affiche le libellé réel de chaque Q-id de la configuration.
 
@@ -2721,6 +2774,11 @@ def build_parser() -> argparse.ArgumentParser:
     fusion.add_argument("files", nargs="*", type=Path,
                         help="fichiers à fusionner ; par défaut ceux de data/manual")
 
+    sonde = sub.add_parser(
+        "label-probe",
+        help="par quelle propriété un label rattache-t-il ses membres ? (réseau requis)")
+    sonde.add_argument("wikidata_id")
+
     epingle = sub.add_parser(
         "pin", help="épingle un lieu déjà collecté : il passe outre les planchers")
     epingle.add_argument("wikidata_id")
@@ -2784,6 +2842,7 @@ def main(argv: list[str] | None = None) -> int:
         "sync": cmd_sync,
         "retheme": cmd_retheme,
         "pin": cmd_pin,
+        "label-probe": cmd_label_probe,
         "pertes": cmd_pertes,
         "merge": cmd_merge,
         "weigh": cmd_weigh,
