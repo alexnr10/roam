@@ -437,6 +437,25 @@ SELECT DISTINCT ?item WHERE {{
 """
 
 
+def member_classes_query(qids: list[str], class_qids: list[str]) -> str:
+    """Parmi les classes de thèmes déclarées, lesquelles ces entités ont-elles ?
+
+    Sert à ranger les membres d'un label — un Grand Site de France, un bien du
+    patrimoine mondial — dans le thème qui leur convient. Les deux côtés sont
+    bornés par un `VALUES`, ce qui garde la requête rapide malgré la remontée
+    de hiérarchie.
+    """
+    items = " ".join(f"wd:{q}" for q in qids)
+    classes = " ".join(f"wd:{q}" for q in class_qids)
+    return f"""
+SELECT DISTINCT ?item ?class WHERE {{
+  VALUES ?item {{ {items} }}
+  VALUES ?class {{ {classes} }}
+  ?item wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* ?class .
+}}
+"""
+
+
 def entity_labels_query(qids: list[str]) -> str:
     """Libellé et description de Q-ids — sert à vérifier la configuration."""
     values = " ".join(f"wd:{q}" for q in qids)

@@ -20,6 +20,12 @@ labels:
     authority: UNESCO
     score_bonus: 40
     makes_collection: true
+    # Mesuré : Wikidata rattache 201 entités françaises au patrimoine mondial,
+    # et vingt-quatre seulement tombaient dans un thème. Les autres — les
+    # citadelles de Vauban, les bâtiments de Le Corbusier, les églises des
+    # chemins de Saint-Jacques — n'existaient nulle part. Le label va donc les
+    # chercher lui-même.
+    collects: true
     wikidata_query: { kind: heritage, qid: Q9259 }   # patrimoine mondial ✓
 
   - id: plus-beaux-villages
@@ -36,6 +42,11 @@ labels:
     makes_collection: true
     # Q1154112 est le LABEL ; Q3456789 est le réseau d'associations qui le porte.
     # Une désignation patrimoniale se rattache au label, pas à l'organisme.
+    #
+    # `label-probe` en compte dix-neuf par cette propriété, alors que le
+    # ministère en labellise beaucoup plus : Wikidata est ici en retard sur la
+    # liste officielle, et c'est une limite connue, pas une erreur de requête.
+    collects: true
     wikidata_query: { kind: heritage, qid: Q1154112 }    # le label ✓
 
   # ⚠️ Ces deux-là étaient inversés : Q10387684 est « classé », Q10387575 est

@@ -31,17 +31,18 @@ from .models import Place
 
 LOG = logging.getLogger(__name__)
 
-# Ajouts manuels et candidats adoptés : ils appartiennent à des thèmes variés
-# mais sont recollectés à chaque passage, y compris quand un seul thème est
-# demandé. Les ranger dans le fichier de leur thème ferait perdre ceux des
-# thèmes non recollectés ; ils ont donc leur propre fichier.
+# Ajouts manuels, candidats adoptés et membres de listes d'État : ils
+# appartiennent à des thèmes variés mais sont recollectés à chaque passage, y
+# compris quand un seul thème est demandé. Les ranger dans le fichier de leur
+# thème ferait perdre ceux des thèmes non recollectés ; ils ont donc leur
+# propre fichier.
 EXTRA_SHARD = "ajouts"
 NO_THEME_SHARD = "sans-theme"
 
 
 def shard_of(place: Place) -> str:
     """Le fichier qui possède ce lieu."""
-    if place.pinned or place.source == "osm":
+    if place.pinned or place.source in ("osm", "label"):
         return EXTRA_SHARD
     return place.theme_id or NO_THEME_SHARD
 

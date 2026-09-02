@@ -3969,3 +3969,113 @@ class TestCollectionDiameter(unittest.TestCase):
         places = self._places(12, 9.0, theme="volcans")
         built = build_theme_collections(places, self._config(25.0))
         self.assertEqual([c.slug for c in built], ["theme-volcans"])
+
+
+class TestCollectingLabels(unittest.TestCase):
+    """Une liste d'État va chercher ses membres au lieu de les attendre.
+
+    Wikidata rattache deux cent une entités françaises au patrimoine mondial ;
+    vingt-quatre seulement tombaient dans un thème. Un label ne faisait que
+    tamponner ce que les thèmes avaient déjà trouvé.
+    """
+
+    class _Client:
+        """Répond aux deux requêtes de la collecte par label, dans l'ordre."""
+
+        def __init__(self, classes: dict[str, str], items: list[dict]):
+            self.classes = classes
+            self.items = items
+            self.appels = 0
+
+        def query(self, requete):
+            self.appels += 1
+            if "?item ?class" in requete:
+                return [
+                    {"item": f"http://www.wikidata.org/entity/{qid}",
+                     "class": f"http://www.wikidata.org/entity/{classe}"}
+                    for qid, classe in self.classes.items()
+                    if f"wd:{qid} " in requete or f"wd:{qid} }}" in requete
+                ]
+            return [row for row in self.items if f"wd:{row['_qid']} " in requete
+                    or f"wd:{row['_qid']} }}" in requete]
+
+    @staticmethod
+    def _item(qid, name, sitelinks=3):
+        return {
+            "_qid": qid,
+            "item": f"http://www.wikidata.org/entity/{qid}",
+            "itemLabel": name,
+            "coord": "Point(2.0 45.0)",
+            "sitelinks": str(sitelinks),
+        }
+
+    @staticmethod
+    def _config(**over):
+        base = dict(collects=True, query_kind="heritage", qid="Q9259")
+        return replace(CONFIG, labels=[
+            replace(label, **{**base, **over}) if label.id == "unesco" else
+            replace(label, collects=False)
+            for label in CONFIG.labels
+        ])
+
+    def _run(self, membres, classes, items, known=frozenset()):
+        from roam_pipeline.fetch import fetch_labelled_places
+        client = self._Client(classes, items)
+        with _capture():
+            return client, fetch_labelled_places(
+                client, self._config(), {"unesco": set(membres)}, set(known)
+            )
+
+    def test_a_member_no_theme_collected_is_fetched(self):
+        # Q23413 est « château fort » : le membre atterrit chez les châteaux.
+        _, places = self._run(
+            ["Q1"], {"Q1": "Q23413"}, [self._item("Q1", "Citadelle de Vauban")])
+        self.assertEqual([(p.name, p.theme_id) for p in places],
+                         [("Citadelle de Vauban", "chateaux")])
+
+    def test_a_collected_member_is_left_alone(self):
+        # Le thème l'a déjà pris pour lui-même : son rattachement fait foi.
+        client, places = self._run(
+            ["Q1"], {"Q1": "Q23413"}, [self._item("Q1", "Déjà là")], known={"Q1"})
+        self.assertEqual(places, [])
+        self.assertEqual(client.appels, 0)
+
+    def test_a_member_no_theme_claims_is_dropped(self):
+        # Une vallée inscrite au patrimoine mondial n'est pas un point.
+        _, places = self._run(
+            ["Q1"], {"Q1": "Q99999999"}, [self._item("Q1", "Val de Loire")])
+        self.assertEqual(places, [])
+
+    def test_a_fetched_member_yields_to_a_theme_that_claims_it(self):
+        # Marqué comme une entrée générique : `dedupe_across_themes` le fait
+        # céder devant n'importe quel rattachement spécifique.
+        _, places = self._run(
+            ["Q1"], {"Q1": "Q23413"}, [self._item("Q1", "Citadelle")])
+        self.assertTrue(places[0].via_broad_class)
+        self.assertEqual(places[0].source, "label")
+
+    def test_a_fetched_member_lives_in_the_extra_shard(self):
+        # Sinon `fetch --only chateaux` effacerait les membres des autres
+        # thèmes, qu'il n'a pas recollectés.
+        from roam_pipeline.raw import EXTRA_SHARD, shard_of
+        _, places = self._run(
+            ["Q1"], {"Q1": "Q23413"}, [self._item("Q1", "Citadelle")])
+        self.assertEqual(shard_of(places[0]), EXTRA_SHARD)
+
+    def test_a_label_that_does_not_collect_asks_nothing(self):
+        from roam_pipeline.fetch import fetch_labelled_places
+        client = self._Client({}, [])
+        places = fetch_labelled_places(
+            client, replace(CONFIG, labels=[replace(label, collects=False)
+                                            for label in CONFIG.labels]),
+            {"unesco": {"Q1"}}, set())
+        self.assertEqual(places, [])
+        self.assertEqual(client.appels, 0)
+
+    def test_the_theme_order_settles_a_member_with_several_classes(self):
+        # Q160742 est « abbaye », Q23413 « château fort » ; `themes.yaml`
+        # déclare les abbayes avant les châteaux, et cet ordre est la priorité
+        # éditoriale.
+        from roam_pipeline.fetch import _theme_of_classes
+        theme = _theme_of_classes({"Q23413", "Q160742"}, CONFIG)
+        self.assertEqual(theme.id, "abbayes")

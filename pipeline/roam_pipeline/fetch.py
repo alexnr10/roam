@@ -325,6 +325,93 @@ def fetch_adopted_places(
     return places
 
 
+def _theme_of_classes(classes: set[str], config: Config) -> Theme | None:
+    """Le premier thème, dans l'ordre de la configuration, qui revendique une
+    de ces classes. L'ordre de `themes.yaml` est déjà la priorité éditoriale —
+    c'est lui qui protège les maisons-musées des musées."""
+    for theme in config.themes:
+        declared = {qid for qid, _ in theme.collected_classes}
+        declared |= {b.qid for b in theme.broad_classes}
+        if declared & classes:
+            return theme
+    return None
+
+
+def fetch_labelled_places(
+    client: wd.SparqlClient,
+    config: Config,
+    label_members: dict[str, set[str]],
+    known: set[str],
+) -> list[Place]:
+    """Les membres d'un label déclaré `collects`, que nul thème n'a collectés.
+
+    Un label ne faisait que tamponner les lieux déjà pris par ailleurs. Wikidata
+    rattache deux cent une entités françaises au patrimoine mondial ; vingt-
+    quatre tombaient dans un thème, et les cent soixante-dix-sept autres —
+    citadelles de Vauban, bâtiments de Le Corbusier, églises des chemins de
+    Saint-Jacques — n'existaient nulle part. Une liste d'État n'a pas à attendre
+    qu'une classe Wikidata veuille bien la reconnaître.
+
+    Le thème vient des classes du lieu, interrogées d'un bloc. Ce qu'aucun thème
+    ne revendique est laissé de côté et signalé : un bien inscrit peut être une
+    vallée ou un itinéraire, et Roam ne collectionne que des points.
+    """
+    voulus: dict[str, set[str]] = {}
+    for label in config.labels:
+        if not label.collects:
+            continue
+        for qid in label_members.get(label.id, set()) - known:
+            voulus.setdefault(qid, set()).add(label.id)
+    if not voulus:
+        return []
+
+    classes = sorted({
+        qid for theme in config.themes
+        for qid in ({q for q, _ in theme.collected_classes}
+                    | {b.qid for b in theme.broad_classes})
+    })
+    if not classes:
+        return []
+
+    par_lieu: dict[str, set[str]] = defaultdict(set)
+    for batch in wd.chunked(sorted(voulus), 150):
+        for row in client.query(wd.member_classes_query(batch, classes)):
+            item = wd.qid_from_uri(row.get("item"))
+            classe = wd.qid_from_uri(row.get("class"))
+            if item and classe:
+                par_lieu[item].add(classe)
+
+    par_theme: dict[str, list[str]] = defaultdict(list)
+    for qid in voulus:
+        theme = _theme_of_classes(par_lieu.get(qid, set()), config)
+        if theme is not None:
+            par_theme[theme.id].append(qid)
+
+    places: list[Place] = []
+    for theme_id, qids in par_theme.items():
+        theme = config.theme(theme_id)
+        for batch in wd.chunked(sorted(qids), 150):
+            for row in client.query(wd.items_query(batch)):
+                place = _row_to_place(row, theme)
+                if place is None:
+                    continue
+                place.source = "label"
+                # Comme une classe générique : le lieu cède devant n'importe
+                # quelle entrée qu'un thème a collectée pour lui-même. Voir
+                # `dedupe_across_themes`.
+                place.via_broad_class = True
+                places.append(place)
+
+    sans_theme = len(voulus) - sum(len(v) for v in par_theme.values())
+    LOG.info(
+        "labels collecteurs : %s membres inconnus des thèmes, %s rattachés, "
+        "%s lieux collectés%s",
+        len(voulus), len(voulus) - sans_theme, len(places),
+        f" ({sans_theme} sans thème, écartés)" if sans_theme else "",
+    )
+    return places
+
+
 def carry_osm_signals(places: list[Place], raw_dir: Path, raw_path: Path) -> int:
     """Reprend l'ouverture au public de la collecte précédente.
 
@@ -901,6 +988,15 @@ def run_fetch(
         if place.wikidata_id not in known
     ]
     places += adopted
+
+    # Les listes d'État qui vont chercher leurs membres, en dernier : elles ne
+    # complètent que ce qu'aucun thème n'a trouvé.
+    try:
+        places += fetch_labelled_places(
+            client, config, label_members, {p.wikidata_id for p in places}
+        )
+    except Exception as exc:  # noqa: BLE001 — un label en échec ne tue pas la collecte
+        LOG.error("labels collecteurs : collecte échouée (%s)", exc)
 
     resolve_admin(client, places)
     apply_labels(places, label_members)

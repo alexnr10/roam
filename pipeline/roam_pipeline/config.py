@@ -90,6 +90,11 @@ class Label:
     query_kind: str
     qid: str | None
     search: str | None = None
+    # Le label VA CHERCHER ses membres, au lieu de se contenter de tamponner
+    # ceux que les thèmes ont déjà collectés. Réservé aux listes finies et
+    # curées : Wikidata rattache deux cent une entités françaises au patrimoine
+    # mondial, dont vingt-quatre seulement tombaient dans un thème.
+    collects: bool = False
 
     @property
     def is_manual(self) -> bool:
@@ -280,6 +285,7 @@ def load_config(config_dir: Path | None = None) -> Config:
                 query_kind=q["kind"],
                 qid=q.get("qid"),
                 search=q.get("search"),
+                collects=bool(lbl.get("collects", False)),
             )
         )
 
