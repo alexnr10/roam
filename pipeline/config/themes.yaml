@@ -409,6 +409,16 @@ themes:
     cap: 40
     # « canyon » ne désigne aucune classe distincte sur Wikidata : gorge suffit.
     wikidata_classes: [Q150784]                      # gorge
+    #
+    # Les gorges de l'Ardèche sont déclarées « vallée » chez Wikidata, pas
+    # « gorge ». Douze versions linguistiques, et invisibles à la collecte.
+    #
+    # « Vallée » est une classe énorme et surtout ambiguë : la vallée de la
+    # Loire ou celle du Rhône sont des régions, pas des lieux qu'on valide au
+    # GPS. Le plancher est donc haut, et ce qui passera devra être relu.
+    broad_classes:
+      - qid: Q39816           # vallée
+        fetch_min_sitelinks: 8
 
   - id: lacs
     name: Lacs
@@ -488,6 +498,19 @@ themes:
     fetch_min_sitelinks: 4
     cap: 60
     wikidata_classes: [Q8502, Q2231510]              # montagne, col
+    #
+    # La montagne Sainte-Victoire et le massif de l'Estérel manquaient
+    # purement et simplement : Wikidata ne les déclare pas « montagne » mais
+    # « chaîne de montagnes ». Aucun thème ne reconnaissait cette classe, et la
+    # collecte ne pouvait donc pas les voir — vingt-trois versions
+    # linguistiques pour la première, onze pour la seconde.
+    #
+    # Une chaîne n'est pas un point, et la plupart n'en sont pas un : c'est
+    # pourquoi le plancher de collecte est ici très haut. En dessous, on
+    # ramènerait tous les chaînons des Alpes et des Pyrénées.
+    broad_classes:
+      - qid: Q46831           # chaîne de montagnes
+        fetch_min_sitelinks: 8
 
   # Avant `plages` : une dune est une plage, mais on y va pour la dune.
   # Déclaré après `plages` au premier jet, ce thème perdait 15 lieux sur 17
@@ -512,6 +535,13 @@ themes:
     fetch_min_sitelinks: 2
     cap: 40
     wikidata_classes: [Q25391, Q244326, Q55706997, Q135951980]
+    #
+    # La Camargue — cinquante versions linguistiques — n'était ni une dune ni
+    # un marais chez Wikidata, mais une « zone humide ». Le thème ne pouvait
+    # pas la voir.
+    broad_classes:
+      - qid: Q170321          # zone humide
+        fetch_min_sitelinks: 8
     # dune, marais salant, marais maritime (pour « marais littoral »),
     # étang côtier.
 

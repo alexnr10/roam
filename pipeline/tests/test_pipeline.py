@@ -1976,9 +1976,12 @@ class TestBroadClasses(unittest.TestCase):
                 )
             themes = (base / "themes.yaml").read_text(encoding="utf-8")
             # Le bloc réel porte un commentaire en fin de ligne : on le
-            # remplace par sa forme, pas par son texte exact.
+            # remplace par sa forme, pas par son texte exact. Plusieurs thèmes
+            # en déclarent maintenant ; le premier suffit à faire le test, et
+            # c'est la configuration ENTIÈRE qu'on veut voir refuser le bloc.
             themes, count = re.subn(
-                r"    broad_classes:\n(?:      .*\n|        .*\n)+", block + "\n", themes
+                r"    broad_classes:\n(?:      .*\n|        .*\n)+", block + "\n",
+                themes, count=1,
             )
             assert count == 1, "bloc `broad_classes` introuvable dans themes.yaml"
             (base / "themes.yaml").write_text(themes, encoding="utf-8")
@@ -4277,3 +4280,34 @@ class TestCompoundOfficialNames(unittest.TestCase):
         from roam_pipeline.cli import _variantes
         self.assertEqual(_variantes("Concors-Sainte-Victoire"),
                          ["Concors-Sainte-Victoire"])
+
+
+class TestNaturalClassGaps(unittest.TestCase):
+    """Trois classes que `probe` a désignées comme des trous de collecte.
+
+    Sainte-Victoire (23 langues), l'Estérel (11), les gorges de l'Ardèche (12)
+    et la Camargue (50) n'étaient dans aucun thème : Wikidata les range en
+    « chaîne de montagnes », « vallée » et « zone humide », qu'aucun thème ne
+    déclarait. Ce ne sont pas des lieux mal notés, ce sont des lieux invisibles.
+    """
+
+    def test_the_new_classes_are_collected_generically(self):
+        for theme_id, qid in (("sommets", "Q46831"),
+                              ("gorges", "Q39816"),
+                              ("dunes-marais", "Q170321")):
+            theme = CONFIG.theme(theme_id)
+            with self.subTest(theme_id):
+                self.assertIn(qid, {b.qid for b in theme.broad_classes})
+                # Générique veut dire : plancher de collecte plus haut que
+                # celui du thème, sinon on ramène toute la classe.
+                floor = dict(theme.collected_classes)[qid]
+                self.assertGreater(floor, theme.fetch_min_sitelinks)
+
+    def test_sainte_victoire_and_the_camargue_would_pass_their_floor(self):
+        # Vingt-trois et cinquante versions linguistiques, d'après `probe`.
+        self.assertLessEqual(dict(CONFIG.theme("sommets").collected_classes)["Q46831"], 23)
+        self.assertLessEqual(
+            dict(CONFIG.theme("dunes-marais").collected_classes)["Q170321"], 50)
+
+    def test_the_ardeche_gorges_would_pass_theirs(self):
+        self.assertLessEqual(dict(CONFIG.theme("gorges").collected_classes)["Q39816"], 12)
