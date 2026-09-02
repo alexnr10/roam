@@ -15,7 +15,7 @@ from .config import Config, Label, Theme
 from .geo import normalize_dept_code, region_of
 from .geocode import AddressClient, CommuneClient, departement_from_insee
 from .models import Place
-from .raw import EXTRA_SHARD, NO_THEME_SHARD, read_raw, shards, write_raw
+from .raw import EXTRA_SHARD, NO_THEME_SHARD, read_raw, shard_of, shards, write_raw
 
 LOG = logging.getLogger(__name__)
 
@@ -402,14 +402,41 @@ def fetch_labelled_places(
                 place.via_broad_class = True
                 places.append(place)
 
-    sans_theme = len(voulus) - sum(len(v) for v in par_theme.values())
+    ranges = {qid for qids in par_theme.values() for qid in qids}
+    orphelins = sorted(set(voulus) - ranges)
     LOG.info(
         "labels collecteurs : %s membres inconnus des thèmes, %s rattachés, "
-        "%s lieux collectés%s",
-        len(voulus), len(voulus) - sans_theme, len(places),
-        f" ({sans_theme} sans thème, écartés)" if sans_theme else "",
+        "%s lieux collectés",
+        len(voulus), len(ranges), len(places),
     )
+    if orphelins:
+        # Les nommer coûte une requête et évite un verdict aveugle : un membre
+        # écarté peut être une vallée inscrite — donc bien écartée — ou un
+        # monument qu'aucun thème ne déclare, donc un trou dans la
+        # configuration. Le compte seul ne permet pas de trancher.
+        noms = _entity_names(client, orphelins)
+        echantillon = ", ".join(
+            f"{noms.get(q, q)} ({q})" for q in orphelins[:12]
+        )
+        LOG.warning(
+            "%s membres de label sans thème, écartés — %s%s",
+            len(orphelins), echantillon,
+            f" (+{len(orphelins) - 12})" if len(orphelins) > 12 else "",
+        )
     return places
+
+
+def _entity_names(client: wd.SparqlClient, qids: list[str]) -> dict[str, str]:
+    noms: dict[str, str] = {}
+    for batch in wd.chunked(qids, 200):
+        try:
+            for row in client.query(wd.entity_labels_query(batch)):
+                qid = wd.qid_from_uri(row.get("item"))
+                if qid:
+                    noms[qid] = row.get("itemLabel") or qid
+        except Exception as exc:  # noqa: BLE001 — un libellé manquant n'est pas fatal
+            LOG.debug("libellés indisponibles (%s)", exc)
+    return noms
 
 
 def carry_osm_signals(places: list[Place], raw_dir: Path, raw_path: Path) -> int:
@@ -1016,10 +1043,17 @@ def run_fetch(
 
     # Les listes d'État qui vont chercher leurs membres, en dernier : elles ne
     # complètent que ce qu'aucun thème n'a trouvé.
+    #
+    # « Aucun thème » se lit sur TOUTE la collecte, pas sur celle du jour :
+    # après un `fetch --only cascades`, les châteaux ne sont pas dans `places`
+    # et le label irait recollecter des lieux que le thème possède déjà. Les
+    # ajouts, eux, restent hors du compte — ce sont justement ceux qu'il faut
+    # recollecter à chaque passage pour qu'ils survivent à la réécriture.
+    deja = {p.wikidata_id for p in places} | {
+        p.wikidata_id for p in read_raw(raw_dir) if shard_of(p) != EXTRA_SHARD
+    }
     try:
-        places += fetch_labelled_places(
-            client, config, label_members, {p.wikidata_id for p in places}
-        )
+        places += fetch_labelled_places(client, config, label_members, deja)
     except Exception as exc:  # noqa: BLE001 — un label en échec ne tue pas la collecte
         LOG.error("labels collecteurs : collecte échouée (%s)", exc)
 

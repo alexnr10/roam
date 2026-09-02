@@ -4153,3 +4153,25 @@ class TestResolveList(unittest.TestCase):
     def test_articles_do_not_count_as_matching_words(self):
         from roam_pipeline.cli import _mots
         self.assertEqual(_mots("Le Marais de la Somme"), {"marais", "somme"})
+
+
+class TestLabelFetchScope(unittest.TestCase):
+    """Une collecte partielle ne doit pas faire recollecter des lieux acquis.
+
+    Après `fetch --only cascades`, les châteaux ne sont pas dans la collecte du
+    jour. Le label irait alors rechercher des lieux qu'un thème possède déjà,
+    et les ferait entrer une seconde fois comme entrées génériques.
+    """
+
+    def test_a_place_held_by_a_theme_shard_counts_as_known(self):
+        from roam_pipeline.raw import EXTRA_SHARD, shard_of
+        tenu = make_place("Château tenu", "chateaux")
+        self.assertNotEqual(shard_of(tenu), EXTRA_SHARD)
+
+    def test_a_label_place_never_counts_as_known(self):
+        # Il vit dans `ajouts`, réécrit à chaque passage : s'il comptait comme
+        # acquis, il ne serait plus recollecté et disparaîtrait.
+        from roam_pipeline.raw import EXTRA_SHARD, shard_of
+        venu = make_place("Citadelle inscrite", "chateaux")
+        venu.source = "label"
+        self.assertEqual(shard_of(venu), EXTRA_SHARD)
