@@ -61,6 +61,27 @@ labels:
     makes_collection: true
     wikidata_query: { kind: heritage, qid: Q498842 }     # le label ✓
 
+  # LA LISTE OFFICIELLE DES MAISONS D'ILLUSTRES.
+  #
+  # Le thème `maisons` était rangé par classes Wikidata, et la hiérarchie des
+  # classes ne dit pas ce qu'on vient voir : « maison-musée » attrapait le
+  # palais des Papes, le palais du Tau et le Sénat, qui trônaient en tête d'un
+  # thème censé rassembler les demeures d'artistes et d'écrivains.
+  #
+  # Une liste d'État est une curation humaine, finie et motivée. Le palais des
+  # Papes n'y sera jamais, quelle que soit la façon dont Wikidata le classe.
+  # C'est le même remède que pour les villages, et pour la même raison.
+  #
+  # 231 membres français, rattachés par désignation patrimoniale — mesuré par
+  # `label-probe Q3280355`, qui donne zéro pour les deux autres façons
+  # d'interroger. Ne pas se fier à ce commentaire : relancer la sonde.
+  - id: maisons-des-illustres
+    name: Maison des Illustres
+    authority: Ministère de la Culture
+    score_bonus: 20
+    makes_collection: true
+    wikidata_query: { kind: heritage, qid: Q3280355 }    # le label ✓
+
   # LES PAYSAGES ONT AUSSI LEUR LISTE OFFICIELLE.
   #
   # Le site classé au titre des paysages (loi de 1930) est au paysage ce que le

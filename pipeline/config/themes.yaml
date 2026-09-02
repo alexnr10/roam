@@ -148,6 +148,12 @@ themes:
     min_sitelinks: 4
     fetch_min_sitelinks: 2
     cap: 50
+    # La liste d'État s'AJOUTE aux classes, elle ne les remplace pas : la villa
+    # Savoye, la maison de verre et le palais idéal ne sont pas des Maisons des
+    # Illustres, et ils ont leur place ici. Ce que la liste apporte, c'est la
+    # précision — une curation humaine où la hiérarchie des classes Wikidata
+    # faisait entrer le palais des Papes.
+    from_labels: [maisons-des-illustres]
     # Diversité géographique : vingt-neuf des cinquante-huit maisons sont parisiennes.
     # Ce n'est pas un fait de géographie mais un fait d'écriture — les
     # volcans sont vraiment en Auvergne, les ponts ne sont pas vraiment à
