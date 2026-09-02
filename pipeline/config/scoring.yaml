@@ -187,6 +187,21 @@ collections:
   # là c'est la monotonie, pas l'étendue, et c'est l'affichage par niveau qui y
   # répond.
   min_diameter_km: 25
+  # À quel point un croisement doit être CARACTÉRISTIQUE de son territoire :
+  # part du thème sur place, rapportée à sa part dans le pays.
+  #
+  # « Cathédrales et basiliques de Provence-Alpes-Côte d'Azur » vaut exactement
+  # ×1,0 — la région n'a ni plus ni moins de cathédrales que la moyenne, et
+  # cette collection n'est que le thème national redécoupé. Personne ne la
+  # collectionne. Les volcans du Puy-de-Dôme valent ×37, les phares du
+  # Finistère ×17, les grottes de la Dordogne ×12.
+  #
+  # Le seuil est posé juste sous ce qu'il faut épargner : les châteaux du
+  # Centre-Val de Loire (×3,0), les mégalithes du Morbihan (×4,8), les villages
+  # d'Occitanie (×2,2), les musées d'Île-de-France (×2,3). En dessous de ×2, on
+  # ne trouve plus que « Châteaux de Provence » (×0,4) ou « Abbayes
+  # d'Île-de-France » (×0,5).
+  min_theme_lift: 2.0
 
 geo:
   # Niveaux géographiques pour lesquels on dérive des collections.

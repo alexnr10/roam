@@ -207,6 +207,9 @@ class CollectionRules:
     # En dessous, ce n'est plus une collection mais un inventaire local. `0`
     # désactive.
     min_diameter_km: float = 0.0
+    # À quel point un croisement doit être CARACTÉRISTIQUE de son territoire :
+    # part du thème sur place, rapportée à sa part dans le pays. `0` désactive.
+    min_theme_lift: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -301,6 +304,7 @@ def load_config(config_dir: Path | None = None) -> Config:
         min_per_departement=int(raw["geo"].get("min_per_departement", 0)),
         max_theme_share=float(raw["collections"].get("max_theme_share", 0.0)),
         min_diameter_km=float(raw["collections"].get("min_diameter_km", 0.0)),
+        min_theme_lift=float(raw["collections"].get("min_theme_lift", 0.0)),
     )
 
     alerts = Alerts(**raw.get("alerts", {"alpine_elevation_m": 2500}))

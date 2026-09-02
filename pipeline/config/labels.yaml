@@ -38,7 +38,10 @@ labels:
   - id: grand-site-de-france
     name: Grand Site de France
     authority: Ministère de la Transition écologique
-    score_bonus: 30
+    # Ramené de 30 à 20 : à 30, les six Grands Sites du thème « Sommets »
+    # occupaient six des dix places du niveau 1, devant le mont Ventoux et le
+    # Crêt de la Neige. Le label doit peser, pas décider seul.
+    score_bonus: 20
     makes_collection: true
     # Q1154112 est le LABEL ; Q3456789 est le réseau d'associations qui le porte.
     # Une désignation patrimoniale se rattache au label, pas à l'organisme.

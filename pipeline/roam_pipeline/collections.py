@@ -340,6 +340,37 @@ def _finalize(
     return collection
 
 
+def drop_twin_collections(collections: list[Collection]) -> list[Collection]:
+    """Écarte les collections qui contiennent exactement les mêmes lieux.
+
+    Un département d'outre-mer est AUSSI une région : La Réunion produisait
+    « Le meilleur de La Réunion » deux fois, et « Volcans et sites volcaniques
+    de La Réunion » deux fois, à l'identique. Neuf doublons dans la liste, que
+    l'utilisateur voyait tels quels.
+
+    La première rencontrée gagne, et `geo_levels` déclare le département avant
+    la région : c'est le niveau le plus précis qui reste, celui dont le nom
+    correspond à ce qu'on parcourt.
+    """
+    vus: dict[tuple[str, frozenset[str]], Collection] = {}
+    out: list[Collection] = []
+    jumelles: list[str] = []
+    for collection in collections:
+        cle = (collection.name, frozenset(cp.place_id for cp in collection.places))
+        if cle in vus:
+            jumelles.append(collection.name)
+            continue
+        vus[cle] = collection
+        out.append(collection)
+    if jumelles:
+        LOG.info(
+            "%s collection(s) en double écartées, mêmes lieux sous le même nom "
+            "à deux niveaux géographiques : %s",
+            len(jumelles), ", ".join(sorted(set(jumelles))),
+        )
+    return out
+
+
 def build_theme_collections(places: list[Place], config: Config) -> list[Collection]:
     by_theme: dict[str, list[Place]] = defaultdict(list)
     for place in places:
@@ -434,6 +465,23 @@ def build_geo_collections(places: list[Place], config: Config) -> list[Collectio
     return out
 
 
+def theme_lift(members: int, dans_la_zone: int, dans_le_pays: int, total: int) -> float:
+    """À quel point ce territoire est-il CARACTÉRISTIQUE de ce thème ?
+
+    Part du thème sur place, rapportée à sa part dans le pays. Un rapport de 1
+    veut dire que ce territoire n'a rien de particulier — « Cathédrales de
+    Provence-Alpes-Côte d'Azur » vaut exactement 1,0, et personne ne
+    collectionne ça : c'est le thème national, découpé.
+
+    Au-dessus, le territoire dit quelque chose : les volcans du Puy-de-Dôme
+    valent ×37, les phares du Finistère ×17, les grottes de la Dordogne ×12,
+    les châteaux du Centre-Val de Loire ×3.
+    """
+    if not dans_la_zone or not dans_le_pays or not total:
+        return 0.0
+    return (members / dans_la_zone) / (dans_le_pays / total)
+
+
 def build_cross_collections(places: list[Place], config: Config) -> list[Collection]:
     """Croisements thème × géographie (« Châteaux du Cantal »).
 
@@ -442,14 +490,18 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
     """
     out: list[Collection] = []
     serres: list[tuple[float, int, str]] = []
+    banals: list[tuple[float, int, str]] = []
     par_id = {place.wikidata_id: place for place in places}
+    par_theme = Counter(place.theme_id for place in places)
 
     for level in config.collections.cross_theme_levels:
         buckets: dict[tuple[str, str], list[Place]] = defaultdict(list)
+        par_zone: Counter[str] = Counter()
         for place in places:
             code = _geo_code(place, level)
             if code:
                 buckets[(place.theme_id, code)].append(place)
+                par_zone[code] += 1
 
         for (theme_id, code), members in buckets.items():
             zone = area(level, code)
@@ -475,6 +527,12 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
             if etendue < config.collections.min_diameter_km:
                 serres.append((etendue, len(built.places), built.name))
                 continue
+            rapport = theme_lift(
+                len(built.places), par_zone[code], par_theme[theme_id], len(places)
+            )
+            if rapport < config.collections.min_theme_lift:
+                banals.append((rapport, len(built.places), built.name))
+                continue
             out.append(built)
 
     if serres:
@@ -490,6 +548,19 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
             config.collections.min_diameter_km,
             ", ".join(f"{nom} ({n} lieux, {d:.0f} km)"
                       for d, n, nom in sorted(serres)),
+        )
+    if banals:
+        # Un croisement où le territoire ne dit rien du thème n'est que le
+        # thème national redécoupé. « Cathédrales de Provence-Alpes-Côte
+        # d'Azur » vaut exactement la moyenne du pays ; les volcans du
+        # Puy-de-Dôme valent trente-sept fois cette moyenne, et c'est cette
+        # collection-là qu'on veut voir dans la liste.
+        LOG.info(
+            "%s croisement(s) écartés, le territoire n'a rien de particulier "
+            "pour ce thème (moins de ×%.1f) : %s",
+            len(banals),
+            config.collections.min_theme_lift,
+            ", ".join(f"{nom} (×{r:.1f})" for r, n, nom in sorted(banals)[:8]),
         )
     return out
 
@@ -958,7 +1029,7 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
         ],
         config,
     )
-    collections = (
+    collections = drop_twin_collections(
         build_theme_collections(kept, config)
         + build_label_collections(kept, config)
         + build_geo_collections(kept, config)

@@ -52,7 +52,9 @@ from roam_pipeline.export import (
     _sql_str, read_review_csv, read_review_themes, write_review_csv, write_review_html, write_seed_sql,
 )
 from roam_pipeline.geo import departements, normalize_dept_code, region_of, regions
-from roam_pipeline.models import Collection, Place, display_name, slugify
+from roam_pipeline.models import (
+    Collection, CollectionPlace, Place, display_name, slugify,
+)
 from roam_pipeline import outlines
 from roam_pipeline.fetch import (
     REMEDIES, diagnose_missing, enrich_departements, stale_themes,
@@ -90,6 +92,16 @@ from roam_pipeline.score import (
 )
 
 CONFIG = load_config()
+
+
+def _sans_lift() -> Config:
+    """La configuration, sans le rapport de caractérisation d'un croisement.
+
+    Les fixtures rassemblent un ou deux thèmes dans un seul département : le
+    rapport y vaut mécaniquement ×1,0 et écarterait tous les croisements, ce
+    qui n'a rien à voir avec ce que ces tests vérifient.
+    """
+    return replace(CONFIG, collections=replace(CONFIG.collections, min_theme_lift=0.0))
 
 
 def make_place(name: str, theme: str = "chateaux", **kwargs) -> Place:
@@ -1463,7 +1475,10 @@ class TestCollections(unittest.TestCase):
         self.assertGreaterEqual(len(memberships), 3)
 
     def test_cross_collection_is_named_grammatically(self):
-        _, collections = build_all(self._spread(30), CONFIG)
+        # Un lot d'un seul thème dans un seul département vaut ×1,0 : le
+        # rapport de caractérisation l'écarterait, et ce n'est pas ce qu'on
+        # teste ici.
+        _, collections = build_all(self._spread(30), _sans_lift())
         names = {c.slug: c.name for c in collections}
         self.assertEqual(names.get("chateaux-departement-15"), "Châteaux du Cantal")
         self.assertEqual(names.get("geo-departement-15"), "Le meilleur du Cantal")
@@ -3783,7 +3798,7 @@ class TestThemeShareInGeoCollections(unittest.TestCase):
         # sortes portent le même `kind` ; c'est `theme_id` qui les distingue.
         with _capture():
             _retenus, cols = build_all(
-                self._lot({"chateaux": 40, "abbayes": 12}), CONFIG)
+                self._lot({"chateaux": 40, "abbayes": 12}), _sans_lift())
         croises = [c for c in cols if c.kind == "geo" and c.theme_id]
         self.assertTrue(croises)
         for collection in croises:
@@ -3936,8 +3951,11 @@ class TestCollectionDiameter(unittest.TestCase):
 
     @staticmethod
     def _config(km: float) -> Config:
+        # Le rapport de caractérisation est neutralisé : ces fixtures n'ont
+        # qu'un thème, il vaut donc ×1,0 et écarterait tout.
         return replace(CONFIG, collections=replace(
-            CONFIG.collections, min_diameter_km=km, cross_theme_levels=["departement"],
+            CONFIG.collections, min_diameter_km=km, min_theme_lift=0.0,
+            cross_theme_levels=["departement"],
         ))
 
     def test_a_diameter_is_the_distance_between_the_two_farthest(self):
@@ -4474,3 +4492,72 @@ class TestSaveRawGuard(unittest.TestCase):
         depot, _ = self._ecrit([ancien], [neuf])
         self.assertEqual(depot["Q2"].name, "Falaises d'Étretat")
         self.assertEqual(depot["Q2"].departement_code, "76")
+
+
+class TestThemeLift(unittest.TestCase):
+    """Un croisement doit dire quelque chose de son territoire.
+
+    « Cathédrales et basiliques de Provence-Alpes-Côte d'Azur » vaut ×1,0 : la
+    région n'a ni plus ni moins de cathédrales que la moyenne du pays, et cette
+    collection n'est que le thème national redécoupé.
+    """
+
+    def test_an_average_territory_scores_one(self):
+        from roam_pipeline.collections import theme_lift
+        # 10 cathédrales sur 100 lieux ici, 100 sur 1000 dans le pays.
+        self.assertAlmostEqual(theme_lift(10, 100, 100, 1000), 1.0)
+
+    def test_a_concentration_scores_high(self):
+        from roam_pipeline.collections import theme_lift
+        # Les volcans du Puy-de-Dôme : le thème y est trente fois plus dense.
+        self.assertAlmostEqual(theme_lift(30, 100, 10, 1000), 30.0)
+
+    def test_an_empty_territory_scores_nothing(self):
+        from roam_pipeline.collections import theme_lift
+        self.assertEqual(theme_lift(0, 0, 10, 1000), 0.0)
+        self.assertEqual(theme_lift(5, 100, 0, 1000), 0.0)
+
+    def test_the_configured_threshold_spares_the_loire(self):
+        # Les châteaux du Centre-Val de Loire valent ×3,0, les mégalithes du
+        # Morbihan ×4,8 : le seuil doit passer sous les deux.
+        self.assertLessEqual(CONFIG.collections.min_theme_lift, 3.0)
+        self.assertGreater(CONFIG.collections.min_theme_lift, 1.0)
+
+
+class TestTwinCollections(unittest.TestCase):
+    """Un département d'outre-mer est AUSSI une région.
+
+    La Réunion produisait « Le meilleur de La Réunion » deux fois, à
+    l'identique, et l'utilisateur voyait les deux.
+    """
+
+    @staticmethod
+    def _collection(slug, name, ids, level):
+        c = Collection(slug=slug, name=name, kind="geo", geo_level=level, geo_code="974")
+        c.places = [CollectionPlace(place_id=q, tier=1, rank=i + 1)
+                    for i, q in enumerate(ids)]
+        return c
+
+    def test_the_same_places_under_the_same_name_appear_once(self):
+        from roam_pipeline.collections import drop_twin_collections
+        a = self._collection("geo-departement-974", "Le meilleur de La Réunion",
+                             ["Q1", "Q2"], "departement")
+        b = self._collection("geo-region-04", "Le meilleur de La Réunion",
+                             ["Q2", "Q1"], "region")
+        with _capture():
+            gardees = drop_twin_collections([a, b])
+        self.assertEqual([c.slug for c in gardees], ["geo-departement-974"])
+
+    def test_the_same_name_over_different_places_is_kept(self):
+        from roam_pipeline.collections import drop_twin_collections
+        a = self._collection("a", "Le meilleur de La Réunion", ["Q1"], "departement")
+        b = self._collection("b", "Le meilleur de La Réunion", ["Q2"], "region")
+        self.assertEqual(len(drop_twin_collections([a, b])), 2)
+
+    def test_the_same_places_under_another_name_is_kept(self):
+        # « Le meilleur de la Dordogne » et « Grottes de la Dordogne » peuvent
+        # coïncider sans être la même collection.
+        from roam_pipeline.collections import drop_twin_collections
+        a = self._collection("a", "Le meilleur de la Dordogne", ["Q1"], "departement")
+        b = self._collection("b", "Grottes et gouffres de la Dordogne", ["Q1"], "departement")
+        self.assertEqual(len(drop_twin_collections([a, b])), 2)
