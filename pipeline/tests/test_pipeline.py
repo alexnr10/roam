@@ -29,6 +29,9 @@ from roam_pipeline.review import (
 )
 from roam_pipeline.collections import (
     _finalize,
+    build_cross_collections,
+    build_theme_collections,
+    diameter_km,
     _mix_themes,
     _rank_within_theme,
     cross_theme_twins,
@@ -42,7 +45,7 @@ from roam_pipeline.collections import (
     dedupe_across_themes,
     haversine_m,
 )
-from roam_pipeline.config import CONFIG_DIR, Exclusions, Visitors, load_config
+from roam_pipeline.config import CONFIG_DIR, Config, Exclusions, Visitors, load_config
 from roam_pipeline.export import (
     review_tiers,
     _sql_str, read_review_csv, read_review_themes, write_review_csv, write_review_html, write_seed_sql,
@@ -3896,3 +3899,62 @@ class TestCrossThemeTwins(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestCollectionDiameter(unittest.TestCase):
+    """Un croisement thème × territoire doit être un voyage, pas un inventaire."""
+
+    @staticmethod
+    def _places(count: int, spread_km: float, theme: str = "ponts") -> list[Place]:
+        # Un degré de latitude ≈ 111 km : on étale les lieux sur la distance
+        # voulue en gardant la même longitude.
+        pas = (spread_km / 111.0) / max(count - 1, 1)
+        return [
+            make_place(
+                f"{theme} {i}", theme,
+                wikidata_id=f"Q90{i:04d}",
+                lat=48.85 + i * pas, lon=2.35,
+                sitelinks=12, departement_code="75", region_code="11",
+            )
+            for i in range(count)
+        ]
+
+    @staticmethod
+    def _config(km: float) -> Config:
+        return replace(CONFIG, collections=replace(
+            CONFIG.collections, min_diameter_km=km, cross_theme_levels=["departement"],
+        ))
+
+    def test_a_diameter_is_the_distance_between_the_two_farthest(self):
+        places = self._places(3, spread_km=100.0)
+        self.assertAlmostEqual(diameter_km(places), 100.0, delta=1.0)
+
+    def test_a_single_place_spans_nothing(self):
+        self.assertEqual(diameter_km(self._places(1, 0.0)), 0.0)
+
+    def test_a_place_without_coordinates_is_ignored(self):
+        places = self._places(2, spread_km=100.0)
+        places.append(make_place("sans point", "ponts", lat=None, lon=None))
+        self.assertAlmostEqual(diameter_km(places), 100.0, delta=1.0)
+
+    def test_a_local_inventory_makes_no_collection(self):
+        # Trente et un ponts dans neuf kilomètres : le cas de Paris.
+        built = build_cross_collections(self._places(31, 9.0), self._config(25.0))
+        self.assertEqual(built, [])
+
+    def test_a_journey_still_makes_one(self):
+        # Carnac : huit mégalithes sur trente et un kilomètres.
+        built = build_cross_collections(self._places(8, 31.0), self._config(25.0))
+        self.assertEqual(len(built), 1)
+        self.assertEqual(len(built[0].places), 8)
+
+    def test_zero_disables_the_rule(self):
+        built = build_cross_collections(self._places(31, 9.0), self._config(0.0))
+        self.assertEqual(len(built), 1)
+
+    def test_the_rule_spares_the_national_theme_collection(self):
+        # Les volcans sont vraiment tous en Auvergne : une collection
+        # nationale resserrée reste légitime.
+        places = self._places(12, 9.0, theme="volcans")
+        built = build_theme_collections(places, self._config(25.0))
+        self.assertEqual([c.slug for c in built], ["theme-volcans"])

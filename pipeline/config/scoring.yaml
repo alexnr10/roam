@@ -163,6 +163,30 @@ collections:
   # trente et un et la collection reste pleine. Aucune des 256 collections ne
   # rétrécit.
   max_theme_share: 0.25
+  # Étendue minimale d'un croisement thème × territoire.
+  #
+  # Un croisement existe parce que la machine croise tout, pas parce que
+  # quelqu'un voudrait le collectionner. « Ponts et viaducs de Paris » alignait
+  # trente et un ponts dans neuf kilomètres — le pont de Tolbiac, le pont Aval,
+  # le pont du Garigliano. On ne collectionne pas ce qui se fait à pied en une
+  # après-midi sans quitter sa ville.
+  #
+  # Le seuil a été mesuré, pas choisi. À 40 km la règle emportait les mégalithes
+  # du Morbihan (Carnac, 31 km) et les volcans de La Réunion (38 km), qui sont
+  # au contraire des raisons de faire le voyage. En triant les trente-neuf
+  # croisements départementaux par étendue, la coupure est nette : tout ce qui
+  # est sous 21 km est Paris, plus les musées de Toulouse et de Nice ; tout ce
+  # qui est au-dessus de 27 km se défend.
+  #
+  # La règle ne vaut QUE pour les croisements. Un thème national doit pouvoir
+  # être resserré si la France l'est (les volcans sont en Auvergne), et un
+  # « Le meilleur de… » est par construction d'un seul territoire.
+  #
+  # Elle ne règle PAS tout : « Littoral et plages des Bouches-du-Rhône » et ses
+  # huit calanques tient dans 34 km et survit. Ce n'est pas la même maladie —
+  # là c'est la monotonie, pas l'étendue, et c'est l'affichage par niveau qui y
+  # répond.
+  min_diameter_km: 25
 
 geo:
   # Niveaux géographiques pour lesquels on dérive des collections.

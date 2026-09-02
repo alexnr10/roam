@@ -213,6 +213,50 @@ describe('progression', () => {
   });
 });
 
+describe('le niveau en cours', () => {
+  const sample = collection([
+    ['t1a', 1], ['t1b', 1],
+    ['t2a', 2], ['t2b', 2],
+    ['t3a', 3],
+  ]);
+
+  it('démarre au niveau 1, à zéro', () => {
+    const { stage } = computeProgress(sample, []);
+    expect(stage).toMatchObject({ tier: 1, visited: 0, total: 2, remaining: 2, pct: 0 });
+  });
+
+  it('mesure le niveau, pas la collection entière', () => {
+    // Un lieu sur cinq au total, mais un sur deux au niveau 1 : c'est cette
+    // seconde lecture qu'on montre.
+    const { stage, pct } = computeProgress(sample, [visit('t1a')]);
+    expect(pct).toBe(20);
+    expect(stage).toMatchObject({ tier: 1, visited: 1, total: 2, pct: 50 });
+  });
+
+  it('passe au niveau suivant une fois le précédent bouclé', () => {
+    const { stage } = computeProgress(sample, [visit('t1a'), visit('t1b')]);
+    expect(stage).toMatchObject({ tier: 2, visited: 0, total: 2, remaining: 2 });
+  });
+
+  it('ignore un niveau vide', () => {
+    const sparse = collection([['t1a', 1], ['t3a', 3]]);
+    const { stage } = computeProgress(sparse, [visit('t1a')]);
+    expect(stage.tier).toBe(3);
+  });
+
+  it('reste sur le dernier niveau quand tout est fini', () => {
+    const visits = ['t1a', 't1b', 't2a', 't2b', 't3a'].map((id) => visit(id));
+    const { stage } = computeProgress(sample, visits);
+    expect(stage).toMatchObject({ tier: 3, complete: true, pct: 100, remaining: 0 });
+  });
+
+  it('ne divise pas par zéro sur une collection vide', () => {
+    expect(computeProgress(collection([]), []).stage).toMatchObject({
+      tier: 1, total: 0, pct: 0,
+    });
+  });
+});
+
 describe('badges', () => {
   const sample = collection([
     ['t1a', 1], ['t1b', 1], ['t2a', 2], ['t2b', 2],

@@ -107,6 +107,7 @@ function Carte({
   router: ReturnType<typeof useRouter>;
 }) {
   const { collection, progress } = item;
+  const { stage } = progress;
   const milestone = nextMilestone(progress);
   const distance = formatDistance(item.distanceM);
   return (
@@ -118,22 +119,25 @@ function Carte({
         <Text style={type.subheading} numberOfLines={1}>
           {collection.name}
         </Text>
-        <Text style={styles.pct}>{progress.pct}%</Text>
+        {/* Le niveau, pas le pourcentage global : « N1 5/8 » se lit comme un
+            palier à portée, « 45,5 % » comme une corvée à moitié faite. */}
+        <Text style={styles.pct}>
+          N{stage.tier} {stage.visited}/{stage.total}
+        </Text>
       </View>
 
-      <ProgressBar pct={progress.pct} />
+      <ProgressBar pct={stage.pct} />
 
       <View style={styles.cardFoot}>
         <Text style={type.small}>
-          {progress.visited}/{progress.total} lieux
+          {progress.visited}/{progress.total} au total
           {distance ? ` · à ${distance}` : ''}
         </Text>
         {progress.complete ? (
           <Pill label="Terminée" tone="verified" />
         ) : milestone ? (
           <Text style={type.small}>
-            {milestone.label} — encore {milestone.remaining} lieu
-            {milestone.remaining > 1 ? 'x' : ''}
+            encore {milestone.remaining} lieu{milestone.remaining > 1 ? 'x' : ''}
           </Text>
         ) : null}
       </View>

@@ -37,6 +37,7 @@ export default function CollectionScreen() {
   }
 
   const milestone = nextMilestone(progress);
+  const { stage } = progress;
 
   return (
     <ScrollView
@@ -50,21 +51,33 @@ export default function CollectionScreen() {
       <BackBar />
       <Text style={type.title}>{collection.name}</Text>
 
+      {/* Ce qui est en gros, c'est le NIVEAU en cours. Un pourcentage sur
+          toute la collection annonce une corvée à moitié faite ; « niveau 1,
+          5 sur 8 » annonce trois lieux avant un palier. Même état, autre
+          envie. Le total reste, en second. */}
       <Card style={{ marginTop: spacing.lg, gap: spacing.md }}>
         <View style={styles.rowBetween}>
-          <Text style={styles.pct}>{progress.pct}%</Text>
-          <Text style={type.small}>
-            {progress.visited}/{progress.total} lieux · {progress.verified} vérifié
-            {progress.verified > 1 ? 's' : ''}
+          <View style={styles.stage}>
+            <TierDot tier={stage.tier} size={14} />
+            {/* Court : le titre complet du niveau est juste en dessous, en
+                tête de sa propre liste. */}
+            <Text style={type.subheading}>Niveau {stage.tier}</Text>
+          </View>
+          <Text style={styles.pct}>
+            {stage.visited}/{stage.total}
           </Text>
         </View>
-        <ProgressBar pct={progress.pct} height={10} />
+        <ProgressBar pct={stage.pct} height={10} />
+        <Text style={type.small}>
+          {progress.visited}/{progress.total} lieux dans toute la collection ·{' '}
+          {progress.verified} vérifié{progress.verified > 1 ? 's' : ''}
+        </Text>
         {progress.complete ? (
           <Pill label="Collection terminée" tone="verified" />
         ) : milestone ? (
           <Text style={type.small}>
-            Prochain palier : {milestone.label} — encore {milestone.remaining} lieu
-            {milestone.remaining > 1 ? 'x' : ''}.
+            Encore {milestone.remaining} lieu{milestone.remaining > 1 ? 'x' : ''} pour
+            boucler ce niveau.
           </Text>
         ) : null}
       </Card>
@@ -127,6 +140,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   pct: { fontSize: 32, fontWeight: '700', color: colors.primary },
+  stage: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flex: 1 },
   tierHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   row: {
     flexDirection: 'row',

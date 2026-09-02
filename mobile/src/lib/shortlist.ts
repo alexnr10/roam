@@ -12,9 +12,9 @@ import type { Collection, Coordinates, Place } from '../types';
  * Trois questions, dans cet ordre, et une seule section par question :
  *
  * 1. « Qu'est-ce que je peux finir ? » — une collection à laquelle il ne
- *    manque qu'un ou deux lieux se termine, où qu'elle soit. La distance
- *    n'entre pas dans ce calcul : c'est même tout l'intérêt, ces collections
- *    sont ce qui donne envie de traverser le pays.
+ *    manque qu'un ou deux lieux POUR BOUCLER SON NIVEAU se termine, où qu'elle
+ *    soit. La distance n'entre pas dans ce calcul : c'est même tout l'intérêt,
+ *    ces collections sont ce qui donne envie de traverser le pays.
  * 2. « Qu'est-ce que je fais ce week-end ? » — la proximité, et elle seule.
  * 3. « Où pourrais-je aller ? » — le reste, thèmes nationaux d'abord parce
  *    qu'ils portent le voyage lointain, puis la géographie par distance.
@@ -56,6 +56,7 @@ export type Ranked = {
   progress: CollectionProgress;
   /** null quand la position est inconnue ou la collection vide. */
   distanceM: number | null;
+  /** Lieux manquants pour finir le NIVEAU en cours, pas la collection. */
   remaining: number;
 };
 
@@ -82,7 +83,11 @@ export function rank(
       collection,
       progress,
       distanceM: position ? nearestPlaceM(placesOf(collection), position) : null,
-      remaining: Math.max(0, progress.total - progress.visited),
+      // Ce qui reste du NIVEAU, pas de la collection. « À un lieu près » sur
+      // les cinquante-huit musées de Paris n'arrivait jamais ; sur le niveau
+      // en cours, c'est la situation ordinaire — et c'est la seule qui donne
+      // envie de reprendre la route.
+      remaining: Math.max(0, progress.stage.remaining),
     };
   });
 }
@@ -116,7 +121,7 @@ export function shortlists(ranked: Ranked[], limit = 5): Shortlists {
  * première visite — puis la distance, qui la remplace tant que tout vaut 0 %.
  */
 export function byProgressThenDistance(a: Ranked, b: Ranked): number {
-  return b.progress.pct - a.progress.pct || byDistance(a, b);
+  return b.progress.stage.pct - a.progress.stage.pct || byDistance(a, b);
 }
 
 export function formatDistance(metres: number | null): string | null {

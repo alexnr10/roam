@@ -19,6 +19,24 @@ export type TierProgress = {
   complete: boolean;
 };
 
+/**
+ * Le niveau en cours, celui dont on parle à l'utilisateur.
+ *
+ * Un pourcentage sur toute la collection ne dit rien à personne : « 45,5 % des
+ * plages des Bouches-du-Rhône » se lit comme une corvée à moitié faite, alors
+ * que la même chose dite « niveau 1 : 5 sur 8 » se lit comme trois lieux avant
+ * un palier. C'est le même état, et ce n'est pas la même envie.
+ */
+export type Stage = {
+  tier: Tier;
+  visited: number;
+  total: number;
+  pct: number;
+  remaining: number;
+  /** Ce niveau-ci est terminé (donc la collection entière l'est aussi). */
+  complete: boolean;
+};
+
 export type CollectionProgress = {
   slug: string;
   visited: number;
@@ -28,8 +46,31 @@ export type CollectionProgress = {
   tiers: TierProgress[];
   /** Niveau courant : le plus haut niveau débloqué. */
   currentTier: Tier;
+  /** Le niveau en cours et son avancement — ce que l'écran affiche. */
+  stage: Stage;
   complete: boolean;
 };
+
+function stageOf(tiers: TierProgress[]): Stage {
+  const remplis = tiers.filter((tier) => tier.total > 0);
+  // Le niveau en cours est le premier ouvert qu'il reste à finir. Quand il n'y
+  // en a plus, on reste sur le dernier : la collection est terminée et c'est
+  // ce niveau-là qu'on veut voir affiché complet.
+  const courant =
+    remplis.find((tier) => tier.unlocked && !tier.complete) ??
+    remplis[remplis.length - 1];
+  if (!courant) {
+    return { tier: 1, visited: 0, total: 0, pct: 0, remaining: 0, complete: false };
+  }
+  return {
+    tier: courant.tier,
+    visited: courant.visited,
+    total: courant.total,
+    pct: Math.round((courant.visited / courant.total) * 1000) / 10,
+    remaining: courant.total - courant.visited,
+    complete: courant.complete,
+  };
+}
 
 export function visitedIds(visits: Visit[]): Set<string> {
   return new Set(visits.map((visit) => visit.placeId));
@@ -78,6 +119,7 @@ export function computeProgress(
     pct: total === 0 ? 0 : Math.round((visited / total) * 1000) / 10,
     tiers,
     currentTier: Math.min(currentTier, 3) as Tier,
+    stage: stageOf(tiers),
     complete: total > 0 && visited === total,
   };
 }
@@ -135,14 +177,9 @@ export function earnedBadges(
 export function nextMilestone(
   progress: CollectionProgress,
 ): { label: string; remaining: number } | null {
-  const activeTier = progress.tiers.find(
-    (tier) => tier.unlocked && !tier.complete && tier.total > 0,
-  );
-  if (activeTier) {
-    return {
-      label: `Niveau ${activeTier.tier}`,
-      remaining: activeTier.total - activeTier.visited,
-    };
+  const { stage } = progress;
+  if (stage.total > 0 && !stage.complete) {
+    return { label: `Niveau ${stage.tier}`, remaining: stage.remaining };
   }
 
   const threshold = BADGE_THRESHOLDS.find((value) => progress.pct < value);

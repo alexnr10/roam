@@ -198,6 +198,10 @@ class CollectionRules:
     min_per_departement: int = 0
     # Part maximale d'un seul thème dans un « Le meilleur de… ». `0` désactive.
     max_theme_share: float = 0.0
+    # Étendue minimale d'un croisement thème × territoire, en kilomètres.
+    # En dessous, ce n'est plus une collection mais un inventaire local. `0`
+    # désactive.
+    min_diameter_km: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -290,6 +294,7 @@ def load_config(config_dir: Path | None = None) -> Config:
         require_departement=bool(raw["geo"].get("require_departement", True)),
         min_per_departement=int(raw["geo"].get("min_per_departement", 0)),
         max_theme_share=float(raw["collections"].get("max_theme_share", 0.0)),
+        min_diameter_km=float(raw["collections"].get("min_diameter_km", 0.0)),
     )
 
     alerts = Alerts(**raw.get("alerts", {"alpine_elevation_m": 2500}))

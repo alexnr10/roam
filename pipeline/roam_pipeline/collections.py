@@ -153,6 +153,16 @@ def cross_theme_twins(places: list[Place]) -> dict[str, list[tuple[Place, float,
     return dict(jumeaux)
 
 
+def diameter_km(places: list[Place]) -> float:
+    """Distance entre les deux lieux les plus éloignés de la liste."""
+    coords = [(p.lat, p.lon) for p in places if p.lat is not None and p.lon is not None]
+    return max(
+        (haversine_m(*a, *b) / 1000.0
+         for i, a in enumerate(coords) for b in coords[i + 1:]),
+        default=0.0,
+    )
+
+
 def _spread(ordered: list[Place], limit: int, max_per_dept: int) -> list[Place]:
     """Choisit `limit` lieux sans laisser un département occuper la collection.
 
@@ -431,6 +441,8 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
     faute de lieux, et c'est exactement l'effet recherché.
     """
     out: list[Collection] = []
+    serres: list[tuple[float, int, str]] = []
+    par_id = {place.wikidata_id: place for place in places}
 
     for level in config.collections.cross_theme_levels:
         buckets: dict[tuple[str, str], list[Place]] = defaultdict(list)
@@ -453,8 +465,32 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
                 geo_code=code,
             )
             built = _finalize(collection, members, config)
-            if built:
-                out.append(built)
+            if not built:
+                continue
+            # Mesurée sur les lieux RETENUS, pas sur les candidats : c'est la
+            # collection telle qu'elle s'affiche qu'on juge, et le plafond en
+            # écarte parfois les extrémités.
+            retenus = [par_id[m.place_id] for m in built.places]
+            etendue = diameter_km(retenus)
+            if etendue < config.collections.min_diameter_km:
+                serres.append((etendue, len(built.places), built.name))
+                continue
+            out.append(built)
+
+    if serres:
+        # Trente et un ponts dans neuf kilomètres : ces croisements existent
+        # parce que la machine croise tout, pas parce que quelqu'un voudrait
+        # les collectionner. Écarter la collection écarte aussi les lieux
+        # qu'elle seule justifiait — le pont de Tolbiac disparaît du catalogue,
+        # le pont Neuf reste. C'est l'effet recherché.
+        LOG.info(
+            "%s croisement(s) écartés, trop resserrés pour être un voyage "
+            "(moins de %.0f km) : %s",
+            len(serres),
+            config.collections.min_diameter_km,
+            ", ".join(f"{nom} ({n} lieux, {d:.0f} km)"
+                      for d, n, nom in sorted(serres)),
+        )
     return out
 
 

@@ -2,8 +2,9 @@ import {
   ALMOST_DONE_REMAINING, NEARBY_RADIUS_M, byProgressThenDistance, formatDistance,
   haversineM, nearestPlaceM, rank, shortlists,
 } from './shortlist';
+import { computeProgress } from './progress';
 import type { CollectionProgress } from './progress';
-import type { Collection } from '../types';
+import type { Collection, Visit } from '../types';
 
 const PARIS = { latitude: 48.8566, longitude: 2.3522 };
 
@@ -16,12 +17,17 @@ function collection(slug: string, total: number): Collection {
   } as Collection;
 }
 
+// Passe par le vrai calcul plutôt que par un objet bricolé : `rank` raisonne
+// désormais sur le niveau en cours, et un faux `stage` ne prouverait rien.
 function progress(slug: string, visited: number, total: number): CollectionProgress {
-  return {
-    slug, visited, verified: 0, total,
-    pct: total ? Math.round((visited / total) * 100) : 0,
-    tiers: [], currentTier: 1, complete: visited >= total,
-  } as CollectionProgress;
+  const c = collection(slug, total);
+  return computeProgress(
+    c,
+    c.places.slice(0, visited).map((m): Visit => ({
+      placeId: m.placeId, method: 'declared', verified: false,
+      visitedAt: '2026-01-01T00:00:00Z',
+    })),
+  );
 }
 
 describe('distances', () => {
