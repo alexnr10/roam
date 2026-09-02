@@ -14,7 +14,6 @@ Q1010268,1,abbayes,Basilique Saint-Sernin de Toulouse
 Q1010879,3,chateaux,Château d'Arques
 Q1011026,2,chateaux,Château de Beynac
 Q1011357,3,chateaux,Château de Castelnaud
-Q1011361,3,chateaux,Château de Châlus-Chabrol
 Q1011384,3,chateaux,Château de Couzan
 Q1011390,3,chateaux,Château de Clisson
 Q1011395,3,chateaux,Tour de Crest
@@ -72,6 +71,7 @@ Q1048878,3,megalithes,Cucuruzzu
 Q1049348,2,cathedrales,Cathédrale Sainte-Marie d'Auch
 Q1049644,1,volcans,Piton de la Fournaise
 Q1049728,2,cathedrales,Cathédrale Saint-Pierre de Rennes
+Q105189951,3,maisons,Maison natale de Pierre Bayle
 Q1054169,2,musees,Centre Pompidou-Metz
 Q1060111,2,ponts,Pont de Saint-Nazaire
 Q1061061,3,chateaux,Château de Loches
@@ -89,6 +89,7 @@ Q1083336,3,cathedrales,Cathédrale Saint-Pierre d'Annecy
 Q1084011,3,cathedrales,Cathédrale Sainte-Réparate de Nice
 Q108596099,3,musees,L'Envol des pionniers
 Q108837387,2,rochers,Aiguille Percée
+Q108934948,3,maisons,Maison Julien-Gracq
 Q1090340,3,chateaux,Château Ausone
 Q109038270,2,gorges,Gorges de Saint-Georges
 Q1090405,3,chateaux,Château Cheval Blanc
@@ -111,6 +112,33 @@ Q1102200,3,cathedrales,Cathédrale Saint-Louis de Blois
 Q1103770,3,abbayes,Abbaye de Graville
 Q1104681,3,cathedrales,Cathédrale Notre-Dame-de-la-Sède de Tarbes
 Q1107373,2,sommets,Col de Joux Plane
+Q110928938,3,maisons,Maison de Tino Rossi
+Q110928942,3,maisons,Maison-atelier Émile Boggio
+Q110928944,3,maisons,Maison de Julie Victoire Daubié
+Q110928950,3,maisons,Maison natale de Jean Giraudoux
+Q110928955,3,maisons,Château de Bois-Guilbert
+Q110928960,3,maisons,Musée-atelier d'Yvonne Guégan
+Q110928961,3,maisons,Propriété de la Fondation Camargo
+Q110928964,3,maisons,Immeuble de la maison des Ailleurs
+Q110928965,3,maisons,Villa Michel Simon
+Q110928969,3,maisons,Parc et demeure Édouard André
+Q110929524,3,maisons,Les Maisonnettes
+Q110929525,3,maisons,Demeure de Ronsard
+Q110929526,3,maisons,Domaine de La Chesnaye
+Q110929527,3,maisons,Maison d'Ernest Renan
+Q110929528,3,maisons,Maison de Pierre Mac Orlan
+Q110929530,3,maisons,Maison Jules Roy
+Q110929531,3,maisons,Maison La Souvenance
+Q110929532,3,maisons,Maison Martin Nadaud
+Q110929533,3,maisons,Maison Max Ernst et Dorothea Tanning
+Q110929534,3,maisons,Maison natale de Max Jacob
+Q110929535,3,maisons,Manoir des Deux Mondes
+Q110929536,3,maisons,Musée Claude Bernard
+Q110929537,3,maisons,Musée Emile Guillaumin
+Q110929539,3,maisons,Musée Gay-Lussac
+Q110929540,3,maisons,Musée Jean-Racine
+Q110929541,3,maisons,Musée Renaudot
+Q110929543,3,maisons,Musée Escoffier de l'art culinaire
 Q1110479,3,sommets,Colomby de Gex
 Q111207734,2,cascades,Cascades de Caraoucou
 Q1113596,3,megalithes,Combe-Capelle
@@ -128,6 +156,7 @@ Q1137826,3,abbayes,Abbaye de Beaulieu-en-Rouergue
 Q1137837,3,sommets,Montagne de Céüse
 Q1137944,3,abbayes,Abbaye d'Aubazine
 Q1138519,2,plages,Sword Beach
+Q1139060,3,sommets,Pic du Midi de Bigorre
 Q1141846,2,chateaux,Château de Cheverny
 Q1142363,2,chateaux,Château de Valençay
 Q1142554,1,sommets,Crêt de la Neige
@@ -165,6 +194,7 @@ Q1227366,1,lacs,Lac d'Aiguebelette
 Q1229179,3,abbayes,Abbaye Notre-Dame de Tamié
 Q1229863,3,abbayes,Monastère Sainte-Marie de Prouilhe
 Q122999925,1,cascades,Cascade d'Angon
+Q1230290,3,maisons,Le Belvédère
 Q1232116,3,abbayes,Abbaye de Luxeuil
 Q12324327,2,jardins,Domaine des Colombières
 Q1232844,1,grottes,Grotte du Mas-d'Azil
@@ -192,6 +222,7 @@ Q1284848,2,musees,Hospices de Beaune
 Q1285196,3,cathedrales,Église Saint-Sava
 Q1289258,1,chateaux,Château des ducs de Bretagne
 Q1290232,3,megalithes,Uxellodunum
+Q129455094,3,maisons,Mas du Bayle-Vert
 Q1296575,3,chateaux,Fort de Planoise
 Q1298462,3,lacs,Lac de Narlay
 Q1300190,3,abbayes,Abbaye Saint-Jean-des-Vignes
@@ -212,7 +243,7 @@ Q1328655,3,megalithes,Pierre-aux-Fées
 Q1329141,1,ponts,Pont des Arts
 Q1329745,3,cathedrales,Cathédrale Notre-Dame-du-Puy de Grasse
 Q1329976,3,chateaux,Citadelle de Besançon
-Q1333383,2,maisons,Château de Montaigne
+Q1333383,1,maisons,Château de Montaigne
 Q1333442,1,ponts,Viaduc de Garabit
 Q1334057,1,sommets,Ballon d'Alsace
 Q1334492,1,iles,Marie-Galante
@@ -220,11 +251,13 @@ Q1336068,2,lacs,Lac du Mont-Cenis
 Q1337859,2,sommets,Mont Aiguille
 Q1339136,3,chateaux,Château de Grésillon
 Q1339429,2,cathedrales,Basilique Saint-Quentin
+Q134435353,3,maisons,Bibliothèque Smith-Lesouëf
 Q1344947,3,cathedrales,Cathédrale Notre-Dame-de-Grâce de Cambrai
 Q1348930,3,lacs,Lac de Naussac
 Q1349239,3,cathedrales,Cathédrale Saint-Alain de Lavaur
 Q13516822,3,chateaux,Fort Saint-Elme
 Q1351690,3,cathedrales,Cathédrale Saint-Étienne de Toul
+Q13518333,3,maisons,Maison natale de Colette
 Q13518357,3,megalithes,La Tourasse
 Q13518426,3,chateaux,Vieux pont de Sospel
 Q135225,1,phares,Phare d'Eckmühl
@@ -242,11 +275,13 @@ Q1376,3,musees,"Musée Saint-Raymond, musée d'Archéologie de Toulouse"
 Q1376597,3,chateaux,Château de Troussay
 Q1377160,3,chateaux,Château du Plessis-Bourré
 Q1385053,3,abbayes,Abbaye de la Charité
+Q138905156,3,maisons,Musée Buffon
 Q1390535,3,villages,Puycelsi
 Q1392601,3,chateaux,Château de Hautefort
 Q1394288,3,abbayes,Abbaye Royale Notre-Dame de Bernay
 Q139580369,1,jardins,Jardin japonais « Île de Versailles »
 Q1397720,1,sommets,Grand Ballon
+Q1398911,2,maisons,Musée du Désert
 Q1399583,3,sommets,Grand Wintersberg
 Q1399824,3,cathedrales,Cathédrale Notre-Dame-de-l'Assomption de Luçon
 Q1399857,2,sommets,Mont Sainte-Odile
@@ -266,11 +301,11 @@ Q1424577,2,plages,Pointe de Pen-Hir
 Q1424710,3,jardins,Parc Georges-Brassens
 Q1425162,3,cathedrales,Cathédrale Saint-Samson de Dol-de-Bretagne
 Q1425474,3,jardins,Jardin botanique de Haute-Bretagne
-Q1430598,3,cathedrales,Basilique Saint-Julien de Brioude
 Q1431547,2,monuments,Tour Saint-Jacques
-Q143463,1,maisons,Palais des papes
+Q143463,2,monuments,Palais des papes
 Q1434679,2,lacs,Lac de Saint-Cassien
 Q1435049,1,plages,Médoc
+Q1435661,3,musees,Fondation Le Corbusier
 Q1435689,2,musees,Fondation Maeght
 Q1436883,3,chateaux,Château de Maintenon
 Q1438801,2,monuments,Fort de Vaux
@@ -282,19 +317,18 @@ Q14420304,3,chateaux,Château de Lanniron
 Q1451798,3,chateaux,Château de Josselin
 Q145306,3,villages,Larressingle
 Q1455591,3,chateaux,Château du Wasenbourg
-Q1456446,3,sommets,Le Reculet
+Q1456446,2,sommets,Le Reculet
 Q14565687,2,rochers,Baousso del Biel
 Q14566044,3,musees,Musée Champollion
 Q1458431,3,lacs,Réservoir de Bouzey
 Q1460090,2,ponts,Pont-Neuf
-Q1461848,3,chateaux,Château de Ferrières
 Q1462683,3,chateaux,Château des Réaux
 Q14628539,3,megalithes,Temple de Mars à Corseul
 Q1464908,3,cathedrales,Basilique Saint-Martin de Tours
 Q1468594,3,cathedrales,Cathédrale Notre-Dame de Coutances
 Q1469250,3,ponts,Pont au Double
 Q1470842,2,chateaux,Château de Sully-sur-Loire
-Q1473446,1,maisons,Fondation Claude-Monet
+Q1473446,2,maisons,Fondation Claude-Monet
 Q1476342,3,villages,Hell-Bourg
 Q1479356,3,chateaux,Château de Talcy
 Q1480604,2,chateaux,Château de Pau
@@ -308,7 +342,7 @@ Q1496402,1,cascades,Cascade de Gavarnie
 Q1496494,2,iles,Gavrinis
 Q1500472,1,plages,Pointe du Raz
 Q1503331,1,monuments,Obélisque de Louxor
-Q15056170,3,musees,Maison des Lumières Denis Diderot
+Q15056170,2,maisons,Maison des Lumières Denis Diderot
 Q1510,2,megalithes,Théâtre antique de Lyon
 Q15106714,3,monuments,Arc Héré
 Q1513866,3,ponts,Pont de Bercy
@@ -349,7 +383,8 @@ Q1552366,2,chateaux,Château du Haut-Koenigsbourg
 Q1553818,1,lacs,Lac de Retournemer
 Q155413,3,villages,Sainte-Agnès
 Q1557685,3,musees,Château de Guédelon
-Q15627617,3,musees,Musée Ampère
+Q15627617,2,maisons,Musée Ampère
+Q15627675,3,maisons,Musée des Papeteries Canson et Montgolfier
 Q1563071,2,cathedrales,Cathédrale Saint-Julien du Mans
 Q1563354,3,musees,Musée Matisse
 Q15638587,3,megalithes,Tumulus du Montioux
@@ -372,6 +407,7 @@ Q1587628,3,musees,Musée national de Céramique
 Q15940146,3,chateaux,Château de Boulogne-sur-Mer
 Q15940508,3,chateaux,Château de Virieu
 Q15943913,3,chateaux,Château de Châteauneuf-sur-Loire
+Q15944355,3,maisons,Château de Labastide-Murat
 Q15948600,3,megalithes,Dolmen de la Grotte aux Fées
 Q1595270,1,forets,Forêt de Haguenau
 Q15952779,2,abbayes,Tour-monastère de l'abbaye de Lérins
@@ -379,11 +415,12 @@ Q15952870,3,musees,Musée lapidaire d'Avignon
 Q15953040,2,ponts,Pont-vieux de Nérac
 Q15972919,2,jardins,Jardin Jungle Karlostachys
 Q15992417,3,chateaux,Château du Louvre
+Q16034352,3,maisons,Maison de Nicéphore Niépce
 Q16040009,3,iles,Îlet Chancel
-Q16040133,3,iles,Îlet Sainte-Marie
 Q1604334,3,ponts,Pont de la Basse-Chaîne
 Q1607765,2,musees,"Lille Métropole Musée d'Art moderne, d'Art contemporain et d'Art brut"
 Q1609139,3,lacs,Lac des Bouillouses
+Q1613242,3,maisons,"Le Clos Arsène Lupin, Maison Maurice Leblanc"
 Q1617779,3,megalithes,Alignements de Kerzérho
 Q161787,3,chateaux,Château de Champs-sur-Marne
 Q1619084,1,monuments,Palais Longchamp
@@ -393,14 +430,16 @@ Q1620783,2,musees,Historial de la Grande Guerre
 Q1621256,2,ponts,Pont de l'Alma
 Q1624140,2,sommets,Hohneck
 Q1626747,3,chateaux,Château de Meudon
-Q1631711,3,musees,Musée Fragonard de l'École vétérinaire de Maisons-Alfort
+Q16303814,3,maisons,Maison d'artiste de la Grande Vigne
+Q16303824,3,maisons,Maison familiale d'Henri Matisse
+Q16303828,3,maisons,Maison Ravier
 Q1632912,3,musees,Musée Galliera
 Q1636244,2,cathedrales,Cathédrale Notre-Dame de Bayeux
 Q1636682,3,musees,Bibliothèque humaniste de Sélestat
 Q1638606,1,phares,Phare de Saint-Mathieu
 Q1639005,2,phares,Phare de l'Île Vierge
 Q1640215,3,musees,Maison Fournaise
-Q1643144,2,monuments,Hôtel de Sully
+Q1643144,3,monuments,Hôtel de Sully
 Q1643799,2,grottes,Grotte de Pair-non-Pair
 Q1643811,2,grottes,Grotte de la Mairie
 Q1645281,3,sommets,Mont de Grange
@@ -421,12 +460,11 @@ Q1658544,2,iles,Île de Port-Cros
 Q1658766,3,cathedrales,Cathédrale Saint-Jean-Baptiste d'Aire
 Q1659709,3,cathedrales,Basilique Saint-Andoche de Saulieu
 Q1659920,2,sommets,Le Semnoz
-Q1661220,3,chateaux,Château de Val
+Q1661220,2,chateaux,Château de Val
 Q16627473,1,cascades,Cascade d'Ars
 Q16635952,3,sommets,Le Fayé
-Q16639191,3,megalithes,Gisement du Martinet
 Q1664416,3,musees,Musée du Petit Palais
-Q1665109,3,musees,Institut national de l'audiovisuel
+Q1665255,2,maisons,Musée de l'atelier Rosa Bonheur
 Q1666367,2,lacs,Lac Pavin
 Q1666762,3,chateaux,Château de Lanquais
 Q1671011,2,cathedrales,Cathédrale Notre-Dame-de-la-Treille
@@ -441,8 +479,10 @@ Q167827,3,abbayes,Abbaye de Saint-Roman
 Q167863,2,musees,Musée du quai Branly - Jacques-Chirac
 Q16802261,3,dunes-marais,Étang de l'Estomac
 Q1683459,3,jardins,Jardins du Trocadéro
+Q1695413,3,maisons,Ancien hôtel de ville de Fort-de-France
 Q1696035,3,abbayes,Abbaye de Lachalade
 Q16964634,3,musees,Cité du Vin
+Q16964856,3,maisons,Villa Majorelle
 Q1709158,3,cathedrales,Cathédrale Sainte-Eulalie-et-Sainte-Julie d'Elne
 Q1711691,2,cathedrales,Cathédrale Saint-Bénigne de Dijon
 Q1711734,1,sommets,Salève
@@ -453,6 +493,7 @@ Q1726347,3,jardins,Parc floral de Paris
 Q1728299,3,plages,Cap Fagnet
 Q1728337,3,plages,Cap d'Antifer
 Q17326807,3,megalithes,Villa Rustica
+Q17347123,3,maisons,Maison Zervos
 Q1736164,3,cathedrales,Cathédrale Saint-Jean de Belley
 Q1736169,3,cathedrales,Cathédrale Saint-Pierre d'Angoulême
 Q1736171,3,cathedrales,Cathédrale Sainte-Marie de Bayonne
@@ -485,7 +526,6 @@ Q1775231,3,abbayes,Abbaye de Fontmorigny
 Q1775457,3,abbayes,Abbaye de la Bénisson-Dieu
 Q1775489,3,abbayes,Abbaye Notre-Dame de Langonnet
 Q1775540,3,abbayes,Abbaye de Loc-Dieu
-Q1775889,3,abbayes,Abbaye de Saint-Benoît-en-Woëvre
 Q1776233,3,abbayes,Abbaye de Vauclair
 Q1776236,3,abbayes,Abbaye de Valloires
 Q177657,2,grottes,Grotte de Villars
@@ -507,7 +547,7 @@ Q1798794,3,musees,Ouvrage de La Ferté
 Q1798855,1,plages,Hague
 Q1799018,3,megalithes,Pierre Turquaise
 Q1799090,1,megalithes,La Roche-aux-Fées
-Q1799101,2,maisons,La Ruche
+Q1799101,3,maisons,La Ruche
 Q179949,2,villages,Navarrenx
 Q1799604,3,lacs,Lac Noir
 Q1799622,2,lacs,Lac de Chalain
@@ -551,8 +591,10 @@ Q1851987,3,chateaux,Château de Sourches
 Q1853517,3,ponts,Passerelle Simone-de-Beauvoir
 Q185444,3,villages,Beynac-et-Cazenac
 Q185479,2,chateaux,Château d'Ussé
+Q18578013,3,maisons,Maison de la photographie des Landes
+Q18578014,3,maisons,Maison de Monsieur Beynier
 Q1858504,2,abbayes,Abbaye Saint-Victor de Marseille
-Q1859459,2,maisons,Château de La Brède
+Q1859459,1,maisons,Château de La Brède
 Q1860484,3,abbayes,Abbaye Notre-Dame de Ganagobie
 Q1862379,3,chateaux,Château d'Esparron-de-Verdon
 Q1863573,3,chateaux,Fort du Salbert
@@ -561,23 +603,23 @@ Q18713494,3,abbayes,Carmel de Lisieux
 Q18745402,3,plages,Pointe Faula
 Q187483,3,musees,Tapisserie de Bayeux
 Q1876013,3,megalithes,Lugdunum Convenarum
-Q1876458,3,chateaux,Château des Rois ducs
 Q18785766,3,plages,Pointe de Penvins
-Q1885888,2,maisons,Domaine de George Sand
-Q188856,3,monuments,Panthéon
+Q1885888,1,maisons,Domaine de George Sand
+Q1885892,3,maisons,Maison de Louis Pasteur à Arbois
+Q188856,2,monuments,Panthéon
 Q1889428,3,musees,Musée des Monuments français
 Q189764,1,megalithes,Pont du Gard
 Q1898465,3,musees,Marineland d'Antibes
 Q190063,1,iles,Île de la Cité
 Q190171,2,villages,Mosset
 Q19017622,3,megalithes,Fanum d'Offemont
-Q1906882,2,monuments,Palais du Pharo
+Q1906882,3,monuments,Palais du Pharo
 Q191094,2,villages,Castelnou
 Q1918916,3,grottes,Grotte de Massabielle
 Q1919398,3,chateaux,Château de Doumely
 Q192356,3,sommets,Le Linleu
 Q192756,3,villages,Sainte-Enimie
-Q193193,3,monuments,Sainte-Chapelle
+Q193193,2,monuments,Sainte-Chapelle
 Q193215,1,chateaux,Château de Chenonceau
 Q1932488,3,lacs,Lac Kir
 Q193562,3,villages,Saint-Suliac
@@ -585,6 +627,8 @@ Q1935662,3,abbayes,Abbaye royale de Saint-Germain d'Auxerre
 Q19365734,3,musees,Musée national de la Marine de Toulon
 Q19368619,3,cascades,Puits des Tines
 Q19371162,2,cascades,Cascade de Cerveyrieu
+Q19387976,2,maisons,Maison Claude Debussy
+Q19387992,3,maisons,Le Prieuré
 Q1945381,3,sommets,Plateau d'Avron
 Q1945401,3,megalithes,Mont Lassois
 Q1945426,3,sommets,Mont Ormel
@@ -600,7 +644,6 @@ Q1959841,3,chateaux,Château de Madame du Barry
 Q196690,3,villages,Saint-Robert
 Q1966959,3,musees,Maison Picassiette
 Q19675,1,musees,Musée du Louvre
-Q19682507,3,megalithes,Complexe funéraire du Moutot à Lavau
 Q1970151,2,iles,Île d'Yeu
 Q1973935,3,abbayes,Prieuré de Serrabone
 Q197482,3,chateaux,Château des Rochers-Sévigné
@@ -610,6 +653,7 @@ Q1983,3,villages,Oingt
 Q1989567,3,chateaux,Château de Gaillon
 Q1992203,3,megalithes,Temple de Diane
 Q199234,1,phares,Phare de Cordouan
+Q19935392,3,maisons,Maison natale d'Auguste Bartholdi
 Q1994367,2,plages,Cap d'Antibes
 Q19945094,3,jardins,Jardin des Combattants de la Nueve
 Q19951156,3,abbayes,Monastère de la Dormition-de-la-Mère-de-Dieu à La Faurie
@@ -649,7 +693,7 @@ Q2048162,3,megalithes,Bagacum Nerviorum
 Q204979,3,villages,Vézelay
 Q2051953,3,jardins,Parc André-Citroën
 Q205367,1,chateaux,Château de Chambord
-Q2054341,2,maisons,Château de Saché
+Q2054341,1,maisons,Château de Saché
 Q205659,3,chateaux,Château de Lunéville
 Q2060046,3,chateaux,Château de Roquetaillade
 Q2060889,3,jardins,Coulée verte René-Dumont
@@ -657,6 +701,7 @@ Q2061380,2,iles,Île d'Aix
 Q2062903,3,chateaux,Château de Clagny
 Q2064073,1,jardins,Jardins de la Fontaine
 Q2064741,3,musees,Pavillon Vendôme
+Q20669768,3,maisons,Fort Sarah Bernhardt
 Q2068180,3,chateaux,Château de Trévarez
 Q206823,1,cathedrales,Cathédrale Notre-Dame de Reims
 Q20724462,3,chateaux,Château de Creil
@@ -679,6 +724,7 @@ Q2093924,2,chateaux,Château d'Abbadia
 Q2095479,3,chateaux,Château de Clermont
 Q2096741,2,sommets,Montagne de Lure
 Q20971142,3,plages,Pointe de Barfleur
+Q20971734,3,maisons,Maison-école du Grand Meaulnes
 Q2098121,1,sommets,Planche des Belles Filles
 Q2100387,2,grottes,Grotte de Lombrives
 Q21009458,3,chateaux,Château de Tallard
@@ -696,7 +742,7 @@ Q21099746,3,cascades,Cascade de la Lauch
 Q21099752,3,cascades,Cascade du Nideck
 Q21099819,3,cascades,Saut de l'Ognon
 Q21099820,3,megalithes,Site antique de Drevant
-Q2111621,2,monuments,Palais des ducs de Bourgogne
+Q2111621,3,monuments,Palais des ducs de Bourgogne
 Q211684,1,villages,Barfleur
 Q2119428,1,sommets,Puy Mary
 Q2124804,3,cathedrales,Cathédrale Saint-Louis de Versailles
@@ -708,6 +754,7 @@ Q214568,1,iles,Île-d'Aix
 Q21479865,3,plages,Cap Béar
 Q21485498,2,megalithes,Tasciaca
 Q21532108,2,volcans,Puy de Jume
+Q21582221,3,maisons,Musée du Maréchal Joffre
 Q216357,2,monuments,Arche de la Défense
 Q2172329,2,megalithes,Jardin des Vestiges
 Q217452,1,abbayes,Basilique Sainte-Marie-Madeleine
@@ -733,7 +780,6 @@ Q2212483,3,cathedrales,Église Saint-Hilaire-le-Grand de Poitiers
 Q2212795,3,cathedrales,Cathédrale Saint-Spire de Corbeil-Essonnes
 Q22158623,2,rochers,Manneporte
 Q2229969,3,monuments,Beffroi de Dunkerque
-Q2240085,3,chateaux,Château d'Argy
 Q2240202,3,chateaux,Château de Baugé
 Q2240223,3,chateaux,Château de Beauté-sur-Marne
 Q2240551,3,chateaux,Château de Cirey
@@ -753,11 +799,12 @@ Q2243645,3,musees,Musée Rimbaud
 Q2243666,3,chateaux,Château de Sully
 Q2243758,3,chateaux,Château de Tournon
 Q2243824,3,chateaux,Château de Vault-de-Lugny
+Q22442779,3,cathedrales,Basilique Saint-Denys d'Argenteuil
 Q2248639,3,abbayes,Abbaye royale de Saint-Riquier
-Q2255375,3,musees,Musée Pasteur
+Q2255375,2,maisons,Musée Pasteur
 Q2255651,3,chateaux,Château de Montrottier
+Q2256147,2,maisons,Bibliothèque de l'Arsenal
 Q2259452,3,chateaux,Château d'Annecy
-Q2260088,3,chateaux,Château du Parc-Soubise
 Q2262571,3,iles,Île Saint-Joseph
 Q2262676,3,lacs,Grand Canal de Versailles
 Q2269718,2,plages,Calanque de Sormiou
@@ -768,22 +815,36 @@ Q2284047,3,grottes,Grotte de Foissac
 Q228472,1,iles,Île de Sein
 Q22869,2,villages,Hunspach
 Q22915915,3,chateaux,Château de Saint-Ouen
-Q22940152,3,chateaux,Château de la Motte
+Q22922427,3,maisons,Maison natale de Louis Braille
+Q22923142,3,maisons,Maison de Stéphane Mallarmé
+Q22924203,3,megalithes,Dolmen de la Pierre-Levée
+Q22939760,3,maisons,Maison André Breton
+Q22939975,3,maisons,Maison natale du maréchal Foch
 Q22940359,3,chateaux,Château de Buranlure
 Q22940848,3,chateaux,Château Saint-Jean de Nogent-le-Rotrou
+Q22941752,3,maisons,Maison natale de Descartes
+Q22942057,3,maisons,Le Grand Coteau
 Q22942089,3,megalithes,Pierre Chaude
+Q22943869,3,maisons,Château de Denainvilliers
 Q22951316,3,ponts,Viaduc de la Tardes
 Q22951440,3,megalithes,Pierre Folle
+Q22953117,3,maisons,"Maison, 24 rue du Commerce"
 Q22953332,3,cathedrales,Basilique Notre-Dame de Gray
 Q22960740,3,chateaux,Château d'Esquelbecq
-Q22962904,3,megalithes,Menhir de Bourg-Jardin
-Q2296362,2,maisons,Musée Gustave-Moreau
+Q2296362,1,maisons,Musée Gustave-Moreau
+Q22963633,3,maisons,Château du Tertre
+Q22964915,3,maisons,Maison de Jacques Copeau
 Q22967182,3,abbayes,Couvent des Cordeliers de Charlieu
 Q22967383,3,chateaux,Château de Châteaumorand
 Q2297114,3,cathedrales,Cathédrale Notre-Dame-de-Nazareth d'Orange
+Q22975827,3,maisons,Maison-atelier de Foujita
+Q22976239,3,maisons,Musée Aristide-Bergès
+Q22980586,3,maisons,Château de Vaux
 Q22985151,3,megalithes,Menhir de la Haute-Borne
-Q22988051,2,maisons,Maison de La Boétie
+Q22988051,3,maisons,Maison de La Boétie
 Q22992063,3,megalithes,Menhir de Men-Bras-de-Kermar-Ker
+Q22998302,3,maisons,Maison-atelier de Daubigny
+Q22998303,3,maisons,Maison du Docteur Gachet
 Q22998467,3,chateaux,Fort du Mont-Dauphin
 Q23013104,3,plages,Plage de Sainte-Marguerite
 Q2306676,3,chateaux,Vieux-château de l'Île d'Yeu
@@ -795,9 +856,8 @@ Q2308353,2,plages,Pointe Saint-Mathieu
 Q2310816,3,cathedrales,Cathédrale Sainte-Marie d'Oloron
 Q2315399,3,abbayes,Abbaye de Saint-Antoine-l'Abbaye
 Q2315459,3,cathedrales,Basilique Saint-Eutrope de Saintes
-Q2315601,3,cathedrales,Église Saint-Martin de Clamecy
 Q2315683,3,cathedrales,Basilique d'Ars
-Q2317145,3,musees,Musée Renoir
+Q2317145,2,maisons,Musée Renoir
 Q2321630,2,sommets,Chamechaude
 Q2321914,3,chateaux,Château de Courances
 Q23305619,3,cathedrales,Cathédrale de la Sainte-Trinité
@@ -806,20 +866,29 @@ Q2341779,2,ponts,Viaduc de Cize-Bolozon
 Q2341945,3,chateaux,Château du Barroux
 Q23426,1,lacs,Lac du Bourget
 Q2343686,3,cathedrales,Cathédrale Sainte-Marie-de-l'Assomption de Lucciana
+Q2348375,3,maisons,Maison des Jardies
+Q23498359,3,maisons,Musée Charles-Louis Philippe
 Q2350639,3,monuments,Maison Pfister
 Q2351952,2,ponts,Pont de Tancarville
-Q2356811,3,chateaux,Château royal de Collioure
+Q2356811,2,chateaux,Château royal de Collioure
 Q2357520,3,musees,Bibliothèque polonaise de Paris
+Q23576291,3,maisons,Maison Lansyer
 Q23596705,3,musees,Musée Saint-Remi
+Q23639863,3,maisons,Hôtel de Cabrières-Sabatier d'Espeyran
+Q23640615,3,maisons,Musée départemental Raymond Poincaré
 Q2366170,3,chateaux,Château de la Pommerie
 Q2371579,3,plages,Cap Croisette
 Q2371597,3,cathedrales,Cathédrale Saint-Tugdual de Tréguier
+Q23719013,3,maisons,Musée Murat
 Q2372049,3,musees,Grande galerie de l'Évolution
 Q2378450,3,chateaux,Château de Quintin
 Q2380772,2,plages,Pointe des Poulains
+Q2381861,3,maisons,Villa Marguerite-Yourcenar
+Q23831223,3,maisons,Atelier musée Jean Lurçat
 Q2385003,3,cathedrales,Cathédrale Saint-Vincent de Saint-Malo
 Q2389498,3,musees,Musée de la Révolution française
 Q2389536,3,musees,Aquarium de Biarritz
+Q23936770,3,maisons,Musée-bibliothèque François Pétrarque
 Q2398623,3,chateaux,Château de Mesnières
 Q2400780,1,jardins,Musée de Salagon
 Q2401144,2,volcans,Piton de Grande-Anse
@@ -830,6 +899,7 @@ Q24084606,3,plages,Cap d'Ona
 Q24084613,3,plages,Cap de la Vella
 Q2409187,3,chateaux,Château de Bouges
 Q2412975,3,chateaux,Château de Portes
+Q2415168,2,maisons,Maison de Jules Verne
 Q2415426,3,chateaux,Château du Touvet
 Q2417255,3,chateaux,Château de Rastignac
 Q2418225,3,chateaux,Château de Vitré
@@ -853,14 +923,13 @@ Q2446035,3,monuments,Tour Perret
 Q2449709,3,musees,Musée de la Contrefaçon
 Q2450180,3,chateaux,Château de la Bastie d'Urfé
 Q2452386,3,grottes,Grotte du Grand Roc
-Q2452513,2,maisons,Villa Ephrussi de Rothschild
+Q2452513,3,musees,Villa Ephrussi de Rothschild
 Q2459723,3,megalithes,Tumulus de Dissignac
 Q246304,3,plages,Pointe des Espagnols
 Q246317,3,villages,Sant'Antonino
 Q246448,2,jardins,Parc de la Villette
 Q246821,3,musees,Musée Goya
 Q24692552,3,plages,Pointe des Roches
-Q24695295,3,lacs,Lac de Petit Saut
 Q24695383,3,plages,Plage de Gosselin
 Q2471852,3,sommets,Aiguille Croche
 Q2473730,3,chateaux,Château de Bercy
@@ -885,10 +954,9 @@ Q250389,3,villages,Montpeyroux
 Q25063,2,grottes,Grottes de Gargas
 Q2507005,3,chateaux,Château de Villemolin
 Q2509175,3,lacs,Lac de Bettaniella
-Q2509432,3,musees,Domaine de la Vallée-aux-Loups
+Q2509432,2,maisons,Domaine de la Vallée-aux-Loups
 Q251083,3,grottes,Grotte des Demoiselles
 Q2519300,3,grottes,Grotte de Dargilan
-Q2520602,3,chateaux,Château de Flers
 Q2524946,2,plages,Cap Taillat
 Q2532625,2,gorges,Gorges de la Bourne
 Q2538129,2,musees,Musée Toulouse-Lautrec
@@ -903,12 +971,14 @@ Q2572089,3,sommets,Monte d'Oro
 Q2574917,3,lacs,Lac de Gravelle
 Q2579100,3,chateaux,Château des Adhémar
 Q2587094,3,chateaux,Château de Ventadour
+Q2588025,2,maisons,Maison d'Émile Zola
 Q258818,2,lacs,Lac de Sainte-Croix
 Q258911,3,villages,Lavardin
 Q2592438,3,grottes,Gouffre Jean-Bernard
 Q2597719,3,musees,Musée de la franc-maçonnerie
-Q2599177,1,maisons,Maison de Victor Hugo
+Q2599177,3,maisons,Maison de Victor Hugo
 Q2599455,3,grottes,Gouffre de la Pierre Saint-Martin
+Q2602923,3,maisons,Manoir de Limoëlou
 Q2611105,3,megalithes,Portus Itius
 Q2612600,3,chateaux,Château des ducs de Bar
 Q26205063,3,plages,Cap Boucan Canot
@@ -932,14 +1002,14 @@ Q267731,3,villages,La Roque-sur-Cèze
 Q2680279,3,chateaux,Château de Marracq
 Q2680838,3,abbayes,Abbaye de Watten
 Q26972766,3,jardins,Jardin de l'UNESCO
-Q2700205,3,chateaux,Château de Menthon-Saint-Bernard
+Q2700205,2,chateaux,Château de Menthon-Saint-Bernard
 Q270179,3,villages,Balazuc
 Q270294,3,villages,Saint-Jean-Pied-de-Port
 Q2706740,3,chateaux,Château de Belcastel
 Q2711480,2,musees,Musée des Augustins de Toulouse
-Q2714932,1,maisons,Musée de la Vie romantique
+Q2714932,3,maisons,Musée de la Vie romantique
 Q2715327,3,chateaux,Château de Castillon
-Q2715373,1,maisons,Musée Bourdelle
+Q2715373,3,maisons,Musée Bourdelle
 Q2717848,3,musees,Bibliothèque-musée de l'Opéra
 Q2721241,3,chateaux,Tour Solidor
 Q272308,1,villages,Gordes
@@ -953,7 +1023,7 @@ Q273012,3,villages,Charroux
 Q273562,2,villages,Belvès
 Q273653,2,musees,Écomusée d'Alsace
 Q2737833,2,cathedrales,Cathédrale Saint-Étienne de Toulouse
-Q2737839,2,sommets,La Rhune
+Q2737839,1,sommets,La Rhune
 Q2738641,3,chateaux,Château des Tourelles
 Q2739331,3,jardins,Jardin des plantes d'Angers
 Q2739499,3,jardins,Parc Clichy-Batignolles - Martin Luther King
@@ -968,7 +1038,6 @@ Q276063,3,megalithes,Amphithéâtre de Fréjus
 Q2762952,3,cathedrales,Cathédrale Notre-Dame-de-l'Assomption de Lescar
 Q2763769,3,chateaux,Château de Ray-sur-Saône
 Q2769798,3,megalithes,Théâtre romain d'Autun
-Q27729574,3,iles,Îlet Chevalier
 Q2782043,3,sommets,Grand Som
 Q2782334,3,monuments,Colonne de la Grande Armée
 Q278566,3,villages,La Garde-Adhémar
@@ -989,7 +1058,6 @@ Q2820351,3,abbayes,Abbaye Saint-André de Meymac
 Q2820371,3,abbayes,Abbaye Saint-Florentin de Bonneval
 Q2820400,3,abbayes,Abbaye Saint-Magloire de Léhon
 Q2820425,3,abbayes,Abbaye Saint-Pierre d'Airvault
-Q2820449,3,abbayes,Abbaye Saint-Vincent de Chantelle
 Q2820451,3,abbayes,Abbaye Saint-Vincent de Metz
 Q2820485,3,abbayes,Abbaye Sainte-Marie de Souillac
 Q2820489,3,abbayes,Abbaye Toussaint d'Angers
@@ -1020,6 +1088,7 @@ Q2845859,3,cathedrales,Cathédrale Saint-Maurice de Mirepoix
 Q284649,1,plages,Pointe du Hoc
 Q284933,3,chateaux,Château de Schoeneck
 Q28494476,3,grottes,Grotte d'Harpea
+Q2858640,3,maisons,Appartement du docteur Gagnon
 Q2859135,3,megalithes,Aquae Sextiae
 Q2859218,2,ponts,Aqueduc de Maintenon
 Q2859432,3,megalithes,Araghju
@@ -1030,6 +1099,7 @@ Q2859877,3,megalithes,Arc de triomphe de Glanum
 Q2860024,2,rochers,Arche de Corte
 Q2860982,3,megalithes,Argentomagus
 Q2867477,2,plages,Presque'île de Quiberon
+Q2868827,3,maisons,Atelier Renoir
 Q287751,2,abbayes,Abbaye Saint-Martin du Canigou
 Q28785,1,cathedrales,Basilique du Sacré-Cœur de Montmartre
 Q2881810,2,jardins,Bambouseraie en Cévennes
@@ -1040,7 +1110,6 @@ Q2886911,3,cathedrales,Basilique Notre-Dame-des-Enfants
 Q2886913,3,cathedrales,Basilique Notre-Dame-de-l'Immaculée-Conception de Boulogne-sur-Mer
 Q2886918,3,cathedrales,Basilique Notre-Dame-des-Miracles
 Q2886923,3,cathedrales,Basilique Notre-Dame d'Alençon
-Q2886924,3,cathedrales,Basilique Notre-Dame d'Avesnières
 Q2886926,3,cathedrales,Basilique Notre-Dame d'Espérance de Charleville-Mézières
 Q2886937,3,cathedrales,Basilique Notre-Dame de Bonsecours
 Q2886952,3,cathedrales,Basilique Notre-Dame de Montligeon
@@ -1066,7 +1135,8 @@ Q288968,1,lacs,Étang de Thau
 Q28911030,3,cascades,Cascade de Vaucoux
 Q28924,3,musees,Catacombes de Paris
 Q2893122,3,lacs,Lac Dziani
-Q28971473,3,megalithes,Théâtre antique de Sanxay
+Q2901290,3,maisons,Bibliothèque Marmottan
+Q29034928,3,villages,Pujols-le-Haut
 Q290355,3,ponts,Pont de Bir-Hakeim
 Q2908933,1,gorges,Gorges du Pont-du-Diable
 Q291093,2,ponts,Pont Mirabeau
@@ -1160,7 +1230,8 @@ Q2942878,3,cathedrales,Cathédrale de la Nativité-de-Marie de Rieux
 Q2942882,3,cathedrales,Cathédrale de la Sainte-Trinité de Laval
 Q2942927,3,cathedrales,Cathédrale grecque Saint-Étienne de Paris
 Q2943281,3,grottes,Caverne Mussard
-Q2945803,3,jardins,Centre international d'art et du paysage de Vassivière
+Q2944890,3,maisons,Centre abbé Pierre Emmaüs
+Q2945212,3,maisons,Centre d'études et musée Edmond-Michelet
 Q2946,1,chateaux,Château de Versailles
 Q2948420,3,plages,Chambre d’Amour
 Q2961249,3,abbayes,Chartreuse Notre-Dame du Val de Bénédiction
@@ -1174,6 +1245,7 @@ Q2968138,3,chateaux,Château d'Asnières
 Q2968147,3,chateaux,Château d'Aubais
 Q2968163,3,chateaux,Château d'Augerville
 Q2968220,3,chateaux,Château d'Esnes
+Q2968224,3,maisons,Château d'Espeyran
 Q2968228,3,chateaux,Château d'Essalois
 Q2968236,3,chateaux,Château d'Étangsannes
 Q2968243,3,chateaux,Château d'Hardelot
@@ -1183,10 +1255,10 @@ Q2968329,3,chateaux,Château d'Osthoffen
 Q2968376,2,monuments,Le Château d'eau
 Q2968393,3,chateaux,Château d'Ô
 Q2968413,3,chateaux,Château de Ballon
+Q2968417,3,maisons,Château de Balzac
 Q2968429,3,chateaux,Château de Bar-sur-Seine
-Q2968565,3,chateaux,Château de Bity
 Q2968575,3,chateaux,Château de Blâmont
-Q2968629,3,chateaux,Château de Bourbon-l'Archambault
+Q2968601,3,maisons,Château de Bonrepos
 Q2968631,3,chateaux,Château de Bournazel
 Q2968638,3,chateaux,Château de Bourron
 Q2968643,3,chateaux,Château de Bouthéon
@@ -1195,7 +1267,6 @@ Q2968742,3,chateaux,Château de Calmont d'Olt
 Q2968752,3,chateaux,Château de Caen
 Q2968762,3,chateaux,Château de Canon
 Q2968803,3,chateaux,Château de Cazeneuve
-Q2968823,3,chateaux,Château de Challain-la-Potherie
 Q2968829,3,chateaux,Château de Chamarande
 Q2968843,3,chateaux,Château de Chamerolles
 Q2968948,3,chateaux,Château de Château-Gaillard
@@ -1205,11 +1276,10 @@ Q2969140,3,chateaux,Château de Domfront
 Q2969143,3,chateaux,Château de Domeyrat
 Q2969166,3,chateaux,Château de Duras
 Q2969191,3,chateaux,Château de Farcheville
-Q2969210,2,maisons,Château de Voltaire
+Q2969210,1,maisons,Château de Voltaire
 Q2969214,3,chateaux,Château de Ferrette
 Q2969230,3,chateaux,Château de Flaugergues
 Q2969236,3,chateaux,Château de Fontaine-Henry
-Q2969304,3,chateaux,Château de Gaujacq
 Q2969314,3,chateaux,Château de Gavaudun
 Q2969342,3,chateaux,Château de Gramont
 Q2969357,2,chateaux,Château de Grignan
@@ -1230,7 +1300,6 @@ Q2969856,3,chateaux,Château de Maÿtie
 Q2969865,3,chateaux,Château de Mauvezin
 Q2969882,3,chateaux,Château de Meung-sur-Loire
 Q2969896,3,chateaux,Château de Miolans
-Q2969937,3,chateaux,Château de Montagu
 Q2969961,3,chateaux,Château de Montaner
 Q2969972,3,chateaux,Château de Montbéliard
 Q2969993,3,chateaux,Château de Montferrand
@@ -1242,10 +1311,10 @@ Q2970406,3,chateaux,Château de Rochechouart
 Q2970473,3,chateaux,Château de Sablé
 Q2970521,3,chateaux,Château de Saint-Germain-Beaupré
 Q2970548,3,chateaux,Château de Saint-Malo
+Q2970571,3,maisons,Château de Saint-Point
 Q2970650,3,chateaux,Château de Sauvan
 Q2970739,3,chateaux,Château de Syam
 Q2970742,3,chateaux,Château de Suscinio
-Q2970772,3,chateaux,Château de Terre Neuve
 Q2970864,3,chateaux,Château de Turenne
 Q2970879,3,chateaux,Château de Vaire
 Q2970893,3,chateaux,Château de Vallery
@@ -1261,11 +1330,13 @@ Q2971336,3,chateaux,Château de la Petite Malmaison
 Q2971342,3,chateaux,Château de la Muette
 Q2971368,3,chateaux,Château de la Roche-Jagu
 Q2971472,3,chateaux,Château des Baux
+Q2971531,3,maisons,Château des Ormes
 Q2971579,3,chateaux,Château des ducs de La Trémoille
 Q2971586,3,chateaux,Château des ducs de Savoie
 Q2971673,3,chateaux,Château du Coudray-Salbart
 Q2971702,3,chateaux,Château du Grand Jardin
 Q2971765,3,chateaux,Château du Petit Trianon
+Q2971796,3,maisons,Château du Pradel
 Q2971815,3,chateaux,Château du Rocher-Portail
 Q2971917,3,chateaux,Châteaux de Bruniquel
 Q29734225,3,musees,Musée de la Gendarmerie et du Cinéma de Saint-Tropez
@@ -1297,14 +1368,20 @@ Q3023355,3,sommets,Dents de Lanfon
 Q3028305,2,iles,Île Milliau
 Q3028467,3,musees,Dinosauria
 Q3028584,3,chateaux,Fort de Bellegarde
+Q30302877,3,maisons,Villa Souques-Pagès
+Q30308373,3,maisons,Maison natale du Maréchal Lannes
+Q30308515,3,maisons,Maison Trenet
+Q30308661,3,maisons,Maison Louis-Guilloux
 Q3033984,3,megalithes,Dolmen d'Amenon
 Q3034089,3,megalithes,Dolmen de la Pierre-Alot
 Q3034092,3,megalithes,Dolmen de la Pierre Couverte
 Q3034171,3,megalithes,Dolmens des Pérottes
+Q3034482,3,maisons,Domaine de Malagar
 Q3036702,3,chateaux,Donjon Lacataye
 Q3041303,1,dunes-marais,Dunes de Keremma
 Q3041305,3,dunes-marais,Dunes de Sermoyer
 Q3043170,3,gorges,Défilé d'Entre-Roches
+Q30524595,3,maisons,Musée d'Histoire et d'archéologie de la Chartreuse
 Q306121,3,abbayes,Abbaye Saint-Michel de Cuxa
 Q306131,3,abbayes,Abbaye Saint-Pierre de Solesmes
 Q306139,2,abbayes,Abbaye de Valmagne
@@ -1315,11 +1392,11 @@ Q3062499,1,rochers,Exsurgence de Port-Miou
 Q3064717,3,plages,Falaises Soubeyranes
 Q3065485,3,jardins,Jardin botanique de Bayonne
 Q3066668,3,megalithes,Fanum d'Aron
-Q3066670,3,megalithes,Fanum de Mouzon
 Q3067,2,megalithes,Aqueduc du Gier
 Q3067362,3,villages,Peyre
 Q3068815,3,jardins,Jardin botanique littoral de Saint-Jean-de-Luz
 Q3073006,3,lacs,Fischboedle
+Q30740288,3,maisons,Maison-musée de Félix Éboué
 Q3075489,1,musees,Fondation d'entreprise Louis-Vuitton
 Q3076306,3,grottes,Fontaine de Fontestorbes
 Q3076348,3,jardins,Fontana Rosa
@@ -1332,7 +1409,6 @@ Q3078054,3,chateaux,Fort Saint-Louis
 Q3078133,3,chateaux,Fort d'Aubervilliers
 Q3078135,3,musees,Fort d'Uxegney
 Q3078183,3,chateaux,Fort de La Prée
-Q3078318,3,chateaux,Fort des Ayvelles
 Q3078321,3,chateaux,Fort des Dunes
 Q3078338,3,chateaux,Fort des Têtes
 Q3078387,3,chateaux,Fort du Portalet
@@ -1388,7 +1464,7 @@ Q3113539,2,iles,Grand Bé
 Q3114585,2,volcans,Grand Suchet
 Q3114891,3,plages,Grande Anse
 Q3116957,2,monuments,Gros-Horloge
-Q3117062,3,monuments,Grosse cloche de Bordeaux
+Q3117062,2,monuments,Grosse cloche de Bordeaux
 Q3117093,3,grottes,Grotte Duruthy
 Q3117102,3,grottes,Grotte Mandrin
 Q3117121,3,grottes,Grotte de Bruniquel
@@ -1404,9 +1480,12 @@ Q3117280,3,grottes,Grottes de Sare
 Q3124,2,megalithes,Amphithéâtre des Trois Gaules
 Q312445,3,chateaux,Château de Dinan
 Q3124818,1,maisons,Musée de la Maison Bonaparte
+Q3125381,3,maisons,Habitation-Sucrerie Clairefontaine
+Q3127505,3,jardins,Harmas de Jean-Henri Fabre
 Q3140928,3,musees,Hospice Comtesse
 Q3145715,3,musees,Hôtel d'Assézat
 Q3146116,3,chateaux,Hôtel de ville d'Angoulême
+Q3149052,3,maisons,Immeuble Franconie
 Q3151766,3,musees,Institut Lumière
 Q3162285,3,jardins,Jardin Anne-Frank
 Q3162304,3,jardins,Jardin Catherine-Labouré
@@ -1467,6 +1546,7 @@ Q3215502,1,lacs,Lac de Paladru
 Q3215504,2,lacs,Lac de Pannecière
 Q3215508,3,lacs,Lac de Payolle
 Q3215514,3,lacs,Lac de Pierre-Percée
+Q3215531,3,lacs,Lac de Saint-Agnan
 Q3215536,2,lacs,Lac de Saint-Andéol
 Q3215558,3,lacs,Lac de Sylans
 Q3215566,3,lacs,Lac de Tolla
@@ -1490,23 +1570,44 @@ Q3246739,3,monuments,Tour du Guet
 Q3246746,3,lacs,Lac de Schiessrothried
 Q325248,3,villages,Lussan
 Q325716,2,sommets,Hartmannswillerkopf
+Q3258023,3,maisons,Logis de la Vergne
+Q3258029,3,maisons,Logis du Maine-Giraud
 Q325826,1,villages,Pérouges
 Q3277885,3,musees,Musée des Beaux-Arts d'Angers
 Q3277928,3,musees,Musée de l'École de Nancy
-Q3278803,2,maisons,Maison Jean-Cocteau
-Q3278824,3,musees,Maison La Roche
+Q3278803,3,maisons,Maison Jean-Cocteau
+Q3279145,3,maisons,Maison d'Alexandra David-Néel
+Q3279371,3,maisons,Maison de Georges Clemenceau
+Q3279402,3,maisons,Maison de Jean Monnet
+Q3279449,3,maisons,Maison natale de Louis Pasteur à Dole
+Q3279453,3,maisons,Maison de Léon et Jeanne Blum
+Q3279523,3,maisons,Maison de Pierre Loti à Rochefort
+Q3279544,3,maisons,Maison de Robert Schuman
+Q3279553,3,maisons,Maison de Saint-Just
 Q3279585,2,maisons,Musée Marcel Proust
 Q3279781,3,musees,Maison de la Magie
+Q3279954,3,maisons,Maison des sœurs de Saint-Joseph-de-Cluny
+Q3280161,3,maisons,Maison forestière Wilfred Owen
 Q3280193,3,chateaux,Maison forte de Reignac
-Q3280225,3,musees,Maison natale de Charles de Gaulle
+Q3280225,2,maisons,Maison natale de Charles de Gaulle
+Q3280227,3,maisons,Maison natale de Condorcet
+Q3280230,3,maisons,Maison natale de François Mitterrand
+Q3280233,3,maisons,Maison natale de Jean-François Millet
+Q3280236,3,maisons,Maison natale de Jeanne d'Arc
+Q3280240,3,maisons,Maison de Camille et Paul Claudel
+Q3280244,3,maisons,Maison natale de Victor Hugo
+Q3280291,3,maisons,Maison « Le Paraïs »
+Q3280344,3,maisons,Maisons Satie
 Q3280855,3,jardins,Square René-Viviani
 Q328371,2,villages,Belcastel
+Q3286133,3,maisons,Manoir d'Ango
+Q3286385,3,maisons,Manoir des Sciences de Réaumur
 Q3287386,3,dunes-marais,Marais de La Villeneuve
 Q3287393,1,dunes-marais,Marais de Pen an Toul
 Q3287427,1,dunes-marais,Marais salants de Guérande
 Q3292683,3,monuments,Palais Cambon
 Q3298467,3,musees,Maternité suisse d'Elne
-Q329852,1,maisons,Palais du Luxembourg
+Q329852,3,monuments,Palais du Luxembourg
 Q32989,2,abbayes,Abbaye Notre-Dame du Bec
 Q331409,2,grottes,Abri de Cro-Magnon
 Q3320265,2,abbayes,Monastère de Cimiez
@@ -1523,30 +1624,50 @@ Q3322570,3,sommets,Monte Renoso
 Q3322576,3,sommets,Monte San Petrone
 Q3325352,3,megalithes,Motte de la Jacquille
 Q3325416,2,sommets,Le Moucherotte
+Q3325679,3,maisons,Moulin de Villeneuve
 Q3328231,3,jardins,Murs à pêches
+Q3329041,3,maisons,Musée Albert-Schweitzer
 Q3329056,3,musees,Musée Anne-de-Beaujeu
-Q3329085,3,musees,Musée Bartholdi
+Q3329073,3,maisons,Musée Barbey-d'Aurevilly
 Q3329089,3,musees,Musée Bargoin
+Q3329106,3,maisons,Musée Champollion
 Q3329113,3,musees,Musée Christian-Dior
-Q3329119,3,musees,Musée Clemenceau
-Q3329121,3,musees,Musée Courbet
+Q3329119,2,maisons,Musée Clemenceau
+Q3329121,2,maisons,Musée Courbet
 Q3329125,3,musees,Musée Crozatier
+Q3329144,3,maisons,Musée Ernest-Renan
 Q3329155,3,musees,Musée Eugène-Boudin
+Q3329160,3,maisons,Musée Flaubert et d'Histoire de la médecine
 Q3329161,3,musees,Musée Faure
+Q3329163,3,maisons,Musée Frédéric-Mistral
+Q3329174,3,maisons,Musée Gerty-Archimède
+Q3329177,3,maisons,Musée Goethe à l'Auberge au Bœuf
+Q3329193,3,maisons,Musée Hector-Berlioz
 Q3329201,3,musees,Musée Hyacinthe-Rigaud
-Q3329221,3,musees,Musée Jean-de-La-Fontaine
+Q3329205,3,maisons,Musée Hébert
+Q3329215,3,maisons,Musée Jean-Frédéric-Oberlin
+Q3329216,3,maisons,Musée Jean-Jacques-Rousseau
+Q3329221,2,maisons,Musée Jean-de-La-Fontaine
 Q3329245,3,musees,Musée Lambinet
 Q3329265,3,musees,Musée Marc-Chagall
 Q3329293,3,musees,Musée Nicolas-Poussin
+Q3329298,3,maisons,Musée Pascal-Paoli
+Q3329311,3,maisons,Musée Pierre-Corneille
+Q3329313,3,maisons,Musée Pierre-Corneille
+Q3329324,3,maisons,"Musée Rabelais, Maison La Devinière"
+Q3329329,3,maisons,Musée Robert-Tatin
 Q3329368,3,musees,Musée Thomas-Henry
 Q3329373,3,musees,Musée Tomi-Ungerer – Centre international de l'illustration
+Q3329378,3,maisons,Musée Verlaine
 Q3329383,3,musees,Musée Vesunna
+Q3329384,3,maisons,Musée Victor-Hugo
+Q3329394,3,maisons,Musée Zervos
 Q3329400,3,musees,Musée Ziem
-Q3329450,3,musees,Musée archéologique de Saintes
 Q3329501,3,musees,Musée des 24 Heures du Mans
 Q3329534,3,musees,Musée d'Aquitaine
 Q3329541,3,musees,Musée d'art moderne André-Malraux
 Q3329594,3,musees,Musée d'Art contemporain du Val-de-Marne
+Q3329609,3,maisons,Musée d'art et d'histoire Romain-Rolland
 Q3329619,3,musees,Musée d'art et d'histoire de Narbonne
 Q3329624,3,musees,Musée d'Art et d'Histoire de Saint-Brieuc
 Q3329627,3,musees,Musée d'art et d'histoire Paul Éluard
@@ -1566,6 +1687,7 @@ Q3329915,3,musees,Musée de la Légion d'honneur
 Q3329933,3,musees,Musée de la Monnaie de Paris
 Q3329952,3,musees,Musée de la Romanité
 Q3330102,3,musees,Musée de Préhistoire de Carnac
+Q3330111,3,musees,Musée des Archives nationales
 Q3330124,3,musees,Musée des Années Trente
 Q3330134,3,musees,Musée des Amériques - Auch
 Q3330186,3,musees,Musée des beaux-arts Denys-Puech
@@ -1593,11 +1715,11 @@ Q3330577,3,musees,Musée français de la photographie
 Q3330634,3,musees,Palais des ducs de Lorraine – Musée lorrain
 Q3330673,3,musees,Musée national Fernand-Léger
 Q3330705,3,musees,Musée national de l'espéranto
+Q3330714,3,maisons,Musée national Clemenceau-de-Lattre
 Q3330734,3,musees,Musée national du Sport
 Q3330758,3,musees,Musée portuaire de Dunkerque
 Q3330824,3,musees,Musée vivant du Cheval
 Q3330868,3,musees,Museum d'histoire naturelle d'Angers
-Q3330897,3,musees,Muséum d'histoire naturelle du Havre
 Q3332772,3,megalithes,Mégalithe de Guillay
 Q3333143,3,musees,Mémorial de Verdun
 Q3333147,3,monuments,Mémorial de l'abolition de l'esclavage
@@ -1620,7 +1742,6 @@ Q334131,3,abbayes,Abbaye de Saint-Amand
 Q334135,3,abbayes,Abbaye Saint-Aubin d'Angers
 Q334144,3,abbayes,Abbaye Saint-Bertin
 Q334150,3,abbayes,Abbaye Saint-Jean de Sorde
-Q334162,3,abbayes,Abbaye Saint-Martin de Ligugé
 Q334186,2,abbayes,Abbaye Royale de Saint-Germain-des-Prés
 Q334189,3,abbayes,Abbaye de Saint-Papoul
 Q334199,3,abbayes,Monastère Saint-Paul-de-Mausole
@@ -1634,17 +1755,14 @@ Q334243,3,abbayes,Abbaye royale de Saint-Wandrille de Fontenelle
 Q334254,3,abbayes,Abbaye Sainte-Marie d'Arles-sur-Tech
 Q334259,2,abbayes,Abbaye royale de Sainte-Marie de Lagrasse
 Q334263,1,abbayes,Abbaye Sainte-Marie de Fontfroide
-Q334315,3,abbayes,Abbaye de Sturzelbronn
 Q334358,2,abbayes,Abbaye Notre-Dame de Hambye
 Q335277,2,ponts,Pont Neuf
 Q3354378,3,megalithes,Oppidum de Nages
 Q3358725,3,musees,Ouvrage de Fermont
-Q3360877,3,musees,Palais Jacques-Cœur
 Q3360882,3,musees,Palais Lascaris
-Q3360910,3,monuments,Palais Rihour
-Q3361032,2,monuments,Palais des ducs d'Aquitaine
+Q3360910,2,monuments,Palais Rihour
+Q3361032,3,monuments,Palais des ducs d'Aquitaine
 Q3361034,3,monuments,Palais de l'Alma
-Q3361198,3,chateaux,Palais ducal de Nevers
 Q3361199,2,maisons,Palais idéal
 Q3361665,3,plages,Palombaggia
 Q3363846,3,jardins,Parc Kellermann
@@ -1655,6 +1773,7 @@ Q3364196,3,jardins,Parc de la Butte du Chapeau-Rouge
 Q3364353,3,jardins,Parc du Mugel
 Q3364656,3,jardins,Parc omnisports Suzanne-Lenglen
 Q336923,3,grottes,Abîme de Bramabiau
+Q3373023,3,maisons,Pavillon Flaubert
 Q3373902,2,megalithes,Pech Maho
 Q3377210,1,volcans,Petit Suchet
 Q3378183,2,phares,Phare de Biarritz
@@ -1710,10 +1829,12 @@ Q3399930,2,jardins,Potager du roi
 Q3402438,2,plages,Presqu'île d'Arvert
 Q3402445,3,plages,Presqu'île de Kermorvan
 Q3402460,3,plages,Presque'île de la Caravelle
+Q3402944,3,abbayes,Abbaye Sainte-Marie de La Garde
 Q3402951,3,abbayes,Prieuré clunisien de Souvigny
 Q3403034,2,maisons,Prieuré de Saint-Cosme
 Q3403076,3,abbayes,Chartreuse de Molsheim
 Q3406130,3,cathedrales,Pro-cathédrale Sainte-Marie de Bastia
+Q3407582,3,maisons,Propriété Caillebotte
 Q3411078,1,volcans,Puy Pariou
 Q3411084,3,volcans,Puy de Chalard
 Q3411087,2,volcans,Puy de Côme
@@ -1776,6 +1897,8 @@ Q3546930,3,sommets,Tête de Chien
 Q3556312,3,megalithes,Verziau de Gargantua
 Q3556548,2,ponts,Viaduc de Busseau
 Q3556677,3,ponts,Viaduc de la Savoureuse
+Q3558455,1,maisons,Villa Arnaga
+Q3558853,3,maisons,Villa des Brillants
 Q3558912,3,megalithes,Villa gallo-romaine de Lassalles
 Q3558989,2,megalithes,Village des bories
 Q3562320,3,cascades,Voile de la Mariée
@@ -1789,7 +1912,6 @@ Q3591678,3,lacs,Étang de Canet-Saint-Nazaire
 Q3591718,3,lacs,Étang de Saint-Quentin
 Q3591786,2,dunes-marais,Étangs de Villepey
 Q3592820,3,villages,Évol
-Q3593182,3,iles,Île Portal
 Q3593353,3,plages,Île de Cayenne
 Q3593460,2,iles,Île des Embiez
 Q3593548,3,chateaux,Îles Saint-Marcouf
@@ -1807,6 +1929,7 @@ Q377882,2,abbayes,Abbaye de Royaumont
 Q378381,2,phares,Phare du Bout du Monde
 Q378453,3,chateaux,Château de Malbrouck
 Q379387,3,abbayes,Prieuré Saint-Michel de Grandmont
+Q3796698,2,maisons,Immeuble Molitor
 Q38180982,2,cascades,Cascades du Mont-Dore
 Q382272,3,villages,Monflanquin
 Q382281,1,villages,Monpazier
@@ -1826,7 +1949,7 @@ Q391823,3,musees,Musée Rolin
 Q392278,2,lacs,Lac des Settons
 Q3962375,2,megalithes,Le Fâ
 Q3991,2,jardins,Parc de la Tête d'Or
-Q404728,1,sommets,Aiguille du Midi
+Q404728,3,sommets,Aiguille du Midi
 Q4055,2,chateaux,Château de Blois
 Q405543,1,musees,Louvre-Lens
 Q406723,1,phares,Phare de Nividic
@@ -1836,7 +1959,7 @@ Q425789,3,chateaux,Château de Castelnau-Bretenoux
 Q428765,2,musees,Musée des Beaux-Arts de Nancy
 Q429513,3,musees,Musée des Blindés de Saumur
 Q435667,3,cathedrales,Ancienne cathédrale de Cambrai
-Q43688220,2,maisons,Musée Yves Saint Laurent Paris
+Q43688220,3,maisons,Musée Yves Saint Laurent Paris
 Q440579,3,chateaux,Château du Clos de Vougeot
 Q4406086,1,forets,Forêt domaniale de la Coubre
 Q440833,3,chateaux,Château du Vieux-Windstein
@@ -1893,6 +2016,7 @@ Q504710,2,ponts,Pont de Normandie
 Q507020,3,chateaux,Palais des Rois de Majorque
 Q508651,2,megalithes,Grand menhir brisé d'Er Grah
 Q509,3,musees,Lugdunum
+Q5104097,3,cathedrales,Cathédrale Saint-Louis-et-Saint-Nicolas de Choisy-le-Roi
 Q511,2,musees,Musée des Beaux-Arts de Lyon
 Q511492,3,chateaux,Château de Commarin
 Q5118736,3,chateaux,Château de Beaucaire
@@ -1901,7 +2025,7 @@ Q5121974,1,cirques,Cirque d'Estaubé
 Q513300,1,cathedrales,Cathédrale Saint-Pierre de Beauvais
 Q516697,2,chateaux,Château de Compiègne
 Q516783,3,megalithes,Temple romain de Château-Bas
-Q518747,2,maisons,Villa Cavrois
+Q518747,3,maisons,Villa Cavrois
 Q519572,3,abbayes,Abbaye de Murbach
 Q522779,1,chateaux,Château de Chaumont-sur-Loire
 Q524185,3,sommets,Pointe de la Grande Journée
@@ -1942,10 +2066,9 @@ Q574056,3,chateaux,Château de Cormatin
 Q576534,3,chateaux,Château de Coucy
 Q576569,3,chateaux,Château de Beauregard
 Q576704,1,lacs,Lac d'Annecy
-Q577444,3,chateaux,Château de Champlâtreux
 Q577783,3,chateaux,Château de La Palice
 Q577871,2,jardins,Jardin d'agronomie tropicale de Paris
-Q578771,1,maisons,Palais du Tau
+Q578771,2,monuments,Palais du Tau
 Q579961,3,chateaux,Château d'Ancy-le-Franc
 Q581818,3,grottes,Site du Regourdou
 Q583988,3,villages,Gargilesse-Dampierre
@@ -1954,7 +2077,8 @@ Q585947,2,cathedrales,Cathédrale Notre-Dame de Laon
 Q586471,3,cathedrales,Cathédrale Saint-Étienne de Meaux
 Q588604,3,plages,Pointe de la Grande Vigie
 Q589000,3,ponts,Pont du Carrousel
-Q589336,3,musees,Musée Curie
+Q589336,2,maisons,Musée Curie
+Q58957767,3,maisons,Maison natale Dominique Jean Larrey
 Q590012,3,sommets,Urkulu
 Q591,3,abbayes,Abbaye Notre-Dame de Fontgombault
 Q591296,2,abbayes,Abbaye de Pontigny
@@ -1972,6 +2096,7 @@ Q604550,2,jardins,Jardin des serres d'Auteuil
 Q605024,3,lacs,Lac de Remoray
 Q605912,3,ponts,Passerelle Léopold-Sédar-Senghor
 Q607372,1,volcans,Puy de Dôme
+Q60832377,3,maisons,Musée Maillol de Banyuls-sur-Mer
 Q60850205,3,dunes-marais,Salins de Gruissan
 Q608624,3,chateaux,Château de Courtanvaux
 Q60964146,3,musees,Fondation Henri Cartier-Bresson
@@ -1981,8 +2106,9 @@ Q614450,3,musees,Palais de la découverte
 Q614979,3,grottes,Grotte du Visage
 Q6159686,3,jardins,Serre de la Madone
 Q6159735,3,jardins,Jardin botanique de Sedan
-Q6159750,3,jardins,Villa Thuret
+Q6159750,2,maisons,Villa Thuret
 Q6159771,3,jardins,Jardin botanique du col de Saverne
+Q61895929,3,maisons,Maison natale de Gaston Doumergue
 Q621803,3,villages,Apremont-sur-Allier
 Q622500,2,chateaux,Château d'If
 Q622710,3,villages,Saint-Léon-sur-Vézère
@@ -2026,7 +2152,7 @@ Q6403,1,lacs,Léman
 Q640447,3,musees,Musée Carnavalet
 Q64107,1,lacs,Lac de Vouglans
 Q641548,2,megalithes,Arènes de Lutèce
-Q643186,2,monuments,Palais du Rhin
+Q643186,3,monuments,Palais du Rhin
 Q64436,1,monuments,Arc de triomphe de l'Étoile
 Q644398,3,ponts,Pont de la Concorde
 Q6464149,3,megalithes,La Noce de Pierres
@@ -2055,6 +2181,7 @@ Q660013,2,villages,Minerve
 Q660510,3,villages,Loubressac
 Q663232,2,villages,Talmont-sur-Gironde
 Q663673,2,chateaux,Château de Vincennes
+Q6650,3,sommets,Pic du Canigou
 Q665265,3,chateaux,Château d'Ambleville
 Q665776,3,villages,Crissay-sur-Manse
 Q667763,1,chateaux,Château de Quéribus
@@ -2071,7 +2198,6 @@ Q675625,3,villages,Baume-les-Messieurs
 Q677543,3,jardins,Jardins des Champs-Élysées
 Q677659,1,megalithes,Maison carrée
 Q677814,2,megalithes,La Graufesenque
-Q678270,3,chateaux,Château de Caumont
 Q680238,3,villages,Château-Chalon
 Q6806980,3,megalithes,Mediolanum Santonum
 Q6815492,3,musees,Mémorial Pegasus
@@ -2087,6 +2213,7 @@ Q686958,3,villages,Le Bec-Hellouin
 Q687057,1,gorges,Gorges du Verdon
 Q688400,3,villages,Bargème
 Q690981,3,villages,Gerberoy
+Q6943608,3,musees,Musée du Berry
 Q7093,3,sommets,Puig Neulós
 Q7208317,3,plages,Pointe Béhague
 Q724929,3,chateaux,Château de Fougères
@@ -2104,7 +2231,6 @@ Q736943,3,megalithes,Vallée des Merveilles
 Q739028,3,cathedrales,Cathédrale Saint-Paul-Aurélien de Saint-Pol-de-Léon
 Q739976,2,chateaux,Château de Vaux-le-Vicomte
 Q740250,3,chateaux,Château de Tarascon
-Q741450,3,chateaux,Château de La Bourdaisière
 Q743206,3,musees,Musée Picasso
 Q744309,3,chateaux,Fort Libéria
 Q745084,3,abbayes,Abbaye de la Trinité de Vendôme
@@ -2115,6 +2241,7 @@ Q747306,3,chateaux,Fort la Latte
 Q747588,1,megalithes,Trophée des Alpes
 Q748241,3,sommets,Grand Colombier
 Q74824372,2,cascades,Cascade de Syratu
+Q748956,3,maisons,Habitation Clément
 Q749158,3,villages,Sainte-Eulalie-d'Olt
 Q749491,3,ponts,Viaduc des Arts
 Q751961,3,villages,Saint-Cirq-Lapopie
@@ -2162,7 +2289,7 @@ Q790408,1,grottes,Aven d'Orgnac
 Q7922962,3,megalithes,Vertillum
 Q799744,3,sommets,Baerenkopf
 Q803523,3,chateaux,Fort de Romainville
-Q8049,2,maisons,Grand Trianon
+Q8049,3,chateaux,Grand Trianon
 Q805255,3,musees,Salle du Jeu de paume
 Q808456,1,megalithes,Cairn de Barnenez
 Q810098,2,cathedrales,Basilique Sainte-Thérèse de Lisieux
@@ -2199,7 +2326,7 @@ Q837592,2,villages,La Roche-Guyon
 Q83766,3,villages,Hunawihr
 Q838322,2,villages,Vouvant
 Q839242,3,chateaux,Hohlandsbourg
-Q839251,2,maisons,Maison de verre
+Q839251,3,maisons,Maison de verre
 Q839285,2,ponts,Pont Gustave-Flaubert
 Q839312,3,musees,Musée de l'Aventure Peugeot
 Q840520,3,villages,Sainte-Suzanne
@@ -2217,11 +2344,11 @@ Q847628,3,cathedrales,Cathédrale Saint-Étienne de Cahors
 Q85166,2,sommets,Cornettes de Bise
 Q853703,3,abbayes,Couvent des Cordeliers de Paris
 Q8564802,3,chateaux,Fort de Villiers
-Q856640,3,musees,La Contemporaine
 Q857276,3,musees,Musée d'Art moderne de Paris
 Q858102,1,plages,Cap Corse
 Q860166,3,musees,Institut du monde arabe
 Q860994,3,musees,Musée national des Arts asiatiques - Guimet
+Q86663464,3,maisons,Musée Raymond-Devos
 Q86665428,3,jardins,Jardin Shamrock
 Q8668,2,jardins,Jardin botanique de Lyon
 Q8670,2,jardins,Jardin Rosa Mir
@@ -2242,6 +2369,7 @@ Q9026818,3,musees,Hôtel-Dieu de Carpentras
 Q902972,3,villages,Monestiés
 Q904022,3,villages,La Garde-Guérin
 Q905650,3,chateaux,Château d'Oiron
+Q90702638,3,maisons,Hôtel de Fermat
 Q907505,3,cathedrales,Cathédrale Notre-Dame de Sées
 Q91012975,2,cascades,Cascade de Baume-les-Messieurs
 Q91200352,2,cascades,Cascade du Bout du Monde
@@ -2252,7 +2380,6 @@ Q914013,1,rochers,Rocher de la Vierge de Biarritz
 Q914743,1,grottes,Grotte de Font-de-Gaume
 Q915291,2,abbayes,Abbaye de Maubuisson
 Q916383,3,megalithes,Pont des Marchands
-Q917337,3,musees,Hôtel de Soubise
 Q917914,2,megalithes,Alignement de Rinaghju
 Q919028,2,cathedrales,Cathédrale Saint-Pierre de Vannes
 Q919415,3,villages,Eus
@@ -2265,12 +2392,13 @@ Q929191,2,lacs,Lac de Saint-Ferréol
 Q931768,3,lacs,Lac de Wildenstein
 Q932828,3,cathedrales,Cathédrale Notre-Dame de Noyon
 Q933691,2,villages,Mornac-sur-Seudre
+Q93444238,3,maisons,Musée Francis Jammes
 Q934764,3,cathedrales,Cathédrale Notre-Dame du Réal
-Q936633,2,monuments,Palais Bourbon
+Q936633,3,monuments,Palais Bourbon
 Q938010,2,sommets,Mont Granier
 Q938847,3,abbayes,Abbaye de Bourras
 Q940137,3,cathedrales,Cathédrale Saint-Louis de Fort-de-France
-Q940746,2,maisons,Villa Savoye
+Q940746,3,maisons,Villa Savoye
 Q942434,2,jardins,Parc du Thabor
 Q944597,3,chateaux,Château de Peyrepertuse
 Q944730,3,jardins,Parc arboretum de Montfermeil
@@ -2279,7 +2407,6 @@ Q946727,3,villages,Sainte-Croix-en-Jarez
 Q946883,3,musees,Musée Maillol
 Q946953,3,villages,Lods
 Q94744,2,cathedrales,Cathédrale Sainte-Cécile d'Albi
-Q947479,3,chateaux,Château de Chantemille
 Q947645,3,chateaux,Château de Montrichard
 Q947669,3,chateaux,Château du Moulin
 Q948136,3,chateaux,Château de Rambures
@@ -2302,6 +2429,7 @@ Q963509,2,ponts,Pont Marie
 Q964638,3,chateaux,Château de Ripaille
 Q964781,2,phares,Nouveau phare de Gatteville
 Q965780,2,musees,Musée Granet
+Q967049,3,maisons,Les Charmettes
 Q968431,3,megalithes,Roquepertuse
 Q971002,2,phares,Phare de Kéréon
 Q972128,2,megalithes,Théâtre antique d'Arles
@@ -2313,6 +2441,7 @@ Q975257,3,megalithes,La Micoque
 Q975925,2,cathedrales,Basilique Notre-Dame-de-la-Garde
 Q976038,3,chateaux,Château de Montgeoffroy
 Q977732,3,musees,Musée d'art et d'histoire du judaïsme
+Q98076048,3,maisons,Maison de Nostradamus
 Q981723,2,abbayes,Abbaye de Gellone
 Q991088,2,sommets,Plomb du Cantal
 Q99218,3,megalithes,Porte Noire
