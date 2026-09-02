@@ -325,6 +325,22 @@ def fetch_adopted_places(
     return places
 
 
+def already_held(raw_dir: Path, replaced: set[str]) -> set[str]:
+    """Les lieux qu'une collecte antérieure possède et que celle-ci ne refait pas.
+
+    Sert à ne pas faire rentrer une deuxième fois, par un candidat adopté ou
+    par une liste d'État, un lieu qu'un thème détient déjà. Les fichiers que la
+    collecte du jour va réécrire sont exclus : leur contenu n'est plus une
+    garantie, et un lieu que la nouvelle requête ne rend plus ne doit pas
+    passer pour acquis.
+    """
+    return {
+        place.wikidata_id
+        for place in read_raw(raw_dir)
+        if shard_of(place) not in replaced
+    }
+
+
 def _theme_of_classes(classes: set[str], config: Config) -> Theme | None:
     """Le premier thème, dans l'ordre de la configuration, qui revendique une
     de ces classes. L'ordre de `themes.yaml` est déjà la priorité éditoriale —
@@ -1033,7 +1049,21 @@ def run_fetch(
     # Les candidats adoptés ne complètent que ce qui manque : quand une requête
     # par classe a déjà trouvé le lieu, c'est ce rattachement-là qui vaut, pas
     # le thème deviné depuis une balise OpenStreetMap.
-    known = {place.wikidata_id for place in places}
+    # Ce que la collecte ENTIÈRE possède déjà, et pas seulement celle du jour.
+    #
+    # Après `fetch --only cascades`, les châteaux ne sont pas dans `places` :
+    # les candidats adoptés et les membres de label rentraient alors une
+    # seconde fois, en doublons, et le fichier `ajouts` gonflait de quatre-
+    # vingt-treize lieux selon la façon dont on avait lancé la collecte. Un
+    # découpage par thème n'a de sens que si le résultat n'en dépend pas.
+    #
+    # Les thèmes recollectés aujourd'hui sont exclus du compte : leur fichier
+    # va être réécrit, et un lieu que la nouvelle requête ne rend plus ne doit
+    # pas passer pour acquis. Les ajouts le sont aussi — ce sont justement ceux
+    # qu'il faut recollecter à chaque passage pour qu'ils survivent.
+    acquis = already_held(raw_dir, {theme.id for theme in themes} | {EXTRA_SHARD})
+
+    known = acquis | {place.wikidata_id for place in places}
     adopted = [
         place
         for place in fetch_adopted_places(client, config, manual_dir)
@@ -1043,17 +1073,11 @@ def run_fetch(
 
     # Les listes d'État qui vont chercher leurs membres, en dernier : elles ne
     # complètent que ce qu'aucun thème n'a trouvé.
-    #
-    # « Aucun thème » se lit sur TOUTE la collecte, pas sur celle du jour :
-    # après un `fetch --only cascades`, les châteaux ne sont pas dans `places`
-    # et le label irait recollecter des lieux que le thème possède déjà. Les
-    # ajouts, eux, restent hors du compte — ce sont justement ceux qu'il faut
-    # recollecter à chaque passage pour qu'ils survivent à la réécriture.
-    deja = {p.wikidata_id for p in places} | {
-        p.wikidata_id for p in read_raw(raw_dir) if shard_of(p) != EXTRA_SHARD
-    }
     try:
-        places += fetch_labelled_places(client, config, label_members, deja)
+        places += fetch_labelled_places(
+            client, config, label_members,
+            acquis | {place.wikidata_id for place in places},
+        )
     except Exception as exc:  # noqa: BLE001 — un label en échec ne tue pas la collecte
         LOG.error("labels collecteurs : collecte échouée (%s)", exc)
 

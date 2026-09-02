@@ -4175,3 +4175,45 @@ class TestLabelFetchScope(unittest.TestCase):
         venu = make_place("Citadelle inscrite", "chateaux")
         venu.source = "label"
         self.assertEqual(shard_of(venu), EXTRA_SHARD)
+
+
+class TestAlreadyHeld(unittest.TestCase):
+    """Ce qu'une collecte partielle doit considérer comme déjà acquis.
+
+    Après `fetch --only cascades`, les châteaux ne sont pas dans la collecte du
+    jour. Sans ce garde-fou, les candidats adoptés et les membres de listes
+    d'État rentraient une seconde fois : le fichier `ajouts` gonflait de
+    quatre-vingt-treize lieux selon la façon dont on avait lancé la collecte.
+    """
+
+    def _raw(self, dossier, places):
+        from roam_pipeline.raw import write_raw, shard_of
+        write_raw(Path(dossier), places, {shard_of(p) for p in places})
+        return Path(dossier)
+
+    def test_a_theme_not_refetched_still_holds_its_places(self):
+        from roam_pipeline.fetch import already_held
+        with tempfile.TemporaryDirectory() as dossier:
+            raw = self._raw(dossier, [make_place("Château tenu", "chateaux",
+                                                 wikidata_id="Q1")])
+            self.assertEqual(already_held(raw, {"cascades", "ajouts"}), {"Q1"})
+
+    def test_a_theme_being_refetched_holds_nothing(self):
+        # Son fichier va être réécrit : un lieu que la nouvelle requête ne rend
+        # plus ne doit pas passer pour acquis, sinon il disparaît sans recours.
+        from roam_pipeline.fetch import already_held
+        with tempfile.TemporaryDirectory() as dossier:
+            raw = self._raw(dossier, [make_place("Cascade", "cascades",
+                                                 wikidata_id="Q2")])
+            self.assertEqual(already_held(raw, {"cascades", "ajouts"}), set())
+
+    def test_the_extra_shard_never_holds_anything(self):
+        # Les ajouts sont recollectés à chaque passage ; les compter comme
+        # acquis les empêcherait de l'être et les ferait disparaître.
+        from roam_pipeline.fetch import already_held
+        from roam_pipeline.raw import EXTRA_SHARD
+        with tempfile.TemporaryDirectory() as dossier:
+            venu = make_place("Citadelle inscrite", "chateaux", wikidata_id="Q3")
+            venu.source = "label"
+            raw = self._raw(dossier, [venu])
+            self.assertEqual(already_held(raw, {"cascades", EXTRA_SHARD}), set())
