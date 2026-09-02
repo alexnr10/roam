@@ -358,6 +358,7 @@ def fetch_labelled_places(
     config: Config,
     label_members: dict[str, set[str]],
     known: set[str],
+    out_dir: Path | None = None,
 ) -> list[Place]:
     """Les membres d'un label déclaré `collects`, que nul thème n'a collectés.
 
@@ -439,7 +440,35 @@ def fetch_labelled_places(
             len(orphelins), echantillon,
             f" (+{len(orphelins) - 12})" if len(orphelins) > 12 else "",
         )
+        if out_dir is not None:
+            _write_orphans(out_dir, orphelins, noms, voulus)
     return places
+
+
+LABEL_ORPHANS = "label-orphelins.csv"
+
+
+def _write_orphans(
+    out_dir: Path,
+    orphelins: list[str],
+    noms: dict[str, str],
+    voulus: dict[str, set[str]],
+) -> None:
+    """Les membres écartés, sur disque plutôt que dans un journal qui défile.
+
+    Douze noms dans une ligne de log suffisent à voir de quoi il s'agit ; ils ne
+    suffisent pas à décider. Les cent trente-neuf sites funéraires de la
+    Première Guerre mondiale, inscrits d'un bloc en 2023, sont un choix
+    éditorial à eux seuls — on les prend tous ou aucun, et ça se regarde sur
+    une liste, pas au fil d'une collecte.
+    """
+    chemin = out_dir / LABEL_ORPHANS
+    lignes = ["wikidata_id,name,labels"]
+    for qid in orphelins:
+        nom = (noms.get(qid, qid) or qid).replace('"', "'")
+        lignes.append(f'{qid},"{nom}",{" ".join(sorted(voulus[qid]))}')
+    chemin.write_text("\r\n".join(lignes) + "\r\n", encoding="utf-8")
+    LOG.info("membres écartés listés dans %s", chemin)
 
 
 def _entity_names(client: wd.SparqlClient, qids: list[str]) -> dict[str, str]:
@@ -1077,6 +1106,7 @@ def run_fetch(
         places += fetch_labelled_places(
             client, config, label_members,
             acquis | {place.wikidata_id for place in places},
+            out_dir=out_dir,
         )
     except Exception as exc:  # noqa: BLE001 — un label en échec ne tue pas la collecte
         LOG.error("labels collecteurs : collecte échouée (%s)", exc)

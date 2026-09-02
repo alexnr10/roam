@@ -4217,3 +4217,37 @@ class TestAlreadyHeld(unittest.TestCase):
             venu.source = "label"
             raw = self._raw(dossier, [venu])
             self.assertEqual(already_held(raw, {"cascades", EXTRA_SHARD}), set())
+
+
+class TestLabelOrphansFile(unittest.TestCase):
+    """Les membres écartés, sur disque plutôt que dans un journal qui défile.
+
+    Les cent trente-neuf sites funéraires de la Première Guerre mondiale,
+    inscrits d'un bloc, sont un choix éditorial à eux seuls : on les prend tous
+    ou aucun, et ça se regarde sur une liste.
+    """
+
+    class _Client:
+        def query(self, requete):
+            if "?item ?class" in requete:
+                return []          # aucune classe de thème ne les revendique
+            if "?itemDescription" in requete:
+                return [{"item": "http://www.wikidata.org/entity/Q1",
+                         "itemLabel": "cimetière militaire Germania"}]
+            return []
+
+    def test_the_discarded_members_are_written_with_their_label(self):
+        from roam_pipeline.fetch import LABEL_ORPHANS, fetch_labelled_places
+        config = replace(CONFIG, labels=[
+            replace(label, collects=(label.id == "unesco")) for label in CONFIG.labels
+        ])
+        with tempfile.TemporaryDirectory() as dossier:
+            out = Path(dossier)
+            with _capture():
+                places = fetch_labelled_places(
+                    self._Client(), config, {"unesco": {"Q1"}}, set(), out_dir=out)
+            self.assertEqual(places, [])
+            ecrit = (out / LABEL_ORPHANS).read_text(encoding="utf-8")
+        self.assertIn("Q1", ecrit)
+        self.assertIn("cimetière militaire Germania", ecrit)
+        self.assertIn("unesco", ecrit)
