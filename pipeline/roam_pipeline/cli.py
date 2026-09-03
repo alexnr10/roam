@@ -1012,6 +1012,13 @@ def _resolve_chez_wikidata(
     identifiant dans une liste officielle. Ceux-là repartent en arbitrage.
     """
     client = wd.SparqlClient()
+    # La requête interroge plusieurs casses du même nom — Wikidata écrit
+    # « forêt de Fontainebleau » sans majuscule. Le résultat revient sous la
+    # graphie trouvée : on le replie sur le nom que le curateur a écrit, sans
+    # quoi la ligne ne se rattache à aucune entrée de sa liste.
+    origine = {
+        forme: nom for nom in noms for forme in wd.label_casings(nom)
+    }
     par_nom: dict[str, list[tuple[str, str]]] = defaultdict(list)
     for batch in wd.chunked(noms, 150):
         try:
@@ -1021,8 +1028,8 @@ def _resolve_chez_wikidata(
             continue
         for row in rows:
             qid = wd.qid_from_uri(row.get("item"))
-            nom = row.get("nom")
-            if qid and nom:
+            nom = origine.get(row.get("nom") or "", row.get("nom"))
+            if qid and nom and (qid, row.get("itemLabel") or nom) not in par_nom[nom]:
                 par_nom[nom].append((qid, row.get("itemLabel") or nom))
 
     trouves = [

@@ -3624,6 +3624,41 @@ class TestSilentLabels(unittest.TestCase):
         self.assertIn("label-plus-beaux-detours", {c.slug for c in faites})
 
 
+class TestLabelCasings(unittest.TestCase):
+    """Wikidata écrit « forêt de Fontainebleau » sans majuscule.
+
+    Un massif forestier est un nom commun. La comparaison de libellé se fait au
+    caractère près, majuscule comprise : quarante-quatre graphies des seize
+    Forêts d'Exception ont rendu ZÉRO, alors que Fontainebleau y est avec
+    vingt-huit versions linguistiques et la bonne classe.
+    """
+
+    def test_both_casings_are_asked(self):
+        formes = wd.label_casings("Forêt de Fontainebleau")
+        self.assertIn("Forêt de Fontainebleau", formes)
+        self.assertIn("forêt de Fontainebleau", formes)
+
+    def test_a_lowercase_name_also_gets_its_capital(self):
+        formes = wd.label_casings("forêt de Bercé")
+        self.assertIn("Forêt de Bercé", formes)
+
+    def test_no_duplicate_when_the_case_does_not_change(self):
+        # « L'Isle-Adam » ne produit qu'une forme utile de plus, pas trois.
+        self.assertEqual(len(wd.label_casings("Étretat")), 2)
+        self.assertEqual(wd.label_casings(""), [])
+
+    def test_only_the_first_letter_moves(self):
+        # « Val-d'Oise » ne doit pas devenir « val-d'oise » : le reste du nom
+        # est intact, et c'est ce qui garde la comparaison exacte.
+        self.assertEqual(wd.label_casings("Val Suzon"),
+                         ["Val Suzon", "val Suzon"])
+
+    def test_the_query_carries_every_form(self):
+        requete = wd.label_lookup_query(["Forêt de Bercé"], "Q4421")
+        self.assertIn('"Forêt de Bercé"@fr', requete)
+        self.assertIn('"forêt de Bercé"@fr', requete)
+
+
 class TestLabelQueryKinds(unittest.TestCase):
     """Toute liste utile n'est pas une désignation patrimoniale.
 

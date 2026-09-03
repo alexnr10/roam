@@ -464,6 +464,26 @@ SELECT DISTINCT ?item WHERE {{
 """
 
 
+def label_casings(nom: str) -> list[str]:
+    """Le nom tel qu'il est, et ses variantes de casse initiale.
+
+    Wikidata écrit les noms propres avec une majuscule et les noms communs
+    sans, et un massif forestier est un nom commun : « forêt de Fontainebleau »,
+    pas « Forêt de Fontainebleau ». La comparaison de libellé se fait au
+    caractère près, majuscule comprise — quarante-quatre graphies des seize
+    Forêts d'Exception ont ainsi rendu ZÉRO, alors que Fontainebleau est sur
+    Wikidata avec vingt-huit versions linguistiques et la bonne classe.
+
+    Trois formes exactes plutôt qu'une comparaison insensible à la casse : la
+    seconde interdirait à Wikidata d'utiliser son index de libellés, et la
+    requête passerait de quelques secondes à un délai dépassé.
+    """
+    if not nom:
+        return []
+    formes = [nom, nom[0].lower() + nom[1:], nom[0].upper() + nom[1:]]
+    return list(dict.fromkeys(formes))
+
+
 def label_lookup_query(names: list[str], class_qid: str) -> str:
     """Q-ids français dont le libellé français est EXACTEMENT l'un de ces noms.
 
@@ -474,10 +494,12 @@ def label_lookup_query(names: list[str], class_qid: str) -> str:
     La classe borne la recherche — « commune française » pour un village — ce
     qui écarte d'emblée le fromage de Rocamadour et le canton québécois du même
     nom. Le libellé doit correspondre au caractère près : c'est ce qui permet
-    d'écrire le résultat sans le faire relire.
+    d'écrire le résultat sans le faire relire. La CASSE INITIALE fait exception,
+    parce qu'elle ne distingue rien — voir `label_casings`.
     """
     values = " ".join(
-        '"%s"@fr' % nom.replace("\\", "\\\\").replace('"', '\\"') for nom in names
+        '"%s"@fr' % forme.replace("\\", "\\\\").replace('"', '\\"')
+        for nom in names for forme in label_casings(nom)
     )
     return f"""
 SELECT DISTINCT ?nom ?item ?itemLabel WHERE {{
