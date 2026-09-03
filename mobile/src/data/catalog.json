@@ -57,7 +57,7 @@
   },
   {
    "id": "jardins",
-   "name": "Jardins remarquables",
+   "name": "Parcs et jardins",
    "nameSingular": "Jardin",
    "icon": "garden"
   },
@@ -47475,7 +47475,7 @@
   },
   {
    "slug": "theme-jardins",
-   "name": "Jardins remarquables",
+   "name": "Parcs et jardins",
    "kind": "theme",
    "themeId": "jardins",
    "labelId": null,
@@ -76095,7 +76095,7 @@
   },
   {
    "slug": "jardins-region-11",
-   "name": "Jardins remarquables d'Île-de-France",
+   "name": "Parcs et jardins d'Île-de-France",
    "kind": "geo",
    "themeId": "jardins",
    "labelId": null,

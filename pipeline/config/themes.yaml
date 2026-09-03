@@ -307,7 +307,12 @@ themes:
   # écrire de mémoire, c'est la règle depuis la première collecte.
 
   - id: jardins
-    name: Jardins remarquables
+    # PAS « Jardins remarquables » : « Jardin remarquable » est le nom d'un
+    # label officiel du ministère de la Culture, qui a sa propre collection.
+    # Les deux se suivaient dans la liste, à un pluriel près, et rien ne disait
+    # laquelle contenait quoi. Le nom appartient au label ; le thème prend
+    # celui de ce qu'il rassemble — et `name_hints` le disait déjà.
+    name: Parcs et jardins
     name_singular: Jardin
     name_hints: [jardin, parc, arboretum, roseraie]
     icon: garden

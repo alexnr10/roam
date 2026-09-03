@@ -12,10 +12,11 @@ import json
 import re
 import sys
 import tempfile
+import unicodedata
 from contextlib import contextmanager
 from io import StringIO
 import unittest
-from collections import Counter
+from collections import Counter, defaultdict
 from dataclasses import replace
 from pathlib import Path
 
@@ -172,6 +173,51 @@ class TestConfig(unittest.TestCase):
         )
         with self.assertRaises(ValueError):
             _validate([broken], CONFIG.labels)
+
+
+class TestCollectionNamesAreDistinguishable(unittest.TestCase):
+    """Deux collections ne doivent pas porter le même nom à un pluriel près.
+
+    Le thème s'appelait « Jardins remarquables » et le label « Jardin
+    remarquable » — le second est le nom officiel du ministère de la Culture,
+    le premier le lui avait emprunté. Dans la liste, deux entrées se suivaient
+    sans que rien ne dise laquelle contenait quoi.
+
+    `drop_twin_collections` ne voyait rien : il compare des noms exacts ET des
+    listes de lieux identiques. Ici les deux différaient. C'est le NOM seul qui
+    est en cause, parce que c'est tout ce que l'utilisateur a pour choisir.
+    """
+
+    @staticmethod
+    def _pli(nom: str) -> str:
+        """Le nom tel qu'on le distingue d'un coup d'œil : sans accents, sans
+        casse, sans pluriel."""
+        sans_accent = "".join(
+            c for c in unicodedata.normalize("NFD", nom.lower())
+            if not unicodedata.combining(c)
+        )
+        mots = re.findall(r"[a-z0-9]+", sans_accent)
+        return " ".join(m[:-1] if m.endswith("s") and len(m) > 4 else m for m in mots)
+
+    def test_no_theme_name_collides_with_a_label_name(self):
+        par_pli = defaultdict(list)
+        for theme in CONFIG.themes:
+            par_pli[self._pli(theme.name)].append(f"thème « {theme.name} »")
+        for label in CONFIG.labels:
+            par_pli[self._pli(label.name)].append(f"label « {label.name} »")
+
+        collisions = {pli: noms for pli, noms in par_pli.items() if len(noms) > 1}
+        self.assertEqual(collisions, {}, f"noms indistinguables : {collisions}")
+
+    def test_the_folding_catches_the_case_that_slipped_through(self):
+        self.assertEqual(self._pli("Jardins remarquables"), self._pli("Jardin remarquable"))
+        # Mais pas deux noms qui partagent seulement un mot générique : le thème
+        # « Monuments et édifices remarquables » et le label « Monument
+        # historique classé » se distinguent très bien.
+        self.assertNotEqual(
+            self._pli("Monuments et édifices remarquables"),
+            self._pli("Monument historique classé"),
+        )
 
 
 class TestGeo(unittest.TestCase):
