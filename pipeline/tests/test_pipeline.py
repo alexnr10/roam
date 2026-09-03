@@ -16,6 +16,7 @@ import unicodedata
 from contextlib import contextmanager
 from io import StringIO
 import unittest
+import unittest.mock
 from collections import Counter, defaultdict
 from dataclasses import replace
 from pathlib import Path
@@ -3495,6 +3496,46 @@ class TestPin(unittest.TestCase):
             relu = read_raw(racine / "raw")
         self.assertEqual(len(relu), 1)
         self.assertFalse(relu[0].pinned)
+
+
+class TestRelabelCannotCreatePlaces(unittest.TestCase):
+    """`relabel` appose des labels, il ne crée pas de lieux.
+
+    Cent une communes des Plus Beaux Détours ont été saisies, puis
+    « relabellisées », et n'ont rien produit : le thème « villages » n'a aucune
+    classe Wikidata, il n'existe que par ses listes, et seul un `fetch` de ce
+    thème va chercher les entités. Le journal ne disait rien.
+    """
+
+    def _relabel(self, brut, membres):
+        from roam_pipeline.cli import cmd_relabel
+        with tempfile.TemporaryDirectory() as tmp:
+            racine = Path(tmp)
+            for nom in ("raw", "manual", "out"):
+                (racine / nom).mkdir()
+            write_raw(racine / "raw", brut, {p.theme_id for p in brut})
+            (racine / "out" / "places_raw.json").write_text(
+                json.dumps([p.to_dict() for p in brut], ensure_ascii=False),
+                encoding="utf-8")
+            args = argparse.Namespace(raw=racine / "raw", manual=racine / "manual",
+                                      out=racine / "out")
+            with _capture() as sortie:
+                with unittest.mock.patch("roam_pipeline.cli.wd.SparqlClient"), \
+                     unittest.mock.patch("roam_pipeline.cli.fetch_label_members",
+                                         side_effect=lambda _c, l, _m: membres.get(l.id, set())):
+                    cmd_relabel(args, CONFIG)
+            return sortie.getvalue()
+
+    def test_a_member_absent_from_the_collection_is_announced(self):
+        brut = [make_place("Gordes", theme="villages", wikidata_id="Q1")]
+        texte = self._relabel(brut, {"plus-beaux-detours": {"Q911450", "Q6381"}})
+        self.assertIn("ne sont PAS dans la collecte", texte)
+        self.assertIn("fetch --only villages", texte)
+
+    def test_nothing_is_said_when_every_member_is_there(self):
+        brut = [make_place("L'Isle-Adam", theme="villages", wikidata_id="Q911450")]
+        texte = self._relabel(brut, {"plus-beaux-detours": {"Q911450"}})
+        self.assertNotIn("ne sont PAS dans la collecte", texte)
 
 
 class TestSilentLabels(unittest.TestCase):
