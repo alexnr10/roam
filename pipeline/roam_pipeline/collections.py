@@ -420,6 +420,15 @@ def fantomes(places: list[Place]) -> list[tuple[Place, list[str]]]:
     prouve rien. Il ramène des faux positifs — le pont d'Avignon, dont il ne
     reste que quatre arches, se visite très bien — et il rate ce que Wikipédia
     ne dit pas. C'est un rabatteur, pas un juge.
+
+    On a cherché mieux : Wikidata porte P576, « date de dissolution, démolition
+    ou disparition », et il paraissait être le signal dur qui remplacerait
+    l'heuristique de texte. Mesuré, il fait pire. Il RATE la tour du Temple, le
+    château de Madrid et Portus Itius — aucun des trois ne le porte — et il
+    DÉSIGNE une trentaine d'abbayes debout, dont la communauté fut dissoute à
+    la Révolution mais dont les bâtiments se visitent : Jumièges, Fontenay,
+    Valloires, Aubazine. La propriété dit qu'une institution a pris fin, pas
+    qu'un lieu a disparu. Ne pas la rebrancher ici.
     """
     trouves: list[tuple[Place, list[str]]] = []
     for place in places:

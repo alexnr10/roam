@@ -34,7 +34,23 @@ P_INSEE_DEPT = "P2586"
 P_INSEE_REGION = "P2585"
 P_ELEVATION = "P2044"
 P_COMMONS_CATEGORY = "P373"
-P_DISSOLVED = "P576"   # date de dissolution, démolition ou disparition
+# Date de dissolution, de démolition ou de disparition.
+#
+# NE PAS s'en servir pour repérer les lieux qui n'existent plus : mesuré sur le
+# catalogue, il échoue dans les deux sens à la fois.
+#
+# Il RATE les vrais disparus — ni la tour du Temple (démolie en 1808), ni le
+# château de Madrid (démoli au XVIIIe), ni Portus Itius n'en portent.
+#
+# Et il DÉSIGNE des lieux debout : sur cinquante-six lieux du catalogue qui le
+# portent, la plupart sont des abbayes dont la COMMUNAUTÉ fut dissoute à la
+# Révolution — Jumièges, Fontenay, Valloires, Aubazine, Loc-Dieu — quand les
+# bâtiments, eux, sont là et se visitent. Aiguebelle est encore un monastère en
+# activité. Glanum porte « 260 » : la cité gallo-romaine fut abandonnée, ses
+# ruines sont l'un des plus beaux sites archéologiques de France.
+#
+# La propriété dit qu'une INSTITUTION a pris fin, pas qu'un lieu a disparu.
+P_DISSOLVED = "P576"
 # Une liste peut tenir à un EXPLOITANT plutôt qu'à une désignation : le Centre
 # des monuments nationaux n'est pas un label, c'est l'établissement public qui
 # gère la centaine de monuments d'État ouverts à la visite. `label-probe` teste
