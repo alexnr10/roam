@@ -9034,6 +9034,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_Calvet"
   },
   {
+   "id": "Q60587245",
+   "slug": "beaulieu-sur-dordogne",
+   "name": "Beaulieu-sur-Dordogne",
+   "themeId": "villages",
+   "lat": 44.978333,
+   "lon": 1.838333,
+   "radiusM": 600,
+   "score": 106.5,
+   "departement": "Corrèze",
+   "departementCode": "19",
+   "regionCode": "75",
+   "communeCode": null,
+   "communeName": null,
+   "summary": null,
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Beaulieu-sur-Dordogne%20Limousin%20France%202010%20Kapel%20des%20P%C3%A9nitents%204.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Beaulieu-sur-Dordogne"
+  },
+  {
    "id": "Q1788518",
    "slug": "ancienne-cathedrale-saint-trophime-a-arles",
    "name": "Ancienne cathédrale Saint-Trophime à Arles",
@@ -10672,6 +10690,60 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Nantua"
   },
   {
+   "id": "Q60618216",
+   "slug": "chatillon-en-diois",
+   "name": "Châtillon-en-Diois",
+   "themeId": "villages",
+   "lat": 44.694722,
+   "lon": 5.484167,
+   "radiusM": 600,
+   "score": 103.5,
+   "departement": "Drôme",
+   "departementCode": "26",
+   "regionCode": "84",
+   "communeCode": null,
+   "communeName": null,
+   "summary": null,
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Chatillon.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2tillon-en-Diois"
+  },
+  {
+   "id": "Q664024",
+   "slug": "polignac",
+   "name": "Polignac",
+   "themeId": "villages",
+   "lat": 45.069722,
+   "lon": 3.859444,
+   "radiusM": 600,
+   "score": 103.5,
+   "departement": "Haute-Loire",
+   "departementCode": "43",
+   "regionCode": "84",
+   "communeCode": null,
+   "communeName": null,
+   "summary": null,
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Polignac%20%28village%292.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Polignac_(Haute-Loire)"
+  },
+  {
+   "id": "Q817881",
+   "slug": "le-castellet",
+   "name": "Le Castellet",
+   "themeId": "villages",
+   "lat": 43.202778,
+   "lon": 5.776667,
+   "radiusM": 600,
+   "score": 103.5,
+   "departement": "Var",
+   "departementCode": "83",
+   "regionCode": "93",
+   "communeCode": null,
+   "communeName": null,
+   "summary": null,
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Le%20Castellet-chateau-mairie.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Le_Castellet_(Var)"
+  },
+  {
    "id": "Q2942319",
    "slug": "cathedrale-saint-caprais-d-agen",
    "name": "Cathédrale Saint-Caprais d'Agen",
@@ -10922,6 +10994,24 @@
    "summary": "L'abbaye de la Trinité de Vendôme est une ancienne abbaye de moines bénédictins fondée en 1033 par Geoffroy Ier Martel, comte de Vendôme, située dans la ville de Vendôme en bordure du Loir.\n\nFondée par Geoffroy Martel, sans doute en 1033, l'abbaye connut son apogée au Moyen Âge, ses dépendances s'étendaient dans l'ouest de la France médiévale, de la Saintonge à la Normandie.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Vendome03.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_la_Trinit%C3%A9_de_Vend%C3%B4me"
+  },
+  {
+   "id": "Q1152950",
+   "slug": "villeneuve",
+   "name": "Villeneuve",
+   "themeId": "villages",
+   "lat": 44.437222,
+   "lon": 2.031944,
+   "radiusM": 600,
+   "score": 102.8,
+   "departement": "Aveyron",
+   "departementCode": "12",
+   "regionCode": "76",
+   "communeCode": null,
+   "communeName": null,
+   "summary": null,
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Villeneuve%20-%20Mairie.JPG?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Villeneuve_(Aveyron)"
   },
   {
    "id": "Q632081",
@@ -21166,24 +21256,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Dourdan"
   },
   {
-   "id": "Q1067494",
-   "slug": "tour-du-temple",
-   "name": "Tour du Temple",
-   "themeId": "chateaux",
-   "lat": 48.86528,
-   "lon": 2.36222,
-   "radiusM": 200,
-   "score": 85.6,
-   "departement": "Paris",
-   "departementCode": "75",
-   "regionCode": "11",
-   "communeCode": "75103",
-   "communeName": "Paris",
-   "summary": "La tour du Temple et son enclos constituaient la maison du Temple, ancienne forteresse parisienne située dans le nord du Marais, au sein du 3e arrondissement de Paris, qui fut détruite en 1808.\nConstruite par les Templiers à partir de 1240, pendant le règne de saint Louis, elle devint par la suite une prison.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Hoffbauer-Brezet-Temple1734.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Tour_du_Temple"
-  },
-  {
    "id": "Q19799735",
    "slug": "domaine-departemental-de-sceaux-chateau-de-sceaux",
    "name": "Domaine départemental de Sceaux - château de Sceaux",
@@ -27626,6 +27698,24 @@
    "summary": "Le château de Grosbois est un château de la Renaissance situé à Boissy-Saint-Léger, dans le département du Val-de-Marne, en France.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Ch%C3%A2teau%20de%20Grosbois.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Grosbois"
+  },
+  {
+   "id": "Q1765935",
+   "slug": "chateau-de-madrid",
+   "name": "Château de Madrid",
+   "themeId": "chateaux",
+   "lat": 48.874167,
+   "lon": 2.255,
+   "radiusM": 200,
+   "score": 77.2,
+   "departement": "Paris",
+   "departementCode": "75",
+   "regionCode": "11",
+   "communeCode": "75116",
+   "communeName": "Paris",
+   "summary": "Le château de Madrid, d'abord appelé château de Boulogne, est une résidence royale bâtie dans le bois de Boulogne. Construit à partir de 1528 sur l'ordre du roi de France François Ier et achevé pour son fils Henri II, il est entièrement démoli à la fin du XVIIIe siècle.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Corbel011%20Le%20ch%C3%A2teau%20de%20Madrid%20%28Magasin%20pittoresque%29.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Madrid"
   },
   {
    "id": "Q22942089",
@@ -50486,11 +50576,11 @@
    "labelId": "plus-beaux-villages",
    "geoLevel": null,
    "geoCode": null,
-   "placeCount": 182,
+   "placeCount": 187,
    "tierCounts": [
     10,
     25,
-    147
+    152
    ],
    "places": [
     {
@@ -51244,164 +51334,189 @@
      "rank": 150
     },
     {
-     "placeId": "Q318168",
+     "placeId": "Q60587245",
      "tier": 3,
      "rank": 151
     },
     {
-     "placeId": "Q691141",
+     "placeId": "Q318168",
      "tier": 3,
      "rank": 152
     },
     {
-     "placeId": "Q1476342",
+     "placeId": "Q691141",
      "tier": 3,
      "rank": 153
     },
     {
-     "placeId": "Q457023",
+     "placeId": "Q1476342",
      "tier": 3,
      "rank": 154
     },
     {
-     "placeId": "Q473957",
+     "placeId": "Q457023",
      "tier": 3,
      "rank": 155
     },
     {
-     "placeId": "Q459683",
+     "placeId": "Q473957",
      "tier": 3,
      "rank": 156
     },
     {
-     "placeId": "Q965394",
+     "placeId": "Q459683",
      "tier": 3,
      "rank": 157
     },
     {
-     "placeId": "Q274678",
+     "placeId": "Q965394",
      "tier": 3,
      "rank": 158
     },
     {
-     "placeId": "Q384722",
+     "placeId": "Q274678",
      "tier": 3,
      "rank": 159
     },
     {
-     "placeId": "Q635125",
+     "placeId": "Q384722",
      "tier": 3,
      "rank": 160
     },
     {
-     "placeId": "Q632276",
+     "placeId": "Q635125",
      "tier": 3,
      "rank": 161
     },
     {
-     "placeId": "Q733035",
+     "placeId": "Q632276",
      "tier": 3,
      "rank": 162
     },
     {
-     "placeId": "Q687259",
+     "placeId": "Q60618216",
      "tier": 3,
      "rank": 163
     },
     {
-     "placeId": "Q632081",
+     "placeId": "Q817881",
      "tier": 3,
      "rank": 164
     },
     {
-     "placeId": "Q540359",
+     "placeId": "Q664024",
      "tier": 3,
      "rank": 165
     },
     {
-     "placeId": "Q828602",
+     "placeId": "Q733035",
      "tier": 3,
      "rank": 166
     },
     {
-     "placeId": "Q1012436",
+     "placeId": "Q687259",
      "tier": 3,
      "rank": 167
     },
     {
-     "placeId": "Q270819",
+     "placeId": "Q632081",
      "tier": 3,
      "rank": 168
     },
     {
-     "placeId": "Q2175251",
+     "placeId": "Q1152950",
      "tier": 3,
      "rank": 169
     },
     {
-     "placeId": "Q743377",
+     "placeId": "Q540359",
      "tier": 3,
      "rank": 170
     },
     {
-     "placeId": "Q837588",
+     "placeId": "Q828602",
      "tier": 3,
      "rank": 171
     },
     {
-     "placeId": "Q732788",
+     "placeId": "Q1012436",
      "tier": 3,
      "rank": 172
     },
     {
-     "placeId": "Q688450",
+     "placeId": "Q270819",
      "tier": 3,
      "rank": 173
     },
     {
-     "placeId": "Q541007",
+     "placeId": "Q2175251",
      "tier": 3,
      "rank": 174
     },
     {
-     "placeId": "Q3067362",
+     "placeId": "Q743377",
      "tier": 3,
      "rank": 175
     },
     {
-     "placeId": "Q225751",
+     "placeId": "Q837588",
      "tier": 3,
      "rank": 176
     },
     {
-     "placeId": "Q1104188",
+     "placeId": "Q732788",
      "tier": 3,
      "rank": 177
     },
     {
-     "placeId": "Q1103952",
+     "placeId": "Q688450",
      "tier": 3,
      "rank": 178
     },
     {
-     "placeId": "Q904022",
+     "placeId": "Q541007",
      "tier": 3,
      "rank": 179
     },
     {
-     "placeId": "Q3592820",
+     "placeId": "Q3067362",
      "tier": 3,
      "rank": 180
     },
     {
-     "placeId": "Q3308728",
+     "placeId": "Q225751",
      "tier": 3,
      "rank": 181
     },
     {
-     "placeId": "Q29034928",
+     "placeId": "Q1104188",
      "tier": 3,
      "rank": 182
+    },
+    {
+     "placeId": "Q1103952",
+     "tier": 3,
+     "rank": 183
+    },
+    {
+     "placeId": "Q904022",
+     "tier": 3,
+     "rank": 184
+    },
+    {
+     "placeId": "Q3592820",
+     "tier": 3,
+     "rank": 185
+    },
+    {
+     "placeId": "Q3308728",
+     "tier": 3,
+     "rank": 186
+    },
+    {
+     "placeId": "Q29034928",
+     "tier": 3,
+     "rank": 187
     }
    ]
   },
@@ -53259,7 +53374,7 @@
      "rank": 7
     },
     {
-     "placeId": "Q1067494",
+     "placeId": "Q1765935",
      "tier": 1,
      "rank": 8
     },
@@ -57670,10 +57785,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "83",
-   "placeCount": 32,
+   "placeCount": 33,
    "tierCounts": [
     11,
-    20,
+    21,
     1
    ],
    "places": [
@@ -57773,12 +57888,12 @@
      "rank": 19
     },
     {
-     "placeId": "Q975080",
+     "placeId": "Q688400",
      "tier": 2,
      "rank": 20
     },
     {
-     "placeId": "Q688400",
+     "placeId": "Q975080",
      "tier": 2,
      "rank": 21
     },
@@ -57788,12 +57903,12 @@
      "rank": 22
     },
     {
-     "placeId": "Q1658544",
+     "placeId": "Q817881",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q733035",
+     "placeId": "Q1658544",
      "tier": 2,
      "rank": 24
     },
@@ -57803,39 +57918,44 @@
      "rank": 25
     },
     {
-     "placeId": "Q688450",
+     "placeId": "Q733035",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q19365734",
+     "placeId": "Q688450",
      "tier": 2,
      "rank": 27
     },
     {
-     "placeId": "Q3593460",
+     "placeId": "Q19365734",
      "tier": 2,
      "rank": 28
     },
     {
-     "placeId": "Q2983361",
+     "placeId": "Q3593460",
      "tier": 2,
      "rank": 29
     },
     {
-     "placeId": "Q1434679",
+     "placeId": "Q2983361",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q2273181",
+     "placeId": "Q1434679",
      "tier": 2,
      "rank": 31
     },
     {
+     "placeId": "Q2273181",
+     "tier": 2,
+     "rank": 32
+    },
+    {
      "placeId": "Q3591786",
      "tier": 3,
-     "rank": 32
+     "rank": 33
     }
    ]
   },
@@ -57847,10 +57967,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "19",
-   "placeCount": 13,
+   "placeCount": 14,
    "tierCounts": [
     10,
-    3,
+    4,
     0
    ],
    "places": [
@@ -57910,14 +58030,19 @@
      "rank": 11
     },
     {
-     "placeId": "Q1137944",
+     "placeId": "Q60587245",
      "tier": 2,
      "rank": 12
     },
     {
-     "placeId": "Q2970864",
+     "placeId": "Q1137944",
      "tier": 2,
      "rank": 13
+    },
+    {
+     "placeId": "Q2970864",
+     "tier": 2,
+     "rank": 14
     }
    ]
   },
@@ -58914,10 +59039,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "12",
-   "placeCount": 23,
+   "placeCount": 24,
    "tierCounts": [
     11,
-    12,
+    13,
     0
    ],
    "places": [
@@ -59022,19 +59147,24 @@
      "rank": 20
     },
     {
-     "placeId": "Q3067362",
+     "placeId": "Q1152950",
      "tier": 2,
      "rank": 21
     },
     {
-     "placeId": "Q2968631",
+     "placeId": "Q3067362",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q3540827",
+     "placeId": "Q2968631",
      "tier": 2,
      "rank": 23
+    },
+    {
+     "placeId": "Q3540827",
+     "tier": 2,
+     "rank": 24
     }
    ]
   },
@@ -60549,10 +60679,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "26",
-   "placeCount": 14,
+   "placeCount": 15,
    "tierCounts": [
     10,
-    4,
+    5,
     0
    ],
    "places": [
@@ -60622,9 +60752,14 @@
      "rank": 13
     },
     {
-     "placeId": "Q2579100",
+     "placeId": "Q60618216",
      "tier": 2,
      "rank": 14
+    },
+    {
+     "placeId": "Q2579100",
+     "tier": 2,
+     "rank": 15
     }
    ]
   },
@@ -60907,10 +61042,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "43",
-   "placeCount": 13,
+   "placeCount": 14,
    "tierCounts": [
     10,
-    2,
+    3,
     1
    ],
    "places": [
@@ -60960,7 +61095,7 @@
      "rank": 9
     },
     {
-     "placeId": "Q270819",
+     "placeId": "Q664024",
      "tier": 1,
      "rank": 10
     },
@@ -60970,14 +61105,19 @@
      "rank": 11
     },
     {
-     "placeId": "Q2969143",
+     "placeId": "Q270819",
      "tier": 2,
      "rank": 12
     },
     {
+     "placeId": "Q2969143",
+     "tier": 2,
+     "rank": 13
+    },
+    {
      "placeId": "Q110929535",
      "tier": 3,
-     "rank": 13
+     "rank": 14
     }
    ]
   },
@@ -66906,12 +67046,12 @@
      "rank": 17
     },
     {
-     "placeId": "Q201428",
+     "placeId": "Q178065",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q178065",
+     "placeId": "Q201428",
      "tier": 2,
      "rank": 19
     },
@@ -66951,12 +67091,12 @@
      "rank": 26
     },
     {
-     "placeId": "Q739976",
+     "placeId": "Q1094338",
      "tier": 2,
      "rank": 27
     },
     {
-     "placeId": "Q1094338",
+     "placeId": "Q739976",
      "tier": 2,
      "rank": 28
     },
@@ -66971,17 +67111,17 @@
      "rank": 30
     },
     {
-     "placeId": "Q663673",
+     "placeId": "Q217925",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q217925",
+     "placeId": "Q3075489",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q3075489",
+     "placeId": "Q663673",
      "tier": 2,
      "rank": 33
     },
@@ -67031,12 +67171,12 @@
      "rank": 42
     },
     {
-     "placeId": "Q648534",
+     "placeId": "Q167863",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q167863",
+     "placeId": "Q648534",
      "tier": 3,
      "rank": 44
     },
@@ -67066,12 +67206,12 @@
      "rank": 49
     },
     {
-     "placeId": "Q2092716",
+     "placeId": "Q743206",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q743206",
+     "placeId": "Q2092716",
      "tier": 3,
      "rank": 51
     },
@@ -67106,17 +67246,17 @@
      "rank": 57
     },
     {
-     "placeId": "Q1626747",
+     "placeId": "Q1538929",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q1538929",
+     "placeId": "Q1265070",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q1265070",
+     "placeId": "Q1626747",
      "tier": 3,
      "rank": 60
     },
@@ -67141,27 +67281,27 @@
      "rank": 64
     },
     {
-     "placeId": "Q1520841",
+     "placeId": "Q193193",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q193193",
+     "placeId": "Q2509432",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q2509432",
+     "placeId": "Q1514062",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q1514062",
+     "placeId": "Q1538826",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q1538826",
+     "placeId": "Q1520841",
      "tier": 3,
      "rank": 69
     },
@@ -67196,12 +67336,12 @@
      "rank": 75
     },
     {
-     "placeId": "Q684846",
+     "placeId": "Q650519",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q650519",
+     "placeId": "Q684846",
      "tier": 3,
      "rank": 77
     },
@@ -68222,12 +68362,12 @@
      "rank": 30
     },
     {
-     "placeId": "Q288968",
+     "placeId": "Q328371",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q328371",
+     "placeId": "Q288968",
      "tier": 2,
      "rank": 32
     },
@@ -68312,12 +68452,12 @@
      "rank": 48
     },
     {
-     "placeId": "Q2038362",
+     "placeId": "Q190171",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q190171",
+     "placeId": "Q2038362",
      "tier": 3,
      "rank": 50
     },
@@ -68342,12 +68482,12 @@
      "rank": 54
     },
     {
-     "placeId": "Q425789",
+     "placeId": "Q317349",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q317349",
+     "placeId": "Q425789",
      "tier": 3,
      "rank": 56
     },
@@ -68407,12 +68547,12 @@
      "rank": 67
     },
     {
-     "placeId": "Q929191",
+     "placeId": "Q317362",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q317362",
+     "placeId": "Q929191",
      "tier": 3,
      "rank": 69
     },
@@ -68624,17 +68764,17 @@
      "rank": 27
     },
     {
-     "placeId": "Q1859459",
+     "placeId": "Q627479",
      "tier": 2,
      "rank": 28
     },
     {
-     "placeId": "Q1063236",
+     "placeId": "Q1859459",
      "tier": 2,
      "rank": 29
     },
     {
-     "placeId": "Q627479",
+     "placeId": "Q1063236",
      "tier": 2,
      "rank": 30
     },
@@ -68699,17 +68839,17 @@
      "rank": 42
     },
     {
-     "placeId": "Q2007231",
+     "placeId": "Q663232",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q2176795",
+     "placeId": "Q2007231",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q663232",
+     "placeId": "Q2176795",
      "tier": 3,
      "rank": 45
     },
@@ -68779,17 +68919,17 @@
      "rank": 58
     },
     {
-     "placeId": "Q3279523",
+     "placeId": "Q273562",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q428854",
+     "placeId": "Q3279523",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q273562",
+     "placeId": "Q428854",
      "tier": 3,
      "rank": 61
     },
@@ -68874,12 +69014,12 @@
      "rank": 77
     },
     {
-     "placeId": "Q177657",
+     "placeId": "Q638265",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q638265",
+     "placeId": "Q177657",
      "tier": 3,
      "rank": 79
     },
@@ -69915,7 +70055,7 @@
      "rank": 35
     },
     {
-     "placeId": "Q292564",
+     "placeId": "Q243663",
      "tier": 2,
      "rank": 36
     },
@@ -69940,7 +70080,7 @@
      "rank": 40
     },
     {
-     "placeId": "Q243663",
+     "placeId": "Q292564",
      "tier": 3,
      "rank": 41
     },
@@ -69985,12 +70125,12 @@
      "rank": 49
     },
     {
-     "placeId": "Q1788518",
+     "placeId": "Q815807",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q815807",
+     "placeId": "Q1788518",
      "tier": 3,
      "rank": 51
     },
@@ -70005,12 +70145,12 @@
      "rank": 53
     },
     {
-     "placeId": "Q8822076",
+     "placeId": "Q476465",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q476465",
+     "placeId": "Q8822076",
      "tier": 3,
      "rank": 55
     },
@@ -70045,32 +70185,32 @@
      "rank": 61
     },
     {
-     "placeId": "Q1369366",
+     "placeId": "Q458748",
      "tier": 3,
      "rank": 62
     },
     {
-     "placeId": "Q3558989",
+     "placeId": "Q1369366",
      "tier": 3,
      "rank": 63
     },
     {
-     "placeId": "Q258818",
+     "placeId": "Q3558989",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q752558",
+     "placeId": "Q258818",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q1664416",
+     "placeId": "Q752558",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q458748",
+     "placeId": "Q1664416",
      "tier": 3,
      "rank": 67
     },
@@ -70090,22 +70230,22 @@
      "rank": 70
     },
     {
-     "placeId": "Q3329265",
+     "placeId": "Q624323",
      "tier": 3,
      "rank": 71
     },
     {
-     "placeId": "Q450348",
+     "placeId": "Q3329265",
      "tier": 3,
      "rank": 72
     },
     {
-     "placeId": "Q15229399",
+     "placeId": "Q450348",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q624323",
+     "placeId": "Q15229399",
      "tier": 3,
      "rank": 74
     },
@@ -70125,17 +70265,17 @@
      "rank": 77
     },
     {
-     "placeId": "Q3086101",
+     "placeId": "Q322270",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q2297114",
+     "placeId": "Q3086101",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q779689",
+     "placeId": "Q2297114",
      "tier": 3,
      "rank": 80
     }
@@ -70689,12 +70829,12 @@
      "rank": 23
     },
     {
-     "placeId": "Q2259452",
+     "placeId": "Q278566",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q278566",
+     "placeId": "Q2259452",
      "tier": 2,
      "rank": 25
     },
@@ -70799,22 +70939,22 @@
      "rank": 45
     },
     {
-     "placeId": "Q2119428",
+     "placeId": "Q658602",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q23426",
+     "placeId": "Q2119428",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q2969896",
+     "placeId": "Q23426",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q658602",
+     "placeId": "Q2969896",
      "tier": 3,
      "rank": 49
     },
@@ -70844,17 +70984,17 @@
      "rank": 54
     },
     {
-     "placeId": "Q1895555",
+     "placeId": "Q250332",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q1711734",
+     "placeId": "Q1895555",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q250332",
+     "placeId": "Q1711734",
      "tier": 3,
      "rank": 57
     },
@@ -70894,22 +71034,22 @@
      "rank": 64
     },
     {
-     "placeId": "Q180709",
+     "placeId": "Q638239",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q2971586",
+     "placeId": "Q180709",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q3377210",
+     "placeId": "Q2971586",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q638239",
+     "placeId": "Q3377210",
      "tier": 3,
      "rank": 68
     },
@@ -70934,27 +71074,27 @@
      "rank": 72
     },
     {
-     "placeId": "Q2321630",
+     "placeId": "Q472992",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q1227366",
+     "placeId": "Q2321630",
      "tier": 3,
      "rank": 74
     },
     {
-     "placeId": "Q3329777",
+     "placeId": "Q1227366",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q122999925",
+     "placeId": "Q3329777",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q472992",
+     "placeId": "Q122999925",
      "tier": 3,
      "rank": 77
     },
@@ -72247,12 +72387,12 @@
      "rank": 27
     },
     {
-     "placeId": "Q205367",
+     "placeId": "Q499751",
      "tier": 2,
      "rank": 28
     },
     {
-     "placeId": "Q499751",
+     "placeId": "Q205367",
      "tier": 2,
      "rank": 29
     },
@@ -72307,12 +72447,12 @@
      "rank": 39
     },
     {
-     "placeId": "Q1289258",
+     "placeId": "Q656699",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q656699",
+     "placeId": "Q1289258",
      "tier": 3,
      "rank": 41
     },
@@ -72377,22 +72517,22 @@
      "rank": 53
     },
     {
-     "placeId": "Q522779",
+     "placeId": "Q272308",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q175676",
+     "placeId": "Q522779",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q1142554",
+     "placeId": "Q175676",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q272308",
+     "placeId": "Q1142554",
      "tier": 3,
      "rank": 57
     },
@@ -72422,17 +72562,17 @@
      "rank": 62
     },
     {
-     "placeId": "Q193215",
+     "placeId": "Q272369",
      "tier": 3,
      "rank": 63
     },
     {
-     "placeId": "Q292516",
+     "placeId": "Q193215",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q272369",
+     "placeId": "Q292516",
      "tier": 3,
      "rank": 65
     },
@@ -72502,12 +72642,12 @@
      "rank": 78
     },
     {
-     "placeId": "Q186536",
+     "placeId": "Q633643",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q633643",
+     "placeId": "Q186536",
      "tier": 3,
      "rank": 80
     }
@@ -72737,10 +72877,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "12",
-   "placeCount": 10,
+   "placeCount": 11,
    "tierCounts": [
     10,
-    0,
+    1,
     0
    ],
    "places": [
@@ -72790,9 +72930,14 @@
      "rank": 9
     },
     {
-     "placeId": "Q3067362",
+     "placeId": "Q1152950",
      "tier": 1,
      "rank": 10
+    },
+    {
+     "placeId": "Q3067362",
+     "tier": 2,
+     "rank": 11
     }
    ]
   },
@@ -75662,11 +75807,11 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "76",
-   "placeCount": 51,
+   "placeCount": 52,
    "tierCounts": [
     10,
     25,
-    16
+    17
    ],
    "places": [
     {
@@ -75890,39 +76035,44 @@
      "rank": 44
     },
     {
-     "placeId": "Q828602",
+     "placeId": "Q1152950",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q743377",
+     "placeId": "Q828602",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q732788",
+     "placeId": "Q743377",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q541007",
+     "placeId": "Q732788",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q3067362",
+     "placeId": "Q541007",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q904022",
+     "placeId": "Q3067362",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q3592820",
+     "placeId": "Q904022",
      "tier": 3,
      "rank": 51
+    },
+    {
+     "placeId": "Q3592820",
+     "tier": 3,
+     "rank": 52
     }
    ]
   },
@@ -77900,133 +78050,6 @@
      "placeId": "Q3111003",
      "tier": 2,
      "rank": 10
-    }
-   ]
-  },
-  {
-   "slug": "plages-region-93",
-   "name": "Littoral et plages de Provence-Alpes-Côte d'Azur",
-   "kind": "geo",
-   "themeId": "plages",
-   "labelId": null,
-   "geoLevel": "region",
-   "geoCode": "93",
-   "placeCount": 22,
-   "tierCounts": [
-    10,
-    12,
-    0
-   ],
-   "places": [
-    {
-     "placeId": "Q204645",
-     "tier": 1,
-     "rank": 1
-    },
-    {
-     "placeId": "Q1994367",
-     "tier": 1,
-     "rank": 2
-    },
-    {
-     "placeId": "Q1034146",
-     "tier": 1,
-     "rank": 3
-    },
-    {
-     "placeId": "Q2933610",
-     "tier": 1,
-     "rank": 4
-    },
-    {
-     "placeId": "Q1034136",
-     "tier": 1,
-     "rank": 5
-    },
-    {
-     "placeId": "Q2269718",
-     "tier": 1,
-     "rank": 6
-    },
-    {
-     "placeId": "Q779689",
-     "tier": 1,
-     "rank": 7
-    },
-    {
-     "placeId": "Q2524946",
-     "tier": 1,
-     "rank": 8
-    },
-    {
-     "placeId": "Q2371579",
-     "tier": 1,
-     "rank": 9
-    },
-    {
-     "placeId": "Q2933606",
-     "tier": 1,
-     "rank": 10
-    },
-    {
-     "placeId": "Q2037477",
-     "tier": 2,
-     "rank": 11
-    },
-    {
-     "placeId": "Q2933600",
-     "tier": 2,
-     "rank": 12
-    },
-    {
-     "placeId": "Q34828756",
-     "tier": 2,
-     "rank": 13
-    },
-    {
-     "placeId": "Q3064717",
-     "tier": 2,
-     "rank": 14
-    },
-    {
-     "placeId": "Q2933592",
-     "tier": 2,
-     "rank": 15
-    },
-    {
-     "placeId": "Q34807869",
-     "tier": 2,
-     "rank": 16
-    },
-    {
-     "placeId": "Q16507207",
-     "tier": 2,
-     "rank": 17
-    },
-    {
-     "placeId": "Q3342073",
-     "tier": 2,
-     "rank": 18
-    },
-    {
-     "placeId": "Q2937139",
-     "tier": 2,
-     "rank": 19
-    },
-    {
-     "placeId": "Q2273181",
-     "tier": 2,
-     "rank": 20
-    },
-    {
-     "placeId": "Q3006362",
-     "tier": 2,
-     "rank": 21
-    },
-    {
-     "placeId": "Q2933594",
-     "tier": 2,
-     "rank": 22
     }
    ]
   },
