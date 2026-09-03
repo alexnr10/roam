@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { buildLabel } from '../../src/lib/build';
 import { collections, places } from '../../src/data/catalog';
 import { computeProgress, earnedBadges, type Badge } from '../../src/lib/progress';
 import { useVisits } from '../../src/store/visits';
@@ -72,6 +73,11 @@ export default function ProfileScreen() {
         </Text>
         <Pill label="Prototype" tone="muted" />
         <Button label="Effacer mes données" tone="secondary" onPress={confirmReset} />
+        {/* La marque de construction. L'aperçu web est un seul fichier que le
+            navigateur d'un téléphone garde en cache : sans elle, on ne peut
+            pas distinguer « la correction n'est pas passée » de « je regarde
+            la page d'hier ». */}
+        <Text style={[type.tiny, { marginTop: spacing.sm }]}>{buildLabel()}</Text>
       </View>
     </ScrollView>
   );

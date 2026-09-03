@@ -18,6 +18,7 @@
  * sécurité. Le fond passe alors en dégradé — mais les contours de la carte de
  * conquête sont NOS données : la France se dessine et se colorie quand même.
  */
+import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,6 +34,28 @@ const pick = (folder, extension) => {
   }
   return readFileSync(join(dist, folder, found[0]), 'utf8');
 };
+
+/**
+ * La signature de ce qui est publié.
+ *
+ * La page est UN SEUL `index.html`, sans nom haché : le navigateur d'un
+ * téléphone la garde bien après la publication suivante. Sans marque, on ne
+ * peut pas distinguer « la correction n'est pas passée » de « je regarde la
+ * page d'hier ». Chez GitHub le commit vient de l'environnement ; en local, de
+ * git — et si git n'a rien à dire, on s'en passe plutôt que d'échouer.
+ */
+const signature = () => {
+  if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA.slice(0, 7);
+  try {
+    return execFileSync('git', ['rev-parse', '--short=7', 'HEAD'], {
+      cwd: here, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return 'local';
+  }
+};
+
+const marque = { sha: signature(), date: new Date().toISOString() };
 
 const css = pick('_expo/static/css', '.css');
 const js = pick('_expo/static/js/web', '.js');
@@ -62,6 +85,9 @@ const safe = js.replaceAll('</script', '<\\/script');
 // que le bundle ne s'exécute — même origine, donc autorisé, sauf en `file://`
 // où l'échec est sans conséquence puisque rien n'y est publié.
 const bootstrap = `
+  // La marque de construction, posée avant le bundle pour qu'il la trouve.
+  window.__ROAM_BUILD__ = ${JSON.stringify(marque)};
+
   // Expo Router lit \`location.pathname\` au démarrage pour choisir la route.
   // Publiée sous un chemin quelconque, la page demanderait une route qui
   // n'existe pas et n'afficherait qu'« Unmatched Route ».
@@ -126,4 +152,4 @@ writeFileSync(
 );
 
 const size = (Buffer.byteLength(readFileSync(out)) / 1024 / 1024).toFixed(1);
-console.log(`page autonome écrite : ${out} (${size} Mo)`);
+console.log(`page autonome écrite : ${out} (${size} Mo, ${marque.sha})`);
