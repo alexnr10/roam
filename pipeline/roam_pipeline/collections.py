@@ -15,7 +15,7 @@ import unicodedata
 from collections import Counter, defaultdict
 
 from .config import Config
-from .geo import FRANCE, area, departements, regions
+from .geo import FRANCE, area, departements, region_of, regions
 from .models import Collection, CollectionPlace, Place
 from .score import assign_tiers, rescued
 
@@ -766,6 +766,105 @@ def _ville(commune_code: str) -> str:
     return commune_code
 
 
+def apply_theme_cap(places: list[Place], config: Config) -> list[Place]:
+    """Combien de lieux d'un thème le CATALOGUE garde, tous territoires confondus.
+
+    À ne pas confondre avec `cap`, qui borne la collection nationale d'un thème.
+    Le catalogue portait cent quatre-vingt-treize cathédrales alors que la
+    collection « Cathédrales et basiliques » en montrait soixante et une : les
+    cent trente-deux autres vivaient dans les collections départementales et
+    régionales, et toutes s'affichaient sur la carte. « Ce n'est plus un guide,
+    ça devient un recensement. »
+
+    Trois réservations, dans cet ordre, avant que le score ne remplisse le
+    reste :
+
+    1. **Les lieux épinglés.** Le curateur a vu le lieu, pas la règle.
+    2. **Un minimum par région.** Sans lui, les quatre cathédrales des DOM
+       tombaient d'un bloc : elles sont seules dans leur région, donc jamais
+       dans les quatre-vingts meilleures de France. La métropole, elle, se
+       répartit déjà toute seule — de cinq à onze par région sans qu'on lui
+       demande rien.
+    3. **Les listes officielles finies.** Même critère que le plancher de
+       notoriété : `makes_collection` dit qu'une liste est assez courte et
+       assez choisie pour valoir dispense. Sans quoi le plafond couperait
+       dans la curation humaine qu'on a passé des jours à saisir — les cent
+       quatre-vingt-sept Plus Beaux Villages SONT la liste de l'association.
+
+    Le reste se remplit au score, et le total ne dépasse jamais le plafond.
+    """
+    caps = {theme.id: theme.catalogue_cap for theme in config.themes
+            if theme.catalogue_cap}
+    if not caps:
+        return places
+
+    mini = config.collections.min_per_region
+    curees = {label.id for label in config.labels if label.makes_collection}
+    par_theme: dict[str, list[Place]] = defaultdict(list)
+    intacts: list[Place] = []
+    for place in places:
+        (par_theme[place.theme_id] if place.theme_id in caps else intacts).append(place)
+
+    kept = list(intacts)
+    for theme_id, lot in par_theme.items():
+        cap = caps[theme_id]
+        lot.sort(key=lambda place: -place.score)
+        if len(lot) <= cap:
+            kept.extend(lot)
+            continue
+
+        pris: dict[str, Place] = {}
+        par_region: dict[str, list[Place]] = defaultdict(list)
+        for place in lot:
+            par_region[region_of(place.departement_code or "").code
+                       if place.departement_code
+                       and region_of(place.departement_code) else ""].append(place)
+
+        def reserve(place: Place) -> None:
+            if len(pris) < cap:
+                pris.setdefault(place.wikidata_id, place)
+
+        # Épinglé À LA MAIN seulement. Un verdict `keep` pose le même drapeau,
+        # et il y en a mille cinq cent cinquante-cinq : les compter comme des
+        # dispenses remplissait le plafond avant qu'une région n'ait eu sa part,
+        # et les quatre cathédrales d'outre-mer tombaient quand même.
+        for place in lot:
+            if place.pinned and not place.kept_in_review:
+                reserve(place)
+        for _code, membres in sorted(par_region.items()):
+            for place in membres[:mini]:
+                reserve(place)
+        for place in lot:
+            if curees & set(place.labels):
+                reserve(place)
+        for place in lot:
+            reserve(place)
+
+        kept.extend(pris.values())
+        LOG.info(
+            "plafond de thème : %s gardés sur %s %s (minimum %s par région) — "
+            "le dernier entré est %s",
+            len(pris), len(lot), theme_id, mini,
+            min(pris.values(), key=lambda p: p.score).name,
+        )
+    return kept
+
+
+def saturated_themes(places: list[Place], config: Config) -> set[str]:
+    """Les thèmes qui ont atteint leur plafond de catalogue.
+
+    Le repêchage géographique comble un TERRITOIRE pauvre ; il n'a pas à
+    rouvrir un quota que le curateur a fermé. Sans cette liste, il remontait
+    des cathédrales restées sous le plancher pour garnir un département, et le
+    plafond de quatre-vingts n'était plus qu'une indication.
+    """
+    compte: Counter[str] = Counter(place.theme_id for place in places)
+    return {
+        theme.id for theme in config.themes
+        if theme.catalogue_cap and compte[theme.id] >= theme.catalogue_cap
+    }
+
+
 def apply_commune_cap(places: list[Place], config: Config) -> list[Place]:
     """Au plus `max_par_commune` lieux d'un même thème dans une même commune.
 
@@ -1182,22 +1281,34 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
     accessible = apply_access_filter(dans_le_sujet, config)
     non_alpin = apply_alpine_filter(accessible, config)
     au_dessus = apply_notoriety_floor(non_alpin, config)
-    # Le plafond par commune vient APRÈS le plancher et avant le repêchage :
-    # il ne doit trancher qu'entre des lieux déjà jugés dignes, et ce qu'il
-    # retire ne doit pas revenir par la porte du repêchage géographique.
+    # Le plafond par commune vient APRÈS le plancher : il ne doit trancher
+    # qu'entre des lieux déjà jugés dignes.
     sous_plafond = apply_commune_cap(au_dessus, config)
     # Les sosies partent AVANT le comptage par département. Compter d'abord
     # faisait croire un département complet alors qu'une de ses douze fiches
     # était un doublon promis à disparaître : les Ardennes et le Val-de-Marne
     # finissaient à onze, sans que rien ne le dise.
-    sans_sosie = dedupe(sous_plafond)
+    # Le plafond de thème AVANT le repêchage, mais le repêchage est prévenu :
+    # c'est la seule composition qui tienne. Après lui, le plafond vidait les
+    # départements que le repêchage venait de remplir — les Landes, l'Orne,
+    # l'Essonne et le Territoire de Belfort perdaient leur « Le meilleur de… ».
+    # Avant lui et sans précaution, le repêchage remontait des cathédrales
+    # restées sous le plancher pour combler ces mêmes départements, et
+    # quatre-vingts redevenaient quatre-vingt-dix-sept.
+    sous_cap = apply_theme_cap(sous_plafond, config)
+    sans_sosie = dedupe(sous_cap)
     # Le plancher mesure la documentation, qui est très inégalement répartie sur
     # le territoire. On rend leur part aux départements qu'il a vidés. Les
     # candidats sont ceux que le PLANCHER a écartés — pas les sosies, qui ont
-    # déjà leur représentant au catalogue.
-    gardes = {place.wikidata_id for place in sous_plafond}
+    # déjà leur représentant au catalogue, ni les thèmes dont le plafond est
+    # atteint : le repêchage comble un territoire, il ne rouvre pas un quota.
+    gardes = {place.wikidata_id for place in au_dessus}
+    satures = saturated_themes(sans_sosie, config)
     complete = rescue_thin_departements(
-        sans_sosie, [p for p in non_alpin if p.wikidata_id not in gardes], config
+        sans_sosie,
+        [p for p in non_alpin
+         if p.wikidata_id not in gardes and p.theme_id not in satures],
+        config,
     )
     # Second passage : les repêchés peuvent se doublonner entre eux.
     kept = dedupe(complete)
@@ -1212,6 +1323,7 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
             ("non alpin", non_alpin),
             ("plancher", au_dessus),
             ("commune", sous_plafond),
+            ("plafond thème", sous_cap),
             ("sosies", sans_sosie),
             ("dépt pauvre", complete),
             ("dédoublé", kept),

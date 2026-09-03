@@ -169,6 +169,14 @@ collections:
   # Sainte-Chapelle (31e), les musées parisiens écrasant tout avec leurs
   # millions de visiteurs.
   max_per_commune: 6
+  # Minimum de lieux par région avant que le plafond de thème ne remplisse au
+  # score. Sans lui, les quatre cathédrales des DOM tombaient d'un bloc :
+  # seules dans leur région, elles ne sont jamais dans les quatre-vingts
+  # meilleures de France. La métropole n'a besoin de rien — elle se répartit
+  # déjà de cinq à onze par région toute seule. Un minimum de 2 ne corrige donc
+  # plus rien et vole trois places à Auvergne-Rhône-Alpes pour les donner à la
+  # Corse : un suffit.
+  min_per_region: 1
   # Une collection n'existe que si elle a assez de lieux pour être une collection.
   min_places: 8
   # Plafond par défaut, surchargé par `cap` dans themes.yaml.

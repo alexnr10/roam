@@ -43,6 +43,9 @@ class Theme:
     fetch_min_sitelinks: int
     cap: int
     wikidata_classes: list[str]
+    # Combien de lieux de ce thème le CATALOGUE garde en tout — à ne pas
+    # confondre avec `cap`, qui borne la collection nationale d'un thème.
+    catalogue_cap: int | None = None
     # « nature » ou « culture ». Roam promet des PAYSAGES autant que du
     # patrimoine ; sans cette étiquette, l'équilibre entre les deux ne se
     # mesure pas, et une dérive vers le bâti passe inaperçue.
@@ -196,6 +199,7 @@ class CollectionRules:
     min_places: int
     max_places: int
     max_per_commune: int
+    min_per_region: int
     geo_levels: list[str]
     cross_theme_levels: list[str]
     require_departement: bool
@@ -256,6 +260,7 @@ def load_config(config_dir: Path | None = None) -> Config:
             min_sitelinks=int(t["min_sitelinks"]),
             fetch_min_sitelinks=int(t.get("fetch_min_sitelinks", 3)),
             cap=int(t["cap"]),
+            catalogue_cap=int(t["catalogue_cap"]) if t.get("catalogue_cap") else None,
             kind=t.get("kind", "culture"),
             # `str()` n'est pas cosmétique : YAML lit « 3947 » comme un entier,
             # et la validation ci-dessous — celle qui dit clairement ce qui ne
@@ -300,6 +305,7 @@ def load_config(config_dir: Path | None = None) -> Config:
         min_places=int(raw["collections"]["min_places"]),
         max_places=int(raw["collections"]["max_places"]),
         max_per_commune=int(raw["collections"].get("max_per_commune", 0)),
+        min_per_region=int(raw["collections"].get("min_per_region", 0)),
         geo_levels=list(raw["geo"]["levels"]),
         cross_theme_levels=list(raw["geo"]["cross_theme_levels"]),
         require_departement=bool(raw["geo"].get("require_departement", True)),

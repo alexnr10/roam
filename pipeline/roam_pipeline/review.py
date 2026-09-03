@@ -118,6 +118,7 @@ def apply_decisions(
             place.tier_shift = 1
         elif decision == "keep":
             place.pinned = True
+            place.kept_in_review = True
         elif strict:
             # En mode strict, seul ce qui a été explicitement relu est conservé.
             continue

@@ -848,12 +848,12 @@ class TestBuildFunnel(unittest.TestCase):
 
         self.assertIn("étape par étape", table)
         # Six dunes au départ, quatre après le périmètre, deux après le plancher,
-        # deux encore après le plafond par commune puis après les sosies — puis
+        # deux encore après les deux plafonds puis après les sosies — puis
         # quatre de nouveau : leur département est pauvre et le repêchage
         # géographique leur rend leur place.
         ligne = next(l for l in table.splitlines() if l.strip().startswith("dunes-marais"))
         self.assertEqual([int(n) for n in ligne.split()[1:]],
-                         [6, 4, 4, 4, 4, 4, 2, 2, 2, 4, 4])
+                         [6, 4, 4, 4, 4, 4, 2, 2, 2, 2, 4, 4])
 
     def test_a_theme_without_any_place_is_left_out_of_the_funnel(self):
         from roam_pipeline.collections import build_all
@@ -3494,6 +3494,185 @@ class TestPin(unittest.TestCase):
             relu = read_raw(racine / "raw")
         self.assertEqual(len(relu), 1)
         self.assertFalse(relu[0].pinned)
+
+
+class TestThemeCap(unittest.TestCase):
+    """Combien de lieux d'un thème le CATALOGUE garde, tous territoires confondus.
+
+    Le catalogue portait 193 cathédrales alors que la collection nationale n'en
+    montrait que 61 : les 132 autres vivaient dans les collections
+    départementales et s'affichaient toutes sur la carte. « Ce n'est plus un
+    guide, ça devient un recensement. »
+    """
+
+    def _lieu(self, nom, score, dept, theme="cathedrales", **kw):
+        return make_place(nom, theme=theme, score=score, departement_code=dept,
+                          wikidata_id=f"Q{abs(hash(nom)) % 999979}", **kw)
+
+    def _cape(self, lieux, cap=4, mini=1):
+        from roam_pipeline.collections import apply_theme_cap
+        themes = [replace(t, catalogue_cap=cap) if t.id == "cathedrales" else t
+                  for t in CONFIG.themes]
+        config = replace(CONFIG, themes=themes,
+                         collections=replace(CONFIG.collections, min_per_region=mini))
+        with _capture():
+            return apply_theme_cap(lieux, config)
+
+    def test_the_best_scored_fill_the_cap(self):
+        lieux = [self._lieu(f"Cathédrale {i}", 100 - i, "34") for i in range(10)]
+        gardes = self._cape(lieux, mini=0)
+        self.assertEqual(len(gardes), 4)
+        self.assertEqual({p.name for p in gardes},
+                         {f"Cathédrale {i}" for i in range(4)})
+
+    def test_a_theme_without_a_cap_is_untouched(self):
+        lieux = [self._lieu(f"Pont {i}", 100 - i, "34", theme="ponts")
+                 for i in range(10)]
+        self.assertEqual(len(self._cape(lieux)), 10)
+
+    def test_every_region_keeps_at_least_one(self):
+        # Les quatre cathédrales d'outre-mer sont seules dans leur région : elles
+        # ne sont jamais dans les quatre-vingts meilleures de France, et elles
+        # tombaient d'un bloc.
+        metropole = [self._lieu(f"Métropole {i}", 200 - i, "34") for i in range(6)]
+        outremer = self._lieu("Cayenne", 60, "973")
+        gardes = self._cape(metropole + [outremer])
+        self.assertIn("Cayenne", {p.name for p in gardes})
+        self.assertEqual(len(gardes), 4)
+
+    def test_an_official_list_is_reserved_before_the_score(self):
+        # Même critère que le plancher : `makes_collection` dit qu'une liste est
+        # assez courte et assez choisie pour valoir dispense.
+        forts = [self._lieu(f"Fort {i}", 200 - i, "34") for i in range(6)]
+        modeste = self._lieu("Petite basilique", 50, "34", labels=["unesco"])
+        gardes = self._cape(forts + [modeste], mini=0)
+        self.assertIn("Petite basilique", {p.name for p in gardes})
+
+    def test_a_review_keep_is_not_a_free_pass(self):
+        # `keep` pose le même drapeau qu'un épinglage à la main, et il y en a
+        # 1555 : les compter comme des dispenses remplissait le plafond avant
+        # qu'une seule région n'ait eu sa part.
+        lieux = [self._lieu(f"Cathédrale {i}", 100 - i, "34") for i in range(8)]
+        for place in lieux:
+            place.pinned = True
+            place.kept_in_review = True
+        self.assertEqual(len(self._cape(lieux, mini=0)), 4)
+
+    def test_a_hand_pinned_place_is_reserved(self):
+        lieux = [self._lieu(f"Cathédrale {i}", 200 - i, "34") for i in range(6)]
+        lieux[-1].pinned = True
+        gardes = self._cape(lieux, mini=0)
+        self.assertIn("Cathédrale 5", {p.name for p in gardes})
+        self.assertEqual(len(gardes), 4)
+
+    def test_the_cap_has_the_last_word_over_the_rescue(self):
+        # Placé avant le repêchage géographique, le plafond était défait : le
+        # repêchage remontait des cathédrales restées sous le plancher pour
+        # combler des départements pauvres, et 80 redevenaient 97.
+        from roam_pipeline.collections import build_all
+        themes = [replace(t, catalogue_cap=3) if t.id == "cathedrales" else t
+                  for t in CONFIG.themes]
+        config = replace(CONFIG, themes=themes)
+        lieux = []
+        for i in range(20):
+            place = make_place(f"Cathédrale {i}", theme="cathedrales",
+                               wikidata_id=f"QC{i}", sitelinks=20 if i < 10 else 1,
+                               lat=43 + i / 20, lon=1 + i / 20)
+            place.departement_code, place.region_code = "34", "76"
+            lieux.append(place)
+        with _capture():
+            retenus, _cols = build_all(lieux, config)
+        self.assertLessEqual(
+            sum(1 for p in retenus if p.theme_id == "cathedrales"), 3)
+
+
+class TestThemeCap(unittest.TestCase):
+    """Combien de lieux d'un thème le CATALOGUE montre, tous territoires confondus.
+
+    La collection « Cathédrales et basiliques » en montrait soixante et une,
+    mais le catalogue en portait cent quatre-vingt-treize : les cent
+    trente-deux autres vivaient dans les collections départementales et
+    s'affichaient toutes sur la carte.
+    """
+
+    def _lieu(self, nom, theme, score, dept, **extra):
+        return make_place(nom, theme=theme, score=score, departement_code=dept,
+                          wikidata_id=f"Q{abs(hash(nom)) % 999979}", **extra)
+
+    def _cape(self, lieux, cap=5, mini=1):
+        from roam_pipeline.collections import apply_theme_cap
+        themes = [replace(t, catalogue_cap=cap if t.id == "cathedrales" else None)
+                  for t in CONFIG.themes]
+        config = replace(CONFIG, themes=themes,
+                         collections=replace(CONFIG.collections, min_per_region=mini))
+        with _capture():
+            return apply_theme_cap(lieux, config)
+
+    def test_only_the_best_survive(self):
+        lieux = [self._lieu(f"Cathédrale {i}", "cathedrales", 100 - i, "75")
+                 for i in range(9)]
+        gardes = self._cape(lieux, mini=0)
+        self.assertEqual(len(gardes), 5)
+        self.assertEqual({p.name for p in gardes},
+                         {f"Cathédrale {i}" for i in range(5)})
+
+    def test_a_theme_without_a_cap_is_untouched(self):
+        lieux = [self._lieu(f"Château {i}", "chateaux", 100 - i, "75")
+                 for i in range(20)]
+        self.assertEqual(len(self._cape(lieux)), 20)
+
+    def test_every_region_keeps_at_least_one(self):
+        # Les quatre cathédrales des DOM sont seules dans leur région : jamais
+        # dans les meilleures de France, donc emportées d'un bloc sans minimum.
+        metropole = [self._lieu(f"Métropole {i}", "cathedrales", 200 - i, "75")
+                     for i in range(5)]
+        outremer = self._lieu("Cathédrale de Cayenne", "cathedrales", 40, "973")
+        gardes = self._cape(metropole + [outremer])
+        self.assertIn("Cathédrale de Cayenne", {p.name for p in gardes})
+        self.assertEqual(len(gardes), 5)
+
+    def test_without_the_minimum_the_overseas_falls(self):
+        metropole = [self._lieu(f"Métropole {i}", "cathedrales", 200 - i, "75")
+                     for i in range(5)]
+        outremer = self._lieu("Cathédrale de Cayenne", "cathedrales", 40, "973")
+        gardes = self._cape(metropole + [outremer], mini=0)
+        self.assertNotIn("Cathédrale de Cayenne", {p.name for p in gardes})
+
+    def test_an_official_list_is_reserved_before_the_score(self):
+        # Les 187 Plus Beaux Villages SONT la liste de l'association : un
+        # plafond qui coupe dedans coupe dans la curation humaine.
+        gros = [self._lieu(f"Cathédrale {i}", "cathedrales", 200 - i, "75")
+                for i in range(5)]
+        petite = self._lieu("Basilique labellisée", "cathedrales", 10, "75",
+                            labels=["unesco"])
+        gardes = self._cape(gros + [petite], mini=0)
+        self.assertIn("Basilique labellisée", {p.name for p in gardes})
+
+    def test_a_pinned_place_comes_first_of_all(self):
+        gros = [self._lieu(f"Cathédrale {i}", "cathedrales", 200 - i, "75")
+                for i in range(5)]
+        epingle = self._lieu("Choisie à la main", "cathedrales", 5, "75")
+        epingle.pinned = True
+        gardes = self._cape(gros + [epingle], mini=0)
+        self.assertIn("Choisie à la main", {p.name for p in gardes})
+
+    def test_a_theme_under_its_cap_loses_nothing(self):
+        lieux = [self._lieu(f"Cathédrale {i}", "cathedrales", 100 - i, "75")
+                 for i in range(3)]
+        self.assertEqual(len(self._cape(lieux)), 3)
+
+    def test_a_saturated_theme_is_closed_to_the_rescue(self):
+        # Le repêchage comble un TERRITOIRE pauvre ; il n'a pas à rouvrir un
+        # quota fermé. Sans cette liste, quatre-vingts cathédrales redevenaient
+        # quatre-vingt-dix-sept.
+        from roam_pipeline.collections import saturated_themes
+        themes = [replace(t, catalogue_cap=5 if t.id == "cathedrales" else None)
+                  for t in CONFIG.themes]
+        config = replace(CONFIG, themes=themes)
+        pleines = [self._lieu(f"Cathédrale {i}", "cathedrales", 100, "75")
+                   for i in range(5)]
+        self.assertEqual(saturated_themes(pleines, config), {"cathedrales"})
+        self.assertEqual(saturated_themes(pleines[:4], config), set())
 
 
 class TestCommuneCap(unittest.TestCase):

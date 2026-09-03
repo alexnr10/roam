@@ -97,6 +97,15 @@ class Place:
     # Ajouté à la main par le curateur : échappe au plancher de notoriété et
     # l'emporte sur le rattachement automatique à un thème.
     pinned: bool = False
+    # Validé en revue, par opposition à épinglé à la main dans `places.csv`.
+    #
+    # Les deux posent `pinned`, et il le faut : un lieu que le curateur a vu et
+    # gardé ne doit pas disparaître parce qu'un plancher a bougé. Mais ils ne
+    # valent pas la même chose face à un PLAFOND. « Keep » veut dire « celui-ci
+    # ne me choque pas » ; il y en a mille cinq cent cinquante-cinq, et les
+    # traiter comme des dispenses remplissait le plafond des cathédrales avant
+    # qu'une seule région n'ait eu sa part.
+    kept_in_review: bool = False
     # D'où vient ce lieu. « wikidata » : trouvé par sa classe, comme la
     # majorité. « osm » : trouvé parce qu'OpenStreetMap atteste qu'il accueille
     # du public, alors que Wikidata ne le classait nulle part. Cette origine ne

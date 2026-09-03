@@ -106,6 +106,12 @@ themes:
     min_sitelinks: 10
     fetch_min_sitelinks: 4
     cap: 60
+    # Le catalogue en portait 193, la collection nationale n'en montrait que 61 :
+    # les 132 autres vivaient dans les collections départementales et
+    # s'affichaient toutes sur la carte. Quatre-vingts, c'est déjà la
+    # cathédrale de chaque ville qui compte — la France a une centaine de
+    # diocèses.
+    catalogue_cap: 80
     wikidata_classes: [Q2977, Q163687, Q120560, Q56242215]
     # cathédrale, basilique, basilique mineure, cathédrale catholique
     #
@@ -131,6 +137,10 @@ themes:
     min_sitelinks: 8
     fetch_min_sitelinks: 3
     cap: 80
+    # 369 au catalogue, pour 88 dans la collection nationale. Cent cinquante
+    # tient les châteaux de la Loire, les forteresses et les grandes demeures
+    # sans descendre au manoir de canton.
+    catalogue_cap: 150
     wikidata_classes: [Q23413, Q751876, Q1785071]   # château fort, château, fort
 
   # AVANT `musees`, et c'est essentiel : une maison-musée est une
