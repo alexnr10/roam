@@ -1,17 +1,13 @@
-# Membres des Plus Beaux Villages de France que la collecte n'a pas.
+# Les deux derniers Plus Beaux Villages à trancher.
 #
-# Vingt-six ont été résolus et écrits dans plus-beaux-villages.csv.
-# Restent les homonymes, que le programme refuse de trancher seul : le
-# département vient de la liste officielle, la description de Wikidata.
+# Wikidata porte pour chacun DEUX entités : l'ancienne commune et la
+# commune nouvelle qui l'a absorbée. La description ne suffit pas à
+# choisir ; ce qui tranche est de savoir laquelle porte des coordonnées et
+# un article, car sans coordonnées la collecte ne peut rien en faire.
+# `resolve-list --classe` l'affiche désormais.
 #
 #     python -m roam_pipeline resolve-list data/manual/villages-a-resoudre.txt \
 #         --into plus-beaux-villages --classe Q484170
 #
-# Capdenac-le-Haut n'y est plus : c'est le village haut de la commune de
-# Capdenac (Q1064107), déjà collectée.
-#
-Le Castellet
 Beaulieu-sur-Dordogne
-Polignac
 Châtillon-en-Diois
-Villeneuve

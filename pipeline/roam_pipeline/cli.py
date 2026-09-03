@@ -990,12 +990,46 @@ def _resolve_chez_wikidata(
     homonymes = [q for couples in ambigus.values() for q, _ in couples]
     if homonymes:
         descriptions = _entity_descriptions(client, homonymes)
+        # Et surtout : le lieu est-il seulement COLLECTABLE ? `items_query`
+        # exige des coordonnées, le plancher compte les langues. Entre une
+        # « ancienne commune » et la « commune nouvelle » qui l'a absorbée, ce
+        # sont ces deux chiffres qui tranchent, pas la description.
+        utiles = _entity_usefulness(client, homonymes)
         ambigus = {
-            nom: [(q, f"{lab} — {descriptions[q]}" if descriptions.get(q) else lab)
+            nom: [(q, _decrire(lab, descriptions.get(q), utiles.get(q)))
                   for q, lab in couples]
             for nom, couples in ambigus.items()
         }
     return trouves, ambigus
+
+
+def _decrire(libelle: str, description: str | None, langues: int | None) -> str:
+    morceaux = [libelle]
+    if description:
+        morceaux.append(description)
+    morceaux.append(
+        "SANS COORDONNÉES, incollectable" if langues is None
+        else f"{langues} langue{'s' if langues > 1 else ''}"
+    )
+    return " — ".join(morceaux)
+
+
+def _entity_usefulness(client, qids: list[str]) -> dict[str, int]:
+    """Langues de chaque entité, pour celles qui portent des coordonnées.
+
+    Absente du résultat = sans coordonnées, donc impossible à collecter : c'est
+    le critère le plus tranchant, et il ne demande aucun jugement.
+    """
+    langues: dict[str, int] = {}
+    for batch in wd.chunked(qids, 150):
+        try:
+            for row in client.query(wd.items_query(batch)):
+                qid = wd.qid_from_uri(row.get("item"))
+                if qid:
+                    langues[qid] = int(row.get("sitelinks") or 0)
+        except Exception as erreur:  # noqa: BLE001
+            LOG.debug("langues indisponibles (%s)", erreur)
+    return langues
 
 
 def _entity_descriptions(client, qids: list[str]) -> dict[str, str]:

@@ -4573,15 +4573,18 @@ class TestResolveAgainstWikidata(unittest.TestCase):
     """
 
     class _Client:
-        def __init__(self, rows, descriptions=()):
+        def __init__(self, rows, descriptions=(), utiles=()):
             self.rows = rows
             self.descriptions = list(descriptions)
+            self.utiles = list(utiles)
             self.vu = []
 
         def query(self, requete):
             self.vu.append(requete)
             if "?itemDescription" in requete:
                 return self.descriptions
+            if "?coord" in requete:
+                return self.utiles
             return self.rows
 
     @staticmethod
@@ -4589,10 +4592,10 @@ class TestResolveAgainstWikidata(unittest.TestCase):
         return {"nom": nom, "item": f"http://www.wikidata.org/entity/{qid}",
                 "itemLabel": label or nom}
 
-    def _run(self, noms, rows, descriptions=()):
+    def _run(self, noms, rows, descriptions=(), utiles=()):
         from unittest import mock
         from roam_pipeline.cli import _resolve_chez_wikidata
-        client = self._Client(rows, descriptions)
+        client = self._Client(rows, descriptions, utiles)
         with mock.patch("roam_pipeline.wikidata.SparqlClient", lambda: client):
             return _resolve_chez_wikidata(noms, "Q484170"), client
 
@@ -4631,6 +4634,18 @@ class TestResolveAgainstWikidata(unittest.TestCase):
         libelles = dict(ambigus["Villeneuve"])
         self.assertIn("Aveyron", libelles["Q1"])
         self.assertIn("Ain", libelles["Q2"])
+
+    def test_an_entity_without_coordinates_says_so(self):
+        # Entre une « ancienne commune » et la « commune nouvelle » qui l'a
+        # absorbée, c'est le seul critère qui ne demande aucun jugement : sans
+        # coordonnées, `items_query` ne rend rien et le lieu est incollectable.
+        (_trouves, ambigus), _ = self._run(
+            ["Villeneuve"],
+            [self._row("Villeneuve", "Q1"), self._row("Villeneuve", "Q2")],
+            utiles=[{"item": "http://www.wikidata.org/entity/Q1", "sitelinks": "12"}])
+        libelles = dict(ambigus["Villeneuve"])
+        self.assertIn("12 langues", libelles["Q1"])
+        self.assertIn("incollectable", libelles["Q2"])
 
     def test_a_name_wikidata_ignores_stays_unresolved(self):
         (trouves, ambigus), _ = self._run(["Village imaginaire"], [])
