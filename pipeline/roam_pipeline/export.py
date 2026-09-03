@@ -14,7 +14,7 @@ from .alerts import alerts_for
 from .score import score_breakdown
 from .models import Collection, Place
 from .review import name_hints, theme_from_name
-from .collections import cross_theme_twins
+from .collections import twins
 
 LOG = logging.getLogger(__name__)
 
@@ -448,7 +448,7 @@ def write_review_html(
     # Ce que le dédoublonnage ne peut pas voir : il ne compare qu'à l'intérieur
     # d'un thème. « Palais du Louvre » et « musée du Louvre » sont à dix mètres
     # et dans deux thèmes différents ; aucune règle ne dit lequel garder.
-    jumeaux = cross_theme_twins(places)
+    jumeaux = twins(places)
 
     # Les thèmes s'alternent au lieu de se suivre. Rangés par identifiant, les
     # abbayes ouvraient chaque niveau — deux cents d'affilée avant la première

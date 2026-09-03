@@ -34,10 +34,11 @@ from roam_pipeline.collections import (
     build_cross_collections,
     build_theme_collections,
     diameter_km,
+    DUPLICATE_DISTANCE_M,
     fantomes,
     _mix_themes,
     _rank_within_theme,
-    cross_theme_twins,
+    twins,
     rescue_thin_departements,
     _spread,
     apply_class_exclusion,
@@ -4048,7 +4049,7 @@ class TestPromoteAgainstTheCap(unittest.TestCase):
         self.assertEqual(len(dedans), 10)
 
 
-class TestCrossThemeTwins(unittest.TestCase):
+class TestTwins(unittest.TestCase):
     """Ce que le dédoublonnage ne peut pas voir.
 
     `dedupe` ne compare qu'à l'intérieur d'un thème, et il a raison : un musée
@@ -4063,7 +4064,7 @@ class TestCrossThemeTwins(unittest.TestCase):
 
     def _paires(self, lieux):
         with _capture():
-            jumeaux = cross_theme_twins(lieux)
+            jumeaux = twins(lieux)
         return jumeaux
 
     def test_two_entries_for_the_same_monument_are_flagged(self):
@@ -4096,6 +4097,40 @@ class TestCrossThemeTwins(unittest.TestCase):
         a = make_place("Dolmen A", theme="megalithes", lat=45.0, lon=2.0)
         b = make_place("Dolmen B", theme="megalithes", lat=45.0001, lon=2.0)
         self.assertEqual(self._paires([a, b]), {})
+
+    def test_a_shared_name_reaches_further_than_proximity_alone(self):
+        # « Château du Louvre » et « musée du Louvre » sont à 188 m : trente-huit
+        # de trop pour le seuil ordinaire, et une seule visite pour qui s'y rend.
+        chateau = self._lieu("Château du Louvre", "chateaux", 48.8602, 2.338, "Paris")
+        musee = self._lieu("Musée du Louvre", "musees", 48.861111, 2.335833, "Paris")
+        jumeaux = self._paires([chateau, musee])
+        self.assertIn(chateau.wikidata_id, jumeaux)
+        _autre, distance, motif = jumeaux[chateau.wikidata_id][0]
+        self.assertGreater(distance, DUPLICATE_DISTANCE_M)
+        self.assertIn("louvre", motif)
+
+    def test_a_shared_name_also_speaks_inside_one_theme(self):
+        # `dedupe` s'arrête à 150 m. L'abbaye de Lérins et sa tour-monastère
+        # sont à 160 : deux fiches pour un même rocher, que personne ne voyait.
+        abbaye = self._lieu("Abbaye de Lérins", "abbayes",
+                            43.5060, 7.0470, "Cannes")
+        tour = self._lieu("Tour-monastère de l'abbaye de Lérins", "abbayes",
+                          43.5046, 7.0473, "Cannes")
+        self.assertIn(abbaye.wikidata_id, self._paires([abbaye, tour]))
+
+    def test_a_shared_name_stops_at_three_hundred_metres(self):
+        # Au-delà, le rendement s'effondre : les calanques de Sugiton et de
+        # Morgiou partagent « calanque » et sont deux calanques.
+        a = self._lieu("Calanque de Sugiton", "plages", 43.2100, 5.4600, "Marseille")
+        b = self._lieu("Calanque de Morgiou", "plages", 43.2150, 5.4600, "Marseille")
+        self.assertEqual(self._paires([a, b]), {})
+
+    def test_proximity_without_a_shared_name_keeps_the_old_reach(self):
+        # Élargir SANS le nom rapprocherait trois cents paires de voisins qui
+        # n'ont rien à voir. À 200 m et sans mot commun, on ne dit rien.
+        musee = self._lieu("Musée Machin", "musees", 45.0, 2.0, "Ici")
+        pont = self._lieu("Pont Truc", "ponts", 45.0018, 2.0, "Ici")
+        self.assertEqual(self._paires([musee, pont]), {})
 
     def test_distant_pairs_are_not_flagged(self):
         musee = self._lieu("Musée Machin", "musees", 45.0, 2.0, "Ici")

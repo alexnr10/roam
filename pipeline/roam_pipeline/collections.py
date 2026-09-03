@@ -67,6 +67,22 @@ MOTS_GENERIQUES = frozenset(
 # au sol. « Musée Toulouse-Lautrec » et « palais de la Berbie » sont à 4 m.
 SAME_FOOTPRINT_M = 30.0
 
+# Quand les DEUX noms portent le même mot distinctif, on regarde deux fois plus
+# loin. « Château du Louvre » et « musée du Louvre » sont à 188 m : trente-huit
+# de trop pour le seuil ordinaire, et une seule visite pour qui s'y rend.
+#
+# Trois cents mètres, et pas plus : c'est là que le rendement s'effondre. Le
+# nom partagé rattrape treize paires entre 150 et 300 m, dont huit désignent
+# vraiment une seule visite — le phare de l'île Vierge et l'île Vierge, le
+# cairn de Gavrinis et Gavrinis, le cap Gris-Nez et son phare, Glanum et son
+# arc. Poussé à 750 m il en ramène dix-neuf de plus, dont presque aucune : les
+# calanques de Sugiton et de Morgiou sont deux calanques, les puys de Lassolas
+# et de Mercœur deux volcans.
+#
+# Le nom fait tout le travail. À 300 m, la seule distance rapproche 308 paires ;
+# avec le nom, vingt.
+NAMED_TWIN_DISTANCE_M = 300.0
+
 
 def _mots_distinctifs(nom: str, commune: str | None) -> set[str]:
     """Les mots d'un nom qui désignent CE monument et pas sa catégorie.
@@ -91,14 +107,21 @@ def _decoupe(texte: str) -> list[str]:
     return [mot for mot in re.split(r"[^a-z0-9]+", sans_accents) if mot]
 
 
-def cross_theme_twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
+def twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
     """Les paires de lieux proches que `dedupe` ne peut pas voir.
 
-    `dedupe` ne compare qu'à l'intérieur d'un thème, et il a raison : un musée
-    et la cathédrale d'en face sont deux visites. Mais la même règle laisse
-    passer « palais du Louvre » (châteaux) et « musée du Louvre » (musées) à
-    dix mètres — une seule visite, deux fiches Wikidata, deux entrées dans le
-    catalogue.
+    `dedupe` ne compare qu'à l'intérieur d'un thème et qu'à cent cinquante
+    mètres, et il a raison de se tenir là : un musée et la cathédrale d'en face
+    sont deux visites, et écarter automatiquement est irréversible. Mais la
+    même règle laisse passer « palais du Louvre » (châteaux) et « musée du
+    Louvre » (musées) à dix mètres — une seule visite, deux fiches Wikidata,
+    deux entrées dans le catalogue.
+
+    Deux portes, donc. La PROXIMITÉ seule ne parle qu'entre thèmes différents
+    et de près. Le NOM PARTAGÉ ouvre deux fois plus loin, et à l'intérieur d'un
+    thème : « château du Louvre » et « musée du Louvre » sont à 188 m, trente-
+    huit de trop pour le seuil ordinaire ; l'abbaye de Lérins et sa
+    tour-monastère à 160 m, dans le même thème, là où `dedupe` s'arrête.
 
     On ne tranche pas ici : distinguer « le musée EST le monument » de « le
     musée est en face » demande de savoir ce qu'on visite, ce qu'aucune donnée
@@ -120,18 +143,31 @@ def cross_theme_twins(places: list[Place]) -> dict[str, list[tuple[Place, float,
                     (round(place.lat + dlat, 2), round(place.lon + dlon, 2)), []
                 )
                 for autre in voisins:
-                    if autre.theme_id == place.theme_id:
-                        continue  # déjà l'affaire de `dedupe`
                     couple = tuple(sorted((place.wikidata_id, autre.wikidata_id)))
                     if couple in vus or couple[0] == couple[1]:
                         continue
                     distance = haversine_m(place.lat, place.lon, autre.lat, autre.lon)
-                    if distance >= DUPLICATE_DISTANCE_M:
+                    if distance >= NAMED_TWIN_DISTANCE_M:
                         continue
-                    vus.add(couple)
                     communs = _mots_distinctifs(
                         place.name, place.commune_name
                     ) & _mots_distinctifs(autre.name, autre.commune_name)
+                    # Deux portes. La proximité seule ne vaut qu'entre thèmes
+                    # différents et de près — `dedupe` fait déjà le reste, et
+                    # élargir sans le nom rapprocherait trois cents paires de
+                    # voisins qui n'ont rien à voir. Le nom partagé, lui, ouvre
+                    # plus loin ET à l'intérieur d'un thème : l'abbaye de Lérins
+                    # et sa tour-monastère sont à 160 m, deux fiches pour un
+                    # même rocher, et `dedupe` s'arrête à 150.
+                    if autre.theme_id == place.theme_id:
+                        # En deçà de son seuil, `dedupe` a déjà tranché — une
+                        # paire qui arrive ici de si près n'existe pas en vrai.
+                        # Au-delà, il ne voit plus rien : c'est le nom qui parle.
+                        if not communs or distance < DUPLICATE_DISTANCE_M:
+                            continue
+                    elif not communs and distance >= DUPLICATE_DISTANCE_M:
+                        continue
+                    vus.add(couple)
                     if communs:
                         motif = "nom partagé : " + ", ".join(sorted(communs))
                     elif distance < SAME_FOOTPRINT_M:
@@ -143,8 +179,7 @@ def cross_theme_twins(places: list[Place]) -> dict[str, list[tuple[Place, float,
 
     if jumeaux:
         LOG.info(
-            "sosies inter-thèmes : %s lieux concernés, %s paires — à trancher "
-            "en revue",
+            "sosies : %s lieux concernés, %s paires — à trancher en revue",
             len(jumeaux),
             len(vus),
         )
