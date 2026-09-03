@@ -17206,6 +17206,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Notre-Dame_de_Fontgombault"
   },
   {
+   "id": "Q761970",
+   "slug": "foret-de-troncais",
+   "name": "Forêt de Tronçais",
+   "themeId": "forets",
+   "lat": 46.64125,
+   "lon": 2.72143,
+   "radiusM": 800,
+   "score": 91.5,
+   "departement": "Allier",
+   "departementCode": "03",
+   "regionCode": "84",
+   "communeCode": "03221",
+   "communeName": "Saint-Bonnet-Tronçais",
+   "summary": "La forêt de Tronçais est une forêt domaniale française située dans le Nord-Ouest de l'Allier. Elle est principalement constituée de chênes sessiles « conduits » en futaie.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Arbres%20de%20la%20Futaie%20de%20Colbert%20en%20For%C3%AAt%20de%20Tron%C3%A7ais%20%2803%29.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/For%C3%AAt_de_Tron%C3%A7ais"
+  },
+  {
    "id": "Q1270698",
    "slug": "desert-de-retz",
    "name": "Désert de Retz",
@@ -17726,6 +17744,24 @@
    "summary": "L'abbaye de Saint-Roman est une ancienne abbaye troglodytique située sur le territoire de la commune de Beaucaire, dans le département du Gard, en France.\nPropriété de la commune de Beaucaire depuis 1988, sa compétence déléguée a été transférée à la Communauté de Communes Beaucaire Terre d'Argence.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Abbaye%20de%20Saint-Roman%20sur%20une%20colline%20au-dessus%20du%20Rh%C3%B4ne.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Saint-Roman"
+  },
+  {
+   "id": "Q1595270",
+   "slug": "foret-de-haguenau",
+   "name": "Forêt de Haguenau",
+   "themeId": "forets",
+   "lat": 48.85,
+   "lon": 7.883333,
+   "radiusM": 800,
+   "score": 90.4,
+   "departement": "Bas-Rhin",
+   "departementCode": "67",
+   "regionCode": "44",
+   "communeCode": "67180",
+   "communeName": "Haguenau",
+   "summary": "La forêt de Haguenau est une forêt située sur le territoire de la commune de Haguenau ; elle est la plus vaste forêt d'Alsace (21 000 ha). Elle est labellisée Forêt d'Exception, label de l'Office national des forêts détenu par une quinzaine de forêts françaises et première forêt indivise à obtenir ce label.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/For%C3%AAt%20de%20Haguenau.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/For%C3%AAt_de_Haguenau"
   },
   {
    "id": "Q3162566",
@@ -20050,6 +20086,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Valloires"
   },
   {
+   "id": "Q3078936",
+   "slug": "foret-de-retz",
+   "name": "Forêt de Retz",
+   "themeId": "forets",
+   "lat": 49.2593,
+   "lon": 3.09242,
+   "radiusM": 800,
+   "score": 84.5,
+   "departement": "Aisne",
+   "departementCode": "02",
+   "regionCode": "32",
+   "communeCode": "02810",
+   "communeName": "Villers-Cotterêts",
+   "summary": "La forêt de Retz [ʁɛts] est une forêt domaniale située principalement dans l'Aisne, mais aussi dans l'Oise (communes de Vauciennes et Ivors), en forme de croissant dont Villers-Cotterêts serait le centre. Elle est située à 80 km au nord-est de Paris.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Coyolles%20%2860%29%2C%20la%20cave%20du%20Diable%20en%20for%C3%AAt%20de%20Retz%208.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/For%C3%AAt_de_Retz"
+  },
+  {
    "id": "Q6467817",
    "slug": "lac-benit",
    "name": "Lac Bénit",
@@ -21092,6 +21146,24 @@
    "summary": "La Maison de Jules Verne ou Maison à la Tour est une demeure-musée d'Amiens, dans laquelle Jules Verne a vécu de 1882 à 1900. Ce musée, à l'intersection du 2 rue Charles-Dubois et du boulevard Jules-Verne, commémore la vie, l'œuvre et l'action publique de l'écrivain, qui y a composé une quarantaine des romans à succès de ses « Voyages extraordinaires ».",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Amiens%20Maison%20Jules%20Verne%201.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Maison_de_Jules_Verne"
+  },
+  {
+   "id": "Q1293678",
+   "slug": "foret-de-fontainebleau",
+   "name": "Forêt de Fontainebleau",
+   "themeId": "forets",
+   "lat": 48.401957,
+   "lon": 2.662717,
+   "radiusM": 800,
+   "score": 81.9,
+   "departement": "Essonne",
+   "departementCode": "91",
+   "regionCode": "11",
+   "communeCode": null,
+   "communeName": null,
+   "summary": null,
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Rochers%20en%20for%C3%AAt%20de%20Fontainebleau11.JPG?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/For%C3%AAt_de_Fontainebleau"
   },
   {
    "id": "Q131830",
@@ -23974,24 +24046,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Th%C3%A9%C3%A2tre_antique_de_Sanxay"
   },
   {
-   "id": "Q761970",
-   "slug": "foret-de-troncais",
-   "name": "Forêt de Tronçais",
-   "themeId": "forets",
-   "lat": 46.64125,
-   "lon": 2.72143,
-   "radiusM": 800,
-   "score": 76.5,
-   "departement": "Allier",
-   "departementCode": "03",
-   "regionCode": "84",
-   "communeCode": "03221",
-   "communeName": "Saint-Bonnet-Tronçais",
-   "summary": "La forêt de Tronçais est une forêt domaniale française située dans le Nord-Ouest de l'Allier. Elle est principalement constituée de chênes sessiles « conduits » en futaie.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Arbres%20de%20la%20Futaie%20de%20Colbert%20en%20For%C3%AAt%20de%20Tron%C3%A7ais%20%2803%29.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/For%C3%AAt_de_Tron%C3%A7ais"
-  },
-  {
    "id": "Q1235906",
    "slug": "dolmen-de-bagneux",
    "name": "Dolmen de Bagneux",
@@ -24674,24 +24728,6 @@
    "summary": "La maison de Louis Pasteur à Arbois est une maison historique située à Arbois dans le Jura où a vécu et travaillé Louis Pasteur (1822-1895). Elle est aujourd'hui un musée consacré à sa mémoire, abritant notamment son laboratoire, labellisée Maisons des Illustres.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Maison%20Pasteur%20Arbois%200001.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Maison_de_Louis_Pasteur_%C3%A0_Arbois"
-  },
-  {
-   "id": "Q1595270",
-   "slug": "foret-de-haguenau",
-   "name": "Forêt de Haguenau",
-   "themeId": "forets",
-   "lat": 48.85,
-   "lon": 7.883333,
-   "radiusM": 800,
-   "score": 75.4,
-   "departement": "Bas-Rhin",
-   "departementCode": "67",
-   "regionCode": "44",
-   "communeCode": "67180",
-   "communeName": "Haguenau",
-   "summary": "La forêt de Haguenau est une forêt située sur le territoire de la commune de Haguenau ; elle est la plus vaste forêt d'Alsace (21 000 ha). Elle est labellisée Forêt d'Exception, label de l'Office national des forêts détenu par une quinzaine de forêts françaises et première forêt indivise à obtenir ce label.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/For%C3%AAt%20de%20Haguenau.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/For%C3%AAt_de_Haguenau"
   },
   {
    "id": "Q3558853",
@@ -26584,6 +26620,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cirque_du_Fer-%C3%A0-Cheval"
   },
   {
+   "id": "Q3079045",
+   "slug": "foret-domaniale-de-verdun",
+   "name": "Forêt domaniale de Verdun",
+   "themeId": "forets",
+   "lat": 49.1955,
+   "lon": 5.43341,
+   "radiusM": 800,
+   "score": 71.3,
+   "departement": "Meuse",
+   "departementCode": "55",
+   "regionCode": "44",
+   "communeCode": "55189",
+   "communeName": "Fleury-devant-Douaumont",
+   "summary": "L'ensemble de massifs boisés dit massif domanial de Verdun ou forêt domaniale de Verdun (plus de 10 000 ha boisés) plus souvent improprement dénommés « forêt de Verdun » est une des zones de massifs boisés de la région forestière dite Côtes et collines de Meuse, du département de la Meuse en Lorraine (boisée à 36 %, ce qui en fait la seconde région forestière de la France métropolitaine).",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Battelfield%20Verdun.JPG?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/For%C3%AAt_domaniale_de_Verdun"
+  },
+  {
    "id": "Q2835200",
    "slug": "jardin-botanique-du-chateau-de-vauville",
    "name": "Jardin botanique du château de Vauville",
@@ -27392,24 +27446,6 @@
    "summary": "Le ballon de Servance est un sommet du massif des Vosges méridionales, en limite de la Bourgogne-Franche-Comté et de la région Grand Est. Il est le point culminant du département de la Haute-Saône, et de la réserve naturelle nationale des Ballons comtois.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Ballon%20de%20Servance%20%40%20Statue%20de%20Jeanne%20d%27Arc%20Ballon%20d%27Alsace%2001.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ballon_de_Servance"
-  },
-  {
-   "id": "Q3078936",
-   "slug": "foret-de-retz",
-   "name": "Forêt de Retz",
-   "themeId": "forets",
-   "lat": 49.2593,
-   "lon": 3.09242,
-   "radiusM": 800,
-   "score": 69.5,
-   "departement": "Aisne",
-   "departementCode": "02",
-   "regionCode": "32",
-   "communeCode": "02810",
-   "communeName": "Villers-Cotterêts",
-   "summary": "La forêt de Retz [ʁɛts] est une forêt domaniale située principalement dans l'Aisne, mais aussi dans l'Oise (communes de Vauciennes et Ivors), en forme de croissant dont Villers-Cotterêts serait le centre. Elle est située à 80 km au nord-est de Paris.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Coyolles%20%2860%29%2C%20la%20cave%20du%20Diable%20en%20for%C3%AAt%20de%20Retz%208.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/For%C3%AAt_de_Retz"
   },
   {
    "id": "Q336923",
@@ -30310,24 +30346,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Dziani_Dzaha"
   },
   {
-   "id": "Q2820421",
-   "slug": "abbaye-saint-paul-de-verdun",
-   "name": "Abbaye Saint-Paul de Verdun",
-   "themeId": "abbayes",
-   "lat": 49.163087,
-   "lon": 5.383902,
-   "radiusM": 150,
-   "score": 64.4,
-   "departement": "Meuse",
-   "departementCode": "55",
-   "regionCode": "44",
-   "communeCode": "55545",
-   "communeName": "Verdun",
-   "summary": "L'abbaye Saint-Paul de Verdun, connue aussi sous le nom d'abbaye des Prémontrés de Verdun, est une ancienne abbaye du XVIIe siècle située à Verdun, dans le département de la Meuse en région Grand Est.\nFondée en 973 par des moines bénédictins, elle passe aux mains des prémontrés en 1135.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Verdun%20sous-prefecture%204juni2006%20045.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Saint-Paul_de_Verdun"
-  },
-  {
    "id": "Q2262571",
    "slug": "ile-saint-joseph",
    "name": "Île Saint-Joseph",
@@ -33226,24 +33244,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Naussac"
   },
   {
-   "id": "Q2994542",
-   "slug": "conservatoire-national-des-plantes-a-parfum-medicinales-aromatiques-et-industrielles",
-   "name": "Conservatoire national des plantes à parfum, médicinales, aromatiques et industrielles",
-   "themeId": "jardins",
-   "lat": 48.396944,
-   "lon": 2.479167,
-   "radiusM": 200,
-   "score": 58.5,
-   "departement": "Essonne",
-   "departementCode": "91",
-   "regionCode": "11",
-   "communeCode": "91405",
-   "communeName": "Milly-la-Forêt",
-   "summary": "Le Conservatoire national des plantes à parfum, médicinales, aromatiques et industrielles (CNPMAI) est une association loi de 1901 à but non lucratif, créée en 1987 par des professionnels de l’industrie des plantes aromatiques et médicinales (ou PAM).\nL'association possède des jardins et un musée ouverts au public.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Equisetum%20hyemale%2001%20by%20Line1.JPG?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Conservatoire_national_des_plantes_%C3%A0_parfum,_m%C3%A9dicinales,_aromatiques_et_industrielles"
-  },
-  {
    "id": "Q3078778",
    "slug": "foret-d-horte",
    "name": "Forêt d'Horte",
@@ -33836,24 +33836,6 @@
    "summary": "La presqu’île de la Caravelle est une réserve naturelle qui se trouve sur la côte est de la Martinique, soit sur la façade Atlantique, dans la commune de Trinité. Elle peut être parcourue ou visitée sur 2 sentiers de randonnée.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Anse%20non%20nomm%C3%A9e%20%C3%A0%20la%20pointe%20de%20la%20presqu%27%C3%AEle%20de%20la%20Caravelle.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Presqu%27%C3%AEle_de_la_Caravelle"
-  },
-  {
-   "id": "Q19951156",
-   "slug": "monastere-de-la-dormition-de-la-mere-de-dieu-a-la-faurie",
-   "name": "Monastère de la Dormition-de-la-Mère-de-Dieu à La Faurie",
-   "themeId": "abbayes",
-   "lat": 44.5763,
-   "lon": 5.74065,
-   "radiusM": 150,
-   "score": 56.4,
-   "departement": "Hautes-Alpes",
-   "departementCode": "05",
-   "regionCode": "93",
-   "communeCode": "05055",
-   "communeName": "La Faurie",
-   "summary": "Le monastère de la Dormition-de-la-Mère-de-Dieu est un monastère orthodoxe situé sur la commune de La Faurie (Hautes-Alpes), au lieu-dit Notre-Dame. Le monastère compte actuellement une communauté d'une dizaine de moines, et dépend de la métropole grecque-orthodoxe de France.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Monast%C3%A8re-la%20Faurie-%C3%A9glise.JPG?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Monast%C3%A8re_de_la_Dormition-de-la-M%C3%A8re-de-Dieu_%C3%A0_La_Faurie"
   },
   {
    "id": "Q3111006",
@@ -36410,6 +36392,24 @@
    "summary": "La pointe de Penvins est une presqu'île de la commune de Sarzeau (Morbihan).",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Pointe%20de%20Penvins%20%283%29.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pointe_de_Penvins"
+  },
+  {
+   "id": "Q2911447",
+   "slug": "foret-de-boscodon",
+   "name": "Forêt de Boscodon",
+   "themeId": "forets",
+   "lat": 44.486967,
+   "lon": 6.443472,
+   "radiusM": 800,
+   "score": 45.6,
+   "departement": "Hautes-Alpes",
+   "departementCode": "05",
+   "regionCode": "93",
+   "communeCode": null,
+   "communeName": null,
+   "summary": null,
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Boscodon-site89.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/For%C3%AAt_de_Boscodon"
   },
   {
    "id": "Q1046882",
@@ -44931,10 +44931,10 @@
    "labelId": null,
    "geoLevel": null,
    "geoCode": null,
-   "placeCount": 20,
+   "placeCount": 23,
    "tierCounts": [
     10,
-    10,
+    13,
     0
    ],
    "places": [
@@ -44949,94 +44949,109 @@
      "rank": 2
     },
     {
-     "placeId": "Q639713",
+     "placeId": "Q3078936",
      "tier": 1,
      "rank": 3
     },
     {
-     "placeId": "Q3078951",
+     "placeId": "Q1293678",
      "tier": 1,
      "rank": 4
     },
     {
-     "placeId": "Q3078936",
+     "placeId": "Q639713",
      "tier": 1,
      "rank": 5
     },
     {
-     "placeId": "Q4406086",
+     "placeId": "Q3079045",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q3078838",
+     "placeId": "Q3078951",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q3078935",
+     "placeId": "Q4406086",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q3078836",
+     "placeId": "Q3078838",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q3078875",
+     "placeId": "Q3078935",
      "tier": 1,
      "rank": 10
     },
     {
-     "placeId": "Q3078867",
+     "placeId": "Q3078836",
      "tier": 2,
      "rank": 11
     },
     {
-     "placeId": "Q3078854",
+     "placeId": "Q3078875",
      "tier": 2,
      "rank": 12
     },
     {
-     "placeId": "Q3079055",
+     "placeId": "Q3078867",
      "tier": 2,
      "rank": 13
     },
     {
-     "placeId": "Q3078853",
+     "placeId": "Q3078854",
      "tier": 2,
      "rank": 14
     },
     {
-     "placeId": "Q3078778",
+     "placeId": "Q3079055",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q3078808",
+     "placeId": "Q3078853",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q3078864",
+     "placeId": "Q3078778",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q3078863",
+     "placeId": "Q3078808",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q3113532",
+     "placeId": "Q3078864",
      "tier": 2,
      "rank": 19
     },
     {
-     "placeId": "Q3078840",
+     "placeId": "Q3078863",
      "tier": 2,
      "rank": 20
+    },
+    {
+     "placeId": "Q3113532",
+     "tier": 2,
+     "rank": 21
+    },
+    {
+     "placeId": "Q3078840",
+     "tier": 2,
+     "rank": 22
+    },
+    {
+     "placeId": "Q2911447",
+     "tier": 2,
+     "rank": 23
     }
    ]
   },
@@ -54271,17 +54286,17 @@
      "rank": 6
     },
     {
-     "placeId": "Q3329215",
+     "placeId": "Q1595270",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q643186",
+     "placeId": "Q3329215",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q1595270",
+     "placeId": "Q643186",
      "tier": 1,
      "rank": 9
     },
@@ -54428,22 +54443,22 @@
      "rank": 6
     },
     {
-     "placeId": "Q624323",
+     "placeId": "Q2911447",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q687259",
+     "placeId": "Q624323",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q380689",
+     "placeId": "Q687259",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q16864802",
+     "placeId": "Q380689",
      "tier": 1,
      "rank": 10
     },
@@ -54453,7 +54468,7 @@
      "rank": 11
     },
     {
-     "placeId": "Q19951156",
+     "placeId": "Q16864802",
      "tier": 2,
      "rank": 12
     }
@@ -55677,17 +55692,17 @@
      "rank": 5
     },
     {
-     "placeId": "Q23640615",
+     "placeId": "Q3079045",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q1696035",
+     "placeId": "Q23640615",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q1775889",
+     "placeId": "Q1696035",
      "tier": 1,
      "rank": 8
     },
@@ -55697,7 +55712,7 @@
      "rank": 9
     },
     {
-     "placeId": "Q2974403",
+     "placeId": "Q1775889",
      "tier": 1,
      "rank": 10
     },
@@ -55707,7 +55722,7 @@
      "rank": 11
     },
     {
-     "placeId": "Q2820421",
+     "placeId": "Q2974403",
      "tier": 2,
      "rank": 12
     }
@@ -57588,17 +57603,17 @@
      "rank": 3
     },
     {
-     "placeId": "Q3402951",
+     "placeId": "Q761970",
      "tier": 1,
      "rank": 4
     },
     {
-     "placeId": "Q2859703",
+     "placeId": "Q3402951",
      "tier": 1,
      "rank": 5
     },
     {
-     "placeId": "Q761970",
+     "placeId": "Q2859703",
      "tier": 1,
      "rank": 6
     },
@@ -58626,12 +58641,12 @@
      "rank": 5
     },
     {
-     "placeId": "Q3556312",
+     "placeId": "Q3078936",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q3078936",
+     "placeId": "Q3556312",
      "tier": 1,
      "rank": 7
     },
@@ -60861,7 +60876,7 @@
      "rank": 3
     },
     {
-     "placeId": "Q639713",
+     "placeId": "Q1293678",
      "tier": 1,
      "rank": 4
     },
@@ -60876,12 +60891,12 @@
      "rank": 6
     },
     {
-     "placeId": "Q2994542",
+     "placeId": "Q3407582",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q3407582",
+     "placeId": "Q639713",
      "tier": 1,
      "rank": 8
     },
@@ -61137,7 +61152,7 @@
      "rank": 11
     },
     {
-     "placeId": "Q639713",
+     "placeId": "Q1293678",
      "tier": 2,
      "rank": 12
     },
@@ -61162,12 +61177,12 @@
      "rank": 16
     },
     {
-     "placeId": "Q730948",
+     "placeId": "Q201428",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q201428",
+     "placeId": "Q730948",
      "tier": 2,
      "rank": 18
     },
@@ -61187,22 +61202,22 @@
      "rank": 21
     },
     {
-     "placeId": "Q3330509",
+     "placeId": "Q390418",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q390418",
+     "placeId": "Q2599177",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q2599177",
+     "placeId": "Q739976",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q739976",
+     "placeId": "Q3330509",
      "tier": 2,
      "rank": 25
     },
@@ -61227,12 +61242,12 @@
      "rank": 29
     },
     {
-     "placeId": "Q309458",
+     "placeId": "Q663673",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q663673",
+     "placeId": "Q309458",
      "tier": 2,
      "rank": 31
     },
@@ -61252,12 +61267,12 @@
      "rank": 34
     },
     {
-     "placeId": "Q217925",
+     "placeId": "Q1758497",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q1758497",
+     "placeId": "Q2509432",
      "tier": 2,
      "rank": 36
     },
@@ -61277,12 +61292,12 @@
      "rank": 39
     },
     {
-     "placeId": "Q2509432",
+     "placeId": "Q648534",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q648534",
+     "placeId": "Q217925",
      "tier": 3,
      "rank": 41
     },
@@ -61307,27 +61322,27 @@
      "rank": 45
     },
     {
-     "placeId": "Q898629",
+     "placeId": "Q64436",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q64436",
+     "placeId": "Q1230290",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q1230290",
+     "placeId": "Q3329787",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q3329787",
+     "placeId": "Q2092716",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q2092716",
+     "placeId": "Q898629",
      "tier": 3,
      "rank": 50
     },
@@ -61347,17 +61362,17 @@
      "rank": 53
     },
     {
-     "placeId": "Q1414059",
+     "placeId": "Q290355",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q290355",
+     "placeId": "Q3388631",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q3388631",
+     "placeId": "Q639713",
      "tier": 3,
      "rank": 56
     },
@@ -61377,22 +61392,22 @@
      "rank": 59
     },
     {
-     "placeId": "Q656302",
+     "placeId": "Q1414059",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q3796698",
+     "placeId": "Q656302",
      "tier": 3,
      "rank": 61
     },
     {
-     "placeId": "Q3329627",
+     "placeId": "Q3796698",
      "tier": 3,
      "rank": 62
     },
     {
-     "placeId": "Q2030715",
+     "placeId": "Q3329627",
      "tier": 3,
      "rank": 63
     },
@@ -61407,22 +61422,22 @@
      "rank": 65
     },
     {
-     "placeId": "Q3329594",
+     "placeId": "Q2030715",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q188856",
+     "placeId": "Q3329594",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q3278803",
+     "placeId": "Q188856",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q604550",
+     "placeId": "Q3278803",
      "tier": 3,
      "rank": 69
     },
@@ -61452,17 +61467,17 @@
      "rank": 74
     },
     {
-     "placeId": "Q3325679",
+     "placeId": "Q604550",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q184407",
+     "placeId": "Q3325679",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q3399930",
+     "placeId": "Q184407",
      "tier": 3,
      "rank": 77
     },
@@ -61472,12 +61487,12 @@
      "rank": 78
     },
     {
-     "placeId": "Q3078951",
+     "placeId": "Q2574917",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q2574917",
+     "placeId": "Q2348375",
      "tier": 3,
      "rank": 80
     }
@@ -61604,32 +61619,32 @@
      "rank": 21
     },
     {
-     "placeId": "Q244546",
+     "placeId": "Q2911447",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q965780",
+     "placeId": "Q244546",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q747588",
+     "placeId": "Q965780",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q598006",
+     "placeId": "Q747588",
      "tier": 2,
      "rank": 25
     },
     {
-     "placeId": "Q83013",
+     "placeId": "Q598006",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q1858504",
+     "placeId": "Q83013",
      "tier": 2,
      "rank": 27
     },
@@ -61644,37 +61659,37 @@
      "rank": 29
     },
     {
-     "placeId": "Q243663",
+     "placeId": "Q1858504",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q1994367",
+     "placeId": "Q243663",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q281849",
+     "placeId": "Q1994367",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q1955741",
+     "placeId": "Q281849",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q815807",
+     "placeId": "Q1955741",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q292564",
+     "placeId": "Q815807",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q958961",
+     "placeId": "Q292564",
      "tier": 2,
      "rank": 36
     },
@@ -61699,27 +61714,27 @@
      "rank": 40
     },
     {
-     "placeId": "Q476465",
+     "placeId": "Q958961",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q1034146",
+     "placeId": "Q476465",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q3329666",
+     "placeId": "Q1034146",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q281494",
+     "placeId": "Q3329666",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q306155",
+     "placeId": "Q281494",
      "tier": 3,
      "rank": 45
     },
@@ -61734,37 +61749,37 @@
      "rank": 47
     },
     {
-     "placeId": "Q458748",
+     "placeId": "Q306155",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q1795927",
+     "placeId": "Q458748",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q624323",
+     "placeId": "Q1795927",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q972128",
+     "placeId": "Q624323",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q3330218",
+     "placeId": "Q972128",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q457023",
+     "placeId": "Q3330218",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q334060",
+     "placeId": "Q457023",
      "tier": 3,
      "rank": 54
     },
@@ -61789,62 +61804,62 @@
      "rank": 58
     },
     {
-     "placeId": "Q1369366",
+     "placeId": "Q334060",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q3558989",
+     "placeId": "Q1369366",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q258818",
+     "placeId": "Q3558989",
      "tier": 3,
      "rank": 61
     },
     {
-     "placeId": "Q752558",
+     "placeId": "Q258818",
      "tier": 3,
      "rank": 62
     },
     {
-     "placeId": "Q274678",
+     "placeId": "Q752558",
      "tier": 3,
      "rank": 63
     },
     {
-     "placeId": "Q1664416",
+     "placeId": "Q274678",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q322270",
+     "placeId": "Q1664416",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q1777218",
+     "placeId": "Q322270",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q3329265",
+     "placeId": "Q1777218",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q450348",
+     "placeId": "Q3329265",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q15229399",
+     "placeId": "Q450348",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q334008",
+     "placeId": "Q15229399",
      "tier": 3,
      "rank": 70
     },
@@ -61869,32 +61884,32 @@
      "rank": 74
     },
     {
-     "placeId": "Q779689",
+     "placeId": "Q334008",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q733035",
+     "placeId": "Q779689",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q2172329",
+     "placeId": "Q733035",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q1368360",
+     "placeId": "Q2172329",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q687259",
+     "placeId": "Q1368360",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q975080",
+     "placeId": "Q687259",
      "tier": 3,
      "rank": 80
     }
@@ -62368,17 +62383,17 @@
      "rank": 7
     },
     {
-     "placeId": "Q2839983",
+     "placeId": "Q3078936",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q3078613",
+     "placeId": "Q2839983",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q3162565",
+     "placeId": "Q3078613",
      "tier": 1,
      "rank": 10
     },
@@ -62393,12 +62408,12 @@
      "rank": 12
     },
     {
-     "placeId": "Q2327866",
+     "placeId": "Q3162565",
      "tier": 2,
      "rank": 13
     },
     {
-     "placeId": "Q3078936",
+     "placeId": "Q2327866",
      "tier": 2,
      "rank": 14
     },
@@ -64905,17 +64920,17 @@
      "rank": 15
     },
     {
-     "placeId": "Q2940841",
+     "placeId": "Q761970",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q8417",
+     "placeId": "Q2940841",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q761970",
+     "placeId": "Q8417",
      "tier": 2,
      "rank": 18
     },
@@ -65709,7 +65724,7 @@
      "rank": 9
     },
     {
-     "placeId": "Q1243526",
+     "placeId": "Q1595270",
      "tier": 1,
      "rank": 10
     },
@@ -65719,17 +65734,17 @@
      "rank": 11
     },
     {
-     "placeId": "Q1553818",
+     "placeId": "Q1243526",
      "tier": 2,
      "rank": 12
     },
     {
-     "placeId": "Q205682",
+     "placeId": "Q1553818",
      "tier": 2,
      "rank": 13
     },
     {
-     "placeId": "Q1595270",
+     "placeId": "Q205682",
      "tier": 2,
      "rank": 14
     },
@@ -65744,12 +65759,12 @@
      "rank": 16
     },
     {
-     "placeId": "Q519572",
+     "placeId": "Q272897",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q272897",
+     "placeId": "Q519572",
      "tier": 2,
      "rank": 18
     },
@@ -65769,17 +65784,17 @@
      "rank": 21
     },
     {
-     "placeId": "Q3403076",
+     "placeId": "Q867719",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q867719",
+     "placeId": "Q148959",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q148959",
+     "placeId": "Q3403076",
      "tier": 2,
      "rank": 24
     },
@@ -65804,17 +65819,17 @@
      "rank": 28
     },
     {
-     "placeId": "Q840662",
+     "placeId": "Q1397720",
      "tier": 2,
      "rank": 29
     },
     {
-     "placeId": "Q1397720",
+     "placeId": "Q185721",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q185721",
+     "placeId": "Q840662",
      "tier": 2,
      "rank": 31
     },
@@ -65864,17 +65879,17 @@
      "rank": 40
     },
     {
-     "placeId": "Q876717",
+     "placeId": "Q3330225",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q3330225",
+     "placeId": "Q318168",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q318168",
+     "placeId": "Q876717",
      "tier": 3,
      "rank": 43
     },
@@ -65899,22 +65914,22 @@
      "rank": 47
     },
     {
-     "placeId": "Q1774965",
+     "placeId": "Q1790386",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q1790386",
+     "placeId": "Q20083915",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q20083915",
+     "placeId": "Q83766",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q83766",
+     "placeId": "Q1774965",
      "tier": 3,
      "rank": 51
     },
@@ -65929,27 +65944,27 @@
      "rank": 53
     },
     {
-     "placeId": "Q2820694",
+     "placeId": "Q1399857",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q1399857",
+     "placeId": "Q3215346",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q3215346",
+     "placeId": "Q3333143",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q3333143",
+     "placeId": "Q22436",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q22436",
+     "placeId": "Q2820694",
      "tier": 3,
      "rank": 58
     },
@@ -65979,12 +65994,12 @@
      "rank": 63
     },
     {
-     "placeId": "Q3320312",
+     "placeId": "Q154728",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q154728",
+     "placeId": "Q3320312",
      "tier": 3,
      "rank": 65
     },
@@ -66024,17 +66039,17 @@
      "rank": 72
     },
     {
-     "placeId": "Q334089",
+     "placeId": "Q18380241",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q18380241",
+     "placeId": "Q203293",
      "tier": 3,
      "rank": 74
     },
     {
-     "placeId": "Q203293",
+     "placeId": "Q334089",
      "tier": 3,
      "rank": 75
     },
@@ -66044,22 +66059,22 @@
      "rank": 76
     },
     {
-     "placeId": "Q2820451",
+     "placeId": "Q1721201",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q1721201",
+     "placeId": "Q3215514",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q3215514",
+     "placeId": "Q3279544",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q3279544",
+     "placeId": "Q21939",
      "tier": 3,
      "rank": 80
     }
@@ -66453,17 +66468,17 @@
      "rank": 20
     },
     {
-     "placeId": "Q2940841",
+     "placeId": "Q761970",
      "tier": 2,
      "rank": 21
     },
     {
-     "placeId": "Q48755777",
+     "placeId": "Q2940841",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q761970",
+     "placeId": "Q48755777",
      "tier": 2,
      "rank": 23
     },
@@ -66718,12 +66733,12 @@
      "rank": 73
     },
     {
-     "placeId": "Q334263",
+     "placeId": "Q954613",
      "tier": 3,
      "rank": 74
     },
     {
-     "placeId": "Q954613",
+     "placeId": "Q334263",
      "tier": 3,
      "rank": 75
     },
@@ -69415,10 +69430,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "11",
-   "placeCount": 19,
+   "placeCount": 18,
    "tierCounts": [
     10,
-    9,
+    8,
     0
    ],
    "places": [
@@ -69503,19 +69518,14 @@
      "rank": 16
     },
     {
-     "placeId": "Q2994542",
+     "placeId": "Q24258376",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q24258376",
-     "tier": 2,
-     "rank": 18
-    },
-    {
      "placeId": "Q944730",
      "tier": 2,
-     "rank": 19
+     "rank": 18
     }
    ]
   },
@@ -72759,11 +72769,6 @@
    {
     "code": "05045",
     "name": "Crots",
-    "parentCode": "05"
-   },
-   {
-    "code": "05055",
-    "name": "La Faurie",
     "parentCode": "05"
    },
    {
