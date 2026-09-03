@@ -3497,6 +3497,40 @@ class TestPin(unittest.TestCase):
         self.assertFalse(relu[0].pinned)
 
 
+class TestSilentLabels(unittest.TestCase):
+    """Un label qui ne rend rien ne doit pas ne rien dire.
+
+    « Les Plus Beaux Détours de France » est configuré depuis le premier jour,
+    alimente le thème « villages » et attendait toujours son fichier : cent
+    quatre communes que le catalogue ne pouvait pas voir — L'Isle-Adam,
+    Beaugency, Meymac — sans qu'une ligne le signale.
+    """
+
+    def test_a_label_without_members_is_announced(self):
+        from roam_pipeline.collections import build_label_collections
+
+        lieux = [make_place(f"Château {i}", theme="chateaux", wikidata_id=f"Q{i}")
+                 for i in range(12)]
+        with self.assertLogs("roam_pipeline.collections", level="WARNING") as logs:
+            build_label_collections(lieux, CONFIG)
+        texte = "\n".join(logs.output)
+        self.assertIn("sans aucun membre", texte)
+        self.assertIn("plus-beaux-detours", texte)
+
+    def test_a_label_with_members_is_not_announced(self):
+        from roam_pipeline.collections import build_label_collections
+
+        lieux = []
+        for i in range(12):
+            place = make_place(f"Village {i}", theme="villages", wikidata_id=f"Q{i}",
+                               sitelinks=20)
+            place.labels = ["plus-beaux-detours"]
+            lieux.append(place)
+        with _capture():
+            faites = build_label_collections(lieux, CONFIG)
+        self.assertIn("label-plus-beaux-detours", {c.slug for c in faites})
+
+
 class TestLabelQueryKinds(unittest.TestCase):
     """Toute liste utile n'est pas une désignation patrimoniale.
 

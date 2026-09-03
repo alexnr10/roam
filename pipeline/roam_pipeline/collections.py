@@ -512,10 +512,14 @@ def build_theme_collections(places: list[Place], config: Config) -> list[Collect
 
 def build_label_collections(places: list[Place], config: Config) -> list[Collection]:
     out = []
+    muets: list[str] = []
     for label in config.labels:
         if not label.makes_collection:
             continue
         members = [p for p in places if label.id in p.labels]
+        if not members:
+            muets.append(label.id)
+            continue
         collection = Collection(
             slug=f"label-{label.id}",
             name=label.name,
@@ -527,6 +531,18 @@ def build_label_collections(places: list[Place], config: Config) -> list[Collect
         built = _finalize(collection, members, config, cap=len(members) or 1)
         if built:
             out.append(built)
+
+    # Un label déclaré « fait une collection » et qui n'a AUCUN membre ne
+    # produit rien, et ne produisait rien en silence. Les Plus Beaux Détours
+    # sont configurés depuis le premier jour, alimentent le thème « villages »,
+    # et attendaient toujours leur fichier : cent quatre communes que le
+    # catalogue ne pouvait pas voir, sans qu'une ligne le dise.
+    if muets:
+        LOG.warning(
+            "%s label(s) déclarés comme collection mais sans aucun membre : %s. "
+            "Liste manuelle absente, ou `relabel` jamais lancé depuis.",
+            len(muets), ", ".join(sorted(muets)),
+        )
     return out
 
 

@@ -1,0 +1,27 @@
+# Membres de l'association Les Plus Beaux Détours de France.
+#
+# Cent quatre communes en 2026, choisies pour leur patrimoine et leur art de
+# vivre. Ce ne sont pas des villages : ce sont de petites VILLES, souvent des
+# chefs-lieux de canton, et c'est exactement ce qui manquait — L'Isle-Adam,
+# Beaugency, Meymac. Qui visite le Val-d'Oise doit passer par L'Isle-Adam, et
+# le catalogue ne la connaissait pas.
+#
+# Wikidata ne porte PAS cette liste : `label-probe` ne rend rien sur les trois
+# propriétés usuelles. Elle se saisit donc à la main, ici, comme celle des
+# Plus Beaux Villages.
+#
+# Le thème « Villages » n'a AUCUNE classe Wikidata : il n'est alimenté que par
+# ces listes. Une commune absente d'ici est invisible, quel que soit son renom.
+#
+# Pour remplir ce fichier depuis la liste officielle :
+#
+#     python -m roam_pipeline resolve-list detours.txt \
+#         --into plus-beaux-detours --classe Q484170
+#
+# Q484170 est la classe « commune française ». Sans elle, la recherche ne
+# regarde que la collecte, où ces communes ne sont pas : seul le château de
+# L'Isle-Adam y figure, sous le plancher de son thème.
+#
+# Puis `relabel` pour apposer le label, et `build`.
+#
+wikidata_id,name
