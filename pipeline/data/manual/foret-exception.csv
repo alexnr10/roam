@@ -1,0 +1,30 @@
+# Les seize forêts labellisées par l'Office national des forêts.
+#
+# `label-probe Q43187359` répond ZÉRO sur les cinq propriétés : Wikidata ne
+# rattache aucun lieu français à ce label. Cette liste est donc la seule source.
+#
+# Onze sur seize. Les quatre premières étaient déjà collectées ; les sept
+# suivantes ont dû être ÉPINGLÉES dans places.csv, car leur classe Wikidata est
+# « forêt » (Q4421) et le thème n'en collecte qu'une, « forêt domaniale »
+# (Q3079027). Sans épinglage, le Q-id ici ne servirait à rien : un label
+# étiquette, il ne collecte pas.
+#
+# MANQUENT ENCORE, à chercher avec `suggest-qids` :
+#     Rouen — trois massifs sous un seul label ONF, à traiter séparément
+#     Bassin d'Arcachon · Val Suzon · Aigoual · Volcans de Martinique
+#
+# ⚠️ Les seize noms viennent d'une recherche web, le site de l'ONF étant
+# inatteignable depuis le conteneur. À confronter à onf.fr.
+#
+wikidata_id,name
+Q3079045,forêt domaniale de Verdun
+Q761970,forêt de Tronçais
+Q1595270,forêt de Haguenau
+Q3078936,forêt de Retz
+Q1293678,forêt de Fontainebleau
+Q3078803,forêt de Bercé
+Q3078997,forêt de la Grande Chartreuse
+Q3079009,forêt de la Sainte-Baume
+Q49329134,forêt de la Montagne de Reims
+Q2911447,forêt de Boscodon
+Q3078859,forêt de Darney
