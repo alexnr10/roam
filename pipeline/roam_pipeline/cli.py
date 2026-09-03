@@ -982,7 +982,33 @@ def _resolve_chez_wikidata(
         if len(couples) == 1
     ]
     ambigus = {nom: couples for nom, couples in par_nom.items() if len(couples) > 1}
+
+    # Une douzaine de « Villeneuve » alignées sans rien pour les distinguer ne
+    # se tranchent pas. La description de Wikidata nomme presque toujours le
+    # département — « commune française du département de l'Aveyron » — et la
+    # liste officielle donne le même : le rapprochement devient évident.
+    homonymes = [q for couples in ambigus.values() for q, _ in couples]
+    if homonymes:
+        descriptions = _entity_descriptions(client, homonymes)
+        ambigus = {
+            nom: [(q, f"{lab} — {descriptions[q]}" if descriptions.get(q) else lab)
+                  for q, lab in couples]
+            for nom, couples in ambigus.items()
+        }
     return trouves, ambigus
+
+
+def _entity_descriptions(client, qids: list[str]) -> dict[str, str]:
+    descriptions: dict[str, str] = {}
+    for batch in wd.chunked(qids, 200):
+        try:
+            for row in client.query(wd.entity_labels_query(batch)):
+                qid = wd.qid_from_uri(row.get("item"))
+                if qid and row.get("itemDescription"):
+                    descriptions[qid] = row["itemDescription"]
+        except Exception as erreur:  # noqa: BLE001 — sans description, on affiche moins
+            LOG.debug("descriptions indisponibles (%s)", erreur)
+    return descriptions
 
 
 def cmd_resolve_list(args: argparse.Namespace, config: Config) -> int:

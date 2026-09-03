@@ -4573,12 +4573,15 @@ class TestResolveAgainstWikidata(unittest.TestCase):
     """
 
     class _Client:
-        def __init__(self, rows):
+        def __init__(self, rows, descriptions=()):
             self.rows = rows
+            self.descriptions = list(descriptions)
             self.vu = []
 
         def query(self, requete):
             self.vu.append(requete)
+            if "?itemDescription" in requete:
+                return self.descriptions
             return self.rows
 
     @staticmethod
@@ -4586,10 +4589,10 @@ class TestResolveAgainstWikidata(unittest.TestCase):
         return {"nom": nom, "item": f"http://www.wikidata.org/entity/{qid}",
                 "itemLabel": label or nom}
 
-    def _run(self, noms, rows):
+    def _run(self, noms, rows, descriptions=()):
         from unittest import mock
         from roam_pipeline.cli import _resolve_chez_wikidata
-        client = self._Client(rows)
+        client = self._Client(rows, descriptions)
         with mock.patch("roam_pipeline.wikidata.SparqlClient", lambda: client):
             return _resolve_chez_wikidata(noms, "Q484170"), client
 
@@ -4611,6 +4614,23 @@ class TestResolveAgainstWikidata(unittest.TestCase):
         _, client = self._run(["Rocamadour"], [])
         self.assertIn("wd:Q484170", client.vu[0])
         self.assertIn('"Rocamadour"@fr', client.vu[0])
+
+    def test_homonyms_carry_their_description(self):
+        # Une douzaine de « Villeneuve » sans rien pour les distinguer ne se
+        # tranchent pas. La description nomme le département, et la liste
+        # officielle donne le même.
+        (_trouves, ambigus), _ = self._run(
+            ["Villeneuve"],
+            [self._row("Villeneuve", "Q1"), self._row("Villeneuve", "Q2")],
+            descriptions=[
+                {"item": "http://www.wikidata.org/entity/Q1",
+                 "itemDescription": "commune française du département de l'Aveyron"},
+                {"item": "http://www.wikidata.org/entity/Q2",
+                 "itemDescription": "commune française du département de l'Ain"},
+            ])
+        libelles = dict(ambigus["Villeneuve"])
+        self.assertIn("Aveyron", libelles["Q1"])
+        self.assertIn("Ain", libelles["Q2"])
 
     def test_a_name_wikidata_ignores_stays_unresolved(self):
         (trouves, ambigus), _ = self._run(["Village imaginaire"], [])

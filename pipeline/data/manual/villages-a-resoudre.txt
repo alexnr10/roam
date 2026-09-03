@@ -1,47 +1,17 @@
 # Membres des Plus Beaux Villages de France que la collecte n'a pas.
 #
-# Relevés sur la liste officielle, moins les cent quarante-deux déjà
-# collectés. Rocamadour n'y est plus : il est déjà dans
-# plus-beaux-villages.csv.
-#
-# Pour les résoudre — Q484170 est « commune française », d'après `probe` :
+# Vingt-six ont été résolus et écrits dans plus-beaux-villages.csv.
+# Restent les homonymes, que le programme refuse de trancher seul : le
+# département vient de la liste officielle, la description de Wikidata.
 #
 #     python -m roam_pipeline resolve-list data/manual/villages-a-resoudre.txt \
 #         --into plus-beaux-villages --classe Q484170
 #
-# La classe n'est pas un détail : sans elle, « Fontevraud-l'Abbaye » se
-# rapproche parfaitement de « Abbaye de Fontevraud » déjà collectée, et
-# c'est l'abbaye qui serait écrite comme village.
+# Capdenac-le-Haut n'y est plus : c'est le village haut de la commune de
+# Capdenac (Q1064107), déjà collectée.
 #
-Colmars
-Entrevaux
-Saorge
-Hierges
-Villeneuve
-Blangy-le-Château
-Marcolès
-Brouage
-Sancerre
-Beaulieu-sur-Dordogne
-Chambon-sur-Voueize
-Châtillon-en-Diois
-Grignan
-La Romieu
-Saint-Bertrand-de-Comminges
-Lavoûte-Chilhac
-Polignac
-Mont-Dauphin
-Bergheim
-Capdenac-le-Haut
-Martel
-Penne-d'Agenais
-Tournon-d'Agenais
-Villeréal
-Le Malzieu-Ville
-Fontevraud-l'Abbaye
-Prats-de-Mollo-la-Preste
-Veules-les-Roses
-Cordes-sur-Ciel
-Bormes-les-Mimosas
-Cotignac
 Le Castellet
+Beaulieu-sur-Dordogne
+Polignac
+Châtillon-en-Diois
+Villeneuve
