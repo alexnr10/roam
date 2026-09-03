@@ -400,9 +400,34 @@ def cmd_relabel(args: argparse.Namespace, config: Config) -> int:
             members[label.id] = set()
     apply_labels(places, members)
 
+    # Un membre que la collecte ne contient pas ne peut pas être étiqueté :
+    # `relabel` appose des labels, il ne crée pas de lieux. Cent une communes
+    # des Plus Beaux Détours ont ainsi été saisies, relabellisées, et n'ont
+    # jamais rien produit — le thème « villages » n'a aucune classe Wikidata,
+    # il n'existe que par ses listes, et seul un `fetch` de ce thème va
+    # chercher les entités correspondantes.
+    presents = {place.wikidata_id for place in places}
+    par_theme_a_refaire: dict[str, int] = {}
+    for theme in config.themes:
+        attendus: set[str] = set()
+        for label_id in theme.from_labels:
+            attendus |= members.get(label_id, set())
+        manquants = attendus - presents
+        if manquants:
+            par_theme_a_refaire[theme.id] = len(manquants)
+
     gagnes = [p for p in places if set(p.labels) - avant[p.wikidata_id]]
     perdus = [p for p in places if avant[p.wikidata_id] - set(p.labels)]
     _save_raw(args, places)
+
+    if par_theme_a_refaire:
+        detail = ", ".join(f"{t} {n}" for t, n in sorted(par_theme_a_refaire.items()))
+        print(f"\n⚠ {sum(par_theme_a_refaire.values())} membres de liste officielle "
+              f"ne sont PAS dans la collecte : {detail}.")
+        print("  `relabel` appose des labels, il ne crée pas de lieux. Pour les "
+              "faire entrer :")
+        for theme_id in sorted(par_theme_a_refaire):
+            print(f"      python -m roam_pipeline fetch --only {theme_id}")
 
     print(f"{len(places)} lieux relus : {len(gagnes)} gagnent un label, "
           f"{len(perdus)} en perdent un.")
