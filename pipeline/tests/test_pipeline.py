@@ -59,6 +59,7 @@ from roam_pipeline.models import (
     Collection, CollectionPlace, Place, display_name, slugify,
 )
 from roam_pipeline import outlines
+from roam_pipeline import wikidata as wd
 from roam_pipeline.fetch import (
     REMEDIES, diagnose_missing, enrich_departements, stale_themes,
 )
@@ -3494,6 +3495,38 @@ class TestPin(unittest.TestCase):
             relu = read_raw(racine / "raw")
         self.assertEqual(len(relu), 1)
         self.assertFalse(relu[0].pinned)
+
+
+class TestLabelQueryKinds(unittest.TestCase):
+    """Toute liste utile n'est pas une désignation patrimoniale.
+
+    Le Centre des monuments nationaux (Q2945551) est un établissement public :
+    il ne DÉSIGNE pas ses monuments, il les gère. Une sonde qui ne teste que
+    P1435, P463 et P31 rend zéro partout et conclut « à saisir à la main »,
+    alors que Wikidata porte l'information sous une autre propriété.
+    """
+
+    def test_the_five_shapes_build_a_query(self):
+        for kind in ("heritage", "member_of", "instance", "operator", "owner"):
+            with self.subTest(kind):
+                requete = wd.label_members_query(kind, "Q2945551")
+                self.assertIn("wd:Q2945551", requete)
+                self.assertIn("SELECT DISTINCT ?item", requete)
+
+    def test_each_shape_asks_a_different_property(self):
+        proprietes = set()
+        for kind in ("heritage", "member_of", "instance", "operator", "owner"):
+            ligne = next(l for l in wd.label_members_query(kind, "Q2945551").splitlines()
+                         if "wd:Q2945551" in l)
+            proprietes.add(ligne.strip())
+        self.assertEqual(len(proprietes), 5)
+
+    def test_an_unknown_shape_is_refused(self):
+        # Se tromper de nom ne doit pas rendre une requête vide en silence :
+        # elle donnerait zéro membre et on chercherait ailleurs pendant une
+        # demi-heure de collecte.
+        with self.assertRaises(ValueError):
+            wd.label_members_query("exploitant", "Q2945551")
 
 
 class TestThemeCap(unittest.TestCase):

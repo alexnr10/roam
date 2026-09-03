@@ -130,15 +130,18 @@ def _save_raw(args: argparse.Namespace, places: list[Place]) -> None:
 def cmd_label_probe(args: argparse.Namespace, config: Config) -> int:
     """Par quelle propriété Wikidata ce label rattache-t-il ses membres ?
 
-    `labels.yaml` propose trois façons de poser la question — désignation
+    `labels.yaml` propose plusieurs façons de poser la question — désignation
     patrimoniale (P1435), appartenance à une organisation (P463), instance
-    d'une classe — et rien ne dit laquelle convient à un label donné. Se
+    d'une classe, et depuis peu l'exploitant (P137) ou le propriétaire (P127),
+    car toute liste utile n'est pas un label : le Centre des monuments
+    nationaux est l'établissement public qui GÈRE une centaine de monuments
+    d'État. Rien ne dit laquelle convient à une entité donnée. Se
     tromper ne lève aucune erreur : la requête rend zéro membre, le label
     n'apporte rien, et il faut une demi-heure de collecte pour s'en apercevoir.
 
-    Trois requêtes bornées répondent avant qu'on écrive la moindre ligne de
+    Cinq requêtes bornées répondent avant qu'on écrive la moindre ligne de
     configuration. Un seul compte non nul désigne la bonne propriété ; aucun
-    signifie que Wikidata ne porte pas ce label, et que la liste devra être
+    signifie que Wikidata ne porte pas cette liste, et qu'elle devra être
     saisie à la main (`kind: manual`).
     """
     qid = (args.wikidata_id or "").strip()
@@ -158,6 +161,8 @@ def cmd_label_probe(args: argparse.Namespace, config: Config) -> int:
         ("heritage", "désignation patrimoniale (P1435) — celle des sites classés"),
         ("member_of", "membre d'une organisation (P463) — celle des Plus Beaux Villages"),
         ("instance", "instance de cette classe (P31/P279*)"),
+        ("operator", "géré par (P137) — pour un exploitant, pas un label"),
+        ("owner", "propriété de (P127)"),
     ):
         try:
             membres = list(client.query(wd.label_members_query(kind, qid)))

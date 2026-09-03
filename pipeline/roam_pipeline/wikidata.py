@@ -35,6 +35,13 @@ P_INSEE_REGION = "P2585"
 P_ELEVATION = "P2044"
 P_COMMONS_CATEGORY = "P373"
 P_DISSOLVED = "P576"   # date de dissolution, démolition ou disparition
+# Une liste peut tenir à un EXPLOITANT plutôt qu'à une désignation : le Centre
+# des monuments nationaux n'est pas un label, c'est l'établissement public qui
+# gère la centaine de monuments d'État ouverts à la visite. `label-probe` teste
+# donc aussi ces deux-là, et c'est son compte — pas une intuition — qui dit
+# laquelle porte les membres.
+P_OPERATOR = "P137"
+P_OWNED_BY = "P127"
 
 
 class SparqlError(RuntimeError):
@@ -418,11 +425,15 @@ SELECT ?item ?visitors WHERE {{
 
 
 def label_members_query(kind: str, qid: str) -> str:
-    """Membres d'un label. `kind` ∈ {heritage, member_of, instance}."""
+    """Membres d'un label. `kind` ∈ {heritage, member_of, instance, operator, owner}."""
     predicate = {
         "heritage": f"wdt:{P_HERITAGE}",
         "member_of": f"wdt:{P_MEMBER_OF}",
         "instance": f"wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}*",
+        # Toute liste n'est pas une désignation. Certaines tiennent à qui gère
+        # le lieu ou à qui le possède — l'État, une fondation, un exploitant.
+        "operator": f"wdt:{P_OPERATOR}",
+        "owner": f"wdt:{P_OWNED_BY}",
     }
     if kind not in predicate:
         raise ValueError(f"type de requête de label non géré : {kind}")
