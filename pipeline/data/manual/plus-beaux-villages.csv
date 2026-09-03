@@ -1,0 +1,16 @@
+# Membres de l'association que Wikidata n'enregistre pas.
+#
+# La liste officielle fait autorité, pas Wikidata : Rocamadour — cinquante-cinq
+# versions linguistiques — est membre des Plus Beaux Villages de France et
+# n'apparaît nulle part dans la requête `P463`. Cette liste COMPLÈTE ce que
+# Wikidata rend, elle ne le remplace pas.
+#
+# Le thème « Villages » n'a AUCUNE classe Wikidata : il est alimenté par ces
+# seules listes. Un village absent d'ici est donc invisible, quel que soit son
+# renom. C'est pourquoi le complément compte.
+#
+# Pour retrouver les identifiants d'une liste de noms :
+#     python -m roam_pipeline resolve-list villages.txt --into plus-beaux-villages
+#
+wikidata_id,name
+Q382628,Rocamadour
