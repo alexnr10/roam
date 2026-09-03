@@ -1,0 +1,42 @@
+# Forêt d'Exception : les seize forêts labellisées par l'ONF.
+#
+# ⚠️ CES NOMS VIENNENT D'UNE RECHERCHE WEB, PAS DU SITE DE L'ONF, qui est
+# inatteignable depuis le conteneur. À confronter à onf.fr/foret-exception
+# avant de considérer la liste comme officielle. Le label existe depuis 2008 ;
+# le réseau s'agrandit, cette liste vieillira.
+#
+# Quatre seulement sont déjà dans la collecte — Verdun, Tronçais, Haguenau,
+# Retz. Les douze autres sont absentes, et le cas de Fontainebleau dit
+# pourquoi : le thème « forets » ne collecte que la classe « forêt domaniale »
+# (Q3079027), et les forêts les plus célèbres ne sont pas rangées là sur
+# Wikidata. Le catalogue connaît le CHÂTEAU de Fontainebleau, pas sa forêt.
+#
+# Deux choses à faire, dans cet ordre :
+#
+#   1. python -m roam_pipeline label-probe Q43187359
+#      Le Q-id est bon (verify-qids l'a confirmé) mais la requête `heritage`
+#      rendait zéro. La sonde teste désormais cinq propriétés au lieu de trois.
+#      Si l'une répond, tout ceci devient inutile.
+#
+#   2. python -m roam_pipeline suggest-qids "forêt"
+#      Pour trouver la classe générique sous laquelle Fontainebleau est rangée,
+#      et pouvoir écrire :
+#          resolve-list data/manual/foret-exception-a-resoudre.txt \
+#              --into foret-exception --classe <Q-id>
+#
+Fontainebleau
+Verdun
+Grande Chartreuse
+Rouen
+Montagne de Reims
+Bercé
+Bassin d'Arcachon
+Val Suzon
+Tronçais
+Sainte-Baume
+Boscodon
+Aigoual
+Volcans de Martinique
+Haguenau
+Retz
+Darney-La Vôge
