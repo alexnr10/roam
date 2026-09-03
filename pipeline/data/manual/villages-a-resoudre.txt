@@ -1,13 +1,16 @@
-# Les deux derniers Plus Beaux Villages à trancher.
+# Rien à résoudre : les cent soixante-quinze membres de la liste
+# officielle sont tous rattachés.
 #
-# Wikidata porte pour chacun DEUX entités : l'ancienne commune et la
-# commune nouvelle qui l'a absorbée. La description ne suffit pas à
-# choisir ; ce qui tranche est de savoir laquelle porte des coordonnées et
-# un article, car sans coordonnées la collecte ne peut rien en faire.
-# `resolve-list --classe` l'affiche désormais.
+# Cent quarante-deux étaient déjà collectés par la requête Wikidata, les
+# trente-deux autres ont été résolus ici et écrits dans
+# plus-beaux-villages.csv. Capdenac-le-Haut n'en était pas un : c'est le
+# village haut de la commune de Capdenac (Q1064107), déjà au catalogue.
 #
-#     python -m roam_pipeline resolve-list data/manual/villages-a-resoudre.txt \
-#         --into plus-beaux-villages --classe Q484170
+# La page copiée annonçait 175 villages quand l'association en revendique
+# 184 : il en manque donc quelques-uns, à ajouter au fil des revues.
 #
-Beaulieu-sur-Dordogne
-Châtillon-en-Diois
+# Pour en ajouter — Q484170 est « commune française » :
+#
+#     python -m roam_pipeline resolve-list --into plus-beaux-villages \
+#         --classe Q484170
+#     (puis colle les noms, un par ligne, et termine par Ctrl-D)
