@@ -8,9 +8,17 @@ import { evaluateCheckIn, suggestCheckIn } from '../../src/lib/checkin';
 import { distanceToPlace, formatDistance } from '../../src/lib/geo';
 import { useCheckIn } from '../../src/lib/useCheckIn';
 import { useLocation } from '../../src/lib/useLocation';
+import { MIN_CARACTERES, search } from '../../src/lib/search';
 import { useVisits } from '../../src/store/visits';
 import { colors, spacing, radius, type, themeEmoji } from '../../src/theme';
-import { Button, ChipRow, Pill, SegmentedControl } from '../../src/ui/components';
+import {
+  Button,
+  ChipRow,
+  EmptyState,
+  Pill,
+  SearchField,
+  SegmentedControl,
+} from '../../src/ui/components';
 import { MapCanvas } from '../../src/ui/MapCanvas';
 import type { Place } from '../../src/types';
 
@@ -24,6 +32,7 @@ export default function MapScreen() {
   const { position, granted, simulated } = useLocation();
   const [filter, setFilter] = useState<Filter>('all');
   const [theme, setTheme] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
 
   const visible = useMemo(() => {
     // Le thème d'abord : c'est lui qui dit ce qu'on cherche, l'état de
@@ -56,10 +65,38 @@ export default function MapScreen() {
       .slice(0, 30);
   }, [visible, position]);
 
+  /**
+   * La recherche ignore le thème et le filtre : on cherche dans tout le
+   * catalogue. Quelqu'un qui tape « etretat » ne veut pas s'entendre dire que
+   * ce lieu est hors du thème qu'il avait choisi trois écrans plus tôt.
+   */
+  const resultats = useMemo(() => search(allPlaces, query), [query]);
+  const enRecherche = query.trim().length >= MIN_CARACTERES;
+
   // La validation vient à l'utilisateur, pas l'inverse.
   const suggestion = useMemo(
     () => suggestCheckIn(allPlaces, position, visitedIds),
     [position, visitedIds],
+  );
+
+  /**
+   * Une seule liste, deux sources. `ou` porte la commune quand c'est elle qui
+   * a répondu : sans ça, voir « Porte d'Aval » sortir sur « etretat » reste
+   * incompréhensible.
+   */
+  const lignes = useMemo<Array<{ place: Place; distanceM: number | null; ou: string | null }>>(
+    () =>
+      enRecherche
+        ? resultats.map(({ place, par }) => ({
+            place,
+            distanceM: null,
+            ou:
+              par === 'lieu'
+                ? [place.communeName, place.departement].filter(Boolean).join(' · ')
+                : null,
+          }))
+        : listed.map((entry) => ({ ...entry, ou: null })),
+    [enRecherche, resultats, listed],
   );
 
   const openPlace = (place: Place) => router.push(`/place/${place.id}`);
@@ -75,6 +112,17 @@ export default function MapScreen() {
       </View>
 
       <View style={styles.controls}>
+        <SearchField
+          value={query}
+          onChange={setQuery}
+          placeholder="Un lieu, une commune, un département"
+        />
+      </View>
+
+      {/* Pendant une recherche, tout s'efface sauf les résultats : la carte et
+          les filtres ne répondent pas à la question posée. */}
+      {enRecherche ? null : (
+      <View style={styles.controls}>
         <SegmentedControl<Filter>
           value={filter}
           onChange={setFilter}
@@ -88,7 +136,9 @@ export default function MapScreen() {
             segmenté, qui n'en tient que quatre. */}
         <ChipRow options={themeOptions} value={theme} onChange={setTheme} />
       </View>
+      )}
 
+      {enRecherche ? null : (
       <View style={styles.map}>
         <MapCanvas
           places={visible}
@@ -98,8 +148,9 @@ export default function MapScreen() {
           highlightedId={suggestion?.id ?? null}
         />
       </View>
+      )}
 
-      {suggestion ? (
+      {!enRecherche && suggestion ? (
         <View style={styles.suggestion}>
           <View style={{ flex: 1 }}>
             <Text style={styles.suggestionKicker}>TU Y ES</Text>
@@ -117,7 +168,7 @@ export default function MapScreen() {
         </View>
       ) : null}
 
-      {Platform.OS === 'web' ? (
+      {!enRecherche && Platform.OS === 'web' ? (
         <View style={styles.notice}>
           <Text style={type.small}>
             {simulated
@@ -127,7 +178,7 @@ export default function MapScreen() {
         </View>
       ) : null}
 
-      {granted === false && Platform.OS !== 'web' ? (
+      {!enRecherche && granted === false && Platform.OS !== 'web' ? (
         <View style={styles.notice}>
           <Text style={type.small}>
             Localisation refusée — tu peux quand même parcourir la carte et cocher
@@ -137,14 +188,27 @@ export default function MapScreen() {
       ) : null}
 
       <FlatList
-        data={listed}
+        data={lignes}
         keyExtractor={(entry) => entry.place.id}
         style={styles.list}
         contentContainerStyle={{ paddingBottom: spacing.xl }}
+        keyboardShouldPersistTaps="handled"
         ListHeaderComponent={
           <Text style={[type.tiny, styles.listHeader]}>
-            {position ? 'AUTOUR DE MOI' : 'CATALOGUE'}
+            {enRecherche
+              ? `${resultats.length} RÉSULTAT${resultats.length > 1 ? 'S' : ''}`
+              : position
+                ? 'AUTOUR DE MOI'
+                : 'CATALOGUE'}
           </Text>
+        }
+        ListEmptyComponent={
+          enRecherche ? (
+            <EmptyState
+              title="Aucun lieu ne répond"
+              body="Essaie le nom de la commune, ou du département — beaucoup de lieux sont fichés sous un nom qu'on n'emploie jamais."
+            />
+          ) : null
         }
         renderItem={({ item }) => {
           const visited = visitedIds.has(item.place.id);
@@ -156,8 +220,11 @@ export default function MapScreen() {
                   {item.place.name}
                 </Text>
                 <Text style={type.small} numberOfLines={1}>
-                  {themeLabel(item.place.themeId)}
-                  {item.place.departement ? ` · ${item.place.departement}` : ''}
+                  {item.ou
+                    ? item.ou
+                    : `${themeLabel(item.place.themeId)}${
+                        item.place.departement ? ` · ${item.place.departement}` : ''
+                      }`}
                 </Text>
               </View>
               {visited ? (
@@ -176,7 +243,7 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   header: { paddingHorizontal: spacing.lg, paddingTop: spacing.sm },
-  controls: { paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
+  controls: { paddingHorizontal: spacing.lg, paddingVertical: spacing.md, gap: spacing.md },
   map: {
     // La France, dans cette projection, est presque carrée : un cadre carré la
     // cadre au plus juste sans marges perdues.

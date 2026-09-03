@@ -1,6 +1,14 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  ViewStyle,
+} from 'react-native';
 
 import { colors, radius, spacing, type } from '../theme';
 import type { Tier } from '../types';
@@ -223,6 +231,50 @@ export function EmptyState({ title, body }: { title: string; body: string }) {
   );
 }
 
+/**
+ * Le champ de recherche.
+ *
+ * Une croix pour effacer plutôt qu'un bouton « annuler » : sur téléphone, on
+ * corrige sa recherche bien plus souvent qu'on ne l'abandonne. La croix
+ * n'apparaît que lorsqu'il y a quelque chose à effacer.
+ */
+export function SearchField({
+  value,
+  onChange,
+  placeholder = 'Rechercher',
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <View style={styles.search}>
+      <Text style={styles.searchIcon}>🔍</Text>
+      <TextInput
+        value={value}
+        onChangeText={onChange}
+        placeholder={placeholder}
+        placeholderTextColor={colors.muted}
+        style={styles.searchInput}
+        autoCorrect={false}
+        autoCapitalize="none"
+        returnKeyType="search"
+        accessibilityLabel={placeholder}
+      />
+      {value.length > 0 ? (
+        <Pressable
+          onPress={() => onChange('')}
+          accessibilityRole="button"
+          accessibilityLabel="Effacer la recherche"
+          hitSlop={8}
+        >
+          <Text style={styles.searchClear}>✕</Text>
+        </Pressable>
+      ) : null}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   back: {
     flexDirection: 'row',
@@ -248,6 +300,22 @@ const styles = StyleSheet.create({
   chipText: { fontSize: 13, color: colors.muted },
   chipTextSelected: { color: '#FFFFFF', fontWeight: '600' },
   track: { backgroundColor: colors.surfaceAlt, overflow: 'hidden', width: '100%' },
+  search: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    height: 44,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  searchIcon: { fontSize: 15 },
+  // `outlineWidth` ne sert que sur le web : sans lui, le champ garde le liseré
+  // bleu que le navigateur pose sur tout élément qui a le focus.
+  searchInput: { flex: 1, ...type.body, padding: 0, outlineWidth: 0 },
+  searchClear: { fontSize: 15, color: colors.muted, paddingHorizontal: spacing.xs },
   pill: {
     paddingHorizontal: spacing.md,
     paddingVertical: 5,
