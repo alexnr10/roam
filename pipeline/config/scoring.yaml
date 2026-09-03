@@ -144,6 +144,31 @@ tiers:
   tier2_min_score: 25.0
 
 collections:
+  # Au plus tant de lieux d'un même thème dans une même commune.
+  #
+  # Paris comptait 162 lieux, Marseille — la deuxième ville du catalogue — 21.
+  # Sur 135 jardins français, 51 étaient parisiens ; la commune suivante en
+  # avait 4. Ce n'est pas une richesse huit fois supérieure, c'est le plancher
+  # qui mesure la documentation : un square parisien a un article de Wikipédia,
+  # un beau jardin du Gers n'en a pas.
+  #
+  # Six, et le chiffre est mesuré. Ce que chaque valeur retire :
+  #
+  #      cap    Paris        reste de la France
+  #        4    162 → 30     11 lieux (Toulouse 4, Les Eyzies 2, Lyon 1…)
+  #        6    162 → 42      2 lieux (Toulouse)
+  #        8    162 → 52      0
+  #       10    162 → 61      0
+  #
+  # À six, la règle est générale mais ne mord que sur l'anomalie. Paris garde
+  # 6 musées, 6 jardins, 6 monuments, 6 ponts : une liste qui ressemble à une
+  # ville, quand 162 ressemblait à un recensement.
+  #
+  # Le couple est COMMUNE × THÈME, jamais la commune seule : « les 30 meilleurs
+  # de Paris » garderait le musée Grévin (18e au score) et jetterait la
+  # Sainte-Chapelle (31e), les musées parisiens écrasant tout avec leurs
+  # millions de visiteurs.
+  max_per_commune: 6
   # Une collection n'existe que si elle a assez de lieux pour être une collection.
   min_places: 8
   # Plafond par défaut, surchargé par `cap` dans themes.yaml.
@@ -201,7 +226,19 @@ collections:
   # d'Occitanie (×2,2), les musées d'Île-de-France (×2,3). En dessous de ×2, on
   # ne trouve plus que « Châteaux de Provence » (×0,4) ou « Abbayes
   # d'Île-de-France » (×0,5).
-  min_theme_lift: 2.0
+  #
+  # Passé de 2,0 à 1,9 avec l'arrivée du plafond par commune, et c'est le MÊME
+  # seuil exprimé dans les nouvelles unités, pas un adoucissement. Le rapport se
+  # mesure contre la part nationale du thème ; retirer cent vingt lieux
+  # parisiens a rétréci le catalogue de 5 %, donc gonflé cette part de 5 %, donc
+  # abaissé TOUS les rapports d'autant. Cinq collections qui n'avaient perdu
+  # aucun membre sont ainsi tombées d'un coup — les mégalithes de Bretagne
+  # (2,06 → 1,96, Carnac compris), les villages d'Occitanie (2,07 → 1,98), les
+  # abbayes de Normandie, les châteaux des Pays de la Loire, les plages de
+  # Provence. À 1,9 elles reviennent toutes, et les deux seules qui restent
+  # dehors sont celles qui ont vraiment perdu leurs lieux : musées et monuments
+  # d'Île-de-France.
+  min_theme_lift: 1.9
 
 geo:
   # Niveaux géographiques pour lesquels on dérive des collections.

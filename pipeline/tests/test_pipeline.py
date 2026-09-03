@@ -848,12 +848,12 @@ class TestBuildFunnel(unittest.TestCase):
 
         self.assertIn("étape par étape", table)
         # Six dunes au départ, quatre après le périmètre, deux après le plancher,
-        # deux encore après les sosies — puis quatre de nouveau : leur
-        # département est pauvre et le repêchage géographique leur rend leur
-        # place.
+        # deux encore après le plafond par commune puis après les sosies — puis
+        # quatre de nouveau : leur département est pauvre et le repêchage
+        # géographique leur rend leur place.
         ligne = next(l for l in table.splitlines() if l.strip().startswith("dunes-marais"))
         self.assertEqual([int(n) for n in ligne.split()[1:]],
-                         [6, 4, 4, 4, 4, 4, 2, 2, 4, 4])
+                         [6, 4, 4, 4, 4, 4, 2, 2, 2, 4, 4])
 
     def test_a_theme_without_any_place_is_left_out_of_the_funnel(self):
         from roam_pipeline.collections import build_all
@@ -3494,6 +3494,88 @@ class TestPin(unittest.TestCase):
             relu = read_raw(racine / "raw")
         self.assertEqual(len(relu), 1)
         self.assertFalse(relu[0].pinned)
+
+
+class TestCommuneCap(unittest.TestCase):
+    """Paris comptait 162 lieux, Marseille — la deuxième ville — 21.
+
+    Sur 135 jardins français, 51 étaient parisiens ; la commune suivante en
+    avait quatre. Le plancher mesure la documentation, et un square parisien a
+    un article de Wikipédia là où un beau jardin du Gers n'en a pas.
+    """
+
+    def _lieu(self, nom, theme, score, commune, code):
+        return make_place(nom, theme=theme, score=score, commune_name=commune,
+                          commune_code=code, wikidata_id=f"Q{abs(hash(nom)) % 999983}")
+
+    def _cape(self, lieux, cap=6):
+        from roam_pipeline.collections import apply_commune_cap
+        config = replace(CONFIG,
+                         collections=replace(CONFIG.collections, max_per_commune=cap))
+        with _capture():
+            return apply_commune_cap(lieux, config)
+
+    def test_only_the_best_of_a_theme_survive_in_one_commune(self):
+        lieux = [self._lieu(f"Square {i}", "jardins", 100 - i, "Paris", "75104")
+                 for i in range(10)]
+        gardes = self._cape(lieux)
+        self.assertEqual(len(gardes), 6)
+        self.assertEqual({p.name for p in gardes},
+                         {f"Square {i}" for i in range(6)})
+
+    def test_the_cap_is_per_theme_not_per_commune(self):
+        # Un simple « les N meilleurs de Paris » garderait le musée Grévin et
+        # jetterait la Sainte-Chapelle : les musées écrasent tout au score.
+        musees = [self._lieu(f"Musée {i}", "musees", 150 - i, "Paris", "75101")
+                  for i in range(8)]
+        chapelle = self._lieu("Sainte-Chapelle", "monuments", 129, "Paris", "75101")
+        gardes = self._cape(musees + [chapelle])
+        self.assertIn("Sainte-Chapelle", {p.name for p in gardes})
+        self.assertEqual(sum(1 for p in gardes if p.theme_id == "musees"), 6)
+
+    def test_the_arrondissements_are_one_city(self):
+        # 75101 à 75120 sont les arrondissements de Paris. Un plafond posé sur
+        # le code de commune s'y appliquait vingt fois et laissait passer vingt
+        # fois trop — personne ne pense « j'ai fait le 5e », on fait Paris.
+        lieux = [self._lieu(f"Jardin {i}", "jardins", 100 - i, "Paris",
+                            f"751{1 + i // 2:02d}") for i in range(10)]
+        self.assertEqual(len(self._cape(lieux)), 6)
+
+    def test_lyon_and_marseille_too(self):
+        for ville, codes in (("Lyon", ["69381", "69385", "69387"]),
+                             ("Marseille", ["13201", "13208", "13212"])):
+            with self.subTest(ville):
+                lieux = [self._lieu(f"{ville} {i}", "musees", 100 - i, ville,
+                                    codes[i % 3]) for i in range(9)]
+                self.assertEqual(len(self._cape(lieux)), 6)
+
+    def test_two_communes_each_get_their_share(self):
+        paris = [self._lieu(f"Paris {i}", "musees", 100 - i, "Paris", "75101")
+                 for i in range(8)]
+        lille = [self._lieu(f"Lille {i}", "musees", 90 - i, "Lille", "59350")
+                 for i in range(3)]
+        self.assertEqual(len(self._cape(paris + lille)), 9)
+
+    def test_a_pinned_place_passes_over_the_cap(self):
+        # Le curateur passe avant le plafond : il a vu le lieu, pas la règle.
+        lieux = [self._lieu(f"Musée {i}", "musees", 100 - i, "Paris", "75101")
+                 for i in range(8)]
+        lieux[-1].pinned = True
+        gardes = self._cape(lieux)
+        self.assertIn("Musée 7", {p.name for p in gardes})
+        self.assertEqual(len(gardes), 6)
+
+    def test_a_place_without_a_commune_is_never_cut(self):
+        # Un phare en mer n'a pas de commune : le plafond ne peut rien en dire.
+        phares = [make_place(f"Phare {i}", theme="phares", score=50,
+                             commune_code=None, wikidata_id=f"Q{900 + i}")
+                  for i in range(10)]
+        self.assertEqual(len(self._cape(phares)), 10)
+
+    def test_a_cap_of_zero_disables_it(self):
+        lieux = [self._lieu(f"Musée {i}", "musees", 100 - i, "Paris", "75101")
+                 for i in range(9)]
+        self.assertEqual(len(self._cape(lieux, cap=0)), 9)
 
 
 class TestFantomes(unittest.TestCase):

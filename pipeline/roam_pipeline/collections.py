@@ -746,6 +746,85 @@ def dedupe_across_themes(places: list[Place], config: Config) -> list[Place]:
     return list(best.values())
 
 
+def _ville(commune_code: str) -> str:
+    """Le code de la VILLE, arrondissements réunis.
+
+    Paris, Lyon et Marseille sont découpés en arrondissements, et l'INSEE leur
+    donne à chacun son code : 75101 à 75120, 69381 à 69389, 13201 à 13216. Un
+    plafond posé sur le code de commune s'y appliquait donc vingt fois, et
+    laissait passer vingt fois trop — c'est exactement ce qu'on voulait éviter.
+
+    Personne ne pense « j'ai fait le 5e » : on fait Paris. La ville est la
+    bonne maille.
+    """
+    if commune_code.startswith("751") and len(commune_code) == 5:
+        return "75056"   # Paris
+    if commune_code.startswith("6938") and len(commune_code) == 5:
+        return "69123"   # Lyon
+    if commune_code.startswith("132") and len(commune_code) == 5:
+        return "13055"   # Marseille
+    return commune_code
+
+
+def apply_commune_cap(places: list[Place], config: Config) -> list[Place]:
+    """Au plus `max_par_commune` lieux d'un même thème dans une même commune.
+
+    Paris comptait cent soixante-deux lieux ; Marseille, la deuxième ville du
+    catalogue, en comptait vingt et un. Sur cent trente-cinq jardins français,
+    cinquante et un étaient parisiens — la commune suivante en avait quatre.
+
+    Ce n'est pas que Paris soit huit fois plus riche : c'est que le plancher
+    mesure la documentation, et qu'un square parisien a un article de Wikipédia
+    là où un beau jardin du Gers n'en a pas. Le score récompense la densité de
+    couverture autant que l'intérêt du lieu.
+
+    Le plafond porte sur le couple COMMUNE × THÈME, et pas sur la commune
+    seule. Un simple « les trente meilleurs de Paris » garderait le musée
+    Grévin, dix-huitième au score, et jetterait la Sainte-Chapelle,
+    trente-et-unième : les musées parisiens écrasent tout avec leurs millions
+    de visiteurs. Par thème, Paris garde ses six musées, ses six jardins, ses
+    six monuments, et la liste ressemble à une ville.
+
+    La règle est générale mais ne mord presque que là : à six, elle retire cent
+    vingt lieux à Paris et deux à Toulouse. C'est la mesure d'une anomalie, pas
+    une exception écrite pour une ville.
+    """
+    cap = config.collections.max_per_commune
+    if not cap:
+        return places
+
+    par_commune: dict[tuple[str, str], list[Place]] = defaultdict(list)
+
+    sans_commune: list[Place] = []
+    for place in places:
+        if place.commune_code:
+            par_commune[(_ville(place.commune_code), place.theme_id)].append(place)
+        else:
+            # Un phare en mer n'a pas de commune. Le plafond ne peut rien dire
+            # de lui, et le silence vaut mieux qu'un rangement arbitraire.
+            sans_commune.append(place)
+
+    kept = list(sans_commune)
+    retires: dict[str, int] = defaultdict(int)
+    for (_code, _theme), lot in par_commune.items():
+        # Épinglé veut dire épinglé : le curateur passe avant le plafond.
+        lot.sort(key=lambda place: (not place.pinned, -place.score))
+        kept.extend(lot[:cap])
+        for place in lot[cap:]:
+            retires[place.commune_name or place.commune_code or "?"] += 1
+
+    if retires:
+        total = sum(retires.values())
+        detail = ", ".join(
+            f"{nom} {n}" for nom, n in sorted(retires.items(), key=lambda kv: -kv[1])[:5]
+        )
+        LOG.info(
+            "plafond par commune (%s par thème) : %s lieux retirés — %s",
+            cap, total, detail,
+        )
+    return kept
+
+
 def apply_notoriety_floor(places: list[Place], config: Config) -> list[Place]:
     """Écarte les lieux sous le plancher éditorial de leur thème.
 
@@ -1103,16 +1182,20 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
     accessible = apply_access_filter(dans_le_sujet, config)
     non_alpin = apply_alpine_filter(accessible, config)
     au_dessus = apply_notoriety_floor(non_alpin, config)
+    # Le plafond par commune vient APRÈS le plancher et avant le repêchage :
+    # il ne doit trancher qu'entre des lieux déjà jugés dignes, et ce qu'il
+    # retire ne doit pas revenir par la porte du repêchage géographique.
+    sous_plafond = apply_commune_cap(au_dessus, config)
     # Les sosies partent AVANT le comptage par département. Compter d'abord
     # faisait croire un département complet alors qu'une de ses douze fiches
     # était un doublon promis à disparaître : les Ardennes et le Val-de-Marne
     # finissaient à onze, sans que rien ne le dise.
-    sans_sosie = dedupe(au_dessus)
+    sans_sosie = dedupe(sous_plafond)
     # Le plancher mesure la documentation, qui est très inégalement répartie sur
     # le territoire. On rend leur part aux départements qu'il a vidés. Les
     # candidats sont ceux que le PLANCHER a écartés — pas les sosies, qui ont
     # déjà leur représentant au catalogue.
-    gardes = {place.wikidata_id for place in au_dessus}
+    gardes = {place.wikidata_id for place in sous_plafond}
     complete = rescue_thin_departements(
         sans_sosie, [p for p in non_alpin if p.wikidata_id not in gardes], config
     )
@@ -1128,6 +1211,7 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
             ("accès", accessible),
             ("non alpin", non_alpin),
             ("plancher", au_dessus),
+            ("commune", sous_plafond),
             ("sosies", sans_sosie),
             ("dépt pauvre", complete),
             ("dédoublé", kept),

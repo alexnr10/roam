@@ -195,6 +195,7 @@ class Alerts:
 class CollectionRules:
     min_places: int
     max_places: int
+    max_per_commune: int
     geo_levels: list[str]
     cross_theme_levels: list[str]
     require_departement: bool
@@ -298,6 +299,7 @@ def load_config(config_dir: Path | None = None) -> Config:
     rules = CollectionRules(
         min_places=int(raw["collections"]["min_places"]),
         max_places=int(raw["collections"]["max_places"]),
+        max_per_commune=int(raw["collections"].get("max_per_commune", 0)),
         geo_levels=list(raw["geo"]["levels"]),
         cross_theme_levels=list(raw["geo"]["cross_theme_levels"]),
         require_departement=bool(raw["geo"].get("require_departement", True)),
