@@ -4615,3 +4615,56 @@ class TestResolveAgainstWikidata(unittest.TestCase):
     def test_a_name_wikidata_ignores_stays_unresolved(self):
         (trouves, ambigus), _ = self._run(["Village imaginaire"], [])
         self.assertEqual((trouves, ambigus), ([], {}))
+
+
+class TestResolveOrder(unittest.TestCase):
+    """Avec une classe, Wikidata passe AVANT le rapprochement par les mots.
+
+    Une classe est une contrainte exacte ; le rapprochement par les mots ne
+    l'est pas, et il se trompe de façon crédible : « Fontevraud-l'Abbaye »
+    désigne une commune, et la collecte n'en connaît que l'abbaye. Écrire ce
+    Q-id-là dans une liste de villages serait une erreur muette.
+    """
+
+    class _Client:
+        def query(self, requete):
+            if "?nom ?item" not in requete:
+                return []
+            return [{"nom": "Fontevraud-l'Abbaye",
+                     "item": "http://www.wikidata.org/entity/Q1111",
+                     "itemLabel": "Fontevraud-l'Abbaye"}]
+
+    def _run(self, classe):
+        import argparse
+        from unittest import mock
+        from roam_pipeline.cli import cmd_resolve_list
+        abbaye = make_place("Abbaye de Fontevraud", "abbayes", wikidata_id="Q9999")
+        with tempfile.TemporaryDirectory() as dossier:
+            base = Path(dossier)
+            (base / "out").mkdir(); (base / "manual").mkdir()
+            (base / "out" / "places_raw.json").write_text(
+                json.dumps([abbaye.to_dict()], ensure_ascii=False), encoding="utf-8")
+            liste = base / "noms.txt"
+            liste.write_text("Fontevraud-l'Abbaye\n", encoding="utf-8")
+            args = argparse.Namespace(
+                file=liste, out=base / "out", manual=base / "manual",
+                seuil=0.6, into="plus-beaux-villages", classe=classe)
+            with mock.patch("roam_pipeline.wikidata.SparqlClient", self._Client), \
+                    _capture() as sortie:
+                cmd_resolve_list(args, CONFIG)
+            ecrit = (base / "manual" / "plus-beaux-villages.csv").read_text(encoding="utf-8")
+        return sortie.getvalue(), ecrit
+
+    def test_the_commune_wins_over_the_abbey(self):
+        _texte, ecrit = self._run("Q484170")
+        self.assertIn("Q1111", ecrit)
+        self.assertNotIn("Q9999", ecrit)
+
+    def test_without_a_class_the_abbey_is_written_as_a_village(self):
+        # La démonstration du danger : « Fontevraud-l'Abbaye » et « Abbaye de
+        # Fontevraud » ont exactement les mêmes mots. Le rapprochement les tient
+        # donc pour un accord parfait et écrit l'abbaye sans rien demander.
+        # C'est ce que la classe empêche.
+        _texte, ecrit = self._run(None)
+        self.assertIn("Q9999", ecrit)
+        self.assertNotIn("Q1111", ecrit)

@@ -1024,6 +1024,25 @@ def cmd_resolve_list(args: argparse.Namespace, config: Config) -> int:
     surs: list[tuple[str, Place]] = []
     doutes: list[tuple[str, list[tuple[float, int, Place]]]] = []
     perdus: list[str] = []
+
+    # Wikidata D'ABORD quand une classe est donnée. Une classe est une
+    # contrainte exacte ; le rapprochement par les mots ne l'est pas, et il se
+    # trompe de façon crédible : « Fontevraud-l'Abbaye » désigne une commune,
+    # et la collecte n'en connaît que l'abbaye. Écrire ce Q-id-là dans une
+    # liste de villages serait une erreur muette.
+    ambigus: dict[str, list[tuple[str, str]]] = {}
+    if args.classe:
+        trouves, ambigus = _resolve_chez_wikidata(noms, args.classe)
+        surs.extend(trouves)
+        pris = {nom for nom, _ in trouves} | set(ambigus)
+        noms = [nom for nom in noms if nom not in pris]
+        if trouves:
+            print(f"{len(trouves)} nom(s) résolus chez Wikidata "
+                  f"(classe {args.classe}) :\n")
+            for nom, place in trouves:
+                print(f"    {place.wikidata_id:<11} {place.name}")
+            print()
+
     for nom in noms:
         exacts: list[Place] = []
         proches: list[tuple[float, int, Place]] = []
@@ -1057,9 +1076,14 @@ def cmd_resolve_list(args: argparse.Namespace, config: Config) -> int:
         else:
             perdus.append(nom)
 
-    if surs:
-        print(f"{len(surs)} nom(s) retrouvés mot pour mot :\n")
-        for nom, place in surs:
+    for nom, candidats in ambigus.items():
+        # Plusieurs communes portent ce nom : le choix est éditorial.
+        doutes.append((nom, [(1.0, 0, _FauxLieu(q, lab)) for q, lab in candidats]))
+
+    locaux = [couple for couple in surs if not isinstance(couple[1], _FauxLieu)]
+    if locaux:
+        print(f"{len(locaux)} nom(s) retrouvés mot pour mot dans la collecte :\n")
+        for nom, place in locaux:
             print(f"    {place.wikidata_id:<11} {place.name}")
 
     if doutes:
@@ -1069,23 +1093,6 @@ def cmd_resolve_list(args: argparse.Namespace, config: Config) -> int:
             for part, extra, place in candidats:
                 print(f"        {place.wikidata_id:<11} {place.name:<44} "
                       f"{part:.0%} du nom, {extra} mot(s) en plus")
-
-    if perdus and args.classe:
-        # Ceux que la collecte ne connaît pas, demandés directement à Wikidata
-        # et bornés par une classe : le thème « Villages » n'a AUCUNE classe, et
-        # ses manquants ne sont donc jamais dans la collecte. `resolve-list` ne
-        # servirait à rien pour eux sans ce détour.
-        trouves, ambigus = _resolve_chez_wikidata(perdus, args.classe)
-        if trouves:
-            print(f"\n{len(trouves)} retrouvés chez Wikidata "
-                  f"(classe {args.classe}) :\n")
-            for nom, place in trouves:
-                print(f"    {place.wikidata_id:<11} {place.name}")
-            surs.extend(trouves)
-        perdus = [nom for nom in perdus
-                  if nom not in {n for n, _ in trouves} and nom not in ambigus]
-        for nom, candidats in ambigus.items():
-            doutes.append((nom, [(1.0, 0, _FauxLieu(q, lab)) for q, lab in candidats]))
 
     if perdus:
         print(f"\n{len(perdus)} sans correspondance :\n")
