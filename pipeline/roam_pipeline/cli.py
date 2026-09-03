@@ -946,6 +946,45 @@ def _variantes(nom: str) -> list[str]:
     return morceaux
 
 
+class _FauxLieu:
+    """Juste assez d'un lieu pour l'afficher parmi les propositions."""
+
+    def __init__(self, wikidata_id: str, name: str):
+        self.wikidata_id = wikidata_id
+        self.name = name
+
+
+def _resolve_chez_wikidata(
+    noms: list[str], class_qid: str
+) -> tuple[list[tuple[str, "_FauxLieu"]], dict[str, list[tuple[str, str]]]]:
+    """Retrouve des noms chez Wikidata, bornés par une classe.
+
+    Un nom qui rend PLUSIEURS entités n'est pas résolu : « Saint-Martin » est
+    une trentaine de communes, et choisir au hasard écrirait un faux
+    identifiant dans une liste officielle. Ceux-là repartent en arbitrage.
+    """
+    client = wd.SparqlClient()
+    par_nom: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    for batch in wd.chunked(noms, 150):
+        try:
+            rows = client.query(wd.label_lookup_query(batch, class_qid))
+        except Exception as erreur:  # noqa: BLE001
+            print(f"    recherche Wikidata en échec ({erreur})", file=sys.stderr)
+            continue
+        for row in rows:
+            qid = wd.qid_from_uri(row.get("item"))
+            nom = row.get("nom")
+            if qid and nom:
+                par_nom[nom].append((qid, row.get("itemLabel") or nom))
+
+    trouves = [
+        (nom, _FauxLieu(*couples[0])) for nom, couples in par_nom.items()
+        if len(couples) == 1
+    ]
+    ambigus = {nom: couples for nom, couples in par_nom.items() if len(couples) > 1}
+    return trouves, ambigus
+
+
 def cmd_resolve_list(args: argparse.Namespace, config: Config) -> int:
     """Retrouve les Q-ids d'une liste de noms dans la collecte.
 
@@ -1031,10 +1070,29 @@ def cmd_resolve_list(args: argparse.Namespace, config: Config) -> int:
                 print(f"        {place.wikidata_id:<11} {place.name:<44} "
                       f"{part:.0%} du nom, {extra} mot(s) en plus")
 
+    if perdus and args.classe:
+        # Ceux que la collecte ne connaît pas, demandés directement à Wikidata
+        # et bornés par une classe : le thème « Villages » n'a AUCUNE classe, et
+        # ses manquants ne sont donc jamais dans la collecte. `resolve-list` ne
+        # servirait à rien pour eux sans ce détour.
+        trouves, ambigus = _resolve_chez_wikidata(perdus, args.classe)
+        if trouves:
+            print(f"\n{len(trouves)} retrouvés chez Wikidata "
+                  f"(classe {args.classe}) :\n")
+            for nom, place in trouves:
+                print(f"    {place.wikidata_id:<11} {place.name}")
+            surs.extend(trouves)
+        perdus = [nom for nom in perdus
+                  if nom not in {n for n, _ in trouves} and nom not in ambigus]
+        for nom, candidats in ambigus.items():
+            doutes.append((nom, [(1.0, 0, _FauxLieu(q, lab)) for q, lab in candidats]))
+
     if perdus:
-        print(f"\n{len(perdus)} sans correspondance — jamais collectés :\n")
+        print(f"\n{len(perdus)} sans correspondance :\n")
         for nom in perdus:
             print(f"    {nom}")
+        if args.classe:
+            print("\n  Ni dans la collecte, ni chez Wikidata sous cette classe.")
         print("\n  Résous-les chez Wikidata :"
               "\n      python -m roam_pipeline suggest-qids "
               + " ".join(f'"{n}"' for n in perdus[:3])
@@ -2902,6 +2960,10 @@ def build_parser() -> argparse.ArgumentParser:
     resolve.add_argument("--into", help="identifiant du label où écrire les lignes trouvées")
     resolve.add_argument("--seuil", type=float, default=0.6,
                          help="part des mots du nom à retrouver (défaut 0,6)")
+    resolve.add_argument("--classe", metavar="Q-ID",
+                         help="cherche aussi chez Wikidata parmi les instances de "
+                              "cette classe (réseau requis) — ex. Q484170 pour une "
+                              "commune française")
 
     explain = sub.add_parser(
         "explain", help="dit pourquoi un lieu est dans le catalogue, ou pourquoi il n'y est pas"

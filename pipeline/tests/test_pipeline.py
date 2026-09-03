@@ -4110,7 +4110,7 @@ class TestResolveList(unittest.TestCase):
     ministère : la différence se saisit à la main, donc se résout par le nom.
     """
 
-    def _run(self, noms, places, into=None):
+    def _run(self, noms, places, into=None, classe=None):
         import argparse
         from roam_pipeline.cli import cmd_resolve_list
 
@@ -4125,7 +4125,7 @@ class TestResolveList(unittest.TestCase):
             liste.write_text("\n".join(noms), encoding="utf-8")
             args = argparse.Namespace(
                 file=liste, out=base / "out", manual=base / "manual",
-                seuil=0.6, into=into)
+                seuil=0.6, into=into, classe=classe)
             sortie = io.StringIO()
             with contextlib.redirect_stdout(sortie):
                 code = cmd_resolve_list(args, CONFIG)
@@ -4561,3 +4561,57 @@ class TestTwinCollections(unittest.TestCase):
         a = self._collection("a", "Le meilleur de la Dordogne", ["Q1"], "departement")
         b = self._collection("b", "Grottes et gouffres de la Dordogne", ["Q1"], "departement")
         self.assertEqual(len(drop_twin_collections([a, b])), 2)
+
+
+class TestResolveAgainstWikidata(unittest.TestCase):
+    """Une liste officielle publie des noms, pas des identifiants.
+
+    Le thème « Villages » n'a AUCUNE classe Wikidata : ses manquants ne sont
+    jamais dans la collecte, et les chercher là n'y peut rien. Il faut aller
+    les demander à Wikidata, bornés par une classe pour que « Rocamadour » ne
+    ramène ni le fromage ni le canton québécois.
+    """
+
+    class _Client:
+        def __init__(self, rows):
+            self.rows = rows
+            self.vu = []
+
+        def query(self, requete):
+            self.vu.append(requete)
+            return self.rows
+
+    @staticmethod
+    def _row(nom, qid, label=None):
+        return {"nom": nom, "item": f"http://www.wikidata.org/entity/{qid}",
+                "itemLabel": label or nom}
+
+    def _run(self, noms, rows):
+        from unittest import mock
+        from roam_pipeline.cli import _resolve_chez_wikidata
+        client = self._Client(rows)
+        with mock.patch("roam_pipeline.wikidata.SparqlClient", lambda: client):
+            return _resolve_chez_wikidata(noms, "Q484170"), client
+
+    def test_a_single_match_resolves(self):
+        (trouves, ambigus), _ = self._run(["Rocamadour"], [self._row("Rocamadour", "Q382628")])
+        self.assertEqual([(n, p.wikidata_id) for n, p in trouves], [("Rocamadour", "Q382628")])
+        self.assertEqual(ambigus, {})
+
+    def test_several_matches_are_never_guessed(self):
+        # « Saint-Martin » est une trentaine de communes : choisir au hasard
+        # écrirait un faux identifiant dans une liste officielle.
+        (trouves, ambigus), _ = self._run(
+            ["Saint-Martin"],
+            [self._row("Saint-Martin", "Q1"), self._row("Saint-Martin", "Q2")])
+        self.assertEqual(trouves, [])
+        self.assertEqual(len(ambigus["Saint-Martin"]), 2)
+
+    def test_the_class_bounds_the_search(self):
+        _, client = self._run(["Rocamadour"], [])
+        self.assertIn("wd:Q484170", client.vu[0])
+        self.assertIn('"Rocamadour"@fr', client.vu[0])
+
+    def test_a_name_wikidata_ignores_stays_unresolved(self):
+        (trouves, ambigus), _ = self._run(["Village imaginaire"], [])
+        self.assertEqual((trouves, ambigus), ([], {}))

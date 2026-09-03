@@ -437,6 +437,32 @@ SELECT DISTINCT ?item WHERE {{
 """
 
 
+def label_lookup_query(names: list[str], class_qid: str) -> str:
+    """Q-ids français dont le libellé français est EXACTEMENT l'un de ces noms.
+
+    Sert à saisir une liste officielle : le ministère et les associations
+    publient des noms, pas des identifiants, et les retrouver un par un à la
+    main n'est pas une opération raisonnable à cent quatre-vingts lignes.
+
+    La classe borne la recherche — « commune française » pour un village — ce
+    qui écarte d'emblée le fromage de Rocamadour et le canton québécois du même
+    nom. Le libellé doit correspondre au caractère près : c'est ce qui permet
+    d'écrire le résultat sans le faire relire.
+    """
+    values = " ".join(
+        '"%s"@fr' % nom.replace("\\", "\\\\").replace('"', '\\"') for nom in names
+    )
+    return f"""
+SELECT DISTINCT ?nom ?item ?itemLabel WHERE {{
+  VALUES ?nom {{ {values} }}
+  ?item rdfs:label ?nom .
+  ?item wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* wd:{class_qid} .
+  ?item wdt:{P_COUNTRY} wd:{Q_FRANCE} .
+  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+}}
+"""
+
+
 def member_classes_query(qids: list[str], class_qids: list[str]) -> str:
     """Parmi les classes de thèmes déclarées, lesquelles ces entités ont-elles ?
 
