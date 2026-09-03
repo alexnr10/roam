@@ -849,13 +849,14 @@ class TestBuildFunnel(unittest.TestCase):
         table = "\n".join(logs.output)
 
         self.assertIn("étape par étape", table)
-        # Six dunes au départ, quatre après le périmètre, deux après le plancher,
-        # deux encore après les deux plafonds puis après les sosies — puis
-        # quatre de nouveau : leur département est pauvre et le repêchage
+        # Six dunes au départ, quatre après le périmètre — les dunes n'étant pas
+        # un thème de liste, l'appartenance ne leur retire rien — deux après le
+        # plancher, deux encore après les deux plafonds puis après les sosies,
+        # puis quatre de nouveau : leur département est pauvre et le repêchage
         # géographique leur rend leur place.
         ligne = next(l for l in table.splitlines() if l.strip().startswith("dunes-marais"))
         self.assertEqual([int(n) for n in ligne.split()[1:]],
-                         [6, 4, 4, 4, 4, 4, 2, 2, 2, 2, 4, 4])
+                         [6, 4, 4, 4, 4, 4, 4, 2, 2, 2, 2, 4, 4])
 
     def test_a_theme_without_any_place_is_left_out_of_the_funnel(self):
         from roam_pipeline.collections import build_all
@@ -3496,6 +3497,57 @@ class TestPin(unittest.TestCase):
             relu = read_raw(racine / "raw")
         self.assertEqual(len(relu), 1)
         self.assertFalse(relu[0].pinned)
+
+
+class TestListOnlyThemes(unittest.TestCase):
+    """Pour un thème nourri par des listes, la liste EST le critère.
+
+    Amélie-les-Bains avait été saisie par erreur parmi les Plus Beaux Détours.
+    Effacer sa ligne du CSV lui retirait son label, mais elle restait au
+    catalogue : cinq versions linguistiques, et le plancher du thème est à
+    trois. Elle devenait un « village de caractère » que personne n'avait
+    choisi.
+    """
+
+    def _garder(self, lieux):
+        from roam_pipeline.collections import apply_list_membership
+        with _capture():
+            return {p.name for p in apply_list_membership(lieux, CONFIG)}
+
+    def _village(self, nom, labels=(), sitelinks=30, **extra):
+        place = make_place(nom, theme="villages", sitelinks=sitelinks,
+                           wikidata_id=f"Q{abs(hash(nom)) % 999961}", **extra)
+        place.labels = list(labels)
+        return place
+
+    def test_a_place_off_every_list_is_dropped(self):
+        dedans = self._village("Gordes", labels=["plus-beaux-villages"])
+        dehors = self._village("Amélie-les-Bains", labels=[])
+        self.assertEqual(self._garder([dedans, dehors]), {"Gordes"})
+
+    def test_any_of_the_themes_lists_is_enough(self):
+        # Le thème « villages » est alimenté par DEUX listes ; l'une suffit.
+        detour = self._village("L'Isle-Adam", labels=["plus-beaux-detours"])
+        self.assertEqual(self._garder([detour]), {"L'Isle-Adam"})
+
+    def test_a_foreign_label_does_not_count(self):
+        # Être Grand Site ne fait pas de vous un Plus Beau Village.
+        egare = self._village("Grand Site quelconque", labels=["grand-site-de-france"])
+        self.assertEqual(self._garder([egare]), set())
+
+    def test_a_pinned_place_stays(self):
+        epingle = self._village("Choisi à la main", labels=[])
+        epingle.pinned = True
+        self.assertEqual(self._garder([epingle]), {"Choisi à la main"})
+
+    def test_a_theme_with_its_own_classes_is_untouched(self):
+        # « chateaux » a des classes Wikidata : la règle ne le concerne pas.
+        chateau = make_place("Château sans label", theme="chateaux",
+                             wikidata_id="Q1", sitelinks=30)
+        from roam_pipeline.collections import apply_list_membership
+        with _capture():
+            garde = apply_list_membership([chateau], CONFIG)
+        self.assertEqual([p.name for p in garde], ["Château sans label"])
 
 
 class TestRelabelCannotCreatePlaces(unittest.TestCase):

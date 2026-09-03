@@ -875,6 +875,51 @@ def apply_theme_cap(places: list[Place], config: Config) -> list[Place]:
     return kept
 
 
+def apply_list_membership(places: list[Place], config: Config) -> list[Place]:
+    """Un thème nourri par des listes ne garde que les membres de ces listes.
+
+    Le thème « villages » n'a aucune classe Wikidata : il n'existe que par les
+    Plus Beaux Villages et les Plus Beaux Détours. Mais une fois collectée, une
+    commune restait au catalogue même retirée de la liste — elle franchissait le
+    plancher de notoriété comme n'importe quel lieu, et rien ne la sortait.
+
+    Amélie-les-Bains, saisie par erreur, comptait cinq versions linguistiques ;
+    Baugé, trente. Le plancher est à trois. Effacer leur ligne du CSV les
+    dépouillait de leur label et les laissait au catalogue, devenues des
+    « villages de caractère » que personne n'avait choisis.
+
+    Pour ces thèmes-là, la liste officielle n'est pas un bonus : c'est la
+    définition. Un lieu qui en sort, sort.
+
+    Le lieu ÉPINGLÉ fait exception, comme partout : le curateur a vu le lieu,
+    pas la règle.
+    """
+    par_liste = {
+        theme.id: set(theme.from_labels)
+        for theme in config.themes
+        if theme.from_labels and not theme.wikidata_classes
+    }
+    if not par_liste:
+        return places
+
+    kept: list[Place] = []
+    sortis: dict[str, list[str]] = defaultdict(list)
+    for place in places:
+        listes = par_liste.get(place.theme_id)
+        if listes is None or place.pinned or listes & set(place.labels):
+            kept.append(place)
+        else:
+            sortis[place.theme_id].append(place.name)
+
+    for theme_id, noms in sortis.items():
+        LOG.info(
+            "%s : %s lieux sortis, plus sur aucune liste officielle — %s%s",
+            theme_id, len(noms), ", ".join(sorted(noms)[:6]),
+            f" (+{len(noms) - 6})" if len(noms) > 6 else "",
+        )
+    return kept
+
+
 def saturated_themes(places: list[Place], config: Config) -> set[str]:
     """Les thèmes qui ont atteint leur plafond de catalogue.
 
@@ -1303,7 +1348,9 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
     en_france = apply_geographic_scope(places, config)
     un_theme = dedupe_across_themes(en_france, config)
     dans_le_sujet = apply_class_exclusion(un_theme, config)
-    accessible = apply_access_filter(dans_le_sujet, config)
+    # Pour un thème qui n'existe que par ses listes, en sortir c'est sortir.
+    sur_liste = apply_list_membership(dans_le_sujet, config)
+    accessible = apply_access_filter(sur_liste, config)
     non_alpin = apply_alpine_filter(accessible, config)
     au_dessus = apply_notoriety_floor(non_alpin, config)
     # Le plafond par commune vient APRÈS le plancher : il ne doit trancher
@@ -1344,6 +1391,7 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
             ("France", en_france),
             ("1 thème", un_theme),
             ("sujet", dans_le_sujet),
+            ("sur liste", sur_liste),
             ("accès", accessible),
             ("non alpin", non_alpin),
             ("plancher", au_dessus),

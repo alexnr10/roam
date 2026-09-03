@@ -1,127 +1,24 @@
-# Les Plus Beaux Détours de France, à résoudre.
+# Plus Beaux Détours : les manquants repérés en revue.
 #
-# Cent une communes extraites de la liste officielle. AUCUNE n'est dans la
-# collecte : le thème « villages » n'a pas de classe Wikidata, et ces petites
-# villes ne sont ramenées par aucun autre thème. Seul le château de
-# L'Isle-Adam y figure, trois versions linguistiques, sous son plancher.
+# Ces quatre-là ne figuraient pas dans la liste collée, ou s'y trouvaient sous
+# un nom que Wikidata ne connaît pas.
+#
+#     Mauriac          Cantal            manquant
+#     Autun            Saône-et-Loire    manquant
+#     Thouars          Deux-Sèvres       manquant
+#     Baugé-en-Anjou   Maine-et-Loire    remplace « Baugé », commune absorbée
+#
+# Deux erreurs ont été retirées du CSV en même temps : Amélie-les-Bains, qui
+# n'a jamais été membre, et Baugé, que Baugé-en-Anjou remplace.
 #
 #     python -m roam_pipeline resolve-list data/manual/detours-a-resoudre.txt \
 #         --into plus-beaux-detours --classe Q484170
 #
-# Q484170 est « commune française ». Sans elle, la recherche ne regarde que la
-# collecte, où il n'y a rien à trouver.
+# RESTENT INTROUVÉS après cette passe, d'après les totaux par région de la
+# liste officielle : 1 en Auvergne-Rhône-Alpes, 2 en Occitanie. Les ajouter ici
+# et relancer — la liste est additive.
 #
-# CE QUI MANQUE ENCORE. Les totaux par région annoncés dans la liste collée
-# somment à 106, et l'association revendique 104 pour 2026. Les noms fournis
-# n'en font que 101 :
-#
-#     Auvergne-Rhône-Alpes         17 annoncés, 15 nommés  → 2 manquants
-#     Occitanie                    11 annoncés,  9 nommés  → 2 manquants
-#     Bourgogne-Franche-Comté       8 annoncés,  7 nommés  → 1 manquant
-#     Provence-Alpes-Côte d'Azur   12 annoncés, 11 nommés  → 1 manquant
-#     Bretagne                      5 annoncés,  6 nommés  → le compte, pas les noms
-#
-# Les ajouter ici puis relancer la commande : la liste est ADDITIVE, rien de
-# ce qui est déjà résolu ne sera perdu.
-#
-Châtillon-sur-Chalaronne
-Nantua
-Trévoux
-Lapalisse
-Néris-les-Bains
-Vals-les-Bains
-Crest
-Nyons
-Brioude
-Le Puy-en-Velay
-Thônes
-Charlieu
-Saint-Galmier
-Issoire
-Saint-Symphorien-sur-Coise
-Châtillon-sur-Seine
-Pontarlier
-Saint-Claude
-Louhans
-Avallon
-Joigny
-Luxeuil-les-Bains
-Dinan
-Pont-Aven
-Saint-Renan
-Fougères
-Vitré
-Pontivy
-Mehun-sur-Yèvre
-Châteaudun
-Nogent-le-Rotrou
-Valençay
-Chinon
-Loches
-Beaugency
-Montargis
-Givet
-Obernai
-Wissembourg
-Thann
-Langres
-Lunéville
-Toul
-Bar-le-Duc
-Commercy
-Bitche
-Neufchâteau
-Bergues
-Gravelines
-Saint-Amand-les-Eaux
-Montreuil-sur-Mer
-Saint-Valery-sur-Somme
-Moret-sur-Loing
-Provins
-L'Isle-Adam
-Honfleur
-Pont-Audemer
-Verneuil-sur-Avre
-Domfront
-Eu
-Forges-les-Eaux
-La Rochefoucauld-en-Angoumois
-Jonzac
-Saint-Jean-d'Angély
-Meymac
-Uzerche
-Aubusson
-Brantôme
-Saint-Léonard-de-Noblat
-Saint-Yrieix-la-Perche
-Lescar
-Chauvigny
-Loudun
-Sarlat
-Limoux
-Villefranche-de-Rouergue
-Revel
-Rieux-Volvestre
-Pézenas
-Figeac
-Mende
-Amélie-les-Bains
-Mazamet
-Clisson
-Baugé
-Montreuil-Bellay
-Château-Gontier
-La Flèche
-Fontenay-le-Comte
-Gréoux-les-Bains
-Sisteron
-Biot
-Tende
-L'Argentière-la-Bessée
-Aups
-Grimaud
-Ollioules
-Saint-Cyr-sur-Mer
-Pernes-les-Fontaines
-Vaison-la-Romaine
-Saint-Pierre
+Mauriac
+Autun
+Thouars
+Baugé-en-Anjou
