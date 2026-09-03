@@ -27700,24 +27700,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Grosbois"
   },
   {
-   "id": "Q1765935",
-   "slug": "chateau-de-madrid",
-   "name": "Château de Madrid",
-   "themeId": "chateaux",
-   "lat": 48.874167,
-   "lon": 2.255,
-   "radiusM": 200,
-   "score": 77.2,
-   "departement": "Paris",
-   "departementCode": "75",
-   "regionCode": "11",
-   "communeCode": "75116",
-   "communeName": "Paris",
-   "summary": "Le château de Madrid, d'abord appelé château de Boulogne, est une résidence royale bâtie dans le bois de Boulogne. Construit à partir de 1528 sur l'ordre du roi de France François Ier et achevé pour son fils Henri II, il est entièrement démoli à la fin du XVIIIe siècle.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Corbel011%20Le%20ch%C3%A2teau%20de%20Madrid%20%28Magasin%20pittoresque%29.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Madrid"
-  },
-  {
    "id": "Q22942089",
    "slug": "pierre-chaude",
    "name": "Pierre Chaude",
@@ -29282,6 +29264,24 @@
    "summary": "Le lac de Sainte-Croix est une retenue artificielle, mise en eau par Électricité de France (EDF) en 1973, à la suite de la construction du barrage de Sainte-Croix, sur le cours du Verdon. Il est situé entre les départements du Var et des Alpes-de-Haute-Provence, au pied des gorges du Verdon, du plan de Canjuers et du plateau de Valensole, haut lieu de la culture du lavandin.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20image%20of%20Lake%20of%20Sainte-Croix%20%28view%20from%20the%20west%29.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Sainte-Croix"
+  },
+  {
+   "id": "Q15992417",
+   "slug": "chateau-du-louvre",
+   "name": "Château du Louvre",
+   "themeId": "chateaux",
+   "lat": 48.8602,
+   "lon": 2.338,
+   "radiusM": 200,
+   "score": 75.5,
+   "departement": "Paris",
+   "departementCode": "75",
+   "regionCode": "11",
+   "communeCode": "75101",
+   "communeName": "Paris",
+   "summary": "Le château du Louvre était un château fort construit par le roi Philippe-Auguste entre 1190 et 1202 pour renforcer l'enceinte qu'il avait construite autour de Paris pour protéger la ville. Il a été démoli par étapes pour laisser la place au palais du Louvre.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Louvre%20-%20Les%20Tr%C3%A8s%20Riches%20Heures.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_du_Louvre"
   },
   {
    "id": "Q3117151",
@@ -53374,7 +53374,7 @@
      "rank": 7
     },
     {
-     "placeId": "Q1765935",
+     "placeId": "Q15992417",
      "tier": 1,
      "rank": 8
     },
@@ -67211,12 +67211,12 @@
      "rank": 50
     },
     {
-     "placeId": "Q2092716",
+     "placeId": "Q188856",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q188856",
+     "placeId": "Q2092716",
      "tier": 3,
      "rank": 52
     },
@@ -67256,12 +67256,12 @@
      "rank": 59
     },
     {
-     "placeId": "Q1626747",
+     "placeId": "Q589336",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q589336",
+     "placeId": "Q1626747",
      "tier": 3,
      "rank": 61
     },
@@ -67301,12 +67301,12 @@
      "rank": 68
     },
     {
-     "placeId": "Q1520841",
+     "placeId": "Q604550",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q604550",
+     "placeId": "Q1520841",
      "tier": 3,
      "rank": 70
     },

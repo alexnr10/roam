@@ -18,7 +18,7 @@ from typing import Any
 from pathlib import Path
 
 from . import wikidata as wd
-from .collections import DUPLICATE_DISTANCE_M, build_all, haversine_m
+from .collections import DUPLICATE_DISTANCE_M, build_all, fantomes, haversine_m
 from .config import CONFIG_DIR, Config, load_config
 from .export import (
     review_state,
@@ -2341,6 +2341,59 @@ def cmd_merge(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def cmd_fantomes(args: argparse.Namespace, config: Config) -> int:
+    """Les lieux du catalogue dont le résumé dit que la chose n'est plus là.
+
+    La revue se fait à plat, fiche par fiche, et il en reste toujours des
+    centaines à lire : un lieu démoli au XVIIIe siècle peut y trôner des
+    semaines au premier niveau d'un département. Ici la question est posée une
+    fois, à tout le catalogue.
+    """
+    places_path = args.out / "places.json"
+    if not places_path.exists():
+        print(f"{places_path} absent — lance d'abord `build`.", file=sys.stderr)
+        return 1
+
+    places = _load_places(places_path)
+    decisions = read_decisions(args.manual / "decisions.csv")
+    trouves = fantomes(places)
+
+    # Où le lieu siège : un fantôme au premier niveau d'une collection est
+    # autrement plus urgent que le même au troisième.
+    rangs: dict[str, list[str]] = defaultdict(list)
+    collections_path = args.out / "collections.json"
+    if collections_path.exists():
+        for collection in json.loads(collections_path.read_text(encoding="utf-8")):
+            for membre in collection["places"]:
+                rangs[membre["place_id"]].append(
+                    f"{collection['name']} N{membre['tier']}#{membre['rank']}")
+
+    if not trouves:
+        print("Aucun lieu suspect. (Le filet lit le français des résumés : "
+              "il ne prouve rien, il rabat.)")
+        return 0
+
+    print(f"{len(trouves)} lieu(x) dont le résumé parle de disparition, "
+          f"sur {len(places)} :\n")
+    for place, motifs in trouves:
+        verdict = decisions.get(place.wikidata_id, ("—", ""))[0]
+        print(f"  {place.score or 0:>6.1f}  {place.wikidata_id:<11} {place.name}")
+        print(f"          {', '.join(motifs)} · verdict actuel : {verdict}")
+        for ou in rangs.get(place.wikidata_id, []):
+            print(f"          {ou}")
+        extrait = " ".join((place.summary or "").split())[:160]
+        if extrait:
+            print(f"          « {extrait}… »")
+        print(f"          verdict {place.wikidata_id} drop --note \"...\"")
+        print()
+
+    print("Ce sont des CANDIDATS, pas des verdicts : le pont d'Avignon, dont il "
+          "ne reste\nque quatre arches, se visite très bien. Vérifie chacun.")
+    print("\nÉcarter un lieu promeut le suivant : relance après le prochain "
+          "`build`.")
+    return 0
+
+
 def cmd_verdict(args: argparse.Namespace, config: Config) -> int:
     """Enregistre un verdict de curation sur un lieu, sans passer par la revue.
 
@@ -3211,6 +3264,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="par quelle propriété un label rattache-t-il ses membres ? (réseau requis)")
     sonde.add_argument("wikidata_id")
 
+    sub.add_parser(
+        "fantomes",
+        help="lieux du catalogue dont le résumé dit qu'ils n'existent plus")
+
     verdict = sub.add_parser(
         "verdict",
         help="écarte ou valide un lieu sans passer par la revue (keep, drop, "
@@ -3286,6 +3343,7 @@ def main(argv: list[str] | None = None) -> int:
         "review": cmd_review,
         "sync": cmd_sync,
         "retheme": cmd_retheme,
+        "fantomes": cmd_fantomes,
         "verdict": cmd_verdict,
         "pin": cmd_pin,
         "label-probe": cmd_label_probe,

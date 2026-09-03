@@ -34,6 +34,7 @@ from roam_pipeline.collections import (
     build_cross_collections,
     build_theme_collections,
     diameter_km,
+    fantomes,
     _mix_themes,
     _rank_within_theme,
     cross_theme_twins,
@@ -3492,6 +3493,68 @@ class TestPin(unittest.TestCase):
             relu = read_raw(racine / "raw")
         self.assertEqual(len(relu), 1)
         self.assertFalse(relu[0].pinned)
+
+
+class TestFantomes(unittest.TestCase):
+    """Un lieu qu'on ne peut pas visiter est l'échec le plus coûteux : il
+    envoie quelqu'un faire la route pour rien.
+
+    Trois sont passés en revue sans être vus. Une revue à plat demande de lire
+    deux mille quatre cents fiches ; ceux-là se disent eux-mêmes, dans leur
+    propre résumé.
+    """
+
+    def _cherche(self, resume, nom="Un lieu"):
+        place = make_place(nom, "chateaux", wikidata_id="Q1", summary=resume)
+        return [m for _p, motifs in fantomes([place]) for m in motifs]
+
+    def test_the_three_that_slipped_through_are_caught(self):
+        cas = {
+            "Tour du Temple":
+                "La tour du Temple et son enclos constituaient la maison du "
+                "Temple, ancienne forteresse parisienne située dans le nord du "
+                "Marais, qui fut détruite en 1808.",
+            "Château de Madrid":
+                "Construit à partir de 1528 sur l'ordre du roi de France "
+                "François Ier et achevé pour son fils Henri II, il est "
+                "entièrement démoli à la fin du XVIIIe siècle.",
+            "Portus Itius":
+                "Sa localisation exacte est inconnue mais il se situerait "
+                "probablement à Saint-Omer ou dans ses environs.",
+        }
+        for nom, resume in cas.items():
+            with self.subTest(nom):
+                self.assertTrue(self._cherche(resume, nom), nom)
+
+    def test_a_ruin_is_not_a_ghost(self):
+        # Le pont d'Avignon n'a plus que quatre de ses vingt-deux arches, et
+        # c'est l'un des lieux les plus visités de France. Un filet large le
+        # ramènerait, avec toutes les ruines du pays.
+        self.assertEqual(self._cherche(
+            "Il ne reste aujourd'hui que quatre arches sur les vingt-deux "
+            "que comptait le pont.", "Pont d'Avignon"), [])
+
+    def test_a_destruction_that_happened_elsewhere_is_not_a_ghost(self):
+        # La chartreuse de Molsheim existe et abrite un musée ; c'est celle de
+        # Koenigshoffen qui fut détruite, mentionnée en passant.
+        self.assertEqual(self._cherche(
+            "La chartreuse de Molsheim est un ancien monastère situé au cœur "
+            "de la ville. La destruction de la chartreuse de Koenigshoffen "
+            "conduisit la communauté à s'y réfugier.", "Chartreuse"), [])
+
+    def test_a_place_without_a_summary_is_silent(self):
+        place = make_place("Sans résumé", "chateaux", wikidata_id="Q1")
+        self.assertEqual(fantomes([place]), [])
+
+    def test_the_loudest_comes_first(self):
+        # Un fantôme notoire siège haut dans les collections : c'est celui qu'il
+        # faut voir en premier.
+        petit = make_place("Petit", "chateaux", wikidata_id="Q1", score=10,
+                           summary="Il fut détruit en 1900.")
+        grand = make_place("Grand", "chateaux", wikidata_id="Q2", score=200,
+                           summary="Il fut démoli en 1808.")
+        self.assertEqual([p.name for p, _ in fantomes([petit, grand])],
+                         ["Grand", "Petit"])
 
 
 class TestVerdict(unittest.TestCase):

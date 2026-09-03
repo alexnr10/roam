@@ -340,6 +340,62 @@ def _finalize(
     return collection
 
 
+# Ce qui trahit un lieu qu'on ne peut PAS visiter.
+#
+# Deux familles, et deux seulement : la chose n'existe plus, ou personne ne
+# sait où elle est. Les motifs sont volontairement étroits — un filet large
+# ramènerait toutes les ruines de France, et une ruine se visite très bien.
+FANTOMES: tuple[tuple[str, str], ...] = (
+    ("démoli, détruit, rasé",
+     r"\b(?:fut|est|a été|furent|ont été)\s+(?:\w+ ){0,2}?"
+     r"(?:détruit|démoli|rasé|dynamit|arasé)"),
+    ("il ne reste rien",
+     r"il ne (?:reste|subsiste)\s+(?:plus\s+)?(?:rien|aucun)\b"),
+    ("a disparu",
+     r"\ba (?:aujourd'hui )?(?:entièrement |totalement |complètement )?disparu"),
+    ("n'existe plus", r"n'existe plus\b"),
+    ("localisation inconnue",
+     r"localisation (?:exacte |précise )?(?:est |reste |demeure )?"
+     r"(?:inconnue|incertaine|hypothétique|discutée)"),
+    ("jamais localisé",
+     r"n'a (?:jamais |pas )(?:été )?(?:formellement )?"
+     r"(?:localisé|identifié|retrouvé)"),
+)
+
+
+def fantomes(places: list[Place]) -> list[tuple[Place, list[str]]]:
+    """Les lieux dont le résumé dit que la chose n'est plus là.
+
+    Un lieu non visitable est l'échec le plus coûteux du catalogue : il envoie
+    quelqu'un faire la route pour rien. Trois sont passés en revue sans être
+    vus — la tour du Temple, démolie en 1808, au huitième rang du niveau 1 de
+    Paris ; le château de Madrid, démoli au XVIIIe siècle, au même rang une
+    fois la tour partie ; Portus Itius, dont personne ne sait où il était.
+
+    Ils ne se voient pas dans une revue à plat : elle demande de lire deux
+    mille quatre cents fiches, et il en reste toujours des centaines à lire.
+    Ici la question est posée une fois, à tout le catalogue.
+
+    Écarter un lieu PROMEUT le suivant — c'est ainsi que le château de Madrid
+    a pris la place de la tour du Temple, puis le château du Louvre celle du
+    château de Madrid. La commande se relance donc après chaque `build`, et
+    n'a fini que lorsqu'elle ne rend plus rien de neuf.
+
+    Le filet est étroit et faillible : il lit le français des résumés, il ne
+    prouve rien. Il ramène des faux positifs — le pont d'Avignon, dont il ne
+    reste que quatre arches, se visite très bien — et il rate ce que Wikipédia
+    ne dit pas. C'est un rabatteur, pas un juge.
+    """
+    trouves: list[tuple[Place, list[str]]] = []
+    for place in places:
+        resume = place.summary or ""
+        motifs = [nom for nom, rx in FANTOMES if re.search(rx, resume, re.I)]
+        if motifs:
+            trouves.append((place, motifs))
+    trouves.sort(key=lambda entree: -(entree[0].score or 0))
+    return trouves
+
+
 def drop_twin_collections(collections: list[Collection]) -> list[Collection]:
     """Écarte les collections qui contiennent exactement les mêmes lieux.
 
