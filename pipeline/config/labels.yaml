@@ -124,12 +124,17 @@ labels:
   # Label de l'Office national des forêts, attribué à une vingtaine de forêts
   # domaniales : la curation officielle des forêts remarquables.
   #
-  # ⚠️ Le Q-id existe et est correct (verify-qids le confirme), mais la requête
-  # `heritage` (P1435) a ramené ZÉRO membre sur une vraie collecte : les forêts
-  # concernées ne portent pas cette désignation sur Wikidata. Un label qui
-  # renvoie zéro sans lever d'erreur est exactement le bug le plus coûteux de ce
-  # pipeline — il est donc basculé en saisie manuelle, comme les autres labels
-  # sans propriété Wikidata fiable. Une vingtaine de forêts à lister, pas plus.
+  # ⚠️ Le Q-id existe et est correct — Q43187359, que `verify-qids` a confirmé.
+  # Mais `label-probe` répond ZÉRO sur les CINQ propriétés : désignation
+  # patrimoniale, appartenance, classe, exploitant, propriétaire. Wikidata ne
+  # rattache aucun lieu français à ce label ; ce n'est pas une erreur de requête,
+  # c'est une absence. La saisie à la main est le seul chemin.
+  #
+  # Seize forêts, dont quatre seulement sont collectées — Verdun, Tronçais,
+  # Haguenau, Retz. Les douze autres manquent parce que le thème « forets » ne
+  # collecte que « forêt domaniale » (Q3079027) : le catalogue connaît le
+  # CHÂTEAU de Fontainebleau et ignore sa forêt.
+  # Voir data/manual/foret-exception-a-resoudre.txt.
   - id: foret-exception
     name: Forêt d'Exception
     authority: Office national des forêts
