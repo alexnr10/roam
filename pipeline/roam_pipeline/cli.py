@@ -2341,6 +2341,61 @@ def cmd_merge(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def cmd_verdict(args: argparse.Namespace, config: Config) -> int:
+    """Enregistre un verdict de curation sur un lieu, sans passer par la revue.
+
+    `decisions.csv` est la mémoire de la curation, et jusqu'ici seule la page
+    de revue savait y écrire. Retirer UN lieu repéré au détour d'une carte
+    demandait d'ouvrir le fichier à la main — et un curateur qui doit éditer un
+    CSV dans `nano` pour écarter un lieu finit par ne plus l'écarter.
+
+    C'est le pendant de `pin` : un geste, un lieu, une raison. Le fichier reste
+    trié et relisible, et la prochaine revue l'emporte toujours sur ce qu'on
+    écrit ici — le verdict le plus récent gagne, comme partout ailleurs.
+    """
+    qid = (args.wikidata_id or "").strip()
+    if not qid.startswith("Q") or not qid[1:].isdigit():
+        print(f"« {qid} » n'est pas un identifiant Wikidata.", file=sys.stderr)
+        return 1
+
+    if not args.clear and args.decision not in DECISIONS:
+        print(f"Verdict inconnu : {args.decision}. Verdicts valides : "
+              + ", ".join(DECISIONS), file=sys.stderr)
+        return 1
+
+    places = read_raw(args.raw)
+    connus = {place.wikidata_id: place.name for place in places}
+    if qid not in connus:
+        # Écarter un lieu absent de la collecte ne casse rien, mais c'est
+        # presque toujours une faute de frappe sur l'identifiant.
+        print(f"{qid} n'est pas dans la collecte — vérifie l'identifiant.",
+              file=sys.stderr)
+        return 1
+
+    path = args.manual / "decisions.csv"
+    decisions = read_decisions(path)
+    avant = decisions.get(qid)
+
+    if args.clear:
+        if decisions.pop(qid, None) is None:
+            print(f"{connus[qid]} ({qid}) n'avait aucun verdict.")
+            return 0
+    else:
+        decisions[qid] = (args.decision, (args.note or "").replace(",", " ").strip())
+
+    write_decisions(path, decisions, connus)
+
+    nom = connus[qid]
+    if args.clear:
+        print(f"Verdict retiré sur {nom} ({qid}) — il était « {avant[0]} ».")
+    elif avant and avant[0] != args.decision:
+        print(f"{nom} ({qid}) : « {avant[0]} » devient « {args.decision} ».")
+    else:
+        print(f"{nom} ({qid}) : « {args.decision} » enregistré.")
+    print("Enchaîne avec `build` pour que le catalogue en tienne compte.")
+    return 0
+
+
 def cmd_pin(args: argparse.Namespace, config: Config) -> int:
     """Épingle un lieu déjà collecté : il passe outre les planchers.
 
@@ -3156,6 +3211,17 @@ def build_parser() -> argparse.ArgumentParser:
         help="par quelle propriété un label rattache-t-il ses membres ? (réseau requis)")
     sonde.add_argument("wikidata_id")
 
+    verdict = sub.add_parser(
+        "verdict",
+        help="écarte ou valide un lieu sans passer par la revue (keep, drop, "
+             "promote, demote)")
+    verdict.add_argument("wikidata_id")
+    verdict.add_argument("decision", nargs="?", default="",
+                         help="keep, drop, promote ou demote")
+    verdict.add_argument("--note", help="pourquoi ce verdict")
+    verdict.add_argument("--clear", action="store_true",
+                         help="retirer le verdict et rendre le lieu à l'automatique")
+
     epingle = sub.add_parser(
         "pin", help="épingle un lieu déjà collecté : il passe outre les planchers")
     epingle.add_argument("wikidata_id")
@@ -3220,6 +3286,7 @@ def main(argv: list[str] | None = None) -> int:
         "review": cmd_review,
         "sync": cmd_sync,
         "retheme": cmd_retheme,
+        "verdict": cmd_verdict,
         "pin": cmd_pin,
         "label-probe": cmd_label_probe,
         "pertes": cmd_pertes,

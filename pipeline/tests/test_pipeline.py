@@ -63,6 +63,7 @@ from roam_pipeline.fetch import (
 from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from_insee
 from roam_pipeline.cli import (
     _known_qids, _pending_terms, _probe_verdict, census, cmd_pin, cmd_retention,
+    cmd_verdict,
     empty_themes,
 )
 from roam_pipeline.wikipedia import title_from_url
@@ -3491,6 +3492,84 @@ class TestPin(unittest.TestCase):
             relu = read_raw(racine / "raw")
         self.assertEqual(len(relu), 1)
         self.assertFalse(relu[0].pinned)
+
+
+class TestVerdict(unittest.TestCase):
+    """Écarter un lieu repéré au détour d'une carte ne doit pas demander nano.
+
+    `decisions.csv` est la mémoire de la curation, et seule la page de revue
+    savait y écrire. Portus Itius — un port de la Manche dont la localisation
+    est inconnue, que Wikidata place à cent quatre-vingts kilomètres dans les
+    terres — trônait au septième rang du niveau 1 du Val-d'Oise.
+    """
+
+    def _run(self, brut, qid, decision="drop", **extra):
+        with tempfile.TemporaryDirectory() as tmp:
+            racine = Path(tmp)
+            (racine / "raw").mkdir()
+            (racine / "manual").mkdir()
+            write_raw(racine / "raw", brut, {p.theme_id for p in brut})
+            args = argparse.Namespace(
+                raw=racine / "raw", manual=racine / "manual", wikidata_id=qid,
+                decision=decision, note=extra.get("note"),
+                clear=extra.get("clear", False))
+            sortie = StringIO()
+            with contextlib.redirect_stdout(sortie):
+                with _capture():
+                    code = cmd_verdict(args, CONFIG)
+            chemin = racine / "manual" / "decisions.csv"
+            # Le dossier temporaire disparaît à la sortie du bloc : on relit
+            # tout ici, sinon l'assertion porte sur un fichier effacé.
+            brut_csv = chemin.read_text(encoding="utf-8") if chemin.exists() else ""
+            return code, sortie.getvalue(), read_decisions(chemin), brut_csv
+
+    def test_a_drop_is_written_with_its_reason(self):
+        brut = [make_place("Portus Itius", theme="megalithes", wikidata_id="Q2611105")]
+        code, _texte, decisions, _csv = self._run(
+            brut, "Q2611105", note="localisation inconnue")
+        self.assertEqual(code, 0)
+        self.assertEqual(decisions["Q2611105"], ("drop", "localisation inconnue"))
+
+    def test_the_name_travels_with_the_verdict(self):
+        # Sans lui, revenir sur un verdict demande d'aller chercher ce que
+        # « Q2611105 » désigne.
+        brut = [make_place("Portus Itius", theme="megalithes", wikidata_id="Q2611105")]
+        _code, _texte, _decisions, csv_brut = self._run(brut, "Q2611105")
+        self.assertIn("Portus Itius", csv_brut)
+
+    def test_an_unknown_place_is_refused(self):
+        # Presque toujours une faute de frappe sur l'identifiant.
+        brut = [make_place("Gordes", theme="villages", wikidata_id="Q1")]
+        code, _texte, decisions, _csv = self._run(brut, "Q404")
+        self.assertEqual(code, 1)
+        self.assertEqual(decisions, {})
+
+    def test_an_unknown_verdict_is_refused(self):
+        brut = [make_place("Gordes", theme="villages", wikidata_id="Q1")]
+        code, _texte, decisions, _csv = self._run(brut, "Q1", decision="supprime")
+        self.assertEqual(code, 1)
+        self.assertEqual(decisions, {})
+
+    def test_clearing_gives_the_place_back_to_the_automatic_rules(self):
+        brut = [make_place("Gordes", theme="villages", wikidata_id="Q1")]
+        with tempfile.TemporaryDirectory() as tmp:
+            racine = Path(tmp)
+            (racine / "raw").mkdir()
+            (racine / "manual").mkdir()
+            write_raw(racine / "raw", brut, {"villages"})
+            base = dict(raw=racine / "raw", manual=racine / "manual",
+                        wikidata_id="Q1", note=None)
+            with contextlib.redirect_stdout(StringIO()), _capture():
+                cmd_verdict(argparse.Namespace(**base, decision="drop", clear=False), CONFIG)
+                cmd_verdict(argparse.Namespace(**base, decision="", clear=True), CONFIG)
+            self.assertEqual(read_decisions(racine / "manual" / "decisions.csv"), {})
+
+    def test_the_other_verdicts_pass_too(self):
+        brut = [make_place("Gordes", theme="villages", wikidata_id="Q1")]
+        for verdict in DECISIONS:
+            with self.subTest(verdict):
+                _code, _t, decisions, _csv = self._run(brut, "Q1", decision=verdict)
+                self.assertEqual(decisions["Q1"][0], verdict)
 
 
 class TestRethemeLosses(unittest.TestCase):
