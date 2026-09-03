@@ -701,6 +701,11 @@ def cmd_adopt(args: argparse.Namespace, config: Config) -> int:
     # sans département, donc injugeables.
     _apply_osm_signals(adopted, candidates_path)
     resolve_admin(client, adopted)
+    # Le filtre des classes AUSSI, et c'est par là que les parcs entraient :
+    # `adopt` ramène ce qu'OpenStreetMap propose, où un parc d'attractions est
+    # un lieu touristique comme un autre. Sans cette passe, il arrive au
+    # catalogue sans que rien ne l'ait regardé.
+    enrich_exclusions(client, adopted, config.exclusions.qids)
     enrich_flags(client, adopted)
     enrich_departements(adopted)
     enrich_article_sizes(adopted)

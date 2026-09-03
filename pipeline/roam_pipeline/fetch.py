@@ -558,6 +558,23 @@ def carry_enrichment(places: list[Place], raw_dir: Path, raw_path: Path) -> int:
         # territoire et les collections régionales lisent les deux.
         if place.departement_code and not place.region_code:
             place.region_code = item.get("region_code")
+
+        # `excluded_class` se reprend sur l'ABSENCE, pas sur la fausseté.
+        #
+        # Il n'est pas dans `ENRICHED_FIELDS` parce que la règle « compléter ce
+        # qui est vide » y serait fausse : elle rendrait sa classe à un lieu
+        # qu'`enrich` vient précisément de blanchir, et retirer une classe de la
+        # liste ne rendrait plus jamais son lieu au catalogue.
+        #
+        # Ce que le report doit rattraper est l'autre cas, et il coûtait cher :
+        # une collecte reconstruit ses lieux à neuf, sans drapeau, et le
+        # marquage vient d'`enrich`, qui interroge Wikidata. Le Parc Astérix,
+        # Nigloland et Marineland sont ainsi rentrés trois fois — marqués le
+        # 30 août, blanchis le 1er septembre, remarqués le 2, blanchis le 3.
+        if place.excluded_class is None and item.get("excluded_class") is not None:
+            place.excluded_class = item["excluded_class"]
+            touche = True
+
         repris += 1 if touche else 0
 
     if repris:
@@ -1011,8 +1028,15 @@ def enrich_exclusions(
     # Repartir de zéro : retirer une classe de la liste doit rendre au
     # catalogue les lieux qu'elle écartait, sans quoi l'exclusion serait un
     # aller sans retour.
+    #
+    # La chaîne VIDE, et non `None` : les deux sont fausses pour qui lit le
+    # drapeau, mais elles ne disent pas la même chose. « » veut dire « passé au
+    # filtre, rien à redire » ; `None` veut dire « jamais vérifié ». Sans cette
+    # nuance, un lieu qui vient d'être blanchi et un lieu qu'aucune vérification
+    # n'a touché se ressemblent — et le report de collecte en collecte ne peut
+    # pas savoir lequel il a le droit de compléter.
     for place in places:
-        place.excluded_class = None
+        place.excluded_class = ""
     if not class_qids or not places:
         return 0
 

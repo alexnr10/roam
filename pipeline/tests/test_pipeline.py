@@ -3558,6 +3558,41 @@ class TestFantomes(unittest.TestCase):
                          ["Grand", "Petit"])
 
 
+class TestExclusionSentinel(unittest.TestCase):
+    """« Vérifié, rien à redire » et « jamais vérifié » ne sont pas la même
+    chose, et rien ne les distinguait.
+
+    Les deux sont fausses pour qui lit le drapeau, donc les deux laissent
+    passer. Mais la première doit survivre au report d'une collecte à l'autre,
+    et la seconde doit pouvoir être complétée par ce que le dépôt sait déjà.
+    """
+
+    def test_a_clean_place_is_marked_as_checked_not_as_unknown(self):
+        from roam_pipeline.fetch import enrich_exclusions
+
+        class _Muet:
+            def query(self, _q):
+                return []
+
+        place = make_place("Cathédrale d'Amiens", "cathedrales", wikidata_id="Q1")
+        self.assertIsNone(place.excluded_class)
+        with _capture():
+            enrich_exclusions(_Muet(), [place], ["Q194195"])
+        self.assertEqual(place.excluded_class, "")
+        # Et le drapeau reste faux : le lieu n'est pas écarté.
+        self.assertFalse(place.excluded_class)
+
+    def test_an_empty_class_list_leaves_everything_untouched(self):
+        from roam_pipeline.fetch import enrich_exclusions
+
+        place = make_place("Gordes", "villages", wikidata_id="Q1",
+                           excluded_class="parc animalier")
+        with _capture():
+            self.assertEqual(enrich_exclusions(None, [place], []), 0)
+        # La liste vide rend le catalogue à lui-même : plus aucune exclusion.
+        self.assertEqual(place.excluded_class, "")
+
+
 class TestVerdict(unittest.TestCase):
     """Écarter un lieu repéré au détour d'une carte ne doit pas demander nano.
 
@@ -4643,6 +4678,30 @@ class TestCarryEnrichment(unittest.TestCase):
                           departement_code=None, region_code=None)
         self._avec([ancien], [neuf])
         self.assertEqual((neuf.departement_code, neuf.region_code), ("34", "76"))
+
+    def test_the_disqualifying_class_survives_a_new_collection(self):
+        # Le Parc Astérix, Nigloland et Marineland sont rentrés trois fois en
+        # quatre jours : marqués le 30 août, blanchis le 1er septembre,
+        # remarqués le 2, blanchis le 3. Le drapeau vient d'`enrich`, qui
+        # interroge Wikidata ; une collecte reconstruit ses lieux sans lui.
+        ancien = make_place("Parc Astérix", "musees", wikidata_id="Q377592",
+                            excluded_class="parc d'attractions")
+        neuf = make_place("Parc Astérix", "musees", wikidata_id="Q377592")
+        self.assertIsNone(neuf.excluded_class)
+        self._avec([ancien], [neuf])
+        self.assertEqual(neuf.excluded_class, "parc d'attractions")
+
+    def test_a_place_just_cleared_does_not_get_its_class_back(self):
+        # `enrich_exclusions` écrit la chaîne VIDE pour dire « vérifié, rien à
+        # redire ». Si le report la traitait comme une absence, retirer une
+        # classe de la liste ne rendrait plus jamais son lieu au catalogue :
+        # l'exclusion serait un aller sans retour.
+        ancien = make_place("Cité de l'espace", "musees", wikidata_id="Q1",
+                            excluded_class="parc d'attractions")
+        neuf = make_place("Cité de l'espace", "musees", wikidata_id="Q1",
+                          excluded_class="")
+        self._avec([ancien], [neuf])
+        self.assertEqual(neuf.excluded_class, "")
 
     def test_the_article_and_the_crowd_survive_too(self):
         ancien = make_place("Léman", "lacs", wikidata_id="Q2",

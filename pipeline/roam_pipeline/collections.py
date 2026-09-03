@@ -946,6 +946,20 @@ def apply_class_exclusion(places: list[Place], config: Config) -> list[Place]:
             shown = ", ".join(sorted(names)[:8])
             more = f" (+{len(names) - 8})" if len(names) > 8 else ""
             LOG.info("    %-24s %3d — %s%s", label, len(names), shown, more)
+
+    # Le filtre ne peut écarter que ce qu'il a REGARDÉ, et son drapeau vient
+    # d'`enrich`, qui interroge Wikidata. Un lieu jamais vérifié le traverse
+    # sans un mot : le Parc Astérix, Nigloland et Marineland sont ainsi rentrés
+    # trois fois en quatre jours, chaque fois en silence. Le silence était le
+    # vrai défaut — c'est lui qu'on corrige ici.
+    jamais_vus = [place for place in places if place.excluded_class is None]
+    if jamais_vus:
+        LOG.warning(
+            "%s lieux n'ont jamais été passés au filtre des classes : ils entrent "
+            "sans avoir été regardés. Lance `enrich` pour les vérifier (ex. %s)",
+            len(jamais_vus),
+            ", ".join(place.name for place in jamais_vus[:3]),
+        )
     return kept
 
 
