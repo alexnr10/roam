@@ -174,14 +174,19 @@ export default function PlaceScreen() {
                   {collection.name}
                 </Text>
               </View>
-              <Text style={type.small}>{progress.pct}%</Text>
+              {/* Le niveau en cours, compté en lieux — la même langue que
+                  l'onglet Collections. Un pourcentage sur l'ensemble ici et un
+                  décompte là-bas décrivaient le même état sans se ressembler. */}
+              <Text style={type.small}>
+                N{progress.stage.tier} {progress.stage.visited}/{progress.stage.total}
+              </Text>
             </View>
             <ProgressBar
-              pct={progress.pct}
-              color={tier ? colors.tier[tier - 1] : colors.primary}
+              pct={progress.stage.pct}
+              color={colors.tier[progress.stage.tier - 1]}
               height={6}
             />
-            {tier ? <Text style={type.small}>Niveau {tier} de cette collection</Text> : null}
+            {tier ? <Text style={type.small}>Ce lieu est de niveau {tier}</Text> : null}
           </Pressable>
         );
       })}

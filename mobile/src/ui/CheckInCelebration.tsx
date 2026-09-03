@@ -127,8 +127,10 @@ export function CheckInCelebration({
                 <AdvanceRow
                   key={advance.collection.slug}
                   name={advance.collection.name}
-                  from={advance.before.pct}
-                  to={advance.after.pct}
+                  tier={advance.tier}
+                  from={advance.fromVisited}
+                  to={advance.toVisited}
+                  total={advance.tierTotal}
                   delay={reduceMotion ? 0 : 260 + index * 140}
                   animate={!reduceMotion}
                 />
@@ -181,16 +183,27 @@ export function CheckInCelebration({
   );
 }
 
+/**
+ * Une collection qui avance, comptée en lieux et non en pourcents.
+ *
+ * « 7 sur 8 » dit ce qu'il reste à faire ; « 87 % » demande une division avant
+ * de vouloir dire quelque chose. Le reste de l'application compte déjà en
+ * lieux — l'écran de récompense parlait encore l'autre langue.
+ */
 function AdvanceRow({
   name,
+  tier,
   from,
   to,
+  total,
   delay,
   animate,
 }: {
   name: string;
+  tier: number;
   from: number;
   to: number;
+  total: number;
   delay: number;
   animate: boolean;
 }) {
@@ -212,7 +225,10 @@ function AdvanceRow({
   }, [progress, to, delay, animate]);
 
   const width = progress.interpolate({
-    inputRange: [0, 100],
+    // Une barre vide sur « 1 sur 12 » ne récompense rien. Le trait garde donc
+    // une amorce visible dès le premier lieu : ce qu'on montre est un début,
+    // pas une proportion à la virgule près.
+    inputRange: [0, Math.max(total, 1)],
     outputRange: ['0%', '100%'],
     extrapolate: 'clamp',
   });
@@ -223,10 +239,17 @@ function AdvanceRow({
         <Text style={type.small} numberOfLines={1}>
           {name}
         </Text>
-        <Text style={styles.advanceValue}>{Math.round(shown)}%</Text>
+        <Text style={styles.advanceValue}>
+          N{tier} {Math.round(shown)}/{total}
+        </Text>
       </View>
       <View style={styles.advanceTrack}>
-        <Animated.View style={[styles.advanceFill, { width }]} />
+        <Animated.View
+          style={[
+            styles.advanceFill,
+            { width, minWidth: to > 0 ? 6 : 0, backgroundColor: colors.tier[tier - 1] },
+          ]}
+        />
       </View>
     </View>
   );

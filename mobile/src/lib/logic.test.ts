@@ -328,6 +328,33 @@ describe('récompense de validation', () => {
     expect(run([]).tierUps).toEqual([]);
   });
 
+  it('compte en LIEUX du niveau, pas en pourcentage de la collection', () => {
+    // « 1 sur 2 » se lit ; « 25 % » d'une collection de quatre-vingts lieux
+    // dessine une jauge vide — l'écran de récompense ne récompensait rien.
+    const [advance] = run([]).advances;
+    expect({ tier: advance.tier, from: advance.fromVisited, to: advance.toVisited,
+             total: advance.tierTotal }).toEqual({ tier: 1, from: 0, to: 1, total: 2 });
+  });
+
+  it('reste sur le niveau du lieu quand la validation le TERMINE', () => {
+    // Valider le dernier lieu du niveau 1 fait passer au niveau 2. Une barre
+    // calée sur « le niveau en cours » repartirait de zéro : le meilleur geste
+    // du jeu, affiché comme un recul.
+    const [advance] = run([visit('a')]).advances;
+    expect(advance.after.stage.tier).toBe(2);
+    expect({ tier: advance.tier, to: advance.toVisited, total: advance.tierTotal })
+      .toEqual({ tier: 1, to: 2, total: 2 });
+  });
+
+  it('suit le niveau du lieu validé, même au-dessus du niveau en cours', () => {
+    const target2 = place({ id: 'c' });
+    const [advance] = describeCheckIn(
+      [sample], target2, [], [makeVisit(target2, 'gps')],
+    ).advances;
+    expect({ tier: advance.tier, to: advance.toVisited, total: advance.tierTotal })
+      .toEqual({ tier: 2, to: 1, total: 2 });
+  });
+
   it('classe la collection la plus avancée en premier', () => {
     const wide = { ...collection([['b', 1], ['p', 1], ['q', 2], ['r', 3]]), slug: 'geo-country-fr' };
     const reward = describeCheckIn(

@@ -4331,6 +4331,69 @@ class TestNaturalClassGaps(unittest.TestCase):
         self.assertLessEqual(dict(CONFIG.theme("gorges").collected_classes)["Q39816"], 12)
 
 
+class TestAlignDepartements(unittest.TestCase):
+    """Un code INSEE de commune contient son département : la vérification est
+    gratuite, et elle n'était pas faite.
+
+    Trente-sept lieux se contredisaient eux-mêmes et se rangeaient dans la
+    mauvaise collection départementale : le château d'Écouen, commune 95205,
+    donc Val-d'Oise, figurait dans « Châteaux des Yvelines ».
+    """
+
+    def _cale(self, place):
+        from roam_pipeline.fetch import align_departements
+        with _capture():
+            align_departements([place])
+        return place
+
+    def test_the_commune_wins_over_wikidata(self):
+        ecouen = make_place("Château d'Écouen", "chateaux", wikidata_id="Q1817122",
+                            commune_code="95205", commune_name="Écouen",
+                            departement_code="78", region_code="11")
+        self._cale(ecouen)
+        self.assertEqual(ecouen.departement_code, "95")
+
+    def test_the_region_follows_the_departement(self):
+        # Le lac Blanc est dans le Haut-Rhin, pas dans les Vosges : Wikidata
+        # remonte la chaîne P131 d'un massif, elle change de région au passage.
+        lac = make_place("Lac Blanc", "lacs", wikidata_id="Q267332",
+                         commune_code="68249", departement_code="88",
+                         region_code="44")
+        self._cale(lac)
+        self.assertEqual((lac.departement_code, lac.region_code), ("68", "44"))
+
+    def test_a_place_that_already_agrees_is_left_alone(self):
+        from roam_pipeline.fetch import align_departements
+        gordes = make_place("Gordes", "villages", wikidata_id="Q2",
+                            commune_code="84091", departement_code="84")
+        with _capture():
+            self.assertEqual(align_departements([gordes]), 0)
+
+    def test_overseas_codes_are_three_digits(self):
+        # 97411 est Saint-Denis de La Réunion : le département est 974, pas 97.
+        piton = make_place("Piton de la Fournaise", "sommets", wikidata_id="Q3",
+                           commune_code="97414", departement_code=None)
+        self._cale(piton)
+        self.assertEqual(piton.departement_code, "974")
+
+    def test_the_overseas_collectivities_stay_out(self):
+        # 98817 est Lifou, en Nouvelle-Calédonie : une COM, hors périmètre v1.
+        # Lui donner « 988 » comme département la faisait entrer par la porte du
+        # filtre, qui n'écarte que ce qu'il ne sait pas situer.
+        lifou = make_place("Lifou", "iles", wikidata_id="Q5",
+                           commune_code="98817", departement_code=None)
+        self._cale(lifou)
+        self.assertIsNone(lifou.departement_code)
+
+    def test_a_place_without_a_commune_is_untouched(self):
+        # Un phare en mer n'a pas de commune : rien à recaler, et surtout rien
+        # à effacer.
+        phare = make_place("Phare de la Jument", "phares", wikidata_id="Q4",
+                           commune_code=None, departement_code="29")
+        self._cale(phare)
+        self.assertEqual(phare.departement_code, "29")
+
+
 class TestCarryEnrichment(unittest.TestCase):
     """Une collecte ne doit pas écraser ce qu'`enrich` a mis des heures à poser.
 

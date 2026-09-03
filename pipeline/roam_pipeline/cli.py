@@ -53,6 +53,7 @@ from .fetch import (
     fetch_listed_places,
     read_csv_rows,
     read_place_list,
+    align_departements,
     resolve_admin,
     run_fetch,
 )
@@ -115,6 +116,10 @@ def _save_raw(args: argparse.Namespace, places: list[Place]) -> None:
             "`sync` après un `git pull` pour éviter ce genre de surprise.",
             repris, len(places),
         )
+    # Même endroit, même raison : un lieu dont le département contredit sa
+    # commune est rangé dans la mauvaise collection départementale, et rien ne
+    # le signale. La commune vient des coordonnées, elle a le dernier mot.
+    align_departements(places)
     write_raw(args.raw, places, replacing={shard_of(place) for place in places})
     (args.out / "places_raw.json").write_text(
         json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2),
@@ -733,9 +738,17 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
             return 1
     _warn_if_behind_repo(args)
 
+    charges = _load_places(raw_path)
+    # Avant de scorer quoi que ce soit : un lieu dont le département contredit
+    # sa commune part dans la mauvaise collection départementale, et rien ne le
+    # dit. La collecte peut venir de n'importe quel chemin — `sync` écrit
+    # `places_raw.json` sans passer par `_save_raw` — donc la vérification se
+    # refait ici, où elle décide.
+    align_departements(charges)
+
     # `scored` garde TOUS les candidats : c'est lui qui alimente la distribution,
     # qui ne sert à régler le plancher que si elle porte sur l'avant-filtre.
-    scored = score_all(_load_places(raw_path), config)
+    scored = score_all(charges, config)
     # Avant tout le reste : le nom choisi par le curateur doit valoir partout,
     # jusque dans la feuille de revue où il relira la ligne.
     renamed = apply_names(scored, read_names(args.manual / "names.csv"))

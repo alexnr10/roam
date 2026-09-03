@@ -565,6 +565,58 @@ def carry_enrichment(places: list[Place], raw_dir: Path, raw_path: Path) -> int:
     return repris
 
 
+def align_departements(places: list[Place]) -> int:
+    """Fait dire au département ce que dit déjà la commune.
+
+    Les deux champs ne viennent pas du même endroit. La commune est trouvée par
+    les COORDONNÉES du lieu — l'API Adresse, puis l'API Géo, qui répond par
+    appartenance au polygone communal. Le département, lui, vient de la chaîne
+    P131 de Wikidata, qui peut nommer n'importe laquelle des communes qu'un
+    massif traverse, une entité historique, ou tout autre chose : le château
+    d'Écouen (Val-d'Oise) se retrouvait dans les Yvelines, le château de Sceaux
+    (Hauts-de-Seine) dans Paris, le lac Blanc (Haut-Rhin) dans les Vosges.
+
+    Or un code INSEE de commune CONTIENT son département. La vérification est
+    gratuite, et elle n'était pas faite : trente-sept lieux se contredisaient
+    eux-mêmes, tranquillement rangés dans la mauvaise collection
+    départementale.
+
+    C'est la commune qui gagne, et pour une raison de fond : chez Roam un lieu
+    est toujours un POINT, et un point n'est que dans une commune. Le massif
+    qui chevauche trois départements est un problème de Wikidata, pas un
+    problème d'ici.
+    """
+    corriges = 0
+    for place in places:
+        # `normalize_dept_code` n'accepte que les cent un départements. Sans lui,
+        # un code INSEE de Nouvelle-Calédonie ou de Polynésie (988xx, 987xx)
+        # donnait un « département » que le filtre du périmètre laissait passer,
+        # et Lifou, Nuku Hiva et le mont Ross entraient dans le catalogue — les
+        # COM sont hors v1.
+        attendu = normalize_dept_code(departement_from_insee(place.commune_code))
+        if not attendu or attendu == place.departement_code:
+            continue
+        LOG.debug(
+            "département corrigé : %s (%s) %s -> %s",
+            place.name, place.wikidata_id, place.departement_code, attendu,
+        )
+        place.departement_code = attendu
+        # La région suit le département, sans quoi le repêchage par territoire
+        # et les collections régionales se contrediraient à leur tour.
+        known = region_of(attendu)
+        if known:
+            place.region_code = known.code
+        corriges += 1
+
+    if corriges:
+        LOG.info(
+            "département recalé sur la commune : %s lieux (la commune vient des "
+            "coordonnées, le département de Wikidata — c'est la commune qui sait)",
+            corriges,
+        )
+    return corriges
+
+
 def carry_osm_signals(places: list[Place], raw_dir: Path, raw_path: Path) -> int:
     """Reprend l'ouverture au public de la collecte précédente.
 
@@ -1195,6 +1247,10 @@ def run_fetch(
     # la fréquentation viennent d'`enrich`, pas de la collecte. Une collecte
     # qui les écrase fausse tous les scores et vide le catalogue, en silence.
     carry_enrichment(places, raw_dir, raw_path)
+
+    # Dernier mot à la commune : `resolve_admin` vient d'écrire un département
+    # tiré de Wikidata, qui peut contredire la commune trouvée aux coordonnées.
+    align_departements(places)
 
     # On ne réécrit que ce qu'on a collecté. Les thèmes non demandés gardent
     # leur fichier ; ceux qui ont échoué aussi — leur dernière collecte réussie

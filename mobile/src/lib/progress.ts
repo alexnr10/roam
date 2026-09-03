@@ -201,6 +201,18 @@ export type CollectionAdvance = {
   collection: Collection;
   before: CollectionProgress;
   after: CollectionProgress;
+  /**
+   * Le niveau où le mouvement a eu lieu : celui du lieu validé.
+   *
+   * Pas le niveau en cours. Une validation qui TERMINE le niveau 1 le fait
+   * passer au niveau 2, et une barre calée sur « le niveau en cours » repartirait
+   * de zéro : le meilleur geste du jeu, affiché comme un recul.
+   */
+  tier: Tier;
+  /** Avancement de CE niveau, avant et après. */
+  fromVisited: number;
+  toVisited: number;
+  tierTotal: number;
 };
 
 export type CheckInReward = {
@@ -222,13 +234,23 @@ export function describeCheckIn(
   const tierUps: Array<{ collection: Collection; tier: Tier }> = [];
 
   for (const collection of collections) {
-    if (!collection.places.some((member) => member.placeId === place.id)) continue;
+    const membership = collection.places.find((member) => member.placeId === place.id);
+    if (!membership) continue;
 
     const before = computeProgress(collection, visitsBefore);
     const after = computeProgress(collection, visitsAfter);
     if (after.visited === before.visited) continue;
 
-    advances.push({ collection, before, after });
+    const tier = membership.tier;
+    advances.push({
+      collection,
+      before,
+      after,
+      tier,
+      fromVisited: before.tiers[tier - 1].visited,
+      toVisited: after.tiers[tier - 1].visited,
+      tierTotal: after.tiers[tier - 1].total,
+    });
 
     const had = new Set(earnedBadges(collection, before).map((badge) => badge.id));
     for (const badge of earnedBadges(collection, after)) {
@@ -243,6 +265,10 @@ export function describeCheckIn(
   }
 
   // La collection la plus proche du but en premier : c'est celle qui parle.
-  advances.sort((a, b) => b.after.pct - a.after.pct);
+  // Au niveau concerné, pas sur l'ensemble — « 7 sur 8 » passe avant « 40 sur
+  // 200 », même si la seconde compte plus de lieux visités.
+  advances.sort(
+    (a, b) => b.toVisited / (b.tierTotal || 1) - a.toVisited / (a.tierTotal || 1),
+  );
   return { advances, newBadges, tierUps };
 }
