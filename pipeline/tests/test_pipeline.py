@@ -2432,6 +2432,21 @@ class TestGapCensus(unittest.TestCase):
         self.assertIn("SUM(IF(?sitelinks >= 2, 1, 0)) AS ?n2", sparql)
         self.assertIn("SUM(IF(?sitelinks >= 8, 1, 0)) AS ?n8", sparql)
 
+    def test_the_ladder_goes_below_the_lowest_floor_in_use(self):
+        # L'échelle commençait à deux, le plancher de collecte le plus bas déjà
+        # écrit : à la question « combien de plages Wikidata décrit-il SOUS
+        # notre plancher ? », la commande répondait par le silence. Or c'est
+        # cette question-là qui décide s'il vaut la peine de descendre.
+        from roam_pipeline.cli import THRESHOLDS
+        self.assertEqual(THRESHOLDS[:3], [0, 1, 2])
+
+    def test_the_threshold_query_filters_nothing(self):
+        # Compter à partir de zéro n'a de sens que si la requête ne coupe pas
+        # elle-même sur la notoriété.
+        sparql = class_thresholds_query("Q3947", [0, 2])
+        self.assertIn("SUM(IF(?sitelinks >= 0, 1, 0)) AS ?n0", sparql)
+        self.assertNotIn("FILTER(?sitelinks", sparql)
+
 
 class TestClassesFoundByTheCensus(unittest.TestCase):
     """Les deux trous que `gaps` a nommés, et qu'il ne doit plus rouvrir."""

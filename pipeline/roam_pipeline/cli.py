@@ -1760,7 +1760,16 @@ def census(rows, counts: dict[str, int], known: set[str], owned: set[str]) -> li
 
 
 #: Planchers explorés par `gaps --class` : ceux qu'on écrirait vraiment.
-THRESHOLDS = [2, 3, 4, 6, 8, 10, 12, 15, 20]
+#
+# Zéro et un en font partie, et il a fallu en avoir besoin pour s'en apercevoir.
+# L'échelle commençait à deux — le plancher de collecte le plus bas déjà écrit —
+# si bien qu'à la question « combien de plages Wikidata décrit-il SOUS notre
+# plancher ? », la commande répondait par le silence. Or c'est exactement la
+# question qui décide s'il vaut la peine de descendre : les plages de la Côte
+# d'Azur manquent au catalogue, et rien ne disait si elles manquaient parce que
+# le plancher les coupe ou parce que Wikidata les ignore. Un outil de mesure
+# qui ne sait pas mesurer en dessous de l'existant ne peut rien conseiller.
+THRESHOLDS = [0, 1, 2, 3, 4, 6, 8, 10, 12, 15, 20]
 
 
 def cmd_retention(args: argparse.Namespace, config: Config) -> int:
@@ -3226,7 +3235,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     gaps.add_argument(
         "--min-sitelinks", type=int, default=12,
-        help="notoriété minimale des lieux recensés (défaut 12 ; plus bas = plus long)",
+        help="notoriété minimale des lieux recensés (défaut 12 ; plus bas = plus "
+             "long). Sans effet avec --class, qui parcourt sa propre échelle de "
+             "planchers, zéro compris.",
     )
     gaps.add_argument("--limit", type=int, default=30, help="classes affichées")
     gaps.add_argument(
