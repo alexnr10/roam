@@ -1375,6 +1375,10 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
     # déjà leur représentant au catalogue, ni les thèmes dont le plafond est
     # atteint : le repêchage comble un territoire, il ne rouvre pas un quota.
     gardes = {place.wikidata_id for place in au_dessus}
+    # Le repêchage reste ouvert aux thèmes qui ont de la place — neuf musées
+    # partis en doublons en laissent — mais le plafond repasse APRÈS lui pour
+    # tenir le compte. Sans ce second passage il ajoutait sans budget : cent
+    # cinquante musées devenaient cent soixante-huit.
     satures = saturated_themes(sans_sosie, config)
     complete = rescue_thin_departements(
         sans_sosie,
@@ -1383,7 +1387,15 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
         config,
     )
     # Second passage : les repêchés peuvent se doublonner entre eux.
-    kept = dedupe(complete)
+    dedouble = dedupe(complete)
+    # Et le plafond une seconde fois, qui tient le compte final. Il ne peut pas
+    # remplacer le premier : appliqué SEUL après le repêchage, il vidait les
+    # départements que celui-ci venait de remplir. Appliqué seul avant, il
+    # laissait le repêchage le dépasser. Les deux ensemble laissent le
+    # repêchage garnir les départements pauvres — c'est ainsi que l'écomusée de
+    # Martinique, quatre langues pour un plancher à douze, reste au catalogue —
+    # sans que le thème dépasse son compte.
+    kept = apply_theme_cap(dedouble, config)
 
     _funnel(
         [
@@ -1399,7 +1411,8 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
             ("plafond thème", sous_cap),
             ("sosies", sans_sosie),
             ("dépt pauvre", complete),
-            ("dédoublé", kept),
+            ("dédoublé", dedouble),
+            ("cap final", kept),
         ],
         config,
     )

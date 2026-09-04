@@ -853,10 +853,11 @@ class TestBuildFunnel(unittest.TestCase):
         # un thème de liste, l'appartenance ne leur retire rien — deux après le
         # plancher, deux encore après les deux plafonds puis après les sosies,
         # puis quatre de nouveau : leur département est pauvre et le repêchage
-        # géographique leur rend leur place.
+        # géographique leur rend leur place. Le plafond de thème repasse en
+        # dernier et ne leur retire rien — les dunes n'en ont pas.
         ligne = next(l for l in table.splitlines() if l.strip().startswith("dunes-marais"))
         self.assertEqual([int(n) for n in ligne.split()[1:]],
-                         [6, 4, 4, 4, 4, 4, 4, 2, 2, 2, 2, 4, 4])
+                         [6, 4, 4, 4, 4, 4, 4, 2, 2, 2, 2, 4, 4, 4])
 
     def test_a_theme_without_any_place_is_left_out_of_the_funnel(self):
         from roam_pipeline.collections import build_all
@@ -3855,6 +3856,20 @@ class TestThemeCap(unittest.TestCase):
         lieux = [self._lieu(f"Cathédrale {i}", "cathedrales", 100 - i, "75")
                  for i in range(3)]
         self.assertEqual(len(self._cape(lieux)), 3)
+
+    def test_the_cap_is_applied_again_after_the_rescue(self):
+        # Le repêchage n'a pas de budget : appelé sur un thème qui a de la place
+        # — neuf musées partis en doublons en laissent — il ajoutait sans
+        # compter, et cent cinquante musées devenaient cent soixante-huit. Le
+        # plafond repasse donc APRÈS lui.
+        #
+        # Il ne peut pas remplacer le premier passage pour autant : appliqué
+        # seul après, il vidait les départements que le repêchage venait de
+        # remplir. Les deux ensemble laissent le repêchage garnir les
+        # départements pauvres sans que le thème dépasse son compte.
+        trop = [self._lieu(f"Cathédrale {i}", "cathedrales", 100 - i, "75")
+                for i in range(9)]
+        self.assertEqual(len(self._cape(trop, mini=0)), 5)
 
     def test_a_saturated_theme_is_closed_to_the_rescue(self):
         # Le repêchage comble un TERRITOIRE pauvre ; il n'a pas à rouvrir un

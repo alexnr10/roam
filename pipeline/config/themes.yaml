@@ -228,6 +228,19 @@ themes:
     # l'hôtel-Dieu de Carpentras sont sortis sans qu'aucune décision ne les
     # vise.
     cap: 80
+    # 217 au catalogue pour 87 dans la collection nationale : les 130 autres
+    # vivaient dans les collections départementales et s'affichaient toutes sur
+    # la carte. Cent cinquante coupe sous 88,7 — le musée national de
+    # l'espéranto, le Tramway de Pithiviers à Toury, le Disneyland Railroad —
+    # et garde les grands musées régionaux : Saint-Étienne, le Palais Lascaris,
+    # Besançon, Orléans.
+    #
+    # Pas plus bas, et pour une raison propre à ce thème : les musées sont ce
+    # que le catalogue a de plus VISITABLE — horaires, billets, fréquentation
+    # mesurée sur 169 des 217, contre 3 cathédrales sur 80. Descendre à 100
+    # coûterait les beaux-arts d'Orléans et de Besançon, qui sont exactement
+    # l'usage quotidien qu'on cherche à servir.
+    catalogue_cap: 150
     # Diversité géographique : soixante-douze musées sur deux cent quatre-vingt-cinq sont parisiens.
     # Ce n'est pas un fait de géographie mais un fait d'écriture — les
     # volcans sont vraiment en Auvergne, les ponts ne sont pas vraiment à
