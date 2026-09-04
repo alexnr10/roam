@@ -584,9 +584,46 @@ themes:
     # y attester. Le bonus d'accueil du public ne s'y applique pas.
     gated: false
     radius_m: 500
-    min_sitelinks: 3
-    fetch_min_sitelinks: 2
+    # UN SEUL des sept thèmes de nature où le plancher de notoriété est à un, et
+    # c'est mesuré, pas concédé. `gaps --class Q40080` recense 647 plages
+    # françaises situées chez Wikidata :
+    #
+    #     ≥0 langues  647
+    #     ≥1 langues  473
+    #     ≥2 langues   98   ← plancher de collecte d'alors
+    #     ≥3 langues   20   ← plancher de notoriété d'alors
+    #
+    # Vingt plages pour toute la France. Ce n'était pas un filtre, c'était un
+    # mur, et il se voyait dans le résultat : sur cent vingt-deux lieux du
+    # thème, soixante-cinq étaient des caps ou des pointes et vingt et un
+    # seulement portaient le mot « plage » — dont les cinq plages du
+    # Débarquement, qui sont des sites historiques, et onze d'outre-mer. La
+    # métropole hors Normandie 1944 apportait CINQ plages.
+    #
+    # Le décompte de versions linguistiques mesure la notoriété d'un MONUMENT.
+    # Pampelonne plafonne à sept langues là où une cathédrale médiocre en a
+    # douze. Appliqué au littoral, il ne trie pas, il rase.
+    #
+    # Un à la collecte comme à la notoriété veut dire : « quelqu'un a écrit un
+    # article ». C'est le vrai plancher, et il écarte quand même les cent
+    # soixante-quatorze objets sans article, qui n'ont ni texte ni
+    # consultations — donc rien sur quoi les départager.
+    #
+    # Ce qui trie ensuite, c'est le SCORE, et pour ce thème il est porté par les
+    # consultations : trois cent trente-six des quatre cent treize lieux
+    # côtiers en ont, les plages du Prado font 5 758 vues par mois quand la
+    # médiane du thème est à 46. Le plafond de catalogue ci-dessous est ce qui
+    # rend la manœuvre sûre — sans lui, baisser le plancher serait un
+    # recensement.
+    min_sitelinks: 1
+    fetch_min_sitelinks: 1
     cap: 60
+    # Le thème en portait cent vingt-deux avec l'ancien plancher : le plafond
+    # garde l'empreinte d'alors et laisse changer la COMPOSITION, pas le volume.
+    # Il est aussi la seule barrière du thème maintenant que le plancher n'en
+    # est plus une — les six classes de reliefs côtiers descendent elles aussi
+    # à une langue, et leur réserve n'est pas mesurée.
+    catalogue_cap: 120
     wikidata_classes: [Q40080, Q107679, Q185113, Q191992, Q34763, Q1026259, Q6502866]
     # plage, falaise, cap, cap (promontoire marin), péninsule, calanque,
     # falaise côtière.
