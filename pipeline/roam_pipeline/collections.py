@@ -801,10 +801,11 @@ def apply_theme_cap(places: list[Place], config: Config) -> list[Place]:
     régionales, et toutes s'affichaient sur la carte. « Ce n'est plus un guide,
     ça devient un recensement. »
 
-    Trois réservations, dans cet ordre, avant que le score ne remplisse le
+    Trois réservations, dans cet ordre, avant que le classement ne remplisse le
     reste :
 
-    1. **Les lieux épinglés.** Le curateur a vu le lieu, pas la règle.
+    1. **Les lieux épinglés À LA MAIN.** Une ligne de places.csv est un lieu que
+       le curateur a ajouté lui-même ; le plafond n'a pas à défaire ce geste.
     2. **Un minimum par région.** Sans lui, les quatre cathédrales des DOM
        tombaient d'un bloc : elles sont seules dans leur région, donc jamais
        dans les quatre-vingts meilleures de France. La métropole, elle, se
@@ -816,7 +817,13 @@ def apply_theme_cap(places: list[Place], config: Config) -> list[Place]:
        dans la curation humaine qu'on a passé des jours à saisir — les cent
        quatre-vingt-sept Plus Beaux Villages SONT la liste de l'association.
 
-    Le reste se remplit au score, et le total ne dépasse jamais le plafond.
+    Le reste se remplit dans l'ordre du LOT, et le lot est classé par la
+    hiérarchie de revue avant de l'être par le score : monté d'un niveau
+    devant, intact ensuite, descendu en dernier. Un verdict `keep` ne réserve
+    RIEN — il y en a mille cinq cent cinquante-cinq, et le curateur en avait
+    gardé cent soixante-treize pour un plafond de quatre-vingts. « Si c'est
+    juste un keep mais que ce dernier se situe à la fin du classement c'est
+    normal qu'il sorte. » Le total ne dépasse jamais le plafond.
     """
     caps = {theme.id: theme.catalogue_cap for theme in config.themes
             if theme.catalogue_cap}
@@ -833,7 +840,11 @@ def apply_theme_cap(places: list[Place], config: Config) -> list[Place]:
     kept = list(intacts)
     for theme_id, lot in par_theme.items():
         cap = caps[theme_id]
-        lot.sort(key=lambda place: -place.score)
+        # La hiérarchie du curateur d'abord, le score ensuite. `tier_shift`
+        # porte le verdict de revue : -1 monté d'un niveau, 0 intact, +1
+        # descendu. Trier au seul score revenait à demander à Wikipédia
+        # d'arbitrer ce que le curateur avait déjà tranché à la main.
+        lot.sort(key=lambda place: (place.tier_shift, -place.score))
         if len(lot) <= cap:
             kept.extend(lot)
             continue
@@ -976,8 +987,18 @@ def apply_commune_cap(places: list[Place], config: Config) -> list[Place]:
     kept = list(sans_commune)
     retires: dict[str, int] = defaultdict(int)
     for (_code, _theme), lot in par_commune.items():
-        # Épinglé veut dire épinglé : le curateur passe avant le plafond.
-        lot.sort(key=lambda place: (not place.pinned, -place.score))
+        # Épinglé À LA MAIN veut dire épinglé : une ligne de places.csv est
+        # un lieu que le curateur a ajouté lui-même, et le plafond n'a pas à
+        # défaire ce geste. Un verdict `keep` pose le même drapeau et ne
+        # réserve rien : il y en a mille cinq cent cinquante-cinq, ils
+        # remplissaient le plafond à eux seuls. « Si c'est juste un keep mais
+        # que ce dernier se situe à la fin du classement c'est normal qu'il
+        # sorte. » Vient ensuite la hiérarchie de revue, puis le score.
+        lot.sort(key=lambda place: (
+            not (place.pinned and not place.kept_in_review),
+            place.tier_shift,
+            -place.score,
+        ))
         kept.extend(lot[:cap])
         for place in lot[cap:]:
             retires[place.commune_name or place.commune_code or "?"] += 1

@@ -3693,96 +3693,6 @@ class TestLabelQueryKinds(unittest.TestCase):
 
 
 class TestThemeCap(unittest.TestCase):
-    """Combien de lieux d'un thème le CATALOGUE garde, tous territoires confondus.
-
-    Le catalogue portait 193 cathédrales alors que la collection nationale n'en
-    montrait que 61 : les 132 autres vivaient dans les collections
-    départementales et s'affichaient toutes sur la carte. « Ce n'est plus un
-    guide, ça devient un recensement. »
-    """
-
-    def _lieu(self, nom, score, dept, theme="cathedrales", **kw):
-        return make_place(nom, theme=theme, score=score, departement_code=dept,
-                          wikidata_id=f"Q{abs(hash(nom)) % 999979}", **kw)
-
-    def _cape(self, lieux, cap=4, mini=1):
-        from roam_pipeline.collections import apply_theme_cap
-        themes = [replace(t, catalogue_cap=cap) if t.id == "cathedrales" else t
-                  for t in CONFIG.themes]
-        config = replace(CONFIG, themes=themes,
-                         collections=replace(CONFIG.collections, min_per_region=mini))
-        with _capture():
-            return apply_theme_cap(lieux, config)
-
-    def test_the_best_scored_fill_the_cap(self):
-        lieux = [self._lieu(f"Cathédrale {i}", 100 - i, "34") for i in range(10)]
-        gardes = self._cape(lieux, mini=0)
-        self.assertEqual(len(gardes), 4)
-        self.assertEqual({p.name for p in gardes},
-                         {f"Cathédrale {i}" for i in range(4)})
-
-    def test_a_theme_without_a_cap_is_untouched(self):
-        lieux = [self._lieu(f"Pont {i}", 100 - i, "34", theme="ponts")
-                 for i in range(10)]
-        self.assertEqual(len(self._cape(lieux)), 10)
-
-    def test_every_region_keeps_at_least_one(self):
-        # Les quatre cathédrales d'outre-mer sont seules dans leur région : elles
-        # ne sont jamais dans les quatre-vingts meilleures de France, et elles
-        # tombaient d'un bloc.
-        metropole = [self._lieu(f"Métropole {i}", 200 - i, "34") for i in range(6)]
-        outremer = self._lieu("Cayenne", 60, "973")
-        gardes = self._cape(metropole + [outremer])
-        self.assertIn("Cayenne", {p.name for p in gardes})
-        self.assertEqual(len(gardes), 4)
-
-    def test_an_official_list_is_reserved_before_the_score(self):
-        # Même critère que le plancher : `makes_collection` dit qu'une liste est
-        # assez courte et assez choisie pour valoir dispense.
-        forts = [self._lieu(f"Fort {i}", 200 - i, "34") for i in range(6)]
-        modeste = self._lieu("Petite basilique", 50, "34", labels=["unesco"])
-        gardes = self._cape(forts + [modeste], mini=0)
-        self.assertIn("Petite basilique", {p.name for p in gardes})
-
-    def test_a_review_keep_is_not_a_free_pass(self):
-        # `keep` pose le même drapeau qu'un épinglage à la main, et il y en a
-        # 1555 : les compter comme des dispenses remplissait le plafond avant
-        # qu'une seule région n'ait eu sa part.
-        lieux = [self._lieu(f"Cathédrale {i}", 100 - i, "34") for i in range(8)]
-        for place in lieux:
-            place.pinned = True
-            place.kept_in_review = True
-        self.assertEqual(len(self._cape(lieux, mini=0)), 4)
-
-    def test_a_hand_pinned_place_is_reserved(self):
-        lieux = [self._lieu(f"Cathédrale {i}", 200 - i, "34") for i in range(6)]
-        lieux[-1].pinned = True
-        gardes = self._cape(lieux, mini=0)
-        self.assertIn("Cathédrale 5", {p.name for p in gardes})
-        self.assertEqual(len(gardes), 4)
-
-    def test_the_cap_has_the_last_word_over_the_rescue(self):
-        # Placé avant le repêchage géographique, le plafond était défait : le
-        # repêchage remontait des cathédrales restées sous le plancher pour
-        # combler des départements pauvres, et 80 redevenaient 97.
-        from roam_pipeline.collections import build_all
-        themes = [replace(t, catalogue_cap=3) if t.id == "cathedrales" else t
-                  for t in CONFIG.themes]
-        config = replace(CONFIG, themes=themes)
-        lieux = []
-        for i in range(20):
-            place = make_place(f"Cathédrale {i}", theme="cathedrales",
-                               wikidata_id=f"QC{i}", sitelinks=20 if i < 10 else 1,
-                               lat=43 + i / 20, lon=1 + i / 20)
-            place.departement_code, place.region_code = "34", "76"
-            lieux.append(place)
-        with _capture():
-            retenus, _cols = build_all(lieux, config)
-        self.assertLessEqual(
-            sum(1 for p in retenus if p.theme_id == "cathedrales"), 3)
-
-
-class TestThemeCap(unittest.TestCase):
     """Combien de lieux d'un thème le CATALOGUE montre, tous territoires confondus.
 
     La collection « Cathédrales et basiliques » en montrait soixante et une,
@@ -3851,6 +3761,55 @@ class TestThemeCap(unittest.TestCase):
         epingle.pinned = True
         gardes = self._cape(gros + [epingle], mini=0)
         self.assertIn("Choisie à la main", {p.name for p in gardes})
+
+    def test_a_review_keep_is_not_a_free_pass(self):
+        # `keep` pose le même drapeau qu'un épinglage à la main, et il y en a
+        # 1555 : les compter comme des dispenses remplissait le plafond avant
+        # qu'une seule région n'ait eu sa part. « Si c'est juste un keep mais
+        # que ce dernier se situe à la fin du classement c'est normal qu'il
+        # sorte. »
+        lieux = [self._lieu(f"Cathédrale {i}", "cathedrales", 100 - i, "75")
+                 for i in range(9)]
+        for place in lieux:
+            place.pinned = True
+            place.kept_in_review = True
+        gardes = self._cape(lieux, mini=0)
+        self.assertEqual(len(gardes), 5)
+        self.assertEqual({p.name for p in gardes},
+                         {f"Cathédrale {i}" for i in range(5)})
+
+    def test_the_review_hierarchy_ranks_before_the_score(self):
+        # Le tri du plafond suit la hiérarchie que le curateur a construite :
+        # un lieu qu'il a MONTÉ d'un niveau passe devant un mieux documenté
+        # qu'il n'a pas touché, et un lieu qu'il a DESCENDU sort le premier.
+        lieux = [self._lieu(f"Cathédrale {i}", "cathedrales", 100 - i, "75")
+                 for i in range(6)]
+        monte = self._lieu("Remontée en revue", "cathedrales", 10, "75")
+        monte.tier_shift = -1
+        lieux[0].tier_shift = 1  # la mieux notée, mais descendue d'un niveau
+        gardes = {p.name for p in self._cape(lieux + [monte], cap=5, mini=0)}
+        self.assertIn("Remontée en revue", gardes)
+        self.assertNotIn("Cathédrale 0", gardes)
+
+    def test_the_cap_has_the_last_word_over_the_rescue(self):
+        # Placé avant le repêchage géographique, le plafond était défait : le
+        # repêchage remontait des cathédrales restées sous le plancher pour
+        # combler des départements pauvres, et 80 redevenaient 97.
+        from roam_pipeline.collections import build_all
+        themes = [replace(t, catalogue_cap=3) if t.id == "cathedrales" else t
+                  for t in CONFIG.themes]
+        config = replace(CONFIG, themes=themes)
+        lieux = []
+        for i in range(20):
+            place = make_place(f"Cathédrale {i}", theme="cathedrales",
+                               wikidata_id=f"QC{i}", sitelinks=20 if i < 10 else 1,
+                               lat=43 + i / 20, lon=1 + i / 20)
+            place.departement_code, place.region_code = "34", "76"
+            lieux.append(place)
+        with _capture():
+            retenus, _cols = build_all(lieux, config)
+        self.assertLessEqual(
+            sum(1 for p in retenus if p.theme_id == "cathedrales"), 3)
 
     def test_a_theme_under_its_cap_loses_nothing(self):
         lieux = [self._lieu(f"Cathédrale {i}", "cathedrales", 100 - i, "75")
@@ -3945,14 +3904,36 @@ class TestCommuneCap(unittest.TestCase):
                  for i in range(3)]
         self.assertEqual(len(self._cape(paris + lille)), 9)
 
-    def test_a_pinned_place_passes_over_the_cap(self):
-        # Le curateur passe avant le plafond : il a vu le lieu, pas la règle.
+    def test_a_hand_pinned_place_passes_over_the_cap(self):
+        # Une ligne de places.csv est un lieu que le curateur a ajouté lui-même :
+        # le plafond n'a pas à défaire ce geste.
         lieux = [self._lieu(f"Musée {i}", "musees", 100 - i, "Paris", "75101")
                  for i in range(8)]
         lieux[-1].pinned = True
         gardes = self._cape(lieux)
         self.assertIn("Musée 7", {p.name for p in gardes})
         self.assertEqual(len(gardes), 6)
+
+    def test_a_review_keep_does_not_pass_over_the_cap(self):
+        # Ici aussi `keep` cessait d'être un verdict pour devenir un bouclier :
+        # les 1555 lieux gardés en revue remplissaient le plafond à eux seuls.
+        lieux = [self._lieu(f"Musée {i}", "musees", 100 - i, "Paris", "75101")
+                 for i in range(8)]
+        for place in lieux:
+            place.pinned = True
+            place.kept_in_review = True
+        gardes = self._cape(lieux)
+        self.assertEqual({p.name for p in gardes},
+                         {f"Musée {i}" for i in range(6)})
+
+    def test_the_review_hierarchy_ranks_before_the_score(self):
+        lieux = [self._lieu(f"Musée {i}", "musees", 100 - i, "Paris", "75101")
+                 for i in range(7)]
+        lieux[0].tier_shift = 1   # la mieux notée, mais descendue en revue
+        lieux[-1].tier_shift = -1  # la moins notée, mais remontée
+        gardes = {p.name for p in self._cape(lieux)}
+        self.assertIn("Musée 6", gardes)
+        self.assertNotIn("Musée 0", gardes)
 
     def test_a_place_without_a_commune_is_never_cut(self):
         # Un phare en mer n'a pas de commune : le plafond ne peut rien en dire.
