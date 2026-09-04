@@ -2361,6 +2361,41 @@ class TestTierChanges(unittest.TestCase):
         self.assertIn('value="bouge"', body)
         self.assertIn("descendu depuis ta dernière revue", body)
 
+    def test_a_decision_for_an_absent_place_never_reaches_the_page(self):
+        # Sept cent vingt-cinq décisions de `decisions.csv` portent sur des lieux
+        # qui ont quitté le catalogue. Le fichier les garde — se dédire est un
+        # geste, l'oubli n'en est pas un — mais la page ne doit pas les compter.
+        with _capture():
+            places = self._catalogue()
+            _retained, collections = build_all(places, CONFIG)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.html"
+            write_review_html(places, collections, CONFIG, path,
+                              decided={"Q3": "keep", "QFANTOME": "keep"})
+            body = path.read_text(encoding="utf-8")
+        debut = body.index("const DECIDED = ")
+        decided = json.loads(body[debut + len("const DECIDED = "):body.index(";", debut)])
+        self.assertIn("Q3", decided)
+        self.assertNotIn("QFANTOME", decided)
+
+    def test_the_browser_memory_is_filtered_and_the_count_bounded(self):
+        # Le stockage du navigateur s'accumule d'une construction à l'autre et
+        # gardait les décisions de lieux depuis sortis du catalogue. Le compteur
+        # affichait « 2132/2125 décidés » : plus de décisions que de lieux.
+        with _capture():
+            places = self._catalogue()
+            _retained, collections = build_all(places, CONFIG)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.html"
+            write_review_html(places, collections, CONFIG, path)
+            body = path.read_text(encoding="utf-8")
+        # Le stockage passe par le tamis, pour les décisions ET les thèmes.
+        self.assertIn("const CONNUS = new Set(DATA.map(p => p.id));", body)
+        self.assertEqual(body.count("retenues(JSON.parse(localStorage.getItem"), 2)
+        # Et le compte se fait sur les lieux de la page, pas sur les clés.
+        self.assertIn("const done = DATA.filter(p => decisions[p.id]).length;", body)
+        self.assertNotIn("Object.values(decisions).filter(Boolean).length", body)
+
     def test_the_page_alternates_themes_after_filtering(self):
         # Rangées par identifiant, les abbayes ouvraient chaque niveau — deux
         # cents d'affilée avant la première cathédrale. Rangées par rang dans

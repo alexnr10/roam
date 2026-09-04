@@ -743,18 +743,41 @@ const THEME_LIST = __THEME_LIST__;
 const KEY = "roam.review.v1";
 const THEME_KEY = "roam.review.themes.v1";
 
+// Les identifiants que CETTE page porte. Le stockage du navigateur, lui,
+// s'accumule d'une construction à l'autre et garde les décisions de lieux
+// depuis sortis du catalogue — sept cent vingt-cinq décisions de
+// `decisions.csv` portent aujourd'hui sur des lieux qui n'y sont plus. Le
+// fichier les filtre ; le stockage ne le faisait pas, et le compteur affichait
+// « 2132/2125 décidés » : plus de décisions que de lieux à décider.
+const CONNUS = new Set(DATA.map(p => p.id));
+
+function retenues(brut) {
+  // On ne garde du stockage que ce que la page peut montrer. Une décision pour
+  // un lieu absent est invisible, non exportable — `feuille()` ne parcourt que
+  // DATA — et ne sert qu'à fausser le compte.
+  const out = {};
+  for (const [id, valeur] of Object.entries(brut || {})) {
+    if (CONNUS.has(id)) out[id] = valeur;
+  }
+  return out;
+}
+
 let decisions = {};
 try {
   // Le fichier d'abord, le navigateur par-dessus : une décision prise ici,
   // pas encore committée, prime sur celle qu'on relit. Une valeur vide dans
   // le stockage est une décision RETIRÉE à la main — elle doit rester vide,
   // sinon un clic pour annuler serait défait au prochain rechargement.
-  decisions = Object.assign({}, DECIDED, JSON.parse(localStorage.getItem(KEY) || "{}"));
+  decisions = Object.assign(
+    {}, DECIDED, retenues(JSON.parse(localStorage.getItem(KEY) || "{}"))
+  );
 } catch (e) { decisions = Object.assign({}, DECIDED); }
 
 let themeOf = {};
 try {
-  themeOf = Object.assign({}, RETHEMED, JSON.parse(localStorage.getItem(THEME_KEY) || "{}"));
+  themeOf = Object.assign(
+    {}, RETHEMED, retenues(JSON.parse(localStorage.getItem(THEME_KEY) || "{}"))
+  );
 } catch (e) { themeOf = Object.assign({}, RETHEMED); }
 
 let persistent = true;
@@ -985,7 +1008,9 @@ function card(p) {
 function render() {
   const list = visible();
   grid.replaceChildren(...list.map(card));
-  const done = Object.values(decisions).filter(Boolean).length;
+  // Compté sur les lieux de la page, jamais sur les clés du stockage : c'est
+  // la seconde barrière contre « plus de décidés que de lieux ».
+  const done = DATA.filter(p => decisions[p.id]).length;
   const doutes = DATA.filter(p => doubtful(p) && !themeOf[p.id]).length;
   // Les trois filtres se combinent, et le sélecteur d'état reste sur « À
   // décider » sans qu'on y pense. Un lieu qu'on a soi-même fait descendre est
