@@ -6586,6 +6586,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Saint-Philibert_de_Tournus"
   },
   {
+   "id": "Q151030",
+   "slug": "moulin-rouge",
+   "name": "Moulin-Rouge",
+   "themeId": "monuments",
+   "lat": 48.884167,
+   "lon": 2.332222,
+   "radiusM": 150,
+   "score": 126.5,
+   "departement": "Paris",
+   "departementCode": "75",
+   "regionCode": "11",
+   "communeCode": "75118",
+   "communeName": "Paris",
+   "summary": "Le Moulin-Rouge est un cabaret parisien fondé en 1889 par le Espagnol Joseph Oller et par Charles Zidler, qui possédaient déjà l'Olympia. Il est situé sur le boulevard de Clichy dans le 18e arrondissement de Paris, dans le quartier Pigalle au pied de la butte Montmartre.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Moulin%20Rouge%2C%2017%20April%202011.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Moulin-Rouge"
+  },
+  {
    "id": "Q649055",
    "slug": "saline-royale-d-arc-et-senans",
    "name": "Saline royale d'Arc-et-Senans",
@@ -6980,24 +6998,6 @@
    "summary": "Le cirque de Gavarnie est un cirque naturel de type glaciaire situé en France dans le massif montagneux des Pyrénées, sur le territoire de la commune de Gavarnie, dans le département des Hautes-Pyrénées, en région Occitanie.\nIl fait partie du parc national des Pyrénées et a été inscrit en 1997 au patrimoine mondial de l'UNESCO dans l'ensemble Pyrénées-Mont Perdu.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Circo%20de%20Gavarnie.JPG?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cirque_de_Gavarnie"
-  },
-  {
-   "id": "Q377066",
-   "slug": "institut-de-france",
-   "name": "Institut de France",
-   "themeId": "monuments",
-   "lat": 48.856837,
-   "lon": 2.337258,
-   "radiusM": 150,
-   "score": 123.3,
-   "departement": "Paris",
-   "departementCode": "75",
-   "regionCode": "11",
-   "communeCode": "75106",
-   "communeName": "Paris",
-   "summary": "L'Institut de France est une institution française créée en 1795. Il rassemble les élites scientifiques, littéraires et artistiques de la nation afin qu'elles travaillent ensemble à perfectionner les sciences et les arts, à développer une réflexion indépendante et à conseiller les pouvoirs publics.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Institut%20de%20France%2C%20Paris%2013%20June%202017.jpg?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Institut_de_France"
   },
   {
    "id": "Q3085786",
@@ -22706,7 +22706,7 @@
    "score": 64.7,
    "departement": "Haute-Corse",
    "departementCode": "2B",
-   "regionCode": "94",
+   "regionCode": "92",
    "communeCode": "2B298",
    "communeName": "Saint-Florent",
    "summary": "La tour de la Mortella (en corse : torra di Mortella) est une tour génoise en ruines située dans la commune de Saint-Florent, dans le département français de la  Haute-Corse.",
@@ -30353,7 +30353,7 @@
    "lat": 48.805,
    "lon": 2.231111,
    "radiusM": 200,
-   "score": 124.4,
+   "score": 124.6,
    "departement": "Hauts-de-Seine",
    "departementCode": "92",
    "regionCode": "11",
@@ -48160,7 +48160,7 @@
      "rank": 44
     },
     {
-     "placeId": "Q1111051",
+     "placeId": "Q151030",
      "tier": 3,
      "rank": 45
     },
@@ -48175,7 +48175,7 @@
      "rank": 47
     },
     {
-     "placeId": "Q640968",
+     "placeId": "Q1111051",
      "tier": 3,
      "rank": 48
     },
@@ -48190,7 +48190,7 @@
      "rank": 50
     },
     {
-     "placeId": "Q269641",
+     "placeId": "Q640968",
      "tier": 3,
      "rank": 51
     },
@@ -48200,7 +48200,7 @@
      "rank": 52
     },
     {
-     "placeId": "Q377066",
+     "placeId": "Q269641",
      "tier": 3,
      "rank": 53
     },
@@ -65266,11 +65266,11 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "94",
-   "placeCount": 51,
+   "placeCount": 50,
    "tierCounts": [
     11,
     25,
-    15
+    14
    ],
    "places": [
     {
@@ -65379,17 +65379,17 @@
      "rank": 21
     },
     {
-     "placeId": "Q7826824",
+     "placeId": "Q10964453",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q10964453",
+     "placeId": "Q1412839",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q1412839",
+     "placeId": "Q7826824",
      "tier": 2,
      "rank": 24
     },
@@ -65399,7 +65399,7 @@
      "rank": 25
     },
     {
-     "placeId": "Q10984637",
+     "placeId": "Q3379494",
      "tier": 2,
      "rank": 26
     },
@@ -65424,109 +65424,104 @@
      "rank": 30
     },
     {
-     "placeId": "Q3379494",
+     "placeId": "Q7826862",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q7826862",
+     "placeId": "Q3390865",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q3390865",
+     "placeId": "Q1235923",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q1235923",
+     "placeId": "Q3322570",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q3322570",
+     "placeId": "Q2509175",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q2509175",
+     "placeId": "Q3379500",
      "tier": 2,
      "rank": 36
     },
     {
-     "placeId": "Q3379500",
+     "placeId": "Q3379571",
      "tier": 3,
      "rank": 37
     },
     {
-     "placeId": "Q3379571",
+     "placeId": "Q1034744",
      "tier": 3,
      "rank": 38
     },
     {
-     "placeId": "Q1034744",
+     "placeId": "Q2859432",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q2859432",
+     "placeId": "Q3322546",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q3322546",
+     "placeId": "Q3215566",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q3215566",
+     "placeId": "Q3381597",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q3381597",
+     "placeId": "Q2723667",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q2723667",
+     "placeId": "Q3107573",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q3107573",
+     "placeId": "Q109045439",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q109045439",
+     "placeId": "Q3471588",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q3471588",
+     "placeId": "Q3215708",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q3215708",
+     "placeId": "Q3390850",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q3390850",
+     "placeId": "Q7826856",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q7826856",
-     "tier": 3,
-     "rank": 50
-    },
-    {
      "placeId": "Q110928938",
      "tier": 3,
-     "rank": 51
+     "rank": 50
     }
    ]
   },
@@ -68215,22 +68210,22 @@
      "rank": 13
     },
     {
-     "placeId": "Q1111051",
+     "placeId": "Q151030",
      "tier": 2,
      "rank": 14
     },
     {
-     "placeId": "Q640968",
+     "placeId": "Q1111051",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q269641",
+     "placeId": "Q640968",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q377066",
+     "placeId": "Q269641",
      "tier": 2,
      "rank": 17
     },
@@ -69678,9 +69673,9 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "94",
-   "placeCount": 11,
+   "placeCount": 10,
    "tierCounts": [
-    10,
+    9,
     1,
     0
    ],
@@ -69701,44 +69696,39 @@
      "rank": 3
     },
     {
-     "placeId": "Q10984637",
+     "placeId": "Q3379494",
      "tier": 1,
      "rank": 4
     },
     {
-     "placeId": "Q3379494",
+     "placeId": "Q7826862",
      "tier": 1,
      "rank": 5
     },
     {
-     "placeId": "Q7826862",
+     "placeId": "Q3379500",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q3379500",
+     "placeId": "Q3379571",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q3379571",
+     "placeId": "Q3381597",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q3381597",
+     "placeId": "Q7826856",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q7826856",
-     "tier": 1,
-     "rank": 10
-    },
-    {
      "placeId": "Q3567122",
      "tier": 2,
-     "rank": 11
+     "rank": 10
     }
    ]
   },
