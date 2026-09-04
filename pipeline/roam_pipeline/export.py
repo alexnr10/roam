@@ -527,6 +527,14 @@ def write_review_html(
                 "theme": config.theme(place.theme_id).name,
                 "themeId": place.theme_id,
                 "dept": dept.name if dept else "",
+                # La commune, parce que le département ne suffit pas toujours à
+                # distinguer deux fiches. « Musée Pierre-Corneille » existe deux
+                # fois en Seine-Maritime — sa maison natale à Rouen et sa maison
+                # des champs à Petit-Couronne — et « Voile de la Mariée » deux
+                # fois à La Réunion, à Salazie et à l'Entre-Deux. Sur la carte de
+                # revue, ces paires étaient impossibles à départager : on croit
+                # revoir un lieu déjà tranché, et on doute de son propre travail.
+                "commune": place.commune_name or "",
                 "tier": best_tier.get(place.wikidata_id, 3),
                 "score": place.score,
                 "parts": parts,
@@ -913,7 +921,8 @@ function card(p) {
           : p.changed === "descend" ? "▼ descendu depuis ta dernière revue"
           : "● nouveau"}</span>` : ""}</div>
       <div class="name">${p.name}</div>
-      <div class="meta">${p.theme}${p.dept ? " · " + p.dept : ""}</div>
+      <div class="meta">${p.theme}${p.dept ? " · " + p.dept : ""}${
+        p.commune && p.commune !== p.dept ? " · " + p.commune : ""}</div>
       ${p.source === "osm"
         ? `<div class="found">Trouvé sur OpenStreetMap — Wikidata ne le classait nulle part</div>`
         : ""}

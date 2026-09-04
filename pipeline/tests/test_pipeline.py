@@ -2467,6 +2467,30 @@ class TestTierChanges(unittest.TestCase):
         self.assertIn('value="bouge"', body)
         self.assertIn("descendu depuis ta dernière revue", body)
 
+    def test_two_homonyms_are_told_apart_by_their_commune(self):
+        # Le département ne suffit pas toujours. « Musée Pierre-Corneille »
+        # existe deux fois en Seine-Maritime — sa maison natale à Rouen, sa
+        # maison des champs à Petit-Couronne — et « Voile de la Mariée » deux
+        # fois à La Réunion. Sur la carte de revue, ces paires étaient
+        # impossibles à départager : on croit revoir un lieu déjà tranché, et on
+        # doute de son propre travail.
+        with _capture():
+            places = self._catalogue()
+            for lieu, commune in zip(places[:2], ("Rouen", "Petit-Couronne")):
+                lieu.name, lieu.commune_name = "Musée Pierre-Corneille", commune
+                lieu.departement_code = "76"
+            _retained, collections = build_all(places, CONFIG)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.html"
+            write_review_html(places, collections, CONFIG, path)
+            body = path.read_text(encoding="utf-8")
+        debut = body.index("const DATA = ")
+        data = json.loads(body[debut + len("const DATA = "):body.index(";\nconst THEMES", debut)])
+        communes = {d["commune"] for d in data if d["name"] == "Musée Pierre-Corneille"}
+        self.assertEqual(communes, {"Rouen", "Petit-Couronne"})
+        # Et la carte l'affiche, sans répéter le département quand il est égal.
+        self.assertIn('p.commune && p.commune !== p.dept', body)
+
     def test_a_decision_for_an_absent_place_never_reaches_the_page(self):
         # Sept cent vingt-cinq décisions de `decisions.csv` portent sur des lieux
         # qui ont quitté le catalogue. Le fichier les garde — se dédire est un
