@@ -1217,6 +1217,37 @@ def apply_class_exclusion(places: list[Place], config: Config) -> list[Place]:
 
     Un lieu épinglé y échappe : le curateur a déjà tranché.
     """
+    # Retirer une classe de `themes.yaml` ne retire RIEN de la collecte : les
+    # lieux qu'elle a ramenés dorment dans `data/raw/<thème>.json` et le build
+    # continue de les servir jusqu'à la prochaine collecte de ce thème. Ajouter
+    # une classe demande un `fetch` ; en retirer une aussi, et c'est moins
+    # évident.
+    #
+    # On ne peut le détecter que pour les classes GÉNÉRIQUES, seules à laisser
+    # une trace sur le lieu (`via_broad_class`). C'est une couverture partielle,
+    # et il vaut mieux le dire que le taire : « théâtre » a été retiré du thème
+    # `monuments` après avoir fait passer le catalogue de 72 à 109 monuments, et
+    # sans cette ligne les trente-sept salles de spectacle y seraient restées.
+    #
+    # Les lieux venus d'un label portent le même drapeau sans venir d'une classe
+    # générique : ils sont exclus du compte.
+    orphelins: dict[str, int] = defaultdict(int)
+    sans_generique = {
+        theme.id for theme in config.themes if not theme.broad_classes
+    }
+    for place in places:
+        if place.via_broad_class and place.source != "label" and place.theme_id in sans_generique:
+            orphelins[place.theme_id] += 1
+    if orphelins:
+        LOG.warning(
+            "%s lieux viennent d'une classe générique QUE LEUR THÈME NE DÉCLARE "
+            "PLUS : %s. Retirer une classe ne vide pas la collecte — relance "
+            "`fetch --only %s`.",
+            sum(orphelins.values()),
+            ", ".join(f"{t} {n}" for t, n in sorted(orphelins.items(), key=lambda kv: -kv[1])),
+            ",".join(sorted(orphelins)),
+        )
+
     # Un thème peut, lui aussi, attendre une classe : `monuments` attend celle
     # des salles de spectacle depuis qu'on s'est aperçu que l'Opéra Garnier
     # n'était nulle part. Tant qu'elle n'est pas résolue, le thème tourne sans

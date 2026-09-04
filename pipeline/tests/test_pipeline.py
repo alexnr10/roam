@@ -4263,6 +4263,63 @@ class TestMissingPageviews(unittest.TestCase):
         self.assertEqual(warn_missing_pageviews([sans], self._config(8.0)), 0)
 
 
+class TestRetiredBroadClasses(unittest.TestCase):
+    """Retirer une classe de `themes.yaml` ne retire rien de la collecte.
+
+    « Théâtre » a été essayé sur `monuments` puis retiré : même admise à dix
+    langues, elle faisait passer le catalogue de 72 monuments à 109, en y
+    mettant Le Chat noir, le Bataclan et le théâtre de l'Odéon. Sans
+    avertissement, les trente-sept salles de spectacle seraient restées au
+    catalogue jusqu'à la prochaine collecte du thème.
+    """
+
+    def _config(self, **kw):
+        return replace(CONFIG,
+                       themes=[replace(t, search=[], broad_classes=[]) for t in CONFIG.themes],
+                       exclusions=replace(CONFIG.exclusions, search=[]), **kw)
+
+    def test_a_place_from_a_retired_class_is_announced(self):
+        from roam_pipeline.collections import apply_class_exclusion
+
+        bataclan = make_place("Bataclan", theme="monuments")
+        bataclan.via_broad_class, bataclan.excluded_class = True, ""
+        with self.assertLogs("roam_pipeline.collections", level="WARNING") as journal:
+            apply_class_exclusion([bataclan], self._config())
+        texte = "\n".join(journal.output)
+        self.assertIn("NE DÉCLARE PLUS", texte)
+        self.assertIn("fetch --only monuments", texte)
+
+    def test_a_class_still_declared_says_nothing(self):
+        from roam_pipeline.collections import apply_class_exclusion
+        from roam_pipeline.config import BroadClass
+
+        themes = [replace(t, search=[],
+                          broad_classes=[BroadClass(qid="Q24354", fetch_min_sitelinks=10)]
+                          if t.id == "monuments" else [])
+                  for t in CONFIG.themes]
+        config = replace(CONFIG, themes=themes,
+                         exclusions=replace(CONFIG.exclusions, search=[]))
+        lieu = make_place("Bataclan", theme="monuments")
+        lieu.via_broad_class, lieu.excluded_class = True, ""
+        with self.assertLogs("roam_pipeline.collections", level="WARNING") as journal:
+            logging.getLogger("roam_pipeline.collections").warning("témoin")
+            apply_class_exclusion([lieu], config)
+        self.assertNotIn("NE DÉCLARE PLUS", "\n".join(journal.output))
+
+    def test_a_place_from_a_label_is_not_counted(self):
+        from roam_pipeline.collections import apply_class_exclusion
+
+        # Les membres d'un label portent le même drapeau sans venir d'une classe
+        # générique : les compter ferait crier au loup à chaque construction.
+        village = make_place("L'Isle-Adam", theme="villages")
+        village.via_broad_class, village.excluded_class = True, ""
+        village.source = "label"
+        with self.assertLogs("roam_pipeline.collections", level="WARNING") as journal:
+            logging.getLogger("roam_pipeline.collections").warning("témoin")
+            apply_class_exclusion([village], self._config())
+        self.assertNotIn("NE DÉCLARE PLUS", "\n".join(journal.output))
+
+
 class TestPendingThemeClasses(unittest.TestCase):
     """Une classe de thème sans Q-id ne collecte rien, et il faut que ça se dise.
 

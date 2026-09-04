@@ -351,21 +351,19 @@ themes:
     #     théâtre Favart (Q47419907) · opéra (Q153562), théâtre (Q24354)
     # « thème(s) qui la reconnaissent : AUCUN » sur les trois.
     #
-    # Les deux classes ne sont PAS traitées pareil, et c'est délibéré. « Opéra »
-    # désigne une maison d'opéra : la France en compte quelques dizaines, elles
-    # sont toutes des monuments, la classe entre au plancher du thème.
-    # « Théâtre » désigne toute salle de spectacle, y compris la salle des fêtes
-    # municipale — c'est une classe GÉNÉRIQUE au sens de `broad_classes`, et
-    # elle est donc admise plus haut, à dix langues. Le volume exact se vérifie
-    # avant de descendre :
+    # « Opéra » SEUL. La classe désigne une maison d'opéra : la France en compte
+    # quelques dizaines, elles sont toutes des monuments.
     #
-    #     python -m roam_pipeline gaps --class Q24354
+    # « Théâtre » (Q24354) a été essayé puis RETIRÉ, et la mesure est nette :
+    # même admise haut, à dix langues, elle a fait passer le thème de 240 lieux
+    # bruts à 283 et le catalogue de 72 monuments à 109. Ce qu'elle ramène est
+    # une salle de spectacle, pas un monument — Le Chat noir, le Bataclan, le
+    # théâtre de l'Odéon. « Il ne faut pas prendre les théâtres mais seulement
+    # les opéras. »
+    #
+    # La distinction tient : on va VOIR le Palais Garnier, on va ASSISTER à
+    # quelque chose au Bataclan. Un thème de monuments range le premier.
     search: []
-    broad_classes:
-      # Toute salle de spectacle, salle des fêtes municipale comprise. Admise
-      # haut, pas au plancher du thème.
-      - qid: Q24354         # théâtre
-        fetch_min_sitelinks: 10
     #
     # Q12518 (« bâtiment de forme verticale ») est la classe qui manquait pour
     # la tour Eiffel. Elle est large : elle ramènera aussi des châteaux d'eau et
