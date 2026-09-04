@@ -1217,6 +1217,22 @@ def apply_class_exclusion(places: list[Place], config: Config) -> list[Place]:
 
     Un lieu épinglé y échappe : le curateur a déjà tranché.
     """
+    # Un thème peut, lui aussi, attendre une classe : `monuments` attend celle
+    # des salles de spectacle depuis qu'on s'est aperçu que l'Opéra Garnier
+    # n'était nulle part. Tant qu'elle n'est pas résolue, le thème tourne sans
+    # elle — et rien ne le disait, puisque l'avertissement de `fetch` ne se
+    # déclenche que pour un thème SANS aucune classe.
+    attente = [
+        (theme.id, terme) for theme in config.themes for terme in theme.search
+    ]
+    if attente:
+        LOG.warning(
+            "%s classe(s) de thème sans Q-id — ces lieux ne sont pas collectés : "
+            "%s. `probe` nomme la classe sur une entité, `suggest-qids` propose.",
+            len(attente),
+            ", ".join(f"{theme} « {terme} »" for theme, terme in attente),
+        )
+
     # Un terme d'exclusion resté sans Q-id n'écarte rien, et n'écartait rien en
     # silence. « épave » a été écrit le jour où deux navires coulés sont entrés
     # au catalogue par la porte de « site archéologique » : tant qu'il n'est pas

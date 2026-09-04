@@ -4263,6 +4263,46 @@ class TestMissingPageviews(unittest.TestCase):
         self.assertEqual(warn_missing_pageviews([sans], self._config(8.0)), 0)
 
 
+class TestPendingThemeClasses(unittest.TestCase):
+    """Une classe de thème sans Q-id ne collecte rien, et il faut que ça se dise.
+
+    L'Opéra Garnier n'était nulle part — ni dans un thème, ni dans la collecte.
+    Sur les quarante et un lieux dont le nom contient « théâtre », « opéra » ou
+    « comédie », les quarante et un étaient antiques : les deux seules classes
+    de spectacle du catalogue datent de l'Antiquité.
+
+    L'avertissement de `fetch` ne couvrait pas ce cas : il ne parle que d'un
+    thème SANS AUCUNE classe résolue. Un thème qui en a sept et en attend une
+    huitième tournait donc sans un mot.
+    """
+
+    def test_a_theme_waiting_for_a_class_is_announced(self):
+        from roam_pipeline.collections import apply_class_exclusion
+
+        themes = [replace(t, search=["opéra"]) if t.id == "monuments" else replace(t, search=[])
+                  for t in CONFIG.themes]
+        config = replace(CONFIG, themes=themes,
+                         exclusions=replace(CONFIG.exclusions, search=[]))
+        with self.assertLogs("roam_pipeline.collections", level="WARNING") as journal:
+            apply_class_exclusion([make_place("Panthéon", theme="monuments")], config)
+        texte = "\n".join(journal.output)
+        self.assertIn("opéra", texte)
+        self.assertIn("monuments", texte)
+
+    def test_nothing_is_said_when_every_class_is_resolved(self):
+        from roam_pipeline.collections import apply_class_exclusion
+
+        config = replace(CONFIG,
+                         themes=[replace(t, search=[]) for t in CONFIG.themes],
+                         exclusions=replace(CONFIG.exclusions, search=[]))
+        lieu = make_place("Panthéon", theme="monuments")
+        lieu.excluded_class = ""
+        with self.assertLogs("roam_pipeline.collections", level="WARNING") as journal:
+            logging.getLogger("roam_pipeline.collections").warning("témoin")
+            apply_class_exclusion([lieu], config)
+        self.assertNotIn("sans Q-id", "\n".join(journal.output))
+
+
 class TestPendingExclusions(unittest.TestCase):
     """Un terme d'exclusion sans Q-id n'écarte rien, et il faut que ça se dise.
 
@@ -4286,7 +4326,12 @@ class TestPendingExclusions(unittest.TestCase):
     def test_nothing_is_said_when_every_term_is_resolved(self):
         from roam_pipeline.collections import apply_class_exclusion
 
-        config = replace(CONFIG, exclusions=replace(CONFIG.exclusions, search=[]))
+        # Les termes de THÈME sont vidés aussi : ce test porte sur les
+        # exclusions, et il ne doit pas tomber le jour où un thème attend une
+        # classe — c'est arrivé avec « opéra » et « théâtre ».
+        config = replace(CONFIG,
+                         themes=[replace(t, search=[]) for t in CONFIG.themes],
+                         exclusions=replace(CONFIG.exclusions, search=[]))
         # `excluded_class` renseigné : le lieu est passé au filtre, donc aucun
         # autre avertissement ne vient brouiller l'assertion.
         carnac = make_place("Carnac", theme="megalithes")
@@ -4294,7 +4339,7 @@ class TestPendingExclusions(unittest.TestCase):
         with self.assertLogs("roam_pipeline.collections", level="WARNING") as journal:
             logging.getLogger("roam_pipeline.collections").warning("témoin")
             apply_class_exclusion([carnac], config)
-        self.assertNotIn("sans Q-id", "\n".join(journal.output))
+        self.assertNotIn("terme(s) d'exclusion sans Q-id", "\n".join(journal.output))
 
 
 class TestFantomes(unittest.TestCase):

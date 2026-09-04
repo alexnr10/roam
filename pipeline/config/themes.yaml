@@ -310,6 +310,27 @@ themes:
     # arc de triomphe, obélisque, amphithéâtre romain, théâtre romain, palais,
     # tour, beffroi
     #
+    # ⚠️ TROU CONSTATÉ, EN ATTENTE DE RÉSOLUTION : les salles de spectacle.
+    # L'Opéra Garnier n'est nulle part — ni dans un thème, ni même dans la
+    # collecte. Seule sa bibliothèque-musée est là. Mesuré : sur les quarante et
+    # un lieux collectés dont le nom contient « théâtre », « opéra » ou
+    # « comédie », les QUARANTE ET UN sont antiques. C'est que les deux seules
+    # classes de spectacle ici — théâtre romain et amphithéâtre romain — datent
+    # de l'Antiquité, et que rien ne ramasse ce qui a été bâti depuis.
+    #
+    # Le nom trompe : « Palais Garnier » n'est pas rangé sous « palais »
+    # (Q16560), Wikidata le classe par son usage. La classe se lit donc sur
+    # l'entité, jamais de mémoire :
+    #
+    #     python -m roam_pipeline probe "Palais Garnier" "Opéra-Comique"
+    #     python -m roam_pipeline gaps --min-sitelinks 12
+    #
+    # `monuments` est le bon foyer : c'est le thème fourre-tout, il accueille
+    # déjà ce qu'aucun autre ne range. Manquent avec Garnier l'Opéra-Comique, le
+    # Grand Théâtre de Bordeaux, l'Opéra de Lyon, les Célestins, le Châtelet —
+    # des lieux pour lesquels on vient de loin.
+    search: [opéra, théâtre]
+    #
     # Q12518 (« bâtiment de forme verticale ») est la classe qui manquait pour
     # la tour Eiffel. Elle est large : elle ramènera aussi des châteaux d'eau et
     # des tours de télévision. Le plancher à dix langues en écarte l'essentiel,
