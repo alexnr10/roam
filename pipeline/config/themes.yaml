@@ -141,6 +141,19 @@ themes:
     # architecturale : Wikidata ne la range donc pas sous « basilique »
     # (Q163687), et cinquante édifices lui échappaient — dont Notre-Dame de
     # Fourvière. Trouvé par `gaps`, qui l'a signalée à 50 absents sur 50.
+    #
+    # ⚠️ TROU CONNU, NON TRANCHÉ : « église » (Q16970), que `gaps` donne à
+    # trente-six absents sur cinquante à douze langues — Saint-Gervais-
+    # Saint-Protais, Notre-Dame-de-Bonne-Nouvelle. Ce thème ne collecte que ce
+    # qui porte un TITRE (cathédrale, basilique) ; une église paroissiale n'en a
+    # pas, si majeure soit-elle.
+    #
+    # Non tranché parce que le remède est plus dangereux que le mal : la France
+    # compte des dizaines de milliers d'églises, et la classe entrerait au
+    # plancher de collecte à quatre langues. Le chiffre à regarder AVANT de
+    # décider, et le seul qui vaille ici :
+    #
+    #     python -m roam_pipeline gaps --class Q16970
 
   # Pas de classe Wikidata : « commune française » ramènerait les 35 000 communes.
   # Les labels sont ici la seule sélection défendable — et ils sont déjà finis.
@@ -306,11 +319,12 @@ themes:
     # Paris. Les thèmes que la géographie concentre pour de bon (volcans,
     # phares, grottes, cascades) n'ont donc pas de quota.
     max_per_departement: 10
-    wikidata_classes: [Q143912, Q170980, Q7362268, Q19757, Q16560, Q12518, Q815448]
+    wikidata_classes: [Q143912, Q170980, Q7362268, Q19757, Q16560, Q12518,
+                       Q815448, Q153562]
     # arc de triomphe, obélisque, amphithéâtre romain, théâtre romain, palais,
-    # tour, beffroi
+    # tour, beffroi, opéra
     #
-    # ⚠️ TROU CONSTATÉ, EN ATTENTE DE RÉSOLUTION : les salles de spectacle.
+    # ⚠️ TROU CONSTATÉ, RÉSOLU : les salles de spectacle.
     # L'Opéra Garnier n'est nulle part — ni dans un thème, ni même dans la
     # collecte. Seule sa bibliothèque-musée est là. Mesuré : sur les quarante et
     # un lieux collectés dont le nom contient « théâtre », « opéra » ou
@@ -329,7 +343,29 @@ themes:
     # déjà ce qu'aucun autre ne range. Manquent avec Garnier l'Opéra-Comique, le
     # Grand Théâtre de Bordeaux, l'Opéra de Lyon, les Célestins, le Châtelet —
     # des lieux pour lesquels on vient de loin.
-    search: [opéra, théâtre]
+    #
+    # Les deux Q-ids sont lus sur `probe "Palais Garnier" "Opéra-Comique"` :
+    #     palais Garnier (Q187840) · classes déclarées : opéra (Q153562)
+    #     théâtre national de l'Opéra-Comique (Q872222) · compagnie d'opéra,
+    #                                                     théâtre (Q24354)
+    #     théâtre Favart (Q47419907) · opéra (Q153562), théâtre (Q24354)
+    # « thème(s) qui la reconnaissent : AUCUN » sur les trois.
+    #
+    # Les deux classes ne sont PAS traitées pareil, et c'est délibéré. « Opéra »
+    # désigne une maison d'opéra : la France en compte quelques dizaines, elles
+    # sont toutes des monuments, la classe entre au plancher du thème.
+    # « Théâtre » désigne toute salle de spectacle, y compris la salle des fêtes
+    # municipale — c'est une classe GÉNÉRIQUE au sens de `broad_classes`, et
+    # elle est donc admise plus haut, à dix langues. Le volume exact se vérifie
+    # avant de descendre :
+    #
+    #     python -m roam_pipeline gaps --class Q24354
+    search: []
+    broad_classes:
+      # Toute salle de spectacle, salle des fêtes municipale comprise. Admise
+      # haut, pas au plancher du thème.
+      - qid: Q24354         # théâtre
+        fetch_min_sitelinks: 10
     #
     # Q12518 (« bâtiment de forme verticale ») est la classe qui manquait pour
     # la tour Eiffel. Elle est large : elle ramènera aussi des châteaux d'eau et
