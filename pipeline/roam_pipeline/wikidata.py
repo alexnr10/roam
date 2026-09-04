@@ -129,6 +129,14 @@ class SparqlClient:
     def search(self, term: str, limit: int = 6, kind: str = "item") -> list[dict[str, str]]:
         """Recherche d'entités par libellé (wbsearchentities).
 
+        Le terme est un PRÉFIXE de libellé ou d'alias, pas une liste de
+        mots-clés. « forêt de Fontainebleau » trouve ; « forêt Fontainebleau »
+        ne trouve rien, et « forêt Rouen » non plus — les cinq Forêts
+        d'Exception restantes ont été cherchées ainsi, et les cinq recherches
+        sont revenues vides alors que les entités existaient. Chercher le seul
+        mot distinctif marche mieux qu'une phrase approximative : « Rocamadour »
+        plutôt que « village de Rocamadour ».
+
         `kind` vaut « item » (Q-ids) ou « property » (P-ids). Une propriété
         écrite de mémoire est aussi silencieuse qu'un Q-id faux : elle ne lève
         rien et ne rend rien.

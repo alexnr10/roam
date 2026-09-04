@@ -3087,7 +3087,11 @@ def build_parser() -> argparse.ArgumentParser:
     suggest = sub.add_parser(
         "suggest-qids", help="propose des Q-ids pour les termes en attente (réseau requis)"
     )
-    suggest.add_argument("terms", nargs="*", help="termes à chercher (défaut : ceux de la config)")
+    suggest.add_argument(
+        "terms", nargs="*",
+        help="termes à chercher — un PRÉFIXE de libellé, pas des mots-clés : "
+             "« forêt de Bercé » ou « Bercé », jamais « forêt Bercé » "
+             "(défaut : les termes en attente dans la config)")
     suggest.add_argument("--limit", type=int, default=6, help="candidats par terme")
     suggest.add_argument(
         "--property",
