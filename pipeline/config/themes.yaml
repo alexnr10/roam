@@ -142,18 +142,24 @@ themes:
     # (Q163687), et cinquante édifices lui échappaient — dont Notre-Dame de
     # Fourvière. Trouvé par `gaps`, qui l'a signalée à 50 absents sur 50.
     #
-    # ⚠️ TROU CONNU, NON TRANCHÉ : « église » (Q16970), que `gaps` donne à
-    # trente-six absents sur cinquante à douze langues — Saint-Gervais-
-    # Saint-Protais, Notre-Dame-de-Bonne-Nouvelle. Ce thème ne collecte que ce
-    # qui porte un TITRE (cathédrale, basilique) ; une église paroissiale n'en a
+    # « église » (Q16970) : ÉCARTÉE, et c'est une décision, pas un oubli.
+    #
+    # `gaps` la donne à trente-six absents sur cinquante à douze langues —
+    # Saint-Gervais-Saint-Protais, Notre-Dame-de-Bonne-Nouvelle, et par la même
+    # porte Saint-Eustache et Saint-Sulpice. Ce thème ne collecte que ce qui
+    # porte un TITRE (cathédrale, basilique) ; une église paroissiale n'en a
     # pas, si majeure soit-elle.
     #
-    # Non tranché parce que le remède est plus dangereux que le mal : la France
-    # compte des dizaines de milliers d'églises, et la classe entrerait au
-    # plancher de collecte à quatre langues. Le chiffre à regarder AVANT de
-    # décider, et le seul qui vaille ici :
+    # « On laisse tomber les églises, ça ne vaut pas le coup, on a déjà les
+    # cathédrales. » La France compte des dizaines de milliers d'églises, la
+    # classe entrerait au plancher de collecte à quatre langues, et une
+    # collection de quatre-vingts cathédrales couvre déjà l'édifice religieux
+    # qu'on traverse le pays pour voir.
     #
-    #     python -m roam_pipeline gaps --class Q16970
+    # À ne PAS rouvrir sans raison neuve : le trou est connu, mesuré, et assumé.
+    # Ce qui le rouvrirait légitimement serait une liste officielle et FINIE
+    # d'églises remarquables, comme les Plus Beaux Villages le sont pour les
+    # communes — pas une classe Wikidata.
 
   # Pas de classe Wikidata : « commune française » ramènerait les 35 000 communes.
   # Les labels sont ici la seule sélection défendable — et ils sont déjà finis.
