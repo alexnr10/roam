@@ -7828,6 +7828,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Domaine_national_de_Saint-Cloud"
   },
   {
+   "id": "Q638423",
+   "slug": "opera-bastille",
+   "name": "Opéra Bastille",
+   "themeId": "monuments",
+   "lat": 48.851944,
+   "lon": 2.370556,
+   "radiusM": 150,
+   "score": 113.7,
+   "departement": "Paris",
+   "departementCode": "75",
+   "regionCode": "11",
+   "communeCode": "75112",
+   "communeName": "Paris",
+   "summary": "L'opéra Bastille est une salle d'opéra moderne située sur la place de la Bastille à Paris. Elle est conçue par Carlos Ott et inaugurée en 1989 à l'occasion des festivités du bicentenaire de la Révolution dans le cadre des grands travaux pour Paris.",
+   "imageUrl": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Op%C3%A9ra_Bastille"
+  },
+  {
    "id": "Q386343",
    "slug": "lac-du-salagou",
    "name": "Lac du Salagou",
@@ -7916,6 +7934,24 @@
    "summary": "La grotte de Niaux est une grotte ornée du Paléolithique supérieur ayant livré de nombreuses figurations pariétales magdaléniennes. Elle est située sur la commune de Niaux, dans l'Ariège (région Occitanie, France), et s'ouvre à mi-pente dans la vallée de Vicdessos.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Grotte%20de%20Niaux%20depuis%20la%20Vache.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Grotte_de_Niaux"
+  },
+  {
+   "id": "Q684594",
+   "slug": "porte-saint-denis",
+   "name": "Porte Saint-Denis",
+   "themeId": "monuments",
+   "lat": 48.869722,
+   "lon": 2.3525,
+   "radiusM": 150,
+   "score": 112.9,
+   "departement": "Paris",
+   "departementCode": "75",
+   "regionCode": "11",
+   "communeCode": "75102",
+   "communeName": "Paris",
+   "summary": "La porte Saint-Denis est un arc de triomphe situé dans l'actuel 10e arrondissement de Paris et construit en 1673, par l'architecte François Blondel, à la gloire de Louis XIV. Elle est située à l'emplacement d'une porte de Paris de l'ancienne enceinte de Charles V.\nLes murs adjacents ont depuis été détruits.\nC'est un des monuments les plus représentatifs de l'art officiel de son époque, présenté dans toutes les anthologies.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Porte%20Saint%20Denis%20-%20Paris%20X%20%28FR75%29%20-%202023-06-14%20-%202.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Porte_Saint-Denis"
   },
   {
    "id": "Q1816823",
@@ -8134,6 +8170,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Maison_des_Lumi%C3%A8res_Denis_Diderot"
   },
   {
+   "id": "Q1469315",
+   "slug": "theatre-du-chatelet",
+   "name": "Théâtre du Châtelet",
+   "themeId": "monuments",
+   "lat": 48.857778,
+   "lon": 2.346389,
+   "radiusM": 150,
+   "score": 111.5,
+   "departement": "Paris",
+   "departementCode": "75",
+   "regionCode": "11",
+   "communeCode": "75101",
+   "communeName": "Paris",
+   "summary": "Le théâtre du Châtelet est un théâtre situé place du Châtelet dans le 1er arrondissement de Paris, inauguré en 1862. Dirigé par Olivier Py depuis 2023, il propose des comédies musicales, des opéras, des concerts classiques, du jazz, des récitals et de la danse.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Th%C3%A9%C3%A2tre%20du%20Ch%C3%A2telet%20Fa%C3%A7ade%20%28cropped%29.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Th%C3%A9%C3%A2tre_du_Ch%C3%A2telet"
+  },
+  {
    "id": "Q1574432",
    "slug": "villa-noailles",
    "name": "Villa Noailles",
@@ -8240,6 +8294,24 @@
    "summary": "Le pont de Normandie est un pont à haubans enjambant l'estuaire de la Seine et reliant Le Havre, au niveau de la commune de Sandouville, à Honfleur. La conception de cet ouvrage exceptionnel est due à Michel Virlogeux.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/2021%20Pont%20de%20Normandie.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pont_de_Normandie"
+  },
+  {
+   "id": "Q1643144",
+   "slug": "hotel-de-sully",
+   "name": "Hôtel de Sully",
+   "themeId": "monuments",
+   "lat": 48.854583,
+   "lon": 2.363778,
+   "radiusM": 150,
+   "score": 110.7,
+   "departement": "Paris",
+   "departementCode": "75",
+   "regionCode": "11",
+   "communeCode": "75104",
+   "communeName": "Paris",
+   "summary": "L'hôtel de Sully est un hôtel particulier entre cour et jardin de style Louis XIII, situé dans le quartier du Marais, dans le 4e arrondissement de Paris, au 62 rue Saint-Antoine. Il est le siège depuis 1967 du Centre des monuments nationaux.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Sully%20Garten.JPG?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/H%C3%B4tel_de_Sully"
   },
   {
    "id": "Q2119428",
@@ -10240,6 +10312,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Maison_d%27%C3%89mile_Zola"
   },
   {
+   "id": "Q950217",
+   "slug": "porte-saint-martin",
+   "name": "Porte Saint-Martin",
+   "themeId": "monuments",
+   "lat": 48.869171,
+   "lon": 2.355601,
+   "radiusM": 150,
+   "score": 101.0,
+   "departement": "Paris",
+   "departementCode": "75",
+   "regionCode": "11",
+   "communeCode": "75110",
+   "communeName": "Paris",
+   "summary": "La porte Saint-Martin est un monument de Paris, situé à l'emplacement d'une porte de l'ancienne enceinte de Charles V. Elle fut érigée en 1674 sur ordre de Louis XIV, en l'honneur de ses victoires sur le Rhin et en Franche-Comté, par l'architecte Pierre Bullet, élève de François Blondel, architecte de la porte Saint-Denis voisine. \nLes murs adjacents ont depuis été détruits.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Porte%20Saint-Martin%2C%20Paris%208%20June%202014.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Porte_Saint-Martin"
+  },
+  {
    "id": "Q3403076",
    "slug": "chartreuse-de-molsheim",
    "name": "Chartreuse de Molsheim",
@@ -11894,6 +11984,24 @@
    "summary": "Le mont Aiguille est une dent avancée de la falaise orientale du massif du Vercors. Il est localisé dans la commune de Chichilianne, à la limite du Trièves, au sud du département français de l'Isère en région Auvergne-Rhône-Alpes.",
    "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Mont%20Aiguille%20vu%20de%20Ruthi%C3%A8re.jpg?width=800",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mont_Aiguille"
+  },
+  {
+   "id": "Q3533101",
+   "slug": "tour-jean-sans-peur",
+   "name": "Tour Jean-sans-Peur",
+   "themeId": "monuments",
+   "lat": 48.8643,
+   "lon": 2.34806,
+   "radiusM": 150,
+   "score": 94.3,
+   "departement": "Paris",
+   "departementCode": "75",
+   "regionCode": "11",
+   "communeCode": "75102",
+   "communeName": "Paris",
+   "summary": "La tour Jean-sans-Peur ou tour de Jean sans Peur est une tour de fortification édifiée à Paris au XVe siècle par le duc Jean Ier de Bourgogne, dit « Jean sans Peur ». Elle est située au 20, rue Étienne-Marcel, dans le 2e arrondissement.",
+   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Tour%20Jean%20Sans%20Peur.jpg?width=800",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Tour_Jean-sans-Peur"
   },
   {
    "id": "Q1364573",
@@ -47747,11 +47855,11 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "75",
-   "placeCount": 53,
+   "placeCount": 59,
    "tierCounts": [
     11,
     25,
-    17
+    23
    ],
    "places": [
     {
@@ -47820,204 +47928,234 @@
      "rank": 13
     },
     {
-     "placeId": "Q898629",
+     "placeId": "Q64436",
      "tier": 2,
      "rank": 14
     },
     {
-     "placeId": "Q1329141",
+     "placeId": "Q188856",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q64436",
+     "placeId": "Q898629",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q2296362",
+     "placeId": "Q1329141",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q178065",
+     "placeId": "Q2296362",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q28785",
+     "placeId": "Q178065",
      "tier": 2,
      "rank": 19
     },
     {
-     "placeId": "Q188856",
+     "placeId": "Q187840",
      "tier": 2,
      "rank": 20
     },
     {
-     "placeId": "Q2714932",
+     "placeId": "Q28785",
      "tier": 2,
      "rank": 21
     },
     {
-     "placeId": "Q656302",
+     "placeId": "Q193193",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q820892",
+     "placeId": "Q2714932",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q309458",
+     "placeId": "Q656302",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q290355",
+     "placeId": "Q820892",
      "tier": 2,
      "rank": 25
     },
     {
-     "placeId": "Q187840",
+     "placeId": "Q329852",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q2715373",
+     "placeId": "Q309458",
      "tier": 2,
      "rank": 27
     },
     {
-     "placeId": "Q28924",
+     "placeId": "Q290355",
      "tier": 2,
      "rank": 28
     },
     {
-     "placeId": "Q193193",
+     "placeId": "Q2715373",
      "tier": 2,
      "rank": 29
     },
     {
-     "placeId": "Q2599177",
+     "placeId": "Q1503331",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q217925",
+     "placeId": "Q28924",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q1758497",
+     "placeId": "Q323767",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q3075489",
+     "placeId": "Q2599177",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q329852",
+     "placeId": "Q217925",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q2256147",
+     "placeId": "Q631104",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q1514062",
+     "placeId": "Q1758497",
      "tier": 2,
      "rank": 36
     },
     {
-     "placeId": "Q2820659",
+     "placeId": "Q3075489",
      "tier": 3,
      "rank": 37
     },
     {
-     "placeId": "Q1094338",
+     "placeId": "Q2256147",
      "tier": 3,
      "rank": 38
     },
     {
-     "placeId": "Q1503331",
+     "placeId": "Q638423",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q6737052",
+     "placeId": "Q1514062",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q1414059",
+     "placeId": "Q2820659",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q540781",
+     "placeId": "Q684594",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q726781",
+     "placeId": "Q1094338",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q323767",
+     "placeId": "Q6737052",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q589336",
+     "placeId": "Q1414059",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q1996069",
+     "placeId": "Q1469315",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q631104",
+     "placeId": "Q540781",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q782969",
+     "placeId": "Q1643144",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q604550",
+     "placeId": "Q726781",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q853703",
+     "placeId": "Q589336",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q3329119",
+     "placeId": "Q950217",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q644398",
+     "placeId": "Q1996069",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q2574917",
+     "placeId": "Q782969",
      "tier": 3,
      "rank": 53
+    },
+    {
+     "placeId": "Q604550",
+     "tier": 3,
+     "rank": 54
+    },
+    {
+     "placeId": "Q853703",
+     "tier": 3,
+     "rank": 55
+    },
+    {
+     "placeId": "Q3329119",
+     "tier": 3,
+     "rank": 56
+    },
+    {
+     "placeId": "Q644398",
+     "tier": 3,
+     "rank": 57
+    },
+    {
+     "placeId": "Q3533101",
+     "tier": 3,
+     "rank": 58
+    },
+    {
+     "placeId": "Q2574917",
+     "tier": 3,
+     "rank": 59
     }
    ]
   },
@@ -60115,22 +60253,22 @@
      "rank": 16
     },
     {
-     "placeId": "Q201428",
+     "placeId": "Q311",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q23402",
+     "placeId": "Q201428",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q730948",
+     "placeId": "Q23402",
      "tier": 2,
      "rank": 19
     },
     {
-     "placeId": "Q311",
+     "placeId": "Q730948",
      "tier": 2,
      "rank": 20
     },
@@ -60150,27 +60288,27 @@
      "rank": 23
     },
     {
-     "placeId": "Q739976",
+     "placeId": "Q64436",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q178065",
+     "placeId": "Q739976",
      "tier": 2,
      "rank": 25
     },
     {
-     "placeId": "Q898629",
+     "placeId": "Q178065",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q2715373",
+     "placeId": "Q898629",
      "tier": 2,
      "rank": 27
     },
     {
-     "placeId": "Q64436",
+     "placeId": "Q2715373",
      "tier": 2,
      "rank": 28
     },
@@ -60180,42 +60318,42 @@
      "rank": 29
     },
     {
-     "placeId": "Q663673",
+     "placeId": "Q188856",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q820892",
+     "placeId": "Q663673",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q309458",
+     "placeId": "Q820892",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q915291",
+     "placeId": "Q309458",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q28785",
+     "placeId": "Q915291",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q290355",
+     "placeId": "Q28785",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q2256147",
+     "placeId": "Q290355",
      "tier": 2,
      "rank": 36
     },
     {
-     "placeId": "Q648534",
+     "placeId": "Q2256147",
      "tier": 2,
      "rank": 37
     },
@@ -60235,202 +60373,202 @@
      "rank": 40
     },
     {
-     "placeId": "Q188856",
+     "placeId": "Q187840",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q6737052",
+     "placeId": "Q648534",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q28924",
+     "placeId": "Q6737052",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q217925",
+     "placeId": "Q28924",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q3388631",
+     "placeId": "Q217925",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q2509432",
+     "placeId": "Q3388631",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q377882",
+     "placeId": "Q2509432",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q1520841",
+     "placeId": "Q193193",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q589336",
+     "placeId": "Q377882",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q3075489",
+     "placeId": "Q1520841",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q3330509",
+     "placeId": "Q589336",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q1758497",
+     "placeId": "Q3075489",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q187840",
+     "placeId": "Q3330509",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q3329119",
+     "placeId": "Q1758497",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q203285",
+     "placeId": "Q3329119",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q2092716",
+     "placeId": "Q216357",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q2588025",
+     "placeId": "Q203285",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q639713",
+     "placeId": "Q2092716",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q384109",
+     "placeId": "Q2588025",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q1094338",
+     "placeId": "Q639713",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q1414059",
+     "placeId": "Q384109",
      "tier": 3,
      "rank": 61
     },
     {
-     "placeId": "Q1230290",
+     "placeId": "Q1094338",
      "tier": 3,
      "rank": 62
     },
     {
-     "placeId": "Q656302",
+     "placeId": "Q1414059",
      "tier": 3,
      "rank": 63
     },
     {
-     "placeId": "Q193193",
+     "placeId": "Q1230290",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q2901290",
+     "placeId": "Q656302",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q1626747",
+     "placeId": "Q329852",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q184407",
+     "placeId": "Q2901290",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q540781",
+     "placeId": "Q1626747",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q1665255",
+     "placeId": "Q184407",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q726781",
+     "placeId": "Q540781",
      "tier": 3,
      "rank": 70
     },
     {
-     "placeId": "Q2030715",
+     "placeId": "Q1665255",
      "tier": 3,
      "rank": 71
     },
     {
-     "placeId": "Q3796698",
+     "placeId": "Q726781",
      "tier": 3,
      "rank": 72
     },
     {
-     "placeId": "Q684846",
+     "placeId": "Q2030715",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q2820659",
+     "placeId": "Q1503331",
      "tier": 3,
      "rank": 74
     },
     {
-     "placeId": "Q216357",
+     "placeId": "Q3796698",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q19387976",
+     "placeId": "Q684846",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q1996069",
+     "placeId": "Q2820659",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q604550",
+     "placeId": "Q19387976",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q3278803",
+     "placeId": "Q1996069",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q8049",
+     "placeId": "Q604550",
      "tier": 3,
      "rank": 80
     }
@@ -65481,12 +65619,12 @@
      "rank": 34
     },
     {
-     "placeId": "Q576704",
+     "placeId": "Q311",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q730948",
+     "placeId": "Q576704",
      "tier": 2,
      "rank": 36
     },
@@ -65506,7 +65644,7 @@
      "rank": 39
     },
     {
-     "placeId": "Q311",
+     "placeId": "Q730948",
      "tier": 3,
      "rank": 40
     },
@@ -65596,22 +65734,22 @@
      "rank": 57
     },
     {
-     "placeId": "Q23426",
+     "placeId": "Q64436",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q815838",
+     "placeId": "Q23426",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q898629",
+     "placeId": "Q815838",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q64436",
+     "placeId": "Q898629",
      "tier": 3,
      "rank": 61
     },
@@ -65691,22 +65829,22 @@
      "rank": 76
     },
     {
-     "placeId": "Q808456",
+     "placeId": "Q188856",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q172125",
+     "placeId": "Q808456",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q594779",
+     "placeId": "Q172125",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q1334057",
+     "placeId": "Q594779",
      "tier": 3,
      "rank": 80
     }
@@ -67912,10 +68050,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "11",
-   "placeCount": 14,
+   "placeCount": 20,
    "tierCounts": [
     10,
-    4,
+    10,
     0
    ],
    "places": [
@@ -67975,19 +68113,49 @@
      "rank": 11
     },
     {
-     "placeId": "Q1796145",
+     "placeId": "Q638423",
      "tier": 2,
      "rank": 12
     },
     {
-     "placeId": "Q787233",
+     "placeId": "Q684594",
      "tier": 2,
      "rank": 13
     },
     {
-     "placeId": "Q3246658",
+     "placeId": "Q1469315",
      "tier": 2,
      "rank": 14
+    },
+    {
+     "placeId": "Q1643144",
+     "tier": 2,
+     "rank": 15
+    },
+    {
+     "placeId": "Q950217",
+     "tier": 2,
+     "rank": 16
+    },
+    {
+     "placeId": "Q3533101",
+     "tier": 2,
+     "rank": 17
+    },
+    {
+     "placeId": "Q1796145",
+     "tier": 2,
+     "rank": 18
+    },
+    {
+     "placeId": "Q787233",
+     "tier": 2,
+     "rank": 19
+    },
+    {
+     "placeId": "Q3246658",
+     "tier": 2,
+     "rank": 20
     }
    ]
   },
@@ -77368,6 +77536,11 @@
    },
    {
     "code": "75109",
+    "name": "Paris",
+    "parentCode": "75"
+   },
+   {
+    "code": "75110",
     "name": "Paris",
     "parentCode": "75"
    },

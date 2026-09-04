@@ -221,7 +221,22 @@ collections:
   # pour la même raison.
   commune_overrides:
     "75056":            # Paris
-      monuments: 10
+      # Seize, et la marche se lit dans les données. Sept classiques entrent
+      # d'un coup — Invalides, Moulin-Rouge, Grand Palais, Institut de France,
+      # Conciergerie, hôtel de ville, colonne Vendôme — et le vivier passe de
+      # vingt à vingt-sept. À dix, ils poussaient dehors le palais du
+      # Luxembourg, l'obélisque de Louxor et la tour Montparnasse : on aurait
+      # échangé des classiques contre d'autres classiques.
+      #
+      # La coupe tombe sur une falaise MESURÉE, pas estimée : la tour
+      # Montparnasse marque 131,1 et l'arc de triomphe du Carrousel 113,9 —
+      # dix-sept points, le plus grand écart du bas de tableau, et les deux
+      # scores sont réels. Au-dessous viennent les portes Saint-Denis et
+      # Saint-Martin, la tour Jean-sans-Peur, le palais Cambon.
+      #
+      # À revoir sur le premier build réel : le rang des sept entrants est une
+      # ESTIMATION, faute de connaître leurs consultations avant l'`enrich`.
+      monuments: 16
       maisons: 10
       # Huit était trop serré : le musée de l'Armée — les Invalides — tombait
       # dixième, et l'Orangerie neuvième. Dix les récupère et s'arrête là,
