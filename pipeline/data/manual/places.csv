@@ -5,6 +5,20 @@
 # notoriété et prennent le thème indiqué ici.
 #
 # Pour trouver un identifiant : python -m roam_pipeline suggest-qids "jardins de Giverny"
+#
+# Quand ÉPINGLER plutôt qu'ajouter une classe au thème ? `probe` tranche : il
+# donne les classes déclarées d'une entité. Si l'une d'elles nomme une sorte de
+# monument — « hôtel de ville », « colonne de la victoire », « opéra » — elle va
+# dans `themes.yaml` et ramène toute la France avec elle. Si elle ne nomme qu'un
+# CONTENANT ou une ORGANISATION, elle vient ici, une ligne à la fois.
+#
+# Les quatre derniers en sont l'exemple. L'hôtel des Invalides est un « complexe
+# immobilier », le Grand Palais un « palais des congrès », la Conciergerie une
+# « prison » et un « tribunal », l'Institut de France une « société savante ».
+# Collecter ces classes ramènerait les centres commerciaux, les palais des
+# congrès de province, toutes les prisons et tous les tribunaux de France pour
+# quatre monuments parisiens. `probe` le dit lui-même sur chacun : « Remède :
+# l'inscrire dans data/manual/places.csv ».
 wikidata_id,theme_id,note
 Q3533474,megalithes,tour de Vésone à Périgueux — la fiche « Vesunna » porte les coordonnées du musée
 Q1139060,sommets,telepherique  observatoire
@@ -17,3 +31,7 @@ Q3079009,forets,Foret d Exception ONF — classe « foret » Q4421, hors portee 
 Q49329134,forets,Foret d Exception ONF — classe « foret » Q4421, hors portee du theme
 Q2911447,forets,Foret d Exception ONF — classe « foret » Q4421, hors portee du theme
 Q3078859,forets,Foret d Exception ONF — classe « foret » Q4421, hors portee du theme
+Q188977,monuments,hotel des Invalides — classe « complexe immobilier » Q1497364, trop generique pour un theme
+Q457318,monuments,Grand Palais — classes « palais des congres » et « espace evenementiel », trop generiques
+Q138101,monuments,Conciergerie de Paris — classes « prison » et « tribunal », impossibles a collecter en masse
+Q377066,monuments,Institut de France — classe « societe savante », une organisation et non un lieu

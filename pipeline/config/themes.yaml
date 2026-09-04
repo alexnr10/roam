@@ -340,9 +340,19 @@ themes:
     # phares, grottes, cascades) n'ont donc pas de quota.
     max_per_departement: 10
     wikidata_classes: [Q143912, Q170980, Q7362268, Q19757, Q16560, Q12518,
-                       Q815448, Q153562]
+                       Q815448, Q153562, Q25550691, Q1930585]
     # arc de triomphe, obélisque, amphithéâtre romain, théâtre romain, palais,
-    # tour, beffroi, opéra
+    # tour, beffroi, opéra, hôtel de ville, colonne de la victoire
+    #
+    # Les deux dernières sont lues sur `probe` :
+    #     hôtel de ville de Paris (Q640968) · hôtel de ville (Q25550691)
+    #     colonne Vendôme (Q1111051) · colonne de la victoire (Q1930585)
+    # « thème(s) qui la reconnaissent : AUCUN » sur les deux.
+    #
+    # Ce sont des classes de LIEU qui nomment une sorte de monument, et elles
+    # se bornent d'elles-mêmes : une mairie de village n'a pas quatre versions
+    # linguistiques. À surveiller au premier build tout de même — si les hôtels
+    # de ville affluent, `gaps --class Q25550691` dira où poser le plancher.
     #
     # ⚠️ TROU CONSTATÉ, RÉSOLU : les salles de spectacle.
     # L'Opéra Garnier n'est nulle part — ni dans un thème, ni même dans la
