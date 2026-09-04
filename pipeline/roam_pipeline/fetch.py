@@ -13,7 +13,12 @@ from . import wikidata as wd
 from .wikipedia import EXTRACT_BATCH, WikipediaClient, title_from_url
 from .config import Config, Label, Theme
 from .geo import normalize_dept_code, region_of
-from .geocode import AddressClient, CommuneClient, departement_from_insee
+from .geocode import (
+    AddressClient,
+    CommuneClient,
+    departement_from_insee,
+    plausibly_french,
+)
 from .models import Place
 from .raw import EXTRA_SHARD, NO_THEME_SHARD, read_raw, shard_of, shards, write_raw
 
@@ -903,14 +908,41 @@ def enrich_communes(
             if found and assign(place, found[0]):
                 resolved += 1
 
+    # Troisième passe : chercher un peu à côté, pour les points que les deux
+    # premières laissent en mer. Un polygone communal s'arrête au trait de côte,
+    # et la plage de Pampelonne — dont Wikidata place le point à un kilomètre au
+    # large — n'appartenait donc à aucune commune. Sans commune, pas de
+    # département ; sans département, aucune collection géographique. Elle
+    # marquait 75,7, le meilleur score du littoral de PACA après la presqu'île
+    # de Giens, et elle sortait du catalogue sans un mot.
+    #
+    # Bornée aux points qui tombent dans une emprise française : elle coûte
+    # jusqu'à vingt-quatre requêtes, et sur les sept cent quatre-vingt-trois
+    # lieux non situés, la quasi-totalité sont des collectivités du Pacifique.
+    au_large = [
+        p for p in missing
+        if not p.commune_code and plausibly_french(p.lat, p.lon)
+    ]
+    if au_large:
+        LOG.info(
+            "API Géo : %s lieux en France mais dans aucune commune — "
+            "recherche aux alentours (~%s s)",
+            len(au_large), int(len(au_large) * 24 * 0.06),
+        )
+        commune_client = commune_client or CommuneClient()
+        for place in au_large:
+            found = commune_client.locate_commune_near(place.lat, place.lon)
+            if found and assign(place, found[0]):
+                resolved += 1
+                LOG.info("  %s → %s", place.name, place.commune_name)
+
     unresolved = [p for p in missing if not p.commune_code]
     LOG.info("communes : %s/%s lieux rattachés", resolved, len(missing))
     if unresolved:
-        # Hors de France, ou en mer : un phare sur son rocher, une réserve de
-        # baie. Ils resteront hors de la carte de conquête à l'échelle
-        # communale, mais gardent leur département.
+        # Hors de France : les collectivités du Pacifique, et ce que Wikidata
+        # situe à l'étranger. Ils resteront hors de la carte de conquête.
         LOG.info(
-            "%s lieux sans commune (hors de France, ou en mer) : %s",
+            "%s lieux sans commune (hors de France) : %s",
             len(unresolved),
             ", ".join(p.name for p in unresolved[:5]),
         )

@@ -16,12 +16,41 @@ from __future__ import annotations
 import csv
 import io
 import logging
+import math
 import time
 from dataclasses import dataclass
 
 import requests
 
 LOG = logging.getLogger(__name__)
+
+# Emprises grossières de la France, métropole et départements d'outre-mer.
+#
+# Elles ne servent QU'À décider si un point mérite la passe de rattrapage par
+# azimuts : celle-ci coûte jusqu'à vingt-quatre requêtes, et sur sept cent
+# quatre-vingt-trois lieux non situés — dont la quasi-totalité sont des
+# collectivités du Pacifique — la dépense n'a pas de sens. Filtrées, il en
+# reste soixante-quatre.
+#
+# Une emprise ne dit PAS qu'un point est en France : elle déborde forcément sur
+# les pays voisins. C'est l'appartenance à une commune, elle, qui tranche.
+FRENCH_ENVELOPES = (
+    (41.0, 51.5, -5.5, 9.7),      # métropole et Corse
+    (15.8, 16.6, -61.9, -60.9),   # Guadeloupe
+    (14.3, 15.0, -61.3, -60.7),   # Martinique
+    (2.0, 6.0, -55.0, -51.5),     # Guyane
+    (-21.5, -20.8, 55.1, 55.9),   # La Réunion
+    (-13.1, -12.6, 44.9, 45.4),   # Mayotte
+)
+
+
+def plausibly_french(lat: float, lon: float) -> bool:
+    """Le point tombe-t-il dans une des emprises françaises ?"""
+    return any(
+        lo_lat <= lat <= hi_lat and lo_lon <= lon <= hi_lon
+        for lo_lat, hi_lat, lo_lon, hi_lon in FRENCH_ENVELOPES
+    )
+
 
 REVERSE_CSV = "https://api-adresse.data.gouv.fr/reverse/csv/"
 COMMUNES = "https://geo.api.gouv.fr/communes"
@@ -148,6 +177,39 @@ class CommuneClient:
         """`(code de département, code de région)`, ou None hors de France."""
         found = self.locate_commune(lat, lon)
         return (found[0].departement, found[1]) if found else None
+
+    def locate_commune_near(
+        self, lat: float, lon: float, radii_m: tuple[int, ...] = (500, 1500, 3000)
+    ) -> tuple[Commune, str] | None:
+        """Comme `locate_commune`, mais accepte de chercher un peu à côté.
+
+        Un polygone communal s'arrête au trait de côte. La plage de Pampelonne,
+        dont Wikidata place le point à un kilomètre au large, n'appartenait donc
+        à aucune commune — et sans commune, pas de département, donc pas de
+        collection géographique. Elle marquait 75,7 : le meilleur score du
+        littoral de PACA après la presqu'île de Giens.
+
+        La question posée devient « ce point est-il à moins de trois kilomètres
+        d'une commune française ? ». On interroge huit azimuts par rayon, du
+        plus proche au plus lointain, et le premier polygone atteint gagne.
+
+        Le rattachement reste JUSTE près d'une frontière, et c'est ce qui
+        distingue cette passe d'un rapprochement au contour le plus proche :
+        l'API ne connaît que les communes françaises, donc un sommet à cheval
+        sur l'Espagne rend son versant français, jamais l'espagnol. Un point
+        réellement à l'étranger, lui, ne rend rien à aucun azimut.
+        """
+        for radius in radii_m:
+            for bearing in range(0, 360, 45):
+                angle = math.radians(bearing)
+                dlat = radius * math.cos(angle) / 110_540
+                dlon = radius * math.sin(angle) / (
+                    111_320 * math.cos(math.radians(lat)) or 1.0
+                )
+                found = self.locate_commune(lat + dlat, lon + dlon)
+                if found:
+                    return found
+        return None
 
     def locate_commune(self, lat: float, lon: float) -> tuple[Commune, str] | None:
         """`(Commune, code de région)`, ou None hors de France."""

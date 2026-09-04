@@ -867,7 +867,21 @@ def apply_theme_cap(places: list[Place], config: Config) -> list[Place]:
         for place in lot:
             if place.pinned and not place.kept_in_review:
                 reserve(place)
+        # Une région n'a droit à sa garantie que si le thème y EXISTE. Sans
+        # cette condition, le minimum forçait un lieu « côtier » dans chaque
+        # région sans côte, et le lieu forcé était par construction le plus
+        # mauvais du lot : la presqu'île de Gennevilliers — le port industriel
+        # de Paris — entrait 120e sur 120 pour l'Île-de-France, Le Saussois
+        # (une falaise d'escalade sur l'Yonne) pour la Bourgogne, la plage de
+        # la confluence pour le Centre.
+        #
+        # Le seuil se lit dans le vivier, et la séparation est franche : les
+        # quatre régions enclavées offrent UN candidat, la plus pauvre des
+        # régions côtières en offre treize.
+        seuil = config.theme(theme_id).min_region_pool
         for _code, membres in sorted(par_region.items()):
+            if len(membres) < seuil:
+                continue
             for place in membres[:mini]:
                 reserve(place)
         for place in lot:

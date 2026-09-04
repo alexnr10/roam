@@ -539,13 +539,27 @@ class TestCommuneEnrichment(unittest.TestCase):
             return {i: self.communes[i] for i, _, _ in points if i in self.communes}
 
     class _Commune:
-        def __init__(self, answer):
+        def __init__(self, answer, near=None):
             self.answer = answer
+            # Réponse rendue aux points DÉCALÉS seulement : c'est ainsi qu'on
+            # simule un polygone communal qui s'arrête au trait de côte.
+            self.near = near
             self.calls = 0
+            self.origine = None
 
         def locate_commune(self, lat, lon):
             self.calls += 1
+            if self.origine is not None and (lat, lon) != self.origine:
+                return self.near
             return self.answer
+
+        def locate_commune_near(self, lat, lon, radii_m=(500, 1500, 3000)):
+            # La vraie logique d'azimuts, sur un point d'interrogation factice :
+            # le test porte sur l'anneau, pas sur le client HTTP.
+            from roam_pipeline.geocode import CommuneClient
+
+            self.origine = (lat, lon)
+            return CommuneClient.locate_commune_near(self, lat, lon, radii_m)
 
     def _commune(self, code, name, dept):
         from roam_pipeline.geocode import Commune
@@ -603,6 +617,51 @@ class TestCommuneEnrichment(unittest.TestCase):
         )
         self.assertIsNone(phare.commune_code)
         self.assertEqual(phare.departement_code, "29")
+
+    def test_a_beach_just_offshore_is_attached_to_the_nearest_commune(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        # Un polygone communal s'arrête au trait de côte. Wikidata place la
+        # plage de Pampelonne à un kilomètre au large : elle n'appartenait donc
+        # à aucune commune, et sans commune pas de département, donc aucune
+        # collection géographique. Elle marquait 75,7 — le meilleur score du
+        # littoral de PACA après la presqu'île de Giens — et sortait sans un mot.
+        plage = make_place("Pampelonne", wikidata_id="Q1760862",
+                           lat=43.227944, lon=6.66853, departement_code=None)
+        commune = self._Commune(None, near=(self._commune("83101", "Ramatuelle", "83"), "93"))
+        self.assertEqual(
+            enrich_communes([plage], self._Address({}), commune), 1
+        )
+        self.assertEqual(plage.commune_name, "Ramatuelle")
+        self.assertEqual(plage.departement_code, "83")
+        self.assertEqual(plage.region_code, "93")
+
+    def test_a_point_outside_france_costs_no_ring_of_calls(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        # La passe d'azimuts coûte jusqu'à vingt-quatre requêtes. Sur les sept
+        # cent quatre-vingt-trois lieux non situés, la quasi-totalité sont des
+        # collectivités du Pacifique : les interroger serait une dépense pure.
+        vaipo = make_place("Cascade de Vaipo", wikidata_id="Q2",
+                           lat=-8.9, lon=-140.1, departement_code=None)
+        commune = self._Commune(None)
+        enrich_communes([vaipo], self._Address({}), commune)
+        # Une seule interrogation : la deuxième passe. Pas d'anneau.
+        self.assertEqual(commune.calls, 1)
+
+    def test_the_envelope_knows_metropole_and_the_dom(self):
+        from roam_pipeline.geocode import plausibly_french
+
+        for nom, lat, lon in (("Pampelonne", 43.227944, 6.66853),
+                              ("Grande Anse, Guadeloupe", 16.33, -61.79),
+                              ("Saint-Denis, La Réunion", -20.88, 55.45)):
+            with self.subTest(nom):
+                self.assertTrue(plausibly_french(lat, lon))
+        for nom, lat, lon in (("Nuku Hiva", -8.9, -140.1),
+                              ("Nouméa", -22.27, 166.44),
+                              ("Kerguelen", -49.35, 70.22)):
+            with self.subTest(nom):
+                self.assertFalse(plausibly_french(lat, lon))
 
 
 class TestGeographicScope(unittest.TestCase):

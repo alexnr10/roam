@@ -46,6 +46,16 @@ class Theme:
     # Combien de lieux de ce thème le CATALOGUE garde en tout — à ne pas
     # confondre avec `cap`, qui borne la collection nationale d'un thème.
     catalogue_cap: int | None = None
+    # Combien de candidats une région doit offrir pour que le plafond lui
+    # garantisse sa place. Zéro par défaut : toute région compte.
+    #
+    # Ce seuil ne peut PAS être global, et c'est mesuré. Le vivier des quatre
+    # cathédrales d'outre-mer vaut un — exactement comme celui de la presqu'île
+    # de Gennevilliers, seul objet « côtier » d'Île-de-France. Le même nombre
+    # dit « la seule cathédrale de Guadeloupe », qu'il faut garder, et « un port
+    # industriel sur la Seine », qu'il faut sortir. Seul le thème sait lequel :
+    # une cathédrale existe dans toutes les régions, une côte non.
+    min_region_pool: int = 0
     # « nature » ou « culture ». Roam promet des PAYSAGES autant que du
     # patrimoine ; sans cette étiquette, l'équilibre entre les deux ne se
     # mesure pas, et une dérive vers le bâti passe inaperçue.
@@ -261,6 +271,7 @@ def load_config(config_dir: Path | None = None) -> Config:
             fetch_min_sitelinks=int(t.get("fetch_min_sitelinks", 3)),
             cap=int(t["cap"]),
             catalogue_cap=int(t["catalogue_cap"]) if t.get("catalogue_cap") else None,
+            min_region_pool=int(t.get("min_region_pool", 0)),
             kind=t.get("kind", "culture"),
             # `str()` n'est pas cosmétique : YAML lit « 3947 » comme un entier,
             # et la validation ci-dessous — celle qui dit clairement ce qui ne
