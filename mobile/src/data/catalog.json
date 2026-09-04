@@ -29410,24 +29410,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cap_Lardier"
   },
   {
-   "id": "Q3006362",
-   "slug": "crete-de-geruen",
-   "name": "Crête de Géruen",
-   "themeId": "plages",
-   "lat": 44.22,
-   "lon": 6.17583,
-   "radiusM": 500,
-   "score": 42.2,
-   "departement": "Alpes-de-Haute-Provence",
-   "departementCode": "04",
-   "regionCode": "93",
-   "communeCode": "04177",
-   "communeName": "Hautes-Duyes",
-   "summary": "La crête de Géruen est une barre rocheuse des Alpes-de-Haute-Provence, au-dessus du village des Hautes-Duyes et du hameau d'Auribeau dans la vallée de Thoard.\nQuatre voies d'escalade nouvelles tracées par Ivano Ghirardini sur les éperons et cheminées canalettes sur cette face calcaire.",
-   "imageUrl": "http://commons.wikimedia.org/wiki/Special:FilePath/Les%20rochers%20de%20Gu%C3%A9ruen%20PA070071.JPG?width=800",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cr%C3%AAte_de_G%C3%A9ruen"
-  },
-  {
    "id": "Q20127619",
    "slug": "saut-de-la-cuve",
    "name": "Saut de la Cuve",
@@ -49520,10 +49502,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "04",
-   "placeCount": 16,
+   "placeCount": 15,
    "tierCounts": [
     10,
-    6,
+    5,
     0
    ],
    "places": [
@@ -49588,24 +49570,19 @@
      "rank": 12
     },
     {
-     "placeId": "Q3006362",
+     "placeId": "Q455660",
      "tier": 2,
      "rank": 13
     },
     {
-     "placeId": "Q455660",
+     "placeId": "Q2570609",
      "tier": 2,
      "rank": 14
     },
     {
-     "placeId": "Q2570609",
-     "tier": 2,
-     "rank": 15
-    },
-    {
      "placeId": "Q3280291",
      "tier": 2,
-     "rank": 16
+     "rank": 15
     }
    ]
   },
@@ -60338,8 +60315,8 @@
    "placeCount": 80,
    "tierCounts": [
     11,
-    29,
-    40
+    28,
+    41
    ],
    "places": [
     {
@@ -60498,12 +60475,12 @@
      "rank": 31
     },
     {
-     "placeId": "Q1994367",
+     "placeId": "Q281849",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q281849",
+     "placeId": "Q1994367",
      "tier": 2,
      "rank": 33
     },
@@ -60523,12 +60500,12 @@
      "rank": 36
     },
     {
-     "placeId": "Q2933610",
+     "placeId": "Q3162425",
      "tier": 2,
      "rank": 37
     },
     {
-     "placeId": "Q3162425",
+     "placeId": "Q2933610",
      "tier": 2,
      "rank": 38
     },
@@ -60538,22 +60515,22 @@
      "rank": 39
     },
     {
-     "placeId": "Q2524946",
-     "tier": 2,
-     "rank": 40
-    },
-    {
      "placeId": "Q2037477",
      "tier": 3,
-     "rank": 41
+     "rank": 40
     },
     {
      "placeId": "Q476465",
      "tier": 3,
-     "rank": 42
+     "rank": 41
     },
     {
      "placeId": "Q1955741",
+     "tier": 3,
+     "rank": 42
+    },
+    {
+     "placeId": "Q281494",
      "tier": 3,
      "rank": 43
     },
@@ -60563,182 +60540,182 @@
      "rank": 44
     },
     {
-     "placeId": "Q281494",
+     "placeId": "Q1574432",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q1574432",
+     "placeId": "Q1369923",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q1369923",
+     "placeId": "Q306155",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q306155",
+     "placeId": "Q458748",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q458748",
+     "placeId": "Q3329666",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q3329666",
+     "placeId": "Q624323",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q624323",
+     "placeId": "Q972128",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q972128",
+     "placeId": "Q457023",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q457023",
+     "placeId": "Q1809766",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q1809766",
+     "placeId": "Q2096741",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q2096741",
+     "placeId": "Q1795927",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q1795927",
+     "placeId": "Q975925",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q1034136",
+     "placeId": "Q334060",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q975925",
+     "placeId": "Q1369366",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q334060",
+     "placeId": "Q3558989",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q1369366",
+     "placeId": "Q258818",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q3558989",
+     "placeId": "Q752558",
      "tier": 3,
      "rank": 61
     },
     {
-     "placeId": "Q258818",
+     "placeId": "Q1034136",
      "tier": 3,
      "rank": 62
     },
     {
-     "placeId": "Q752558",
+     "placeId": "Q274678",
      "tier": 3,
      "rank": 63
     },
     {
-     "placeId": "Q274678",
+     "placeId": "Q322270",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q322270",
+     "placeId": "Q3330218",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q3330218",
+     "placeId": "Q1777218",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q1777218",
+     "placeId": "Q450348",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q450348",
+     "placeId": "Q15229399",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q15229399",
+     "placeId": "Q6159750",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q6159750",
+     "placeId": "Q1189890",
      "tier": 3,
      "rank": 70
     },
     {
-     "placeId": "Q1189890",
+     "placeId": "Q965394",
      "tier": 3,
      "rank": 71
     },
     {
-     "placeId": "Q965394",
+     "placeId": "Q1664416",
      "tier": 3,
      "rank": 72
     },
     {
-     "placeId": "Q1664416",
+     "placeId": "Q334008",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q334008",
+     "placeId": "Q733035",
      "tier": 3,
      "rank": 74
     },
     {
-     "placeId": "Q779689",
+     "placeId": "Q2172329",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q733035",
+     "placeId": "Q779689",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q2172329",
+     "placeId": "Q687259",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q687259",
+     "placeId": "Q975080",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q975080",
+     "placeId": "Q3329265",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q3329265",
+     "placeId": "Q2983361",
      "tier": 3,
      "rank": 80
     }
@@ -71508,11 +71485,6 @@
    {
     "code": "04154",
     "name": "Pontis",
-    "parentCode": "04"
-   },
-   {
-    "code": "04177",
-    "name": "Hautes-Duyes",
     "parentCode": "04"
    },
    {
