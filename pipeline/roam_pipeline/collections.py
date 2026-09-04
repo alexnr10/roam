@@ -1209,6 +1209,18 @@ def apply_class_exclusion(places: list[Place], config: Config) -> list[Place]:
 
     Un lieu épinglé y échappe : le curateur a déjà tranché.
     """
+    # Un terme d'exclusion resté sans Q-id n'écarte rien, et n'écartait rien en
+    # silence. « épave » a été écrit le jour où deux navires coulés sont entrés
+    # au catalogue par la porte de « site archéologique » : tant qu'il n'est pas
+    # résolu, ils y restent, et seule cette ligne le dit.
+    if config.exclusions.search:
+        LOG.warning(
+            "%s terme(s) d'exclusion sans Q-id — ils n'écartent RIEN : %s. "
+            "`suggest-qids` propose, `verify-qids` confirme.",
+            len(config.exclusions.search),
+            ", ".join(config.exclusions.search),
+        )
+
     if not config.exclusions.qids:
         return places
 

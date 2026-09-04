@@ -9,6 +9,7 @@ import argparse
 import contextlib
 import io
 import json
+import logging
 import re
 import sys
 import tempfile
@@ -4020,6 +4021,40 @@ class TestCommuneCap(unittest.TestCase):
         lieux = [self._lieu(f"Musée {i}", "musees", 100 - i, "Paris", "75101")
                  for i in range(9)]
         self.assertEqual(len(self._cape(lieux, cap=0)), 9)
+
+
+class TestPendingExclusions(unittest.TestCase):
+    """Un terme d'exclusion sans Q-id n'écarte rien, et il faut que ça se dise.
+
+    « épave » a été écrit le jour où deux navires coulés sont entrés au
+    catalogue par la porte de « site archéologique ». Tant qu'il n'est pas
+    résolu, ils y restent — et rien ne le disait.
+    """
+
+    def test_an_unresolved_term_is_announced(self):
+        from roam_pipeline.collections import apply_class_exclusion
+
+        config = replace(CONFIG, exclusions=replace(CONFIG.exclusions, search=["épave"]))
+        lieu = make_place("Amoco Cadiz", theme="megalithes")
+        with self.assertLogs("roam_pipeline.collections", level="WARNING") as journal:
+            gardes = apply_class_exclusion([lieu], config)
+        self.assertEqual(len(gardes), 1)
+        texte = "\n".join(journal.output)
+        self.assertIn("épave", texte)
+        self.assertIn("n'écartent RIEN", texte)
+
+    def test_nothing_is_said_when_every_term_is_resolved(self):
+        from roam_pipeline.collections import apply_class_exclusion
+
+        config = replace(CONFIG, exclusions=replace(CONFIG.exclusions, search=[]))
+        # `excluded_class` renseigné : le lieu est passé au filtre, donc aucun
+        # autre avertissement ne vient brouiller l'assertion.
+        carnac = make_place("Carnac", theme="megalithes")
+        carnac.excluded_class = ""
+        with self.assertLogs("roam_pipeline.collections", level="WARNING") as journal:
+            logging.getLogger("roam_pipeline.collections").warning("témoin")
+            apply_class_exclusion([carnac], config)
+        self.assertNotIn("sans Q-id", "\n".join(journal.output))
 
 
 class TestFantomes(unittest.TestCase):
