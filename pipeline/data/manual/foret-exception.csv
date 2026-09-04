@@ -9,9 +9,19 @@
 # (Q3079027). Sans épinglage, le Q-id ici ne servirait à rien : un label
 # étiquette, il ne collecte pas.
 #
-# MANQUENT ENCORE, à chercher avec `suggest-qids` :
-#     Rouen — trois massifs sous un seul label ONF, à traiter séparément
-#     Bassin d'Arcachon · Val Suzon · Aigoual · Volcans de Martinique
+# LES CINQ AUTRES N'EXISTENT PAS SUR WIKIDATA. Cherché, et c'est un résultat,
+# pas un échec de recherche — `suggest-qids` sur le mot distinctif ne rend
+# aucune entité « forêt » pour Rouen/Roumare, le Bassin d'Arcachon, le Val
+# Suzon, l'Aigoual ni les Volcans de Martinique.
+#
+# Trois entités VOISINES existent, et il ne faut pas les prendre : le mont
+# Aigoual (Q1836325) est un sommet, déjà au catalogue sous `sommets` ; la
+# réserve naturelle régionale du Val-Suzon (Q15695567) et la réserve
+# biologique intégrale de la Montagne Pelée (Q65953533) sont des aires
+# protégées. Aucune n'est une forêt : les ranger ici mettrait des objets faux
+# dans une liste officielle, et le mont Aigoual y ferait doublon avec lui-même.
+#
+# Onze exactes valent mieux que quatorze dont trois sont autre chose.
 #
 # ⚠️ Les seize noms viennent d'une recherche web, le site de l'ONF étant
 # inatteignable depuis le conteneur. À confronter à onf.fr.
