@@ -123,11 +123,38 @@ visitors:
 # Même règle à trois états que la fréquentation : un lieu sans article, ou sans
 # consultation enregistrée, ne perd RIEN.
 pageviews:
-  # Poids NUL : le signal se collecte et s'observe avant de peser. `weigh`
-  # montre ce que chaque poids ferait au classement réel, sans rien changer.
-  #     python -m roam_pipeline enrich --pageviews
-  #     python -m roam_pipeline weigh --theme jardins --weights 0 8 16 24
-  weight: 0.0
+  # Ce que le public d'ici va réellement voir, mois après mois.
+  #
+  # Activé à HUIT après deux mesures, et la première disait non. Le signal est
+  # additif : mille vues valent six points à ce poids, une donnée manquante en
+  # vaut zéro — un lieu dont les consultations n'ont pas été collectées ne
+  # reçoit donc pas « rien », il reçoit un malus. Mille huit cent quatre-vingt-
+  # dix-huit lieux étaient dans ce cas, dont la SAINTE-CHAPELLE, le viaduc de
+  # Millau, Provins et Sarlat : à huit, la Sainte-Chapelle sortait du catalogue,
+  # punie pour un trou de collecte. `enrich --pageviews` est une option, et la
+  # collecte des plages ne l'avait jamais reçue.
+  #
+  # Comblée, la couverture passe de 8 192 à 10 089 lieux — il n'en reste UN
+  # sans consultations. Le même poids donne alors :
+  #
+  #     36 lieux entrent, 27 sortent — 3 % du catalogue
+  #     entrent  : Catacombes de Paris (7 057 vues), Fondation Louis-Vuitton,
+  #                cathédrale d'Angers, Notre-Dame du Puy-en-Velay,
+  #                Saint-Sauveur d'Aix, la Mothe-Chandeniers, Tiffauges,
+  #                les grottes de Choranche, la calanque d'En-Vau
+  #     sortent  : des cathédrales et châteaux à deux ou trois cents vues
+  #
+  # C'est la calanque d'En-Vau qui a déclenché la mesure : elle faisait 589
+  # vues par mois et sortait derrière le CAP PINÈDE, terminal à conteneurs du
+  # port de Marseille, qui en fait 47 — mais dont l'article Wikipédia est
+  # quatre fois plus long. Le poids sur la taille d'article classait la
+  # documentation ; celui-ci classe l'intérêt.
+  #
+  # `score_all` avertit dès que ce poids est actif et qu'un lieu a un article
+  # sans consultations : le piège de la première mesure ne peut plus se tendre
+  # en silence.
+  #     python -m roam_pipeline weigh --theme plages --weights 0 8 16 24
+  weight: 8.0
   # Le score suit log1p(vues / scale). Cinq cents vues par mois valent un
   # demi-poids : c'est l'ordre de grandeur d'un lieu que le public connaît
   # sans qu'il soit national.

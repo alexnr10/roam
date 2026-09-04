@@ -65,7 +65,7 @@ from .review import (
     read_decisions, read_names, read_themes, theme_claims, write_themes,
     read_snapshot, vanished, write_decisions, write_names, write_snapshot,
 )
-from .score import rescued, score_all
+from .score import rescued, score_all, warn_missing_pageviews
 
 LOG = logging.getLogger("roam")
 
@@ -783,6 +783,7 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
 
     # `scored` garde TOUS les candidats : c'est lui qui alimente la distribution,
     # qui ne sert à régler le plancher que si elle porte sur l'avant-filtre.
+    warn_missing_pageviews(charges, config)
     scored = score_all(charges, config)
     # Avant tout le reste : le nom choisi par le curateur doit valoir partout,
     # jusque dans la feuille de revue où il relira la ligne.

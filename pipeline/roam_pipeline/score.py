@@ -162,7 +162,10 @@ def compute_score(place: Place, config: Config) -> float:
 
 
 def score_all(places: list[Place], config: Config) -> list[Place]:
-    warn_missing_pageviews(places, config)
+    # L'avertissement sur la couverture des consultations n'est PAS ici : une
+    # construction appelle `score_all` deux fois — une sur tous les candidats,
+    # une sur ce que les décisions ont gardé — et le même avertissement rendu
+    # deux fois se lit comme un bug. Il est appelé une fois, par `build`.
     for place in places:
         place.score = compute_score(place, config)
         place.inclusion_criteria = derive_criteria(place, config)

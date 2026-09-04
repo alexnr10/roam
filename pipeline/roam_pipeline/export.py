@@ -63,8 +63,49 @@ REVIEW_HEADER = [
 ]
 
 
+def warn_lost_collections(collections: list[Collection], out_dir: Path) -> list[str]:
+    """Quelles collections la construction précédente avait, et celle-ci n'a plus.
+
+    Une collection qui disparaît ne dit rien d'elle-même. « Littoral et plages
+    de Provence-Alpes-Côte d'Azur » est tombée à ×1,89 pour un seuil de ×1,90,
+    « Musées du Grand Est » à ×1,85 — vingt-deux et vingt et un lieux, effacés
+    de la carte sans une ligne.
+
+    Le journal des croisements écartés ne les rattrapait pas : il nomme les huit
+    rapports les PLUS BAS, c'est-à-dire les plus évidemment banals, jamais ceux
+    qui meurent au seuil. Or ce sont exactement ceux-là qui méritent un regard,
+    puisqu'ils existaient la veille.
+
+    La comparaison se fait sur le fichier de la construction précédente, qu'on
+    est sur le point d'écraser : rien à stocker, rien à tenir à jour.
+    """
+    path = out_dir / "collections.json"
+    if not path.exists():
+        return []
+    try:
+        avant = {c["slug"]: c for c in json.loads(path.read_text(encoding="utf-8"))}
+    except (json.JSONDecodeError, KeyError, TypeError):
+        # Un fichier illisible n'est pas une perte de collection : on se tait.
+        return []
+
+    maintenant = {c.slug for c in collections}
+    perdues = [c for slug, c in sorted(avant.items()) if slug not in maintenant]
+    if perdues:
+        LOG.warning(
+            "%s collection(s) de la construction précédente ont DISPARU : %s. "
+            "`explain` sur leurs lieux dit ce qui a changé.",
+            len(perdues),
+            ", ".join(
+                f"{c.get('name', c['slug'])} ({c.get('place_count', '?')} lieux)"
+                for c in perdues
+            ),
+        )
+    return [c["slug"] for c in perdues]
+
+
 def write_json(places: list[Place], collections: list[Collection], out_dir: Path) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
+    warn_lost_collections(collections, out_dir)
     (out_dir / "places.json").write_text(
         json.dumps([p.to_dict() for p in places], ensure_ascii=False, indent=2), encoding="utf-8"
     )

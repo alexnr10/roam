@@ -4023,6 +4023,66 @@ class TestCommuneCap(unittest.TestCase):
         self.assertEqual(len(self._cape(lieux, cap=0)), 9)
 
 
+class TestLostCollections(unittest.TestCase):
+    """Une collection qui disparaît ne dit rien d'elle-même.
+
+    « Littoral et plages de PACA » est tombée à ×1,89 pour un seuil de ×1,90,
+    « Musées du Grand Est » à ×1,85 — vingt-deux et vingt et un lieux effacés de
+    la carte sans une ligne. Le journal des croisements écartés ne les
+    rattrapait pas : il nomme les huit rapports les plus BAS, jamais ceux qui
+    meurent au seuil, qui sont pourtant les seuls à avoir existé la veille.
+    """
+
+    def _collection(self, slug):
+        from roam_pipeline.models import Collection
+
+        return Collection(slug=slug, name=slug.title(), kind="theme")
+
+    def _ecrire(self, dossier, slugs):
+        import json as _json
+
+        (dossier / "collections.json").write_text(
+            _json.dumps([{"slug": s, "name": s.title(), "place_count": 20} for s in slugs]),
+            encoding="utf-8",
+        )
+
+    def test_a_collection_that_vanished_is_named(self):
+        from roam_pipeline.export import warn_lost_collections
+
+        with tempfile.TemporaryDirectory() as tmp:
+            dossier = Path(tmp)
+            self._ecrire(dossier, ["musees-region-44", "chateaux-departement-37"])
+            restantes = [self._collection("chateaux-departement-37")]
+            with self.assertLogs("roam_pipeline.export", level="WARNING") as journal:
+                perdues = warn_lost_collections(restantes, dossier)
+            self.assertEqual(perdues, ["musees-region-44"])
+            self.assertIn("Musees-Region-44", "\n".join(journal.output))
+
+    def test_nothing_is_said_when_none_vanished(self):
+        from roam_pipeline.export import warn_lost_collections
+
+        with tempfile.TemporaryDirectory() as tmp:
+            dossier = Path(tmp)
+            self._ecrire(dossier, ["musees-region-44"])
+            self.assertEqual(
+                warn_lost_collections([self._collection("musees-region-44")], dossier), []
+            )
+
+    def test_the_first_build_has_nothing_to_compare(self):
+        from roam_pipeline.export import warn_lost_collections
+
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(warn_lost_collections([], Path(tmp)), [])
+
+    def test_an_unreadable_file_is_not_a_loss(self):
+        from roam_pipeline.export import warn_lost_collections
+
+        with tempfile.TemporaryDirectory() as tmp:
+            dossier = Path(tmp)
+            (dossier / "collections.json").write_text("{ pas du json", encoding="utf-8")
+            self.assertEqual(warn_lost_collections([], dossier), [])
+
+
 class TestMissingPageviews(unittest.TestCase):
     """Le signal des consultations est additif : une donnée manquante est un malus.
 
