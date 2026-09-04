@@ -223,7 +223,13 @@ collections:
     "75056":            # Paris
       monuments: 10
       maisons: 10
-      musees: 8
+      # Huit était trop serré : le musée de l'Armée — les Invalides — tombait
+      # dixième, et l'Orangerie neuvième. Dix les récupère et s'arrête là,
+      # Guimet, les Arts et Métiers, l'Institut du monde arabe, Rodin et Cluny
+      # restant dehors. Attention en relisant le classement : le septième est le
+      # musée national d'Art moderne, qui EST le Centre Pompidou et que le
+      # dédoublonnage mange — dix au plafond font donc neuf musées réels.
+      musees: 10
   # Minimum de lieux par région avant que le plafond de thème ne remplisse au
   # score. Sans lui, les quatre cathédrales des DOM tombaient d'un bloc :
   # seules dans leur région, elles ne sont jamais dans les quatre-vingts
