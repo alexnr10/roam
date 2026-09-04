@@ -6,11 +6,14 @@ humaine (cf. docs/curation-charter.md).
 
 from __future__ import annotations
 
+import logging
 import math
 from typing import Any, Callable
 
 from .config import Config, Scoring, Tiers
 from .models import Place
+
+LOG = logging.getLogger(__name__)
 
 
 def label_bonus(place_labels: list[str], config: Config) -> float:
@@ -159,10 +162,46 @@ def compute_score(place: Place, config: Config) -> float:
 
 
 def score_all(places: list[Place], config: Config) -> list[Place]:
+    warn_missing_pageviews(places, config)
     for place in places:
         place.score = compute_score(place, config)
         place.inclusion_criteria = derive_criteria(place, config)
     return places
+
+
+def warn_missing_pageviews(places: list[Place], config: Config) -> int:
+    """Un lieu qui a un article mais pas ses consultations est PÉNALISÉ.
+
+    Le signal est additif : mille vues par mois valent six points au poids huit,
+    et une donnée manquante en vaut zéro. Un lieu dont les consultations n'ont
+    pas été collectées ne reçoit donc pas « rien », il reçoit un malus — pour un
+    trou de collecte, pas pour un fait qui le concerne.
+
+    Mesuré le jour où l'on a voulu activer le poids : mille huit cent
+    quatre-vingt-dix-huit lieux avaient un article francophone et aucune
+    consultation, dont la Sainte-Chapelle, le viaduc de Millau, Provins, Sarlat
+    et Autun. À poids huit, la Sainte-Chapelle SORTAIT du catalogue. Le défaut
+    n'était pas le poids, c'était la couverture — `enrich --pageviews` est une
+    option, et la collecte des plages ne l'avait jamais reçue.
+
+    L'avertissement ne se déclenche que si le poids est actif : tant qu'il vaut
+    zéro, un trou de couverture ne coûte rien à personne.
+    """
+    if not config.pageviews.active:
+        return 0
+    muets = [p for p in places if p.has_frwiki and not p.pageviews_per_month]
+    if not muets:
+        return 0
+    LOG.warning(
+        "%s lieux ont un article francophone mais AUCUNE consultation, alors que "
+        "le poids des consultations est actif (%s) : ils sont pénalisés pour un "
+        "trou de collecte, pas pour ce qu'ils sont (ex. %s). "
+        "Lance `enrich --pageviews`.",
+        len(muets),
+        config.pageviews.weight,
+        ", ".join(p.name for p in sorted(muets, key=lambda p: -p.sitelinks)[:3]),
+    )
+    return len(muets)
 
 
 def derive_criteria(place: Place, config: Config) -> list[str]:

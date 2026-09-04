@@ -61,9 +61,9 @@ exclude_classes:
   # Encore à résoudre : le terme générique français, sous lequel se rangent
   # les parcs qu'aucune des classes ci-dessus ne nomme.
     - Q15982170    # parc de loisirs — le terme générique français
-  # ⚠️ EN ATTENTE DE RÉSOLUTION. Le thème « Mégalithes et sites antiques »
-  # collecte « site archéologique » (Q839954), et une épave EST un site
-  # archéologique sous-marin chez Wikidata. Six sont dans la collecte :
+  # Le thème « Mégalithes et sites antiques » collecte « site archéologique »
+  # (Q839954), et une épave EST un site archéologique sous-marin chez Wikidata.
+  # Six sont dans la collecte :
   #
   #     Q473794 Amoco Cadiz (25 langues) · Q1354330 Erika (17) ·
   #     Q3381131 HNoMS Svenner (10) · Q1389657 SS Galeka (8) ·
@@ -72,14 +72,14 @@ exclude_classes:
   # Elles étaient là depuis toujours, tenues dehors par le SEUL fait que
   # Wikidata ne les situait pas. Le rattachement par azimuts leur a donné une
   # commune, et deux sont entrées au catalogue — un défaut que la nouvelle
-  # passe n'a pas créé, seulement révélé. Le filtre doit donc porter sur la
-  # classe, pas sur le rattachement.
+  # passe n'a pas créé, seulement révélé. Le filtre porte donc sur la classe,
+  # pas sur le rattachement.
   #
-  # Ne rien écrire de mémoire : la classe se lit sur les entités fautives.
-  #     python -m roam_pipeline probe Q473794 Q1354330 Q502558
-  # puis on ajoute le Q-id ci-dessus et `verify-qids` le confirme.
-  search:
-    - épave
+  # Q852190 est lu sur la sortie de `probe Q473794 Q1354330 Q502558`, qui la
+  # déclare sur les trois : « classes déclarées : pétrolier (Q14928), épave
+  # (Q852190) ». Rien de mémoire, comme depuis la première collecte.
+    - Q852190      # épave — l'Amoco Cadiz n'est pas un site de visite
+  search: []
 
 themes:
   - id: villages

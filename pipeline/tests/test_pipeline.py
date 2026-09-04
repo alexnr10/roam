@@ -4023,6 +4023,50 @@ class TestCommuneCap(unittest.TestCase):
         self.assertEqual(len(self._cape(lieux, cap=0)), 9)
 
 
+class TestMissingPageviews(unittest.TestCase):
+    """Le signal des consultations est additif : une donnée manquante est un malus.
+
+    Mille huit cent quatre-vingt-dix-huit lieux avaient un article francophone
+    et aucune consultation — dont la Sainte-Chapelle, le viaduc de Millau,
+    Provins et Sarlat. À poids huit, la Sainte-Chapelle sortait du catalogue,
+    punie pour un trou de collecte.
+    """
+
+    def _config(self, weight):
+        from dataclasses import replace as rep
+
+        return rep(CONFIG, pageviews=rep(CONFIG.pageviews, weight=weight))
+
+    def test_the_gap_is_announced_when_the_weight_is_active(self):
+        from roam_pipeline.score import warn_missing_pageviews
+
+        muet = make_place("Sainte-Chapelle", has_frwiki=True, sitelinks=57)
+        muet.pageviews_per_month = None
+        vu = make_place("Louvre", has_frwiki=True, sitelinks=90)
+        vu.pageviews_per_month = 5000
+        with self.assertLogs("roam_pipeline.score", level="WARNING") as journal:
+            n = warn_missing_pageviews([muet, vu], self._config(8.0))
+        self.assertEqual(n, 1)
+        self.assertIn("Sainte-Chapelle", "\n".join(journal.output))
+
+    def test_nothing_is_said_while_the_weight_is_zero(self):
+        from roam_pipeline.score import warn_missing_pageviews
+
+        # Tant que le poids vaut zéro, un trou de couverture ne coûte rien.
+        muet = make_place("Sainte-Chapelle", has_frwiki=True, sitelinks=57)
+        muet.pageviews_per_month = None
+        self.assertEqual(warn_missing_pageviews([muet], self._config(0.0)), 0)
+
+    def test_a_place_without_a_french_article_is_not_counted(self):
+        from roam_pipeline.score import warn_missing_pageviews
+
+        # Sans article, il n'y a pas de consultations à collecter : ce n'est pas
+        # un trou, c'est l'état du monde.
+        sans = make_place("Sommet obscur", has_frwiki=False)
+        sans.pageviews_per_month = None
+        self.assertEqual(warn_missing_pageviews([sans], self._config(8.0)), 0)
+
+
 class TestPendingExclusions(unittest.TestCase):
     """Un terme d'exclusion sans Q-id n'écarte rien, et il faut que ça se dise.
 
