@@ -36,22 +36,69 @@ def haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
 
 def dedupe(places: list[Place]) -> list[Place]:
-    """Écarte les doublons de proximité, en gardant le mieux scoré."""
+    """Écarte les doublons de proximité, en gardant le mieux scoré.
+
+    Deux bandes, et pas une seule, parce que la distance seule se trompe.
+
+    **Sous trente mètres**, deux fiches décrivent la même emprise au sol et la
+    fusion est juste quel que soit le nom : le musée national d'Art moderne EST
+    le Centre Pompidou, le musée des Beaux-Arts d'Arras est dans l'abbaye
+    Saint-Vaast, les thermes de Chassenon sont Cassinomagus.
+
+    **Entre trente et cent cinquante mètres**, il faut en plus que les deux noms
+    PARTAGENT un mot distinctif. Sans cette condition, la règle se trompait dix
+    fois sur quatorze sur le catalogue réel :
+
+        Sainte-Chapelle          écartée par la Conciergerie de Paris (120 m)
+        musée Grobet-Labadié     par les Beaux-Arts de Marseille     (149 m)
+        musée de l'Œuvre N.-D.   par les Beaux-Arts de Strasbourg     (62 m)
+        musée historique         par le musée alsacien               (100 m)
+        musée Rude               par les Beaux-Arts de Dijon         (133 m)
+        odéon antique de Lyon    par le théâtre antique de Lyon      (124 m)
+        Table des Marchands      par le Grand menhir brisé            (48 m)
+        Arc Héré, hôtel de ville de Nancy, opéra de Dijon…
+
+    Ce sont des visites distinctes, avec chacune son billet. Le nom partagé,
+    lui, désigne bien une seule visite — et il ouvre déjà la porte inverse dans
+    `twins`, jusqu'à trois cents mètres.
+
+    Ce qui reste douteux n'est pas perdu : `twins` le signale au curateur, qui
+    tranche. Écarter automatiquement est irréversible ; c'est pour cela que la
+    règle doit être plus prudente que le contraire.
+    """
     kept: list[Place] = []
     by_theme: dict[str, list[Place]] = defaultdict(list)
+    fusionnes: list[tuple[Place, Place, float]] = []
 
     for place in sorted(places, key=lambda p: -p.score):
-        neighbours = by_theme[place.theme_id]
-        if any(
-            haversine_m(place.lat, place.lon, other.lat, other.lon) < DUPLICATE_DISTANCE_M
-            for other in neighbours
-        ):
-            LOG.debug("doublon écarté : %s (%s)", place.name, place.wikidata_id)
+        jumeau: tuple[Place, float] | None = None
+        for other in by_theme[place.theme_id]:
+            ecart = haversine_m(place.lat, place.lon, other.lat, other.lon)
+            if ecart >= DUPLICATE_DISTANCE_M:
+                continue
+            if ecart < SAME_FOOTPRINT_M or (
+                _mots_distinctifs(place.name, place.commune_name)
+                & _mots_distinctifs(other.name, other.commune_name)
+            ):
+                jumeau = (other, ecart)
+                break
+        if jumeau is not None:
+            fusionnes.append((place, jumeau[0], jumeau[1]))
             continue
-        neighbours.append(place)
+        by_theme[place.theme_id].append(place)
         kept.append(place)
 
     LOG.info("déduplication : %s lieux gardés sur %s", len(kept), len(places))
+    if fusionnes:
+        # Nommés, et non plus en DEBUG : la fusion est irréversible, et c'est
+        # la seule occasion de la voir passer.
+        LOG.info(
+            "  doublons de proximité fusionnés : %s",
+            ", ".join(
+                f"{perdu.name} → {garde.name} ({ecart:.0f} m)"
+                for perdu, garde, ecart in sorted(fusionnes, key=lambda t: -t[0].score)[:8]
+            ),
+        )
     return kept
 
 

@@ -380,15 +380,74 @@ class TestDedupe(unittest.TestCase):
         self.assertAlmostEqual(haversine_m(48.8566, 2.3522, 45.7640, 4.8357) / 1000, 392, delta=8)
 
     def test_near_identical_places_are_merged(self):
-        a = make_place("Château de X", lat=45.0, lon=2.0, sitelinks=20)
-        b = make_place("Chapelle du château de X", lat=45.0005, lon=2.0005, sitelinks=3)
+        # Le nom distinctif doit être autre chose que la commune : « Louvre »
+        # dans Paris, et non « Chambord » dans Chambord, que `_mots_distinctifs`
+        # retire à raison — sinon deux musées d'une même ville passeraient pour
+        # la même visite.
+        a = make_place("Palais du Louvre", lat=48.8606, lon=2.3376, sitelinks=20)
+        b = make_place("Cour Carrée du Louvre", lat=48.8610, lon=2.3380, sitelinks=3)
+        for lieu in (a, b):
+            lieu.commune_name = "Paris"
         score_all([a, b], CONFIG)
         kept = dedupe([a, b])
-        self.assertEqual([p.name for p in kept], ["Château de X"])
+        self.assertEqual([p.name for p in kept], ["Palais du Louvre"])
 
     def test_distinct_places_are_both_kept(self):
         a = make_place("Château A", lat=45.0, lon=2.0)
         b = make_place("Château B", lat=45.1, lon=2.1)
+        score_all([a, b], CONFIG)
+        self.assertEqual(len(dedupe([a, b])), 2)
+
+    def test_two_neighbours_without_a_shared_name_both_survive(self):
+        # La Sainte-Chapelle et la Conciergerie sont à 120 m et n'ont pas un mot
+        # en commun : deux visites, deux billets. La distance seule se trompait
+        # dix fois sur quatorze — le musée Grobet-Labadié écarté par les
+        # Beaux-Arts de Marseille, l'odéon antique de Lyon par le théâtre
+        # antique, la Table des Marchands par le Grand menhir brisé.
+        a = make_place("Conciergerie de Paris", theme="monuments",
+                       lat=48.85639, lon=2.34556, sitelinks=43)
+        b = make_place("Sainte-Chapelle", theme="monuments",
+                       lat=48.85537, lon=2.34503, sitelinks=57)
+        for lieu in (a, b):
+            lieu.commune_name = "Paris"
+        score_all([a, b], CONFIG)
+        self.assertEqual(len(dedupe([a, b])), 2)
+
+    def test_a_shared_name_still_merges_beyond_the_footprint(self):
+        # « Château du Louvre » et « musée du Louvre » sont à 188 m : une seule
+        # visite. Le nom partagé reste le signal qui autorise la fusion.
+        a = make_place("Palais du Louvre", theme="chateaux",
+                       lat=48.8606, lon=2.3376, sitelinks=40)
+        b = make_place("Chapelle du Louvre", theme="chateaux",
+                       lat=48.8615, lon=2.3376, sitelinks=3)
+        for lieu in (a, b):
+            lieu.commune_name = "Paris"
+        score_all([a, b], CONFIG)
+        self.assertEqual([p.name for p in dedupe([a, b])], ["Palais du Louvre"])
+
+    def test_the_same_footprint_merges_whatever_the_names(self):
+        # Sous trente mètres, deux fiches décrivent la même emprise au sol : le
+        # musée national d'Art moderne EST le Centre Pompidou, le musée des
+        # Beaux-Arts d'Arras est dans l'abbaye Saint-Vaast.
+        a = make_place("Centre Pompidou", theme="musees", lat=48.8607, lon=2.3522,
+                       sitelinks=37)
+        b = make_place("Musée national d'Art moderne", theme="musees",
+                       lat=48.86071, lon=2.3522, sitelinks=20)
+        for lieu in (a, b):
+            lieu.commune_name = "Paris"
+        score_all([a, b], CONFIG)
+        self.assertEqual([p.name for p in dedupe([a, b])], ["Centre Pompidou"])
+
+    def test_the_commune_name_is_not_a_shared_word(self):
+        # Sans cela, « musée des Beaux-Arts de Tours » et « cathédrale
+        # Saint-Gatien de Tours » partageraient un mot pour la seule raison
+        # qu'ils sont dans la même ville.
+        a = make_place("Musée des Beaux-Arts de Tours", theme="musees",
+                       lat=47.3941, lon=0.6948, sitelinks=10)
+        b = make_place("Musée du Compagnonnage de Tours", theme="musees",
+                       lat=47.3950, lon=0.6948, sitelinks=5)
+        for lieu in (a, b):
+            lieu.commune_name = "Tours"
         score_all([a, b], CONFIG)
         self.assertEqual(len(dedupe([a, b])), 2)
 
