@@ -1,0 +1,22 @@
+# Ce que git ne doit PAS essayer de fusionner.
+#
+# `catalog.json` fait soixante-dix-neuf mille lignes et il est RÉGÉNÉRÉ en
+# entier par `export-app`. Deux personnes qui construisent le catalogue chacune
+# de leur côté produisent deux fichiers entièrement différents : la fusion
+# ligne à ligne n'a aucun sens sur un artefact. Au mieux elle conflit — au pire
+# elle « réussit » en entrelaçant deux listes de lieux, ou laisse des marqueurs
+# de conflit à l'intérieur du JSON, et l'application casse sans un mot.
+#
+# `merge=binary` dit à git de ne pas essayer : il garde la version courante,
+# signale le conflit, et la résolution est toujours la même — reconstruire.
+#
+#     git checkout --ours mobile/src/data/catalog.json
+#     git add mobile/src/data/catalog.json && git commit
+#     python3 -m roam_pipeline build && python3 -m roam_pipeline export-app
+#
+# Les fichiers de curation, eux, se fusionnent très bien et ne sont pas listés
+# ici : `write_decisions` réécrit `decisions.csv` TRIÉ par identifiant, donc
+# deux séries de verdicts s'intercalent proprement. C'est une propriété qu'il
+# vaut mieux ne pas perdre.
+mobile/src/data/catalog.json merge=binary
+mobile/src/data/outlines.json merge=binary
