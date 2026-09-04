@@ -27,7 +27,7 @@
   },
   {
    "id": "maisons",
-   "name": "Maisons d'artistes et d'écrivains",
+   "name": "Maisons et demeures remarquables",
    "nameSingular": "Maison",
    "icon": "house"
   },
@@ -40005,7 +40005,7 @@
   },
   {
    "slug": "theme-maisons",
-   "name": "Maisons d'artistes et d'écrivains",
+   "name": "Maisons et demeures remarquables",
    "kind": "theme",
    "themeId": "maisons",
    "labelId": null,
@@ -66630,7 +66630,7 @@
   },
   {
    "slug": "maisons-departement-78",
-   "name": "Maisons d'artistes et d'écrivains des Yvelines",
+   "name": "Maisons et demeures remarquables des Yvelines",
    "kind": "geo",
    "themeId": "maisons",
    "labelId": null,
@@ -67114,7 +67114,7 @@
   },
   {
    "slug": "maisons-departement-37",
-   "name": "Maisons d'artistes et d'écrivains d'Indre-et-Loire",
+   "name": "Maisons et demeures remarquables d'Indre-et-Loire",
    "kind": "geo",
    "themeId": "maisons",
    "labelId": null,
@@ -67298,7 +67298,7 @@
   },
   {
    "slug": "maisons-departement-76",
-   "name": "Maisons d'artistes et d'écrivains de Seine-Maritime",
+   "name": "Maisons et demeures remarquables de Seine-Maritime",
    "kind": "geo",
    "themeId": "maisons",
    "labelId": null,
@@ -68535,7 +68535,7 @@
   },
   {
    "slug": "maisons-region-11",
-   "name": "Maisons d'artistes et d'écrivains d'Île-de-France",
+   "name": "Maisons et demeures remarquables d'Île-de-France",
    "kind": "geo",
    "themeId": "maisons",
    "labelId": null,

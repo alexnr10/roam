@@ -185,8 +185,22 @@ themes:
   # maison de Van Gogh et l'atelier Cézanne au profit de `musees` — neuf
   # lieux sur trente, et précisément les mieux documentés. Il ne lui
   # restait que deux lieux, sous le minimum d'une collection.
+  # PAS « Maisons des Illustres » : c'est le nom du label du ministère de la
+  # Culture, qui a sa propre collection — deux cent treize membres. Le nom
+  # appartient au label ; le thème prend celui de ce qu'il rassemble. Même
+  # arbitrage que « Jardin remarquable » contre « Parcs et jardins ».
+  #
+  # Et PLUS « Maisons d'artistes et d'écrivains », qui énumérait deux métiers
+  # pour un thème qui en couvre bien davantage : la maison Bonaparte, le château
+  # de Voltaire, celui de Montaigne, La Boisserie de De Gaulle, les musées
+  # Curie, Pasteur et Clemenceau. Une énumération de métiers finit toujours par
+  # en oublier un.
+  #
+  # « Demeures » couvre en outre le cas que « maison de quelqu'un » ne dit pas :
+  # les maisons célèbres SANS habitant célèbre — la villa Savoye, la villa
+  # Cavrois, le Palais idéal, la maison de verre. On y va pour le bâtiment.
   - id: maisons
-    name: Maisons d'artistes et d'écrivains
+    name: Maisons et demeures remarquables
     name_singular: Maison
     name_hints: [maison, villa, atelier, demeure]
     icon: house
