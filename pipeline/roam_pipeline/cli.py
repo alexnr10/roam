@@ -1253,7 +1253,8 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
     """
     from .collections import (
         apply_access_filter, apply_alpine_filter, apply_class_exclusion,
-        apply_geographic_scope, apply_notoriety_floor, dedupe, dedupe_across_themes,
+        apply_commune_cap, apply_geographic_scope, apply_list_membership,
+        apply_notoriety_floor, apply_theme_cap, dedupe, dedupe_across_themes,
     )
 
     raw_path = args.out / "places_raw.json"
@@ -1292,13 +1293,24 @@ def cmd_explain(args: argparse.Namespace, config: Config) -> int:
     try:
         kept, _counts = apply_decisions(everything, decisions, strict=args.strict)
         score_all(kept, config)
+        # Le MÊME enchaînement que `build_all`, dans le MÊME ordre. Il en
+        # manquait trois — l'appartenance à une liste officielle et les deux
+        # plafonds — et `explain` répondait alors « retenu par tous les filtres,
+        # mais dans aucune collection » à un lieu qu'un plafond avait coupé.
+        # C'est arrivé à l'obélisque de Louxor : trente et une langues, dix
+        # mille sept cents consultations par mois, gardé en revue, et septième
+        # des monuments parisiens pour six places. La réponse était fausse, et
+        # une réponse fausse coûte plus cher que pas de réponse.
         stages = [("décision du curateur", kept)]
         stages.append(("périmètre français", apply_geographic_scope(stages[-1][1], config)))
         stages.append(("thème unique", dedupe_across_themes(stages[-1][1], config)))
         stages.append(("classe écartée", apply_class_exclusion(stages[-1][1], config)))
+        stages.append(("sorti de sa liste officielle", apply_list_membership(stages[-1][1], config)))
         stages.append(("accès refusé", apply_access_filter(stages[-1][1], config)))
         stages.append(("accès alpin non prouvé", apply_alpine_filter(stages[-1][1], config)))
         stages.append(("plancher de notoriété", apply_notoriety_floor(stages[-1][1], config)))
+        stages.append(("plafond par commune", apply_commune_cap(stages[-1][1], config)))
+        stages.append(("plafond de thème", apply_theme_cap(stages[-1][1], config)))
         stages.append(("doublon de proximité", dedupe(stages[-1][1])))
         _retained, collections = build_all(kept, config)
     finally:

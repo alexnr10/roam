@@ -1143,6 +1143,47 @@ class TestExplain(unittest.TestCase):
         self.assertIn("plancher de notoriété", output)
         self.assertIn("ÉCARTÉ", output)
 
+    def test_a_place_cut_by_the_commune_cap_says_so(self):
+        # `explain` rejouait sept étapes sur les dix de `build_all` : les deux
+        # plafonds et l'appartenance à une liste officielle manquaient. Il
+        # répondait alors « retenu par tous les filtres, mais dans aucune
+        # collection » à un lieu qu'un plafond avait coupé — c'est arrivé à
+        # l'obélisque de Louxor, trente et une langues, dix mille sept cents
+        # consultations par mois, gardé en revue, septième des monuments
+        # parisiens pour six places. Une réponse fausse coûte plus cher que pas
+        # de réponse.
+        cap = CONFIG.collections.max_per_commune
+        parisiens = []
+        for index in range(cap + 3):
+            lieu = make_place(f"Monument {index}", wikidata_id=f"QP{index}",
+                              theme_id="monuments", sitelinks=40 - index,
+                              lat=48.85 + index / 500, lon=2.35)
+            lieu.departement_code, lieu.region_code = "75", "11"
+            lieu.commune_code, lieu.commune_name = f"751{index % 20 + 1:02d}", "Paris"
+            lieu.has_frwiki, lieu.image_url = True, "x"
+            parisiens.append(lieu)
+        # Le dernier au score est celui que le plafond doit couper.
+        output = self._run(f"monument {cap + 2}", self._catalogue() + parisiens)
+        self.assertIn("plafond par commune", output)
+        self.assertIn("ÉCARTÉ", output)
+
+    def test_every_stage_of_the_build_is_replayed(self):
+        # La liste des étapes de `explain` doit suivre celle de `build_all` :
+        # c'est en la laissant diverger qu'on obtient une réponse fausse.
+        import inspect
+        from roam_pipeline import cli
+        from roam_pipeline.collections import build_all
+
+        source = inspect.getsource(cli.cmd_explain)
+        for filtre in ("apply_geographic_scope", "dedupe_across_themes",
+                       "apply_class_exclusion", "apply_list_membership",
+                       "apply_access_filter", "apply_alpine_filter",
+                       "apply_notoriety_floor", "apply_commune_cap",
+                       "apply_theme_cap", "dedupe"):
+            with self.subTest(filtre):
+                self.assertIn(filtre, inspect.getsource(build_all))
+                self.assertIn(filtre, source)
+
     def test_a_place_never_collected_hands_over_to_probe(self):
         # `explain` ne connaît que le collecté : il ne peut pas dire POURQUOI un
         # lieu n'est jamais entré. Lui faire proposer un remède serait deviner ;
