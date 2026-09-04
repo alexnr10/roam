@@ -225,6 +225,16 @@ class CollectionRules:
     # À quel point un croisement doit être CARACTÉRISTIQUE de son territoire :
     # part du thème sur place, rapportée à sa part dans le pays. `0` désactive.
     min_theme_lift: float = 0.0
+    # Plafonds par commune qui dérogent au plafond général, `{code INSEE de la
+    # ville: {thème: plafond}}`. Le code est celui de la VILLE — 75056 pour
+    # Paris, pas ses vingt arrondissements.
+    #
+    # Une dérogation est une exception ASSUMÉE, écrite en toutes lettres et
+    # limitée à ce qu'elle nomme. Aucune autre commune n'est touchée, aucun
+    # thème non listé ne bouge — c'est ce qui la distingue d'un plafond général
+    # relevé « un peu », qui ferait entrer un septième château dans chaque ville
+    # de France pour régler un problème parisien.
+    commune_overrides: dict[str, dict[str, int]] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -324,6 +334,12 @@ def load_config(config_dir: Path | None = None) -> Config:
         max_theme_share=float(raw["collections"].get("max_theme_share", 0.0)),
         min_diameter_km=float(raw["collections"].get("min_diameter_km", 0.0)),
         min_theme_lift=float(raw["collections"].get("min_theme_lift", 0.0)),
+        commune_overrides={
+            str(ville): {str(t): int(n) for t, n in (plafonds or {}).items()}
+            for ville, plafonds in (
+                raw["collections"].get("commune_overrides") or {}
+            ).items()
+        },
     )
 
     alerts = Alerts(**raw.get("alerts", {"alpine_elevation_m": 2500}))

@@ -196,6 +196,34 @@ collections:
   # Sainte-Chapelle (31e), les musées parisiens écrasant tout avec leurs
   # millions de visiteurs.
   max_per_commune: 6
+
+  # Paris est une exception, et elle est écrite en toutes lettres plutôt que
+  # dissimulée dans un plafond général relevé « un peu » — qui ferait entrer un
+  # septième château dans chaque ville de France pour régler un problème
+  # parisien. Le code est celui de la VILLE, pas de ses vingt arrondissements.
+  #
+  # Six par thème y traitait le pont de Bir-Hakeim comme le Panthéon, alors que
+  # la ville n'est pas également riche en tout. Mesuré sur son vivier au pied du
+  # plafond :
+  #
+  #   jardins  55 candidats, décrochage après le 6e   (109 puis 93)  → laissé
+  #   ponts    34 candidats, décrochage après le 6e   (99 puis 87)   → laissé
+  #   cathédrales 17 candidats : deux sommets, Notre-Dame et le Sacré-Cœur,
+  #            puis un plateau d'églises nationales autour de cent → laissé
+  #   monuments 20 candidats, décrochage après le 8e  (131 puis 114)
+  #   maisons   15 candidats, décrochage après le 10e (102 puis 93)
+  #   musées    80 candidats, AUCUN décrochage : du Louvre à Jacquemart-André,
+  #            trente-deux institutions se suivent sans rupture
+  #
+  # Les musées sont donc le seul cas où le chiffre ne peut pas se lire dans les
+  # données — c'est un arbitrage, et il est serré à huit : « Paris est une ville
+  # de monuments. » Les monuments montent à dix, au-delà de leur décrochage,
+  # pour la même raison.
+  commune_overrides:
+    "75056":            # Paris
+      monuments: 10
+      maisons: 10
+      musees: 8
   # Minimum de lieux par région avant que le plafond de thème ne remplisse au
   # score. Sans lui, les quatre cathédrales des DOM tombaient d'un bloc :
   # seules dans leur région, elles ne sont jamais dans les quatre-vingts

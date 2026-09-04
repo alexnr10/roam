@@ -1152,18 +1152,24 @@ class TestExplain(unittest.TestCase):
         # consultations par mois, gardé en revue, septième des monuments
         # parisiens pour six places. Une réponse fausse coûte plus cher que pas
         # de réponse.
+        # Un thème SANS dérogation parisienne, et une ville sans dérogation :
+        # le test porte sur le plafond général, pas sur l'arbitrage de Paris.
         cap = CONFIG.collections.max_per_commune
-        parisiens = []
+        self.assertNotIn(
+            "ponts", CONFIG.collections.commune_overrides.get("69123", {}),
+            "ce test suppose Lyon sans dérogation sur les ponts",
+        )
+        lyonnais = []
         for index in range(cap + 3):
-            lieu = make_place(f"Monument {index}", wikidata_id=f"QP{index}",
-                              theme_id="monuments", sitelinks=40 - index,
-                              lat=48.85 + index / 500, lon=2.35)
-            lieu.departement_code, lieu.region_code = "75", "11"
-            lieu.commune_code, lieu.commune_name = f"751{index % 20 + 1:02d}", "Paris"
+            lieu = make_place(f"Pont {index}", wikidata_id=f"QP{index}",
+                              theme_id="ponts", sitelinks=40 - index,
+                              lat=45.75 + index / 500, lon=4.85)
+            lieu.departement_code, lieu.region_code = "69", "84"
+            lieu.commune_code, lieu.commune_name = "69381", "Lyon"
             lieu.has_frwiki, lieu.image_url = True, "x"
-            parisiens.append(lieu)
+            lyonnais.append(lieu)
         # Le dernier au score est celui que le plafond doit couper.
-        output = self._run(f"monument {cap + 2}", self._catalogue() + parisiens)
+        output = self._run(f"pont {cap + 2}", self._catalogue() + lyonnais)
         self.assertIn("plafond par commune", output)
         self.assertIn("ÉCARTÉ", output)
 
@@ -4009,8 +4015,12 @@ class TestCommuneCap(unittest.TestCase):
 
     def _cape(self, lieux, cap=6):
         from roam_pipeline.collections import apply_commune_cap
+        # Sans dérogation : ces tests portent sur la RÈGLE GÉNÉRALE. Les laisser
+        # lire celles de la configuration réelle en ferait des tests de Paris,
+        # qui changeraient de sens au prochain arbitrage éditorial.
         config = replace(CONFIG,
-                         collections=replace(CONFIG.collections, max_per_commune=cap))
+                         collections=replace(CONFIG.collections, max_per_commune=cap,
+                                             commune_overrides={}))
         with _capture():
             return apply_commune_cap(lieux, config)
 
@@ -4085,6 +4095,56 @@ class TestCommuneCap(unittest.TestCase):
         gardes = {p.name for p in self._cape(lieux)}
         self.assertIn("Musée 6", gardes)
         self.assertNotIn("Musée 0", gardes)
+
+    def test_a_named_city_may_derogate_theme_by_theme(self):
+        # Six par thème traitait le pont de Bir-Hakeim comme le Panthéon. Paris
+        # n'est pas également riche en tout : ses jardins et ses ponts décrochent
+        # après le sixième, ses musées ne décrochent jamais.
+        from roam_pipeline.collections import apply_commune_cap
+
+        config = replace(CONFIG, collections=replace(
+            CONFIG.collections, max_per_commune=6,
+            commune_overrides={"75056": {"monuments": 10}}))
+        monuments = [self._lieu(f"Monument {i}", "monuments", 100 - i, "Paris", "75101")
+                     for i in range(14)]
+        ponts = [self._lieu(f"Pont {i}", "ponts", 100 - i, "Paris", "75104")
+                 for i in range(14)]
+        with _capture():
+            gardes = apply_commune_cap(monuments + ponts, config)
+        self.assertEqual(sum(1 for p in gardes if p.theme_id == "monuments"), 10)
+        # Le thème non nommé ne bouge pas.
+        self.assertEqual(sum(1 for p in gardes if p.theme_id == "ponts"), 6)
+
+    def test_a_derogation_touches_no_other_city(self):
+        # C'est ce qui la distingue d'un plafond général relevé « un peu », qui
+        # ferait entrer un septième château dans chaque ville de France pour
+        # régler un problème parisien.
+        from roam_pipeline.collections import apply_commune_cap
+
+        config = replace(CONFIG, collections=replace(
+            CONFIG.collections, max_per_commune=6,
+            commune_overrides={"75056": {"monuments": 10}}))
+        paris = [self._lieu(f"Paris {i}", "monuments", 100 - i, "Paris", "75101")
+                 for i in range(12)]
+        lyon = [self._lieu(f"Lyon {i}", "monuments", 100 - i, "Lyon", "69381")
+                for i in range(12)]
+        with _capture():
+            gardes = apply_commune_cap(paris + lyon, config)
+        self.assertEqual(sum(1 for p in gardes if p.commune_name == "Paris"), 10)
+        self.assertEqual(sum(1 for p in gardes if p.commune_name == "Lyon"), 6)
+
+    def test_the_derogation_covers_every_arrondissement(self):
+        # 75101 à 75120 sont une seule ville : une dérogation posée sur 75056
+        # doit valoir pour les vingt, sinon elle ne vaut rien.
+        from roam_pipeline.collections import apply_commune_cap
+
+        config = replace(CONFIG, collections=replace(
+            CONFIG.collections, max_per_commune=6,
+            commune_overrides={"75056": {"monuments": 9}}))
+        lieux = [self._lieu(f"Monument {i}", "monuments", 100 - i, "Paris",
+                            f"751{i % 20 + 1:02d}") for i in range(14)]
+        with _capture():
+            self.assertEqual(len(apply_commune_cap(lieux, config)), 9)
 
     def test_a_place_without_a_commune_is_never_cut(self):
         # Un phare en mer n'a pas de commune : le plafond ne peut rien en dire.

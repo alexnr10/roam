@@ -983,8 +983,8 @@ def apply_commune_cap(places: list[Place], config: Config) -> list[Place]:
     vingt lieux à Paris et deux à Toulouse. C'est la mesure d'une anomalie, pas
     une exception écrite pour une ville.
     """
-    cap = config.collections.max_per_commune
-    if not cap:
+    defaut = config.collections.max_per_commune
+    if not defaut:
         return places
 
     par_commune: dict[tuple[str, str], list[Place]] = defaultdict(list)
@@ -1000,7 +1000,10 @@ def apply_commune_cap(places: list[Place], config: Config) -> list[Place]:
 
     kept = list(sans_commune)
     retires: dict[str, int] = defaultdict(int)
+    derogations = config.collections.commune_overrides
     for (_code, _theme), lot in par_commune.items():
+        # Une dérogation ne vaut que pour le couple ville × thème qu'elle nomme.
+        cap = derogations.get(_code, {}).get(_theme, defaut)
         # Épinglé À LA MAIN veut dire épinglé : une ligne de places.csv est
         # un lieu que le curateur a ajouté lui-même, et le plafond n'a pas à
         # défaire ce geste. Un verdict `keep` pose le même drapeau et ne
@@ -1023,8 +1026,13 @@ def apply_commune_cap(places: list[Place], config: Config) -> list[Place]:
             f"{nom} {n}" for nom, n in sorted(retires.items(), key=lambda kv: -kv[1])[:5]
         )
         LOG.info(
-            "plafond par commune (%s par thème) : %s lieux retirés — %s",
-            cap, total, detail,
+            "plafond par commune (%s par thème%s) : %s lieux retirés — %s",
+            defaut,
+            "".join(
+                f" ; {ville} " + ", ".join(f"{t} {n}" for t, n in sorted(p.items()))
+                for ville, p in sorted(derogations.items())
+            ),
+            total, detail,
         )
     return kept
 
