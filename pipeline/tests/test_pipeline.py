@@ -4242,6 +4242,53 @@ class TestCommuneCap(unittest.TestCase):
         self.assertEqual(len(self._cape(lieux, cap=0)), 9)
 
 
+class TestOrphansAfterCollections(unittest.TestCase):
+    """Un lieu repêché puis jeté faute de collection : le travail est perdu.
+
+    Le Territoire de Belfort est remonté de zéro à CINQ lieux par le repêchage
+    géographique, puis redescendu à UN : quatre n'entraient dans aucune
+    collection. Les deux mécanismes ne se parlent pas — le repêchage vise douze
+    lieux par département, une collection départementale en exige huit — et le
+    journal disait « 4 écartés faute de collection » sans dire lesquels.
+    """
+
+    def _lieu(self, nom, repeche):
+        lieu = make_place(nom, theme_id="sommets", wikidata_id=f"Q{abs(hash(nom)) % 99991}")
+        lieu.departement_code, lieu.geo_rescued = "90", repeche
+        return lieu
+
+    def test_a_rescued_orphan_is_named_and_flagged(self):
+        from roam_pipeline.collections import warn_orphans
+
+        perdus = [self._lieu("Baerenkopf", True), self._lieu("Le Fayé", True)]
+        with self.assertLogs("roam_pipeline.collections", level="WARNING") as journal:
+            self.assertEqual(warn_orphans(perdus, CONFIG), 2)
+        texte = "\n".join(journal.output)
+        self.assertIn("Baerenkopf (90)", texte)
+        self.assertIn("REPÊCHÉS", texte)
+        # Les deux réglages qui se contredisent sont nommés, sinon la ligne
+        # dit le symptôme sans la cause.
+        self.assertIn(str(CONFIG.collections.min_per_departement), texte)
+        self.assertIn(str(CONFIG.collections.min_places), texte)
+
+    def test_an_ordinary_orphan_is_only_named(self):
+        from roam_pipeline.collections import warn_orphans
+
+        # Sans repêchage, ce n'est pas le même défaut : le lieu a simplement
+        # échoué à trouver une collection, et l'avertissement serait à tort
+        # alarmant.
+        with self.assertLogs("roam_pipeline.collections", level="INFO") as journal:
+            self.assertEqual(warn_orphans([self._lieu("Sommet obscur", False)], CONFIG), 0)
+        texte = "\n".join(journal.output)
+        self.assertIn("Sommet obscur", texte)
+        self.assertNotIn("REPÊCHÉS", texte)
+
+    def test_nothing_is_said_when_no_place_is_orphaned(self):
+        from roam_pipeline.collections import warn_orphans
+
+        self.assertEqual(warn_orphans([], CONFIG), 0)
+
+
 class TestLostCollections(unittest.TestCase):
     """Une collection qui disparaît ne dit rien d'elle-même.
 

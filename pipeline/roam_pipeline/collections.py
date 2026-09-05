@@ -1575,10 +1575,51 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
     # Un lieu qui n'entre dans aucune collection ne sert à rien : on le sort.
     used = {cp.place_id for c in collections for cp in c.places}
     retained = [p for p in kept if p.wikidata_id in used]
+    orphelins = [p for p in kept if p.wikidata_id not in used]
     LOG.info(
         "%s collections, %s lieux retenus (%s écartés faute de collection)",
         len(collections),
         len(retained),
-        len(kept) - len(retained),
+        len(orphelins),
     )
+    warn_orphans(orphelins, config)
     return retained, collections
+
+
+def warn_orphans(orphelins: list[Place], config: Config) -> int:
+    """Nomme les lieux qu'aucune collection n'a voulus, et dit lesquels étaient repêchés.
+
+    Le compte seul cachait un cas précis et coûteux : un lieu REPÊCHÉ pour
+    combler un département pauvre, puis jeté ici faute de collection. Les deux
+    mécanismes ne se parlent pas — le repêchage vise douze lieux par
+    département, une collection départementale en exige huit — et un
+    département qui n'atteint ni l'un ni l'autre voit son repêchage
+    entièrement annulé.
+
+    C'est arrivé au Territoire de Belfort : remonté de zéro à CINQ lieux par le
+    repêchage, redescendu à UN ici. Le journal disait « 4 écartés faute de
+    collection » sans dire lesquels, ni que c'étaient les quatre repêchés — on
+    aurait cherché un défaut de collecte là où il n'y en avait aucun.
+
+    Renvoie le nombre de repêchés perdus, pour que l'appelant puisse en juger.
+    """
+    if not orphelins:
+        return 0
+    repeches = [p for p in orphelins if p.geo_rescued]
+    if repeches:
+        LOG.warning(
+            "  dont %s REPÊCHÉS pour combler leur département, puis jetés "
+            "faute de collection : %s. Le repêchage vise %s lieux par "
+            "département, une collection départementale en exige %s — entre "
+            "les deux, le travail est perdu.",
+            len(repeches),
+            ", ".join(f"{p.name} ({p.departement_code})" for p in repeches[:6]),
+            config.collections.min_per_departement,
+            config.collections.min_places,
+        )
+    else:
+        LOG.info(
+            "  écartés : %s",
+            ", ".join(f"{p.name} ({p.departement_code})" for p in orphelins[:6]),
+        )
+    return len(repeches)
