@@ -63,7 +63,8 @@ from .outlines import export as export_outlines
 from .review import (
     CLEAR, DECISIONS, apply_decisions, apply_names, apply_themes, diff_tiers,
     read_decisions, read_names, read_themes, theme_claims, write_themes,
-    read_snapshot, vanished, write_decisions, write_names, write_snapshot,
+    read_snapshot, snapshot_is_safe, snapshot_losses, vanished, write_decisions,
+    write_names, write_snapshot,
 )
 from .score import rescued, score_all, warn_missing_pageviews
 
@@ -1469,13 +1470,25 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
         # `build` sur la machine complète, des centaines de lieux déjà relus
         # reviendraient marqués « nouveau ». Les décisions, elles, s'ajoutent
         # sans rien détruire — on les écrit dans tous les cas.
+        #
+        # Mais la TAILLE du catalogue ne dit pas ça. Elle baisse aussi quand la
+        # curation avance : écarter des lieux, relever un plancher, resserrer
+        # un plafond. Comparer les deux totaux a bloqué la photographie pendant
+        # cinq revues d'affilée — 685 lieux de moins, dont AUCUN perdu par la
+        # machine — et le repère est resté figé au 3 septembre : trois cents
+        # lieux revenaient marqués « nouveau » à chaque construction.
+        #
+        # Le seul signe d'une collecte incomplète est un lieu absent de la
+        # COLLECTE elle-même. Celui qui a quitté le catalogue mais que
+        # `places_raw.json` contient toujours est parti pour une raison connue.
         ancien = read_snapshot(snapshot_path)
-        manque = len(ancien) - len(finales)
-        if ancien and manque > max(20, len(ancien) // 50):
-            print(f"⚠ Niveaux NON enregistrés : ce catalogue compte {len(finales)} "
-                  f"lieux contre {len(ancien)} dans le dernier instantané. "
-                  "Cette machine n'a pas tout collecté ; réécrire les niveaux "
-                  "ferait passer les lieux manquants pour disparus.")
+        vivants = {p.wikidata_id for p in finales}
+        perdus = snapshot_losses(ancien, vivants, set(names))
+        if not snapshot_is_safe(ancien, vivants, set(names)):
+            print(f"⚠ Niveaux NON enregistrés : {len(perdus)} lieux du dernier "
+                  "instantané ont disparu jusque de la COLLECTE. Cette machine "
+                  "n'a pas tout collecté ; réécrire les niveaux ferait passer "
+                  "ces lieux pour disparus.")
             print("  Tes décisions, elles, sont bien enregistrées dans "
                   "decisions.csv — pense à les committer.")
             return status

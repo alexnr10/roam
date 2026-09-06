@@ -385,6 +385,45 @@ def read_snapshot(path: Path) -> dict[str, tuple[int, str]]:
     return snapshot
 
 
+def snapshot_losses(
+    previous: dict[str, tuple[int, str]],
+    kept: set[str],
+    collected: set[str],
+) -> list[str]:
+    """Les disparitions qu'AUCUNE étape du pipeline n'explique.
+
+    Un lieu qui a quitté le catalogue mais que la collecte contient toujours
+    est parti pour une raison connue : une décision du curateur, un plancher
+    relevé, un plafond resserré. Sa disparition est un résultat, pas un
+    accident.
+
+    Un lieu absent jusque de la COLLECTE est le seul signe qui compte : cette
+    machine n'a pas tout téléchargé, et photographier les niveaux ferait passer
+    des centaines de lieux déjà relus pour « nouveaux » à la construction
+    suivante.
+    """
+    return [qid for qid in previous if qid not in kept and qid not in collected]
+
+
+def snapshot_is_safe(
+    previous: dict[str, tuple[int, str]],
+    kept: set[str],
+    collected: set[str],
+) -> bool:
+    """Peut-on photographier les niveaux sans perdre le repère ?
+
+    Comparer les deux TOTAUX, comme on le faisait, confond la curation avec un
+    accident : le catalogue maigrit quand le travail avance. La photographie
+    est restée bloquée cinq revues d'affilée sur un catalogue passé de 2448 à
+    2076 lieux, dont aucun n'avait quitté la collecte — et le repère figé
+    faisait revenir trois cents lieux marqués « nouveau » à chaque
+    construction.
+    """
+    if not previous:
+        return True
+    return len(snapshot_losses(previous, kept, collected)) <= max(20, len(previous) // 50)
+
+
 def write_snapshot(
     path: Path, state: dict[str, tuple[int, str]], names: dict[str, str]
 ) -> None:

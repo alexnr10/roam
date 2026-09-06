@@ -4341,6 +4341,54 @@ class TestCrowdedTier1(unittest.TestCase):
         self.assertEqual(warn_crowded_tier1([juste], CONFIG), [])
 
 
+class TestSnapshotGuard(unittest.TestCase):
+    """Le repère de la dernière revue s'est figé au 3 septembre.
+
+    La photographie des niveaux refusait de s'écrire dès que le catalogue avait
+    maigri d'un cinquantième — une protection contre une machine qui n'aurait
+    pas tout collecté. Mais le catalogue maigrit AUSSI quand le travail avance :
+    écarter des lieux, relever un plancher, resserrer un plafond. Il est passé
+    de 2448 à 2076 lieux sans qu'aucun ne quitte la collecte, la photographie
+    est restée bloquée cinq revues d'affilée, et trois cents lieux revenaient
+    marqués « nouveau » à chaque construction.
+    """
+
+    @staticmethod
+    def _instantane(n):
+        return {f"Q{i}": (1, "chateaux") for i in range(n)}
+
+    def test_curation_never_blocks_the_snapshot(self):
+        from roam_pipeline.review import snapshot_is_safe, snapshot_losses
+
+        ancien = self._instantane(2448)
+        collecte = set(ancien)              # la collecte les contient tous
+        garde = {f"Q{i}" for i in range(2076)}   # 372 écartés par la curation
+        self.assertEqual(snapshot_losses(ancien, garde, collecte), [])
+        self.assertTrue(snapshot_is_safe(ancien, garde, collecte))
+
+    def test_an_incomplete_collect_still_blocks_it(self):
+        from roam_pipeline.review import snapshot_is_safe, snapshot_losses
+
+        ancien = self._instantane(2448)
+        # Une machine qui n'a téléchargé que la moitié : les absents manquent
+        # jusque dans la collecte, et rien n'explique leur disparition.
+        collecte = {f"Q{i}" for i in range(1200)}
+        self.assertEqual(len(snapshot_losses(ancien, collecte, collecte)), 1248)
+        self.assertFalse(snapshot_is_safe(ancien, collecte, collecte))
+
+    def test_a_handful_of_losses_is_tolerated(self):
+        from roam_pipeline.review import snapshot_is_safe
+
+        ancien = self._instantane(100)
+        collecte = {f"Q{i}" for i in range(85)}
+        self.assertTrue(snapshot_is_safe(ancien, collecte, collecte))
+
+    def test_the_first_snapshot_is_always_written(self):
+        from roam_pipeline.review import snapshot_is_safe
+
+        self.assertTrue(snapshot_is_safe({}, set(), set()))
+
+
 class TestSurprisingPromotions(unittest.TestCase):
     """« Je ne pensais pas qu'ils monteraient si haut. »
 
