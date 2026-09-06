@@ -7,7 +7,7 @@ import type { ZoneConquest, ZoneShade } from '../../src/lib/conquest';
 import { useVisits } from '../../src/store/visits';
 import { colors, conquest, radius, spacing, type } from '../../src/theme';
 import { ConquestMap, conquestOutlinesExist } from '../../src/ui/ConquestMap';
-import { ChipRow, EmptyState, Pill, ProgressBar } from '../../src/ui/components';
+import { BackBar, ChipRow, EmptyState, Pill, ProgressBar } from '../../src/ui/components';
 import { SegmentedControl } from '../../src/ui/components';
 import type { AreaLevel } from '../../src/types';
 
@@ -109,6 +109,9 @@ export default function ConquestScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.controls}>
+        {/* La conquête n'est plus un onglet : on y entre depuis « Moi », et il
+            faut donc pouvoir en ressortir. */}
+        <BackBar />
         <SegmentedControl
           options={LEVELS.map(({ value, label }) => ({ value, label }))}
           value={level}

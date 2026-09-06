@@ -27,13 +27,17 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="collections"
-        options={{ title: 'Collections', tabBarIcon: icon('🎯') }}
+        options={{ title: 'Explorer', tabBarIcon: icon('🧭') }}
       />
+      {/* La conquête reste un écran, plus un onglet : c'est une récompense, et
+          une récompense ne réclame pas le quart de la barre. On y entre depuis
+          « Moi ». Trois onglets valent mieux que quatre — chacun devient plus
+          large, donc plus facile à atteindre du pouce. */}
       <Tabs.Screen
         name="conquete"
-        options={{ title: 'Conquête', tabBarIcon: icon('🚩') }}
+        options={{ href: null, title: 'Conquête', headerShown: false }}
       />
-      <Tabs.Screen name="profil" options={{ title: 'Profil', tabBarIcon: icon('🎖️') }} />
+      <Tabs.Screen name="profil" options={{ title: 'Moi', tabBarIcon: icon('🎖️') }} />
     </Tabs>
   );
 }

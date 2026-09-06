@@ -56,6 +56,7 @@ export function MapCanvas({
   onSelectPlace,
   highlightedId,
   focus,
+  onDeselect,
 }: MapCanvasProps) {
   const container = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreMap | null>(null);
@@ -64,9 +65,11 @@ export function MapCanvas({
   // mais doit toujours voir la liste courante.
   const byId = useRef(new Map<string, Place>());
   const onSelect = useRef(onSelectPlace);
+  const onVide = useRef(onDeselect);
 
   byId.current = new Map(places.map((place) => [place.id, place]));
   onSelect.current = onSelectPlace;
+  onVide.current = onDeselect;
 
   const [degraded, setDegraded] = useState(false);
   // WebGL2 manque encore sur quelques WebViews Android et sur les machines
@@ -229,6 +232,15 @@ export function MapCanvas({
       // laissait la moitié des lieux hors du cadre : le centre d'un groupe
       // n'est pas le centre de son emprise, et le zoom d'éclatement ne dit rien
       // de son étendue. On récupère donc les lieux du paquet et on cadre dessus.
+      // Toucher le fond referme la fiche : les gestionnaires de couche ne
+      // disent que ce qu'on a touché, jamais ce qu'on a quitté.
+      instance.on('click', (event: MapLayerMouseEvent) => {
+        const dessus = instance.queryRenderedFeatures(event.point, {
+          layers: ['place-hit', 'clusters'],
+        });
+        if (dessus.length === 0) onVide.current?.();
+      });
+
       instance.on('click', 'clusters', async (event: MapLayerMouseEvent) => {
         const feature = event.features?.[0];
         const clusterId = feature?.properties?.cluster_id;

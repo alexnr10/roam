@@ -32,6 +32,14 @@ export type MapCanvasProps = {
   highlightedId?: string | null;
   /** Lieu sur lequel recentrer la carte, quand le choix vient d'ailleurs. */
   focus?: { lat: number; lon: number } | null;
+  /**
+   * La carte a été touchée AILLEURS que sur un point.
+   *
+   * Sans ce signal, la fiche ouverte par un point restait à l'écran sans
+   * qu'aucun geste ne la referme : le bandeau des lieux voisins disparaissait
+   * pour de bon, et il fallait changer d'onglet pour le retrouver.
+   */
+  onDeselect?: () => void;
 };
 
 /**
@@ -58,6 +66,7 @@ export function MapCanvas({
   onSelectPlace,
   highlightedId,
   focus,
+  onDeselect,
 }: MapCanvasProps) {
   if (!Maps) {
     return (
@@ -93,6 +102,7 @@ export function MapCanvas({
       onSelectPlace={onSelectPlace}
       highlightedId={highlightedId}
       focus={focus}
+      onDeselect={onDeselect}
     />
   );
 }
@@ -112,6 +122,7 @@ function NativeMap({
   onSelectPlace,
   highlightedId,
   focus,
+  onDeselect,
 }: {
   MapView: typeof import('react-native-maps').default;
   Marker: typeof import('react-native-maps').Marker;
@@ -121,6 +132,7 @@ function NativeMap({
   onSelectPlace: (place: Place) => void;
   highlightedId?: string | null;
   focus?: { lat: number; lon: number } | null;
+  onDeselect?: () => void;
 }) {
   const [cadre, setCadre] = useState<Cadre | null>(null);
   const vue = useRef<import('react-native-maps').default | null>(null);
@@ -155,6 +167,9 @@ function NativeMap({
       showsUserLocation
       showsMyLocationButton
       toolbarEnabled={false}
+      // `onPress` de la carte ne se déclenche PAS sur un marqueur : toucher le
+      // fond veut donc dire « je regarde autre chose ».
+      onPress={() => onDeselect?.()}
       onRegionChangeComplete={(vue: {
         latitude: number;
         longitude: number;

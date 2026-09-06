@@ -107,6 +107,10 @@ export default function MapScreen() {
           visitedIds={visitedIds}
           position={position}
           onSelectPlace={setChoisi}
+          // Toucher la carte à côté d'un point rend le bandeau : sans ce
+          // retour, la fiche restait ouverte pour de bon et les lieux voisins
+          // disparaissaient jusqu'au changement d'onglet.
+          onDeselect={() => setChoisi(null)}
           highlightedId={enAvant?.id ?? suggestion?.id ?? null}
           focus={enAvant ? { lat: enAvant.lat, lon: enAvant.lon } : null}
         />

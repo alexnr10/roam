@@ -1,161 +1,211 @@
 import { useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { collections, getPlacesInCollection } from '../../src/data/catalog';
-import { computeProgress, nextMilestone } from '../../src/lib/progress';
 import {
-  byProgressThenDistance, formatDistance, rank, shortlists, type Ranked,
-} from '../../src/lib/shortlist';
+  areas,
+  collections,
+  getPlacesInCollection,
+  places as toutes,
+} from '../../src/data/catalog';
+import { autourDeToi, chercheCollections, parRegion, territoireDe } from '../../src/lib/explorer';
 import { useLocation } from '../../src/lib/useLocation';
-import { useVisits } from '../../src/store/visits';
 import { colors, radius, spacing, type } from '../../src/theme';
-import { Pill, ProgressBar } from '../../src/ui/components';
-import type { CollectionKind } from '../../src/types';
+import { Photo, SearchField } from '../../src/ui/components';
+import type { Collection } from '../../src/types';
 
 /**
- * Deux cent quatre-vingts collections, et trois questions pour les ranger.
+ * Explorer : trouver quoi faire ici, ou là où l'on va.
  *
- * Le tri par progression décroissante ne triait RIEN tant qu'aucun lieu
- * n'était collecté : tout valait 0 %, et l'ordre des cartes était celui du
- * fichier. Le nouvel arrivant voyait 253 collections géographiques sans le
- * moindre principe d'organisation.
+ * L'écran affichait deux cents collections à plat, dont cent soixante-dix
+ * géographiques. « Le meilleur du Cantal » n'intéresse que deux personnes :
+ * celle qui y habite et celle qui prépare d'y aller — les montrer toutes ne
+ * s'adresse donc à personne.
+ *
+ * Trois portes remplacent la liste : là où tu es, là où tu vas (par le nom),
+ * et le reste par région — dix-huit portes au lieu de cent soixante-dix.
+ *
+ * La progression n'apparaît plus ici. Elle a sa place dans « Moi » : c'est une
+ * récompense, et ce n'est pas ce qu'on vient chercher quand on cherche où
+ * aller ce week-end.
  */
-const SECTIONS: Array<{ kind: CollectionKind; title: string; blurb: string }> = [
-  { kind: 'theme', title: 'Par thème', blurb: 'Châteaux, cascades, sommets…' },
-  { kind: 'label', title: 'Par label', blurb: 'Les listes officielles, déjà curées' },
-  { kind: 'geo', title: 'Par géographie', blurb: 'Ta région, ton département, le pays' },
-];
-
-export default function CollectionsScreen() {
+export default function ExplorerScreen() {
   const router = useRouter();
-  const { visits } = useVisits();
   const { position } = useLocation();
+  const [query, setQuery] = useState('');
+  const [region, setRegion] = useState<string | null>(null);
 
-  const classe = useMemo(
-    () => rank(
-      collections,
-      (collection) => computeProgress(collection, visits),
-      getPlacesInCollection,
-      position,
-    ),
-    [visits, position],
+  const ici = useMemo(() => territoireDe(toutes, position), [position]);
+  const proches = useMemo(
+    () => autourDeToi(collections, ici.departement, ici.region),
+    [ici.departement, ici.region],
   );
+  const territoires = useMemo(
+    () => parRegion(collections, areas.region, areas.departement),
+    [],
+  );
+  const trouvees = useMemo(() => chercheCollections(collections, query), [query]);
+  const enRecherche = query.trim().length >= 2;
 
-  const { almostDone, nearby, rest } = useMemo(() => shortlists(classe), [classe]);
+  const themes = collections.filter((c) => c.kind === 'theme');
+  const labels = collections.filter((c) => c.kind === 'label');
 
   return (
     <ScrollView
       style={{ backgroundColor: colors.bg }}
       contentContainerStyle={{ padding: spacing.lg, paddingBottom: spacing.xxl }}
+      keyboardShouldPersistTaps="handled"
     >
-      <Bloc
-        titre="À un lieu près"
-        blurb="Il ne te manque presque rien — où que ce soit"
-        items={almostDone}
-        router={router}
-      />
-      <Bloc
-        titre="Près de toi"
-        blurb="Ce que tu peux aller voir ce week-end"
-        items={nearby}
-        router={router}
+      <SearchField
+        value={query}
+        onChange={setQuery}
+        placeholder="Une région, un département, un thème"
       />
 
-      {SECTIONS.map((section) => {
-        const items = rest
-          .filter((r) => r.collection.kind === section.kind)
-          .sort(byProgressThenDistance);
-        return (
+      {enRecherche ? (
+        <Bloc
+          titre={`${trouvees.length} collection${trouvees.length > 1 ? 's' : ''}`}
+          items={trouvees}
+          router={router}
+        />
+      ) : (
+        <>
+          {proches.length ? (
+            <Bloc
+              titre="Autour de toi"
+              blurb="Ce qu'il y a à voir dans ton département, puis dans ta région"
+              items={proches}
+              router={router}
+            />
+          ) : null}
+
           <Bloc
-            key={section.kind}
-            titre={section.title}
-            blurb={section.blurb}
-            items={items}
+            titre="Par thème"
+            blurb="Châteaux, cascades, sommets — la colonne vertébrale du guide"
+            items={themes}
             router={router}
           />
-        );
-      })}
+
+          <Bloc
+            titre="Les listes officielles"
+            blurb="Déjà curées par d'autres : Plus Beaux Villages, UNESCO, Grands Sites"
+            items={labels}
+            router={router}
+          />
+
+          <Text style={type.heading}>Par région</Text>
+          <Text style={[type.small, { marginBottom: spacing.md }]}>
+            Pour préparer un voyage — touche une région pour voir ses collections
+          </Text>
+          {territoires.map((territoire) => (
+            <View key={territoire.code}>
+              <Pressable
+                style={styles.region}
+                onPress={() =>
+                  setRegion(region === territoire.code ? null : territoire.code)
+                }
+              >
+                <Text style={type.subheading}>{territoire.nom}</Text>
+                <Text style={type.small}>
+                  {territoire.collections.length} · {region === territoire.code ? '▾' : '▸'}
+                </Text>
+              </Pressable>
+              {region === territoire.code
+                ? territoire.collections.map((collection) => (
+                    <Carte key={collection.slug} collection={collection} router={router} />
+                  ))
+                : null}
+            </View>
+          ))}
+        </>
+      )}
     </ScrollView>
   );
 }
 
 function Bloc({
-  titre, blurb, items, router,
+  titre,
+  blurb,
+  items,
+  router,
 }: {
   titre: string;
-  blurb: string;
-  items: Ranked[];
+  blurb?: string;
+  items: Collection[];
   router: ReturnType<typeof useRouter>;
 }) {
   if (items.length === 0) return null;
   return (
-    <View style={{ marginBottom: spacing.xl }}>
+    <View style={{ marginTop: spacing.xl }}>
       <Text style={type.heading}>{titre}</Text>
-      <Text style={[type.small, { marginBottom: spacing.md }]}>{blurb}</Text>
-      {items.map((item) => (
-        <Carte key={item.collection.slug} item={item} router={router} />
+      {blurb ? <Text style={[type.small, { marginBottom: spacing.md }]}>{blurb}</Text> : null}
+      {items.map((collection) => (
+        <Carte key={collection.slug} collection={collection} router={router} />
       ))}
     </View>
   );
 }
 
+/**
+ * Une collection se montre par une photo, pas par une barre de progression.
+ *
+ * On choisit d'aller quelque part parce qu'on a vu à quoi ça ressemble. La
+ * vignette est celle du lieu le mieux classé — c'est aussi la promesse la plus
+ * honnête qu'une collection puisse faire.
+ */
 function Carte({
-  item, router,
+  collection,
+  router,
 }: {
-  item: Ranked;
+  collection: Collection;
   router: ReturnType<typeof useRouter>;
 }) {
-  const { collection, progress } = item;
-  const { stage } = progress;
-  const milestone = nextMilestone(progress);
-  const distance = formatDistance(item.distanceM);
+  const tete = useMemo(() => {
+    const membres = getPlacesInCollection(collection);
+    return membres.find((place) => place.imageUrl) ?? membres[0] ?? null;
+  }, [collection]);
+
   return (
     <Pressable
-      style={styles.card}
+      style={styles.carte}
       onPress={() => router.push(`/collection/${collection.slug}`)}
     >
-      <View style={styles.cardHead}>
-        <Text style={type.subheading} numberOfLines={1}>
+      <Photo
+        url={tete?.imageUrl}
+        themeId={tete?.themeId ?? collection.themeId ?? 'monuments'}
+        width={72}
+        height={72}
+      />
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={type.subheading} numberOfLines={2}>
           {collection.name}
         </Text>
-        {/* Le niveau, pas le pourcentage global : « N1 5/8 » se lit comme un
-            palier à portée, « 45,5 % » comme une corvée à moitié faite. */}
-        <Text style={styles.pct}>
-          N{stage.tier} {stage.visited}/{stage.total}
-        </Text>
-      </View>
-
-      <ProgressBar pct={stage.pct} />
-
-      <View style={styles.cardFoot}>
         <Text style={type.small}>
-          {progress.visited}/{progress.total} au total
-          {distance ? ` · à ${distance}` : ''}
+          {collection.placeCount} lieux · {collection.tierCounts[0]} incontournables
         </Text>
-        {progress.complete ? (
-          <Pill label="Terminée" tone="verified" />
-        ) : milestone ? (
-          <Text style={type.small}>
-            encore {milestone.remaining} lieu{milestone.remaining > 1 ? 'x' : ''}
-          </Text>
-        ) : null}
       </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
+  carte: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: radius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    gap: spacing.sm,
+    padding: spacing.sm,
+    marginBottom: spacing.sm,
   },
-  cardHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  pct: { ...type.subheading, marginLeft: 'auto', color: colors.primary },
-  cardFoot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  region: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+  },
 });

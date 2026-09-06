@@ -1,17 +1,21 @@
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { buildLabel } from '../../src/lib/build';
 import { collections, places } from '../../src/data/catalog';
-import { computeProgress, earnedBadges, type Badge } from '../../src/lib/progress';
+import { computeProgress, earnedBadges, nextMilestone, type Badge } from '../../src/lib/progress';
+import { rank, shortlists } from '../../src/lib/shortlist';
+import { useLocation } from '../../src/lib/useLocation';
+import { getPlacesInCollection } from '../../src/data/catalog';
 import { useVisits } from '../../src/store/visits';
 import { colors, radius, spacing, type } from '../../src/theme';
-import { Button, Card, EmptyState, Pill } from '../../src/ui/components';
+import { Button, Card, EmptyState, Pill, ProgressBar } from '../../src/ui/components';
 
 export default function ProfileScreen() {
   const { visits, reset } = useVisits();
   const router = useRouter();
+  const { position } = useLocation();
 
   const verified = visits.filter((visit) => visit.verified).length;
 
@@ -20,6 +24,18 @@ export default function ProfileScreen() {
       earnedBadges(collection, computeProgress(collection, visits)),
     );
   }, [visits]);
+
+  // Ce qui est presque fini : le seul classement de collections qui donne
+  // envie d'aller quelque part une fois qu'on collectionne déjà.
+  const aUnLieuPres = useMemo(() => {
+    const classe = rank(
+      collections,
+      (collection) => computeProgress(collection, visits),
+      getPlacesInCollection,
+      position,
+    );
+    return shortlists(classe, 3).almostDone;
+  }, [visits, position]);
 
   const confirmReset = () =>
     Alert.alert(
@@ -42,6 +58,50 @@ export default function ProfileScreen() {
         <Stat value={verified} label="dont vérifiés GPS" />
         <Stat value={badges.length} label="badges" />
       </View>
+
+      {/* La conquête et le quadrillage vivent ici : ce sont des récompenses, et
+          une récompense ne réclame pas le quart de la barre d'onglets. */}
+      <Card style={{ marginBottom: spacing.lg, gap: spacing.sm }}>
+        <Text style={type.subheading}>Ta carte de conquête</Text>
+        <Text style={type.small}>
+          Les départements et les régions se colorent à mesure que tu termines leurs
+          collections.
+        </Text>
+        <Button
+          label="Voir la carte"
+          tone="secondary"
+          onPress={() => router.push('/conquete')}
+        />
+      </Card>
+
+      {aUnLieuPres.length ? (
+        <View style={{ marginBottom: spacing.lg }}>
+          <Text style={type.heading}>À un lieu près</Text>
+          <Text style={[type.small, { marginBottom: spacing.md }]}>
+            Il ne te manque presque rien — où que ce soit
+          </Text>
+          {aUnLieuPres.map((item) => {
+            const jalon = nextMilestone(item.progress);
+            return (
+              <Pressable
+                key={item.collection.slug}
+                style={styles.presque}
+                onPress={() => router.push(`/collection/${item.collection.slug}`)}
+              >
+                <Text style={type.subheading} numberOfLines={1}>
+                  {item.collection.name}
+                </Text>
+                <ProgressBar pct={item.progress.stage.pct} />
+                <Text style={type.small}>
+                  {jalon
+                    ? `encore ${jalon.remaining} lieu${jalon.remaining > 1 ? 'x' : ''}`
+                    : 'terminée'}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      ) : null}
 
       {/* Le quadrillage, à portée du premier écran : une application de
           collection qui démarre à zéro ne dit rien de son propriétaire, alors
@@ -121,6 +181,15 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   statValue: { fontSize: 26, fontWeight: '700', color: colors.primary },
+  presque: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    gap: spacing.sm,
+  },
   badges: { gap: spacing.sm },
   badge: {
     flexDirection: 'row',
