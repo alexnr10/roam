@@ -381,6 +381,24 @@ class TestTiers(unittest.TestCase):
         self.assertEqual(tier, 1)
         self.assertEqual(naturel, 2)
 
+    def test_a_promotion_that_buys_an_entry_does_not_also_lift(self):
+        # Un clic ne fait qu'une chose. Le pont du Port-à-l'Anglais,
+        # quarante et unième des quarante-deux ponts par le score, entrait au
+        # niveau 1 : le budget du niveau 2 n'était pas épuisé quand son tour
+        # venait — les promotions précédentes l'avaient vidé vers le niveau 1 —
+        # il y prenait donc une place, et son propre déplacement le montait
+        # encore d'un cran.
+        places = [make_place(f"P{i}", sitelinks=200 - i) for i in range(30)]
+        score_all(places, CONFIG)
+        entrant = sorted(places, key=lambda p: -p.score)[10]
+        entrant.tier_shift = -1
+        niveaux = {p.wikidata_id: (tier, naturel)
+                   for p, tier, _rang, naturel in assign_tiers(
+                       places, CONFIG.tiers,
+                       sans_deplacement={entrant.wikidata_id})}
+        # Son rang lui vaut le niveau 2, et il y reste : l'entrée est payée.
+        self.assertEqual(niveaux[entrant.wikidata_id], (2, 2))
+
     def test_a_promotion_that_changes_nothing_says_so(self):
         # Remonter un lieu qui valait déjà le niveau 1 ne fait rien. La revue
         # doit pouvoir le dire : c'est une décision à effacer, pas à garder.
@@ -2539,9 +2557,10 @@ class TestTierChanges(unittest.TestCase):
         # clic sur la même flèche ramène au rang naturel.
         self.assertIn("function fleche(p, d, act)", body)
         self.assertIn("Annuler : le ramènerait au niveau", body)
-        # Hors de la collection nationale, monter fait d'abord ENTRER : le
-        # niveau 3 est alors hors d'atteinte, et la flèche le dit.
-        self.assertIn("N1-2", body)
+        # Hors de la collection nationale, monter fait ENTRER et rien de
+        # plus : la flèche ne promet aucun niveau, elle annonce l'entrée.
+        self.assertIn('const suffixe = entrant ? " entrer"', body)
+        self.assertIn("Le ferait ENTRER dans la collection nationale, à son rang", body)
         self.assertIn("sans ta décision", body)
         # Et retrouver ses propres promotions est un filtre à part entière.
         self.assertIn('<option value="promote">Montés par moi</option>', body)
@@ -4486,6 +4505,18 @@ class TestSurprisingPromotions(unittest.TestCase):
         with self.assertLogs("roam_pipeline.collections", level="INFO") as journal:
             self.assertEqual(warn_surprising_promotions(lieux, [collection]), [])
         self.assertIn("sans effet", "\n".join(journal.output))
+
+    def test_an_entry_is_never_called_a_promotion_without_effect(self):
+        # Une promotion qui a fait ENTRER n'est pas sans effet : elle a payé
+        # l'entrée, c'est pour cela qu'elle ne monte pas — et le niveau égale
+        # le rang par construction.
+        from roam_pipeline.collections import warn_surprising_promotions
+
+        lieux = [self._lieu("Q1", -1)]
+        collection = self._collection([("Q1", 2, 2)])
+        collection.places[0].forced = True
+        with _capture():
+            self.assertEqual(warn_surprising_promotions(lieux, [collection]), [])
 
     def test_geographic_collections_are_left_alone(self):
         # Le niveau y est relatif à un territoire, pas à la France : y monter

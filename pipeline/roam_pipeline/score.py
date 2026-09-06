@@ -222,7 +222,8 @@ def derive_criteria(place: Place, config: Config) -> list[str]:
 
 
 def assign_tiers(
-    ranked: list[Place], tiers: Tiers, ordre: Callable[[Place], Any] | None = None
+    ranked: list[Place], tiers: Tiers, ordre: Callable[[Place], Any] | None = None,
+    sans_deplacement: set[str] | None = None,
 ) -> list[tuple[Place, int, int, int]]:
     """Attribue un niveau à chaque lieu d'une collection, par rang décroissant.
 
@@ -255,6 +256,14 @@ def assign_tiers(
     ce que la revue doit montrer : un `promote` déplace d'un cran, mais rien
     sur la fiche ne disait de quel cran on partait, et remonter un lieu dont
     le rang naturel était déjà le second le portait au niveau 1 par surprise.
+
+    `sans_deplacement` nomme les lieux dont la promotion a déjà servi : ceux
+    qu'elle a fait ENTRER dans la collection. Un clic ne fait qu'une chose. Le
+    pont du Port-à-l'Anglais, quarante et unième des quarante-deux ponts par le
+    score, entrait au niveau 1 : le budget du niveau 2 n'était pas épuisé quand
+    son tour venait — les promotions précédentes l'avaient vidé vers le niveau
+    1 — il y prenait donc une place, et son propre déplacement le montait
+    encore d'un cran. La promotion paie l'entrée, pas le rang.
     """
     ordered = sorted(ranked, key=ordre or (lambda p: (-p.score, p.name)))
     juges: list[tuple[Place, int, int]] = []
@@ -269,7 +278,8 @@ def assign_tiers(
         else:
             tier = 3
         naturel = tier
-        tier = min(3, max(1, tier + place.tier_shift))
+        if not sans_deplacement or place.wikidata_id not in sans_deplacement:
+            tier = min(3, max(1, tier + place.tier_shift))
         # Les places se comptent sur le niveau FINAL, pas sur celui qu'on aurait
         # donné sans la décision. Autrement un lieu descendu occuperait une
         # place de niveau 1 sans y figurer, et le lieu suivant se retrouverait

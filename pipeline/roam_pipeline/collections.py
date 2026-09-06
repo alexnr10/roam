@@ -417,7 +417,8 @@ def _finalize(
     collection.places = [
         CollectionPlace(place_id=place.wikidata_id, tier=tier, rank=rank,
                         forced=place.wikidata_id in forces, natural_tier=naturel)
-        for place, tier, rank, naturel in assign_tiers(ordered, config.tiers, ordre)
+        for place, tier, rank, naturel in assign_tiers(
+            ordered, config.tiers, ordre, sans_deplacement=forces)
     ]
     return collection
 
@@ -1673,7 +1674,10 @@ def warn_surprising_promotions(
                 continue
             if cp.tier == 1 and cp.natural_tier == 2:
                 montes.append((collection.name, place))
-            elif cp.tier == cp.natural_tier:
+            elif cp.tier == cp.natural_tier and not cp.forced:
+                # Un lieu ENTRÉ par sa promotion n'est jamais « sans effet » :
+                # elle a payé son entrée, c'est pour cela qu'elle ne le monte
+                # pas — et son niveau égale son rang par construction.
                 inutiles.append(place)
 
     if montes:

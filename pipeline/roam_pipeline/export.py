@@ -926,16 +926,16 @@ function fleche(p, d, act) {
   const cible = on ? p.naturalTier : apres(p, act);
   const signe = act === "promote" ? "↑" : "↓";
   // Un lieu hors de la collection nationale n'a pas de rang à déplacer : le
-  // monter l'y fait d'abord ENTRER, puis le déplace d'un cran depuis le rang
-  // que son score lui vaut. Il ne peut donc pas arriver au niveau 3 — 83 des
-  // 109 promotions sont au niveau 2, les 26 autres au niveau 1.
+  // monter l'y fait ENTRER, et rien de plus. La promotion paie l'entrée — le
+  // pont du Port-à-l'Anglais, quarante et unième des quarante-deux ponts par
+  // le score, arrivait sinon au niveau 1.
   const entrant = !p.national && act === "promote";
   const titre = entrant
-    ? "Le ferait ENTRER dans la collection nationale, au niveau 2 — ou 1 si son score le place en tête"
+    ? "Le ferait ENTRER dans la collection nationale, à son rang — un clic fait une chose : il entre, il ne monte pas"
     : !cible ? "Faire descendre"
     : on ? `Annuler : le ramènerait au niveau ${cible}`
          : `Le porterait au niveau ${cible}`;
-  const suffixe = entrant ? " N1-2" : cible ? " N" + cible : "";
+  const suffixe = entrant ? " entrer" : cible ? " N" + cible : "";
   return `<button data-act="${act}"${on ? ` data-on="${act}"` : ""}`
     + ` title="${titre}">${signe}${suffixe}</button>`;
 }
@@ -1006,7 +1006,9 @@ function card(p) {
         </div>
       ${p.forced
         ? `<div class="found">Entré dans la collection nationale par ta
-             décision : son score le laissait sous le plafond du thème.</div>`
+             décision : son score le laissait sous le plafond du thème. Il y
+             entre à son RANG — ta promotion paie l'entrée, elle ne monte
+             pas.</div>`
         : p.shift ? `<div class="found">Déplacé par toi :
         ${p.shift < 0 ? "monté" : "descendu"} d'un niveau${
           p.naturalTier && p.national
