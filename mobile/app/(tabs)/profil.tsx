@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -10,6 +11,7 @@ import { Button, Card, EmptyState, Pill } from '../../src/ui/components';
 
 export default function ProfileScreen() {
   const { visits, reset } = useVisits();
+  const router = useRouter();
 
   const verified = visits.filter((visit) => visit.verified).length;
 
@@ -40,6 +42,19 @@ export default function ProfileScreen() {
         <Stat value={verified} label="dont vérifiés GPS" />
         <Stat value={badges.length} label="badges" />
       </View>
+
+      {/* Le quadrillage, à portée du premier écran : une application de
+          collection qui démarre à zéro ne dit rien de son propriétaire, alors
+          que la moitié de ce qu'il a vu dans sa vie est au catalogue. */}
+      <Card style={{ marginBottom: spacing.lg, gap: spacing.sm }}>
+        <Text style={type.subheading}>Tu y es sûrement déjà allé</Text>
+        <Text style={type.small}>
+          {places.length} lieux au catalogue, et une vie de voyages derrière toi. Passe-les
+          en photos et coche ce que tu reconnais — c'est plus rapide que de les chercher
+          un par un.
+        </Text>
+        <Button label="Reconnaître mes lieux" onPress={() => router.push('/reconnaitre')} />
+      </Card>
 
       <Text style={[type.heading, { marginBottom: spacing.md }]}>Badges</Text>
 

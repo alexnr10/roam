@@ -27,6 +27,7 @@ export default function RootLayout() {
               écrans portent leur propre `BackBar`, qui marche partout. */}
           <Stack.Screen name="place/[id]" options={{ headerShown: false }} />
           <Stack.Screen name="collection/[slug]" options={{ headerShown: false }} />
+          <Stack.Screen name="reconnaitre" options={{ headerShown: false }} />
         </Stack>
         </CelebrationProvider>
       </VisitsProvider>

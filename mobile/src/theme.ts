@@ -49,7 +49,14 @@ export const type = {
   tiny: { fontSize: 11, color: colors.muted, letterSpacing: 0.4 },
 };
 
-/** Emoji par thème — provisoire, à remplacer par un jeu d'icônes dessiné. */
+/**
+ * Emoji par thème — provisoire, à remplacer par un jeu d'icônes dessiné.
+ *
+ * Les vingt-trois thèmes y figurent, et il le faut : l'emoji sert de repli
+ * quand un lieu n'a pas de photo ou qu'elle ne charge pas, et dix thèmes sans
+ * entrée affichaient un 📍 anonyme — le quadrillage en montrait des grilles
+ * entières.
+ */
 export const themeEmoji: Record<string, string> = {
   chateaux: '🏰',
   abbayes: '⛪',
@@ -64,4 +71,14 @@ export const themeEmoji: Record<string, string> = {
   ponts: '🌉',
   phares: '🗼',
   monuments: '🗿',
+  musees: '🖼️',
+  maisons: '🏡',
+  jardins: '🌷',
+  megalithes: '🪨',
+  iles: '🏝️',
+  volcans: '🌋',
+  forets: '🌲',
+  cirques: '🗻',
+  'dunes-marais': '🏖️',
+  rochers: '🧗',
 };

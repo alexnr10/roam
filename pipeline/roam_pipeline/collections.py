@@ -739,6 +739,43 @@ def _geo_code(place: Place, level: str) -> str | None:
     return None
 
 
+def fix_region_codes(places: list[Place]) -> list[Place]:
+    """Rend son vrai code de région à un lieu que Wikidata range à l'ancienne.
+
+    Le code de région se déduit normalement du département. Quand ce chemin
+    échoue, le rattachement se rabat sur la valeur brute de Wikidata — et
+    celle-ci porte parfois la nomenclature d'AVANT 2016 : la Corse en « 92 »
+    (l'ancien code de Provence-Alpes-Côte d'Azur), le lac du Der en « 21 »
+    (Champagne-Ardenne). Sept lieux du catalogue portaient un code que le
+    répertoire des régions ne connaît pas.
+
+    Un code inconnu n'est pas anodin : il exclut le lieu des collections de sa
+    région et de la carte de conquête, silencieusement, puisqu'aucune région ne
+    porte ce numéro. On le recalcule depuis le département, et on l'efface
+    plutôt que de le garder faux.
+    """
+    connues = regions()
+    corriges: list[tuple[Place, str]] = []
+    for place in places:
+        if not place.region_code or place.region_code in connues:
+            continue
+        zone = region_of(place.departement_code) if place.departement_code else None
+        corriges.append((place, place.region_code))
+        place.region_code = zone.code if zone else None
+
+    if corriges:
+        LOG.info(
+            "codes de région corrigés : %s lieux portaient un code inconnu du "
+            "répertoire (%s)",
+            len(corriges),
+            ", ".join(
+                f"{place.name} {ancien}→{place.region_code or 'aucun'}"
+                for place, ancien in corriges[:5]
+            ),
+        )
+    return places
+
+
 def apply_geographic_scope(places: list[Place], config: Config) -> list[Place]:
     """Écarte les lieux qu'on ne sait pas rattacher à un département français.
 
@@ -1519,7 +1556,7 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
     # Les étapes sont déroulées une à une plutôt qu'imbriquées : c'est ce qui
     # permet de garder chaque population intermédiaire et d'en tirer
     # l'entonnoir par thème.
-    en_france = apply_geographic_scope(places, config)
+    en_france = apply_geographic_scope(fix_region_codes(places), config)
     un_theme = dedupe_across_themes(en_france, config)
     dans_le_sujet = apply_class_exclusion(un_theme, config)
     # Pour un thème qui n'existe que par ses listes, en sortir c'est sortir.

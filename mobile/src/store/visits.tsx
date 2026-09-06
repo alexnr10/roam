@@ -20,7 +20,16 @@ type VisitsContextValue = {
   ready: boolean;
   hasVisited: (placeId: string) => boolean;
   addVisit: (place: Place, method: VisitMethod, distanceM?: number) => void;
+  /**
+   * Enregistre un LOT de visites en une fois.
+   *
+   * Le quadrillage en marque cinquante d'un geste. Les ajouter une à une
+   * ferait cinquante rendus et cinquante écritures dans le stockage, pour un
+   * seul geste de l'utilisateur.
+   */
+  addVisits: (places: Place[], method: VisitMethod) => void;
   removeVisit: (placeId: string) => void;
+  removeVisits: (placeIds: string[]) => void;
   reset: () => void;
 };
 
@@ -81,8 +90,23 @@ export function VisitsProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
+  const addVisits = useCallback((lot: Place[], method: VisitMethod) => {
+    setVisits((current) => {
+      const connus = new Set(current.map((visit) => visit.placeId));
+      const nouveaux = lot
+        .filter((place) => !connus.has(place.id))
+        .map((place) => makeVisit(place, method));
+      return nouveaux.length ? [...current, ...nouveaux] : current;
+    });
+  }, []);
+
   const removeVisit = useCallback((placeId: string) => {
     setVisits((current) => current.filter((visit) => visit.placeId !== placeId));
+  }, []);
+
+  const removeVisits = useCallback((placeIds: string[]) => {
+    const partants = new Set(placeIds);
+    setVisits((current) => current.filter((visit) => !partants.has(visit.placeId)));
   }, []);
 
   const reset = useCallback(() => setVisits([]), []);
@@ -95,10 +119,12 @@ export function VisitsProvider({ children }: { children: React.ReactNode }) {
       ready,
       hasVisited: (placeId: string) => visitedIds.has(placeId),
       addVisit,
+      addVisits,
       removeVisit,
+      removeVisits,
       reset,
     };
-  }, [visits, ready, addVisit, removeVisit, reset]);
+  }, [visits, ready, addVisit, addVisits, removeVisit, removeVisits, reset]);
 
   return <VisitsContext.Provider value={value}>{children}</VisitsContext.Provider>;
 }

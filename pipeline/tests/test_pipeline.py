@@ -3713,6 +3713,42 @@ class TestImageCredits(unittest.TestCase):
         self.assertIsNone(lieu.image_author)
 
 
+class TestRegionCodes(unittest.TestCase):
+    """Wikidata range parfois un lieu dans la nomenclature d'AVANT 2016.
+
+    La Corse en « 92 » — l'ancien code de Provence-Alpes-Côte d'Azur — et le lac
+    du Der en « 21 », Champagne-Ardenne. Treize lieux portaient un code que le
+    répertoire des régions ne connaît pas, ce qui les excluait des collections
+    de leur région et de la carte de conquête, sans que rien ne le dise.
+    """
+
+    def test_an_unknown_code_is_recomputed_from_the_departement(self):
+        from roam_pipeline.collections import fix_region_codes
+
+        corse = make_place("Tour de Nonza", departement_code="2B", region_code="92")
+        with _capture():
+            fix_region_codes([corse])
+        self.assertEqual(corse.region_code, "94")
+
+    def test_a_valid_code_is_left_alone(self):
+        from roam_pipeline.collections import fix_region_codes
+
+        lieu = make_place("Château", departement_code="15", region_code="84")
+        with _capture():
+            fix_region_codes([lieu])
+        self.assertEqual(lieu.region_code, "84")
+
+    def test_an_unfixable_code_is_erased_rather_than_kept_wrong(self):
+        # Aucun département pour le recalculer : mieux vaut « on ne sait pas »
+        # qu'un numéro qu'aucune région ne porte.
+        from roam_pipeline.collections import fix_region_codes
+
+        perdu = make_place("Nulle part", departement_code=None, region_code="92")
+        with _capture():
+            fix_region_codes([perdu])
+        self.assertIsNone(perdu.region_code)
+
+
 class TestChosenPhoto(unittest.TestCase):
     """Wikidata ne donne qu'une image par lieu, et ce n'est pas un choix.
 
