@@ -949,9 +949,13 @@ def _report_tier_changes(changes, gone, before, retained) -> None:
         print("Niveaux inchangés depuis la dernière revue.")
         return
 
-    print("Depuis ta dernière revue : "
-          + ", ".join(f"{n} {verdict}" for verdict, n in sorted(counts.items()))
-          + (f", {len(gone)} sortis du catalogue" if gone else ""))
+    # Assemblé en une seule liste : la sortie du catalogue est un changement
+    # comme les autres, et la traiter à part affichait « , 2 sortis » quand
+    # elle était le seul.
+    morceaux = [f"{n} {verdict}" for verdict, n in sorted(counts.items())]
+    if gone:
+        morceaux.append(f"{len(gone)} sortis du catalogue")
+    print("Depuis ta dernière revue : " + ", ".join(morceaux))
 
     names = {p.wikidata_id: p.name for p in retained}
     for verdict, titre in (("theme", "changé de thème"), ("descend", "descendus")):

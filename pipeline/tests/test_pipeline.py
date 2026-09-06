@@ -988,8 +988,13 @@ class TestBuildFunnel(unittest.TestCase):
     def test_the_funnel_follows_a_theme_through_every_stage(self):
         from roam_pipeline.collections import build_all
 
+        # Sans plancher de repêchage : la fixture n'a que des dunes à une
+        # langue, et c'est le PARCOURS qu'on vérifie ici, pas la qualité des
+        # repêchés — le plancher a son propre test.
+        config = replace(CONFIG, collections=replace(
+            CONFIG.collections, min_rescue_score=0.0))
         with self.assertLogs("roam_pipeline.collections", level="INFO") as logs:
-            build_all(self._catalogue(), CONFIG)
+            build_all(self._catalogue(), config)
         table = "\n".join(logs.output)
 
         self.assertIn("étape par étape", table)
@@ -1334,6 +1339,27 @@ class TestDurableDecisions(unittest.TestCase):
         self.assertTrue(garde.pinned)
         self.assertFalse(ignore.pinned)
         self.assertEqual(counts["pending"], 1)
+
+    def test_every_verdict_that_keeps_marks_the_place_as_reviewed(self):
+        # Déplacer un lieu d'un niveau, c'est l'avoir regardé et gardé. Onze
+        # lieux repêchés pour combler leur département portaient un verdict —
+        # le viaduc de Chaumont, monté au niveau 1 — sans porter aucune trace
+        # de relecture, et le plancher du repêchage les retirait.
+        from roam_pipeline.review import apply_decisions
+
+        monte = make_place("Monté", wikidata_id="Q1")
+        descendu = make_place("Descendu", wikidata_id="Q2")
+        ignore = make_place("Non relu", wikidata_id="Q3")
+        apply_decisions([monte, descendu, ignore],
+                        {"Q1": ("promote", ""), "Q2": ("demote", "")})
+        self.assertTrue(monte.kept_in_review)
+        self.assertTrue(descendu.kept_in_review)
+        self.assertFalse(ignore.kept_in_review)
+        # Mais `pinned` reste au `keep` : l'étendre ferait entrer ces lieux
+        # sous le plancher de notoriété, et le plafond du thème rendrait leurs
+        # places en écartant trois musées explicitement gardés.
+        self.assertFalse(monte.pinned)
+        self.assertFalse(descendu.pinned)
 
     def test_promote_moves_a_tier_without_removing_anything(self):
         from roam_pipeline.review import apply_decisions
@@ -3633,6 +3659,34 @@ class TestThinDepartements(unittest.TestCase):
         repeches = self._repecher(au_dessus, sous)
         self.assertEqual(len(repeches), 3)
         self.assertTrue(all(p.geo_rescued for p in sous))
+
+    def test_a_candidate_too_weak_is_never_offered(self):
+        # Le quota n'est pas une obligation de remplissage. Sans plancher, un
+        # refus appelait le candidat suivant, toujours un peu plus faible : la
+        # Marne gardait sept candidats entre 52 et 42 points, et la revue en
+        # proposait deux à chaque construction sans jamais finir.
+        au_dessus = [self._lieu("Gardé", "51", 20, 90.0, lat=49.0, lon=4.0)]
+        faible = self._lieu("Couvent des Capucins", "51", 3, 52.0, lat=49.1, lon=4.1)
+        essai = replace(CONFIG, collections=replace(
+            CONFIG.collections, min_per_departement=12, min_rescue_score=55.0))
+        with _capture():
+            repeches = rescue_thin_departements(au_dessus, [faible], essai)
+        self.assertEqual(len(repeches), 1)
+        self.assertFalse(faible.geo_rescued)
+
+    def test_a_place_the_curator_reviewed_escapes_that_floor(self):
+        # Le plancher arbitre entre des candidats que personne n'a jugés. La
+        # tour Dreyfus, descendue d'un niveau par le curateur, en sortait à 47
+        # points : une heuristique retirait ce qu'un jugement avait retenu.
+        au_dessus = [self._lieu("Gardé", "973", 20, 90.0, lat=4.9, lon=-52.3)]
+        relu = self._lieu("Tour Dreyfus", "973", 3, 47.0, lat=4.8, lon=-52.4)
+        relu.kept_in_review = True
+        essai = replace(CONFIG, collections=replace(
+            CONFIG.collections, min_per_departement=12, min_rescue_score=55.0))
+        with _capture():
+            repeches = rescue_thin_departements(au_dessus, [relu], essai)
+        self.assertEqual(len(repeches), 2)
+        self.assertTrue(relu.geo_rescued)
 
     def test_a_rich_departement_gets_nothing(self):
         # La Dordogne compte soixante-quatre lieux : la tour de Vésone, sous son

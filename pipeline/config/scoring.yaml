@@ -361,6 +361,20 @@ geo:
   # catalogue, il doit se relire comme tel.
   min_per_departement: 12
 
+  # Le quota n'est pas une obligation de remplissage. Sous ce score, un lieu
+  # n'est plus repêchable même par un département vide.
+  #
+  # Sans lui, un refus appelait le candidat suivant, toujours un peu plus
+  # faible : la Marne gardait sept candidats en réserve, entre 52 et 42 points,
+  # et la revue en proposait deux à chaque construction sans jamais finir. À 55,
+  # les réserves de la Marne, du Lot-et-Garonne et de la Guyane se vident d'un
+  # coup, et rien de ce que le curateur avait retenu ne bouge : le plus faible
+  # repêchage qu'il ait gardé est le Moulin de Dannemois, à 57.
+  #
+  # Un département sous son quota n'est pas un échec. Le Territoire de Belfort
+  # tient à un lieu, et c'est un meilleur catalogue qu'avec onze remplissages.
+  min_rescue_score: 55
+
 alerts:
   # Au-dessus, un sommet demande souvent bien plus qu'une randonnée. Certains
   # ont pourtant un téléphérique : c'est un signal de revue, pas une exclusion.

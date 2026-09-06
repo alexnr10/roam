@@ -216,6 +216,11 @@ class CollectionRules:
     # Nombre de lieux visé dans CHAQUE département. En dessous, les meilleurs
     # candidats sous le plancher de leur thème sont repêchés. `0` désactive.
     min_per_departement: int = 0
+    # Score en dessous duquel un lieu n'est plus repêchable, même pour combler
+    # un département vide. Le quota n'est pas une obligation de remplissage :
+    # sans ce plancher, la revue proposait indéfiniment le candidat suivant,
+    # toujours un peu plus faible, jusqu'à épuiser la réserve. `0` désactive.
+    min_rescue_score: float = 0.0
     # Part maximale d'un seul thème dans un « Le meilleur de… ». `0` désactive.
     max_theme_share: float = 0.0
     # Étendue minimale d'un croisement thème × territoire, en kilomètres.
@@ -331,6 +336,7 @@ def load_config(config_dir: Path | None = None) -> Config:
         cross_theme_levels=list(raw["geo"]["cross_theme_levels"]),
         require_departement=bool(raw["geo"].get("require_departement", True)),
         min_per_departement=int(raw["geo"].get("min_per_departement", 0)),
+        min_rescue_score=float(raw["geo"].get("min_rescue_score", 0.0)),
         max_theme_share=float(raw["collections"].get("max_theme_share", 0.0)),
         min_diameter_km=float(raw["collections"].get("min_diameter_km", 0.0)),
         min_theme_lift=float(raw["collections"].get("min_theme_lift", 0.0)),

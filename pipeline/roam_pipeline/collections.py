@@ -1422,14 +1422,29 @@ def rescue_thin_departements(
     if not cible:
         return au_dessus
 
+    # Le quota n'est pas une obligation de remplissage. Sans plancher, un refus
+    # appelait le candidat suivant, toujours un peu plus faible : la Marne
+    # gardait sept candidats entre 52 et 42 points, et la revue en proposait
+    # deux à chaque construction sans jamais finir. Un département sous son
+    # quota n'est pas un échec — le Territoire de Belfort tient à un lieu.
+    plancher = config.collections.min_rescue_score
+
     compte: Counter[str] = Counter(
         place.departement_code for place in au_dessus if place.departement_code
     )
     deja = [(place.lat, place.lon) for place in au_dessus]
     candidats: dict[str, list[Place]] = defaultdict(list)
+    trop_faibles: Counter[str] = Counter()
     for place in sorted(sous_le_plancher, key=lambda p: -p.score):
-        if place.departement_code and compte[place.departement_code] < cible:
-            candidats[place.departement_code].append(place)
+        if not place.departement_code or compte[place.departement_code] >= cible:
+            continue
+        # Un lieu que le curateur a RELU échappe au plancher : il l'a vu et
+        # gardé, fût-ce pour le descendre d'un niveau. Le plancher arbitre
+        # entre des candidats que personne n'a jugés, rien de plus.
+        if place.score < plancher and not place.kept_in_review:
+            trop_faibles[place.departement_code] += 1
+            continue
+        candidats[place.departement_code].append(place)
 
     repeches: list[Place] = []
     for code, lot in candidats.items():
@@ -1483,6 +1498,15 @@ def rescue_thin_departements(
             "(les plus fournis : %s)",
             len(repeches), len(par_dept), cible,
             ", ".join(f"{c} {n}" for c, n in par_dept.most_common(5)),
+        )
+    if trop_faibles:
+        # Ce que le plancher a laissé de côté, c'est exactement ce que la revue
+        # aurait proposé construction après construction, un candidat par refus.
+        LOG.info(
+            "repêchage : %s candidat(s) écartés sous %s points dans %s "
+            "département(s), qui resteront sous %s faute de mieux (%s)",
+            sum(trop_faibles.values()), plancher, len(trop_faibles), cible,
+            ", ".join(f"{c} {n}" for c, n in trop_faibles.most_common(5)),
         )
     return au_dessus + repeches
 

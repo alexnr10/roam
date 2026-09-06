@@ -118,6 +118,17 @@ def apply_decisions(
             place.tier_shift = 1
         elif decision == "keep":
             place.pinned = True
+        # Tout verdict qui n'écarte pas marque le lieu comme RELU. Déplacer un
+        # lieu d'un niveau, c'est l'avoir regardé et gardé : le plancher du
+        # repêchage géographique, qui est une heuristique, ne doit pas retirer
+        # ce qu'un jugement a retenu — la tour Dreyfus, descendue d'un niveau
+        # par le curateur, en sortait à 47 points.
+        #
+        # `pinned` reste réservé au `keep` et aux épingles manuelles : lui
+        # ajouter les déplacements ferait entrer onze lieux sous le plancher de
+        # notoriété, et le plafond du thème rendrait leurs places en écartant
+        # trois musées explicitement gardés.
+        if decision in ("keep", "promote", "demote"):
             place.kept_in_review = True
         elif strict:
             # En mode strict, seul ce qui a été explicitement relu est conservé.
