@@ -10,11 +10,12 @@ import { useCheckIn } from '../../src/lib/useCheckIn';
 import { useLocation } from '../../src/lib/useLocation';
 import { MIN_CARACTERES, search } from '../../src/lib/search';
 import { useVisits } from '../../src/store/visits';
-import { colors, spacing, radius, type, themeEmoji } from '../../src/theme';
+import { colors, spacing, radius, type } from '../../src/theme';
 import {
   Button,
   ChipRow,
   EmptyState,
+  Photo,
   Pill,
   SearchField,
   SegmentedControl,
@@ -214,7 +215,12 @@ export default function MapScreen() {
           const visited = visitedIds.has(item.place.id);
           return (
             <Pressable style={styles.row} onPress={() => openPlace(item.place)}>
-              <Text style={styles.rowEmoji}>{themeEmoji[item.place.themeId] ?? '📍'}</Text>
+              <Photo
+                url={item.place.imageUrl}
+                themeId={item.place.themeId}
+                width={56}
+                height={56}
+              />
               <View style={{ flex: 1 }}>
                 <Text style={type.body} numberOfLines={1}>
                   {item.place.name}
@@ -291,5 +297,4 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.border,
   },
-  rowEmoji: { fontSize: 22 },
 });

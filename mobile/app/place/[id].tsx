@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from 'react-native';
 
 import {
@@ -24,13 +25,22 @@ import { computeProgress } from '../../src/lib/progress';
 import { useCheckIn } from '../../src/lib/useCheckIn';
 import { useLocation } from '../../src/lib/useLocation';
 import { useVisits } from '../../src/store/visits';
-import { colors, radius, spacing, themeEmoji, type } from '../../src/theme';
-import { BackBar, Button, Card, Pill, ProgressBar, TierDot } from '../../src/ui/components';
+import { colors, radius, spacing, type } from '../../src/theme';
+import {
+  BackBar,
+  Button,
+  Card,
+  Photo,
+  Pill,
+  ProgressBar,
+  TierDot,
+} from '../../src/ui/components';
 
 export default function PlaceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { width: ecran } = useWindowDimensions();
   const { visits, visitedIds, removeVisit } = useVisits();
   const checkIn = useCheckIn();
   const { position } = useLocation();
@@ -64,8 +74,17 @@ export default function PlaceScreen() {
       }}
     >
       <BackBar />
-      <Text style={styles.emoji}>{themeEmoji[place.themeId] ?? '📍'}</Text>
-      <Text style={type.title}>{place.name}</Text>
+      {/* La photo AVANT le nom : on reconnaît un lieu avant de le lire, et
+          c'est tout l'objet de cet écran quand on cherche à se rappeler si on
+          y est allé. Trois pour deux, le cadrage des photos de paysage. */}
+      <Photo
+        url={place.imageUrl}
+        themeId={place.themeId}
+        width={ecran - spacing.lg * 2}
+        height={Math.round(((ecran - spacing.lg * 2) * 2) / 3)}
+        round={radius.lg}
+      />
+      <Text style={[type.title, { marginTop: spacing.md }]}>{place.name}</Text>
       <Text style={[type.small, { marginTop: spacing.xs }]}>
         {themeLabel(place.themeId)}
         {place.departement ? ` · ${place.departement}` : ''}
@@ -196,7 +215,6 @@ export default function PlaceScreen() {
 
 const styles = StyleSheet.create({
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  emoji: { fontSize: 40, marginBottom: spacing.sm },
   summary: { marginTop: spacing.md, lineHeight: 22 },
   rowBetween: {
     flexDirection: 'row',

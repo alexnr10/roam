@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
 import {
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -10,8 +11,67 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import { colors, radius, spacing, type } from '../theme';
+import { photoUrl } from '../lib/photo';
+import { colors, radius, spacing, themeEmoji, type } from '../theme';
 import type { Tier } from '../types';
+
+/**
+ * La photo d'un lieu, avec son repli.
+ *
+ * Le catalogue en donne une pour 2 005 lieux sur 2 028. Les vingt-trois autres
+ * — la villa Savoye, le gouffre Jean-Bernard — ne doivent pas laisser un trou :
+ * l'emoji du thème sur fond teinté dit « pas de photo », pas « ça a raté ».
+ *
+ * Le même repli sert quand le chargement échoue, et c'est le cas important :
+ * hors réseau, un cadre vide sur toute une liste donne une application cassée.
+ *
+ * La largeur DEMANDÉE est celle du cadre, pas celle du fichier : `photoUrl`
+ * l'arrondit à l'un des trois paliers que Commons garde en cache.
+ */
+export function Photo({
+  url,
+  themeId,
+  width,
+  height,
+  round = radius.md,
+}: {
+  url?: string | null;
+  themeId: string;
+  /** Largeur du cadre en points — sert à choisir la taille téléchargée. */
+  width: number;
+  height: number;
+  round?: number;
+}) {
+  const [rate, setRate] = React.useState(false);
+  const src = rate ? null : photoUrl(url, width);
+  const cadre = {
+    width,
+    height,
+    borderRadius: round,
+    backgroundColor: colors.surfaceAlt,
+    overflow: 'hidden' as const,
+  };
+
+  if (!src) {
+    return (
+      <View style={[cadre, styles.sansPhoto]}>
+        <Text style={{ fontSize: Math.round(Math.min(width, height) * 0.42) }}>
+          {themeEmoji[themeId] ?? '📍'}
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <Image
+      accessibilityIgnoresInvertColors
+      source={{ uri: src }}
+      onError={() => setRate(true)}
+      resizeMode="cover"
+      style={cadre}
+    />
+  );
+}
 
 export function ProgressBar({
   pct,
@@ -276,6 +336,7 @@ export function SearchField({
 }
 
 const styles = StyleSheet.create({
+  sansPhoto: { alignItems: 'center', justifyContent: 'center' },
   back: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -6,8 +6,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { getCollection, getPlace, themeLabel } from '../../src/data/catalog';
 import { computeProgress, nextMilestone } from '../../src/lib/progress';
 import { useVisits } from '../../src/store/visits';
-import { colors, radius, spacing, themeEmoji, type } from '../../src/theme';
-import { BackBar, Card, Pill, ProgressBar, TierDot } from '../../src/ui/components';
+import { colors, radius, spacing, type } from '../../src/theme';
+import { BackBar, Card, Photo, Pill, ProgressBar, TierDot } from '../../src/ui/components';
 import type { Tier } from '../../src/types';
 
 const TIER_TITLES: Record<Tier, string> = {
@@ -110,7 +110,12 @@ export default function CollectionScreen() {
                   style={[styles.row, !tierProgress.unlocked && styles.rowLocked]}
                   onPress={() => router.push(`/place/${place.id}`)}
                 >
-                  <Text style={styles.emoji}>{themeEmoji[place.themeId] ?? '📍'}</Text>
+                  <Photo
+                    url={place.imageUrl}
+                    themeId={place.themeId}
+                    width={56}
+                    height={56}
+                  />
                   <View style={{ flex: 1 }}>
                     <Text style={type.body} numberOfLines={1}>
                       {place.name}
@@ -154,5 +159,4 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   rowLocked: { opacity: 0.55 },
-  emoji: { fontSize: 20 },
 });

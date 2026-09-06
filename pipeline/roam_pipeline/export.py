@@ -443,12 +443,30 @@ def write_seed_sql(
 REVIEW_PAGE_TITLE = "Roam — revue du catalogue"
 
 
-def _thumbnail(image_url: str | None, width: int = 400) -> str:
-    """Vignette Commons. `Special:FilePath` accepte un paramètre de largeur."""
+def _commons_url(image_url: str | None) -> str:
+    """L'adresse Commons du fichier, en HTTPS et sans largeur.
+
+    Wikidata la donne en `http://`. Servie depuis une page en HTTPS — la
+    prévisualisation publiée l'est — c'est du contenu mixte : le navigateur la
+    remonte parfois, la refuse parfois, et l'image manque sans rien dire.
+
+    La largeur ne s'écrit pas ici : elle appartient à qui affiche. Une vignette
+    de liste n'a pas besoin des huit cents pixels d'une fiche, et un catalogue
+    qui n'embarque qu'une seule taille fait télécharger deux mille grandes
+    images pour en montrer des carrés de cinquante-six.
+    """
     if not image_url:
         return ""
-    separator = "&" if "?" in image_url else "?"
-    return f"{image_url}{separator}width={width}"
+    return image_url.replace("http://", "https://", 1)
+
+
+def _thumbnail(image_url: str | None, width: int = 400) -> str:
+    """Vignette Commons. `Special:FilePath` accepte un paramètre de largeur."""
+    url = _commons_url(image_url)
+    if not url:
+        return ""
+    separator = "&" if "?" in url else "?"
+    return f"{url}{separator}width={width}"
 
 
 def _twin_key(qid: str, jumeaux: dict) -> str:
@@ -1234,7 +1252,9 @@ def write_app_catalog(
                 "communeCode": place.commune_code,
                 "communeName": place.commune_name,
                 "summary": place.summary,
-                "imageUrl": _thumbnail(place.image_url, 800) or None,
+                # L'adresse NUE : l'application demande la largeur qu'elle
+                # affiche. Voir `src/lib/photo.ts`.
+                "imageUrl": _commons_url(place.image_url) or None,
                 "wikipediaUrl": place.wikipedia_url,
             }
         )
