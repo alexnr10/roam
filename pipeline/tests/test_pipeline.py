@@ -4242,6 +4242,52 @@ class TestCommuneCap(unittest.TestCase):
         self.assertEqual(len(self._cape(lieux, cap=0)), 9)
 
 
+class TestCrowdedTier1(unittest.TestCase):
+    """Chaque `promote` ajoute un niveau 1, et l'effet est cumulatif.
+
+    Les ponts sont montés à quinze niveau 1 pour un budget de dix — dont cinq
+    promus à la main — et les phares à douze sur trente-cinq lieux. Un lieu sur
+    trois au niveau 1 ne dit plus « incontournable », il dit « ordinaire ».
+    Rien ne le signalait : la dérive ne se voit qu'en comptant.
+    """
+
+    def _collection(self, nom, niveaux, kind="theme"):
+        from roam_pipeline.models import Collection, CollectionPlace
+
+        c = Collection(slug=nom, name=nom, kind=kind, theme_id="ponts")
+        c.places = [CollectionPlace(place_id=f"Q{i}", tier=t, rank=i + 1)
+                    for i, t in enumerate(niveaux)]
+        return c
+
+    def test_a_collection_over_budget_is_named(self):
+        from roam_pipeline.collections import warn_crowded_tier1
+
+        budget = CONFIG.tiers.tier1_size
+        trop = self._collection("Ponts et viaducs", [1] * (budget + 5) + [2] * 26)
+        juste = self._collection("Cascades", [1] * budget + [2] * 20)
+        with self.assertLogs("roam_pipeline.collections", level="INFO") as journal:
+            noms = warn_crowded_tier1([trop, juste], CONFIG)
+        self.assertEqual(noms, ["Ponts et viaducs"])
+        texte = "\n".join(journal.output)
+        self.assertIn(f"Ponts et viaducs {budget + 5}/", texte)
+        self.assertNotIn("Cascades", texte)
+
+    def test_only_national_collections_are_counted(self):
+        from roam_pipeline.collections import warn_crowded_tier1
+
+        # Une collection géographique n'a pas de budget de niveau 1 à tenir :
+        # le niveau y est relatif à un territoire, pas à la France.
+        geo = self._collection("Châteaux du Cantal",
+                               [1] * (CONFIG.tiers.tier1_size + 5), kind="geo")
+        self.assertEqual(warn_crowded_tier1([geo], CONFIG), [])
+
+    def test_nothing_is_said_within_budget(self):
+        from roam_pipeline.collections import warn_crowded_tier1
+
+        juste = self._collection("Cascades", [1] * CONFIG.tiers.tier1_size + [3] * 5)
+        self.assertEqual(warn_crowded_tier1([juste], CONFIG), [])
+
+
 class TestOrphansAfterCollections(unittest.TestCase):
     """Un lieu repêché puis jeté faute de collection : le travail est perdu.
 

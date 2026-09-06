@@ -1583,7 +1583,39 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
         len(orphelins),
     )
     warn_orphans(orphelins, config)
+    warn_crowded_tier1(collections, config)
     return retained, collections
+
+
+def warn_crowded_tier1(collections: list[Collection], config: Config) -> list[str]:
+    """Quelles collections comptent plus de lieux de niveau 1 que leur budget.
+
+    Le niveau 1 veut dire « les dix meilleurs de cette collection ». Chaque
+    `promote` en ajoute un, et c'est voulu — le plafond est une heuristique, la
+    décision un jugement. Mais l'effet est CUMULATIF et rien ne le disait : les
+    ponts sont montés à quinze niveau 1 pour un budget de dix, dont cinq
+    promus à la main, et les phares à douze sur trente-cinq lieux.
+
+    Un lieu sur trois au niveau 1 ne dit plus « incontournable », il dit
+    « ordinaire ». La ligne ne corrige rien : elle rend visible une dérive qui
+    ne se voit qu'en comptant, et que le curateur seul peut arbitrer.
+    """
+    budget = config.tiers.tier1_size
+    trop = [
+        (c.name, sum(1 for cp in c.places if cp.tier == 1), len(c.places))
+        for c in collections
+        if c.kind == "theme"
+    ]
+    trop = [(nom, n1, n) for nom, n1, n in trop if n1 > budget]
+    if not trop:
+        return []
+    LOG.info(
+        "%s collection(s) dépassent le budget de %s lieux au niveau 1, par tes "
+        "promotions : %s",
+        len(trop), budget,
+        ", ".join(f"{nom} {n1}/{n}" for nom, n1, n in sorted(trop, key=lambda t: -t[1])[:6]),
+    )
+    return [nom for nom, _, _ in trop]
 
 
 def warn_orphans(orphelins: list[Place], config: Config) -> int:
