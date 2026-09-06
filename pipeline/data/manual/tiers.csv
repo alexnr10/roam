@@ -90,6 +90,7 @@ Q110929533,3,maisons,Maison Max Ernst et Dorothea Tanning
 Q110929536,3,maisons,Musée Claude Bernard
 Q110929540,3,maisons,Musée Jean-Racine
 Q110929543,2,maisons,Musée Escoffier de l'art culinaire
+Q110983817,3,abbayes,Couvent des Capucins
 Q1110479,3,sommets,Colomby de Gex
 Q1111051,1,monuments,Colonne Vendôme
 Q111207734,3,cascades,Cascades de Caraoucou
@@ -100,7 +101,6 @@ Q1122731,3,chateaux,Château du Clos Lucé
 Q1125842,3,chateaux,Château de la Verrerie
 Q112659724,2,cascades,Cascade de la Vis
 Q113389,2,chateaux,Château d'Azay-le-Rideau
-Q113644718,3,plages,Klippe des Annes
 Q1137826,3,abbayes,Abbaye de Beaulieu-en-Rouergue
 Q1137837,3,sommets,Montagne de Céüse
 Q1137944,3,abbayes,Abbaye d'Aubazine
@@ -134,7 +134,6 @@ Q1190649,1,maisons,Château de Monte-Cristo
 Q1191209,3,cathedrales,Cathédrale Saint-Maurice d'Angers
 Q11937330,3,abbayes,Abbatiale Saint-Volusien
 Q1200500,3,cathedrales,Cathédrale Notre-Dame-des-Doms d'Avignon
-Q121864290,3,ponts,Pont Vieux
 Q122281,2,grottes,Abri de Cap Blanc
 Q1227366,1,lacs,Lac d'Aiguebelette
 Q1229179,3,abbayes,Abbaye Notre-Dame de Tamié
@@ -443,6 +442,7 @@ Q1799643,2,lacs,Lac du Der-Chantecoq
 Q18005355,3,cascades,Cascade de Mérelle
 Q18005497,3,cascades,Petite Cascade de Tendon
 Q18005509,3,ponts,Pont de la Libération de Villeneuve-sur-Lot
+Q18005511,3,ponts,Pont sur le Lot de Castelmoron-sur-Lot
 Q18005532,3,cascades,Saut des Cuves
 Q18009259,2,cascades,Grande Cascade de Tendon
 Q180136,3,sommets,Montagne d'Alaric
@@ -626,6 +626,7 @@ Q2107701,3,abbayes,Abbaye Saint-Georges de Boscherville
 Q21099746,3,cascades,Cascade de la Lauch
 Q21099752,3,cascades,Cascade du Nideck
 Q21099819,3,cascades,Saut de l'Ognon
+Q21099821,3,megalithes,Site antique de Sanxay
 Q2111621,2,monuments,Palais des ducs de Bourgogne
 Q211593,3,villages,Eu
 Q211684,2,villages,Barfleur
@@ -703,7 +704,6 @@ Q22951316,3,ponts,Viaduc de la Tardes
 Q22952806,3,ponts,Pont des Chouans
 Q22953117,3,maisons,"Maison, 24 rue du Commerce"
 Q22962904,3,megalithes,Menhir de Bourg-Jardin
-Q22963472,3,monuments,Hôtel de ville d'Alençon
 Q22963608,3,megalithes,Mégalithes du Creux
 Q2296362,1,maisons,Musée Gustave-Moreau
 Q22967182,3,abbayes,Couvent des Cordeliers de Charlieu
@@ -906,7 +906,7 @@ Q2821559,1,dunes-marais,Aber de Crozon
 Q282328,2,lacs,Étang du Lanoux
 Q283254,1,abbayes,Abbaye de Fontevraud
 Q2835200,3,jardins,Jardin botanique du château de Vauville
-Q28374564,2,phares,Tour Dreyfus
+Q28374564,3,phares,Tour Dreyfus
 Q2839983,2,phares,Phare de Calais
 Q2843748,2,musees,Musée Ingres-Bourdelle
 Q2844420,1,megalithes,Amphithéâtre de Saintes
@@ -934,7 +934,6 @@ Q288968,1,lacs,Étang de Thau
 Q28911030,3,cascades,Cascade de Vaucoux
 Q28924,1,musees,Catacombes de Paris
 Q2893122,3,lacs,Lac Dziani
-Q28971473,3,megalithes,Théâtre antique de Sanxay
 Q2901290,3,maisons,Bibliothèque Marmottan
 Q29034928,3,villages,Pujols-le-Haut
 Q290355,1,ponts,Pont de Bir-Hakeim
@@ -995,7 +994,6 @@ Q2942394,3,cathedrales,Cathédrale Saint-Maclou de Pontoise
 Q2942470,3,cathedrales,Cathédrale Sainte-Anne d'Apt
 Q2942776,3,cathedrales,Cathédrale Saint-Denis de Saint-Denis
 Q2945212,3,maisons,Centre d'études et musée Edmond-Michelet
-Q2945803,3,jardins,Centre international d'art et du paysage de Vassivière
 Q2946,1,chateaux,Château de Versailles
 Q2948420,3,plages,Chambre d’Amour
 Q2961249,3,abbayes,Chartreuse Notre-Dame du Val de Bénédiction
@@ -1082,6 +1080,7 @@ Q3078808,2,forets,Forêt de Bois Blanc
 Q3078836,2,forets,Forêt de Carnoët
 Q3078838,1,forets,Forêt de Cerisy
 Q3078840,2,forets,Forêt de Chabrières
+Q3078851,2,forets,Forêt domaniale de Châteauneuf-En-Thymerais
 Q3078853,2,forets,Forêt domaniale de Cinglais
 Q3078854,2,forets,Forêt de Coëtquen
 Q3078859,2,forets,Forêt de Darney
@@ -1204,6 +1203,7 @@ Q3215508,2,lacs,Lac de Payolle
 Q3215514,2,lacs,Lac de Pierre-Percée
 Q3215531,3,lacs,Lac de Saint-Agnan
 Q3215536,3,lacs,Lac de Saint-Andéol
+Q3215539,3,lacs,Lac de Saint-Pardoux
 Q3215558,3,lacs,Lac de Sylans
 Q3215566,3,lacs,Lac de Tolla
 Q3215690,3,lacs,Lac des Truites
@@ -1337,7 +1337,6 @@ Q3330222,3,musees,Musée des Arts et de l'Archéologie de Valenciennes
 Q3330225,3,musees,Musée des Beaux-Arts de Reims
 Q3330509,1,jardins,Musée départemental Albert-Kahn
 Q3330534,3,musees,Musée des antiquités de Rouen
-Q3330593,3,musees,Musée de l'hydraviation
 Q3330600,3,musees,Musée historique de Strasbourg
 Q3330634,3,musees,Palais des ducs de Lorraine – Musée lorrain
 Q3330714,3,maisons,Musée national Clemenceau-de-Lattre
@@ -1459,7 +1458,6 @@ Q3397237,3,ponts,Pont de l'Iroise
 Q3397418,3,ponts,Pont du Bonhomme
 Q3397487,1,ponts,Pont du Port-à-l'Anglais
 Q3397571,3,ponts,Pont métallique sur l'Adour
-Q3397786,3,ponts,Ponts Nelson-Mandela
 Q3398915,3,monuments,Porte Désilles
 Q3399930,2,jardins,Potager du roi
 Q3402438,2,plages,Presqu'île d'Arvert
@@ -1635,12 +1633,10 @@ Q476584,3,villages,Joigny
 Q476848,3,villages,Candes-Saint-Martin
 Q477613,2,chateaux,Château de Villandry
 Q4784839,3,jardins,Arboretum de Pézanin
-Q4784854,3,jardins,Arboretum de l'Étoile des Andaines
 Q478701,3,abbayes,Abbaye royale de Saint-Médard de Soissons
 Q480763,2,grottes,Abri du Poisson
 Q48755777,1,rochers,Les Pénitents
 Q48758119,2,rochers,Le Bouillon
-Q48758967,3,megalithes,Dolmen de Nuisy
 Q4889555,3,sommets,Puig de Coma Negra
 Q489014,2,cathedrales,Cathédrale Saint-Étienne de Sens
 Q490364,2,abbayes,Abbaye Saint-Michel de Frigolet
@@ -1709,7 +1705,6 @@ Q583988,3,villages,Gargilesse-Dampierre
 Q584590,3,cathedrales,Cathédrale Saint-Pierre de Lisieux
 Q585947,2,cathedrales,Cathédrale Notre-Dame de Laon
 Q58635368,3,villages,La Rochefoucauld-en-Angoumois
-Q58836709,3,musees,Centre international du Vitrail
 Q588604,3,plages,Pointe de la Grande Vigie
 Q589336,3,maisons,Musée Curie
 Q589980,3,villages,Saint-Pierre
@@ -1731,7 +1726,7 @@ Q607372,1,volcans,Puy de Dôme
 Q60832377,3,maisons,Musée Maillol de Banyuls-sur-Mer
 Q608423,2,monuments,Opéra de Nice
 Q60850205,3,dunes-marais,Salins de Gruissan
-Q611062,3,musees,Musée de la Grande Guerre du pays de Meaux
+Q611062,2,musees,Musée de la Grande Guerre du pays de Meaux
 Q611944,2,cathedrales,Cathédrale Saint-Lazare d'Autun
 Q6159686,3,jardins,Serre de la Madone
 Q6159718,3,jardins,Jardin botanique de Cayenne
