@@ -3677,14 +3677,22 @@ class TestImageCredits(unittest.TestCase):
         deja = make_place("Déjà crédité", wikidata_id="Q2")
         deja.image_url = "https://commons.wikimedia.org/wiki/Special:FilePath/B.jpg"
         deja.image_author, deja.image_licence = "Quelqu'un", "CC0"
+        deja.image_credit_for = "File:B.jpg"
+        # Sa photo a changé depuis : le crédit porte sur un AUTRE fichier, et
+        # il faut le redemander plutôt que de créditer le mauvais photographe.
+        changee = make_place("Photo changée", wikidata_id="Q4")
+        changee.image_url = "https://commons.wikimedia.org/wiki/Special:FilePath/D.jpg"
+        changee.image_author, changee.image_licence = "L'ancien", "CC0"
+        changee.image_credit_for = "File:C.jpg"
         sans_photo = make_place("Sans photo", wikidata_id="Q3")
 
         client = _Faux()
         with _capture():
-            trouves = enrich_image_credits([nu, deja, sans_photo], client)
+            trouves = enrich_image_credits([nu, deja, changee, sans_photo], client)
 
-        self.assertEqual(trouves, 1)
-        self.assertEqual(client.demandes, [["File:A.jpg"]])
+        self.assertEqual(trouves, 2)
+        self.assertEqual(client.demandes, [["File:A.jpg", "File:D.jpg"]])
+        self.assertEqual(changee.image_author, "Un photographe")
         self.assertEqual(nu.image_author, "Un photographe")
         self.assertEqual(nu.image_licence, "CC BY-SA 4.0")
         # Ni écrasé, ni inventé.
@@ -3703,6 +3711,85 @@ class TestImageCredits(unittest.TestCase):
         with _capture():
             self.assertEqual(enrich_image_credits([lieu], _Casse()), 0)
         self.assertIsNone(lieu.image_author)
+
+
+class TestChosenPhoto(unittest.TestCase):
+    """Wikidata ne donne qu'une image par lieu, et ce n'est pas un choix.
+
+    La propriété P18 porte celle qu'un contributeur a posée là, un jour :
+    souvent juste, parfois à contre-jour, parfois cadrée sur un détail quand on
+    attendait l'ensemble. Une ligne de `photos.csv` l'emporte.
+    """
+
+    def test_the_file_is_recognised_in_every_form(self):
+        from roam_pipeline.review import photo_file
+
+        # Le curateur colle ce qu'il a sous la main ; les quatre désignent la
+        # même photo, et lui demander de les distinguer serait une tracasserie.
+        for forme in (
+            "Tour Eiffel.jpg",
+            "File:Tour Eiffel.jpg",
+            "Fichier:Tour_Eiffel.jpg",
+            "https://commons.wikimedia.org/wiki/File:Tour_Eiffel.jpg",
+            "https://commons.wikimedia.org/wiki/Special:FilePath/"
+            "Tour%20Eiffel.jpg?width=800",
+        ):
+            self.assertEqual(photo_file(forme), "Tour Eiffel.jpg", forme)
+
+    def test_a_chosen_photo_replaces_the_wikidata_one(self):
+        from roam_pipeline.review import apply_photos, photo_url
+
+        lieu = make_place("Tour Eiffel", wikidata_id="Q243")
+        lieu.image_url = photo_url("Vue de jour.jpg")
+        autre = make_place("Panthéon", wikidata_id="Q131013")
+        autre.image_url = photo_url("Pantheon.jpg")
+
+        self.assertEqual(apply_photos([lieu, autre], {"Q243": "Tour Eiffel de nuit.jpg"}), 1)
+        self.assertEqual(lieu.image_url, photo_url("Tour Eiffel de nuit.jpg"))
+        self.assertEqual(autre.image_url, photo_url("Pantheon.jpg"))
+
+    def test_removing_the_line_gives_the_wikidata_image_back(self):
+        # Le fichier brut garde ce que Wikidata donne : le choix vit dans
+        # `photos.csv`, et s'en retire aussi facilement qu'il s'y écrit.
+        from roam_pipeline.review import apply_photos, photo_url
+
+        lieu = make_place("Tour Eiffel", wikidata_id="Q243")
+        lieu.image_url = photo_url("Vue de jour.jpg")
+        apply_photos([lieu], {})
+        self.assertEqual(lieu.image_url, photo_url("Vue de jour.jpg"))
+
+    def test_the_file_survives_a_write_and_a_read(self):
+        from roam_pipeline.review import read_photos, write_photos
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "photos.csv"
+            write_photos(path, {"Q243": "Tour Eiffel de nuit.jpg"},
+                         {"Q243": "la photo de jour est à contre-jour"})
+            self.assertEqual(read_photos(path), {"Q243": "Tour Eiffel de nuit.jpg"})
+
+    def test_the_credit_does_not_follow_a_changed_photo(self):
+        # Citer le mauvais photographe est pire que n'en citer aucun.
+        from roam_pipeline.export import _credit
+        from roam_pipeline.review import photo_url
+
+        lieu = make_place("Tour Eiffel", wikidata_id="Q243")
+        lieu.image_url = photo_url("Vue de jour.jpg")
+        lieu.image_author, lieu.image_licence = "Quelqu'un", "CC BY-SA 4.0"
+        lieu.image_credit_for = "File:Vue de jour.jpg"
+        self.assertEqual(_credit(lieu)["imageAuthor"], "Quelqu'un")
+
+        lieu.image_url = photo_url("Vue de nuit.jpg")
+        self.assertIsNone(_credit(lieu)["imageAuthor"])
+        self.assertIsNone(_credit(lieu)["imageLicence"])
+
+    def test_an_underscore_is_a_space_in_a_file_title(self):
+        # MediaWiki ne les distingue pas, et Wikidata écrit l'un quand le
+        # curateur écrit l'autre : les confondre ferait redemander le crédit
+        # d'une photo qui n'a pas changé.
+        from roam_pipeline.commons import file_title
+        from roam_pipeline.review import photo_url
+
+        self.assertEqual(file_title(photo_url("Tour Eiffel.jpg")), "File:Tour Eiffel.jpg")
 
 
 class _FakeViews(WikipediaClient):

@@ -135,6 +135,12 @@ class Place:
     # dépôt, qui est le minimum honnête.
     image_author: str | None = None
     image_licence: str | None = None
+    # Le fichier auquel ce crédit appartient. Un crédit n'est pas une propriété
+    # du LIEU mais de la PHOTO : changer la photo d'un lieu — `photos.csv` le
+    # permet — sans oublier son crédit afficherait le nom d'un photographe sous
+    # l'image de quelqu'un d'autre. On garde donc le titre du fichier crédité,
+    # et l'export ne cite l'auteur que si les deux concordent.
+    image_credit_for: str | None = None
     # Entré par une classe GÉNÉRIQUE (`broad_classes`) et non par une classe
     # propre au thème. Une porte large ne vaut pas une porte précise : le
     # dédoublonnage inter-thèmes s'en sert pour trancher.

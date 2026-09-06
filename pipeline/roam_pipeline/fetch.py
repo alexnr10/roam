@@ -814,7 +814,9 @@ def enrich_image_credits(places: list[Place], client=None) -> int:
     par_titre: dict[str, list[Place]] = defaultdict(list)
     for place in places:
         titre = file_title(place.image_url)
-        if titre and not place.image_author and not place.image_licence:
+        # Le crédit déjà en place vaut pour CE fichier : s'il porte sur un
+        # autre, la photo a changé depuis, et il faut le redemander.
+        if titre and place.image_credit_for != titre:
             par_titre[titre].append(place)
 
     titres = sorted(par_titre)
@@ -838,6 +840,7 @@ def enrich_image_credits(places: list[Place], client=None) -> int:
         for titre, (auteur, licence) in credits.items():
             for place in par_titre.get(titre, []):
                 place.image_author, place.image_licence = auteur, licence
+                place.image_credit_for = titre
                 trouves += 1
 
     sans = sum(1 for lot in par_titre.values() for p in lot if not p.image_licence)

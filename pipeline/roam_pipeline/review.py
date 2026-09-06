@@ -22,6 +22,7 @@ import unicodedata
 import logging
 from collections import Counter
 from pathlib import Path
+from urllib.parse import quote, unquote
 
 from .models import Place, display_name
 
@@ -196,6 +197,103 @@ def apply_names(places: list[Place], names: dict[str, str]) -> int:
         chosen = names.get(place.wikidata_id)
         if chosen and chosen != place.name:
             place.name = chosen
+            changed += 1
+    return changed
+
+
+# ---------------------------------------------------------------------------
+# Photo principale
+# ---------------------------------------------------------------------------
+
+PHOTOS_HEADER = """# Photo principale choisie par le curateur.
+#
+# Wikidata ne donne qu'une image par lieu — la propriété P18 — et ce n'est pas
+# une décision éditoriale : c'est celle qu'un contributeur a posée là, un jour.
+# Elle est souvent juste, parfois prise à contre-jour, parfois cadrée sur un
+# détail quand on attendait l'ensemble.
+#
+# Une ligne ici l'emporte. La valeur est le NOM DU FICHIER sur Wikimedia
+# Commons — « Chateau de Chambord vu du ciel.jpg » — avec ou sans le préfixe
+# « File: ». Une adresse complète est acceptée aussi : on n'en garde que le nom.
+#
+# Le crédit suit le fichier, pas le lieu : après un changement ici, la fiche
+# cite le dépôt seul jusqu'au prochain `enrich --images`. Citer le mauvais
+# photographe serait pire que n'en citer aucun.
+#
+wikidata_id,file,note
+"""
+
+COMMONS_FILEPATH = "https://commons.wikimedia.org/wiki/Special:FilePath/"
+
+
+def photo_file(valeur: str) -> str:
+    """Le nom du fichier Commons, quelle que soit la forme donnée.
+
+    Le curateur copie ce qu'il a sous la main : un nom de fichier, un titre
+    avec son espace de noms, ou l'adresse de la page. Les trois désignent la
+    même photo, et lui demander de les distinguer serait une tracasserie.
+    """
+    nom = unquote(valeur.strip())
+    for marqueur in (COMMONS_FILEPATH, "Special:FilePath/", "/wiki/"):
+        if marqueur in nom:
+            nom = nom.rsplit(marqueur, 1)[-1]
+    nom = nom.split("?", 1)[0]
+    for prefixe in ("File:", "Fichier:"):
+        if nom.startswith(prefixe):
+            nom = nom[len(prefixe):]
+    return nom.replace("_", " ").strip()
+
+
+def photo_url(fichier: str) -> str:
+    """L'adresse Commons d'un fichier, sous la forme que le pipeline manipule."""
+    return f"{COMMONS_FILEPATH}{quote(fichier.replace(' ', '_'), safe='')}"
+
+
+def read_photos(path: Path) -> dict[str, str]:
+    """`{qid: nom de fichier Commons}`. Fichier absent = aucun choix."""
+    photos: dict[str, str] = {}
+    if not path.exists():
+        return photos
+
+    lines = [
+        line
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    for row in csv.DictReader(lines):
+        qid = (row.get("wikidata_id") or "").strip()
+        fichier = photo_file(row.get("file") or "")
+        if qid and fichier:
+            photos[qid] = fichier
+    return photos
+
+
+def write_photos(path: Path, photos: dict[str, str], notes: dict[str, str] | None = None) -> None:
+    notes = notes or {}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as fh:
+        fh.write(PHOTOS_HEADER)
+        writer = csv.writer(fh)
+        for qid in sorted(photos):
+            writer.writerow([qid, photos[qid], notes.get(qid, "")])
+    LOG.info("photos : %s choix conservés dans %s", len(photos), path)
+
+
+def apply_photos(places: list[Place], photos: dict[str, str]) -> int:
+    """Remplace l'image de Wikidata par celle du curateur. Renvoie le compte.
+
+    Appliqué à CHAQUE construction, comme les renommages : le fichier brut
+    garde ce que Wikidata donne, et retirer une ligne rend sa photo d'origine
+    au lieu.
+    """
+    changed = 0
+    for place in places:
+        fichier = photos.get(place.wikidata_id)
+        if not fichier:
+            continue
+        choisie = photo_url(fichier)
+        if choisie != place.image_url:
+            place.image_url = choisie
             changed += 1
     return changed
 

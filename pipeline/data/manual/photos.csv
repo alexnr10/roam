@@ -1,0 +1,16 @@
+# Photo principale choisie par le curateur.
+#
+# Wikidata ne donne qu'une image par lieu — la propriété P18 — et ce n'est pas
+# une décision éditoriale : c'est celle qu'un contributeur a posée là, un jour.
+# Elle est souvent juste, parfois prise à contre-jour, parfois cadrée sur un
+# détail quand on attendait l'ensemble.
+#
+# Une ligne ici l'emporte. La valeur est le NOM DU FICHIER sur Wikimedia
+# Commons — « Chateau de Chambord vu du ciel.jpg » — avec ou sans le préfixe
+# « File: ». Une adresse complète est acceptée aussi : on n'en garde que le nom.
+#
+# Le crédit suit le fichier, pas le lieu : après un changement ici, la fiche
+# cite le dépôt seul jusqu'au prochain `enrich --images`. Citer le mauvais
+# photographe serait pire que n'en citer aucun.
+#
+wikidata_id,file,note

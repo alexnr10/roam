@@ -37,11 +37,14 @@ def file_title(image_url: str | None) -> str | None:
     """`.../Special:FilePath/Tour%20Eiffel.jpg` → `File:Tour Eiffel.jpg`.
 
     L'adresse porte le nom du fichier encodé ; l'API veut le titre décodé,
-    préfixé de son espace de noms.
+    préfixé de son espace de noms. Le tiret bas y vaut l'espace — MediaWiki ne
+    les distingue pas, et Wikidata écrit l'un quand le curateur écrit l'autre :
+    les confondre ferait redemander le crédit d'une photo qui n'a pas changé.
     """
     if not image_url or "Special:FilePath/" not in image_url:
         return None
     nom = unquote(image_url.rsplit("Special:FilePath/", 1)[-1]).split("?", 1)[0]
+    nom = nom.replace("_", " ").strip()
     return f"File:{nom}" if nom else None
 
 
@@ -72,6 +75,38 @@ class CommonsClient:
         if elapsed < self.min_interval_s:
             time.sleep(self.min_interval_s - elapsed)
         self._last_call = time.monotonic()
+
+    def category_files(self, category: str, limit: int = 50) -> list[str]:
+        """Les fichiers d'une catégorie Commons, pour choisir autrement.
+
+        Wikidata ne donne qu'une image par lieu, et la catégorie Commons en
+        contient parfois cent. C'est là que se trouve la photo qu'on aurait
+        voulue — celle prise du ciel, celle de la façade entière — et il n'y a
+        aucun moyen de la connaître sans la demander.
+
+        Seuls les fichiers, pas les sous-catégories : on cherche une photo, pas
+        un plan de classement.
+        """
+        if not category:
+            return []
+        titre = category if category.startswith("Category:") else f"Category:{category}"
+        self._throttle()
+        response = self._session.get(
+            API,
+            params={
+                "action": "query",
+                "format": "json",
+                "formatversion": "2",
+                "list": "categorymembers",
+                "cmtitle": titre,
+                "cmtype": "file",
+                "cmlimit": str(limit),
+            },
+            timeout=self.timeout_s,
+        )
+        response.raise_for_status()
+        membres = response.json().get("query", {}).get("categorymembers", [])
+        return [m["title"] for m in membres if m.get("title")]
 
     def credits(self, titles: list[str]) -> dict[str, tuple[str | None, str | None]]:
         """`{titre de fichier: (auteur, licence)}` pour un lot de cinquante.

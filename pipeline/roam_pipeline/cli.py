@@ -62,10 +62,10 @@ from .models import Collection, CollectionPlace, Place
 from .outlines import ATTRIBUTION as OUTLINE_ATTRIBUTION, DEFAULT_TOLERANCE_KM2
 from .outlines import export as export_outlines
 from .review import (
-    CLEAR, DECISIONS, apply_decisions, apply_names, apply_themes, diff_tiers,
-    read_decisions, read_names, read_themes, theme_claims, write_themes,
-    read_snapshot, snapshot_is_safe, snapshot_losses, vanished, write_decisions,
-    write_names, write_snapshot,
+    CLEAR, DECISIONS, apply_decisions, apply_names, apply_photos, apply_themes,
+    diff_tiers, photo_file, read_decisions, read_names, read_photos, read_themes,
+    theme_claims, write_themes, read_snapshot, snapshot_is_safe, snapshot_losses,
+    vanished, write_decisions, write_names, write_photos, write_snapshot,
 )
 from .score import rescued, score_all, warn_missing_pageviews
 
@@ -795,6 +795,10 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     # Avant tout le reste : le nom choisi par le curateur doit valoir partout,
     # jusque dans la feuille de revue où il relira la ligne.
     renamed = apply_names(scored, read_names(args.manual / "names.csv"))
+    # La photo choisie par le curateur, avant l'export : Wikidata n'en donne
+    # qu'une, et ce n'est pas une décision éditoriale — c'est celle qu'un
+    # contributeur a posée là, un jour.
+    rephotos = apply_photos(scored, read_photos(args.manual / "photos.csv"))
     # Le rattachement choisi par le curateur, avant tout le reste : il change
     # la collection d'appartenance, donc les voisins, donc le rang.
     themes = read_themes(args.manual / "themes.csv")
@@ -839,6 +843,8 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
 
     if renamed:
         print(f"Renommages appliqués : {renamed}")
+    if rephotos:
+        print(f"Photos choisies appliquées : {rephotos}")
 
     if themes:
         gardes = {place.wikidata_id for place in retained}
@@ -2086,6 +2092,105 @@ def cmd_rename(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def cmd_photo(args: argparse.Namespace, config: Config) -> int:
+    """Choisit la photo principale d'un lieu, durablement.
+
+    Wikidata n'en donne qu'une — la propriété P18 — et ce n'est pas une
+    décision éditoriale : c'est celle qu'un contributeur a posée là, un jour.
+    Souvent juste, parfois à contre-jour, parfois cadrée sur un détail quand on
+    attendait l'ensemble.
+
+    La valeur attendue est le nom du fichier sur Commons. Le curateur colle ce
+    qu'il a sous la main — un nom, un titre avec son espace de noms, l'adresse
+    de la page : les trois désignent la même photo.
+    """
+    path = args.manual / "photos.csv"
+    photos = read_photos(path)
+
+    if args.wikidata_id is None:
+        if not photos:
+            print("Aucune photo choisie. "
+                  "Usage : photo Q243 « Tour Eiffel de nuit.jpg »")
+            return 0
+        for qid in sorted(photos):
+            print(f"  {qid:<12} {photos[qid]}")
+        print(f"\n{len(photos)} photo(s) choisie(s) dans {path}")
+        return 0
+
+    qid = args.wikidata_id.strip()
+    if not qid.startswith("Q") or not qid[1:].isdigit():
+        print(f"« {qid} » n'est pas un identifiant Wikidata.", file=sys.stderr)
+        return 1
+
+    if args.clear:
+        if photos.pop(qid, None) is None:
+            print(f"{qid} n'avait pas de photo choisie.")
+            return 0
+        write_photos(path, photos)
+        print(f"{qid} reprend l'image de Wikidata.")
+        return 0
+
+    if args.list:
+        return _list_photos(args, qid, photos)
+
+    if not args.file:
+        print("Il manque le fichier. Usage : photo Q243 « Tour Eiffel de nuit.jpg »",
+              file=sys.stderr)
+        return 1
+
+    fichier = photo_file(args.file)
+    if not fichier:
+        print(f"« {args.file} » ne nomme aucun fichier Commons.", file=sys.stderr)
+        return 1
+
+    photos[qid] = fichier
+    write_photos(path, photos)
+    print(f"{qid} s'affichera avec « {fichier} ».")
+    print("Relance `build` puis `enrich --images` : le crédit suit le FICHIER, "
+          "et la fiche cite le dépôt seul tant qu'il n'a pas été redemandé.")
+    return 0
+
+
+def _list_photos(args: argparse.Namespace, qid: str, photos: dict[str, str]) -> int:
+    """Les autres photos disponibles pour ce lieu, d'après sa catégorie Commons.
+
+    Sans cette liste, choisir se fait à l'aveugle : Wikidata donne une image et
+    ne dit pas qu'il en existe quatre-vingts autres, dont celle qu'on voulait.
+    """
+    from .commons import CommonsClient, file_title
+
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
+        return 1
+
+    lieu = next((p for p in _load_places(raw_path) if p.wikidata_id == qid), None)
+    if lieu is None:
+        print(f"{qid} n'est pas dans la collecte.", file=sys.stderr)
+        return 1
+    if not lieu.commons_category:
+        print(f"{lieu.name} n'a pas de catégorie Commons : Wikidata ne connaît "
+              "que son image, et il n'y a rien à comparer.")
+        return 0
+
+    actuelle = file_title(lieu.image_url)
+    try:
+        fichiers = CommonsClient().category_files(lieu.commons_category)
+    except Exception as exc:
+        print(f"Commons n'a pas répondu ({exc}).", file=sys.stderr)
+        return 1
+
+    print(f"{lieu.name} — catégorie « {lieu.commons_category} », "
+          f"{len(fichiers)} fichier(s) :\n")
+    for titre in fichiers:
+        marque = "  ←  actuelle" if titre == actuelle else ""
+        if photos.get(qid) and titre == f"File:{photos[qid]}":
+            marque = "  ←  choisie"
+        print(f"  {titre}{marque}")
+    print(f"\nPour en choisir une : photo {qid} « <nom du fichier> »")
+    return 0
+
+
 def cmd_pertes(args: argparse.Namespace, config: Config) -> int:
     """Quels redressements de thème ont fait DISPARAÎTRE un lieu ?
 
@@ -3311,6 +3416,21 @@ def build_parser() -> argparse.ArgumentParser:
         "--clear", action="store_true", help="revenir au libellé de Wikidata"
     )
 
+    photo = sub.add_parser(
+        "photo", help="choisit la photo principale d'un lieu (durable)"
+    )
+    photo.add_argument("wikidata_id", nargs="?",
+                       help="Q-id du lieu ; omis, liste les photos choisies")
+    photo.add_argument("file", nargs="?",
+                       help="fichier Commons : un nom, un titre « File:… » ou une adresse")
+    photo.add_argument(
+        "--list", action="store_true",
+        help="lister les photos de la catégorie Commons du lieu (réseau requis)",
+    )
+    photo.add_argument(
+        "--clear", action="store_true", help="revenir à l'image de Wikidata"
+    )
+
     sub.add_parser("stats", help="statistiques du catalogue construit")
 
     app = sub.add_parser("export-app", help="écrit le catalogue dans l'application")
@@ -3454,6 +3574,7 @@ def main(argv: list[str] | None = None) -> int:
         "retention": cmd_retention,
         "probe": cmd_probe,
         "rename": cmd_rename,
+        "photo": cmd_photo,
         "export-app": cmd_export_app,
         "export-outlines": cmd_export_outlines,
     }

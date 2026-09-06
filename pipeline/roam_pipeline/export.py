@@ -469,6 +469,15 @@ def _thumbnail(image_url: str | None, width: int = 400) -> str:
     return f"{url}{separator}width={width}"
 
 
+def _credit(place: Place) -> dict[str, str | None]:
+    """Auteur et licence de la photo, s'ils portent bien sur CELLE affichée."""
+    from .commons import file_title
+
+    if place.image_credit_for and place.image_credit_for == file_title(place.image_url):
+        return {"imageAuthor": place.image_author, "imageLicence": place.image_licence}
+    return {"imageAuthor": None, "imageLicence": None}
+
+
 def _twin_key(qid: str, jumeaux: dict) -> str:
     """Clef de tri partagée par les deux membres de la paire la plus serrée."""
     lot = jumeaux.get(qid)
@@ -1259,8 +1268,12 @@ def write_app_catalog(
                 # plupart des licences de Commons exigent de citer l'auteur.
                 # `null` quand Commons ne le documente pas — la fiche se rabat
                 # alors sur le nom du dépôt.
-                "imageAuthor": place.image_author,
-                "imageLicence": place.image_licence,
+                #
+                # Et seulement s'il porte sur le fichier AFFICHÉ : une photo
+                # changée dans `photos.csv` garde son ancien crédit jusqu'au
+                # prochain `enrich --images`, et citer le mauvais photographe
+                # est pire que n'en citer aucun.
+                **_credit(place),
                 "wikipediaUrl": place.wikipedia_url,
             }
         )
