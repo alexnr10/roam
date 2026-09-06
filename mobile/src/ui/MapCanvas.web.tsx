@@ -55,6 +55,7 @@ export function MapCanvas({
   position,
   onSelectPlace,
   highlightedId,
+  focus,
 }: MapCanvasProps) {
   const container = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreMap | null>(null);
@@ -181,6 +182,27 @@ export function MapCanvas({
         },
       });
 
+      // La zone TACTILE, invisible et large.
+      //
+      // Le point mesure quatre pixels au dézoom : sur un téléphone, on le rate
+      // une fois sur deux, et c'est le geste le plus fréquent de l'application.
+      // MapLibre interroge les couches même transparentes — un cercle
+      // d'opacité nulle attrape donc le doigt sans rien salir à l'écran.
+      instance.addLayer({
+        id: 'place-hit',
+        type: 'circle',
+        source: SOURCE,
+        filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-color': mapColors.todo,
+          // Un centième d'opacité, pas zéro : invisible à l'œil, et la couche
+          // reste indiscutablement DESSINÉE — donc interrogeable au clic, sans
+          // dépendre de la façon dont le moteur traite l'opacité nulle.
+          'circle-opacity': 0.01,
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 14, 10, 18, 14, 22],
+        },
+      });
+
       // Le lieu proposé à la validation, par-dessus tout le reste.
       instance.addLayer({
         id: 'place-highlight',
@@ -195,7 +217,7 @@ export function MapCanvas({
         },
       });
 
-      instance.on('click', 'place', (event: MapLayerMouseEvent) => {
+      instance.on('click', 'place-hit', (event: MapLayerMouseEvent) => {
         const id = event.features?.[0]?.properties?.id as string | undefined;
         const place = id ? byId.current.get(id) : undefined;
         if (place) onSelect.current(place);
@@ -237,7 +259,7 @@ export function MapCanvas({
 
       setReady(true);
 
-      for (const layer of ['place', 'clusters']) {
+      for (const layer of ['place-hit', 'clusters']) {
         instance.on('mouseenter', layer, () => {
           instance.getCanvas().style.cursor = 'pointer';
         });
@@ -272,6 +294,26 @@ export function MapCanvas({
       highlightedId ?? '__none__',
     ]);
   }, [ready, highlightedId]);
+
+  // Recentrage sur un lieu choisi ailleurs — dans le bandeau, dans la
+  // recherche. Sans lui, toucher une vignette ne dit pas où elle se trouve, et
+  // la carte et la liste racontent deux histoires différentes.
+  //
+  // Les dépendances sont les COORDONNÉES, pas l'objet : `focus` est reconstruit
+  // à chaque rendu, et s'y fier recentrerait la carte à la moindre frappe dans
+  // la recherche — l'utilisateur ne pourrait plus la déplacer.
+  const focusLat = focus?.lat ?? null;
+  const focusLon = focus?.lon ?? null;
+  useEffect(() => {
+    if (!ready || focusLat === null || focusLon === null) return;
+    const instance = map.current;
+    if (!instance) return;
+    instance.easeTo({
+      center: [focusLon, focusLat],
+      zoom: Math.max(instance.getZoom(), 11),
+      duration: 600,
+    });
+  }, [ready, focusLat, focusLon]);
 
   // Position de l'utilisateur : un marqueur distinct, pas un point du catalogue.
   useEffect(() => {
