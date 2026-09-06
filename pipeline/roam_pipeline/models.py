@@ -170,6 +170,11 @@ class CollectionPlace:
     # collection l'avait coupé. La collection dépasse alors son plafond, et
     # c'est assumé : le plafond est une heuristique, la décision un jugement.
     forced: bool = False
+    # Le niveau qu'il aurait eu SANS la décision du curateur. Le niveau seul
+    # ne dit pas d'où l'on part : un lieu remonté depuis le niveau 2 et un
+    # lieu qui valait déjà le niveau 1 s'affichent à l'identique, et la revue
+    # ne peut pas relire ses propres décisions.
+    natural_tier: int = 0
 
 
 @dataclass

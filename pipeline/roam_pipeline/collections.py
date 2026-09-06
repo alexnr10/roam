@@ -416,8 +416,8 @@ def _finalize(
 
     collection.places = [
         CollectionPlace(place_id=place.wikidata_id, tier=tier, rank=rank,
-                        forced=place.wikidata_id in forces)
-        for place, tier, rank in assign_tiers(ordered, config.tiers, ordre)
+                        forced=place.wikidata_id in forces, natural_tier=naturel)
+        for place, tier, rank, naturel in assign_tiers(ordered, config.tiers, ordre)
     ]
     return collection
 
@@ -1584,6 +1584,7 @@ def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Co
     )
     warn_orphans(orphelins, config)
     warn_crowded_tier1(collections, config)
+    warn_surprising_promotions(retained, collections)
     return retained, collections
 
 
@@ -1616,6 +1617,60 @@ def warn_crowded_tier1(collections: list[Collection], config: Config) -> list[st
         ", ".join(f"{nom} {n1}/{n}" for nom, n1, n in sorted(trop, key=lambda t: -t[1])[:6]),
     )
     return [nom for nom, _, _ in trop]
+
+
+def warn_surprising_promotions(
+    places: list[Place], collections: list[Collection]
+) -> list[Place]:
+    """Les promotions qui ont porté un lieu au niveau 1 sans qu'on s'y attende.
+
+    Une promotion déplace d'un cran, mais rien ne disait de quel cran on part :
+    remonter un lieu dont le rang naturel était le SECOND le porte au niveau 1.
+    Le curateur croyait viser le niveau 2, et se retrouvait avec seize ponts
+    « incontournables » pour un budget de dix.
+
+    Le geste qui répare n'est pas `demote` : la décision se cumulerait au rang
+    NATUREL, pas au niveau affiché, et enverrait le lieu au niveau 3. C'est la
+    décision qu'il faut EFFACER.
+
+    Les promotions sans effet — un lieu qui valait déjà le niveau 1 — sont
+    signalées avec : elles n'ont rien changé, et il vaut mieux le savoir avant
+    d'en discuter.
+    """
+    par_id = {place.wikidata_id: place for place in places}
+    montes: list[tuple[str, Place]] = []
+    inutiles: list[Place] = []
+    for collection in collections:
+        if collection.kind != "theme":
+            continue
+        for cp in collection.places:
+            place = par_id.get(cp.place_id)
+            if place is None or place.tier_shift >= 0 or not cp.natural_tier:
+                continue
+            if cp.tier == 1 and cp.natural_tier == 2:
+                montes.append((collection.name, place))
+            elif cp.tier == cp.natural_tier:
+                inutiles.append(place)
+
+    if montes:
+        LOG.info(
+            "%s lieu(x) portés au NIVEAU 1 par ta promotion, alors que leur rang "
+            "naturel était le second : %s. Pour les rendre au niveau 2, EFFACE la "
+            "décision (✕) — `demote` repartirait du même rang naturel et les "
+            "enverrait au niveau 3.",
+            len(montes),
+            ", ".join(
+                f"{place.name} ({nom}, {place.score:.0f} pts)"
+                for nom, place in sorted(montes, key=lambda couple: couple[1].score)[:12]
+            ),
+        )
+    if inutiles:
+        LOG.info(
+            "%s promotion(s) sans effet — ces lieux valaient déjà leur niveau : %s",
+            len(inutiles),
+            ", ".join(place.name for place in sorted(inutiles, key=lambda p: p.name)),
+        )
+    return [place for _nom, place in montes]
 
 
 def warn_orphans(orphelins: list[Place], config: Config) -> int:

@@ -131,7 +131,7 @@ def under_floor(place: Place, config: Config) -> bool:
 
 def _membership(
     collections: list[Collection],
-) -> tuple[dict[str, list[str]], dict[str, int], set[str], set[str]]:
+) -> tuple[dict[str, list[str]], dict[str, int], set[str], set[str], dict[str, int]]:
     """Collections de chaque lieu, et son niveau de priorité de revue.
 
     Le niveau retenu est celui de la COLLECTION THÉMATIQUE NATIONALE, pas le
@@ -142,6 +142,8 @@ def _membership(
     """
     membership: dict[str, list[str]] = defaultdict(list)
     review_tier: dict[str, int] = {}
+    # Le niveau d'AVANT la décision, dans cette même collection nationale.
+    naturels: dict[str, int] = {}
 
     for collection in collections:
         for cp in collection.places:
@@ -152,6 +154,7 @@ def _membership(
             continue
         for cp in collection.places:
             review_tier[cp.place_id] = cp.tier
+            naturels[cp.place_id] = cp.natural_tier
 
     # Hors de la collection nationale de son thème : à relire en dernier. Mais
     # « niveau 3 » et « pas dans la collection » sont deux états différents, et
@@ -173,7 +176,7 @@ def _membership(
         if cp.forced
     }
 
-    return membership, review_tier, dans_nationale, forces
+    return membership, review_tier, dans_nationale, forces, naturels
 
 
 def review_state(
@@ -217,7 +220,7 @@ def write_review_csv(
     Triée par niveau puis par thème : le travail est trop long pour être fait
     d'un bloc, il doit pouvoir être fait par tranches utiles.
     """
-    membership, best_tier, _nationale, _forces = _membership(collections)
+    membership, best_tier, _nationale, _forces, _naturels = _membership(collections)
     depts = departements()
     # Les niveaux 1 en tête, groupés par thème. Relire 1 900 lignes d'un bloc
     # est décourageant ; relire d'abord les 200 incontournables donne déjà un
@@ -481,7 +484,7 @@ def write_review_html(
     zéro. La page part donc de `decisions.csv`, et le navigateur n'ajoute que
     ce qui n'y est pas encore.
     """
-    membership, best_tier, nationale, forces = _membership(collections)
+    membership, best_tier, nationale, forces, naturels = _membership(collections)
     depts = departements()
     hints = name_hints(config)
     claims = claims or {}
@@ -536,6 +539,12 @@ def write_review_html(
                 # revoir un lieu déjà tranché, et on doute de son propre travail.
                 "commune": place.commune_name or "",
                 "tier": best_tier.get(place.wikidata_id, 3),
+                # Le niveau qu'il aurait SANS la décision du curateur. C'est
+                # lui qui dit où mène un clic : « monter » un lieu dont le rang
+                # naturel est le second le porte au niveau 1, et rien sur la
+                # fiche ne le disait — dix-neuf lieux sont ainsi arrivés au
+                # niveau 1 sans que personne l'ait voulu.
+                "naturalTier": naturels.get(place.wikidata_id, 0),
                 "score": place.score,
                 "parts": parts,
                 "sitelinks": place.sitelinks,
@@ -726,6 +735,8 @@ _REVIEW_TEMPLATE = """<!doctype html>
       <option value="sosie">Sosies — deux fiches pour une seule visite ?</option>
       <option value="keep">Gardés</option>
       <option value="drop">Écartés</option>
+      <option value="promote">Montés par moi</option>
+      <option value="demote">Descendus par moi</option>
     </select>
     <button class="primary" id="export">Télécharger les décisions</button>
     <span class="depot" id="depot"></span>
@@ -897,6 +908,38 @@ function alterner(lieux) {
     || a.name.localeCompare(b.name));
 }
 
+// Où mène un clic. Le niveau naturel n'existe que pour les lieux DÉJÀ dans la
+// collection nationale : ailleurs, le lieu n'a pas de rang à déplacer, et un
+// « monter » le fait d'abord entrer — son niveau ne se connaîtra qu'au prochain
+// build.
+function apres(p, act) {
+  if (!p.national || !p.naturalTier) return null;
+  return Math.min(3, Math.max(1, p.naturalTier + (act === "promote" ? -1 : 1)));
+}
+
+// La flèche annonce le niveau qu'elle produirait. Un second clic sur la même
+// flèche EFFACE la décision : la destination est alors le rang naturel, et
+// c'est le seul geste juste pour un lieu monté trop haut — `descendre` le
+// déplacerait de deux crans depuis ce même rang naturel.
+function fleche(p, d, act) {
+  const on = d === act;
+  const cible = on ? p.naturalTier : apres(p, act);
+  const signe = act === "promote" ? "↑" : "↓";
+  // Un lieu hors de la collection nationale n'a pas de rang à déplacer : le
+  // monter l'y fait d'abord ENTRER, puis le déplace d'un cran depuis le rang
+  // que son score lui vaut. Il ne peut donc pas arriver au niveau 3 — 83 des
+  // 109 promotions sont au niveau 2, les 26 autres au niveau 1.
+  const entrant = !p.national && act === "promote";
+  const titre = entrant
+    ? "Le ferait ENTRER dans la collection nationale, au niveau 2 — ou 1 si son score le place en tête"
+    : !cible ? "Faire descendre"
+    : on ? `Annuler : le ramènerait au niveau ${cible}`
+         : `Le porterait au niveau ${cible}`;
+  const suffixe = entrant ? " N1-2" : cible ? " N" + cible : "";
+  return `<button data-act="${act}"${on ? ` data-on="${act}"` : ""}`
+    + ` title="${titre}">${signe}${suffixe}</button>`;
+}
+
 function card(p) {
   const el = document.createElement("article");
   const d = decisions[p.id] || "";
@@ -965,7 +1008,12 @@ function card(p) {
         ? `<div class="found">Entré dans la collection nationale par ta
              décision : son score le laissait sous le plafond du thème.</div>`
         : p.shift ? `<div class="found">Déplacé par toi :
-        ${p.shift < 0 ? "monté" : "descendu"} d'un niveau</div>` : ""}
+        ${p.shift < 0 ? "monté" : "descendu"} d'un niveau${
+          p.naturalTier && p.national
+            ? p.naturalTier === p.tier
+              ? ` — sans effet, il était déjà au niveau ${p.tier}`
+              : ` — niveau ${p.naturalTier} sans ta décision`
+            : ""}</div>` : ""}
       ${p.visitable === true
         ? `<div class="open">✓ ouvert au public${p.hours ? ` · ${p.hours}` : ""}</div>`
         : ""}
@@ -983,10 +1031,8 @@ function card(p) {
     <div class="actions">
       <button data-act="keep"${d === "keep" ? ' data-on="keep"' : ""}>Garder</button>
       <button data-act="drop"${d === "drop" ? ' data-on="drop"' : ""}>Écarter</button>
-      <button data-act="promote"${d === "promote" ? ' data-on="promote"' : ""}
-              title="Faire remonter">↑</button>
-      <button data-act="demote"${d === "demote" ? ' data-on="demote"' : ""}
-              title="Faire descendre">↓</button>
+      ${fleche(p, d, "promote")}
+      ${fleche(p, d, "demote")}
       ${d || p.id in DECIDED
         ? `<button data-act="" data-clear="1" title="Revenir à aucune décision">✕</button>`
         : ""}

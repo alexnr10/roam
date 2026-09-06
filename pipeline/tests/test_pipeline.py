@@ -348,7 +348,7 @@ class TestTiers(unittest.TestCase):
         places = [make_place(f"P{i}", sitelinks=200 - i) for i in range(60)]
         score_all(places, CONFIG)
         counts = {1: 0, 2: 0, 3: 0}
-        for _, tier, _ in assign_tiers(places, CONFIG.tiers):
+        for _, tier, _, _ in assign_tiers(places, CONFIG.tiers):
             counts[tier] += 1
         self.assertLessEqual(counts[1], CONFIG.tiers.tier1_size)
         self.assertLessEqual(counts[2], CONFIG.tiers.tier2_size)
@@ -358,19 +358,44 @@ class TestTiers(unittest.TestCase):
         # simplement parce qu'ils sont les dix seuls de leur collection.
         weak = [make_place(f"W{i}", sitelinks=1) for i in range(10)]
         score_all(weak, CONFIG)
-        tiers = {tier for _, tier, _ in assign_tiers(weak, CONFIG.tiers)}
+        tiers = {tier for _, tier, _, _ in assign_tiers(weak, CONFIG.tiers)}
         self.assertNotIn(1, tiers)
 
     def test_ranking_is_by_descending_score(self):
         places = [make_place(f"P{i}", sitelinks=i) for i in range(1, 20)]
         score_all(places, CONFIG)
-        scores = [p.score for p, _, _ in assign_tiers(places, CONFIG.tiers)]
+        scores = [p.score for p, _, _, _ in assign_tiers(places, CONFIG.tiers)]
         self.assertEqual(scores, sorted(scores, reverse=True))
+
+    def test_the_natural_tier_survives_the_decision(self):
+        # Le niveau seul ne dit pas d'où l'on part. Un `promote` déplace d'un
+        # cran, et rien sur la fiche ne disait de quel cran : dix-neuf lieux
+        # sont arrivés au niveau 1 sans que personne l'ait voulu.
+        places = [make_place(f"P{i}", sitelinks=200 - i) for i in range(30)]
+        score_all(places, CONFIG)
+        onzieme = sorted(places, key=lambda p: -p.score)[10]
+        onzieme.tier_shift = -1
+        niveaux = {p.wikidata_id: (tier, naturel)
+                   for p, tier, _rang, naturel in assign_tiers(places, CONFIG.tiers)}
+        tier, naturel = niveaux[onzieme.wikidata_id]
+        self.assertEqual(tier, 1)
+        self.assertEqual(naturel, 2)
+
+    def test_a_promotion_that_changes_nothing_says_so(self):
+        # Remonter un lieu qui valait déjà le niveau 1 ne fait rien. La revue
+        # doit pouvoir le dire : c'est une décision à effacer, pas à garder.
+        places = [make_place(f"P{i}", sitelinks=200 - i) for i in range(30)]
+        score_all(places, CONFIG)
+        premier = max(places, key=lambda p: p.score)
+        premier.tier_shift = -1
+        niveaux = {p.wikidata_id: (tier, naturel)
+                   for p, tier, _rang, naturel in assign_tiers(places, CONFIG.tiers)}
+        self.assertEqual(niveaux[premier.wikidata_id], (1, 1))
 
     def test_ordering_is_stable_on_score_ties(self):
         places = [make_place(name, sitelinks=5) for name in ("Zèbre", "Alpha", "Milieu")]
         score_all(places, CONFIG)
-        names = [p.name for p, _, _ in assign_tiers(places, CONFIG.tiers)]
+        names = [p.name for p, _, _, _ in assign_tiers(places, CONFIG.tiers)]
         self.assertEqual(names, ["Alpha", "Milieu", "Zèbre"])
 
 
@@ -2467,6 +2492,34 @@ class TestTierChanges(unittest.TestCase):
         self.assertIn('value="bouge"', body)
         self.assertIn("descendu depuis ta dernière revue", body)
 
+    def test_the_page_says_where_an_arrow_would_land(self):
+        # « Je ne pensais pas qu'ils monteraient si haut. » La flèche déplaçait
+        # d'un cran sans jamais dire de quel cran on partait : remonter un lieu
+        # dont le rang naturel était le second le portait au niveau 1.
+        places = self._catalogue()
+        onzieme = sorted(places, key=lambda p: -p.score)[10]
+        onzieme.tier_shift = -1
+        with _capture():
+            retained, collections = build_all(places, CONFIG)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.html"
+            write_review_html(retained, collections, CONFIG, path)
+            body = path.read_text(encoding="utf-8")
+        debut = body.index("const DATA = ")
+        data = json.loads(body[debut + len("const DATA = "):body.index(";\nconst THEMES", debut)])
+        fiche = next(d for d in data if d["id"] == onzieme.wikidata_id)
+        self.assertEqual((fiche["tier"], fiche["naturalTier"]), (1, 2))
+        # La page annonce la destination AVANT le clic, et sait qu'un second
+        # clic sur la même flèche ramène au rang naturel.
+        self.assertIn("function fleche(p, d, act)", body)
+        self.assertIn("Annuler : le ramènerait au niveau", body)
+        # Hors de la collection nationale, monter fait d'abord ENTRER : le
+        # niveau 3 est alors hors d'atteinte, et la flèche le dit.
+        self.assertIn("N1-2", body)
+        self.assertIn("sans ta décision", body)
+        # Et retrouver ses propres promotions est un filtre à part entière.
+        self.assertIn('<option value="promote">Montés par moi</option>', body)
+
     def test_two_homonyms_are_told_apart_by_their_commune(self):
         # Le département ne suffit pas toujours. « Musée Pierre-Corneille »
         # existe deux fois en Seine-Maritime — sa maison natale à Rouen, sa
@@ -4288,6 +4341,61 @@ class TestCrowdedTier1(unittest.TestCase):
         self.assertEqual(warn_crowded_tier1([juste], CONFIG), [])
 
 
+class TestSurprisingPromotions(unittest.TestCase):
+    """« Je ne pensais pas qu'ils monteraient si haut. »
+
+    Une promotion déplace d'un cran, mais rien ne disait de quel cran on part :
+    remonter un lieu dont le rang naturel était le SECOND le porte au niveau 1.
+    Vingt lieux y sont arrivés ainsi, et seize ponts se disaient
+    « incontournables » pour un budget de dix.
+    """
+
+    def _collection(self, membres):
+        from roam_pipeline.models import Collection, CollectionPlace
+
+        c = Collection(slug="ponts", name="Ponts et viaducs", kind="theme", theme_id="ponts")
+        c.places = [CollectionPlace(place_id=qid, tier=tier, rank=index + 1,
+                                    natural_tier=naturel)
+                    for index, (qid, tier, naturel) in enumerate(membres)]
+        return c
+
+    def _lieu(self, qid, shift):
+        lieu = make_place(qid, theme_id="ponts", wikidata_id=qid)
+        lieu.tier_shift, lieu.score = shift, 62.0
+        return lieu
+
+    def test_a_promotion_that_reached_tier_one_is_named(self):
+        from roam_pipeline.collections import warn_surprising_promotions
+
+        lieux = [self._lieu("Q1", -1), self._lieu("Q2", -1), self._lieu("Q3", 0)]
+        collection = self._collection([("Q1", 1, 2), ("Q2", 2, 3), ("Q3", 1, 1)])
+        with self.assertLogs("roam_pipeline.collections", level="INFO") as journal:
+            surpris = warn_surprising_promotions(lieux, [collection])
+        self.assertEqual([p.wikidata_id for p in surpris], ["Q1"])
+        texte = "\n".join(journal.output)
+        # Et le geste juste est nommé : effacer, pas descendre.
+        self.assertIn("EFFACE la décision", texte)
+
+    def test_a_promotion_that_changed_nothing_is_told_apart(self):
+        from roam_pipeline.collections import warn_surprising_promotions
+
+        lieux = [self._lieu("Q1", -1)]
+        collection = self._collection([("Q1", 1, 1)])
+        with self.assertLogs("roam_pipeline.collections", level="INFO") as journal:
+            self.assertEqual(warn_surprising_promotions(lieux, [collection]), [])
+        self.assertIn("sans effet", "\n".join(journal.output))
+
+    def test_geographic_collections_are_left_alone(self):
+        # Le niveau y est relatif à un territoire, pas à la France : y monter
+        # un lieu n'engage pas le budget national.
+        from roam_pipeline.collections import warn_surprising_promotions
+
+        collection = self._collection([("Q1", 1, 2)])
+        collection.kind = "geo"
+        self.assertEqual(
+            warn_surprising_promotions([self._lieu("Q1", -1)], [collection]), [])
+
+
 class TestOrphansAfterCollections(unittest.TestCase):
     """Un lieu repêché puis jeté faute de collection : le travail est perdu.
 
@@ -5093,7 +5201,7 @@ class TestThemeShareInGeoCollections(unittest.TestCase):
         rangs = _rank_within_theme(lot)
         ordre = lambda p: (rangs[p.wikidata_id], -p.score, p.name)  # noqa: E731
         niveaux = assign_tiers(sorted(lot, key=ordre), CONFIG.tiers, ordre)
-        premiers = {place.theme_id for place, tier, _rang in niveaux if tier == 1}
+        premiers = {place.theme_id for place, tier, _rang, _nat in niveaux if tier == 1}
         self.assertIn("cascades", premiers)
 
     def test_cross_collections_keep_their_single_theme(self):

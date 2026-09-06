@@ -223,7 +223,7 @@ def derive_criteria(place: Place, config: Config) -> list[str]:
 
 def assign_tiers(
     ranked: list[Place], tiers: Tiers, ordre: Callable[[Place], Any] | None = None
-) -> list[tuple[Place, int, int]]:
+) -> list[tuple[Place, int, int, int]]:
     """Attribue un niveau à chaque lieu d'une collection, par rang décroissant.
 
     Le niveau est RELATIF à la collection : les meilleurs prennent le niveau 1.
@@ -250,9 +250,14 @@ def assign_tiers(
 
     le plafond est une heuristique, la décision est un jugement, et faire
     redescendre quelqu'un d'autre en silence serait pire.
+
+    Chaque lieu repart avec le niveau qu'il AURAIT eu sans la décision. C'est
+    ce que la revue doit montrer : un `promote` déplace d'un cran, mais rien
+    sur la fiche ne disait de quel cran on partait, et remonter un lieu dont
+    le rang naturel était déjà le second le portait au niveau 1 par surprise.
     """
     ordered = sorted(ranked, key=ordre or (lambda p: (-p.score, p.name)))
-    juges: list[tuple[Place, int]] = []
+    juges: list[tuple[Place, int, int]] = []
     tier1_used = 0
     tier2_used = 0
 
@@ -263,6 +268,7 @@ def assign_tiers(
             tier = 2
         else:
             tier = 3
+        naturel = tier
         tier = min(3, max(1, tier + place.tier_shift))
         # Les places se comptent sur le niveau FINAL, pas sur celui qu'on aurait
         # donné sans la décision. Autrement un lieu descendu occuperait une
@@ -273,7 +279,7 @@ def assign_tiers(
             tier1_used += 1
         elif tier == 2:
             tier2_used += 1
-        juges.append((place, tier))
+        juges.append((place, tier, naturel))
 
     # Renumérotés dans l'ordre des niveaux : sans cela, un lieu descendu
     # garderait son rang et la liste afficherait un niveau 3 avant un niveau 1.
@@ -281,5 +287,8 @@ def assign_tiers(
     # rang dans le thème qui a décidé de l'entrée, et les deux doivent dire
     # la même chose.
     position = {place.wikidata_id: index for index, place in enumerate(ordered)}
-    juges.sort(key=lambda couple: (couple[1], position[couple[0].wikidata_id]))
-    return [(place, tier, index) for index, (place, tier) in enumerate(juges, start=1)]
+    juges.sort(key=lambda trio: (trio[1], position[trio[0].wikidata_id]))
+    return [
+        (place, tier, index, naturel)
+        for index, (place, tier, naturel) in enumerate(juges, start=1)
+    ]
