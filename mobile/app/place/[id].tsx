@@ -84,6 +84,17 @@ export default function PlaceScreen() {
         height={Math.round(((ecran - spacing.lg * 2) * 2) / 3)}
         round={radius.lg}
       />
+      {/* Le crédit de la photo. Une image de Commons n'est pas libre de
+          droits : la plupart des licences exigent de citer l'auteur. Tant que
+          `enrich --images` n'a pas tourné, on cite au moins le dépôt — c'est
+          le minimum honnête, et ça ne prétend pas savoir ce qu'on ignore. */}
+      {place.imageUrl ? (
+        <Text style={[type.tiny, styles.credit]} numberOfLines={2}>
+          Photo :{place.imageAuthor ? ` ${place.imageAuthor} ·` : ''}
+          {place.imageLicence ? ` ${place.imageLicence} ·` : ''} Wikimedia
+          Commons
+        </Text>
+      ) : null}
       <Text style={[type.title, { marginTop: spacing.md }]}>{place.name}</Text>
       <Text style={[type.small, { marginTop: spacing.xs }]}>
         {themeLabel(place.themeId)}
@@ -215,6 +226,7 @@ export default function PlaceScreen() {
 
 const styles = StyleSheet.create({
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  credit: { marginTop: spacing.xs },
   summary: { marginTop: spacing.md, lineHeight: 22 },
   rowBetween: {
     flexDirection: 'row',

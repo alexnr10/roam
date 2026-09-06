@@ -45,6 +45,7 @@ from .fetch import (
     enrich_exclusions,
     enrich_visitors,
     enrich_article_sizes,
+    enrich_image_credits,
     enrich_pageviews,
     enrich_communes,
     enrich_departements,
@@ -475,6 +476,11 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     # demande.
     if args.pageviews:
         enrich_pageviews(places)
+    # Le crédit des photos : cinquante fichiers par requête, et deux mille
+    # fichiers seulement. C'est une passe courte, mais elle demande le réseau
+    # de Commons — on la garde optionnelle comme les autres.
+    if args.images:
+        enrich_image_credits(places)
     _save_raw(args, places)
     print(f"{found} tailles d'articles ajoutées → {raw_path}")
     print("Relance `build` pour en tenir compte dans le classement.")
@@ -3157,6 +3163,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--pageviews",
         action="store_true",
         help="ajouter les consultations Wikipédia (une requête par article)",
+    )
+    enrich.add_argument(
+        "--images",
+        action="store_true",
+        help="ajouter l'auteur et la licence des photos (Wikimedia Commons)",
     )
     enrich.add_argument(
         "--skip-summaries",

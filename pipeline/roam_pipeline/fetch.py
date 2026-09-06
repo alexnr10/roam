@@ -797,6 +797,57 @@ def enrich_pageviews(places: list[Place], client: WikipediaClient | None = None)
     return found
 
 
+def enrich_image_credits(places: list[Place], client=None) -> int:
+    """Auteur et licence de chaque photo, demandés à Commons.
+
+    Wikidata donne l'adresse du fichier, jamais son crédit. Or une image de
+    Commons n'est pas libre de droits : la plupart des licences exigent de
+    citer l'auteur, et le catalogue en publie deux mille.
+
+    Comme les tailles d'articles, cinquante fichiers par requête. Un lieu déjà
+    crédité n'est pas redemandé : relancer après une interruption ne recommence
+    pas, et une photo qui change d'adresse repart de zéro toute seule.
+    """
+    from .commons import BATCH as COMMONS_BATCH, CommonsClient, file_title
+
+    client = client or CommonsClient()
+    par_titre: dict[str, list[Place]] = defaultdict(list)
+    for place in places:
+        titre = file_title(place.image_url)
+        if titre and not place.image_author and not place.image_licence:
+            par_titre[titre].append(place)
+
+    titres = sorted(par_titre)
+    if not titres:
+        LOG.info("crédits des photos : rien à récupérer")
+        return 0
+
+    LOG.info(
+        "crédits des photos : %s fichiers, %s par requête",
+        len(titres), COMMONS_BATCH,
+    )
+    trouves = 0
+    for debut in range(0, len(titres), COMMONS_BATCH):
+        lot = titres[debut:debut + COMMONS_BATCH]
+        try:
+            credits = client.credits(lot)
+        except Exception as exc:
+            # Un lot qui échoue ne doit pas coûter les quarante autres.
+            LOG.warning("crédits des photos : lot %s échoué (%s)", debut // COMMONS_BATCH, exc)
+            continue
+        for titre, (auteur, licence) in credits.items():
+            for place in par_titre.get(titre, []):
+                place.image_author, place.image_licence = auteur, licence
+                trouves += 1
+
+    sans = sum(1 for lot in par_titre.values() for p in lot if not p.image_licence)
+    LOG.info(
+        "crédits des photos : %s lieux crédités, %s sans crédit documenté",
+        trouves, sans,
+    )
+    return trouves
+
+
 def enrich_summaries(places: list[Place], client: WikipediaClient | None = None) -> int:
     """Récupère une description courte pour chaque lieu.
 

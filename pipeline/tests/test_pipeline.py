@@ -3623,6 +3623,88 @@ class TestPageviews(unittest.TestCase):
         self.assertIsNone(_FakeViews(None, status=404).pageviews("Un lieu"))
 
 
+class TestImageCredits(unittest.TestCase):
+    """Une image de Commons n'est pas libre de droits.
+
+    La plupart des licences exigent de citer l'auteur, et le catalogue en
+    publie deux mille. Wikidata donne l'adresse du fichier, jamais son crédit :
+    il faut le demander à Commons.
+    """
+
+    def test_the_file_title_is_read_back_from_the_url(self):
+        from roam_pipeline.commons import file_title
+
+        self.assertEqual(
+            file_title("https://commons.wikimedia.org/wiki/"
+                       "Special:FilePath/Tour%20Eiffel.jpg"),
+            "File:Tour Eiffel.jpg",
+        )
+        # La largeur éventuelle ne fait pas partie du nom du fichier.
+        self.assertEqual(
+            file_title("https://commons.wikimedia.org/wiki/"
+                       "Special:FilePath/Pont%20du%20Gard.jpg?width=800"),
+            "File:Pont du Gard.jpg",
+        )
+
+    def test_an_url_that_is_not_a_file_has_no_title(self):
+        from roam_pipeline.commons import file_title
+
+        self.assertIsNone(file_title(None))
+        self.assertIsNone(file_title("https://example.org/photo.jpg"))
+
+    def test_the_author_is_stripped_of_its_html(self):
+        from roam_pipeline.commons import texte
+
+        # Commons range l'auteur en HTML : c'est presque toujours un lien.
+        self.assertEqual(texte('<a href="/wiki/x">Benh LIEU SONG</a>'), "Benh LIEU SONG")
+        self.assertEqual(texte("Jean&nbsp;Dupont"), "Jean Dupont")
+        self.assertIsNone(texte("<span> </span>"))
+        self.assertIsNone(texte(None))
+
+    def test_a_place_already_credited_is_not_asked_again(self):
+        from roam_pipeline.fetch import enrich_image_credits
+
+        class _Faux:
+            def __init__(self):
+                self.demandes = []
+
+            def credits(self, titles):
+                self.demandes.append(list(titles))
+                return {t: ("Un photographe", "CC BY-SA 4.0") for t in titles}
+
+        nu = make_place("Sans crédit", wikidata_id="Q1")
+        nu.image_url = "https://commons.wikimedia.org/wiki/Special:FilePath/A.jpg"
+        deja = make_place("Déjà crédité", wikidata_id="Q2")
+        deja.image_url = "https://commons.wikimedia.org/wiki/Special:FilePath/B.jpg"
+        deja.image_author, deja.image_licence = "Quelqu'un", "CC0"
+        sans_photo = make_place("Sans photo", wikidata_id="Q3")
+
+        client = _Faux()
+        with _capture():
+            trouves = enrich_image_credits([nu, deja, sans_photo], client)
+
+        self.assertEqual(trouves, 1)
+        self.assertEqual(client.demandes, [["File:A.jpg"]])
+        self.assertEqual(nu.image_author, "Un photographe")
+        self.assertEqual(nu.image_licence, "CC BY-SA 4.0")
+        # Ni écrasé, ni inventé.
+        self.assertEqual(deja.image_author, "Quelqu'un")
+        self.assertIsNone(sans_photo.image_author)
+
+    def test_a_failing_batch_does_not_cost_the_others(self):
+        from roam_pipeline.fetch import enrich_image_credits
+
+        class _Casse:
+            def credits(self, titles):
+                raise RuntimeError("503")
+
+        lieu = make_place("Un lieu", wikidata_id="Q1")
+        lieu.image_url = "https://commons.wikimedia.org/wiki/Special:FilePath/A.jpg"
+        with _capture():
+            self.assertEqual(enrich_image_credits([lieu], _Casse()), 0)
+        self.assertIsNone(lieu.image_author)
+
+
 class _FakeViews(WikipediaClient):
     """Un client qui ne sort pas sur le réseau, pour éprouver la médiane."""
 

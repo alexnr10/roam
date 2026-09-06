@@ -1255,6 +1255,12 @@ def write_app_catalog(
                 # L'adresse NUE : l'application demande la largeur qu'elle
                 # affiche. Voir `src/lib/photo.ts`.
                 "imageUrl": _commons_url(place.image_url) or None,
+                # Le crédit, sans quoi la photo n'est pas publiable : la
+                # plupart des licences de Commons exigent de citer l'auteur.
+                # `null` quand Commons ne le documente pas — la fiche se rabat
+                # alors sur le nom du dépôt.
+                "imageAuthor": place.image_author,
+                "imageLicence": place.image_licence,
                 "wikipediaUrl": place.wikipedia_url,
             }
         )

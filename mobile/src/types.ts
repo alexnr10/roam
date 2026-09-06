@@ -34,6 +34,13 @@ export type Place = {
   communeName?: string | null;
   summary?: string | null;
   imageUrl?: string | null;
+  /**
+   * Le crédit de la photo. Une image de Commons n'est pas libre de droits :
+   * la plupart des licences exigent de citer l'auteur, et le catalogue en
+   * publie deux mille. `null` = Commons ne le documente pas.
+   */
+  imageAuthor?: string | null;
+  imageLicence?: string | null;
   /** Source de la description : l'écran du lieu doit y renvoyer (CC BY-SA). */
   wikipediaUrl?: string | null;
 };

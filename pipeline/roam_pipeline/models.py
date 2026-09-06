@@ -128,6 +128,13 @@ class Place:
     # cinquante-six langues parce que la tour Eiffel s'y trouve, et les jardins
     # de la Fontaine dans six — ce que personne n'irait appeler un classement.
     pageviews_per_month: int | None = None
+    # Le crédit de la photo : qui l'a prise, et sous quelle licence. Une image
+    # de Commons n'est pas libre de droits — la plupart des licences exigent de
+    # citer l'auteur, et le catalogue en publie deux mille. `None` signifie
+    # « Commons ne le documente pas » : la fiche se rabat alors sur le nom du
+    # dépôt, qui est le minimum honnête.
+    image_author: str | None = None
+    image_licence: str | None = None
     # Entré par une classe GÉNÉRIQUE (`broad_classes`) et non par une classe
     # propre au thème. Une porte large ne vaut pas une porte précise : le
     # dédoublonnage inter-thèmes s'en sert pour trancher.
