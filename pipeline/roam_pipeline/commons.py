@@ -119,6 +119,13 @@ class CommonsClient:
 
         Un titre absent de la réponse — fichier supprimé, renommé — n'apparaît
         pas : l'appelant sait alors qu'il ne pourra pas afficher l'image.
+
+        Le résultat est indexé par le titre DEMANDÉ, jamais par celui que
+        MediaWiki renvoie. Il normalise les siens — tiret bas, accents composés,
+        redirections — et rendre le titre normalisé faisait manquer le crédit à
+        celui qui l'avait demandé : la villa Savoye et la pagode Khánh-Anh
+        étaient publiées sans attribution, redemandées à chaque passe et
+        signalées à chaque construction, sans que rien ne puisse aboutir.
         """
         credits: dict[str, tuple[str | None, str | None]] = {}
         if not titles:
@@ -135,17 +142,38 @@ class CommonsClient:
                 "iiprop": "extmetadata",
                 "iiextmetadatafilter": "Artist|LicenseShortName",
                 "titles": "|".join(titles),
+                # Un fichier renommé garde une redirection : la suivre évite de
+                # perdre le crédit d'une photo qui n'a fait que changer de nom.
+                "redirects": "1",
             },
             timeout=self.timeout_s,
         )
         response.raise_for_status()
-        for page in response.json().get("query", {}).get("pages", []):
+        payload = response.json().get("query", {})
+
+        # MediaWiki normalise et suit les redirections : il faut refaire le
+        # chemin en sens inverse pour rendre chaque crédit à son titre d'origine.
+        alias: dict[str, str] = {}
+        for entry in payload.get("normalized", []):
+            alias[entry["from"]] = entry["to"]
+        for entry in payload.get("redirects", []):
+            alias[entry["from"]] = entry["to"]
+
+        par_titre: dict[str, tuple[str | None, str | None]] = {}
+        for page in payload.get("pages", []):
             infos = page.get("imageinfo") or []
             if not infos:
                 continue
             meta = infos[0].get("extmetadata") or {}
-            credits[page.get("title", "")] = (
+            par_titre[page.get("title", "")] = (
                 texte((meta.get("Artist") or {}).get("value")),
                 texte((meta.get("LicenseShortName") or {}).get("value")),
             )
+
+        for title in titles:
+            resolved = title
+            for _ in range(3):  # normalisation puis redirection, au plus
+                resolved = alias.get(resolved, resolved)
+            if resolved in par_titre:
+                credits[title] = par_titre[resolved]
         return credits

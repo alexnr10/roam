@@ -3778,6 +3778,94 @@ class TestRegionCodes(unittest.TestCase):
         self.assertIsNone(perdu.region_code)
 
 
+class _FakeCommons:
+    """Un Commons qui ne sort pas sur le réseau, et qui NORMALISE les titres."""
+
+    class _Response:
+        def __init__(self, payload):
+            self._payload = payload
+
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return self._payload
+
+    class _Session:
+        def __init__(self, payload):
+            self._payload = payload
+            self.appels = []
+
+        def get(self, url, params=None, timeout=None):
+            self.appels.append(params)
+            return _FakeCommons._Response(self._payload)
+
+    def __init__(self, payload):
+        from roam_pipeline.commons import CommonsClient
+
+        self.client = CommonsClient(min_interval_s=0)
+        self.session = self._Session(payload)
+        self.client._session = self.session
+
+
+class TestCommonsTitles(unittest.TestCase):
+    """MediaWiki normalise les titres, et le crédit se perdait en route.
+
+    Le tiret bas devient une espace, les accents sont recomposés, un fichier
+    renommé redirige. Rendre le crédit sous le titre NORMALISÉ le rendait
+    introuvable pour celui qui l'avait demandé : la villa Savoye et la pagode
+    Khánh-Anh étaient publiées sans attribution, redemandées à chaque passe et
+    signalées à chaque construction, sans que rien ne puisse aboutir.
+    """
+
+    def test_a_normalised_title_gives_its_credit_back(self):
+        faux = _FakeCommons({
+            "query": {
+                "normalized": [
+                    {"from": "File:Villa_Savoye.jpg", "to": "File:Villa Savoye.jpg"}
+                ],
+                "pages": [{
+                    "title": "File:Villa Savoye.jpg",
+                    "imageinfo": [{"extmetadata": {
+                        "Artist": {"value": "<a href='x'>Quelqu'un</a>"},
+                        "LicenseShortName": {"value": "CC BY-SA 4.0"},
+                    }}],
+                }],
+            }
+        })
+        credits = faux.client.credits(["File:Villa_Savoye.jpg"])
+        self.assertEqual(credits, {"File:Villa_Savoye.jpg": ("Quelqu'un", "CC BY-SA 4.0")})
+
+    def test_a_renamed_file_is_followed(self):
+        faux = _FakeCommons({
+            "query": {
+                "redirects": [{"from": "File:Ancien.jpg", "to": "File:Nouveau.jpg"}],
+                "pages": [{
+                    "title": "File:Nouveau.jpg",
+                    "imageinfo": [{"extmetadata": {
+                        "LicenseShortName": {"value": "CC0"},
+                    }}],
+                }],
+            }
+        })
+        self.assertEqual(faux.client.credits(["File:Ancien.jpg"]), {"File:Ancien.jpg": (None, "CC0")})
+        # La redirection est demandée à l'API, pas devinée.
+        self.assertEqual(faux.session.appels[0]["redirects"], "1")
+
+    def test_a_file_without_metadata_still_answers(self):
+        # « Demandé, rien à dire » doit se distinguer de « jamais demandé ».
+        faux = _FakeCommons({
+            "query": {"pages": [{"title": "File:Muet.jpg", "imageinfo": [{}]}]}
+        })
+        self.assertEqual(faux.client.credits(["File:Muet.jpg"]), {"File:Muet.jpg": (None, None)})
+
+    def test_a_missing_file_answers_nothing(self):
+        faux = _FakeCommons({
+            "query": {"pages": [{"title": "File:Disparu.jpg", "missing": True}]}
+        })
+        self.assertEqual(faux.client.credits(["File:Disparu.jpg"]), {})
+
+
 class TestMissingImages(unittest.TestCase):
     """Vingt-trois lieux du catalogue n'ont aucune image.
 
