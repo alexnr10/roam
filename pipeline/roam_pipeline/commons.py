@@ -111,9 +111,14 @@ class CommonsClient:
     def credits(self, titles: list[str]) -> dict[str, tuple[str | None, str | None]]:
         """`{titre de fichier: (auteur, licence)}` pour un lot de cinquante.
 
-        Un titre absent de la réponse — fichier supprimé, renommé — n'a pas de
-        crédit et n'apparaît pas dans le résultat. C'est aussi une information :
-        l'appelant sait alors qu'il ne pourra pas afficher l'image.
+        Un fichier qui EXISTE rend une entrée, même quand Commons n'en
+        documente ni l'auteur ni la licence : « demandé, rien à dire » et
+        « jamais demandé » sont deux états différents, et les confondre faisait
+        redemander à chaque passe les mêmes fichiers muets — et signaler à
+        chaque construction des lieux pour lesquels il n'y a rien à faire.
+
+        Un titre absent de la réponse — fichier supprimé, renommé — n'apparaît
+        pas : l'appelant sait alors qu'il ne pourra pas afficher l'image.
         """
         credits: dict[str, tuple[str | None, str | None]] = {}
         if not titles:
@@ -139,8 +144,8 @@ class CommonsClient:
             if not infos:
                 continue
             meta = infos[0].get("extmetadata") or {}
-            auteur = texte((meta.get("Artist") or {}).get("value"))
-            licence = texte((meta.get("LicenseShortName") or {}).get("value"))
-            if auteur or licence:
-                credits[page.get("title", "")] = (auteur, licence)
+            credits[page.get("title", "")] = (
+                texte((meta.get("Artist") or {}).get("value")),
+                texte((meta.get("LicenseShortName") or {}).get("value")),
+            )
         return credits

@@ -479,30 +479,47 @@ def _credit(place: Place) -> dict[str, str | None]:
 
 
 def warn_missing_credits(places: list[Place]) -> list[Place]:
-    """Les lieux dont la photo est publiée SANS son crédit.
+    """Les lieux dont la photo est publiée SANS son crédit, et pourquoi.
 
     Une image de Commons n'est pas libre de droits : la plupart des licences
-    exigent de citer l'auteur. Un lieu dont la photo vient d'être changée dans
-    `photos.csv` garde son ancien crédit jusqu'au prochain `enrich --images` —
-    et l'export, qui refuse de citer le mauvais photographe, n'en cite alors
-    aucun. C'est le bon comportement, mais il ne doit pas passer inaperçu :
-    six lieux se sont retrouvés publiés sans attribution après un changement de
-    photo, et rien ne le disait.
+    exigent de citer l'auteur. Deux situations très différentes se cachent
+    derrière une fiche sans crédit, et les confondre rend l'avertissement
+    inutile :
+
+    - le crédit n'a JAMAIS été demandé pour ce fichier — une photo choisie dans
+      `photos.csv`, une image trouvée depuis l'article — et un
+      `enrich --images` le règle ;
+    - il a été demandé, et Commons ne documente rien. Il n'y a alors rien à
+      faire, et le répéter à chaque construction apprend à ne plus lire.
+
+    Seule la première mérite une alerte. Renvoie les lieux à créditer.
     """
     from .commons import file_title
 
-    nus = [
-        place for place in places
-        if place.image_url and not _credit(place)["imageLicence"]
-    ]
-    if nus:
+    jamais: list[Place] = []
+    muets = 0
+    for place in places:
+        if not place.image_url or _credit(place)["imageLicence"]:
+            continue
+        if place.image_credit_for == file_title(place.image_url):
+            muets += 1          # demandé, Commons n'a rien
+        else:
+            jamais.append(place)
+
+    if jamais:
         LOG.warning(
             "%s lieu(x) publient une photo SANS crédit — la licence de Commons "
             "l'exige. Lance `enrich --images` (ex. %s)",
-            len(nus),
-            ", ".join(place.name for place in nus[:5]),
+            len(jamais),
+            ", ".join(place.name for place in jamais[:5]),
         )
-    return nus
+    if muets:
+        LOG.info(
+            "%s photo(s) sans auteur ni licence documentés sur Commons : la "
+            "fiche cite le dépôt seul, et il n'y a rien de plus à en tirer",
+            muets,
+        )
+    return jamais
 
 
 def _twin_key(qid: str, jumeaux: dict) -> str:

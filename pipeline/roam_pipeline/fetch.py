@@ -889,8 +889,11 @@ def enrich_image_credits(places: list[Place], client=None) -> int:
         for titre, (auteur, licence) in credits.items():
             for place in par_titre.get(titre, []):
                 place.image_author, place.image_licence = auteur, licence
+                # La marque se pose dans tous les cas : elle dit « demandé pour
+                # CE fichier », pas « trouvé ».
                 place.image_credit_for = titre
-                trouves += 1
+                if auteur or licence:
+                    trouves += 1
 
     sans = sum(1 for lot in par_titre.values() for p in lot if not p.image_licence)
     LOG.info(

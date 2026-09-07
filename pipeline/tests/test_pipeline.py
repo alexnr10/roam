@@ -3699,6 +3699,35 @@ class TestImageCredits(unittest.TestCase):
         self.assertEqual(deja.image_author, "Quelqu'un")
         self.assertIsNone(sans_photo.image_author)
 
+    def test_a_file_commons_does_not_document_is_not_asked_twice(self):
+        # « Demandé, rien à dire » et « jamais demandé » sont deux états
+        # différents : les confondre faisait redemander à chaque passe les
+        # mêmes fichiers muets, et signaler à chaque construction des lieux
+        # pour lesquels il n'y a rien à faire.
+        from roam_pipeline.fetch import enrich_image_credits
+
+        class _Muet:
+            def __init__(self):
+                self.demandes = []
+
+            def credits(self, titles):
+                self.demandes.append(list(titles))
+                return {t: (None, None) for t in titles}
+
+        lieu = make_place("Photo anonyme", wikidata_id="Q1")
+        lieu.image_url = "https://commons.wikimedia.org/wiki/Special:FilePath/A.jpg"
+
+        client = _Muet()
+        with _capture():
+            enrich_image_credits([lieu], client)
+        self.assertEqual(lieu.image_credit_for, "File:A.jpg")
+        self.assertIsNone(lieu.image_author)
+
+        # Deuxième passe : plus rien à demander.
+        with _capture():
+            enrich_image_credits([lieu], client)
+        self.assertEqual(len(client.demandes), 1)
+
     def test_a_failing_batch_does_not_cost_the_others(self):
         from roam_pipeline.fetch import enrich_image_credits
 
@@ -3901,6 +3930,23 @@ class TestChosenPhoto(unittest.TestCase):
             nus = warn_missing_credits([nu, credite, sans_photo])
         self.assertEqual([p.name for p in nus], ["Villa Savoye"])
         self.assertIn("enrich --images", "\n".join(journal.output))
+
+    def test_a_photo_commons_does_not_document_is_not_an_alert(self):
+        # « Demandé, rien à dire » et « jamais demandé » sont deux états
+        # différents. Répéter le premier à chaque construction apprend à ne
+        # plus lire les avertissements.
+        from roam_pipeline.export import warn_missing_credits
+        from roam_pipeline.review import photo_url
+
+        muet = make_place("Photo anonyme", wikidata_id="Q1")
+        muet.image_url = photo_url("Anonyme.jpg")
+        muet.image_credit_for = "File:Anonyme.jpg"   # demandé, sans réponse
+
+        with self.assertLogs("roam_pipeline.export", level="INFO") as journal:
+            self.assertEqual(warn_missing_credits([muet]), [])
+        texte = "\n".join(journal.output)
+        self.assertIn("rien de plus à en tirer", texte)
+        self.assertNotIn("WARNING", texte)
 
     def test_the_credit_does_not_follow_a_changed_photo(self):
         # Citer le mauvais photographe est pire que n'en citer aucun.
