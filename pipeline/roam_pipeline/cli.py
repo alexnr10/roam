@@ -28,6 +28,7 @@ from .export import (
     write_json,
     write_review_csv,
     write_app_catalog,
+    warn_missing_credits,
     write_review_html,
     write_seed_sql,
 )
@@ -819,6 +820,10 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     score_all(kept, config)
 
     retained, collections = build_all(kept, config)
+    # Le contrôle porte sur ce qui est PUBLIÉ, donc après la construction : une
+    # photo sans crédit dans la collecte ne regarde personne, la même photo au
+    # catalogue est une licence non respectée.
+    warn_missing_credits(retained)
 
     # Ce qui a bougé depuis la dernière revue. Le niveau d'un lieu n'est pas une
     # propriété du lieu : c'est son rang dans sa collection. Ajouter un signal

@@ -3882,6 +3882,26 @@ class TestChosenPhoto(unittest.TestCase):
                          {"Q243": "la photo de jour est à contre-jour"})
             self.assertEqual(read_photos(path), {"Q243": "Tour Eiffel de nuit.jpg"})
 
+    def test_a_photo_published_without_its_credit_is_signalled(self):
+        # Six lieux se sont retrouvés publiés sans attribution après un
+        # changement de photo, et rien ne le disait. L'export a raison de ne pas
+        # citer le mauvais photographe ; le silence, lui, n'est pas défendable.
+        from roam_pipeline.export import warn_missing_credits
+        from roam_pipeline.review import photo_url
+
+        nu = make_place("Villa Savoye", wikidata_id="Q1")
+        nu.image_url = photo_url("Villa Savoye.jpg")
+        credite = make_place("Tour Eiffel", wikidata_id="Q2")
+        credite.image_url = photo_url("Tour Eiffel.jpg")
+        credite.image_author, credite.image_licence = "Quelqu'un", "CC BY-SA 4.0"
+        credite.image_credit_for = "File:Tour Eiffel.jpg"
+        sans_photo = make_place("Les Maisonnettes", wikidata_id="Q3")
+
+        with self.assertLogs("roam_pipeline.export", level="WARNING") as journal:
+            nus = warn_missing_credits([nu, credite, sans_photo])
+        self.assertEqual([p.name for p in nus], ["Villa Savoye"])
+        self.assertIn("enrich --images", "\n".join(journal.output))
+
     def test_the_credit_does_not_follow_a_changed_photo(self):
         # Citer le mauvais photographe est pire que n'en citer aucun.
         from roam_pipeline.export import _credit

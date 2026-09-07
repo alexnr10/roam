@@ -478,6 +478,33 @@ def _credit(place: Place) -> dict[str, str | None]:
     return {"imageAuthor": None, "imageLicence": None}
 
 
+def warn_missing_credits(places: list[Place]) -> list[Place]:
+    """Les lieux dont la photo est publiée SANS son crédit.
+
+    Une image de Commons n'est pas libre de droits : la plupart des licences
+    exigent de citer l'auteur. Un lieu dont la photo vient d'être changée dans
+    `photos.csv` garde son ancien crédit jusqu'au prochain `enrich --images` —
+    et l'export, qui refuse de citer le mauvais photographe, n'en cite alors
+    aucun. C'est le bon comportement, mais il ne doit pas passer inaperçu :
+    six lieux se sont retrouvés publiés sans attribution après un changement de
+    photo, et rien ne le disait.
+    """
+    from .commons import file_title
+
+    nus = [
+        place for place in places
+        if place.image_url and not _credit(place)["imageLicence"]
+    ]
+    if nus:
+        LOG.warning(
+            "%s lieu(x) publient une photo SANS crédit — la licence de Commons "
+            "l'exige. Lance `enrich --images` (ex. %s)",
+            len(nus),
+            ", ".join(place.name for place in nus[:5]),
+        )
+    return nus
+
+
 def _twin_key(qid: str, jumeaux: dict) -> str:
     """Clef de tri partagée par les deux membres de la paire la plus serrée."""
     lot = jumeaux.get(qid)
