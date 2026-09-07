@@ -5,138 +5,161 @@
    "id": "villages",
    "name": "Villages de caractère",
    "nameSingular": "Village",
+   "nameShort": "Villages",
    "icon": "village"
   },
   {
    "id": "abbayes",
    "name": "Abbayes et monastères",
    "nameSingular": "Abbaye",
+   "nameShort": "Abbayes",
    "icon": "abbey"
   },
   {
    "id": "cathedrales",
    "name": "Cathédrales et basiliques",
    "nameSingular": "Cathédrale",
+   "nameShort": "Cathédrales",
    "icon": "cathedral"
   },
   {
    "id": "chateaux",
    "name": "Châteaux",
    "nameSingular": "Château",
+   "nameShort": "Châteaux",
    "icon": "castle"
   },
   {
    "id": "maisons",
    "name": "Maisons et demeures remarquables",
    "nameSingular": "Maison",
+   "nameShort": "Maisons",
    "icon": "house"
   },
   {
    "id": "musees",
    "name": "Musées",
    "nameSingular": "Musée",
+   "nameShort": "Musées",
    "icon": "museum"
   },
   {
    "id": "monuments",
    "name": "Monuments et édifices remarquables",
    "nameSingular": "Monument",
+   "nameShort": "Monuments",
    "icon": "monument"
   },
   {
    "id": "grottes",
    "name": "Grottes et gouffres",
    "nameSingular": "Grotte",
+   "nameShort": "Grottes",
    "icon": "cave"
   },
   {
    "id": "megalithes",
    "name": "Mégalithes et sites antiques",
    "nameSingular": "Site",
+   "nameShort": "Mégalithes",
    "icon": "megalith"
   },
   {
    "id": "jardins",
    "name": "Parcs et jardins",
    "nameSingular": "Jardin",
+   "nameShort": "Jardins",
    "icon": "garden"
   },
   {
    "id": "phares",
    "name": "Phares",
    "nameSingular": "Phare",
+   "nameShort": "Phares",
    "icon": "lighthouse"
   },
   {
    "id": "ponts",
    "name": "Ponts et viaducs",
    "nameSingular": "Pont",
+   "nameShort": "Ponts",
    "icon": "bridge"
   },
   {
    "id": "cascades",
    "name": "Cascades",
    "nameSingular": "Cascade",
+   "nameShort": "Cascades",
    "icon": "waterfall"
   },
   {
    "id": "cirques",
    "name": "Cirques naturels",
    "nameSingular": "Cirque",
+   "nameShort": "Cirques",
    "icon": "cirque"
   },
   {
    "id": "gorges",
    "name": "Gorges et canyons",
    "nameSingular": "Gorges",
+   "nameShort": "Gorges",
    "icon": "canyon"
   },
   {
    "id": "lacs",
    "name": "Lacs",
    "nameSingular": "Lac",
+   "nameShort": "Lacs",
    "icon": "lake"
   },
   {
    "id": "iles",
    "name": "Îles",
    "nameSingular": "Île",
+   "nameShort": "Îles",
    "icon": "island"
   },
   {
    "id": "volcans",
    "name": "Volcans et sites volcaniques",
    "nameSingular": "Volcan",
+   "nameShort": "Volcans",
    "icon": "volcan"
   },
   {
    "id": "sommets",
    "name": "Sommets",
    "nameSingular": "Sommet",
+   "nameShort": "Sommets",
    "icon": "mountain"
   },
   {
    "id": "dunes-marais",
    "name": "Dunes et marais",
    "nameSingular": "Site",
+   "nameShort": "Dunes et marais",
    "icon": "dune"
   },
   {
    "id": "plages",
    "name": "Littoral et plages",
    "nameSingular": "Site",
+   "nameShort": "Plages",
    "icon": "beach"
   },
   {
    "id": "forets",
    "name": "Forêts remarquables",
    "nameSingular": "Forêt",
+   "nameShort": "Forêts",
    "icon": "foret"
   },
   {
    "id": "rochers",
    "name": "Curiosités géologiques",
    "nameSingular": "Curiosité",
+   "nameShort": "Rochers",
    "icon": "rocher"
   }
  ],
