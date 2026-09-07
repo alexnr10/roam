@@ -240,6 +240,10 @@ class CollectionRules:
     # relevé « un peu », qui ferait entrer un septième château dans chaque ville
     # de France pour régler un problème parisien.
     commune_overrides: dict[str, dict[str, int]] = field(default_factory=dict)
+    # Croisements gardés QUOI QU'IL ARRIVE, par leur identifiant de collection
+    # (« plages-region-93 »). Le rapport de caractérisation est une heuristique ;
+    # une ligne ici est un jugement, et il l'emporte.
+    always_cross: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -340,6 +344,7 @@ def load_config(config_dir: Path | None = None) -> Config:
         max_theme_share=float(raw["collections"].get("max_theme_share", 0.0)),
         min_diameter_km=float(raw["collections"].get("min_diameter_km", 0.0)),
         min_theme_lift=float(raw["collections"].get("min_theme_lift", 0.0)),
+        always_cross=[str(slug) for slug in (raw["collections"].get("always_cross") or [])],
         commune_overrides={
             str(ville): {str(t): int(n) for t, n in (plafonds or {}).items()}
             for ville, plafonds in (

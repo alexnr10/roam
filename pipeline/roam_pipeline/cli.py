@@ -2111,6 +2111,9 @@ def cmd_photo(args: argparse.Namespace, config: Config) -> int:
     path = args.manual / "photos.csv"
     photos = read_photos(path)
 
+    if args.manquantes:
+        return _photos_manquantes(args, photos)
+
     if args.wikidata_id is None:
         if not photos:
             print("Aucune photo choisie. "
@@ -2152,6 +2155,43 @@ def cmd_photo(args: argparse.Namespace, config: Config) -> int:
     print(f"{qid} s'affichera avec « {fichier} ».")
     print("Relance `build` puis `enrich --images` : le crédit suit le FICHIER, "
           "et la fiche cite le dépôt seul tant qu'il n'a pas été redemandé.")
+    return 0
+
+
+def _photos_manquantes(args: argparse.Namespace, photos: dict[str, str]) -> int:
+    """Les lieux du CATALOGUE sans photo, et ce qu'il reste à tenter pour eux.
+
+    Un lieu sans image se voit : sur la carte comme dans les listes, il passe
+    pour une erreur. Les compter ne suffit pas — il faut savoir lesquels ont
+    encore une piste (une catégorie Commons à ouvrir) et lesquels n'en ont
+    aucune, parce que ces derniers demandent une photo qu'il faudra prendre.
+    """
+    places_path = args.out / "places.json"
+    if not places_path.exists():
+        print(f"{places_path} absent — lance d'abord `build`.", file=sys.stderr)
+        return 1
+
+    sans = [p for p in _load_places(places_path) if not p.image_url]
+    if not sans:
+        print("Tous les lieux du catalogue ont une photo.")
+        return 0
+
+    pistes = [p for p in sans if p.commons_category]
+    orphelins = [p for p in sans if not p.commons_category]
+
+    print(f"{len(sans)} lieu(x) du catalogue sans photo.\n")
+    if pistes:
+        print(f"  Une catégorie Commons existe — à ouvrir ({len(pistes)}) :")
+        for place in sorted(pistes, key=lambda p: p.name):
+            print(f"      photo {place.wikidata_id:<12} --list   # {place.name}")
+        print()
+    if orphelins:
+        print(f"  Rien sur Commons, ni catégorie ni image d'article ({len(orphelins)}) :")
+        for place in sorted(orphelins, key=lambda p: p.name):
+            dept = place.departement_code or "??"
+            print(f"      {place.wikidata_id:<12} {place.name} ({dept})")
+        print("\n  Ceux-là demandent une photo à téléverser sur Wikimedia Commons,")
+        print("  puis « photo <Q-id> <nom du fichier> ».")
     return 0
 
 
@@ -3448,6 +3488,10 @@ def build_parser() -> argparse.ArgumentParser:
                        help="Q-id du lieu ; omis, liste les photos choisies")
     photo.add_argument("file", nargs="?",
                        help="fichier Commons : un nom, un titre « File:… » ou une adresse")
+    photo.add_argument(
+        "--manquantes", action="store_true",
+        help="lister les lieux du catalogue sans photo, et ce qu'il reste à tenter",
+    )
     photo.add_argument(
         "--list", action="store_true",
         help="lister les photos de la catégorie Commons du lieu (réseau requis)",

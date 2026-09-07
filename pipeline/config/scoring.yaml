@@ -324,6 +324,25 @@ collections:
   # d'Île-de-France.
   min_theme_lift: 1.9
 
+  # Croisements gardés QUOI QU'IL ARRIVE, par leur identifiant de collection.
+  #
+  # « Littoral et plages de Provence-Alpes-Côte d'Azur » vit exactement sur le
+  # seuil : ×1,90 une construction, ×1,89 la suivante. Vingt-deux lieux qui
+  # entrent et sortent du catalogue au centième près, ce n'est plus une règle,
+  # c'est un tirage au sort — et redescendre le seuil ne ferait que déplacer le
+  # tirage, en ramenant au passage les musées et les châteaux d'Île-de-France,
+  # que la règle existe précisément pour écarter.
+  #
+  # Le rapport se mesure contre la part nationale du thème, et PACA est
+  # pénalisée d'être riche en TOUT : ses châteaux, ses villages et ses musées
+  # gonflent son dénominateur et diluent ses plages. La Bretagne vaut ×3,95, la
+  # Normandie ×2,61, la Provence ×1,90 — ce que personne n'irait appeler un
+  # classement des littoraux français.
+  #
+  # Le rapport est une heuristique, la décision est un jugement.
+  always_cross:
+    - plages-region-93        # Littoral et plages de Provence-Alpes-Côte d'Azur
+
 geo:
   # Niveaux géographiques pour lesquels on dérive des collections.
   levels: [departement, region, country]

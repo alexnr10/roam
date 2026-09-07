@@ -671,6 +671,7 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
     out: list[Collection] = []
     serres: list[tuple[float, int, str]] = []
     banals: list[tuple[float, int, str]] = []
+    gardes: list[tuple[float, str]] = []
     par_id = {place.wikidata_id: place for place in places}
     par_theme = Counter(place.theme_id for place in places)
 
@@ -710,7 +711,12 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
             rapport = theme_lift(
                 len(built.places), par_zone[code], par_theme[theme_id], len(places)
             )
-            if rapport < config.collections.min_theme_lift:
+            if collection.slug in config.collections.always_cross:
+                # Le rapport est une heuristique, la décision est un jugement.
+                # Elle doit se voir : une exception qui agit en silence est une
+                # règle qu'on ne peut plus discuter.
+                gardes.append((rapport, built.name))
+            elif rapport < config.collections.min_theme_lift:
                 banals.append((rapport, len(built.places), built.name))
                 continue
             out.append(built)
@@ -728,6 +734,12 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
             config.collections.min_diameter_km,
             ", ".join(f"{nom} ({n} lieux, {d:.0f} km)"
                       for d, n, nom in proches_du_seuil(serres)),
+        )
+    if gardes:
+        LOG.info(
+            "%s croisement(s) gardés par décision malgré leur rapport : %s",
+            len(gardes),
+            ", ".join(f"{nom} (×{r:.2f})" for r, nom in sorted(gardes, reverse=True)),
         )
     if banals:
         # Un croisement où le territoire ne dit rien du thème n'est que le

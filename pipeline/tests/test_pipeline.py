@@ -6485,6 +6485,31 @@ class TestThemeLift(unittest.TestCase):
         rejets = [(i / 10, 8, f"C{i}") for i in range(20)]
         self.assertEqual(len(proches_du_seuil(rejets)), 8)
 
+    def test_a_named_crossing_survives_its_ratio(self):
+        # « Littoral et plages de Provence-Alpes-Côte d'Azur » vit exactement
+        # sur le seuil : ×1,90 une construction, ×1,89 la suivante. Vingt-deux
+        # lieux qui entrent et sortent au centième près, ce n'est plus une
+        # règle, c'est un tirage au sort.
+        from roam_pipeline.collections import build_cross_collections
+
+        lot = TestCollectionDiameter._places(10, spread_km=100.0)
+        # Un seul thème : le rapport vaut ×1,0 et le seuil écarte tout.
+        strict = replace(CONFIG, collections=replace(
+            CONFIG.collections, min_diameter_km=0.0, min_theme_lift=1.9,
+            cross_theme_levels=["departement"], always_cross=[],
+        ))
+        with _capture():
+            self.assertEqual(build_cross_collections(lot, strict), [])
+
+        garde = replace(strict, collections=replace(
+            strict.collections, always_cross=["ponts-departement-75"]))
+        with self.assertLogs("roam_pipeline.collections", level="INFO") as journal:
+            built = build_cross_collections(lot, garde)
+        self.assertEqual(len(built), 1)
+        # L'exception doit se VOIR : une exception silencieuse est une règle
+        # qu'on ne peut plus discuter.
+        self.assertIn("gardés par décision", "\n".join(journal.output))
+
     def test_the_configured_threshold_spares_the_loire(self):
         # Les châteaux du Centre-Val de Loire valent ×3,0, les mégalithes du
         # Morbihan ×4,8 : le seuil doit passer sous les deux.
