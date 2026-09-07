@@ -10,12 +10,14 @@ import { outlinesFor } from '../data/outlines';
 import type { Emprise } from '../lib/regions';
 import {
   REGIONS,
+  centreDe,
   emprise,
+  niveauxDe,
   partDuCadre,
   prochaineOuverture,
+  rangDepuisLeCentre,
   regionDuCadre,
   regionDuDepartement,
-  niveauxDe,
   voile,
 } from '../lib/regions';
 import { colors, spacing, type } from '../theme';
@@ -25,10 +27,14 @@ import {
   CLUSTER_MAX_ZOOM,
   CLUSTER_RADIUS,
   FRANCE_BOUNDS,
+  ATTENUATION_AUTRES,
   OUT_OF_SCOPE_VEIL,
   REGION_LINES,
   SEUIL_REGION,
+  OPACITE_PLEINE,
   opaciteDesAplats,
+  opaciteEnCascade,
+  pasDeCascade,
   tonsDesRegions,
   TRANSITION,
   mapColors,
@@ -68,9 +74,16 @@ function toFeatureCollection(
   regionOuverte: string | null,
 ): GeoJSON.FeatureCollection<GeoJSON.Point> {
   const niveaux = regionOuverte ? niveauxDe(regionOuverte) : null;
+  const contour = regionOuverte ? REGIONS.get(regionOuverte) : undefined;
+  // L'ordre d'apparition : du centre de la région vers les bords. Il est
+  // calculé une fois, ici, et voyage avec les points — l'animation n'a plus
+  // qu'à comparer un rang à un compteur.
+  const rangs = contour
+    ? rangDepuisLeCentre(places, centreDe(emprise(contour.geometry)))
+    : places.map(() => 0);
   return {
     type: 'FeatureCollection',
-    features: places.map((place) => ({
+    features: places.map((place, index) => ({
       type: 'Feature',
       geometry: { type: 'Point', coordinates: [place.lon, place.lat] },
       properties: {
@@ -81,6 +94,7 @@ function toFeatureCollection(
         // collection. Celui qui a un sens ici est celui de la région ouverte —
         // c'est le point de vue depuis lequel on regarde.
         tier: niveaux?.get(place.id) ?? 3,
+        rang: rangs[index],
       },
     })),
   };
@@ -145,11 +159,65 @@ export function MapCanvas({
    * livrable voulait dire par « dézoomer referme » : un geste, pas un arrondi.
    */
   const zoomOuverture = useRef<number | null>(null);
+  /** La région dont on a déjà joué l'arrivée. */
+  const regionPrecedente = useRef<string | null>(null);
+  /** Ce qu'il reste des autres régions, en cours d'animation. */
+  const attenuation = useRef(1);
+  const image = useRef<number | null>(null);
+  const imageAplats = useRef<number | null>(null);
 
   byId.current = new Map(places.map((place) => [place.id, place]));
   onSelect.current = onSelectPlace;
   onVide.current = onDeselect;
   onRegion.current = onRegionChange;
+
+  /**
+   * Une animation, en une fonction.
+   *
+   * `requestAnimationFrame` plutôt qu'une transition CSS : ce qu'on anime est
+   * une propriété de peinture MapLibre, que seul le moteur de carte sait
+   * appliquer. Une seule propriété est réécrite par image, quel que soit le
+   * nombre de lieux — l'expression, elle, fait le reste dans le GPU.
+   */
+  const boucler = React.useCallback(
+    (
+      registre: React.MutableRefObject<number | null>,
+      duree: number,
+      surImage: (avancement: number, ecoule: number) => void,
+      surFin?: () => void,
+    ) => {
+      const debut = performance.now();
+      const pas = () => {
+        const ecoule = performance.now() - debut;
+        const avancement = Math.min(1, ecoule / duree);
+        surImage(avancement, ecoule);
+        if (avancement < 1) {
+          registre.current = requestAnimationFrame(pas);
+        } else {
+          registre.current = null;
+          surFin?.();
+        }
+      };
+      if (registre.current !== null) cancelAnimationFrame(registre.current);
+      registre.current = requestAnimationFrame(pas);
+    },
+    [],
+  );
+
+  const animer = React.useCallback(
+    (duree: number, surImage: (a: number, e: number) => void, surFin?: () => void) =>
+      boucler(image, duree, surImage, surFin),
+    [boucler],
+  );
+  const animerAplats = React.useCallback(
+    (duree: number, surImage: (a: number, e: number) => void) =>
+      boucler(imageAplats, duree, surImage),
+    [boucler],
+  );
+  const arreterAnimation = React.useCallback(() => {
+    if (image.current !== null) cancelAnimationFrame(image.current);
+    image.current = null;
+  }, []);
 
   const [ouverte, setOuverte] = useState<string | null>(null);
   const [degraded, setDegraded] = useState(false);
@@ -371,7 +439,7 @@ export function MapCanvas({
               colors.primary,
               mapColors.todo,
             ],
-            'circle-opacity': ['match', ['get', 'tier'], 3, 0.8, 1] as never,
+            'circle-opacity': OPACITE_PLEINE as never,
             'circle-radius': ['match', ['get', 'tier'], 1, 5.2, 2, 4, 3] as never,
             'circle-stroke-width': ['match', ['get', 'tier'], 1, 1.3, 0] as never,
             'circle-stroke-color': mapColors.halo,
@@ -558,20 +626,102 @@ export function MapCanvas({
 
     return () => {
       cancelled = true;
+      if (image.current !== null) cancelAnimationFrame(image.current);
+      if (imageAplats.current !== null) cancelAnimationFrame(imageAplats.current);
       created?.remove();
       map.current = null;
       setReady(false);
     };
   }, []);
 
-  // Données : uniquement les lieux de la région ouverte. À l'échelle du pays,
-  // aucun — c'est le fondement de la nouvelle carte.
+  /**
+   * Les lieux de la région ouverte, et la façon dont ils arrivent.
+   *
+   * À l'échelle du pays, aucun — c'est le fondement de la nouvelle carte. À
+   * l'ouverture, ils n'apparaissent pas d'un coup : deux cent soixante-douze
+   * pastilles surgissant ensemble font un clignotement, alors qu'une cascade
+   * depuis le centre se lit comme un remplissage.
+   *
+   * Trois réglages viennent de l'artboard, pas d'un tâtonnement :
+   *
+   * - ils commencent AVANT la fin du vol, à 520 ms sur 900 : on atterrit sur
+   *   une région déjà peuplée au lieu d'attendre devant un aplat vide ;
+   * - chacun fond en 220 ms ;
+   * - au retour, ils s'effacent en 160 ms — et on ne les voit donc pas glisser
+   *   pendant que la caméra recule.
+   */
   useEffect(() => {
-    if (!ready) return;
-    const source = map.current?.getSource(SOURCE) as GeoJSONSource | undefined;
-    const dedans = ouverte ? places.filter((place) => place.regionCode === ouverte) : [];
-    source?.setData(toFeatureCollection(dedans, visitedIds, ouverte));
+    const instance = map.current;
+    if (!ready || !instance) return;
+    const source = instance.getSource(SOURCE) as GeoJSONSource | undefined;
+    if (!source) return;
+
+    const changementDeRegion = ouverte !== regionPrecedente.current;
+    regionPrecedente.current = ouverte;
+    arreterAnimation();
+
+    if (!ouverte) {
+      if (!changementDeRegion) return;
+      // Le fondu de sortie s'applique aux points ENCORE en place : les vider
+      // d'abord ne laisserait rien à effacer.
+      animer(TRANSITION.retour.lieux, (avancement) => {
+        instance.setPaintProperty('place', 'circle-opacity', [
+          '*',
+          OPACITE_PLEINE,
+          1 - avancement,
+        ] as never);
+      }, () => {
+        source.setData({ type: 'FeatureCollection', features: [] });
+        instance.setPaintProperty('place', 'circle-opacity', OPACITE_PLEINE as never);
+      });
+      return;
+    }
+
+    const dedans = places.filter((place) => place.regionCode === ouverte);
+    source.setData(toFeatureCollection(dedans, visitedIds, ouverte));
+
+    if (!changementDeRegion) {
+      // Un filtre de thème, une visite validée : la liste change, mais on ne
+      // rejoue pas l'arrivée dans la région — on n'y arrive pas deux fois.
+      instance.setPaintProperty('place', 'circle-opacity', OPACITE_PLEINE as never);
+      return;
+    }
+
+    const pas = pasDeCascade(dedans.length);
+    const cascade = pas * Math.max(0, dedans.length - 1) + TRANSITION.lieux.apparition;
+    instance.setPaintProperty('place', 'circle-opacity', opaciteEnCascade(0, pas) as never);
+    animer(TRANSITION.lieux.delai + cascade, (avancement, ecoule) => {
+      instance.setPaintProperty(
+        'place',
+        'circle-opacity',
+        opaciteEnCascade(ecoule - TRANSITION.lieux.delai, pas) as never,
+      );
+    }, () => {
+      instance.setPaintProperty('place', 'circle-opacity', OPACITE_PLEINE as never);
+    });
   }, [ready, places, visitedIds, ouverte]);
+
+  /**
+   * L'effacement des autres régions, pendant le vol.
+   *
+   * Pendant, et non avant : les faire pâlir à l'arrêt donne un clignotement, et
+   * après l'atterrissage, un deuxième temps mort.
+   */
+  useEffect(() => {
+    const instance = map.current;
+    if (!ready || !instance || !instance.getLayer('region-aplat')) return;
+    const depart = attenuation.current;
+    const cible = ouverte ? ATTENUATION_AUTRES : 1;
+    if (depart === cible) return;
+    animerAplats(TRANSITION.autresRegions.duree, (avancement) => {
+      attenuation.current = depart + (cible - depart) * avancement;
+      instance.setPaintProperty(
+        'region-aplat',
+        'fill-opacity',
+        opaciteDesAplats(attenuation.current) as never,
+      );
+    });
+  }, [ready, ouverte]);
 
   // Ce que l'ouverture d'une région change sur les couches : son contour, les
   // coutures de ses départements, les noms qui vont avec.
@@ -611,12 +761,17 @@ export function MapCanvas({
       highlightedId ?? '__none__',
     ]);
     // Un point touché : les autres reculent, pour qu'on voie lequel on a pris.
+    //
+    // Sauf pendant l'arrivée dans une région : rendre son opacité pleine à la
+    // couche couperait la cascade en cours, et les pastilles surgiraient d'un
+    // coup. La cascade repose elle-même sur l'opacité pleine en terminant.
+    if (!highlightedId && image.current !== null) return;
     map.current?.setPaintProperty(
       'place',
       'circle-opacity',
       highlightedId
         ? (['case', ['==', ['get', 'id'], highlightedId], 1, 0.55] as never)
-        : (['match', ['get', 'tier'], 3, 0.8, 1] as never),
+        : (OPACITE_PLEINE as never),
     );
   }, [ready, highlightedId]);
 

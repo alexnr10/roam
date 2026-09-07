@@ -5,7 +5,10 @@ import {
   REGION_TONES,
   REGION_TONE_BY_CODE,
   mapColors,
+  TRANSITION,
   opaciteDesAplats,
+  opaciteEnCascade,
+  pasDeCascade,
   repeindre,
   tonsDesRegions,
 } from './mapStyle';
@@ -178,5 +181,109 @@ describe('repeindre', () => {
   it('ne touche pas au style d’origine', () => {
     repeindre(styleTiers);
     expect(styleTiers.layers[0].paint['background-color']).toBe('#fff');
+  });
+});
+
+describe('opaciteDesAplats — l’effacement des autres régions', () => {
+  it('atténue les paliers de zoom, sans toucher à l’ouverte ni au survol', () => {
+    // Ce qui s'efface pendant le vol, ce sont LES AUTRES. La région ouverte a
+    // déjà son propre voile, et le survol sa propre couleur.
+    const plein = opaciteDesAplats();
+    const attenue = opaciteDesAplats(0.55);
+    const paliers = REGION_FILL_OPACITY.slice(3) as number[];
+    for (let i = 0; i < paliers.length; i += 2) {
+      const a = plein[4 + i] as unknown[];
+      const b = attenue[4 + i] as unknown[];
+      expect(b[2]).toBe(a[2]); // région ouverte
+      expect(b[4]).toBe(a[4]); // survol
+      expect(b[5]).toBeCloseTo((a[5] as number) * 0.55, 10);
+    }
+  });
+});
+
+describe('pasDeCascade', () => {
+  it('garde le pas du livrable quand les lieux sont peu nombreux', () => {
+    // Les huit lieux de Mayotte : douze millisecondes chacun, soit un
+    // balayage de moins d'un dixième de seconde.
+    expect(pasDeCascade(8)).toBe(TRANSITION.lieux.cascade);
+  });
+
+  it('resserre le pas quand il y a foule', () => {
+    // Douze millisecondes sur les deux cent soixante-douze lieux d'Occitanie
+    // feraient trois secondes et quart : ce n'est plus un remplissage, c'est
+    // une attente.
+    const pas = pasDeCascade(272);
+    expect(pas).toBeLessThan(TRANSITION.lieux.cascade);
+    expect(pas * 271).toBeCloseTo(TRANSITION.lieux.etalement, 6);
+  });
+
+  it('ne divise pas par zéro sur un lieu unique', () => {
+    expect(pasDeCascade(1)).toBe(0);
+    expect(pasDeCascade(0)).toBe(0);
+  });
+
+  it('borne l’étalement, quel que soit le nombre de lieux', () => {
+    for (const combien of [1, 2, 8, 41, 137, 272, 2029]) {
+      const etalement = pasDeCascade(combien) * Math.max(0, combien - 1);
+      expect(etalement).toBeLessThanOrEqual(TRANSITION.lieux.etalement + 1e-9);
+    }
+  });
+});
+
+describe('opaciteEnCascade', () => {
+  /** Évalue l'expression à la main, pour un lieu donné. */
+  const evaluer = (expression: unknown, proprietes: Record<string, number>): number => {
+    if (!Array.isArray(expression)) return expression as number;
+    const [operateur, ...arguments_] = expression;
+    const valeurs = arguments_.map((a) => evaluer(a, proprietes));
+    switch (operateur) {
+      case 'get':
+        return proprietes[arguments_[0] as string];
+      case '*':
+        return valeurs.reduce((a, b) => a * b, 1);
+      case '-':
+        return valeurs[0] - valeurs[1];
+      case '/':
+        return valeurs[0] / valeurs[1];
+      case 'min':
+        return Math.min(...valeurs);
+      case 'max':
+        return Math.max(...valeurs);
+      case 'match': {
+        const sujet = valeurs[0];
+        for (let i = 1; i < valeurs.length - 1; i += 2) {
+          if (sujet === valeurs[i]) return valeurs[i + 1];
+        }
+        return valeurs[valeurs.length - 1];
+      }
+      default:
+        throw new Error(`opérateur inattendu : ${operateur}`);
+    }
+  };
+
+  const premier = { tier: 1, rang: 0 };
+  const centieme = { tier: 1, rang: 100 };
+
+  it('part de rien', () => {
+    expect(evaluer(opaciteEnCascade(0, 12), premier)).toBe(0);
+  });
+
+  it('remplit le premier point en `apparition` millisecondes', () => {
+    expect(evaluer(opaciteEnCascade(TRANSITION.lieux.apparition, 12), premier)).toBe(1);
+  });
+
+  it('fait attendre les points éloignés du centre', () => {
+    // Le centième point n'a pas encore commencé quand le premier est plein.
+    expect(evaluer(opaciteEnCascade(TRANSITION.lieux.apparition, 12), centieme)).toBe(0);
+  });
+
+  it('n’oublie personne à la fin de la cascade', () => {
+    const front = 100 * 12 + TRANSITION.lieux.apparition;
+    expect(evaluer(opaciteEnCascade(front, 12), centieme)).toBe(1);
+  });
+
+  it('respecte le retrait du niveau 3', () => {
+    const plein = evaluer(opaciteEnCascade(9999, 12), { tier: 3, rang: 0 });
+    expect(plein).toBeCloseTo(0.8, 10);
   });
 });

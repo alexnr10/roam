@@ -215,6 +215,14 @@ export const REGION_FILL_OPACITY = [
 export const OPACITE_REGION_OUVERTE = 0.14;
 
 /**
+ * Ce qu'il reste des autres régions quand une région est ouverte.
+ *
+ * Pas zéro : elles disent encore où l'on est dans le pays, et la frontière de
+ * la région ouverte n'a de sens que s'il y a quelque chose de l'autre côté.
+ */
+export const ATTENUATION_AUTRES = 0.55;
+
+/**
  * Le zoom en dessous duquel aucune région ne s'ouvre.
  *
  * L'ouverture se décide sur la place que la région prend à l'écran, pas sur un
@@ -399,7 +407,22 @@ export const TRANSITION = {
   zoom: 900,
   courbe: [0.22, 0.61, 0.36, 1] as [number, number, number, number],
   autresRegions: { quand: 'pendant' as const, duree: 260 },
-  lieux: { delai: 520, cascade: 12, apparition: 220, depuis: 'centre' as const },
+  lieux: {
+    delai: 520,
+    cascade: 12,
+    apparition: 220,
+    depuis: 'centre' as const,
+    /**
+     * Durée totale maximale de la cascade, en millisecondes.
+     *
+     * Douze millisecondes par pastille ne se comptent pas — sur huit lieux à
+     * Mayotte. Sur les deux cent soixante-douze de l'Occitanie, elles font
+     * trois secondes et quart : ce n'est plus un remplissage, c'est une
+     * attente. Le pas se resserre donc quand il y a foule, et l'effet reste le
+     * même : un balayage depuis le centre.
+     */
+    etalement: 600,
+  },
   retour: { zoom: 700, lieux: 160 },
   /** Marge autour de la région à l'arrivée, en points. */
   padding: 28,
@@ -427,7 +450,7 @@ export function tonsDesRegions(): unknown[] {
  * On inverse donc l'imbrication : l'interpolation reste au sommet, et c'est
  * chacune de ses sorties qui porte le cas du survol.
  */
-export function opaciteDesAplats(): unknown[] {
+export function opaciteDesAplats(attenuation = 1): unknown[] {
   const survol = (valeur: number) => [
     'case',
     // La région ouverte d'abord : son voile tombe quel que soit le zoom.
@@ -435,7 +458,10 @@ export function opaciteDesAplats(): unknown[] {
     OPACITE_REGION_OUVERTE,
     ['boolean', ['feature-state', 'hover'], false],
     0.85,
-    valeur,
+    // Les AUTRES régions, celles qu'on quitte : elles s'effacent pendant le
+    // vol. Les faire pâlir à l'arrêt donnerait un clignotement, et après
+    // l'atterrissage un deuxième temps mort.
+    valeur * attenuation,
   ];
   const stops = REGION_FILL_OPACITY.slice(3) as number[];
   const sortie: unknown[] = ['interpolate', ['linear'], ['zoom']];
@@ -443,4 +469,48 @@ export function opaciteDesAplats(): unknown[] {
     sortie.push(stops[i], survol(stops[i + 1]));
   }
   return sortie;
+}
+
+/** L'opacité d'une pastille au repos : le niveau 3 s'efface un peu. */
+export const OPACITE_PLEINE = ['match', ['get', 'tier'], 3, 0.8, 1];
+
+/**
+ * Le pas de la cascade, resserré quand il y a foule.
+ *
+ * Douze millisecondes par pastille ne se comptent pas — sur les huit lieux de
+ * Mayotte. Sur les deux cent soixante-douze de l'Occitanie, elles feraient
+ * trois secondes et quart : ce n'est plus un remplissage, c'est une attente.
+ */
+export function pasDeCascade(combien: number): number {
+  const { cascade, etalement } = TRANSITION.lieux;
+  if (combien <= 1) return 0;
+  return Math.min(cascade, etalement / (combien - 1));
+}
+
+/**
+ * L'opacité des pastilles à un instant de la cascade.
+ *
+ * `front` est le temps écoulé depuis la première pastille. Chaque point a son
+ * propre départ — son rang multiplié par le pas — et fond en `apparition`
+ * millisecondes. Une seule propriété de peinture à réécrire par image, quel
+ * que soit le nombre de lieux.
+ */
+export function opaciteEnCascade(front: number, pas: number): unknown {
+  return [
+    '*',
+    OPACITE_PLEINE,
+    [
+      'min',
+      1,
+      [
+        'max',
+        0,
+        [
+          '/',
+          ['-', front, ['*', ['get', 'rang'], pas]],
+          TRANSITION.lieux.apparition,
+        ],
+      ],
+    ],
+  ];
 }
