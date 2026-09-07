@@ -342,17 +342,19 @@ export function SearchField({
 
 const styles = StyleSheet.create({
   sansPhoto: { alignItems: 'center', justifyContent: 'center' },
+  // Le seul chemin de retour d'un écran de fiche, et il tenait en quatre points
+  // de marge : quarante-quatre de haut, comme tout ce qui se touche.
   back: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: spacing.sm,
     alignSelf: 'flex-start',
-    paddingVertical: spacing.xs,
-    paddingRight: spacing.md,
+    paddingVertical: spacing.md,
+    paddingRight: spacing.lg,
     marginBottom: spacing.sm,
   },
-  backArrow: { fontSize: 20, color: colors.primary, lineHeight: 22 },
-  backLabel: { fontSize: 15, color: colors.primary, fontWeight: '600' },
+  backArrow: { fontSize: 24, color: colors.primary, lineHeight: 26 },
+  backLabel: { fontSize: 17, color: colors.primary, fontWeight: '600' },
   chipRow: { gap: spacing.xs, paddingVertical: spacing.xs, paddingRight: spacing.lg },
   // Treize pixels de texte dans six de marge : il fallait zoomer pour lire les
   // thèmes, et la pastille faisait trente-deux points de haut là où le pouce en

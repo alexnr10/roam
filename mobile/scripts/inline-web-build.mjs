@@ -3,7 +3,15 @@
  *
  * Sert à faire relire l'application sur un téléphone sans PC ni hébergeur :
  * une page autonome se publie et s'ouvre n'importe où. Le fragment produit n'a
- * ni `<html>` ni `<head>` — l'hôte les fournit.
+ * ni `<html>` ni `<head>` — le navigateur les fabrique.
+ *
+ * Mais il ne fabrique PAS la déclaration de fenêtre d'affichage, et sans elle
+ * un téléphone dessine la page dans une fenêtre virtuelle de 980 points avant
+ * de tout réduire pour la faire tenir : le texte arrive à moins de la moitié de
+ * sa taille, les commandes aussi, et aucun réglage typographique ne rattrape ça
+ * — on peut monter tout d'un cran, tout est ensuite divisé par deux. Le
+ * `dist/index.html` d'Expo la porte ; cette page-ci, publiée seule sur GitHub
+ * Pages, ne l'avait jamais eue.
  *
  * C'est aussi ce fichier que publie `.github/workflows/apercu.yml`, et pour une
  * raison qui n'est pas seulement pratique : servi sous `/roam/`, un dossier
@@ -137,6 +145,13 @@ const bootstrap = `
 writeFileSync(
   out,
   [
+    // La fenêtre d'affichage AVANT tout le reste : sans elle, un téléphone
+    // dessine la page à 980 points et la réduit de moitié.
+    '<meta name="viewport" content="width=device-width, initial-scale=1, '
+      + 'viewport-fit=cover" />',
+    // Le jeu de caractères, pour la même raison qu'elle : le navigateur le
+    // devine tant qu'il y arrive, et une abbaye devient une abbaye.
+    '<meta charset="utf-8" />',
     '<title>Roam</title>',
     `<style>${reset}\n${css}</style>`,
     '<div id="root"></div>',
