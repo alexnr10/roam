@@ -148,7 +148,9 @@ class CommonsClient:
             if isinstance(valeur, dict)
         }
 
-    def credits(self, titles: list[str]) -> dict[str, tuple[str | None, str | None]]:
+    def credits(
+        self, titles: list[str]
+    ) -> dict[str, tuple[str | None, str | None] | None]:
         """`{titre de fichier: (auteur, licence)}` pour un lot de cinquante.
 
         Un fichier qui EXISTE rend une entrée, même quand Commons n'en
@@ -157,8 +159,11 @@ class CommonsClient:
         redemander à chaque passe les mêmes fichiers muets — et signaler à
         chaque construction des lieux pour lesquels il n'y a rien à faire.
 
-        Un titre absent de la réponse — fichier supprimé, renommé — n'apparaît
-        pas : l'appelant sait alors qu'il ne pourra pas afficher l'image.
+        Un fichier que Commons dit INEXISTANT rend `None`, et c'est une
+        troisième information, distincte des deux autres : elle permet de
+        réparer un lieu dont l'image pointe dans le vide. Un titre absent du
+        résultat n'est pas la même chose — c'est le lot entier qui a échoué, et
+        il ne faut alors rien conclure ni rien effacer.
 
         Le résultat est indexé par le titre DEMANDÉ, jamais par celui que
         MediaWiki renvoie. Il normalise les siens — tiret bas, accents composés,
@@ -167,7 +172,7 @@ class CommonsClient:
         étaient publiées sans attribution, redemandées à chaque passe et
         signalées à chaque construction, sans que rien ne puisse aboutir.
         """
-        credits: dict[str, tuple[str | None, str | None]] = {}
+        credits: dict[str, tuple[str | None, str | None] | None] = {}
         if not titles:
             return credits
 
@@ -199,8 +204,11 @@ class CommonsClient:
         for entry in payload.get("redirects", []):
             alias[entry["from"]] = entry["to"]
 
-        par_titre: dict[str, tuple[str | None, str | None]] = {}
+        par_titre: dict[str, tuple[str | None, str | None] | None] = {}
         for page in payload.get("pages", []):
+            if page.get("missing"):
+                par_titre[page.get("title", "")] = None
+                continue
             infos = page.get("imageinfo") or []
             if not infos:
                 continue

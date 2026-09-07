@@ -3884,11 +3884,45 @@ class TestCommonsTitles(unittest.TestCase):
         })
         self.assertEqual(faux.client.raw_metadata("File:Disparu.jpg"), (None, {}))
 
-    def test_a_missing_file_answers_nothing(self):
+    def test_a_missing_file_says_so_rather_than_staying_silent(self):
+        # Trois états, pas deux : « crédité », « rien à dire », et « ce fichier
+        # n'existe pas ». Le dernier permet de réparer un lieu dont l'image
+        # pointe dans le vide — un titre ABSENT du résultat, lui, veut dire que
+        # le lot a échoué, et il ne faut alors rien effacer.
         faux = _FakeCommons({
             "query": {"pages": [{"title": "File:Disparu.jpg", "missing": True}]}
         })
-        self.assertEqual(faux.client.credits(["File:Disparu.jpg"]), {})
+        self.assertEqual(faux.client.credits(["File:Disparu.jpg"]), {"File:Disparu.jpg": None})
+
+    def test_a_place_pointing_at_a_missing_file_is_cleared(self):
+        from roam_pipeline.fetch import enrich_image_credits
+
+        class _Absent:
+            def credits(self, titles):
+                return {t: None for t in titles}
+
+        perdu = make_place("Villa Savoye", wikidata_id="Q1")
+        perdu.image_url = "https://commons.wikimedia.org/wiki/Special:FilePath/Fantome.jpg"
+        perdu.image_author = "Un ancien crédit"
+        with _capture():
+            enrich_image_credits([perdu], _Absent())
+        self.assertIsNone(perdu.image_url)
+        self.assertIsNone(perdu.image_author)
+
+    def test_a_failed_batch_erases_nothing(self):
+        # L'absence d'une réponse n'est pas une réponse : un réseau capricieux
+        # ne doit pas vider le catalogue de ses photos.
+        from roam_pipeline.fetch import enrich_image_credits
+
+        class _Casse:
+            def credits(self, titles):
+                raise RuntimeError("503")
+
+        lieu = make_place("Tour Eiffel", wikidata_id="Q1")
+        lieu.image_url = "https://commons.wikimedia.org/wiki/Special:FilePath/A.jpg"
+        with _capture():
+            enrich_image_credits([lieu], _Casse())
+        self.assertIsNotNone(lieu.image_url)
 
 
 class TestMissingImages(unittest.TestCase):
@@ -3908,6 +3942,19 @@ class TestMissingImages(unittest.TestCase):
             self.demandes.append(list(titles))
             return {t: self.images[t] for t in titles if t in self.images}
 
+    class _Commons:
+        """Commons, avec la liste des fichiers qu'il héberge VRAIMENT."""
+
+        def __init__(self, heberges=None, credit=("Un photographe", "CC BY-SA 4.0")):
+            self.heberges, self.credit, self.demandes = heberges, credit, []
+
+        def credits(self, titles):
+            self.demandes.append(list(titles))
+            gardes = titles if self.heberges is None else [
+                t for t in titles if t in self.heberges
+            ]
+            return {t: self.credit for t in gardes}
+
     def _lieu(self, nom, image=None, article="Un article"):
         lieu = make_place(nom, wikidata_id=f"Q{abs(hash(nom)) % 99991}")
         lieu.image_url = image
@@ -3922,8 +3969,37 @@ class TestMissingImages(unittest.TestCase):
         nu = self._lieu("Villa Savoye", article="Villa Savoye")
         client = self._Faux({"Villa Savoye": "Villa Savoye 1.jpg"})
         with _capture():
-            self.assertEqual(enrich_missing_images([nu], client), 1)
+            self.assertEqual(enrich_missing_images([nu], client, self._Commons()), 1)
         self.assertIn("Villa%20Savoye%201.jpg", nu.image_url.replace("_", "%20"))
+
+    def test_an_image_commons_does_not_host_is_refused(self):
+        # Wikipédia héberge quelques images chez elle : l'adresse Commons qu'on
+        # en tirait pointait dans le vide, le catalogue croyait avoir une photo,
+        # et l'application montrait son repli. La villa Savoye affichait
+        # « File:Villa Savoye en 2014.jpg », que Commons ne connaît pas.
+        from roam_pipeline.fetch import enrich_missing_images
+
+        nu = self._lieu("Villa Savoye", article="Villa Savoye")
+        client = self._Faux({"Villa Savoye": "Villa Savoye en 2014.jpg"})
+        commons = self._Commons(heberges=set())      # Commons n'en veut pas
+        with _capture():
+            self.assertEqual(enrich_missing_images([nu], client, commons), 0)
+        self.assertIsNone(nu.image_url)
+        self.assertEqual(commons.demandes, [["File:Villa Savoye en 2014.jpg"]])
+
+    def test_the_verification_brings_the_credit_along(self):
+        # Elle interroge déjà les métadonnées : demander deux fois serait payer
+        # deux fois, et laisser le crédit arriver plus tard l'a fait ne jamais
+        # arriver du tout.
+        from roam_pipeline.fetch import enrich_missing_images
+
+        nu = self._lieu("Villa Savoye", article="Villa Savoye")
+        client = self._Faux({"Villa Savoye": "Villa Savoye 1.jpg"})
+        with _capture():
+            enrich_missing_images([nu], client, self._Commons())
+        self.assertEqual(nu.image_author, "Un photographe")
+        self.assertEqual(nu.image_licence, "CC BY-SA 4.0")
+        self.assertEqual(nu.image_credit_for, "File:Villa Savoye 1.jpg")
 
     def test_wikidata_keeps_the_upper_hand(self):
         # C'est un REPLI, pas une source : on ne va chercher l'article que là où
@@ -3934,7 +4010,7 @@ class TestMissingImages(unittest.TestCase):
                               article="Tour Eiffel")
         client = self._Faux({"Tour Eiffel": "Autre.jpg"})
         with _capture():
-            self.assertEqual(enrich_missing_images([illustre], client), 0)
+            self.assertEqual(enrich_missing_images([illustre], client, self._Commons()), 0)
         self.assertEqual(illustre.image_url, "https://exemple/deja.jpg")
         self.assertEqual(client.demandes, [])
 
@@ -3943,7 +4019,8 @@ class TestMissingImages(unittest.TestCase):
 
         orphelin = self._lieu("Les Maisonnettes", article=None)
         with _capture():
-            self.assertEqual(enrich_missing_images([orphelin], self._Faux({})), 0)
+            self.assertEqual(
+                enrich_missing_images([orphelin], self._Faux({}), self._Commons()), 0)
         self.assertIsNone(orphelin.image_url)
 
     def test_a_failing_batch_does_not_cost_the_others(self):
@@ -3955,7 +4032,7 @@ class TestMissingImages(unittest.TestCase):
 
         lieu = self._lieu("Villa Savoye", article="Villa Savoye")
         with _capture():
-            self.assertEqual(enrich_missing_images([lieu], _Casse()), 0)
+            self.assertEqual(enrich_missing_images([lieu], _Casse(), self._Commons()), 0)
         self.assertIsNone(lieu.image_url)
 
     def test_the_found_image_can_be_credited_like_any_other(self):
@@ -3966,7 +4043,8 @@ class TestMissingImages(unittest.TestCase):
 
         nu = self._lieu("Villa Savoye", article="Villa Savoye")
         with _capture():
-            enrich_missing_images([nu], self._Faux({"Villa Savoye": "Villa Savoye 1.jpg"}))
+            enrich_missing_images(
+                [nu], self._Faux({"Villa Savoye": "Villa Savoye 1.jpg"}), self._Commons())
         self.assertEqual(file_title(nu.image_url), "File:Villa Savoye 1.jpg")
 
 

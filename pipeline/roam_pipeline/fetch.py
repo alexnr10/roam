@@ -797,7 +797,9 @@ def enrich_pageviews(places: list[Place], client: WikipediaClient | None = None)
     return found
 
 
-def enrich_missing_images(places: list[Place], client: WikipediaClient | None = None) -> int:
+def enrich_missing_images(
+    places: list[Place], client: WikipediaClient | None = None, commons=None
+) -> int:
     """Donne une photo aux lieux que Wikidata n'illustre pas.
 
     Vingt-trois lieux du catalogue n'ont aucune image : la villa Savoye, le
@@ -809,10 +811,24 @@ def enrich_missing_images(places: list[Place], client: WikipediaClient | None = 
     mêmes contributeurs, pour les mêmes raisons. C'est un REPLI, pas une source :
     on ne va la chercher que là où la propriété P18 est vide, et une ligne de
     `photos.csv` l'emporte de toute façon sur les deux.
+
+    Mais l'image de tête d'un article n'est pas forcément sur COMMONS. Wikipédia
+    en héberge quelques-unes chez elle, et l'adresse qu'on en tirait pointait
+    alors dans le vide : la villa Savoye affichait « File:Villa Savoye en 2014.jpg »,
+    que Commons ne connaît pas. Le catalogue croyait avoir une photo, l'application
+    montrait son repli, et le crédit ne pouvait évidemment pas arriver.
+
+    Chaque fichier est donc VÉRIFIÉ auprès de Commons avant d'être adopté — et
+    la vérification rapporte le crédit du même coup, puisqu'elle interroge déjà
+    les métadonnées. Une image que Commons n'héberge pas est refusée : le lieu
+    reste sans photo, ce qui est la vérité, et une image restée sur Wikipédia
+    peut de toute façon relever d'un usage que sa licence ne nous accorde pas.
     """
+    from .commons import BATCH as COMMONS_BATCH, CommonsClient
     from .review import photo_url
 
     client = client or WikipediaClient()
+    commons = commons or CommonsClient()
     par_titre: dict[str, list[Place]] = defaultdict(list)
     for place in places:
         titre = title_from_url(place.wikipedia_url)
@@ -825,19 +841,50 @@ def enrich_missing_images(places: list[Place], client: WikipediaClient | None = 
         return 0
 
     LOG.info("photos manquantes : %s articles interrogés", len(titres))
-    trouvees = 0
+    proposees: dict[str, str] = {}          # titre d'article -> nom de fichier
     for debut in range(0, len(titres), BATCH):
         lot = titres[debut:debut + BATCH]
         try:
-            images = client.page_images(lot)
+            proposees.update(client.page_images(lot))
         except Exception as exc:
             LOG.warning("photos manquantes : lot %s échoué (%s)", debut // BATCH, exc)
-            continue
-        for titre, fichier in images.items():
-            for place in par_titre.get(titre, []):
-                place.image_url = photo_url(fichier)
-                trouvees += 1
 
+    if not proposees:
+        LOG.info("photos manquantes : aucun article n'a d'image de tête")
+        return 0
+
+    # Vérification auprès de Commons, qui rapporte le crédit du même coup.
+    fichiers = sorted({f"File:{nom}" for nom in proposees.values()})
+    connus: dict[str, tuple[str | None, str | None]] = {}
+    for debut in range(0, len(fichiers), COMMONS_BATCH):
+        lot = fichiers[debut:debut + COMMONS_BATCH]
+        try:
+            connus.update(commons.credits(lot))
+        except Exception as exc:
+            LOG.warning("photos manquantes : vérification du lot %s échouée (%s)",
+                        debut // COMMONS_BATCH, exc)
+
+    trouvees = 0
+    refusees = 0
+    for titre, nom in proposees.items():
+        fichier = f"File:{nom}"
+        if fichier not in connus:
+            refusees += 1
+            continue
+        auteur, licence = connus[fichier]
+        for place in par_titre.get(titre, []):
+            place.image_url = photo_url(nom)
+            place.image_author, place.image_licence = auteur, licence
+            place.image_credit_for = fichier
+            trouvees += 1
+
+    if refusees:
+        LOG.info(
+            "photos manquantes : %s image(s) d'article REFUSÉES, Commons ne les "
+            "héberge pas — Wikipédia en garde quelques-unes chez elle, et leur "
+            "licence ne nous est pas forcément accordée",
+            refusees,
+        )
     LOG.info(
         "photos manquantes : %s lieux illustrés par leur article, %s toujours sans",
         trouvees,
@@ -878,6 +925,7 @@ def enrich_image_credits(places: list[Place], client=None) -> int:
         len(titres), COMMONS_BATCH,
     )
     trouves = 0
+    vides = 0
     for debut in range(0, len(titres), COMMONS_BATCH):
         lot = titres[debut:debut + COMMONS_BATCH]
         try:
@@ -886,8 +934,19 @@ def enrich_image_credits(places: list[Place], client=None) -> int:
             # Un lot qui échoue ne doit pas coûter les quarante autres.
             LOG.warning("crédits des photos : lot %s échoué (%s)", debut // COMMONS_BATCH, exc)
             continue
-        for titre, (auteur, licence) in credits.items():
+        for titre, valeur in credits.items():
             for place in par_titre.get(titre, []):
+                if valeur is None:
+                    # Commons ne connaît pas ce fichier : l'adresse pointe dans
+                    # le vide, l'application montre son repli, et la garder
+                    # ferait croire au catalogue qu'il a une photo. On l'efface,
+                    # le prochain passage cherchera ailleurs.
+                    place.image_url = None
+                    place.image_author = place.image_licence = None
+                    place.image_credit_for = None
+                    vides += 1
+                    continue
+                auteur, licence = valeur
                 place.image_author, place.image_licence = auteur, licence
                 # La marque se pose dans tous les cas : elle dit « demandé pour
                 # CE fichier », pas « trouvé ».
@@ -900,6 +959,12 @@ def enrich_image_credits(places: list[Place], client=None) -> int:
         "crédits des photos : %s lieux crédités, %s sans crédit documenté",
         trouves, sans,
     )
+    if vides:
+        LOG.warning(
+            "%s lieu(x) pointaient vers un fichier que Commons ne connaît PAS : "
+            "photo effacée, ils sont de nouveau sans image",
+            vides,
+        )
     return trouves
 
 
