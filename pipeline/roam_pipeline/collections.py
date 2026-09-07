@@ -629,6 +629,22 @@ def build_geo_collections(places: list[Place], config: Config) -> list[Collectio
     return out
 
 
+def proches_du_seuil(rejets: list[tuple], combien: int = 8) -> list[tuple]:
+    """Les rejets les plus PROCHES du seuil, pas les plus extrêmes.
+
+    Un journal qui nomme les huit croisements les plus banals ne dit rien : ce
+    sont les plus évidemment banals, ceux dont personne ne discutera jamais.
+    Ceux qui méritent un regard sont ceux qui meurent AU seuil — « Littoral et
+    plages de Provence-Alpes-Côte d'Azur » à ×1,89 pour un seuil de ×1,90 :
+    vingt-deux lieux effacés de la carte pour un centième, et rien dans le
+    journal pour le dire.
+
+    Les rejets sont rangés par leur mesure en premier élément ; le plus proche
+    du seuil est donc le plus grand.
+    """
+    return sorted(rejets, reverse=True)[:combien]
+
+
 def theme_lift(members: int, dans_la_zone: int, dans_le_pays: int, total: int) -> float:
     """À quel point ce territoire est-il CARACTÉRISTIQUE de ce thème ?
 
@@ -707,11 +723,11 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
         # le pont Neuf reste. C'est l'effet recherché.
         LOG.info(
             "%s croisement(s) écartés, trop resserrés pour être un voyage "
-            "(moins de %.0f km) : %s",
+            "(moins de %.0f km) — les plus proches du seuil : %s",
             len(serres),
             config.collections.min_diameter_km,
             ", ".join(f"{nom} ({n} lieux, {d:.0f} km)"
-                      for d, n, nom in sorted(serres)),
+                      for d, n, nom in proches_du_seuil(serres)),
         )
     if banals:
         # Un croisement où le territoire ne dit rien du thème n'est que le
@@ -719,12 +735,23 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
         # d'Azur » vaut exactement la moyenne du pays ; les volcans du
         # Puy-de-Dôme valent trente-sept fois cette moyenne, et c'est cette
         # collection-là qu'on veut voir dans la liste.
+        # Les plus PROCHES du seuil, pas les plus bas.
+        #
+        # La liste nommait les huit rapports les plus faibles — les plus
+        # évidemment banals, ceux dont personne ne discutera jamais. Ceux qui
+        # méritent un regard sont ceux qui meurent AU seuil : « Littoral et
+        # plages de Provence-Alpes-Côte d'Azur » à ×1,89 pour un seuil de
+        # ×1,90, vingt-deux lieux effacés de la carte pour un centième. C'est
+        # la seule information qui permette de discuter le réglage.
         LOG.info(
             "%s croisement(s) écartés, le territoire n'a rien de particulier "
-            "pour ce thème (moins de ×%.1f) : %s",
+            "pour ce thème (moins de ×%.1f) — les plus proches du seuil : %s",
             len(banals),
             config.collections.min_theme_lift,
-            ", ".join(f"{nom} (×{r:.1f})" for r, n, nom in sorted(banals)[:8]),
+            ", ".join(
+                f"{nom} (×{r:.2f}, {n} lieux)"
+                for r, n, nom in proches_du_seuil(banals)
+            ),
         )
     return out
 

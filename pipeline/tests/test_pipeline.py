@@ -6466,6 +6466,25 @@ class TestThemeLift(unittest.TestCase):
         self.assertEqual(theme_lift(0, 0, 10, 1000), 0.0)
         self.assertEqual(theme_lift(5, 100, 0, 1000), 0.0)
 
+    def test_the_log_names_what_died_at_the_threshold(self):
+        # « Littoral et plages de Provence-Alpes-Côte d'Azur » est tombée à
+        # ×1,89 pour un seuil de ×1,90 : vingt-deux lieux effacés de la carte
+        # pour un centième, pendant que le journal nommait huit croisements
+        # à ×0,5 dont personne ne discutera jamais.
+        from roam_pipeline.collections import proches_du_seuil
+
+        rejets = [(0.5, 9, "Banal"), (1.89, 22, "Plages de PACA"), (1.2, 10, "Moyen")]
+        self.assertEqual(
+            [nom for _r, _n, nom in proches_du_seuil(rejets, 2)],
+            ["Plages de PACA", "Moyen"],
+        )
+
+    def test_the_log_stays_short(self):
+        from roam_pipeline.collections import proches_du_seuil
+
+        rejets = [(i / 10, 8, f"C{i}") for i in range(20)]
+        self.assertEqual(len(proches_du_seuil(rejets)), 8)
+
     def test_the_configured_threshold_spares_the_loire(self):
         # Les châteaux du Centre-Val de Loire valent ×3,0, les mégalithes du
         # Morbihan ×4,8 : le seuil doit passer sous les deux.
