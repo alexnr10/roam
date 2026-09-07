@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import wikidata as wd
-from .wikipedia import EXTRACT_BATCH, WikipediaClient, title_from_url
+from .wikipedia import BATCH, EXTRACT_BATCH, WikipediaClient, title_from_url
 from .config import Config, Label, Theme
 from .geo import normalize_dept_code, region_of
 from .geocode import (
@@ -795,6 +795,55 @@ def enrich_pageviews(places: list[Place], client: WikipediaClient | None = None)
             LOG.info("consultations : %s/%s articles", index, len(titles))
     LOG.info("consultations : %s articles renseignés sur %s", found, len(titles))
     return found
+
+
+def enrich_missing_images(places: list[Place], client: WikipediaClient | None = None) -> int:
+    """Donne une photo aux lieux que Wikidata n'illustre pas.
+
+    Vingt-trois lieux du catalogue n'ont aucune image : la villa Savoye, le
+    musée de Pont-Aven, la presqu'île de Crozon. Une grille de photos qui montre
+    des trous n'est plus une grille de photos, et sur la carte comme dans les
+    listes, ces lieux passent pour des erreurs.
+
+    L'article francophone, lui, en a presque toujours une — choisie par les
+    mêmes contributeurs, pour les mêmes raisons. C'est un REPLI, pas une source :
+    on ne va la chercher que là où la propriété P18 est vide, et une ligne de
+    `photos.csv` l'emporte de toute façon sur les deux.
+    """
+    from .review import photo_url
+
+    client = client or WikipediaClient()
+    par_titre: dict[str, list[Place]] = defaultdict(list)
+    for place in places:
+        titre = title_from_url(place.wikipedia_url)
+        if titre and not place.image_url:
+            par_titre[titre].append(place)
+
+    titres = sorted(par_titre)
+    if not titres:
+        LOG.info("photos manquantes : rien à chercher")
+        return 0
+
+    LOG.info("photos manquantes : %s articles interrogés", len(titres))
+    trouvees = 0
+    for debut in range(0, len(titres), BATCH):
+        lot = titres[debut:debut + BATCH]
+        try:
+            images = client.page_images(lot)
+        except Exception as exc:
+            LOG.warning("photos manquantes : lot %s échoué (%s)", debut // BATCH, exc)
+            continue
+        for titre, fichier in images.items():
+            for place in par_titre.get(titre, []):
+                place.image_url = photo_url(fichier)
+                trouvees += 1
+
+    LOG.info(
+        "photos manquantes : %s lieux illustrés par leur article, %s toujours sans",
+        trouvees,
+        sum(1 for lot in par_titre.values() for p in lot if not p.image_url),
+    )
+    return trouvees
 
 
 def enrich_image_credits(places: list[Place], client=None) -> int:

@@ -137,6 +137,60 @@ class WikipediaClient:
                 sizes[title] = by_title[resolved]
         return sizes
 
+    def page_images(self, titles: list[str]) -> dict[str, str]:
+        """`{titre: nom du fichier}` — l'image de tête de l'article.
+
+        Wikidata ne porte pas d'image pour tout le monde : vingt-trois lieux du
+        catalogue n'en ont aucune, et une grille de photos qui montre des trous
+        n'est plus une grille de photos. Or l'article francophone en a presque
+        toujours une, choisie par les mêmes contributeurs et pour les mêmes
+        raisons.
+
+        C'est un REPLI, pas une source : la propriété P18 reste prioritaire, et
+        `photos.csv` l'emporte sur les deux. Le nom rendu est celui du fichier
+        Commons, ce qui permet d'en demander le crédit comme pour les autres.
+        """
+        images: dict[str, str] = {}
+        if not titles:
+            return images
+
+        self._throttle()
+        response = self._session.get(
+            API,
+            params={
+                "action": "query",
+                "format": "json",
+                "formatversion": "2",
+                "prop": "pageimages",
+                "piprop": "name",
+                "titles": "|".join(titles),
+                "redirects": "1",
+            },
+            timeout=self.timeout_s,
+        )
+        response.raise_for_status()
+        payload = response.json().get("query", {})
+
+        alias: dict[str, str] = {}
+        for entry in payload.get("normalized", []):
+            alias[entry["from"]] = entry["to"]
+        for entry in payload.get("redirects", []):
+            alias[entry["from"]] = entry["to"]
+
+        by_title = {
+            page["title"]: page["pageimage"]
+            for page in payload.get("pages", [])
+            if page.get("pageimage")
+        }
+
+        for title in titles:
+            resolved = title
+            for _ in range(3):
+                resolved = alias.get(resolved, resolved)
+            if resolved in by_title:
+                images[title] = by_title[resolved]
+        return images
+
     def intros(self, titles: list[str], sentences: int = 2) -> dict[str, str]:
         """Deux premières phrases de l'article, en texte brut.
 

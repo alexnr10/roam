@@ -3749,6 +3749,85 @@ class TestRegionCodes(unittest.TestCase):
         self.assertIsNone(perdu.region_code)
 
 
+class TestMissingImages(unittest.TestCase):
+    """Vingt-trois lieux du catalogue n'ont aucune image.
+
+    La villa Savoye, le musée de Pont-Aven, la presqu'île de Crozon. Une grille
+    de photos qui montre des trous n'est plus une grille de photos — et sur la
+    carte comme dans les listes, ces lieux passent pour des erreurs. L'article
+    francophone, lui, porte presque toujours une image de tête.
+    """
+
+    class _Faux:
+        def __init__(self, images):
+            self.images, self.demandes = images, []
+
+        def page_images(self, titles):
+            self.demandes.append(list(titles))
+            return {t: self.images[t] for t in titles if t in self.images}
+
+    def _lieu(self, nom, image=None, article="Un article"):
+        lieu = make_place(nom, wikidata_id=f"Q{abs(hash(nom)) % 99991}")
+        lieu.image_url = image
+        lieu.wikipedia_url = (
+            f"https://fr.wikipedia.org/wiki/{article.replace(' ', '_')}" if article else None
+        )
+        return lieu
+
+    def test_a_place_without_an_image_takes_the_one_from_its_article(self):
+        from roam_pipeline.fetch import enrich_missing_images
+
+        nu = self._lieu("Villa Savoye", article="Villa Savoye")
+        client = self._Faux({"Villa Savoye": "Villa Savoye 1.jpg"})
+        with _capture():
+            self.assertEqual(enrich_missing_images([nu], client), 1)
+        self.assertIn("Villa%20Savoye%201.jpg", nu.image_url.replace("_", "%20"))
+
+    def test_wikidata_keeps_the_upper_hand(self):
+        # C'est un REPLI, pas une source : on ne va chercher l'article que là où
+        # la propriété P18 est vide.
+        from roam_pipeline.fetch import enrich_missing_images
+
+        illustre = self._lieu("Tour Eiffel", image="https://exemple/deja.jpg",
+                              article="Tour Eiffel")
+        client = self._Faux({"Tour Eiffel": "Autre.jpg"})
+        with _capture():
+            self.assertEqual(enrich_missing_images([illustre], client), 0)
+        self.assertEqual(illustre.image_url, "https://exemple/deja.jpg")
+        self.assertEqual(client.demandes, [])
+
+    def test_a_place_without_an_article_is_left_alone(self):
+        from roam_pipeline.fetch import enrich_missing_images
+
+        orphelin = self._lieu("Les Maisonnettes", article=None)
+        with _capture():
+            self.assertEqual(enrich_missing_images([orphelin], self._Faux({})), 0)
+        self.assertIsNone(orphelin.image_url)
+
+    def test_a_failing_batch_does_not_cost_the_others(self):
+        from roam_pipeline.fetch import enrich_missing_images
+
+        class _Casse:
+            def page_images(self, titles):
+                raise RuntimeError("503")
+
+        lieu = self._lieu("Villa Savoye", article="Villa Savoye")
+        with _capture():
+            self.assertEqual(enrich_missing_images([lieu], _Casse()), 0)
+        self.assertIsNone(lieu.image_url)
+
+    def test_the_found_image_can_be_credited_like_any_other(self):
+        # Le nom rendu est celui du fichier Commons : le crédit se demande
+        # ensuite par le chemin habituel.
+        from roam_pipeline.commons import file_title
+        from roam_pipeline.fetch import enrich_missing_images
+
+        nu = self._lieu("Villa Savoye", article="Villa Savoye")
+        with _capture():
+            enrich_missing_images([nu], self._Faux({"Villa Savoye": "Villa Savoye 1.jpg"}))
+        self.assertEqual(file_title(nu.image_url), "File:Villa Savoye 1.jpg")
+
+
 class TestChosenPhoto(unittest.TestCase):
     """Wikidata ne donne qu'une image par lieu, et ce n'est pas un choix.
 

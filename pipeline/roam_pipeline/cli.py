@@ -46,6 +46,7 @@ from .fetch import (
     enrich_visitors,
     enrich_article_sizes,
     enrich_image_credits,
+    enrich_missing_images,
     enrich_pageviews,
     enrich_communes,
     enrich_departements,
@@ -480,6 +481,9 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     # fichiers seulement. C'est une passe courte, mais elle demande le réseau
     # de Commons — on la garde optionnelle comme les autres.
     if args.images:
+        # D'ABORD le repli sur l'article : une photo trouvée ici doit être
+        # créditée comme les autres, et le crédit se demande ensuite.
+        enrich_missing_images(places)
         enrich_image_credits(places)
     _save_raw(args, places)
     print(f"{found} tailles d'articles ajoutées → {raw_path}")
@@ -2168,12 +2172,33 @@ def _list_photos(args: argparse.Namespace, qid: str, photos: dict[str, str]) -> 
     if lieu is None:
         print(f"{qid} n'est pas dans la collecte.", file=sys.stderr)
         return 1
+    actuelle = file_title(lieu.image_url)
+
+    # Sans catégorie Commons, il reste l'image de tête de l'article : c'est
+    # exactement le cas des lieux sans photo, et leur proposer « rien » serait
+    # les abandonner là où une piste existe.
     if not lieu.commons_category:
-        print(f"{lieu.name} n'a pas de catégorie Commons : Wikidata ne connaît "
-              "que son image, et il n'y a rien à comparer.")
+        from .wikipedia import WikipediaClient, title_from_url
+
+        titre = title_from_url(lieu.wikipedia_url)
+        depuis_article = {}
+        if titre:
+            try:
+                depuis_article = WikipediaClient().page_images([titre])
+            except Exception as exc:
+                print(f"Wikipédia n'a pas répondu ({exc}).", file=sys.stderr)
+                return 1
+        fichier = depuis_article.get(titre or "")
+        if not fichier:
+            print(f"{lieu.name} n'a ni catégorie Commons ni image d'article. "
+                  "Il faut en téléverser une sur Wikimedia Commons, puis "
+                  f"« photo {qid} <nom du fichier> ».")
+            return 0
+        print(f"{lieu.name} — pas de catégorie Commons, mais son article porte :\n")
+        print(f"  File:{fichier}")
+        print(f"\nPour la choisir : photo {qid} « {fichier} »")
         return 0
 
-    actuelle = file_title(lieu.image_url)
     try:
         fichiers = CommonsClient().category_files(lieu.commons_category)
     except Exception as exc:
@@ -3272,7 +3297,7 @@ def build_parser() -> argparse.ArgumentParser:
     enrich.add_argument(
         "--images",
         action="store_true",
-        help="ajouter l'auteur et la licence des photos (Wikimedia Commons)",
+        help="chercher les photos manquantes, et créditer toutes les photos",
     )
     enrich.add_argument(
         "--skip-summaries",
