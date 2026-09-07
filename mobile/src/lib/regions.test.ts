@@ -7,6 +7,7 @@ import {
   emprise,
   lieuxDe,
   niveauxDe,
+  prochaineOuverture,
   rangDepuisLeCentre,
   regionAu,
   regionDuCadre,
@@ -262,5 +263,58 @@ describe('regionDuCadre', () => {
         [9.6, 51.2],
       ]),
     ).toBeNull();
+  });
+});
+
+describe('prochaineOuverture', () => {
+  it('ouvre ce que la caméra montre quand rien n’est ouvert', () => {
+    expect(prochaineOuverture({ region: null, ancre: null }, '75', 5.6)).toEqual({
+      region: '75',
+      ancre: 5.6,
+    });
+  });
+
+  it('ne défait JAMAIS le clic qui vient d’atterrir', () => {
+    // C'est tout le défaut : le vol se termine, la règle géométrique est
+    // réévaluée, et elle referme la région que l'utilisateur vient d'ouvrir.
+    // Les lieux apparaissaient puis disparaissaient — il fallait zoomer pour
+    // les faire revenir.
+    expect(prochaineOuverture({ region: '75', ancre: null }, null, 5.57)).toEqual({
+      region: '75',
+      ancre: 5.57,
+    });
+  });
+
+  it('ne referme pas sans dézoom, quoi que dise la géométrie', () => {
+    // Une région tout juste cadrée peut ne pas « remplir l'écran » d'un
+    // cheveu. Tant que la caméra n'a pas reculé, ce n'est pas au calcul de
+    // décider.
+    expect(prochaineOuverture({ region: '75', ancre: 5.57 }, null, 5.57).region).toBe('75');
+  });
+
+  it('referme dès que le dézoom sort la région du cadre', () => {
+    expect(prochaineOuverture({ region: '75', ancre: 5.6 }, null, 5.1)).toEqual({
+      region: null,
+      ancre: null,
+    });
+  });
+
+  it('passe à la voisine quand c’est elle qui remplit l’écran', () => {
+    expect(prochaineOuverture({ region: '75', ancre: 6 }, '76', 6.4)).toEqual({
+      region: '76',
+      ancre: 6.4,
+    });
+  });
+
+  it('retient le plus haut zoom atteint', () => {
+    // Zoomer sur un village puis ressortir au cadrage d'arrivée n'est pas un
+    // dézoom : sans cette mémoire, la région se refermerait au retour.
+    const apresZoom = prochaineOuverture({ region: '75', ancre: 5.6 }, '75', 11);
+    expect(apresZoom.ancre).toBe(11);
+    expect(prochaineOuverture(apresZoom, '75', 5.7).region).toBe('75');
+  });
+
+  it('reste ouverte en dérivant vers la mer, sans dézoom', () => {
+    expect(prochaineOuverture({ region: '75', ancre: 6 }, null, 6).region).toBe('75');
   });
 });

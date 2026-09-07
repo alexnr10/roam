@@ -11,6 +11,8 @@ import type { Emprise } from '../lib/regions';
 import {
   REGIONS,
   emprise,
+  partDuCadre,
+  prochaineOuverture,
   regionDuCadre,
   regionDuDepartement,
   niveauxDe,
@@ -58,6 +60,7 @@ const SOURCE = 'places';
 const REGIONS_SRC = 'regions';
 const DEPTS_SRC = 'departements';
 const VOILE_SRC = 'voile';
+
 
 function toFeatureCollection(
   places: Place[],
@@ -130,6 +133,18 @@ export function MapCanvas({
   // fois pour toutes et doit comparer à l'état courant, pas à celui du rendu
   // où il a été créé.
   const ouverteRef = useRef<string | null>(null);
+  /**
+   * Le zoom auquel la région s'est ouverte.
+   *
+   * Sans cette ancre, la règle « remplit-elle l'écran ? » est réévaluée à
+   * chaque fin de mouvement, y compris juste après le vol qu'on vient de
+   * déclencher : la carte peut alors défaire le clic de l'utilisateur, sur un
+   * calcul qu'il n'a pas demandé. C'est ce qui faisait clignoter les lieux.
+   *
+   * Le clic fait donc autorité, et seul un DÉZOOM franc referme — ce que le
+   * livrable voulait dire par « dézoomer referme » : un geste, pas un arrondi.
+   */
+  const zoomOuverture = useRef<number | null>(null);
 
   byId.current = new Map(places.map((place) => [place.id, place]));
   onSelect.current = onSelectPlace;
@@ -142,6 +157,14 @@ export function MapCanvas({
   // charge jamais.
   const premiereErreur = useRef<string | null>(null);
   const [muette, setMuette] = useState<string | null>(null);
+  /**
+   * Le relevé de bord, sur `?debug` dans l'adresse.
+   *
+   * Une carte se règle sur un téléphone, dehors, et personne n'y ouvre une
+   * console. Quand un défaut ne se reproduit pas ici, il faut pouvoir le LIRE
+   * là-bas — sinon on en est réduit à formuler des hypothèses.
+   */
+  const [releve, setReleve] = useState<string | null>(null);
   // WebGL2 manque encore sur quelques WebViews Android et sur les machines
   // sans accélération : MapLibre lève à la construction, et sans ce garde-fou
   // l'écran restait un rectangle gris sans un mot d'explication.
@@ -450,6 +473,8 @@ export function MapCanvas({
           // une grande région cadrée sur un téléphone n'atteint pas un zoom
           // élevé, et attendre un palier la laissait fermée sur place.
           ouverteRef.current = code;
+          // L'ancre se posera à l'arrivée du vol : d'ici là, rien ne referme.
+          zoomOuverture.current = null;
           setOuverte(code);
           onRegion.current?.(code);
           ouvrir(instance, code);
@@ -470,7 +495,29 @@ export function MapCanvas({
         // c'est le geste que tout le monde tente en premier, et il n'y a rien
         // à apprendre.
         instance.on('moveend', () => {
-          const code = regionSousLaCamera(instance);
+          const zoom = instance.getZoom();
+          const vue = regionSousLaCamera(instance);
+          const suite = prochaineOuverture(
+            { region: ouverteRef.current, ancre: zoomOuverture.current },
+            vue,
+            zoom,
+          );
+          const code = suite.region;
+          zoomOuverture.current = suite.ancre;
+
+          if (debogage()) {
+            const cadre = cadreLibre(instance);
+            const suivie = code ?? ouverteRef.current;
+            const feature = suivie ? REGIONS.get(suivie) : undefined;
+            const part = feature ? partDuCadre(emprise(feature.geometry), cadre) : 0;
+            const el = instance.getContainer();
+            setReleve(
+              `${suivie ?? '—'} z${zoom.toFixed(2)} ancre ${
+                zoomOuverture.current?.toFixed(2) ?? '—'
+              } part ${part.toFixed(2)} cadre ${el.clientWidth}×${el.clientHeight}`,
+            );
+          }
+
           if (code === ouverteRef.current) return;
           ouverteRef.current = code;
           setOuverte(code);
@@ -621,6 +668,11 @@ export function MapCanvas({
   return (
     <View style={styles.canvas}>
       <div ref={container} style={{ position: 'absolute', inset: 0 }} />
+      {releve ? (
+        <View style={styles.releve} pointerEvents="none">
+          <Text style={styles.releveTexte}>{releve}</Text>
+        </View>
+      ) : null}
       {muette ? (
         <View style={styles.notice} pointerEvents="none">
           <Text style={styles.noticeText}>Carte muette : {muette}</Text>
@@ -746,4 +798,19 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   noticeText: { fontSize: 12, color: colors.muted },
+  releve: {
+    position: 'absolute',
+    bottom: 8,
+    left: 8,
+    backgroundColor: colors.text,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  releveTexte: { fontSize: 11, color: colors.bg },
 });
+
+/** Le relevé n'apparaît que si l'adresse porte `?debug`. */
+function debogage(): boolean {
+  return typeof window !== 'undefined' && window.location.search.includes('debug');
+}

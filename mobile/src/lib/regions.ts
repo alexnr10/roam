@@ -287,13 +287,73 @@ export function rangDepuisLeCentre(
  * moitié du cadre dans un sens ou dans l'autre, on ne regarde plus la France :
  * on regarde un endroit.
  */
-export function remplitLEcran(region: Emprise, vue: Emprise, part = 0.5): boolean {
+export function partDuCadre(region: Emprise, vue: Emprise): number {
   const largeurVue = vue[1][0] - vue[0][0];
   const hauteurVue = vue[1][1] - vue[0][1];
-  if (largeurVue <= 0 || hauteurVue <= 0) return false;
-  const largeur = (region[1][0] - region[0][0]) / largeurVue;
-  const hauteur = (region[1][1] - region[0][1]) / hauteurVue;
-  return Math.max(largeur, hauteur) >= part;
+  if (largeurVue <= 0 || hauteurVue <= 0) return 0;
+  return Math.max(
+    (region[1][0] - region[0][0]) / largeurVue,
+    (region[1][1] - region[0][1]) / hauteurVue,
+  );
+}
+
+export function remplitLEcran(region: Emprise, vue: Emprise, part = 0.5): boolean {
+  return partDuCadre(region, vue) >= part;
+}
+
+/** L'état d'ouverture : la région, et le plus haut zoom atteint depuis. */
+export type Ouverture = { region: string | null; ancre: number | null };
+
+/**
+ * De combien le zoom doit baisser pour compter comme un dézoom.
+ *
+ * Deux fins de mouvement consécutives peuvent rendre des zooms qui diffèrent
+ * au millième ; sans ce seuil, cette poussière passerait pour un geste.
+ */
+export const BRUIT_DE_ZOOM = 0.05;
+
+/**
+ * Ce que devient l'ouverture à la fin d'un mouvement de caméra.
+ *
+ * La règle « la région ouverte est celle qui remplit l'écran » est juste tant
+ * qu'on se déplace, et fausse juste après un clic : réévaluée à l'arrivée du
+ * vol qu'on vient de déclencher, elle peut DÉFAIRE le geste de l'utilisateur
+ * sur un calcul qu'il n'a pas demandé. Les lieux apparaissaient, puis
+ * disparaissaient — et il fallait zoomer pour les faire revenir.
+ *
+ * Deux gestes seulement peuvent donc refermer, et ce sont des gestes :
+ *
+ * - **dézoomer** jusqu'à ce que la région ne remplisse plus l'écran ;
+ * - **se déplacer** jusque chez la voisine, qui prend alors la place.
+ *
+ * Une caméra qui n'a pas reculé ne referme jamais, quoi que dise la géométrie.
+ * C'est ce qui rend la mécanique insensible aux cas limites — une région tout
+ * juste cadrée, un archipel, un écran inhabituellement court.
+ *
+ * `ancre` est le plus haut zoom atteint depuis l'ouverture : sans quoi, zoomer
+ * sur un village puis ressortir au cadrage d'arrivée compterait comme un
+ * dézoom. `ancre: null` avec une région ouverte signale un clic dont le vol
+ * vient d'arriver : on pose l'ancre là, sans rien remettre en cause.
+ */
+export function prochaineOuverture(
+  actuelle: Ouverture,
+  vue: string | null,
+  zoom: number,
+  bruit = BRUIT_DE_ZOOM,
+): Ouverture {
+  if (!actuelle.region) {
+    return { region: vue, ancre: vue ? zoom : null };
+  }
+  if (actuelle.ancre === null) {
+    return { region: actuelle.region, ancre: zoom };
+  }
+  if (vue && vue !== actuelle.region) {
+    return { region: vue, ancre: zoom };
+  }
+  if (!vue && zoom < actuelle.ancre - bruit) {
+    return { region: null, ancre: null };
+  }
+  return { region: actuelle.region, ancre: Math.max(actuelle.ancre, zoom) };
 }
 
 /** Le centre d'une emprise. */
