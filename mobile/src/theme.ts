@@ -1,24 +1,67 @@
 /** Jetons de style. Un seul endroit à toucher pour changer l'identité visuelle. */
 
+/**
+ * Une seule identité, claire et chaude.
+ *
+ * Pas de mode sombre en v1, et ce n'est pas une économie : c'est une décision.
+ * Roam se lit debout, dehors, en plein soleil — la condition où un fond sombre
+ * perd le plus (reflets, contraste écrasé, luminosité poussée à fond). Et les
+ * deux mille photos du catalogue sont des pierres claires, des tuiles, du
+ * calcaire, du sable : posées sur du sable, elles se prolongent ; posées sur du
+ * noir, elles deviennent vingt-trois vignettes qui brillent dans le vide.
+ *
+ * Le fond n'est pas blanc pour autant. `bg` est un sable, pas un papier : c'est
+ * la même famille que la carte, et c'est ce qui fait qu'une carte claire et une
+ * app claire ne se contentent pas de coexister — elles sont la même surface.
+ *
+ * Un mode sombre reste possible plus tard : il ne demande que de remplacer les
+ * onze valeurs de `colors` et les huit de `mapColors`. Rien d'autre du code ne
+ * connaît une couleur.
+ */
 export const colors = {
-  bg: '#FBFAF7',
-  surface: '#FFFFFF',
-  surfaceAlt: '#F3F0EA',
-  text: '#1A1917',
-  muted: '#6F6A62',
-  border: '#E7E3DB',
-  primary: '#B4532B',
-  primarySoft: '#F6E7DE',
-  verified: '#2F6F4E',
-  locked: '#B8B2A8',
-  /** Un niveau, une couleur — reprise partout : carte, listes, badges. */
-  tier: ['#B4532B', '#8A7B5C', '#9A958C'] as const,
+  /** Sable. Le fond de l'application ET la terre de la carte. */
+  bg: '#F5EAD8',
+  /** Lin. Cartes, vignettes, barre de recherche — ce qui flotte au-dessus. */
+  surface: '#F9F4ED',
+  surfaceAlt: '#EEE7DB',
+  text: '#201E1D',
+  muted: '#645C50',
+  border: '#DCD7C4',
+
+  /**
+   * Terre cuite profonde. C'est la couleur de l'ENCRE d'accent, pas du dessin.
+   *
+   * La terre cuite claire (`primaryLight`) ne tient pas 4,5:1 sur le sable :
+   * en texte de seize points elle passe à 3:1, et l'app se lit au soleil. Le
+   * cran plus foncé donne 5,8:1, et du blanc dessus 6,9:1 — donc bouton plein,
+   * libellé, lien, chiffre : toujours celui-ci.
+   */
+  primary: '#8C491A',
+  /**
+   * Terre cuite pleine. Pour ce qui n'est pas du texte : pastilles de la carte,
+   * aplat de la région ouverte, jauges, tampons.
+   */
+  primaryLight: '#C67139',
+  primarySoft: '#FFE1D0',
+
+  /** Sauge profonde : la seconde voix. Visite vérifiée, nature, confirmation. */
+  verified: '#56633F',
+  locked: '#C0B6A5',
+
+  /**
+   * Un niveau, une couleur — reprise partout : carte, listes, badges.
+   *
+   * Terre cuite, sauge, neutre : le niveau 1 porte l'accent de la marque, le
+   * niveau 3 s'efface. Trois valeurs distinctes en noir et blanc aussi, donc
+   * lisibles pour un daltonien.
+   */
+  tier: ['#8C491A', '#728157', '#82796A'] as const,
 };
 
 /**
  * Les deux couleurs de la carte de conquête.
  *
- * Or : une collection du territoire est achevée. Terracotta pleine : le
+ * Or : une collection du territoire est achevée. Terre cuite pleine : le
  * territoire l'est entièrement, tous thèmes confondus. La seconde ne s'obtient
  * qu'en passant par la première, et se lit comme un aboutissement.
  */
@@ -38,26 +81,35 @@ export const spacing = {
   xxl: 32,
 };
 
-export const radius = { sm: 6, md: 10, lg: 16, pill: 999 };
+/** Tout est arrondi. `pill` pour ce qui se touche, `lg` pour ce qui contient. */
+export const radius = { sm: 8, md: 12, lg: 20, xl: 28, pill: 999 };
+
+/**
+ * Les polices.
+ *
+ * Aucune police externe : l'aperçu web est un seul fichier HTML inliné, et un
+ * @font-face distant y ajouterait une dépendance réseau pour un gain
+ * d'apparence. Donc les polices du système — mais pas la même pour tout.
+ *
+ * Un serif pour les titres : c'est ce qui sépare un guide de voyage d'un
+ * tableau de bord, et Georgia (ou New York sur iOS, Noto Serif sur Android)
+ * est présente partout sans rien télécharger. Le corps reste la police
+ * d'interface du système, qui est ce qu'on lit le mieux en petit.
+ *
+ * Note : la police d'affichage du design system (Caprasimo) est inutilisable
+ * ici — elle n'existe sur aucun système et devrait être téléchargée. Le serif
+ * système en tient le rôle : même intention, coût réseau nul.
+ */
+export const fonts = {
+  display: 'Georgia, "Iowan Old Style", "Palatino", "Times New Roman", serif',
+  body: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+};
 
 /**
  * Largeur maximale du contenu, en points.
  *
- * L'application est pensée pour le téléphone, et tout y est dimensionné
- * d'après la largeur de l'écran : la photo d'une fiche fait la largeur moins
- * les marges, une tuile du quadrillage la moitié. Sur un ordinateur, la même
- * règle donnait une photo de dix-huit cents pixels de large — l'écran entier
- * pour une seule image, et six lignes de texte étirées d'un bord à l'autre.
- *
- * Au-delà de cette largeur, le contenu se centre au lieu de s'étirer. Ce n'est
- * pas une version « bureau » : c'est la version téléphone, rendue lisible sur
- * un grand écran.
- *
- * Sept cent vingt et non cinq cent soixante : la borne servait à empêcher une
- * photo de deux mètres, pas à rétrécir le catalogue. À 560, l'écran d'un
- * ordinateur ne montrait que trois vignettes et quatre thèmes — moins qu'un
- * téléphone en paysage, pour un guide dont tout l'objet est d'en montrer
- * beaucoup d'un coup.
+ * Au-delà, le contenu se centre au lieu de s'étirer. Ce n'est pas une version
+ * « bureau » : c'est la version téléphone, rendue lisible sur un grand écran.
  */
 export const LARGEUR_MAX = 720;
 
@@ -67,32 +119,63 @@ export function largeurUtile(ecran: number): number {
 }
 
 /**
- * L'échelle typographique, montée d'un cran.
- *
- * Quinze points de corps et treize de légende passent bien sur un écran
- * d'ordinateur, à cinquante centimètres. Sur un téléphone tenu à bout de bras,
- * dehors, il faut zoomer — et une application de guide se lit debout, à
- * l'arrêt, en cherchant quoi faire.
+ * L'échelle typographique.
  *
  * Seize et quatorze sont les tailles que les systèmes eux-mêmes emploient pour
  * une liste. On ne descend en dessous que pour ce qui est vraiment secondaire.
+ *
+ * `title` et `heading` passent au serif : ce sont les deux seuls endroits où la
+ * voix de la marque parle. Un sous-titre en serif, et l'écran devient un
+ * magazine ; un corps de texte en serif, et il devient illisible en petit.
  */
 export const type = {
-  title: { fontSize: 30, fontWeight: '700' as const, color: colors.text },
-  heading: { fontSize: 22, fontWeight: '700' as const, color: colors.text },
-  subheading: { fontSize: 17, fontWeight: '600' as const, color: colors.text },
-  body: { fontSize: 16, color: colors.text },
-  small: { fontSize: 14, color: colors.muted },
-  tiny: { fontSize: 12, color: colors.muted, letterSpacing: 0.4 },
+  title: { fontSize: 30, fontFamily: fonts.display, fontWeight: '400' as const, color: colors.text, letterSpacing: -0.2 },
+  heading: { fontSize: 22, fontFamily: fonts.display, fontWeight: '400' as const, color: colors.text },
+  subheading: { fontSize: 17, fontFamily: fonts.body, fontWeight: '600' as const, color: colors.text },
+  body: { fontSize: 16, fontFamily: fonts.body, color: colors.text },
+  small: { fontSize: 14, fontFamily: fonts.body, color: colors.muted },
+  tiny: { fontSize: 12, fontFamily: fonts.body, color: colors.muted, letterSpacing: 0.4 },
+  /** Sur-titre : petites capitales espacées. Sert de kicker, jamais de corps. */
+  kicker: {
+    fontSize: 12,
+    fontFamily: fonts.body,
+    fontWeight: '700' as const,
+    letterSpacing: 1.1,
+    textTransform: 'uppercase' as const,
+    color: colors.primary,
+  },
 };
 
 /**
- * Emoji par thème — provisoire, à remplacer par un jeu d'icônes dessiné.
+ * Les ombres.
  *
- * Les vingt-trois thèmes y figurent, et il le faut : l'emoji sert de repli
- * quand un lieu n'a pas de photo ou qu'elle ne charge pas, et dix thèmes sans
- * entrée affichaient un 📍 anonyme — le quadrillage en montrait des grilles
- * entières.
+ * Ce qui flotte au-dessus de la carte a besoin d'un décollement, mais chaud :
+ * une ombre grise sur du sable donne une tache sale. Celle-ci est une terre
+ * d'ombre très diluée.
+ */
+export const elevation = {
+  flottant: {
+    shadowColor: '#3D2A18',
+    shadowOpacity: 0.14,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+  },
+  pose: {
+    shadowColor: '#3D2A18',
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+};
+
+/**
+ * Emoji par thème — repli, plus l'illustration principale.
+ *
+ * Les icônes dessinées (`themeIcons.tsx`) remplacent l'emoji dans l'interface :
+ * pastilles de thème, pastilles de carte, repli d'une photo manquante. L'emoji
+ * reste ici comme dernier filet, et parce qu'il ne coûte rien.
  */
 export const themeEmoji: Record<string, string> = {
   chateaux: '🏰',
