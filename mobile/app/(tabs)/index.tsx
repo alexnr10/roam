@@ -359,8 +359,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  fermer: { padding: spacing.sm },
-  fermerTexte: { fontSize: 16, color: colors.muted },
+  // Une croix de seize points dans huit de marge se rate : trente-deux points
+  // de cible au total, pour un geste qu'on fait à chaque lieu regardé.
+  fermer: { padding: spacing.md, marginRight: -spacing.xs },
+  fermerTexte: { fontSize: 20, color: colors.muted },
   suggestion: {
     flexDirection: 'row',
     alignItems: 'center',

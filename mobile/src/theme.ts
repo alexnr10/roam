@@ -52,21 +52,38 @@ export const radius = { sm: 6, md: 10, lg: 16, pill: 999 };
  * Au-delà de cette largeur, le contenu se centre au lieu de s'étirer. Ce n'est
  * pas une version « bureau » : c'est la version téléphone, rendue lisible sur
  * un grand écran.
+ *
+ * Sept cent vingt et non cinq cent soixante : la borne servait à empêcher une
+ * photo de deux mètres, pas à rétrécir le catalogue. À 560, l'écran d'un
+ * ordinateur ne montrait que trois vignettes et quatre thèmes — moins qu'un
+ * téléphone en paysage, pour un guide dont tout l'objet est d'en montrer
+ * beaucoup d'un coup.
  */
-export const LARGEUR_MAX = 560;
+export const LARGEUR_MAX = 720;
 
 /** La largeur réellement disponible pour le contenu, marges comprises. */
 export function largeurUtile(ecran: number): number {
   return Math.min(ecran, LARGEUR_MAX);
 }
 
+/**
+ * L'échelle typographique, montée d'un cran.
+ *
+ * Quinze points de corps et treize de légende passent bien sur un écran
+ * d'ordinateur, à cinquante centimètres. Sur un téléphone tenu à bout de bras,
+ * dehors, il faut zoomer — et une application de guide se lit debout, à
+ * l'arrêt, en cherchant quoi faire.
+ *
+ * Seize et quatorze sont les tailles que les systèmes eux-mêmes emploient pour
+ * une liste. On ne descend en dessous que pour ce qui est vraiment secondaire.
+ */
 export const type = {
-  title: { fontSize: 28, fontWeight: '700' as const, color: colors.text },
-  heading: { fontSize: 20, fontWeight: '700' as const, color: colors.text },
-  subheading: { fontSize: 16, fontWeight: '600' as const, color: colors.text },
-  body: { fontSize: 15, color: colors.text },
-  small: { fontSize: 13, color: colors.muted },
-  tiny: { fontSize: 11, color: colors.muted, letterSpacing: 0.4 },
+  title: { fontSize: 30, fontWeight: '700' as const, color: colors.text },
+  heading: { fontSize: 22, fontWeight: '700' as const, color: colors.text },
+  subheading: { fontSize: 17, fontWeight: '600' as const, color: colors.text },
+  body: { fontSize: 16, color: colors.text },
+  small: { fontSize: 14, color: colors.muted },
+  tiny: { fontSize: 12, color: colors.muted, letterSpacing: 0.4 },
 };
 
 /**

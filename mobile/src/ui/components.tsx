@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
     paddingHorizontal: spacing.md,
-    height: 44,
+    height: 52,
     borderRadius: radius.md,
     backgroundColor: colors.surface,
     borderWidth: 1,
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
   // `outlineWidth` ne sert que sur le web : sans lui, le champ garde le liseré
   // bleu que le navigateur pose sur tout élément qui a le focus.
   searchInput: { flex: 1, ...type.body, padding: 0, outlineWidth: 0 },
-  searchClear: { fontSize: 15, color: colors.muted, paddingHorizontal: spacing.xs },
+  searchClear: { fontSize: 17, color: colors.muted, paddingHorizontal: spacing.sm },
   pill: {
     paddingHorizontal: spacing.md,
     paddingVertical: 5,
@@ -400,15 +400,16 @@ const styles = StyleSheet.create({
   },
   segment: {
     flex: 1,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
     borderRadius: radius.pill,
     alignItems: 'center',
   },
   segmentSelected: { backgroundColor: colors.surface },
-  segmentText: { fontSize: 13, fontWeight: '600', color: colors.muted },
+  segmentText: { fontSize: 15, fontWeight: '600', color: colors.muted },
   segmentTextSelected: { color: colors.text },
+  // Quarante-quatre points de haut au minimum, c'est la taille d'un pouce.
   button: {
-    paddingVertical: spacing.md + 2,
+    paddingVertical: spacing.lg,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.md,
     alignItems: 'center',
@@ -420,7 +421,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   buttonDisabled: { backgroundColor: colors.surfaceAlt },
-  buttonText: { fontSize: 15, fontWeight: '700' },
+  buttonText: { fontSize: 17, fontWeight: '700' },
   buttonTextPrimary: { color: '#FFFFFF' },
   buttonTextSecondary: { color: colors.text },
   card: {
