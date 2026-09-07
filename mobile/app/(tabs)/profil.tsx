@@ -9,7 +9,7 @@ import { rank, shortlists } from '../../src/lib/shortlist';
 import { useLocation } from '../../src/lib/useLocation';
 import { getPlacesInCollection } from '../../src/data/catalog';
 import { useVisits } from '../../src/store/visits';
-import { colors, radius, spacing, type } from '../../src/theme';
+import { LARGEUR_MAX, colors, radius, spacing, type } from '../../src/theme';
 import { Button, Card, EmptyState, Pill, ProgressBar } from '../../src/ui/components';
 
 export default function ProfileScreen() {
@@ -50,7 +50,15 @@ export default function ProfileScreen() {
   return (
     <ScrollView
       style={{ backgroundColor: colors.bg }}
-      contentContainerStyle={{ padding: spacing.lg, paddingBottom: spacing.xxl }}
+      contentContainerStyle={{
+        padding: spacing.lg,
+        paddingBottom: spacing.xxl,
+        // Centré sur grand écran plutôt qu'étiré : c'est une
+        // application de téléphone, lue sur un ordinateur.
+        width: '100%',
+        maxWidth: LARGEUR_MAX,
+        alignSelf: 'center',
+      }}
     >
       <View style={styles.stats}>
         <Stat value={visits.length} label="lieux validés" />

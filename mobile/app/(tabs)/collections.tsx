@@ -10,7 +10,7 @@ import {
 } from '../../src/data/catalog';
 import { autourDeToi, chercheCollections, parRegion, territoireDe } from '../../src/lib/explorer';
 import { useLocation } from '../../src/lib/useLocation';
-import { colors, radius, spacing, type } from '../../src/theme';
+import { LARGEUR_MAX, colors, radius, spacing, type } from '../../src/theme';
 import { Photo, SearchField } from '../../src/ui/components';
 import type { Collection } from '../../src/types';
 
@@ -53,7 +53,15 @@ export default function ExplorerScreen() {
   return (
     <ScrollView
       style={{ backgroundColor: colors.bg }}
-      contentContainerStyle={{ padding: spacing.lg, paddingBottom: spacing.xxl }}
+      contentContainerStyle={{
+        padding: spacing.lg,
+        paddingBottom: spacing.xxl,
+        // Centré sur grand écran plutôt qu'étiré : c'est une
+        // application de téléphone, lue sur un ordinateur.
+        width: '100%',
+        maxWidth: LARGEUR_MAX,
+        alignSelf: 'center',
+      }}
       keyboardShouldPersistTaps="handled"
     >
       <SearchField

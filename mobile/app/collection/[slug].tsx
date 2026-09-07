@@ -6,7 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { getCollection, getPlace, themeLabel } from '../../src/data/catalog';
 import { computeProgress, nextMilestone } from '../../src/lib/progress';
 import { useVisits } from '../../src/store/visits';
-import { colors, radius, spacing, type } from '../../src/theme';
+import { LARGEUR_MAX, colors, radius, spacing, type } from '../../src/theme';
 import { BackBar, Card, Photo, Pill, ProgressBar, TierDot } from '../../src/ui/components';
 import type { Tier } from '../../src/types';
 
@@ -46,6 +46,11 @@ export default function CollectionScreen() {
         padding: spacing.lg,
         paddingTop: insets.top + spacing.md,
         paddingBottom: spacing.xxl,
+        // Centré sur grand écran plutôt qu'étiré : c'est une application de
+        // téléphone, lue sur un ordinateur.
+        width: '100%',
+        maxWidth: LARGEUR_MAX,
+        alignSelf: 'center',
       }}
     >
       <BackBar />

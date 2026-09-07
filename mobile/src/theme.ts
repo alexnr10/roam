@@ -40,6 +40,26 @@ export const spacing = {
 
 export const radius = { sm: 6, md: 10, lg: 16, pill: 999 };
 
+/**
+ * Largeur maximale du contenu, en points.
+ *
+ * L'application est pensée pour le téléphone, et tout y est dimensionné
+ * d'après la largeur de l'écran : la photo d'une fiche fait la largeur moins
+ * les marges, une tuile du quadrillage la moitié. Sur un ordinateur, la même
+ * règle donnait une photo de dix-huit cents pixels de large — l'écran entier
+ * pour une seule image, et six lignes de texte étirées d'un bord à l'autre.
+ *
+ * Au-delà de cette largeur, le contenu se centre au lieu de s'étirer. Ce n'est
+ * pas une version « bureau » : c'est la version téléphone, rendue lisible sur
+ * un grand écran.
+ */
+export const LARGEUR_MAX = 560;
+
+/** La largeur réellement disponible pour le contenu, marges comprises. */
+export function largeurUtile(ecran: number): number {
+  return Math.min(ecran, LARGEUR_MAX);
+}
+
 export const type = {
   title: { fontSize: 28, fontWeight: '700' as const, color: colors.text },
   heading: { fontSize: 20, fontWeight: '700' as const, color: colors.text },

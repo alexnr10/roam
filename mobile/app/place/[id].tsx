@@ -25,7 +25,7 @@ import { computeProgress } from '../../src/lib/progress';
 import { useCheckIn } from '../../src/lib/useCheckIn';
 import { useLocation } from '../../src/lib/useLocation';
 import { useVisits } from '../../src/store/visits';
-import { colors, radius, spacing, type } from '../../src/theme';
+import { LARGEUR_MAX, colors, largeurUtile, radius, spacing, type } from '../../src/theme';
 import {
   BackBar,
   Button,
@@ -71,6 +71,12 @@ export default function PlaceScreen() {
         padding: spacing.lg,
         paddingTop: insets.top + spacing.md,
         paddingBottom: spacing.xxl,
+        // Sur un grand écran, le contenu se CENTRE au lieu de s'étirer : la
+        // photo faisait sinon dix-huit cents pixels de large, et le texte
+        // courait d'un bord à l'autre.
+        width: '100%',
+        maxWidth: LARGEUR_MAX,
+        alignSelf: 'center',
       }}
     >
       <BackBar />
@@ -80,8 +86,8 @@ export default function PlaceScreen() {
       <Photo
         url={place.imageUrl}
         themeId={place.themeId}
-        width={ecran - spacing.lg * 2}
-        height={Math.round(((ecran - spacing.lg * 2) * 2) / 3)}
+        width={largeurUtile(ecran) - spacing.lg * 2}
+        height={Math.round(((largeurUtile(ecran) - spacing.lg * 2) * 2) / 3)}
         round={radius.lg}
       />
       {/* Le crédit de la photo. Une image de Commons n'est pas libre de

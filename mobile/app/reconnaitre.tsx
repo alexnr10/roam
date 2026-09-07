@@ -13,7 +13,7 @@ import {
 import { areas, places as toutes } from '../src/data/catalog';
 import { regionsPresentes, tuiles, type Mode } from '../src/lib/grid';
 import { useVisits } from '../src/store/visits';
-import { colors, radius, spacing, type } from '../src/theme';
+import { LARGEUR_MAX, colors, largeurUtile, radius, spacing, type } from '../src/theme';
 import { BackBar, ChipRow, EmptyState, Photo, SegmentedControl } from '../src/ui/components';
 import type { Place } from '../src/types';
 
@@ -51,8 +51,10 @@ export default function RecognitionScreen() {
   );
 
   // Deux colonnes : au-delà, la photo devient trop petite pour être reconnue,
-  // ce qui vide l'écran de sa raison d'être.
-  const colonne = Math.floor((ecran - spacing.lg * 2 - spacing.md) / 2);
+  // ce qui vide l'écran de sa raison d'être. Et bornées : sur un ordinateur,
+  // la même règle donnait des tuiles de neuf cents pixels — deux photos par
+  // écran, là où le quadrillage vit d'en montrer beaucoup d'un coup.
+  const colonne = Math.floor((largeurUtile(ecran) - spacing.lg * 2 - spacing.md) / 2);
 
   const basculer = (id: string) =>
     setChoisis((actuels) => {
@@ -116,6 +118,9 @@ export default function RecognitionScreen() {
           paddingTop: insets.top + spacing.md,
           paddingBottom: spacing.xxl * 3,
           gap: spacing.lg,
+          width: '100%',
+          maxWidth: LARGEUR_MAX,
+          alignSelf: 'center',
         }}
         // La grille est longue — deux mille tuiles. On ne garde en mémoire que
         // ce qui est proche de l'écran, sans quoi le défilement saccade dès la

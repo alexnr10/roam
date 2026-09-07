@@ -9,9 +9,10 @@ import { evaluateCheckIn, suggestCheckIn } from '../../src/lib/checkin';
 import { distanceToPlace, formatDistance } from '../../src/lib/geo';
 import { useCheckIn } from '../../src/lib/useCheckIn';
 import { useLocation } from '../../src/lib/useLocation';
+import { useRoulette } from '../../src/lib/roulette';
 import { MIN_CARACTERES, search } from '../../src/lib/search';
 import { useVisits } from '../../src/store/visits';
-import { colors, spacing, radius, type } from '../../src/theme';
+import { LARGEUR_MAX, colors, spacing, radius, type } from '../../src/theme';
 import {
   Button,
   ChipRow,
@@ -25,8 +26,15 @@ import type { Place } from '../../src/types';
 
 /** Combien de vignettes dans le bandeau. Au-delà, on fait défiler pour rien. */
 const BANDEAU = 30;
-/** Largeur d'une vignette du bandeau, points. */
-const VIGNETTE = 168;
+/**
+ * Largeur d'une vignette du bandeau, points.
+ *
+ * Cent soixante-huit tenait deux vignettes et demie sur un téléphone, mais la
+ * photo y faisait quatre-vingt-seize points de haut : on reconnaissait mal, et
+ * c'est tout ce qu'on lui demande. Cent quatre-vingt-dix en montre toujours
+ * deux, avec une image d'un quart plus grande.
+ */
+const VIGNETTE = 190;
 
 /**
  * L'écran principal : une carte, et ce qu'elle contient.
@@ -57,6 +65,10 @@ export default function MapScreen() {
   const [choisi, setChoisi] = useState<Place | null>(null);
   const [auMilieu, setAuMilieu] = useState<Place | null>(null);
   const rail = useRef<FlatList<Place> | null>(null);
+  // Sur un ordinateur, la molette ne défile que verticalement : le bandeau
+  // restait bloqué sur les trois vignettes visibles, sans indice qu'il y en
+  // avait trente.
+  useRoulette(rail);
 
   const visible = useMemo(
     () => (theme ? allPlaces.filter((p) => p.themeId === theme) : allPlaces),
@@ -117,14 +129,16 @@ export default function MapScreen() {
       </View>
 
       <View style={[styles.haut, { paddingTop: insets.top + spacing.sm }]}>
-        <SearchField
-          value={query}
-          onChange={setQuery}
-          placeholder="Un lieu, une commune, un département"
-        />
-        {enRecherche ? null : (
-          <ChipRow options={themeOptions} value={theme} onChange={setTheme} />
-        )}
+        <View style={styles.colonne}>
+          <SearchField
+            value={query}
+            onChange={setQuery}
+            placeholder="Un lieu, une commune, un département"
+          />
+          {enRecherche ? null : (
+            <ChipRow options={themeOptions} value={theme} onChange={setTheme} />
+          )}
+        </View>
       </View>
 
       {/* Pendant une recherche, les résultats couvrent la carte : elle ne
@@ -134,6 +148,7 @@ export default function MapScreen() {
           <FlatList
             data={resultats}
             keyExtractor={(entry) => entry.place.id}
+            contentContainerStyle={{ width: '100%', maxWidth: LARGEUR_MAX, alignSelf: 'center' }}
             keyboardShouldPersistTaps="handled"
             ListHeaderComponent={
               <Text style={[type.tiny, styles.titreListe]}>
@@ -183,6 +198,7 @@ export default function MapScreen() {
 
       {!enRecherche ? (
         <View style={[styles.bas, { paddingBottom: insets.bottom + spacing.sm }]}>
+          <View style={styles.colonne}>
           {suggestion && !choisi ? (
             <View style={styles.suggestion}>
               <View style={{ flex: 1 }}>
@@ -260,7 +276,7 @@ export default function MapScreen() {
                     url={item.imageUrl}
                     themeId={item.themeId}
                     width={VIGNETTE}
-                    height={96}
+                    height={120}
                   />
                   <Text style={[type.body, styles.nom]} numberOfLines={1}>
                     {item.name}
@@ -278,6 +294,7 @@ export default function MapScreen() {
               Mode démo : ta position est simulée.
             </Text>
           ) : null}
+          </View>
         </View>
       ) : null}
     </View>
@@ -286,12 +303,15 @@ export default function MapScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
+  // Un cadre pleine largeur, une colonne bornée au milieu : `alignSelf` ne
+  // centre RIEN sur un élément posé en absolu — `left: 0` et `right: 0` gagnent,
+  // et la barre restait collée au bord gauche d'un écran d'ordinateur.
   haut: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    gap: spacing.sm,
+    alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.sm,
     // Un voile clair : la recherche doit rester lisible au-dessus d'une carte
@@ -315,7 +335,10 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.border,
   },
-  bas: { position: 'absolute', left: 0, right: 0, bottom: 0, gap: spacing.sm },
+  // Centré et borné sur grand écran : la recherche et le bandeau appartiennent
+  // à une application de téléphone, pas à un tableau de bord de deux mètres.
+  bas: { position: 'absolute', left: 0, right: 0, bottom: 0, alignItems: 'center' },
+  colonne: { width: '100%', maxWidth: LARGEUR_MAX, gap: spacing.sm },
   vignette: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,

@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Image,
   Pressable,
@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import { photoUrl } from '../lib/photo';
+import { useRoulette } from '../lib/roulette';
 import { colors, radius, spacing, themeEmoji, type } from '../theme';
 import type { Tier } from '../types';
 
@@ -178,8 +179,12 @@ export function ChipRow<T extends string>({
   value: T | null;
   onChange: (value: T | null) => void;
 }) {
+  const rangee = useRef<ScrollView | null>(null);
+  useRoulette(rangee);
+
   return (
     <ScrollView
+      ref={rangee}
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.chipRow}
@@ -349,16 +354,19 @@ const styles = StyleSheet.create({
   backArrow: { fontSize: 20, color: colors.primary, lineHeight: 22 },
   backLabel: { fontSize: 15, color: colors.primary, fontWeight: '600' },
   chipRow: { gap: spacing.xs, paddingVertical: spacing.xs, paddingRight: spacing.lg },
+  // Treize pixels de texte dans six de marge : il fallait zoomer pour lire les
+  // thèmes, et la pastille faisait trente-deux points de haut là où le pouce en
+  // demande quarante-quatre.
   chip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: 6,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 10,
     borderRadius: radius.pill,
     backgroundColor: colors.surfaceAlt,
     borderWidth: 1,
     borderColor: colors.border,
   },
   chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chipText: { fontSize: 13, color: colors.muted },
+  chipText: { fontSize: 15, color: colors.muted },
   chipTextSelected: { color: '#FFFFFF', fontWeight: '600' },
   track: { backgroundColor: colors.surfaceAlt, overflow: 'hidden', width: '100%' },
   search: {
