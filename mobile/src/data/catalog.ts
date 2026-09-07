@@ -62,3 +62,9 @@ export const getTierForPlace = (collection: Collection, placeId: string) =>
 
 export const themeLabel = (themeId: string): string =>
   themeById.get(themeId)?.name ?? themeId;
+
+/** Le nom court d'un thème, ou son nom complet quand il tient déjà. */
+export const themeLabelCourt = (themeId: string): string => {
+  const theme = themeById.get(themeId);
+  return theme?.nameShort || theme?.name || themeId;
+};

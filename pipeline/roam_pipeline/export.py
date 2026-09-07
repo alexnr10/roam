@@ -1396,6 +1396,10 @@ def write_app_catalog(
                 "id": theme.id,
                 "name": theme.name,
                 "nameSingular": theme.name_singular,
+                # Le nom court, pour les rangées de pastilles où la place
+                # manque : « Monuments et édifices remarquables » y occupait la
+                # largeur entière, et on voyait deux thèmes sur vingt-trois.
+                "nameShort": theme.name_short,
                 "icon": theme.icon,
             }
             for theme in config.themes

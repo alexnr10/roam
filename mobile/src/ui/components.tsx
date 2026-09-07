@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   // thèmes, et la pastille faisait trente-deux points de haut là où le pouce en
   // demande quarante-quatre.
   chip: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     paddingVertical: 10,
     borderRadius: radius.pill,
     backgroundColor: colors.surfaceAlt,

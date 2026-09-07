@@ -132,6 +132,23 @@ class TestConfig(unittest.TestCase):
         self.assertTrue(CONFIG.labels)
         self.assertEqual(CONFIG.theme("chateaux").name, "Châteaux")
 
+    def test_every_theme_has_a_name_short_enough_for_a_chip(self):
+        # La rangée de thèmes au-dessus de la carte est une file de pastilles :
+        # au-delà d'une quinzaine de caractères, une seule occupe la largeur
+        # d'un téléphone, et on voit deux thèmes sur vingt-trois.
+        trop_longs = [
+            (theme.id, theme.name_short)
+            for theme in CONFIG.themes
+            if len(theme.name_short) > 16
+        ]
+        self.assertEqual(trop_longs, [])
+
+    def test_a_short_name_falls_back_to_the_full_one(self):
+        # La plupart des thèmes tiennent déjà en un mot : leur en demander un
+        # second serait une ligne de configuration pour rien.
+        for theme in CONFIG.themes:
+            self.assertTrue(theme.name_short)
+
     def test_every_theme_has_a_source_or_is_pending(self):
         # Classe Wikidata, listes officielles, ou termes en attente de
         # résolution — mais jamais rien du tout.

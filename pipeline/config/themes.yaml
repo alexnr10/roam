@@ -85,6 +85,7 @@ themes:
   - id: villages
     name: Villages de caractère
     name_singular: Village
+    name_short: Villages
     name_hints: [village]
     icon: village
     kind: culture
@@ -105,6 +106,7 @@ themes:
   - id: abbayes
     name: Abbayes et monastères
     name_singular: Abbaye
+    name_short: Abbayes
     name_hints: [abbaye, prieuré, chartreuse, monastère, couvent]
     icon: abbey
     kind: culture
@@ -117,6 +119,7 @@ themes:
   - id: cathedrales
     name: Cathédrales et basiliques
     name_singular: Cathédrale
+    name_short: Cathédrales
     name_hints: [cathédrale, basilique, collégiale]
     icon: cathedral
     kind: culture
@@ -202,6 +205,7 @@ themes:
   - id: maisons
     name: Maisons et demeures remarquables
     name_singular: Maison
+    name_short: Maisons
     name_hints: [maison, villa, atelier, demeure]
     icon: house
     kind: culture
@@ -318,6 +322,7 @@ themes:
   - id: monuments
     name: Monuments et édifices remarquables
     name_singular: Monument
+    name_short: Monuments
     icon: monument
     kind: culture
     radius_m: 150
@@ -406,6 +411,7 @@ themes:
   - id: grottes
     name: Grottes et gouffres
     name_singular: Grotte
+    name_short: Grottes
     name_hints: [grotte, gouffre, aven, caverne]
     icon: cave
     kind: nature
@@ -418,6 +424,7 @@ themes:
   - id: megalithes
     name: Mégalithes et sites antiques
     name_singular: Site
+    name_short: Mégalithes
     name_hints: [dolmen, menhir, alignement, cairn, cromlech]
     icon: megalith
     kind: culture
@@ -440,6 +447,7 @@ themes:
     # celui de ce qu'il rassemble — et `name_hints` le disait déjà.
     name: Parcs et jardins
     name_singular: Jardin
+    name_short: Jardins
     name_hints: [jardin, parc, arboretum, roseraie]
     icon: garden
     kind: nature
@@ -472,6 +480,7 @@ themes:
   - id: ponts
     name: Ponts et viaducs
     name_singular: Pont
+    name_short: Ponts
     name_hints: [pont, viaduc, aqueduc, passerelle]
     icon: bridge
     kind: culture
@@ -510,6 +519,7 @@ themes:
   - id: cirques
     name: Cirques naturels
     name_singular: Cirque
+    name_short: Cirques
     name_hints: [cirque]
     icon: cirque
     kind: nature
@@ -526,6 +536,7 @@ themes:
   - id: gorges
     name: Gorges et canyons
     name_singular: Gorges
+    name_short: Gorges
     name_hints: [gorges, canyon, défilé]
     icon: canyon
     kind: nature
@@ -592,6 +603,7 @@ themes:
   - id: volcans
     name: Volcans et sites volcaniques
     name_singular: Volcan
+    name_short: Volcans
     name_hints: [volcan, puy]
     icon: volcan
     kind: nature
@@ -679,6 +691,7 @@ themes:
   - id: plages
     name: Littoral et plages
     name_singular: Site
+    name_short: Plages
     name_hints: [plage, anse, crique]
     icon: beach
     kind: nature
@@ -781,6 +794,7 @@ themes:
   - id: forets
     name: Forêts remarquables
     name_singular: Forêt
+    name_short: Forêts
     name_hints: [forêt, bois, futaie]
     icon: foret
     kind: nature
@@ -801,6 +815,7 @@ themes:
   - id: rochers
     name: Curiosités géologiques
     name_singular: Curiosité
+    name_short: Rochers
     name_hints: [rocher, roche, roque]
     icon: rocher
     kind: nature

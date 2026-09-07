@@ -82,9 +82,12 @@ export default function MapScreen() {
 
   const themeOptions = useMemo(
     () => [
-      { value: null, label: 'Tous les thèmes' },
+      // Le nom COURT : « Monuments et édifices remarquables » occupait la
+      // largeur d'un téléphone à lui seul, et on voyait deux thèmes sur
+      // vingt-trois. Le nom complet reste sur la page de la collection.
+      { value: null, label: 'Tous' },
       ...themes
-        .map((entry) => ({ value: entry.id, label: entry.name }))
+        .map((entry) => ({ value: entry.id, label: entry.nameShort || entry.name }))
         .sort((a, b) => a.label.localeCompare(b.label, 'fr')),
     ],
     [],

@@ -56,6 +56,13 @@ class Theme:
     # industriel sur la Seine », qu'il faut sortir. Seul le thème sait lequel :
     # une cathédrale existe dans toutes les régions, une côte non.
     min_region_pool: int = 0
+    # Nom COURT, pour les rangées de pastilles où la place manque. Vide, c'est
+    # le nom complet qui sert : la plupart des thèmes tiennent déjà en un mot.
+    #
+    # « Monuments et édifices remarquables » dit ce que contient la collection,
+    # et c'est le bon nom sur sa page. Dans le filtre au-dessus de la carte, il
+    # en occupait la largeur entière : on voyait deux thèmes sur vingt-trois.
+    name_short: str = ""
     # « nature » ou « culture ». Roam promet des PAYSAGES autant que du
     # patrimoine ; sans cette étiquette, l'équilibre entre les deux ne se
     # mesure pas, et une dérive vers le bâti passe inaperçue.
@@ -284,6 +291,7 @@ def load_config(config_dir: Path | None = None) -> Config:
             id=t["id"],
             name=t["name"],
             name_singular=t["name_singular"],
+            name_short=t.get("name_short") or t["name"],
             icon=t.get("icon", ""),
             radius_m=int(t["radius_m"]),
             min_sitelinks=int(t["min_sitelinks"]),

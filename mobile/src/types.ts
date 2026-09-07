@@ -71,6 +71,14 @@ export type Theme = {
   id: string;
   name: string;
   nameSingular: string;
+  /**
+   * Le nom court, pour les rangées de pastilles où la place manque.
+   *
+   * « Monuments et édifices remarquables » dit ce que contient la collection,
+   * et c'est le bon nom sur sa page. Dans le filtre au-dessus de la carte, il
+   * en occupe la largeur entière : on voyait deux thèmes sur vingt-trois.
+   */
+  nameShort?: string;
   icon: string;
 };
 
