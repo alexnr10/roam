@@ -4,7 +4,9 @@ import {
   REGION_FILL_OPACITY,
   REGION_TONES,
   REGION_TONE_BY_CODE,
+  mapColors,
   opaciteDesAplats,
+  repeindre,
   tonsDesRegions,
 } from './mapStyle';
 
@@ -90,5 +92,91 @@ describe('tonsDesRegions', () => {
     for (const [a, b] of voisines) {
       expect(REGION_TONE_BY_CODE[a]).not.toBe(REGION_TONE_BY_CODE[b]);
     }
+  });
+});
+
+describe('repeindre', () => {
+  /**
+   * Un style tiers, réduit à ce qui compte : plusieurs TYPES sur une même
+   * couche de données. C'est la forme qu'ont les styles d'OpenMapTiles, dont
+   * `positron` — et c'est elle qui faisait tout disparaître.
+   */
+  const styleTiers = {
+    version: 8,
+    glyphs: 'https://exemple/{fontstack}/{range}.pbf',
+    sources: { openmaptiles: { type: 'vector', url: 'https://exemple' } },
+    layers: [
+      { id: 'background', type: 'background', paint: { 'background-color': '#fff' } },
+      { id: 'water', type: 'fill', 'source-layer': 'water', paint: {} },
+      { id: 'waterway', type: 'line', 'source-layer': 'waterway', paint: {} },
+      { id: 'landcover-wood', type: 'fill', 'source-layer': 'landcover', paint: {} },
+      { id: 'building', type: 'fill', 'source-layer': 'building', paint: {} },
+      { id: 'building-3d', type: 'fill-extrusion', 'source-layer': 'building', paint: {} },
+      { id: 'highway-motorway', type: 'line', 'source-layer': 'transportation', paint: {} },
+      // Les flèches de sens unique : une couche de SYMBOLES sur la même couche
+      // de données que les tracés.
+      { id: 'highway-oneway', type: 'symbol', 'source-layer': 'transportation', layout: {}, paint: {} },
+      { id: 'place-city', type: 'symbol', 'source-layer': 'place', layout: {}, paint: {} },
+      { id: 'poi-level-1', type: 'symbol', 'source-layer': 'poi', paint: {} },
+      { id: 'boundary-3', type: 'line', 'source-layer': 'boundary', paint: {} },
+    ],
+  };
+
+  const prefixesParType: Record<string, string> = {
+    background: 'background',
+    fill: 'fill',
+    line: 'line',
+    symbol: 'text',
+  };
+
+  it('ne pose jamais une propriété étrangère au type de la couche', () => {
+    // Poser `line-color` sur une couche de symboles produit un style que
+    // MapLibre refuse EN ENTIER : il le signale par un événement et n'émet
+    // jamais `load`. Aucune couche de Roam n'est alors posée — la carte reste
+    // un rectangle vide, et rien à l'écran ne dit pourquoi.
+    const repeint = repeindre(styleTiers);
+    for (const couche of repeint.layers) {
+      const attendu = prefixesParType[couche.type];
+      if (!attendu) continue;
+      for (const propriete of Object.keys(couche.paint ?? {})) {
+        expect(propriete.startsWith(attendu)).toBe(true);
+      }
+    }
+  });
+
+  it('garde les tracés de route et écarte leurs flèches de sens unique', () => {
+    const repeint = repeindre(styleTiers);
+    const ids = repeint.layers.map((couche: { id: string }) => couche.id);
+    expect(ids).toContain('highway-motorway');
+    expect(ids).not.toContain('highway-oneway');
+  });
+
+  it('écarte le bavardage : points d’intérêt, frontières, bâtiments en relief', () => {
+    const ids = repeindre(styleTiers).layers.map((couche: { id: string }) => couche.id);
+    expect(ids).not.toContain('poi-level-1');
+    expect(ids).not.toContain('boundary-3');
+    expect(ids).not.toContain('building-3d');
+  });
+
+  it('n’impose aucune police aux étiquettes qu’il colore', () => {
+    // Un nom de fonte absent du jeu de glyphes du style ferait disparaître les
+    // étiquettes qu'on vient justement de colorer.
+    const ville = repeindre(styleTiers).layers.find(
+      (couche: { id: string }) => couche.id === 'place-city',
+    );
+    expect(ville.paint['text-color']).toBe(mapColors.labelInk);
+    expect(ville.layout['text-font']).toBeUndefined();
+  });
+
+  it('repeint le fond au sable de l’application', () => {
+    const fond = repeindre(styleTiers).layers.find(
+      (couche: { id: string }) => couche.id === 'background',
+    );
+    expect(fond.paint['background-color']).toBe(mapColors.earth);
+  });
+
+  it('ne touche pas au style d’origine', () => {
+    repeindre(styleTiers);
+    expect(styleTiers.layers[0].paint['background-color']).toBe('#fff');
   });
 });

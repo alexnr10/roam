@@ -244,44 +244,77 @@ export function repeindre(style: any) {
     if (src === 'poi' || id.startsWith('poi') || id.includes('shield')) continue;
     if (src === 'boundary' && layer.type === 'line') continue;
     if (src === 'aeroway') continue;
+    // Les bâtiments en relief appartiennent à une carte qu'on parcourt en
+    // ville, pas à un fond de guide. Et on ne saurait pas les repeindre : leurs
+    // propriétés n'ont rien à voir avec celles d'un aplat.
+    if (layer.type === 'fill-extrusion') continue;
 
     layer.paint = layer.paint ?? {};
 
-    if (layer.type === 'background') {
-      layer.paint['background-color'] = mapColors.earth;
-    } else if (src === 'water' || src === 'waterway') {
-      if (layer.type === 'fill') {
-        layer.paint['fill-color'] = mapColors.water;
-        layer.paint['fill-outline-color'] = mapColors.waterDeep;
-      } else if (layer.type === 'line') {
-        layer.paint['line-color'] = mapColors.waterDeep;
-        layer.paint['line-width'] = ['interpolate', ['linear'], ['zoom'], 8, 0.4, 14, 1.6];
-      }
-    } else if (src === 'landcover' || src === 'park') {
-      layer.paint['fill-color'] = mapColors.green;
-      layer.paint['fill-opacity'] = 0.55;
-    } else if (src === 'landuse') {
-      layer.paint['fill-color'] = mapColors.built;
-      layer.paint['fill-opacity'] = 0.6;
-    } else if (src === 'building') {
-      layer.paint['fill-color'] = mapColors.built;
-      layer.paint['fill-opacity'] = 0.75;
-      delete layer.paint['fill-outline-color'];
-    } else if (src === 'transportation') {
-      const grande = /motorway|trunk|primary/.test(id);
-      layer.paint['line-color'] = grande ? mapColors.road : mapColors.roadMinor;
-      // Les routes sont une TEXTURE, pas un réseau : on ne se sert pas de Roam
-      // pour conduire. Assez fines pour se lire de loin comme une trame.
-      layer.paint['line-width'] = grande
-        ? ['interpolate', ['linear'], ['zoom'], 7, 0.5, 12, 2.2, 16, 6]
-        : ['interpolate', ['linear'], ['zoom'], 11, 0.4, 16, 3];
-    } else if (layer.type === 'symbol') {
-      // Étiquettes : seulement les lieux habités, et en brun.
-      if (src !== 'place') continue;
-      layer.paint['text-color'] = mapColors.labelInk;
-      layer.paint['text-halo-color'] = mapColors.labelHalo;
-      layer.paint['text-halo-width'] = 1.6;
-      layer.layout = { ...(layer.layout ?? {}), 'text-font': ['Noto Sans Regular'] };
+    // On distingue le TYPE avant la couche de données.
+    //
+    // Poser `line-color` sur une couche de symboles, ou `fill-color` sur une
+    // couche de lignes, produit un style que MapLibre REFUSE EN ENTIER : il
+    // signale l'erreur par un événement et n'émet jamais `load`. Aucune de nos
+    // couches n'est alors posée, et la carte reste un rectangle vide.
+    //
+    // Un style tiers mélange les types sur une même couche de données —
+    // `transportation` porte les tracés ET les flèches de sens unique. Ne
+    // filtrer que par `source-layer` suffisait donc à tout effacer.
+    switch (layer.type) {
+      case 'background':
+        layer.paint['background-color'] = mapColors.earth;
+        break;
+
+      case 'fill':
+        if (src === 'water' || src === 'waterway') {
+          layer.paint['fill-color'] = mapColors.water;
+          layer.paint['fill-outline-color'] = mapColors.waterDeep;
+        } else if (src === 'landcover' || src === 'park') {
+          layer.paint['fill-color'] = mapColors.green;
+          layer.paint['fill-opacity'] = 0.55;
+        } else if (src === 'landuse') {
+          layer.paint['fill-color'] = mapColors.built;
+          layer.paint['fill-opacity'] = 0.6;
+        } else if (src === 'building') {
+          layer.paint['fill-color'] = mapColors.built;
+          layer.paint['fill-opacity'] = 0.75;
+          delete layer.paint['fill-outline-color'];
+        }
+        break;
+
+      case 'line':
+        if (src === 'water' || src === 'waterway') {
+          layer.paint['line-color'] = mapColors.waterDeep;
+          layer.paint['line-width'] = ['interpolate', ['linear'], ['zoom'], 8, 0.4, 14, 1.6];
+        } else if (src === 'transportation') {
+          const grande = /motorway|trunk|primary/.test(id);
+          layer.paint['line-color'] = grande ? mapColors.road : mapColors.roadMinor;
+          // Les routes sont une TEXTURE, pas un réseau : on ne se sert pas de
+          // Roam pour conduire. Assez fines pour se lire comme une trame.
+          layer.paint['line-width'] = grande
+            ? ['interpolate', ['linear'], ['zoom'], 7, 0.5, 12, 2.2, 16, 6]
+            : ['interpolate', ['linear'], ['zoom'], 11, 0.4, 16, 3];
+        } else if (src === 'building') {
+          layer.paint['line-color'] = mapColors.built;
+        }
+        break;
+
+      case 'symbol':
+        // Seuls les lieux habités gardent la parole, et en brun.
+        if (src !== 'place') continue;
+        layer.paint['text-color'] = mapColors.labelInk;
+        layer.paint['text-halo-color'] = mapColors.labelHalo;
+        layer.paint['text-halo-width'] = 1.6;
+        // La police n'est PAS imposée : un nom de fonte absent du jeu de
+        // glyphes du style ferait disparaître les étiquettes qu'on vient de
+        // colorer. Celle du style d'origine est forcément servie.
+        break;
+
+      default:
+        // Type inconnu : on garde la couche telle quelle plutôt que de la
+        // faire disparaître. Le style d'un tiers peut en introduire.
+        break;
     }
 
     garde.push(layer);

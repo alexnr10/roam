@@ -138,6 +138,10 @@ export function MapCanvas({
 
   const [ouverte, setOuverte] = useState<string | null>(null);
   const [degraded, setDegraded] = useState(false);
+  // Le premier reproche de MapLibre, gardé pour l'afficher si la carte ne
+  // charge jamais.
+  const premiereErreur = useRef<string | null>(null);
+  const [muette, setMuette] = useState<string | null>(null);
   // WebGL2 manque encore sur quelques WebViews Android et sur les machines
   // sans accélération : MapLibre lève à la construction, et sans ce garde-fou
   // l'écran restait un rectangle gris sans un mot d'explication.
@@ -185,8 +189,23 @@ export function MapCanvas({
       // exception : sans cette écoute, une couche peut manquer sans qu'aucune
       // ligne ne le signale — et c'est arrivé aux aplats de régions.
       instance.on('error', (event) => {
-        console.warn('Roam : carte —', event.error?.message ?? event);
+        const message = event.error?.message ?? String(event);
+        premiereErreur.current = premiereErreur.current ?? message;
+        console.warn('Roam : carte —', message);
       });
+
+      // Le guet.
+      //
+      // Un style refusé par MapLibre n'émet JAMAIS `load` : aucune de nos
+      // couches n'est posée, et l'écran reste un rectangle de sable sans un mot
+      // d'explication. On ne peut pas demander à quelqu'un debout dans la rue
+      // d'ouvrir une console — la panne doit se lire à l'écran.
+      const guet = setTimeout(() => {
+        if (map.current === instance && !instance.isStyleLoaded()) {
+          setMuette(premiereErreur.current ?? 'le fond de carte n’a pas pu être chargé');
+        }
+      }, 8000);
+      instance.on('load', () => clearTimeout(guet));
 
       instance.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
@@ -592,7 +611,11 @@ export function MapCanvas({
   return (
     <View style={styles.canvas}>
       <div ref={container} style={{ position: 'absolute', inset: 0 }} />
-      {degraded ? (
+      {muette ? (
+        <View style={styles.notice} pointerEvents="none">
+          <Text style={styles.noticeText}>Carte muette : {muette}</Text>
+        </View>
+      ) : degraded ? (
         <View style={styles.notice} pointerEvents="none">
           <Text style={styles.noticeText}>
             Fond de carte indisponible — les régions restent dessinées
