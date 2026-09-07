@@ -27,14 +27,19 @@ import type { Place } from '../../src/types';
 /** Combien de vignettes dans le bandeau. Au-delà, on fait défiler pour rien. */
 const BANDEAU = 30;
 /**
- * Largeur d'une vignette du bandeau, points.
+ * Largeur d'une vignette du bandeau, points, et hauteur de sa photo.
  *
- * Cent soixante-huit tenait deux vignettes et demie sur un téléphone, mais la
- * photo y faisait quatre-vingt-seize points de haut : on reconnaissait mal, et
- * c'est tout ce qu'on lui demande. Cent quatre-vingt-dix en montre toujours
- * deux, avec une image d'un quart plus grande.
+ * Le bandeau flotte AU-DESSUS de la carte : chaque point qu'il prend est un
+ * point de carte en moins. À cent quatre-vingt-dix de large et cent vingt de
+ * photo, il mangeait un tiers de la hauteur utile — la France y tenait à peine,
+ * et on ne voyait que deux lieux.
+ *
+ * Cent cinquante-six et quatre-vingt-huit : trois vignettes visibles, un tiers
+ * de hauteur rendu à la carte, et une photo qui reste assez grande pour qu'on
+ * reconnaisse un lieu — c'est tout ce qu'on lui demande.
  */
-const VIGNETTE = 190;
+const VIGNETTE = 156;
+const VIGNETTE_PHOTO = 88;
 
 /**
  * L'écran principal : une carte, et ce qu'elle contient.
@@ -224,8 +229,8 @@ export default function MapScreen() {
               <Photo
                 url={choisi.imageUrl}
                 themeId={choisi.themeId}
-                width={96}
-                height={96}
+                width={84}
+                height={84}
               />
               <View style={{ flex: 1, gap: 2 }}>
                 <Text style={type.subheading} numberOfLines={2}>
@@ -276,7 +281,7 @@ export default function MapScreen() {
                     url={item.imageUrl}
                     themeId={item.themeId}
                     width={VIGNETTE}
-                    height={120}
+                    height={VIGNETTE_PHOTO}
                   />
                   <Text style={[type.body, styles.nom]} numberOfLines={1}>
                     {item.name}

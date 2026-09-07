@@ -1,4 +1,4 @@
-import { PALIERS, palier, photoUrl } from './photo';
+import { DENSITE_MAX, PALIERS, palier, photoUrl } from './photo';
 
 const NUE =
   'https://commons.wikimedia.org/wiki/Special:FilePath/Tour%20Eiffel.jpg';
@@ -25,6 +25,26 @@ describe('photoUrl', () => {
   });
 });
 
+describe('densité', () => {
+  it("demande l'image à la densité de l'écran, pas à la taille du cadre", () => {
+    // Une photo demandée en POINTS est étirée d'autant de fois qu'il y a de
+    // pixels par point : quatre cents pixels sur mille, c'est flou — et
+    // l'application vend des images.
+    expect(photoUrl(NUE, 380, 2.6)).toBe(`${NUE}?width=800`);
+    expect(photoUrl(NUE, 380, 1)).toBe(`${NUE}?width=400`);
+  });
+
+  it('ne dépasse pas deux, quel que soit ce que dit le téléphone', () => {
+    // Au-delà l'œil ne distingue plus grand-chose, et chaque palier double le
+    // poids téléchargé — sur un forfait mobile, au bord d'une route.
+    expect(photoUrl(NUE, 400, 4)).toBe(photoUrl(NUE, 400, DENSITE_MAX));
+  });
+
+  it("ne rétrécit jamais l'image sous la taille du cadre", () => {
+    expect(photoUrl(NUE, 400, 0.5)).toBe(`${NUE}?width=400`);
+  });
+});
+
 describe('palier', () => {
   it('arrondit au palier supérieur, jamais en dessous', () => {
     // Une image plus petite que son cadre est floue ; c'est le seul sens où
@@ -38,5 +58,6 @@ describe('palier', () => {
     // Sinon un écran très dense ferait fabriquer à Commons une taille unique,
     // rien qu'à lui.
     expect(palier(4000)).toBe(PALIERS[PALIERS.length - 1]);
+    expect(PALIERS[PALIERS.length - 1]).toBe(1200);
   });
 });

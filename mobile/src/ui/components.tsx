@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import React, { useRef } from 'react';
 import {
   Image,
+  PixelRatio,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -44,7 +45,10 @@ export function Photo({
   round?: number;
 }) {
   const [rate, setRate] = React.useState(false);
-  const src = rate ? null : photoUrl(url, width);
+  // La densité de l'écran, pas seulement la taille du cadre : une photo
+  // demandée en POINTS est étirée d'autant de fois qu'il y a de pixels par
+  // point, et arrive floue là où l'application vend des images.
+  const src = rate ? null : photoUrl(url, width, PixelRatio.get());
   const cadre = {
     width,
     height,

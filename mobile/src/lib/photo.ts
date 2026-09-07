@@ -22,19 +22,36 @@
  */
 
 /** Les seules largeurs que l'application demande. */
-export const PALIERS = [200, 400, 800] as const;
+export const PALIERS = [200, 400, 800, 1200] as const;
 
 /** Le plus petit palier qui couvre cette largeur. Au-delà, le plus grand. */
 export function palier(largeur: number): number {
   return PALIERS.find((p) => p >= largeur) ?? PALIERS[PALIERS.length - 1];
 }
 
+/**
+ * La DENSITÉ au-delà de laquelle on ne demande plus mieux.
+ *
+ * Un téléphone récent affiche entre deux et quatre pixels physiques par point.
+ * Demander une image à la taille en POINTS la fait donc agrandir d'autant à
+ * l'affichage, et une photo de quatre cents pixels étirée sur mille est floue —
+ * exactement ce qu'on ne peut pas se permettre dans une application qui vend
+ * des images.
+ *
+ * Deux suffisent : au-delà, l'œil ne distingue plus grand-chose et chaque
+ * palier double le poids téléchargé, sur un forfait mobile, au bord d'une
+ * route.
+ */
+export const DENSITE_MAX = 2;
+
 export function photoUrl(
   imageUrl: string | null | undefined,
   largeur: number,
+  densite = 1,
 ): string | null {
   if (!imageUrl) return null;
   const sur = imageUrl.replace(/^http:\/\//, 'https://');
   const separateur = sur.includes('?') ? '&' : '?';
-  return `${sur}${separateur}width=${palier(largeur)}`;
+  const pixels = largeur * Math.min(Math.max(densite, 1), DENSITE_MAX);
+  return `${sur}${separateur}width=${palier(pixels)}`;
 }

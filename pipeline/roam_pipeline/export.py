@@ -460,8 +460,14 @@ def _commons_url(image_url: str | None) -> str:
     return image_url.replace("http://", "https://", 1)
 
 
-def _thumbnail(image_url: str | None, width: int = 400) -> str:
-    """Vignette Commons. `Special:FilePath` accepte un paramètre de largeur."""
+def _thumbnail(image_url: str | None, width: int = 800) -> str:
+    """Vignette Commons. `Special:FilePath` accepte un paramètre de largeur.
+
+    Huit cents et non quatre cents : la carte de revue fait au moins 280 points
+    de large, et un téléphone y met deux à trois pixels par point. Une image
+    demandée à la taille du CADRE arrive donc étirée du même facteur, et on
+    relit un catalogue de photos sur des photos floues.
+    """
     url = _commons_url(image_url)
     if not url:
         return ""
