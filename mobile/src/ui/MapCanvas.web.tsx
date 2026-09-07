@@ -6,6 +6,16 @@ import type { GeoJSONSource, MapLayerMouseEvent, Map as MapLibreMap } from 'mapl
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { outlinesFor } from '../data/outlines';
+import {
+  REGIONS,
+  emprise,
+  niveauxDe,
+  regionAu,
+  regionDuDepartement,
+  remplitLEcran,
+  voile,
+} from '../lib/regions';
 import { colors, spacing, type } from '../theme';
 import type { Place } from '../types';
 import type { MapCanvasProps } from './MapCanvas';
@@ -13,6 +23,12 @@ import {
   CLUSTER_MAX_ZOOM,
   CLUSTER_RADIUS,
   FRANCE_BOUNDS,
+  OUT_OF_SCOPE_VEIL,
+  REGION_LINES,
+  SEUIL_REGION,
+  opaciteDesAplats,
+  tonsDesRegions,
+  TRANSITION,
   mapColors,
   resolveBasemap,
 } from './mapStyle';
@@ -21,20 +37,34 @@ import { prepareMapLibre } from './maplibreSetup';
 /**
  * Carte du build web, sur MapLibre.
  *
- * Les lieux ne sont pas des marqueurs HTML mais une source GeoJSON dessinée par
- * le moteur : à mille six cents points, un nœud du DOM par lieu rendrait le
- * défilement poussif, là où le rendu vectoriel reste fluide et permet le
- * regroupement au dézoom.
+ * Le principe tient en une phrase : **les aplats de régions ne sont pas un
+ * décor posé sur les tuiles, ils sont le voile qui les couvre**. À l'échelle du
+ * pays leur opacité est de 0,96 — on voit dix-huit aplats de sable, pas une
+ * carte routière. En ouvrant une région le voile tombe à 0,14 : la vraie carte
+ * apparaît, avec ses routes et ses villes, au moment exact où on en a besoin.
+ *
+ * Un seul mécanisme règle donc les deux reproches faits à l'ancienne carte :
+ * « c'est illisible quand on dézoome » et « ça ressemble à de l'OSM brut ».
+ *
+ * Conséquence directe : plus aucune bulle de regroupement chiffrée. À l'échelle
+ * du pays on n'affiche AUCUN lieu ; dans une région ouverte il y en a au pire
+ * deux cent soixante-douze, et deux cent soixante-douze pastilles graduées par
+ * niveau se lisent — là où une bulle « 272 » ne dit rien.
  */
 
 export const mapAvailable = true;
 
 const SOURCE = 'places';
+const REGIONS_SRC = 'regions';
+const DEPTS_SRC = 'departements';
+const VOILE_SRC = 'voile';
 
 function toFeatureCollection(
   places: Place[],
   visitedIds: ReadonlySet<string>,
+  regionOuverte: string | null,
 ): GeoJSON.FeatureCollection<GeoJSON.Point> {
+  const niveaux = regionOuverte ? niveauxDe(regionOuverte) : null;
   return {
     type: 'FeatureCollection',
     features: places.map((place) => ({
@@ -44,8 +74,35 @@ function toFeatureCollection(
         id: place.id,
         name: place.name,
         visited: visitedIds.has(place.id) ? 1 : 0,
+        // Roam n'a pas de niveau absolu : le niveau est relatif à une
+        // collection. Celui qui a un sens ici est celui de la région ouverte —
+        // c'est le point de vue depuis lequel on regarde.
+        tier: niveaux?.get(place.id) ?? 3,
       },
     })),
+  };
+}
+
+/**
+ * La marge de caméra, ramenée au cadre réel.
+ *
+ * L'écran fait 844 points, mais la recherche, les filtres et la pastille de
+ * retour en mangent près de deux cents en haut, le bandeau et les onglets deux
+ * cent cinquante en bas. Cadrer sur la hauteur entière fait passer la Bretagne
+ * sous la barre de recherche et la Corse sous le bandeau.
+ *
+ * MapLibre refuse une marge plus grande que son conteneur : sur un cadre court
+ * — un écran d'ordinateur en paysage, une fenêtre réduite — les valeurs de la
+ * maquette dépasseraient. On les borne donc à un tiers de chaque côté.
+ */
+export function margeDeCamera(largeur: number, hauteur: number) {
+  const borne = (valeur: number, taille: number) =>
+    Math.max(8, Math.min(valeur, Math.floor(taille / 3)));
+  return {
+    top: borne(196, hauteur),
+    bottom: borne(250, hauteur),
+    left: borne(TRANSITION.padding, largeur),
+    right: borne(TRANSITION.padding, largeur),
   };
 }
 
@@ -57,6 +114,7 @@ export function MapCanvas({
   highlightedId,
   focus,
   onDeselect,
+  onRegionChange,
 }: MapCanvasProps) {
   const container = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreMap | null>(null);
@@ -66,11 +124,19 @@ export function MapCanvas({
   const byId = useRef(new Map<string, Place>());
   const onSelect = useRef(onSelectPlace);
   const onVide = useRef(onDeselect);
+  const onRegion = useRef(onRegionChange);
+  const survolee = useRef<string | null>(null);
+  // La région ouverte vit aussi dans une référence : `moveend` est posé une
+  // fois pour toutes et doit comparer à l'état courant, pas à celui du rendu
+  // où il a été créé.
+  const ouverteRef = useRef<string | null>(null);
 
   byId.current = new Map(places.map((place) => [place.id, place]));
   onSelect.current = onSelectPlace;
   onVide.current = onDeselect;
+  onRegion.current = onRegionChange;
 
+  const [ouverte, setOuverte] = useState<string | null>(null);
   const [degraded, setDegraded] = useState(false);
   // WebGL2 manque encore sur quelques WebViews Android et sur les machines
   // sans accélération : MapLibre lève à la construction, et sans ce garde-fou
@@ -99,6 +165,10 @@ export function MapCanvas({
           container: container.current,
           style: style as maplibregl.StyleSpecification,
           bounds: FRANCE_BOUNDS,
+          // FRANCE_BOUNDS est la vue de DÉPART, pas une limite : aucun
+          // `maxBounds`, aucun `maxZoom` bridé. La carte reste une vraie carte
+          // du monde, librement navigable — c'est ainsi qu'on atteint les cinq
+          // régions d'outre-mer, sans encart dans un coin.
           fitBoundsOptions: { padding: 12 },
           attributionControl: { compact: true },
         });
@@ -110,177 +180,304 @@ export function MapCanvas({
         return;
       }
       map.current = instance;
-    created = instance;
-    instance.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
-
-    instance.on('load', () => {
-      instance.addSource(SOURCE, {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: [] },
-        cluster: true,
-        clusterRadius: CLUSTER_RADIUS,
-        clusterMaxZoom: CLUSTER_MAX_ZOOM,
+      created = instance;
+      // MapLibre refuse une couche mal formée par un ÉVÉNEMENT, pas par une
+      // exception : sans cette écoute, une couche peut manquer sans qu'aucune
+      // ligne ne le signale — et c'est arrivé aux aplats de régions.
+      instance.on('error', (event) => {
+        console.warn('Roam : carte —', event.error?.message ?? event);
       });
 
-      // Paquets : la taille dit le nombre, sans jamais devenir envahissante.
-      instance.addLayer({
-        id: 'clusters',
-        type: 'circle',
-        source: SOURCE,
-        filter: ['has', 'point_count'],
-        paint: {
-          'circle-color': mapColors.cluster,
-          'circle-opacity': 0.9,
-          // La taille dépend du nombre ET du zoom : des pastilles calibrées
-          // pour un département deviennent envahissantes à l'échelle du pays.
-          'circle-radius': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            4,
-            ['step', ['get', 'point_count'], 9, 10, 12, 50, 16],
-            9,
-            ['step', ['get', 'point_count'], 15, 10, 20, 50, 26],
-          ],
-          'circle-stroke-width': 2,
-          'circle-stroke-color': mapColors.halo,
-        },
-      });
-      // Une couche de texte exige que le style fournisse des polices ; sans
-      // elles, MapLibre tente de construire une URL vide et échoue. Le nombre
-      // est alors omis — la taille du cercle dit déjà l'ordre de grandeur.
-      if (instance.getStyle()?.glyphs) {
+      instance.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+
+      instance.on('load', () => {
+        const contoursRegions = outlinesFor('region');
+        const contoursDepts = outlinesFor('departement');
+
+        // ── 1. Le voile hors-France ──────────────────────────────────────
+        // Le monde percé de la France. En dérivant vers l'Atlantique ou
+        // l'océan Indien, des trous nets apparaissent dans le sable : c'est
+        // ainsi qu'on découvre la Guadeloupe et Mayotte.
+        instance.addSource(VOILE_SRC, { type: 'geojson', data: voile() });
         instance.addLayer({
-          id: 'cluster-count',
-          type: 'symbol',
-          source: SOURCE,
-          filter: ['has', 'point_count'],
-          layout: {
-            'text-field': ['get', 'point_count_abbreviated'],
-            'text-font': ['Noto Sans Bold'],
-            'text-size': 12,
-            'text-allow-overlap': true,
+          id: 'voile',
+          type: 'fill',
+          source: VOILE_SRC,
+          paint: {
+            'fill-color': OUT_OF_SCOPE_VEIL.color,
+            'fill-opacity': OUT_OF_SCOPE_VEIL.opacity,
           },
-          paint: { 'text-color': mapColors.clusterText },
         });
-      }
 
-      // Lieux : plein et vert quand c'est validé, creux et terracotta sinon.
-      instance.addLayer({
-        id: 'place',
-        type: 'circle',
-        source: SOURCE,
-        filter: ['!', ['has', 'point_count']],
-        paint: {
-          'circle-color': [
-            'case',
-            ['==', ['get', 'visited'], 1],
-            mapColors.visited,
-            mapColors.todo,
-          ],
-          'circle-opacity': ['case', ['==', ['get', 'visited'], 1], 1, 0.65],
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 4, 10, 7, 14, 10],
-          'circle-stroke-width': 1.5,
-          'circle-stroke-color': mapColors.halo,
-        },
-      });
+        if (contoursRegions) {
+          instance.addSource(REGIONS_SRC, {
+            type: 'geojson',
+            data: contoursRegions,
+            // Le survol passe par `feature-state`, qui a besoin d'un
+            // identifiant : sans lui, MapLibre n'a rien à quoi accrocher l'état.
+            promoteId: 'code',
+          });
 
-      // La zone TACTILE, invisible et large.
-      //
-      // Le point mesure quatre pixels au dézoom : sur un téléphone, on le rate
-      // une fois sur deux, et c'est le geste le plus fréquent de l'application.
-      // MapLibre interroge les couches même transparentes — un cercle
-      // d'opacité nulle attrape donc le doigt sans rien salir à l'écran.
-      instance.addLayer({
-        id: 'place-hit',
-        type: 'circle',
-        source: SOURCE,
-        filter: ['!', ['has', 'point_count']],
-        paint: {
-          'circle-color': mapColors.todo,
-          // Un centième d'opacité, pas zéro : invisible à l'œil, et la couche
-          // reste indiscutablement DESSINÉE — donc interrogeable au clic, sans
-          // dépendre de la façon dont le moteur traite l'opacité nulle.
-          'circle-opacity': 0.01,
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 14, 10, 18, 14, 22],
-        },
-      });
+          // ── 2. L'ombre des régions ─────────────────────────────────────
+          // MapLibre ne sait faire ni ombre portée, ni filtre, ni mode de
+          // fusion sur un polygone. Une seconde couche de contour, large,
+          // translucide et décalée est le seul moyen — et il suffit.
+          instance.addLayer({
+            id: 'region-ombre',
+            type: 'line',
+            source: REGIONS_SRC,
+            paint: {
+              'line-color': REGION_LINES.shadow,
+              'line-width': REGION_LINES.shadowWidth,
+              'line-opacity': REGION_LINES.shadowOpacity,
+              'line-translate': REGION_LINES.shadowOffset,
+            },
+          });
 
-      // Le lieu proposé à la validation, par-dessus tout le reste.
-      instance.addLayer({
-        id: 'place-highlight',
-        type: 'circle',
-        source: SOURCE,
-        filter: ['==', ['get', 'id'], '__none__'],
-        paint: {
-          'circle-color': mapColors.todo,
-          'circle-radius': 13,
-          'circle-stroke-width': 4,
-          'circle-stroke-color': mapColors.halo,
-        },
-      });
+          // ── 3. Les aplats ──────────────────────────────────────────────
+          // C'est ici que tient toute l'identité : l'opacité suit le zoom.
+          instance.addLayer({
+            id: 'region-aplat',
+            type: 'fill',
+            source: REGIONS_SRC,
+            paint: {
+              'fill-color': [
+                'case',
+                ['boolean', ['feature-state', 'hover'], false],
+                REGION_LINES.hover,
+                tonsDesRegions(),
+              ] as never,
+              'fill-opacity': opaciteDesAplats() as never,
+            },
+          });
 
-      instance.on('click', 'place-hit', (event: MapLayerMouseEvent) => {
-        const id = event.features?.[0]?.properties?.id as string | undefined;
-        const place = id ? byId.current.get(id) : undefined;
-        if (place) onSelect.current(place);
-      });
-
-      // Taper un paquet cadre sur ce qu'il contient réellement.
-      //
-      // Se contenter de zoomer sur le centre du paquet au niveau d'éclatement
-      // laissait la moitié des lieux hors du cadre : le centre d'un groupe
-      // n'est pas le centre de son emprise, et le zoom d'éclatement ne dit rien
-      // de son étendue. On récupère donc les lieux du paquet et on cadre dessus.
-      // Toucher le fond referme la fiche : les gestionnaires de couche ne
-      // disent que ce qu'on a touché, jamais ce qu'on a quitté.
-      instance.on('click', (event: MapLayerMouseEvent) => {
-        const dessus = instance.queryRenderedFeatures(event.point, {
-          layers: ['place-hit', 'clusters'],
-        });
-        if (dessus.length === 0) onVide.current?.();
-      });
-
-      instance.on('click', 'clusters', async (event: MapLayerMouseEvent) => {
-        const feature = event.features?.[0];
-        const clusterId = feature?.properties?.cluster_id;
-        if (clusterId === undefined) return;
-        const source = instance.getSource(SOURCE) as GeoJSONSource;
-
-        try {
-          const leaves = await source.getClusterLeaves(clusterId as number, 500, 0);
-          const bounds = new maplibregl.LngLatBounds();
-          for (const leaf of leaves) {
-            bounds.extend((leaf.geometry as GeoJSON.Point).coordinates as [number, number]);
-          }
-          if (!bounds.isEmpty()) {
-            instance.fitBounds(bounds, { padding: 60, maxZoom: 13, duration: 600 });
-            return;
-          }
-        } catch {
-          // On retombe sur le zoom d'éclatement ci-dessous.
+          // ── 4. Les coutures entre régions ──────────────────────────────
+          instance.addLayer({
+            id: 'region-couture',
+            type: 'line',
+            source: REGIONS_SRC,
+            paint: {
+              'line-color': REGION_LINES.seam,
+              'line-width': REGION_LINES.seamWidth,
+            },
+          });
         }
 
-        const zoom = await source.getClusterExpansionZoom(clusterId as number);
-        instance.easeTo({
-          center: (feature!.geometry as GeoJSON.Point).coordinates as [number, number],
-          zoom,
-          duration: 500,
+        // ── 5. Les coutures de départements ──────────────────────────────
+        // Elles ne sont pas un étage de navigation : un deuxième clic
+        // obligatoire ajouterait un palier avant de voir un lieu. Elles ne
+        // servent que de repère DANS une région ouverte — « du côté du Gard ».
+        if (contoursDepts) {
+          instance.addSource(DEPTS_SRC, {
+            type: 'geojson',
+            data: contoursDepts,
+            promoteId: 'code',
+          });
+          instance.addLayer({
+            id: 'departement-couture',
+            type: 'line',
+            source: DEPTS_SRC,
+            filter: ['in', ['get', 'code'], ['literal', []]],
+            paint: {
+              'line-color': REGION_LINES.shadow,
+              'line-opacity': 0.5,
+              'line-width': 1.1,
+              'line-dasharray': [4, 4],
+            },
+          });
+        }
+
+        // ── 6. Le contour de la région ouverte ───────────────────────────
+        if (contoursRegions) {
+          instance.addLayer({
+            id: 'region-choisie',
+            type: 'line',
+            source: REGIONS_SRC,
+            filter: ['==', ['get', 'code'], '__aucune__'],
+            paint: {
+              'line-color': REGION_LINES.chosen,
+              'line-width': REGION_LINES.chosenWidth,
+            },
+          });
+        }
+
+        // ── 7. Les lieux ─────────────────────────────────────────────────
+        instance.addSource(SOURCE, {
+          type: 'geojson',
+          data: { type: 'FeatureCollection', features: [] },
+          // Le regroupement est désactivé (CLUSTER_MAX_ZOOM = 0) : on n'affiche
+          // aucun lieu à l'échelle du pays, donc il n'y a plus rien à
+          // regrouper. La source garde ses réglages pour que le rétablir soit
+          // une valeur à changer, pas une refonte.
+          cluster: CLUSTER_MAX_ZOOM > 0,
+          clusterRadius: CLUSTER_RADIUS,
+          clusterMaxZoom: CLUSTER_MAX_ZOOM,
         });
+
+        // Un niveau, une couleur, une taille — repris partout : carte, listes,
+        // badges. Aucun chiffre, aucun regroupement.
+        instance.addLayer({
+          id: 'place',
+          type: 'circle',
+          source: SOURCE,
+          paint: {
+            'circle-color': [
+              'case',
+              ['==', ['get', 'visited'], 1],
+              mapColors.visited,
+              ['==', ['get', 'tier'], 1],
+              colors.primary,
+              mapColors.todo,
+            ],
+            'circle-opacity': ['match', ['get', 'tier'], 3, 0.8, 1] as never,
+            'circle-radius': ['match', ['get', 'tier'], 1, 5.2, 2, 4, 3] as never,
+            'circle-stroke-width': ['match', ['get', 'tier'], 1, 1.3, 0] as never,
+            'circle-stroke-color': mapColors.halo,
+          },
+        });
+
+        // Le lieu mis en avant, par-dessus tout le reste.
+        instance.addLayer({
+          id: 'place-highlight',
+          type: 'circle',
+          source: SOURCE,
+          filter: ['==', ['get', 'id'], '__none__'],
+          paint: {
+            'circle-color': colors.primary,
+            'circle-radius': 8.5,
+            'circle-stroke-width': 2.2,
+            'circle-stroke-color': mapColors.halo,
+          },
+        });
+
+        // ── Les noms de départements ─────────────────────────────────────
+        // Un repère, pas une couche d'information : MapLibre en masque
+        // lui-même la plupart par collision, et c'est très bien ainsi.
+        if (contoursDepts && instance.getStyle()?.glyphs) {
+          instance.addLayer({
+            id: 'departement-nom',
+            type: 'symbol',
+            source: DEPTS_SRC,
+            filter: ['in', ['get', 'code'], ['literal', []]],
+            layout: {
+              'text-field': ['get', 'nom'],
+              'text-font': ['Noto Sans Regular'],
+              'text-size': 13,
+            },
+            paint: {
+              'text-color': '#5A4A38',
+              'text-opacity': 0.85,
+              'text-halo-color': mapColors.labelHalo,
+              'text-halo-width': 1.4,
+            },
+          });
+        }
+
+        // ── Gestes ───────────────────────────────────────────────────────
+
+        /**
+         * Le lieu sous le doigt, à quatorze pixels près.
+         *
+         * Une pastille de niveau 3 fait trois pixels : sur un téléphone on la
+         * rate une fois sur deux, et c'est le geste le plus fréquent de
+         * l'application. On interrogeait autrefois une couche de cercles
+         * transparents et larges ; à deux cent soixante-douze lieux dans une
+         * région ouverte, leurs disques finissaient par se voir. Une recherche
+         * par BOÎTE donne la même tolérance sans rien dessiner du tout.
+         */
+        const lieuSousLeDoigt = (point: maplibregl.Point) => {
+          const marge = 14;
+          const trouves = instance.queryRenderedFeatures(
+            [
+              [point.x - marge, point.y - marge],
+              [point.x + marge, point.y + marge],
+            ],
+            { layers: ['place'] },
+          );
+          if (trouves.length === 0) return undefined;
+          // Le plus proche du doigt, pas le premier venu : deux pastilles
+          // voisines rendraient le choix arbitraire.
+          let meilleur = trouves[0];
+          let distance = Infinity;
+          for (const feature of trouves) {
+            const [lon, lat] = (feature.geometry as GeoJSON.Point).coordinates;
+            const projete = instance.project([lon, lat]);
+            const d = (projete.x - point.x) ** 2 + (projete.y - point.y) ** 2;
+            if (d < distance) {
+              distance = d;
+              meilleur = feature;
+            }
+          }
+          const id = meilleur.properties?.id as string | undefined;
+          return id ? byId.current.get(id) : undefined;
+        };
+
+        // Toucher une région l'ouvre. Le clic n'est qu'un RACCOURCI vers l'état
+        // que le zoom produirait de toute façon : c'est `moveend` qui fait foi.
+        instance.on('click', 'region-aplat', (event: MapLayerMouseEvent) => {
+          if (ouverteRef.current) return;
+          const code = event.features?.[0]?.properties?.code as string | undefined;
+          if (!code) return;
+          // Le survol laissé en place repeindrait la région en terre cuite
+          // pendant tout le vol : le doigt ne bouge plus, donc `mouseleave`
+          // n'arrive jamais.
+          poserSurvol(instance, survolee.current, false);
+          survolee.current = null;
+          // On ouvre AVANT le vol plutôt que d'attendre que la caméra le dise :
+          // une grande région cadrée sur un téléphone n'atteint pas un zoom
+          // élevé, et attendre un palier la laissait fermée sur place.
+          ouverteRef.current = code;
+          setOuverte(code);
+          onRegion.current?.(code);
+          ouvrir(instance, code);
+        });
+
+        instance.on('click', (event: MapLayerMouseEvent) => {
+          const place = lieuSousLeDoigt(event.point);
+          if (place) {
+            onSelect.current(place);
+            return;
+          }
+          // Toucher le fond referme la fiche : les gestionnaires de couche ne
+          // disent que ce qu'on a touché, jamais ce qu'on a quitté.
+          onVide.current?.();
+        });
+
+        // La région ouverte est celle qui REMPLIT l'écran. Dézoomer referme —
+        // c'est le geste que tout le monde tente en premier, et il n'y a rien
+        // à apprendre.
+        instance.on('moveend', () => {
+          const code = regionSousLaCamera(instance);
+          if (code === ouverteRef.current) return;
+          ouverteRef.current = code;
+          setOuverte(code);
+          onRegion.current?.(code);
+        });
+
+        instance.on('mousemove', 'region-aplat', (event: MapLayerMouseEvent) => {
+          if (ouverteRef.current) return;
+          const code = event.features?.[0]?.properties?.code as string | undefined;
+          if (code === survolee.current) return;
+          poserSurvol(instance, survolee.current, false);
+          survolee.current = code ?? null;
+          poserSurvol(instance, survolee.current, true);
+        });
+        instance.on('mouseleave', 'region-aplat', () => {
+          poserSurvol(instance, survolee.current, false);
+          survolee.current = null;
+        });
+
+        for (const layer of ['place', 'region-aplat']) {
+          instance.on('mouseenter', layer, () => {
+            instance.getCanvas().style.cursor = 'pointer';
+          });
+          instance.on('mouseleave', layer, () => {
+            instance.getCanvas().style.cursor = '';
+          });
+        }
+
+        setReady(true);
       });
-
-      setReady(true);
-
-      for (const layer of ['place-hit', 'clusters']) {
-        instance.on('mouseenter', layer, () => {
-          instance.getCanvas().style.cursor = 'pointer';
-        });
-        instance.on('mouseleave', layer, () => {
-          instance.getCanvas().style.cursor = '';
-        });
-      }
-    });
-
     })();
 
     return () => {
@@ -291,12 +488,44 @@ export function MapCanvas({
     };
   }, []);
 
-  // Données : rejouées à chaque changement de filtre ou de validation.
+  // Données : uniquement les lieux de la région ouverte. À l'échelle du pays,
+  // aucun — c'est le fondement de la nouvelle carte.
   useEffect(() => {
     if (!ready) return;
     const source = map.current?.getSource(SOURCE) as GeoJSONSource | undefined;
-    source?.setData(toFeatureCollection(places, visitedIds));
-  }, [ready, places, visitedIds]);
+    const dedans = ouverte ? places.filter((place) => place.regionCode === ouverte) : [];
+    source?.setData(toFeatureCollection(dedans, visitedIds, ouverte));
+  }, [ready, places, visitedIds, ouverte]);
+
+  // Ce que l'ouverture d'une région change sur les couches : son contour, les
+  // coutures de ses départements, les noms qui vont avec.
+  useEffect(() => {
+    const instance = map.current;
+    if (!ready || !instance) return;
+    instance.setFilter('region-choisie', ['==', ['get', 'code'], ouverte ?? '__aucune__']);
+    // Le voile de la région ouverte tombe à 0,14 : c'est là que la vraie carte
+    // apparaît. On repasse sur les dix-huit — c'est dix-huit, pas dix-huit
+    // mille, et cela évite d'avoir à retenir laquelle était marquée.
+    if (instance.getSource(REGIONS_SRC)) {
+      for (const code of REGIONS.keys()) {
+        instance.setFeatureState(
+          { source: REGIONS_SRC, id: code },
+          { ouverte: code === ouverte },
+        );
+      }
+    }
+
+    const departements = ouverte
+      ? (outlinesFor('departement')?.features ?? [])
+          .map((feature) => feature.properties.code)
+          .filter((code) => regionDuDepartement(code) === ouverte)
+      : [];
+    for (const couche of ['departement-couture', 'departement-nom']) {
+      if (instance.getLayer(couche)) {
+        instance.setFilter(couche, ['in', ['get', 'code'], ['literal', departements]]);
+      }
+    }
+  }, [ready, ouverte]);
 
   useEffect(() => {
     if (!ready) return;
@@ -305,11 +534,18 @@ export function MapCanvas({
       ['get', 'id'],
       highlightedId ?? '__none__',
     ]);
+    // Un point touché : les autres reculent, pour qu'on voie lequel on a pris.
+    map.current?.setPaintProperty(
+      'place',
+      'circle-opacity',
+      highlightedId
+        ? (['case', ['==', ['get', 'id'], highlightedId], 1, 0.55] as never)
+        : (['match', ['get', 'tier'], 3, 0.8, 1] as never),
+    );
   }, [ready, highlightedId]);
 
   // Recentrage sur un lieu choisi ailleurs — dans le bandeau, dans la
-  // recherche. Sans lui, toucher une vignette ne dit pas où elle se trouve, et
-  // la carte et la liste racontent deux histoires différentes.
+  // recherche. Sans lui, toucher une vignette ne dit pas où elle se trouve.
   //
   // Les dépendances sont les COORDONNÉES, pas l'objet : `focus` est reconstruit
   // à chaque rendu, et s'y fier recentrerait la carte à la moindre frappe dans
@@ -336,7 +572,7 @@ export function MapCanvas({
       marker.current = null;
       return;
     }
-    const dot = marker.current ?? new maplibregl.Marker({ color: '#2563EB' });
+    const dot = marker.current ?? new maplibregl.Marker({ color: colors.verified });
     dot.setLngLat([position.longitude, position.latitude]).addTo(instance);
     marker.current = dot;
   }, [ready, position]);
@@ -359,7 +595,7 @@ export function MapCanvas({
       {degraded ? (
         <View style={styles.notice} pointerEvents="none">
           <Text style={styles.noticeText}>
-            Fond de carte indisponible — les lieux restent affichés
+            Fond de carte indisponible — les régions restent dessinées
           </Text>
         </View>
       ) : null}
@@ -367,14 +603,81 @@ export function MapCanvas({
   );
 }
 
+/**
+ * La région sous la caméra, si elle remplit l'écran.
+ *
+ * « La région ouverte est celle qui remplit l'écran. » Un palier de zoom en dur
+ * ne peut pas dire cela : l'Occitanie cadrée sur un téléphone atterrit vers 6,6
+ * et Mayotte vers 10,5. C'est donc la part du cadre qu'elle occupe qui décide,
+ * et dézoomer referme — le geste que tout le monde tente en premier.
+ */
+function regionSousLaCamera(instance: MapLibreMap): string | null {
+  if (instance.getZoom() < SEUIL_REGION) return null;
+  const centre = instance.getCenter();
+  const code = regionAu(centre.lng, centre.lat);
+  if (!code) return null;
+  const feature = REGIONS.get(code);
+  const vue = instance.getBounds();
+  if (!feature) return null;
+  return remplitLEcran(emprise(feature.geometry), [
+    [vue.getWest(), vue.getSouth()],
+    [vue.getEast(), vue.getNorth()],
+  ])
+    ? code
+    : null;
+}
+
+/** Le survol d'une région, par `feature-state`. */
+function poserSurvol(instance: MapLibreMap, code: string | null, actif: boolean) {
+  if (!code || !instance.getSource(REGIONS_SRC)) return;
+  instance.setFeatureState({ source: REGIONS_SRC, id: code }, { hover: actif });
+}
+
+/**
+ * Le vol vers une région.
+ *
+ * Le zoom d'arrivée n'est jamais fixe : la caméra se cale sur l'EMPRISE de la
+ * région. Mayotte arrive donc beaucoup plus près que l'Occitanie — un zoom en
+ * dur donnerait huit taches perdues dans un aplat vide d'un côté, et deux cent
+ * soixante-douze points débordant du cadre de l'autre.
+ */
+function ouvrir(instance: MapLibreMap, code: string) {
+  const feature = REGIONS.get(code);
+  if (!feature) return;
+  const bornes = emprise(feature.geometry);
+  const cadre = instance.getContainer();
+  instance.fitBounds(bornes, {
+    padding: margeDeCamera(cadre.clientWidth, cadre.clientHeight),
+    duration: TRANSITION.zoom,
+    // La courbe vient de l'artboard, pas d'un réglage au jugé.
+    easing: bezier(TRANSITION.courbe),
+  });
+}
+
+/** Une courbe de Bézier à quatre points de contrôle, résolue par bissection. */
+export function bezier([x1, y1, x2, y2]: [number, number, number, number]) {
+  const abscisse = (t: number) => 3 * t * (1 - t) ** 2 * x1 + 3 * t ** 2 * (1 - t) * x2 + t ** 3;
+  const ordonnee = (t: number) => 3 * t * (1 - t) ** 2 * y1 + 3 * t ** 2 * (1 - t) * y2 + t ** 3;
+  return (avancement: number) => {
+    let bas = 0;
+    let haut = 1;
+    for (let i = 0; i < 24; i += 1) {
+      const milieu = (bas + haut) / 2;
+      if (abscisse(milieu) < avancement) bas = milieu;
+      else haut = milieu;
+    }
+    return ordonnee((bas + haut) / 2);
+  };
+}
+
 const styles = StyleSheet.create({
-  canvas: { flex: 1, backgroundColor: colors.surfaceAlt, overflow: 'hidden' },
+  canvas: { flex: 1, backgroundColor: colors.bg, overflow: 'hidden' },
   fallback: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: spacing.xl,
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: colors.bg,
   },
   fallbackBody: { textAlign: 'center', marginTop: spacing.sm },
   notice: {

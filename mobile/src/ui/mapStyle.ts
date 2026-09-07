@@ -181,6 +181,36 @@ export const REGION_FILL_OPACITY = [
  * voit apparaître des trous nets dans le voile. C'est ainsi qu'on découvre que
  * la Guadeloupe et Mayotte sont au catalogue sans qu'aucun encart ne le dise.
  */
+/**
+ * Le zoom à partir duquel une région s'ouvre.
+ *
+ * `regionOuverte` est dérivé du zoom autant que du clic : la région ouverte est
+ * celle qui REMPLIT l'écran. Le clic n'est qu'un raccourci vers cet état, et
+ * dézoomer referme — c'est le geste que tout le monde tente en premier.
+ *
+ * Sept virgule deux, et pas huit : c'est le zoom auquel une région moyenne
+ * cesse d'entrer entière dans le cadre, donc celui où l'on a cessé de regarder
+ * la France pour regarder un endroit.
+ */
+/**
+ * Le voile de la région OUVERTE.
+ *
+ * « En ouvrant une région, ce même voile tombe à 0,14 : la vraie carte apparaît,
+ * avec ses routes et ses villes, au moment exact où on en a besoin. » Ce n'est
+ * donc pas le zoom seul qui le fait tomber — une grande région cadrée sur un
+ * téléphone s'arrête vers 6,6, et son aplat serait encore à demi opaque.
+ */
+export const OPACITE_REGION_OUVERTE = 0.14;
+
+/**
+ * Le zoom en dessous duquel aucune région ne s'ouvre.
+ *
+ * L'ouverture se décide sur la place que la région prend à l'écran, pas sur un
+ * palier de zoom : voir `remplitLEcran`. Ce plancher n'est là que pour empêcher
+ * une région d'occuper « la moitié du cadre » à l'échelle du globe.
+ */
+export const SEUIL_REGION = 4.5;
+
 export const OUT_OF_SCOPE_VEIL = { color: colors.bg, opacity: 0.72 };
 
 export function worldRing(): [number, number][] {
@@ -327,3 +357,43 @@ export const TRANSITION = {
   /** Marge autour de la région à l'arrivée, en points. */
   padding: 28,
 };
+
+/** L'expression qui donne son sable à chaque région. Un coloriage, pas un hachage. */
+export function tonsDesRegions(): unknown[] {
+  const cas: unknown[] = ['match', ['get', 'code']];
+  for (const [code, ton] of Object.entries(REGION_TONE_BY_CODE)) {
+    cas.push(code, REGION_TONES[ton]);
+  }
+  cas.push(REGION_TONES.lin);
+  return cas;
+}
+
+/**
+ * L'opacité des aplats, survol compris.
+ *
+ * `["zoom"]` n'a le droit d'apparaître qu'en ENTRÉE d'un `interpolate` ou d'un
+ * `step` de premier niveau. Glisser l'interpolation dans une branche de `case`
+ * — pour traiter le survol — produit une couche que MapLibre refuse, et il la
+ * refuse par un événement `error`, pas par une exception : la couche manque, et
+ * rien ne le dit. Les aplats étaient absents, donc invisibles et inclicables.
+ *
+ * On inverse donc l'imbrication : l'interpolation reste au sommet, et c'est
+ * chacune de ses sorties qui porte le cas du survol.
+ */
+export function opaciteDesAplats(): unknown[] {
+  const survol = (valeur: number) => [
+    'case',
+    // La région ouverte d'abord : son voile tombe quel que soit le zoom.
+    ['boolean', ['feature-state', 'ouverte'], false],
+    OPACITE_REGION_OUVERTE,
+    ['boolean', ['feature-state', 'hover'], false],
+    0.85,
+    valeur,
+  ];
+  const stops = REGION_FILL_OPACITY.slice(3) as number[];
+  const sortie: unknown[] = ['interpolate', ['linear'], ['zoom']];
+  for (let i = 0; i < stops.length; i += 2) {
+    sortie.push(stops[i], survol(stops[i + 1]));
+  }
+  return sortie;
+}

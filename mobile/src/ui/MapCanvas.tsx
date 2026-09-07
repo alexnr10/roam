@@ -40,6 +40,14 @@ export type MapCanvasProps = {
    * pour de bon, et il fallait changer d'onglet pour le retrouver.
    */
   onDeselect?: () => void;
+  /**
+   * La région ouverte a changé.
+   *
+   * Elle est dérivée du zoom autant que du clic : au-delà du seuil, c'est la
+   * région qui remplit l'écran qui s'ouvre. L'écran s'en sert pour titrer le
+   * bandeau et montrer la pastille de retour.
+   */
+  onRegionChange?: (code: string | null) => void;
 };
 
 /**
