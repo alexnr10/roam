@@ -3859,6 +3859,31 @@ class TestCommonsTitles(unittest.TestCase):
         })
         self.assertEqual(faux.client.credits(["File:Muet.jpg"]), {"File:Muet.jpg": (None, None)})
 
+    def test_the_diagnostic_shows_every_documented_field(self):
+        # `credits` ne demande que deux champs ; un fichier versé par une
+        # institution range parfois son auteur ailleurs, et le catalogue écrit
+        # alors la même chose que pour un fichier inexistant : rien.
+        faux = _FakeCommons({
+            "query": {"pages": [{
+                "title": "File:Institution.jpg",
+                "imageinfo": [{"extmetadata": {
+                    "Credit": {"value": "<b>Musée X</b>"},
+                    "LicenseUrl": {"value": "https://exemple/licence"},
+                    "Categories": {"value": ""},
+                }}],
+            }]}
+        })
+        connu, meta = faux.client.raw_metadata("File:Institution.jpg")
+        self.assertEqual(connu, "File:Institution.jpg")
+        self.assertEqual(meta["Credit"], "Musée X")
+        self.assertIn("LicenseUrl", meta)
+
+    def test_the_diagnostic_says_when_the_file_is_gone(self):
+        faux = _FakeCommons({
+            "query": {"pages": [{"title": "File:Disparu.jpg", "missing": True}]}
+        })
+        self.assertEqual(faux.client.raw_metadata("File:Disparu.jpg"), (None, {}))
+
     def test_a_missing_file_answers_nothing(self):
         faux = _FakeCommons({
             "query": {"pages": [{"title": "File:Disparu.jpg", "missing": True}]}

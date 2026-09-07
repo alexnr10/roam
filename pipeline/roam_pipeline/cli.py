@@ -2160,6 +2160,9 @@ def cmd_photo(args: argparse.Namespace, config: Config) -> int:
         print(f"{qid} reprend l'image de Wikidata.")
         return 0
 
+    if args.credit:
+        return _photo_credit(args, qid, photos)
+
     if args.list:
         return _list_photos(args, qid, photos)
 
@@ -2215,6 +2218,67 @@ def _photos_manquantes(args: argparse.Namespace, photos: dict[str, str]) -> int:
             print(f"      {place.wikidata_id:<12} {place.name} ({dept})")
         print("\n  Ceux-là demandent une photo à téléverser sur Wikimedia Commons,")
         print("  puis « photo <Q-id> <nom du fichier> ».")
+    return 0
+
+
+def _photo_credit(args: argparse.Namespace, qid: str, photos: dict[str, str]) -> int:
+    """Ce que Commons documente vraiment sur la photo d'un lieu.
+
+    Un crédit qui n'arrive pas peut avoir trois causes, et le catalogue les
+    écrit toutes les trois de la même façon — un champ vide : le fichier
+    n'existe pas, Commons le connaît sous un autre titre, ou il range son
+    auteur dans un champ qu'on ne demande pas. `credits` ne demande que
+    `Artist` et `LicenseShortName`, parce que ce sont les deux qu'une fiche
+    affiche ; un fichier versé par une institution en utilise parfois d'autres.
+
+    On montre donc l'échange entier : le titre demandé, celui que Commons
+    renvoie, et tous les champs qu'il porte.
+    """
+    from .commons import CommonsClient, file_title
+    from .review import photo_url
+
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
+        return 1
+
+    lieu = next((p for p in _load_places(raw_path) if p.wikidata_id == qid), None)
+    if lieu is None:
+        print(f"{qid} n'est pas dans la collecte.", file=sys.stderr)
+        return 1
+
+    # La photo telle qu'elle sera PUBLIÉE : le choix du curateur l'emporte.
+    url = photo_url(photos[qid]) if qid in photos else lieu.image_url
+    titre = file_title(url)
+    if not titre:
+        print(f"{lieu.name} n'a aucune photo.")
+        return 0
+
+    print(f"{lieu.name}")
+    print(f"  fichier publié   : {titre}")
+    print(f"  crédit enregistré: {lieu.image_author or '—'} · "
+          f"{lieu.image_licence or '—'} (demandé pour {lieu.image_credit_for or '—'})")
+
+    try:
+        connu, meta = CommonsClient().raw_metadata(titre)
+    except Exception as exc:
+        print(f"  Commons n'a pas répondu ({exc}).", file=sys.stderr)
+        return 1
+
+    if connu is None:
+        print("\n  Commons ne connaît PAS ce fichier : il a été supprimé ou renommé.")
+        print(f"  Cherche-en un autre : photo {qid} --list")
+        return 0
+
+    print(f"  titre chez Commons: {connu}"
+          f"{'  (différent de celui demandé)' if connu != titre else ''}")
+    if not meta:
+        print("\n  Aucune métadonnée : ce fichier ne documente ni auteur ni licence.")
+        return 0
+    print(f"\n  {len(meta)} champ(s) documentés :")
+    for clef, valeur in sorted(meta.items()):
+        if valeur:
+            print(f"      {clef:<24} {valeur[:70]}")
     return 0
 
 
@@ -3514,6 +3578,10 @@ def build_parser() -> argparse.ArgumentParser:
     photo.add_argument(
         "--manquantes", action="store_true",
         help="lister les lieux du catalogue sans photo, et ce qu'il reste à tenter",
+    )
+    photo.add_argument(
+        "--credit", action="store_true",
+        help="montrer ce que Commons documente sur la photo d'un lieu (réseau requis)",
     )
     photo.add_argument(
         "--list", action="store_true",

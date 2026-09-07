@@ -108,6 +108,46 @@ class CommonsClient:
         membres = response.json().get("query", {}).get("categorymembers", [])
         return [m["title"] for m in membres if m.get("title")]
 
+    def raw_metadata(self, title: str) -> tuple[str | None, dict[str, str]]:
+        """Tout ce que Commons documente sur UN fichier, sans filtre ni tri.
+
+        Un outil de diagnostic, pas une source. `credits` ne demande que deux
+        champs — `Artist` et `LicenseShortName` — parce que ce sont les deux
+        qu'une fiche affiche. Quand un crédit n'arrive pas, la question est
+        justement de savoir si le fichier existe, sous quel titre Commons le
+        connaît, et quels champs il porte VRAIMENT : un fichier importé depuis
+        Flickr ou versé par une institution range parfois son auteur ailleurs.
+
+        Renvoie le titre tel que Commons le nomme (`None` si le fichier
+        n'existe pas) et la table complète de ses métadonnées.
+        """
+        self._throttle()
+        response = self._session.get(
+            API,
+            params={
+                "action": "query",
+                "format": "json",
+                "formatversion": "2",
+                "prop": "imageinfo",
+                "iiprop": "extmetadata",
+                "titles": title,
+                "redirects": "1",
+            },
+            timeout=self.timeout_s,
+        )
+        response.raise_for_status()
+        pages = response.json().get("query", {}).get("pages", [])
+        if not pages or pages[0].get("missing"):
+            return None, {}
+        page = pages[0]
+        infos = page.get("imageinfo") or []
+        meta = (infos[0].get("extmetadata") or {}) if infos else {}
+        return page.get("title"), {
+            clef: texte(valeur.get("value")) or ""
+            for clef, valeur in meta.items()
+            if isinstance(valeur, dict)
+        }
+
     def credits(self, titles: list[str]) -> dict[str, tuple[str | None, str | None]]:
         """`{titre de fichier: (auteur, licence)}` pour un lot de cinquante.
 
