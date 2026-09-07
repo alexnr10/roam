@@ -67,8 +67,20 @@ export const mapColors = {
   /** Forêts, parcs, prés. La sauge du système, très diluée. */
   green: '#E1EECC',
   built: colors.surfaceAlt,
-  road: colors.border,
-  roadMinor: colors.surfaceAlt,
+  /**
+   * Les routes.
+   *
+   * Le parti pris d'origine — « une texture, pas un réseau » — était juste sur
+   * le principe et faux sur les valeurs : au sable de la bordure, sur du sable,
+   * elles ne se voyaient pas du tout. Une région ouverte devenait alors un
+   * aplat vide où l'on ne pouvait pas se situer, et c'est raté pour un guide :
+   * on y cherche « quoi faire par ici », donc il faut d'abord savoir où est ici.
+   *
+   * Deux crans plus foncées, elles se lisent sans devenir une carte routière —
+   * les grands axes portent la structure, les secondaires restent une trame.
+   */
+  road: '#C4B49A',
+  roadMinor: '#DCD3C4',
   labelInk: '#474238',
   labelHalo: colors.bg,
 
@@ -292,9 +304,11 @@ export function repeindre(style: any) {
           layer.paint['line-color'] = grande ? mapColors.road : mapColors.roadMinor;
           // Les routes sont une TEXTURE, pas un réseau : on ne se sert pas de
           // Roam pour conduire. Assez fines pour se lire comme une trame.
+          // Visibles dès le zoom d'arrivée d'une région, vers 6,5 : c'est là
+          // qu'on regarde, et c'est là qu'elles étaient absentes.
           layer.paint['line-width'] = grande
-            ? ['interpolate', ['linear'], ['zoom'], 7, 0.5, 12, 2.2, 16, 6]
-            : ['interpolate', ['linear'], ['zoom'], 11, 0.4, 16, 3];
+            ? ['interpolate', ['linear'], ['zoom'], 6, 0.8, 9, 1.8, 12, 3.4, 16, 8]
+            : ['interpolate', ['linear'], ['zoom'], 8, 0.5, 12, 1.4, 16, 4.5];
         } else if (src === 'building') {
           layer.paint['line-color'] = mapColors.built;
         }

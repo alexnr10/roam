@@ -114,6 +114,42 @@ export function regionAu(lon: number, lat: number): string | null {
   return null;
 }
 
+/**
+ * La région que le cadre montre — celle qu'on ouvre.
+ *
+ * D'abord la terre sous le centre du cadre, ce qui règle les treize régions
+ * métropolitaines et les trois d'outre-mer d'un seul tenant.
+ *
+ * Mais un ARCHIPEL n'a pas de terre en son milieu : la Guadeloupe s'étale de
+ * Marie-Galante aux Saintes, et une fois cadrée, le centre de l'écran tombe en
+ * pleine mer. La région se refermait donc au moment même où on venait de
+ * l'ouvrir. On retombe alors sur l'emprise : la plus petite région dont le
+ * rectangle contient ce point et qui remplit l'écran.
+ */
+export function regionDuCadre(cadre: Emprise): string | null {
+  const [lon, lat] = centreDe(cadre);
+  const dessus = regionAu(lon, lat);
+  if (dessus) {
+    const feature = REGIONS.get(dessus);
+    if (feature && remplitLEcran(emprise(feature.geometry), cadre)) return dessus;
+  }
+
+  let meilleure: string | null = null;
+  let plusPetite = Infinity;
+  for (const [code, feature] of REGIONS) {
+    const bornes = emprise(feature.geometry);
+    if (lon < bornes[0][0] || lon > bornes[1][0]) continue;
+    if (lat < bornes[0][1] || lat > bornes[1][1]) continue;
+    if (!remplitLEcran(bornes, cadre)) continue;
+    const aire = (bornes[1][0] - bornes[0][0]) * (bornes[1][1] - bornes[0][1]);
+    if (aire < plusPetite) {
+      plusPetite = aire;
+      meilleure = code;
+    }
+  }
+  return meilleure;
+}
+
 /** L'anneau du monde, sens direct. L'extérieur du voile. */
 export function anneauDuMonde(): Anneau {
   return [

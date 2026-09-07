@@ -7,13 +7,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { outlinesFor } from '../data/outlines';
+import type { Emprise } from '../lib/regions';
 import {
   REGIONS,
   emprise,
-  niveauxDe,
-  regionAu,
+  regionDuCadre,
   regionDuDepartement,
-  remplitLEcran,
+  niveauxDe,
   voile,
 } from '../lib/regions';
 import { colors, spacing, type } from '../theme';
@@ -434,9 +434,13 @@ export function MapCanvas({
         // Toucher une région l'ouvre. Le clic n'est qu'un RACCOURCI vers l'état
         // que le zoom produirait de toute façon : c'est `moveend` qui fait foi.
         instance.on('click', 'region-aplat', (event: MapLayerMouseEvent) => {
-          if (ouverteRef.current) return;
           const code = event.features?.[0]?.properties?.code as string | undefined;
           if (!code) return;
+          // Toucher la région déjà ouverte, c'est toucher le fond : c'est le
+          // gestionnaire général qui s'en charge, et il referme la fiche.
+          // Toucher la VOISINE, en revanche, doit y aller — passer d'une région
+          // à sa voisine est le geste même d'un guide qu'on feuillette.
+          if (code === ouverteRef.current) return;
           // Le survol laissé en place repeindrait la région en terre cuite
           // pendant tout le vol : le doigt ne bouge plus, donc `mouseleave`
           // n'arrive jamais.
@@ -474,8 +478,14 @@ export function MapCanvas({
         });
 
         instance.on('mousemove', 'region-aplat', (event: MapLayerMouseEvent) => {
-          if (ouverteRef.current) return;
           const code = event.features?.[0]?.properties?.code as string | undefined;
+          // La région ouverte est déjà peinte : la repeindre en survol
+          // effacerait justement ce qui dit qu'elle est ouverte.
+          if (code === ouverteRef.current) {
+            poserSurvol(instance, survolee.current, false);
+            survolee.current = null;
+            return;
+          }
           if (code === survolee.current) return;
           poserSurvol(instance, survolee.current, false);
           survolee.current = code ?? null;
@@ -636,18 +646,40 @@ export function MapCanvas({
  */
 function regionSousLaCamera(instance: MapLibreMap): string | null {
   if (instance.getZoom() < SEUIL_REGION) return null;
-  const centre = instance.getCenter();
-  const code = regionAu(centre.lng, centre.lat);
-  if (!code) return null;
-  const feature = REGIONS.get(code);
-  const vue = instance.getBounds();
-  if (!feature) return null;
-  return remplitLEcran(emprise(feature.geometry), [
-    [vue.getWest(), vue.getSouth()],
-    [vue.getEast(), vue.getNorth()],
-  ])
-    ? code
-    : null;
+  return regionDuCadre(cadreLibre(instance));
+}
+
+/**
+ * La bande réellement libre, en coordonnées géographiques.
+ *
+ * L'écran entier n'est pas ce qu'on voit : la recherche et les filtres en
+ * mangent près de deux cents points en haut, le bandeau et les onglets deux
+ * cent cinquante en bas. C'est dans cette bande-là que la caméra cadre une
+ * région — donc c'est elle, et non le conteneur, qui doit dire si la région
+ * remplit l'écran.
+ *
+ * Comparer à la vue entière faisait qu'une région tout juste cadrée n'occupait
+ * qu'à peine la moitié du conteneur : elle se refermait sur place, et ses
+ * lieux disparaissaient une fraction de seconde après être apparus.
+ */
+function cadreLibre(instance: MapLibreMap): Emprise {
+  const el = instance.getContainer();
+  const marge = margeDeCamera(el.clientWidth, el.clientHeight);
+  const hautGauche = instance.unproject([marge.left, marge.top]);
+  const basDroite = instance.unproject([
+    el.clientWidth - marge.right,
+    el.clientHeight - marge.bottom,
+  ]);
+  return [
+    [
+      Math.min(hautGauche.lng, basDroite.lng),
+      Math.min(hautGauche.lat, basDroite.lat),
+    ],
+    [
+      Math.max(hautGauche.lng, basDroite.lng),
+      Math.max(hautGauche.lat, basDroite.lat),
+    ],
+  ];
 }
 
 /** Le survol d'une région, par `feature-state`. */

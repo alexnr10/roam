@@ -9,6 +9,7 @@ import {
   niveauxDe,
   rangDepuisLeCentre,
   regionAu,
+  regionDuCadre,
   regionDuDepartement,
   remplitLEcran,
   voile,
@@ -220,5 +221,46 @@ describe('remplitLEcran', () => {
       [occitanie[1][0] + 0.4, occitanie[1][1] + 0.4],
     ];
     expect(remplitLEcran(occitanie, large)).toBe(true);
+  });
+});
+
+describe('regionDuCadre', () => {
+  /** Le cadre qu'on obtient en cadrant une région, marge comprise. */
+  const cadrer = (code: string, marge = 0.06): [[number, number], [number, number]] => {
+    const bornes = emprise(REGIONS.get(code)!.geometry);
+    const dx = (bornes[1][0] - bornes[0][0]) * marge;
+    const dy = (bornes[1][1] - bornes[0][1]) * marge;
+    return [
+      [bornes[0][0] - dx, bornes[0][1] - dy],
+      [bornes[1][0] + dx, bornes[1][1] + dy],
+    ];
+  };
+
+  it('ouvre CHAQUE région une fois cadrée sur elle', () => {
+    // Le vrai défaut n'était pas d'ouvrir la mauvaise région, mais de la
+    // refermer aussitôt : les lieux apparaissaient puis disparaissaient.
+    for (const code of REGIONS.keys()) {
+      expect([code, regionDuCadre(cadrer(code))]).toEqual([code, code]);
+    }
+  });
+
+  it('ouvre la Guadeloupe, dont le centre du cadre tombe en pleine mer', () => {
+    // Un archipel n'a pas de terre en son milieu : de Marie-Galante aux
+    // Saintes, le point central est de l'eau. Le test point-dans-polygone seul
+    // ne trouvait rien, et la région se refermait sur place.
+    const cadre = cadrer('01');
+    const [lon, lat] = centreDe(cadre);
+    expect(regionAu(lon, lat)).toBeNull();
+    expect(regionDuCadre(cadre)).toBe('01');
+  });
+
+  it('ne trouve rien sur une vue de la France entière', () => {
+    // Aucune région ne remplit l'écran : on regarde le pays, pas un endroit.
+    expect(
+      regionDuCadre([
+        [-5.2, 41.3],
+        [9.6, 51.2],
+      ]),
+    ).toBeNull();
   });
 });

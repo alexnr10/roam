@@ -40,6 +40,15 @@ const BANDEAU = 30;
  */
 const VIGNETTE = 156;
 const VIGNETTE_PHOTO = 88;
+/**
+ * La largeur RÉELLEMENT disponible pour la photo, dans la vignette.
+ *
+ * La vignette fait cent cinquante-six points de large, mais elle a huit points
+ * de marge intérieure de chaque côté et un filet d'un point : il ne reste que
+ * cent trente-huit. Demander la photo à cent cinquante-six la faisait déborder
+ * à droite, et l'image paraissait décalée dans son cadre.
+ */
+const VIGNETTE_LARGEUR_PHOTO = VIGNETTE - 2 * spacing.sm - 2;
 
 /**
  * L'écran principal : une carte, et ce qu'elle contient.
@@ -283,7 +292,7 @@ export default function MapScreen() {
                   <Photo
                     url={item.imageUrl}
                     themeId={item.themeId}
-                    width={VIGNETTE}
+                    width={VIGNETTE_LARGEUR_PHOTO}
                     height={VIGNETTE_PHOTO}
                   />
                   <Text style={[type.body, styles.nom]} numberOfLines={1}>

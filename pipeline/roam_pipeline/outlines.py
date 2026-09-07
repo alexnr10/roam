@@ -58,12 +58,19 @@ GRID = 1e-4
 #: Aire minimale d'un triangle, en km², sous laquelle un sommet ne raconte plus
 #: rien à l'échelle regardée. Les départements en gardent davantage que les
 #: régions : on les regarde de plus près.
-DEFAULT_TOLERANCE_KM2: dict[str, float] = {"region": 1.2, "departement": 0.7}
+DEFAULT_TOLERANCE_KM2: dict[str, float] = {"region": 0.35, "departement": 0.2}
 
 #: Un polygone plus petit que cela disparaît — sauf s'il est le seul du
-#: territoire. Ce sont les îlots et les rochers, invisibles à l'écran mais
-#: coûteux en octets ; le garde-fou protège Mayotte comme Saint-Nazaire.
-MIN_POLYGON_KM2: float = 1.0
+#: territoire. Ce sont les îlots et les rochers ; le garde-fou protège Mayotte
+#: comme Saint-Nazaire.
+#:
+#: Un kilomètre carré était trop grossier depuis que la carte S'OUVRE sur une
+#: région : à cette échelle, Bréhat, Molène ou les Glénan sont des lieux qu'on
+#: va voir, pas des poussières. Descendre à dix hectares rend cinquante îles à
+#: la Bretagne, dix à la Corse — pour quatre cents sommets de plus en tout,
+#: soit à peu près rien. Ce n'est pas la finesse des îles qui pèse dans le
+#: fichier, c'est celle des côtes.
+MIN_POLYGON_KM2: float = 0.1
 
 Point = tuple[int, int]
 """Un sommet quantifié : (longitude, latitude) en pas de `GRID`."""
@@ -398,6 +405,7 @@ def export(
     tolerances: dict[str, float] | None = None,
     grid: float = GRID,
     source_dir: Path | None = None,
+    min_polygon_km2: float = MIN_POLYGON_KM2,
 ) -> dict[str, int]:
     """Écrit `outlines.json` : une collection GeoJSON par échelle."""
     tolerances = tolerances or DEFAULT_TOLERANCE_KM2
@@ -410,7 +418,9 @@ def export(
             features = raw["features"]
         else:
             features = fetch(level)
-        simplified = build_outlines(features, tolerances[level], grid)
+        simplified = build_outlines(
+            features, tolerances[level], grid, min_polygon_km2=min_polygon_km2
+        )
         payload[level] = {"type": "FeatureCollection", "features": simplified}
         counts[level] = len(simplified)
         LOG.info(
