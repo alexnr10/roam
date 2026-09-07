@@ -46,6 +46,7 @@ from .fetch import (
     enrich_exclusions,
     enrich_visitors,
     enrich_article_sizes,
+    credit_chosen_photos,
     enrich_image_credits,
     enrich_missing_images,
     enrich_pageviews,
@@ -486,24 +487,7 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
         # créditée comme les autres, et le crédit se demande ensuite.
         enrich_missing_images(places)
         # Les photos CHOISIES le temps de la demande, puis rendues.
-        #
-        # `photos.csv` s'applique à la construction, pas à la collecte : le
-        # fichier brut garde ce que Wikidata donne, et retirer une ligne rend sa
-        # photo d'origine au lieu. Mais `enrich` travaille sur ce fichier brut —
-        # il ne voyait donc JAMAIS la photo choisie, et son crédit ne pouvait
-        # pas arriver. Six lieux étaient publiés sans attribution, et aucune
-        # commande n'aurait pu les créditer.
-        #
-        # On applique l'adresse choisie, on demande les crédits, on rend
-        # l'adresse d'origine : le crédit reste attaché au FICHIER choisi, et
-        # `_credit` le montrera parce que la construction rétablira ce fichier.
-        avant = {place.wikidata_id: place.image_url for place in places}
-        choisies = apply_photos(places, read_photos(args.manual / "photos.csv"))
-        if choisies:
-            LOG.info("crédits : %s photo(s) choisies prises en compte", choisies)
-        enrich_image_credits(places)
-        for place in places:
-            place.image_url = avant[place.wikidata_id]
+        credit_chosen_photos(places, read_photos(args.manual / "photos.csv"))
     _save_raw(args, places)
     print(f"{found} tailles d'articles ajoutées → {raw_path}")
     print("Relance `build` pour en tenir compte dans le classement.")

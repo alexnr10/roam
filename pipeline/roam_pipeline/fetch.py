@@ -797,6 +797,44 @@ def enrich_pageviews(places: list[Place], client: WikipediaClient | None = None)
     return found
 
 
+def credit_chosen_photos(
+    places: list[Place], photos: dict[str, str], crediter=None
+) -> int:
+    """Demande les crédits en tenant compte des photos CHOISIES, puis rend les
+    adresses d'origine.
+
+    `photos.csv` s'applique à la construction, pas à la collecte : le fichier
+    brut garde ce que Wikidata donne, et retirer une ligne rend sa photo
+    d'origine au lieu. Mais `enrich` travaille sur ce fichier brut — sans ce
+    détour, il demandait le crédit du fichier de Wikidata, jamais celui du
+    fichier choisi, et le crédit d'une photo choisie ne pouvait pas arriver.
+
+    On ne rend que les adresses qu'on a soi-même remplacées. La première
+    version restaurait TOUT, et effaçait ainsi la réparation faite au passage :
+    un lieu dont la photo fantôme venait d'être retirée la retrouvait aussitôt,
+    et trois lieux sont restés cassés deux constructions de plus.
+    """
+    from .review import apply_photos
+
+    if not photos:
+        crediter = crediter or enrich_image_credits
+        return crediter(places)
+
+    avant = {
+        place.wikidata_id: place.image_url
+        for place in places
+        if place.wikidata_id in photos
+    }
+    apply_photos(places, photos)
+    try:
+        crediter = crediter or enrich_image_credits
+        return crediter(places)
+    finally:
+        for place in places:
+            if place.wikidata_id in avant:
+                place.image_url = avant[place.wikidata_id]
+
+
 def enrich_missing_images(
     places: list[Place], client: WikipediaClient | None = None, commons=None
 ) -> int:

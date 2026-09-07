@@ -3925,6 +3925,67 @@ class TestCommonsTitles(unittest.TestCase):
         self.assertIsNotNone(lieu.image_url)
 
 
+class TestCreditWithChosenPhotos(unittest.TestCase):
+    """Le détour par les photos choisies, et ce qu'il ne doit PAS écraser.
+
+    `photos.csv` s'applique à la construction, pas à la collecte. `enrich`
+    travaille sur la collecte : sans ce détour, il demandait le crédit du
+    fichier de Wikidata, jamais celui du fichier choisi.
+    """
+
+    @staticmethod
+    def _lieu(nom, qid, url):
+        lieu = make_place(nom, wikidata_id=qid)
+        lieu.image_url = url
+        return lieu
+
+    def test_the_credit_is_asked_for_the_chosen_file(self):
+        from roam_pipeline.fetch import credit_chosen_photos
+        from roam_pipeline.review import photo_url
+
+        lieu = self._lieu("Aber de Crozon", "Q1", photo_url("Wikidata.jpg"))
+        demandes = []
+
+        def crediter(places):
+            demandes.append(places[0].image_url)
+            places[0].image_credit_for = "File:Choisie.jpg"
+            return 1
+
+        credit_chosen_photos([lieu], {"Q1": "Choisie.jpg"}, crediter)
+        self.assertEqual(demandes, [photo_url("Choisie.jpg")])
+        # L'adresse d'origine est rendue : la collecte ne garde pas le choix.
+        self.assertEqual(lieu.image_url, photo_url("Wikidata.jpg"))
+        self.assertEqual(lieu.image_credit_for, "File:Choisie.jpg")
+
+    def test_a_repair_is_not_undone_by_the_restore(self):
+        # La première version restaurait TOUT : un lieu dont la photo fantôme
+        # venait d'être retirée la retrouvait aussitôt, et trois lieux sont
+        # restés cassés deux constructions de plus.
+        from roam_pipeline.fetch import credit_chosen_photos
+        from roam_pipeline.review import photo_url
+
+        choisi = self._lieu("Aber de Crozon", "Q1", photo_url("Wikidata.jpg"))
+        fantome = self._lieu("Villa Savoye", "Q2", photo_url("Inexistante.jpg"))
+
+        def crediter(places):
+            for place in places:            # la réparation, comme en vrai
+                if "Inexistante" in (place.image_url or ""):
+                    place.image_url = None
+            return 0
+
+        credit_chosen_photos([choisi, fantome], {"Q1": "Choisie.jpg"}, crediter)
+        self.assertIsNone(fantome.image_url)
+        self.assertEqual(choisi.image_url, photo_url("Wikidata.jpg"))
+
+    def test_without_any_chosen_photo_nothing_is_touched(self):
+        from roam_pipeline.fetch import credit_chosen_photos
+        from roam_pipeline.review import photo_url
+
+        lieu = self._lieu("Tour Eiffel", "Q1", photo_url("Wikidata.jpg"))
+        credit_chosen_photos([lieu], {}, lambda places: 0)
+        self.assertEqual(lieu.image_url, photo_url("Wikidata.jpg"))
+
+
 class TestMissingImages(unittest.TestCase):
     """Vingt-trois lieux du catalogue n'ont aucune image.
 
