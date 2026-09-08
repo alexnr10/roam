@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FBFAF7"
+      "backgroundColor": "#F5EAD8"
     },
     "ios": {
       "supportsTablet": true,
@@ -23,7 +23,7 @@
     "android": {
       "package": "app.roam.mobile",
       "adaptiveIcon": {
-        "backgroundColor": "#FBFAF7",
+        "backgroundColor": "#F5EAD8",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
