@@ -1,0 +1,101 @@
+# Ce que la collecte par CLASSE ne peut pas voir.
+#
+# Relevé après l'Axe Majeur de Cergy (Q15063077), signalé absent à la
+# relecture. Il ne manquait pas par décision : il manquait de la collecte
+# brute elle-même, faute qu'aucun thème ne déclare sa classe. La liste
+# ci-dessous rassemble les lieux qui tombent par le même trou, ou par un trou
+# voisin, et qui valent le détour.
+#
+# AUCUN Q-ID ICI. Ils se résolvent, ils ne s'écrivent pas de mémoire :
+#
+#     python -m roam_pipeline suggest-qids "Le Cyclop Milly-la-Forêt"
+#     python -m roam_pipeline probe <le Q-id obtenu>
+#
+# `probe` dit s'il faut épingler dans places.csv ou déclarer une classe. La
+# règle est celle du README : une classe qui nomme une SORTE DE MONUMENT
+# ramène toute la France et se borne d'elle-même ; une classe qui nomme un
+# statut (« œuvre d'art ») ou un contenant ne se borne pas, et le lieu
+# s'épingle une ligne à la fois.
+#
+#
+# ── 1. Œuvres monumentales — classe « œuvre d'art », à épingler ───────────
+#
+# Même cas exact que l'Axe Majeur. Aucune ne peut entrer par une classe.
+#
+#   Les rochers sculptés de Rothéneuf     Saint-Malo (35)
+#   Le Lion de Belfort                    Belfort (90)
+#   Le Cyclop de Jean Tinguely            Milly-la-Forêt (91)
+#   Les Deux Plateaux (colonnes de Buren) Paris (75)
+#   La Vallée des Saints                  Carnoët (22)
+#   Les Machines de l'île                 Nantes (44)
+#
+#
+# ── 2. Architecture du XXe siècle — trou par les THÈMES, pas par la classe ─
+#
+# Le catalogue tient déjà les villas (Savoye, Cavrois, Noailles, Majorelle) :
+# la classe « villa » fonctionne. Ce qui manque est l'architecture RELIGIEUSE
+# et COLLECTIVE du siècle, qu'aucun thème ne ramasse.
+#
+# Ronchamp est le cas à regarder en premier, parce que son absence n'est pas
+# un oubli mais la conséquence d'une décision prise ailleurs : `cathedrales`
+# ne collecte que ce qui porte un TITRE — cathédrale, basilique — et la note
+# du thème le dit, « on laisse tomber les églises ». Notre-Dame-du-Haut est
+# une chapelle inscrite au patrimoine mondial. La décision reste sans doute
+# juste dans l'ensemble ; elle a ici une victime, à épingler.
+#
+#   Chapelle Notre-Dame-du-Haut          Ronchamp (70)        UNESCO
+#   La Cité radieuse                     Marseille (13)       UNESCO
+#   Couvent Sainte-Marie de La Tourette  Éveux (69)           UNESCO
+#   La Grande Arche                      Puteaux (92)
+#   Le Familistère de Guise              Guise (02)
+#
+#
+# ── 3. Lieux de mémoire ───────────────────────────────────────────────────
+#
+# Verdun est couvert (fort de Douaumont, mémorial, forêt domaniale) et ne
+# demande rien. Ceux-ci ne sont ni un monument, ni un musée, ni un village de
+# caractère — aucun thème ne les nomme.
+#
+#   Oradour-sur-Glane, village martyr     Oradour-sur-Glane (87)
+#   Camp des Milles                       Aix-en-Provence (13)
+#   Caverne du Dragon, Chemin des Dames   Oulches-la-Vallée-Foulon (02)
+#
+#
+# ── 4. Patrimoine industriel ──────────────────────────────────────────────
+#
+#   Centre historique minier de Lewarde   Lewarde (59)        UNESCO
+#
+#
+# ── ⚠ LA PHOTO : la moitié de cette liste arrivera sans image ─────────────
+#
+# Une photo vient de la propriété P18 de Wikidata, et P18 pointe sur
+# Wikimedia Commons. Or la France n'a pas de liberté de panorama
+# commerciale : l'exception de l'article L122-5 11° du code de la propriété
+# intellectuelle ne couvre que l'usage NON COMMERCIAL par une personne
+# physique, quand Commons exige l'usage commercial. Une œuvre encore
+# protégée — l'auteur mort il y a moins de soixante-dix ans — n'a donc
+# normalement pas de photo hébergeable, donc pas de P18 utilisable.
+#
+# Ce n'est pas une conjecture : les treize lieux sans photo du catalogue sont
+# déjà, pour l'essentiel, du XXe siècle — la villa Savoye (Le Corbusier,
+# mort en 1965), le musée d'Art moderne de Strasbourg, l'atelier Jean
+# Lurçat, la maison Max Ernst. La villa Savoye est au patrimoine mondial et
+# n'a pas d'image : ce n'est pas l'obscurité, c'est le droit d'auteur.
+#
+# Donc, dans cette liste :
+#
+#   photo probable   Rothéneuf (abbé Fouré, †1910), Lion de Belfort
+#                    (Bartholdi, †1904), Familistère (Godin, †1888),
+#                    Oradour, Camp des Milles, Caverne du Dragon, Lewarde
+#                    — domaine public, ou bâti sans auteur protégé.
+#
+#   photo douteuse   Axe Majeur (Karavan, †2021), Le Cyclop (Tinguely,
+#                    †1991), colonnes de Buren, Machines de l'île, Vallée
+#                    des Saints, Ronchamp / Cité radieuse / La Tourette
+#                    (Le Corbusier, †1965 — libre en 2036), Grande Arche.
+#
+# `photos.csv` ne sauve pas ces cas : il choisit un fichier SUR Commons, et
+# le problème est qu'il n'y en a pas. Le vrai remède est une photo prise par
+# le curateur et téléversée sous licence libre — ce que le droit permet à
+# l'auteur du cliché, sans régler la question de l'œuvre photographiée.
+# À défaut, la fiche s'affiche sans image, comme la villa Savoye aujourd'hui.
