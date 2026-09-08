@@ -857,6 +857,34 @@ themes:
     # un type de peuplement forestier très commun, pas un critère de beauté —
     # même piège que les 289 801 sites OSM du tout début. Le label Forêt
     # d'Exception (ONF) porte la curation qualitative sur ce thème.
+    #
+    # « Forêt domaniale » seule ne voyait pas les grandes forêts de France.
+    # Wikidata range la plupart sous la classe GÉNÉRIQUE, et la domanialité est
+    # un statut de propriété, pas une classe descriptive : c'est un hasard
+    # d'écriture qu'un élément la porte. Manquaient ainsi Compiègne,
+    # Rambouillet, Brocéliande, Chantilly, Orléans, Ermenonville, Montmorency —
+    # et Fontainebleau elle-même, au catalogue par la seule grâce du label ONF.
+    # Sept des trente-deux forêts du catalogue ne tenaient que par ce label :
+    # une liste de vingt et une forêts portait à elle seule le haut du thème.
+    broad_classes:
+      - qid: Q4421            # forêt
+        # Le plancher, mesuré par `gaps --class Q4421` — lieux français situés
+        # de cette classe :
+        #
+        #     ≥0     ≥1     ≥2     ≥3     ≥4     ≥6     ≥8    ≥10    ≥20
+        #   2920   2884    275    156     76     24     13     10      4
+        #
+        # La falaise est entre 1 et 2 langue : 2 884 forêts n'ont qu'un article
+        # francophone, et ce sont les bois communaux. À 3, il en reste 156 —
+        # borné, et une langue sous le plancher d'AFFICHAGE du thème (4), pour
+        # laisser à un épinglage ou à une liste officielle de quoi repêcher.
+        # C'est le même écart que les classes propres du thème (2 pour 4).
+        #
+        # Plus haut que les classes propres, et c'est la raison d'être de
+        # `broad_classes` : une porte large se paie d'une exigence plus forte.
+        # 8, le plancher des autres classes génériques, laisserait Montmorency
+        # dehors avec ses 4 langues — la question qui a ouvert tout ceci.
+        fetch_min_sitelinks: 3
 
   - id: rochers
     name: Curiosités géologiques
