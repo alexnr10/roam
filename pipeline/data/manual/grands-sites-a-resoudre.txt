@@ -60,16 +60,32 @@
 #                               cas de la plage de Pampelonne, pour lequel la
 #                               passe de rattrapage par azimuts existe.
 #
-#   Havre du Payré       (85)   SANS REPRÉSENTANT, et probablement pour de
-#                               bon. `suggest-qids "Payré"` ne rend que des
-#                               communes de la Vienne, un nom de famille et
-#                               un site archéologique de l'Ardèche : Wikidata
-#                               ne connaît pas ce havre. Le catalogue n'a
-#                               aucun de ses composants non plus — ni Le
-#                               Veillon, ni Talmont-Saint-Hilaire.
+#   Havre du Payré       (85)   ABANDONNÉ, et c'est une décision, pas un
+#                               échec de recherche. Les trois termes ont été
+#                               lancés. « Payré » ne rend que des communes de
+#                               la Vienne, un nom de famille et un site
+#                               archéologique de l'Ardèche.
+#                               « Talmont-Saint-Hilaire » rend la COMMUNE, qui
+#                               n'est ni le site ni un village de caractère.
+#                               « Le Veillon » rend Q108076419, un terrain du
+#                               Conservatoire du Littoral dont `probe` dit
+#                               tout :
 #
-#                               Restent à essayer « Talmont-Saint-Hilaire »
-#                               et « Le Veillon », qui n'ont pas été lancés.
+#                                   coordonnées : — AUCUNE —
+#                                   langues : 0 · article francophone : non
+#                                   classes : aire protégée (Q473972)
+#
+#                               On peut lui porter des coordonnées à la main,
+#                               `probe` le propose. Mais la fiche n'aurait ni
+#                               résumé ni photo, et son libellé serait celui
+#                               d'un acte d'acquisition. La Pointe de la
+#                               Courte Dune, entité du même import, est déjà
+#                               au catalogue avec une langue, aucun résumé et
+#                               un nom qu'il a fallu réécrire à la main : on
+#                               sait donc à quoi ressemble ce qu'on ajouterait.
+#
+#                               Une fiche vide dans un guide vaut moins qu'un
+#                               site manquant.
 #
 # Quarante-neuf des cinquante sites officiels ont donc un représentant, pour
 # une liste que la propriété Wikidata seule ne connaît qu'à dix-neuf.
