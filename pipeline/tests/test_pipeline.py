@@ -4021,17 +4021,41 @@ class TestMissingImages(unittest.TestCase):
             return {t: self.images[t] for t in titles if t in self.images}
 
     class _Commons:
-        """Commons, avec la liste des fichiers qu'il héberge VRAIMENT."""
+        """Commons, avec la liste des fichiers qu'il héberge VRAIMENT.
+
+        Ce faux RENDAIT une entrée seulement pour les fichiers hébergés, et les
+        autres étaient simplement absents du résultat. Le vrai client ne fait
+        pas cela : son contrat distingue trois états, et un fichier que Commons
+        dit inexistant rend une entrée à `None`. Un titre absent veut dire tout
+        autre chose — le lot a échoué, il n'y a rien à conclure.
+
+        La différence n'était pas une subtilité de test : le code de production
+        ne testait que l'absence, lisait donc le `None` comme un couple, et
+        `enrich --images` mourait sur un `TypeError` qui emportait la passe
+        entière. Le test « Commons ne l'héberge pas » passait pendant ce
+        temps-là, parce que ce faux-ci lui donnait la mauvaise forme.
+        """
 
         def __init__(self, heberges=None, credit=("Un photographe", "CC BY-SA 4.0")):
             self.heberges, self.credit, self.demandes = heberges, credit, []
 
         def credits(self, titles):
             self.demandes.append(list(titles))
-            gardes = titles if self.heberges is None else [
-                t for t in titles if t in self.heberges
-            ]
-            return {t: self.credit for t in gardes}
+            if self.heberges is None:
+                return {t: self.credit for t in titles}
+            return {
+                t: (self.credit if t in self.heberges else None) for t in titles
+            }
+
+    class _CommonsMuet:
+        """Commons quand le LOT échoue : aucune entrée, et rien à conclure."""
+
+        def __init__(self):
+            self.demandes = []
+
+        def credits(self, titles):
+            self.demandes.append(list(titles))
+            return {}
 
     def _lieu(self, nom, image=None, article="Un article"):
         lieu = make_place(nom, wikidata_id=f"Q{abs(hash(nom)) % 99991}")
@@ -4064,6 +4088,19 @@ class TestMissingImages(unittest.TestCase):
             self.assertEqual(enrich_missing_images([nu], client, commons), 0)
         self.assertIsNone(nu.image_url)
         self.assertEqual(commons.demandes, [["File:Villa Savoye en 2014.jpg"]])
+
+    def test_a_batch_without_an_answer_concludes_nothing(self):
+        # Le troisième état du contrat de `credits`, et le seul qui ne soit pas
+        # un verdict : un titre ABSENT du résultat dit que le lot a échoué, pas
+        # que Commons refuse le fichier. On ne pose pas d'image — mais on ne
+        # l'écrit pas non plus au compte des refus.
+        from roam_pipeline.fetch import enrich_missing_images
+
+        nu = self._lieu("Villa Savoye", article="Villa Savoye")
+        client = self._Faux({"Villa Savoye": "Villa Savoye 1.jpg"})
+        with _capture():
+            self.assertEqual(enrich_missing_images([nu], client, self._CommonsMuet()), 0)
+        self.assertIsNone(nu.image_url)
 
     def test_the_verification_brings_the_credit_along(self):
         # Elle interroge déjà les métadonnées : demander deux fois serait payer

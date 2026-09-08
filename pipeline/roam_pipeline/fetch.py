@@ -904,12 +904,27 @@ def enrich_missing_images(
 
     trouvees = 0
     refusees = 0
+    perdues = 0
     for titre, nom in proposees.items():
         fichier = f"File:{nom}"
         if fichier not in connus:
+            # Le lot a échoué : `credits` ne rend alors AUCUNE entrée pour ces
+            # titres, et son contrat dit de n'en rien conclure. On ne pose pas
+            # d'image, mais on ne prétend pas non plus que Commons l'a refusée.
+            perdues += 1
+            continue
+        credit = connus[fichier]
+        if credit is None:
+            # Commons dit le fichier INEXISTANT — le troisième état que rend
+            # `credits`, distinct de « existe sans crédit documenté », qui rend
+            # un couple de None. C'est le cas que cette fonction doit refuser :
+            # « une image que Commons n'héberge pas est refusée ». Il était lu
+            # comme un couple, et le dépaquetage levait une TypeError qui
+            # emportait toute la passe — donc aussi le crédit des photos, qui
+            # se demande juste après, et l'écriture du fichier brut.
             refusees += 1
             continue
-        auteur, licence = connus[fichier]
+        auteur, licence = credit
         for place in par_titre.get(titre, []):
             place.image_url = photo_url(nom)
             place.image_author, place.image_licence = auteur, licence
@@ -922,6 +937,12 @@ def enrich_missing_images(
             "héberge pas — Wikipédia en garde quelques-unes chez elle, et leur "
             "licence ne nous est pas forcément accordée",
             refusees,
+        )
+    if perdues:
+        LOG.warning(
+            "photos manquantes : %s fichier(s) sans réponse de Commons — lot "
+            "échoué, rien n'est conclu. Relancer la passe les redemandera.",
+            perdues,
         )
     LOG.info(
         "photos manquantes : %s lieux illustrés par leur article, %s toujours sans",
