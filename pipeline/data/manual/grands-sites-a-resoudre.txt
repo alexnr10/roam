@@ -41,17 +41,38 @@
 # Ce n'est pas un problème de label mais de collecte, et il se traite comme
 # les œuvres monumentales : suggest-qids, puis probe, puis places.csv.
 #
-#   Baie de Somme        (80)   Q1741383 résolu, à passer au probe puis à
-#                               épingler. Les autres candidats étaient des
-#                               entités de PROTECTION — réserve naturelle,
-#                               site Ramsar, parc régional — et non le lieu
-#                               qu'on visite ; deux autres étaient un
-#                               bailleur social et une société de services.
+#   Baie de Somme        (80)   ÉPINGLÉE. Q1741383, thème dunes-marais,
+#                               vérifiée sur probe : coordonnées présentes,
+#                               aucune classe écartée. Ses classes — paysage
+#                               culturel, baie, estuaire — ne sont déclarées
+#                               par aucun thème, d'où l'épinglage. Les autres
+#                               candidats étaient des entités de PROTECTION
+#                               (réserve naturelle, site Ramsar, parc
+#                               régional), qui décrivent un statut et non un
+#                               lieu ; deux autres étaient un bailleur social
+#                               et une société de services — la recherche par
+#                               préfixe ramasse les raisons sociales.
 #
-#   Havre du Payré       (85)   `suggest-qids` ne rend RIEN. À rechercher
-#                               autrement : « Payré », « Talmont-Saint-
-#                               Hilaire ». S'il n'existe pas chez Wikidata,
-#                               ce site restera sans représentant.
+#                               ⚠ À VÉRIFIER après le build : Wikidata donne
+#                               « Somme » pour commune, qui est le
+#                               DÉPARTEMENT. Et le point tombe dans la baie,
+#                               donc peut-être dans aucune commune — c'est le
+#                               cas de la plage de Pampelonne, pour lequel la
+#                               passe de rattrapage par azimuts existe.
+#
+#   Havre du Payré       (85)   SANS REPRÉSENTANT, et probablement pour de
+#                               bon. `suggest-qids "Payré"` ne rend que des
+#                               communes de la Vienne, un nom de famille et
+#                               un site archéologique de l'Ardèche : Wikidata
+#                               ne connaît pas ce havre. Le catalogue n'a
+#                               aucun de ses composants non plus — ni Le
+#                               Veillon, ni Talmont-Saint-Hilaire.
+#
+#                               Restent à essayer « Talmont-Saint-Hilaire »
+#                               et « Le Veillon », qui n'ont pas été lancés.
+#
+# Quarante-neuf des cinquante sites officiels ont donc un représentant, pour
+# une liste que la propriété Wikidata seule ne connaît qu'à dix-neuf.
 #
 # Deux autres sont réglés SANS collecte, par le même raisonnement que le pont
 # transbordeur : le catalogue possédait déjà un composant du site.
