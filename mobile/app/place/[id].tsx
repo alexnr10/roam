@@ -15,7 +15,6 @@ import {
 import { getCollectionsForPlace, getPlace, themeLabel } from '../../src/data/catalog';
 import { evaluateCheckIn } from '../../src/lib/checkin';
 import { etoilesDe } from '../../src/lib/etoiles';
-import { palierMinuscule, rangSur } from '../../src/lib/paliers';
 import { formatDistance } from '../../src/lib/geo';
 import { setSimulatedPosition } from '../../src/lib/simulation';
 import { computeProgress } from '../../src/lib/progress';
@@ -197,7 +196,6 @@ export default function PlaceScreen() {
       </Text>
 
       {memberships.map((collection) => {
-        const rang = collection.places.find((membre) => membre.placeId === place.id);
         const progress = computeProgress(collection, visits);
         return (
           <Pressable
@@ -208,25 +206,19 @@ export default function PlaceScreen() {
             <Text style={type.body} numberOfLines={1}>
               {collection.name}
             </Text>
-            <ProgressBar
-              pct={progress.stage.pct}
-              color={colors.tier[progress.stage.tier - 1]}
-              height={6}
-            />
-            {/* Une seule phrase, parce que ce sont deux choses différentes et
-                qu'elles se confondaient : à gauche TA progression dans le
-                palier en cours, à droite la place DU LIEU dans la liste.
-                Affichées l'une sous l'autre, « les incontournables » semblait
-                qualifier le lieu — et disait le contraire de son rang.
-                Le palier est nommé, pas numéroté : un second barème chiffré à
-                côté des étoiles ferait deux échelles pour une seule idée. Et un
-                rang n'a aucun barème à apprendre. */}
+            {/* Sur la fiche d'un lieu, une collection ne répond qu'à UNE
+                question : où j'en suis dedans. Rien d'autre.
+                On y montrait le palier en cours — « 0/11 des incontournables »
+                — ce qui laissait croire que le lieu en était un, et qu'on ne
+                l'avait pas validé. C'est le contraire : la maison du docteur
+                Gachet est cent quatrième sur cent cinquante-cinq.
+                Le rang du lieu est parti avec : l'étoile, en haut de la fiche,
+                dit déjà sa valeur, et deux mesures de la même chose sur un même
+                écran ne s'additionnent pas, elles se contredisent. */}
+            <ProgressBar pct={progress.pct} color={colors.primaryLight} height={6} />
             <Text style={type.small}>
-              {progress.stage.visited}/{progress.stage.total}{' '}
-              {palierMinuscule(progress.stage.tier).replace(/^la |^les /, (mot) =>
-                mot === 'les ' ? 'des ' : 'de ',
-              )}
-              {rang ? ` · ce lieu est ${rangSur(rang.rank, collection.placeCount)}` : ''}
+              {progress.visited} lieu{progress.visited > 1 ? 'x' : ''} validé
+              {progress.visited > 1 ? 's' : ''} sur {progress.total}
             </Text>
           </Pressable>
         );

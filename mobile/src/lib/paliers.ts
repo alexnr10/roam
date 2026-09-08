@@ -33,7 +33,3 @@ export const PALIERS: Record<Tier, string> = {
 /** Le même nom, en minuscule, pour une phrase : « … la deuxième ligne finie ». */
 export const palierMinuscule = (tier: Tier): string =>
   PALIERS[tier].charAt(0).toLowerCase() + PALIERS[tier].slice(1);
-
-/** Le rang d'un lieu dans une liste : « 34ᵉ sur 57 ». */
-export const rangSur = (rang: number, total: number): string =>
-  `${rang === 1 ? '1ᵉʳ' : `${rang}ᵉ`} sur ${total}`;

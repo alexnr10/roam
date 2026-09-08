@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 
-import { PALIERS, palierMinuscule, rangSur } from './paliers';
+import { PALIERS, palierMinuscule } from './paliers';
 
 describe('PALIERS', () => {
   it('nomme les trois paliers, sans les numéroter', () => {
@@ -15,16 +15,6 @@ describe('PALIERS', () => {
 
   it('donne une minuscule utilisable dans une phrase', () => {
     expect(palierMinuscule(2)).toBe('la deuxième ligne');
-  });
-});
-
-describe('rangSur', () => {
-  it('accorde le premier', () => {
-    expect(rangSur(1, 57)).toBe('1ᵉʳ sur 57');
-  });
-
-  it('numérote les autres', () => {
-    expect(rangSur(34, 57)).toBe('34ᵉ sur 57');
   });
 });
 
