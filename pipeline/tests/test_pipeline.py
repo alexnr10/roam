@@ -6049,6 +6049,53 @@ class TestPromoteAgainstTheCap(unittest.TestCase):
         self.assertNotIn(lieux[-1].wikidata_id, geo)
         self.assertEqual(len(geo), 10)
 
+    def _niveau(self, collection, qid):
+        return next(cp.tier for cp in collection.places if cp.place_id == qid)
+
+    def test_a_forced_entry_costs_the_lift(self):
+        # La règle, vue depuis la collection et non depuis `assign_tiers` :
+        # `promote` sur un lieu hors collection paie son entrée, et son rang
+        # décide seul de son niveau.
+        lieux = [make_place(f"Château {i}", sitelinks=40 - i, lat=45 + i * 0.1,
+                            wikidata_id=f"Q{i}") for i in range(12)]
+        score_all(lieux, CONFIG)
+        dernier = lieux[-1]
+        dernier.tier_shift = -1
+        col = self._collection(lieux, 10)
+        cp = next(c for c in col.places if c.place_id == dernier.wikidata_id)
+        self.assertTrue(cp.forced)
+        self.assertEqual(cp.tier, cp.natural_tier)
+
+    def test_promote2_pays_the_entry_and_keeps_the_lift(self):
+        # Le mot qui manquait au curateur : « fais-le entrer ET monte-le ».
+        # Deux gestes, donc deux effets — mais il faut les avoir demandés.
+        lieux = [make_place(f"Château {i}", sitelinks=40 - i, lat=45 + i * 0.1,
+                            wikidata_id=f"Q{i}") for i in range(12)]
+        score_all(lieux, CONFIG)
+        dernier = lieux[-1]
+        dernier.tier_shift = -1
+        dernier.promotion_double = True
+        col = self._collection(lieux, 10)
+        cp = next(c for c in col.places if c.place_id == dernier.wikidata_id)
+        self.assertTrue(cp.forced)          # il est bien ENTRÉ par sa promotion
+        self.assertEqual(cp.tier, max(1, cp.natural_tier - 1))
+        self.assertLess(cp.tier, cp.natural_tier)
+
+    def test_promote2_does_nothing_more_when_no_entry_is_owed(self):
+        # LA garantie, et la raison pour laquelle l'accident du pont du
+        # Port-à-l'Anglais reste hors d'atteinte : `promote2` ne dispense que
+        # d'une entrée. Sur un lieu qui est déjà dans sa collection, il n'y a
+        # rien à dispenser, et il vaut exactement `promote` — jamais deux crans.
+        lieux = [make_place(f"Château {i}", sitelinks=40 - i, lat=45 + i * 0.1,
+                            wikidata_id=f"Q{i}") for i in range(12)]
+        score_all(lieux, CONFIG)
+        dedans = lieux[5]                   # largement sous le plafond de dix
+        dedans.tier_shift = -1
+        simple = self._niveau(self._collection(lieux, 10), dedans.wikidata_id)
+        dedans.promotion_double = True
+        double = self._niveau(self._collection(lieux, 10), dedans.wikidata_id)
+        self.assertEqual(double, simple)
+
     def test_a_demoted_place_is_not_forced_in(self):
         # Descendre un lieu n'est pas demander qu'il entre.
         lieux = [make_place(f"Château {i}", sitelinks=40 - i, lat=45 + i * 0.1,

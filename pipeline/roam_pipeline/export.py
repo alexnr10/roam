@@ -19,7 +19,7 @@ from .collections import twins
 LOG = logging.getLogger(__name__)
 
 REVIEW_HEADER = [
-    "decision",       # à remplir : (vide)=en attente, keep, drop, promote, demote
+    "decision",       # à remplir : (vide)=en attente, keep, drop, promote, promote2, demote
     "curator_note",
     "name",
     "theme",
@@ -738,7 +738,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
           overflow: hidden; display: flex; flex-direction: column; }
   .card.keep { border-color: var(--keep); box-shadow: inset 0 0 0 1px var(--keep); }
   .card.drop { opacity: .45; border-color: var(--drop); }
-  .card.promote, .card.demote { border-color: var(--muted); }
+  .card.promote, .card.promote2, .card.demote { border-color: var(--muted); }
   .card.rethemed { border-color: var(--primary); }
   .hors { color: var(--primary); }
   .theme-pick { display: flex; align-items: center; gap: 6px; font-size: 12px;
@@ -778,7 +778,8 @@ _REVIEW_TEMPLATE = """<!doctype html>
   .actions button { flex: 1; padding: 7px 0; font-size: 13px; }
   .actions button[data-on="keep"] { background: var(--keep); color: #fff; border-color: var(--keep); }
   .actions button[data-on="drop"] { background: var(--drop); color: #fff; border-color: var(--drop); }
-  .actions button[data-on="promote"], .actions button[data-on="demote"] {
+  .actions button[data-on="promote"], .actions button[data-on="promote2"],
+  .actions button[data-on="demote"] {
     background: var(--text); color: #fff; border-color: var(--text); }
   a { color: var(--primary); }
   .warn { background: #FBEEE6; border: 1px solid var(--primary); color: var(--primary);
@@ -813,6 +814,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
       <option value="keep">Gardés</option>
       <option value="drop">Écartés</option>
       <option value="promote">Montés par moi</option>
+      <option value="promote2">Entrés et montés par moi</option>
       <option value="demote">Descendus par moi</option>
     </select>
     <button class="primary" id="export">Télécharger les décisions</button>
@@ -1008,13 +1010,27 @@ function fleche(p, d, act) {
   // le score, arrivait sinon au niveau 1.
   const entrant = !p.national && act === "promote";
   const titre = entrant
-    ? "Le ferait ENTRER dans la collection nationale, à son rang — un clic fait une chose : il entre, il ne monte pas"
+    ? "Le ferait ENTRER dans la collection nationale, à son rang — un clic fait une chose : il entre, il ne monte pas. Pour les deux à la fois, la double flèche."
     : !cible ? "Faire descendre"
     : on ? `Annuler : le ramènerait au niveau ${cible}`
          : `Le porterait au niveau ${cible}`;
   const suffixe = entrant ? " entrer" : cible ? " N" + cible : "";
   return `<button data-act="${act}"${on ? ` data-on="${act}"` : ""}`
     + ` title="${titre}">${signe}${suffixe}</button>`;
+}
+
+// « Fais-le entrer ET monte-le. » Deux gestes, donc un bouton à part.
+//
+// Il ne s'affiche que pour un lieu HORS de sa collection nationale, et c'est
+// ce qui rend l'accident impossible plutôt qu'improbable : là où une entrée
+// est à payer, `promote2` l'offre ; partout ailleurs il ne peut rien faire de
+// plus qu'un `promote`, donc on ne le propose pas.
+function fleche2(p, d) {
+  if (p.national) return "";
+  const on = d === "promote2";
+  return `<button data-act="promote2"${on ? ' data-on="promote2"' : ""}`
+    + ` title="Le ferait entrer dans la collection nationale ET monter d'un cran">`
+    + `↑↑ entrer et monter</button>`;
 }
 
 function card(p) {
@@ -1111,6 +1127,7 @@ function card(p) {
       <button data-act="keep"${d === "keep" ? ' data-on="keep"' : ""}>Garder</button>
       <button data-act="drop"${d === "drop" ? ' data-on="drop"' : ""}>Écarter</button>
       ${fleche(p, d, "promote")}
+      ${fleche2(p, d)}
       ${fleche(p, d, "demote")}
       ${d || p.id in DECIDED
         ? `<button data-act="" data-clear="1" title="Revenir à aucune décision">✕</button>`

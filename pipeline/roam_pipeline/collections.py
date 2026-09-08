@@ -414,11 +414,20 @@ def _finalize(
         else (ordered, set())
     )
 
+    # Être ENTRÉ par sa promotion et PAYER cette entrée d'un cran sont deux
+    # choses, et les confondre laissait le curateur sans mot pour dire « fais-le
+    # entrer et monte-le ». `forces` dit qui est entré — la revue l'affiche.
+    # `paient` dit qui y perd son déplacement, et `promote2` en dispense.
+    paient = {
+        place.wikidata_id for place in ordered
+        if place.wikidata_id in forces and not place.promotion_double
+    }
+
     collection.places = [
         CollectionPlace(place_id=place.wikidata_id, tier=tier, rank=rank,
                         forced=place.wikidata_id in forces, natural_tier=naturel)
         for place, tier, rank, naturel in assign_tiers(
-            ordered, config.tiers, ordre, sans_deplacement=forces)
+            ordered, config.tiers, ordre, sans_deplacement=paient)
     ]
     return collection
 

@@ -28,7 +28,7 @@ from .models import Place, display_name
 
 LOG = logging.getLogger(__name__)
 
-DECISIONS = ("keep", "drop", "promote", "demote")
+DECISIONS = ("keep", "drop", "promote", "promote2", "demote")
 # Retirer un verdict est un geste à part : ce n'est pas une décision qu'on
 # enregistre, c'est une décision qu'on efface. Sans lui, revenir sur un `demote`
 # demandait d'éditer le fichier à la main — et un curateur qui doit ouvrir un CSV
@@ -39,7 +39,10 @@ HEADER = """# Décisions éditoriales, cumulées au fil des revues.
 #
 # keep    : validé, et conservé même si un plancher venait à monter.
 # drop    : écarté du catalogue.
-# promote : remonté dans le classement.
+# promote : remonté dans le classement. Sur un lieu hors de sa collection
+#           nationale, il l'y fait ENTRER, à son rang, et rien de plus.
+# promote2: le fait entrer ET le monte d'un cran. À n'employer que là où
+#           `promote` ne ferait qu'entrer — ailleurs il vaut `promote`.
 # demote  : descendu dans le classement.
 #
 # Ce fichier est la mémoire de la curation. Le supprimer perd tout le travail
@@ -113,8 +116,13 @@ def apply_decisions(
             counts[decision or "pending"] += 1
         if decision == "drop":
             continue
-        if decision == "promote":
+        if decision in ("promote", "promote2"):
             place.tier_shift = -1
+            # `promote2` ne change pas le DÉPLACEMENT — toujours un cran, comme
+            # tout verdict — il change qui le paie. Un lieu forcé dans sa
+            # collection voit normalement son cran consommé par l'entrée ; ici
+            # l'entrée est offerte, et le cran lui reste.
+            place.promotion_double = decision == "promote2"
         elif decision == "demote":
             place.tier_shift = 1
         elif decision == "keep":
@@ -129,7 +137,7 @@ def apply_decisions(
         # ajouter les déplacements ferait entrer onze lieux sous le plancher de
         # notoriété, et le plafond du thème rendrait leurs places en écartant
         # trois musées explicitement gardés.
-        if decision in ("keep", "promote", "demote"):
+        if decision in ("keep", "promote", "promote2", "demote"):
             place.kept_in_review = True
         elif strict:
             # En mode strict, seul ce qui a été explicitement relu est conservé.

@@ -90,6 +90,19 @@ class Place:
     # deux et 15 disparaissaient purement et simplement du catalogue — alors
     # qu'écarter un lieu, c'est `drop`, et que ce sont deux gestes distincts.
     tier_shift: int = 0
+    # La promotion vaut-elle DEUX gestes ?
+    #
+    # Un `promote` sur un lieu hors collection nationale le fait ENTRER, et
+    # rien de plus : « la promotion paie l'entrée, pas le rang ». C'est la
+    # règle, et elle protège d'un vrai accident — le pont du Port-à-l'Anglais,
+    # quarante et unième des quarante-deux ponts, arrivait au niveau 1.
+    #
+    # Mais elle laissait le curateur sans mot pour dire « fais-le entrer ET
+    # monte-le », qui est une intention légitime et simplement DIFFÉRENTE. Le
+    # verdict `promote2` la porte, et lui seul : sur un lieu déjà dans sa
+    # collection, il ne peut rien faire de plus qu'un `promote`, puisque
+    # aucune entrée n'est à payer. L'accident reste donc hors d'atteinte.
+    promotion_double: bool = False
     # Conservé parce que son département était vide, non parce qu'il franchit le
     # plancher de son thème. La revue doit le dire : c'est le pari le plus
     # fragile du catalogue, et le relecteur doit pouvoir le juger comme tel.
