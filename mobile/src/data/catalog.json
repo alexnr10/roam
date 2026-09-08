@@ -21705,6 +21705,26 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Monte_San_Petrone"
   },
   {
+   "id": "Q334416",
+   "slug": "abbaye-saint-pierre-de-beaulieu-sur-dordogne",
+   "name": "Abbaye Saint-Pierre de Beaulieu-sur-Dordogne",
+   "themeId": "abbayes",
+   "lat": 44.979353,
+   "lon": 1.838236,
+   "radiusM": 150,
+   "score": 71.3,
+   "departement": "Corrèze",
+   "departementCode": "19",
+   "regionCode": "75",
+   "communeCode": "19019",
+   "communeName": "Beaulieu-sur-Dordogne",
+   "summary": "L'abbaye Saint-Pierre de Beaulieu-sur-Dordogne est une abbaye bénédictine située à Beaulieu-sur-Dordogne, dans le département de la Corrèze (France)",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Abbatiale%20Saint-Pierre%20de%20Beaulieu-sur-Dordogne-2194.jpg",
+   "imageAuthor": "Raimond Spekking",
+   "imageLicence": "CC BY-SA 4.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Saint-Pierre_de_Beaulieu-sur-Dordogne"
+  },
+  {
    "id": "Q91200352",
    "slug": "cascade-du-bout-du-monde",
    "name": "Cascade du Bout du Monde",
@@ -30225,6 +30245,26 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cascades_du_Bras_d%27Annette"
   },
   {
+   "id": "Q53286344",
+   "slug": "rocher-de-l-imperatrice",
+   "name": "Rocher de l'Impératrice",
+   "themeId": "sommets",
+   "lat": 48.389083,
+   "lon": -4.375583,
+   "radiusM": 200,
+   "score": 39.9,
+   "departement": "Finistère",
+   "departementCode": "29",
+   "regionCode": "53",
+   "communeCode": "29189",
+   "communeName": "Plougastel-Daoulas",
+   "summary": "L' abri sous roche du Rocher de l'Impératrice est un site préhistorique situé sur la commune de Plougastel-Daoulas dans le département français du Finistère. L'abri correspond probablement à un abri de chasse.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/XVMad81c4ba-0a6d-11e7-acbf-8c3ff258e447-320x246.jpg",
+   "imageAuthor": "Photo Nicolas Naudinot, croquis Camille Bourdier",
+   "imageLicence": "CC BY 4.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abri_sous_roche_du_Rocher_de_l%27Imp%C3%A9ratrice"
+  },
+  {
    "id": "Q19368619",
    "slug": "puits-des-tines",
    "name": "Puits des Tines",
@@ -30303,6 +30343,26 @@
    "imageAuthor": "© Geolina",
    "imageLicence": "CC BY-SA 4.0",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cascade_de_Bras_Rouge"
+  },
+  {
+   "id": "Q3593206",
+   "slug": "ile-saint-nicolas",
+   "name": "Île Saint-Nicolas",
+   "themeId": "iles",
+   "lat": 47.7239,
+   "lon": -4.0,
+   "radiusM": 2000,
+   "score": 39.4,
+   "departement": "Finistère",
+   "departementCode": "29",
+   "regionCode": "53",
+   "communeCode": "29058",
+   "communeName": "Fouesnant",
+   "summary": "L'île Saint-Nicolas (ou Saint-Nicolas des Glénan) est l'île principale de l'archipel des Glénan au sud de Fouesnant dans le Finistère.\n\nEn 1717, le commandant Robelin écrit : « Sur l'Île Saint-Nicolas, il y avait autrefois un ermite dont il reste encore une petite maison couverte de paille avec un four, un jardin clos d'un bon mur, et un puits d'eau douce qui est très bonne.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Glenan%20islands%20st%20nicolas01.jpg",
+   "imageAuthor": "MyName ( Vberger )",
+   "imageLicence": "CC BY-SA 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/%C3%8Ele_Saint-Nicolas_(Gl%C3%A9nan)"
   },
   {
    "id": "Q16802261",
@@ -51774,11 +51834,11 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "29",
-   "placeCount": 57,
+   "placeCount": 59,
    "tierCounts": [
     10,
     27,
-    20
+    22
    ],
    "places": [
     {
@@ -51897,37 +51957,37 @@
      "rank": 23
     },
     {
-     "placeId": "Q448875",
+     "placeId": "Q3090839",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q1809044",
+     "placeId": "Q448875",
      "tier": 2,
      "rank": 25
     },
     {
-     "placeId": "Q1424577",
+     "placeId": "Q1809044",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q1639005",
+     "placeId": "Q1424577",
      "tier": 2,
      "rank": 27
     },
     {
-     "placeId": "Q3393734",
+     "placeId": "Q1639005",
      "tier": 2,
      "rank": 28
     },
     {
-     "placeId": "Q238377",
+     "placeId": "Q3393734",
      "tier": 2,
      "rank": 29
     },
     {
-     "placeId": "Q3090839",
+     "placeId": "Q238377",
      "tier": 2,
      "rank": 30
     },
@@ -51937,22 +51997,22 @@
      "rank": 31
     },
     {
-     "placeId": "Q246304",
+     "placeId": "Q460386",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q406723",
+     "placeId": "Q246304",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q2100819",
+     "placeId": "Q406723",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q971002",
+     "placeId": "Q2100819",
      "tier": 2,
      "rank": 35
     },
@@ -51967,82 +52027,82 @@
      "rank": 37
     },
     {
-     "placeId": "Q1093147",
+     "placeId": "Q971002",
      "tier": 3,
      "rank": 38
     },
     {
-     "placeId": "Q3393725",
+     "placeId": "Q2428252",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q2085041",
+     "placeId": "Q1093147",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q3393717",
+     "placeId": "Q3393725",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q1364525",
+     "placeId": "Q2085041",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q3402445",
+     "placeId": "Q3393717",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q3378338",
+     "placeId": "Q1364525",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q26257939",
+     "placeId": "Q3402445",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q274846",
+     "placeId": "Q3378338",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q739028",
+     "placeId": "Q26257939",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q2969479",
+     "placeId": "Q274846",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q2633713",
+     "placeId": "Q739028",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q3330220",
+     "placeId": "Q2969479",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q2428252",
+     "placeId": "Q2633713",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q6464149",
+     "placeId": "Q3330220",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q460386",
+     "placeId": "Q6464149",
      "tier": 3,
      "rank": 53
     },
@@ -52065,6 +52125,16 @@
      "placeId": "Q24937863",
      "tier": 3,
      "rank": 57
+    },
+    {
+     "placeId": "Q53286344",
+     "tier": 3,
+     "rank": 58
+    },
+    {
+     "placeId": "Q3593206",
+     "tier": 3,
+     "rank": 59
     }
    ]
   },
@@ -52163,10 +52233,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "19",
-   "placeCount": 12,
+   "placeCount": 13,
    "tierCounts": [
     10,
-    2,
+    3,
     0
    ],
    "places": [
@@ -52206,29 +52276,34 @@
      "rank": 7
     },
     {
-     "placeId": "Q453324",
+     "placeId": "Q2820351",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q181804",
+     "placeId": "Q453324",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q196690",
+     "placeId": "Q181804",
      "tier": 1,
      "rank": 10
     },
     {
-     "placeId": "Q191784",
+     "placeId": "Q196690",
      "tier": 2,
      "rank": 11
     },
     {
-     "placeId": "Q2820351",
+     "placeId": "Q191784",
      "tier": 2,
      "rank": 12
+    },
+    {
+     "placeId": "Q334416",
+     "tier": 2,
+     "rank": 13
     }
    ]
   },
@@ -63537,12 +63612,12 @@
      "rank": 41
     },
     {
-     "placeId": "Q656738",
+     "placeId": "Q333850",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q333850",
+     "placeId": "Q656738",
      "tier": 3,
      "rank": 43
     },
@@ -63602,12 +63677,12 @@
      "rank": 54
     },
     {
-     "placeId": "Q273562",
+     "placeId": "Q1137944",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q1137944",
+     "placeId": "Q273562",
      "tier": 3,
      "rank": 56
     },
@@ -63667,17 +63742,17 @@
      "rank": 67
     },
     {
-     "placeId": "Q382272",
+     "placeId": "Q2820351",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q1736171",
+     "placeId": "Q382272",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q2820351",
+     "placeId": "Q1736171",
      "tier": 3,
      "rank": 70
     },
@@ -64688,17 +64763,17 @@
      "rank": 21
     },
     {
-     "placeId": "Q420376",
+     "placeId": "Q228472",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q128259",
+     "placeId": "Q420376",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q228472",
+     "placeId": "Q128259",
      "tier": 2,
      "rank": 24
     },
@@ -64733,22 +64808,22 @@
      "rank": 30
     },
     {
-     "placeId": "Q3162656",
+     "placeId": "Q13837005",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q3287393",
+     "placeId": "Q3162656",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q2933238",
+     "placeId": "Q3287393",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q13837005",
+     "placeId": "Q2933238",
      "tier": 2,
      "rank": 34
     },
@@ -64823,22 +64898,22 @@
      "rank": 48
     },
     {
-     "placeId": "Q2499032",
+     "placeId": "Q3010567",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q1809044",
+     "placeId": "Q2499032",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q201311",
+     "placeId": "Q1809044",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q3010567",
+     "placeId": "Q201311",
      "tier": 3,
      "rank": 52
     },
@@ -64878,42 +64953,42 @@
      "rank": 59
     },
     {
-     "placeId": "Q3483905",
+     "placeId": "Q3090839",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q3162322",
+     "placeId": "Q3483905",
      "tier": 3,
      "rank": 61
     },
     {
-     "placeId": "Q2821559",
+     "placeId": "Q3162322",
      "tier": 3,
      "rank": 62
     },
     {
-     "placeId": "Q1419562",
+     "placeId": "Q2821559",
      "tier": 3,
      "rank": 63
     },
     {
-     "placeId": "Q3393734",
+     "placeId": "Q1419562",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q406723",
+     "placeId": "Q3393734",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q234704",
+     "placeId": "Q406723",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q3090839",
+     "placeId": "Q234704",
      "tier": 3,
      "rank": 67
     },
@@ -64938,47 +65013,47 @@
      "rank": 71
     },
     {
-     "placeId": "Q1364573",
+     "placeId": "Q21027228",
      "tier": 3,
      "rank": 72
     },
     {
-     "placeId": "Q6464149",
+     "placeId": "Q1364573",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q3393632",
+     "placeId": "Q6464149",
      "tier": 3,
      "rank": 74
     },
     {
-     "placeId": "Q3078867",
+     "placeId": "Q460386",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q2100819",
+     "placeId": "Q3393632",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q55905",
+     "placeId": "Q3078867",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q21027228",
+     "placeId": "Q2100819",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q971002",
+     "placeId": "Q55905",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q2820400",
+     "placeId": "Q971002",
      "tier": 3,
      "rank": 80
     }
@@ -67602,12 +67677,12 @@
      "rank": 49
     },
     {
-     "placeId": "Q835966",
+     "placeId": "Q217452",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q217452",
+     "placeId": "Q835966",
      "tier": 3,
      "rank": 51
     },
@@ -67637,12 +67712,12 @@
      "rank": 56
     },
     {
-     "placeId": "Q3124818",
+     "placeId": "Q815838",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q815838",
+     "placeId": "Q3124818",
      "tier": 3,
      "rank": 58
     },
@@ -70598,10 +70673,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "53",
-   "placeCount": 10,
+   "placeCount": 11,
    "tierCounts": [
     10,
-    0,
+    1,
     0
    ],
    "places": [
@@ -70654,6 +70729,11 @@
      "placeId": "Q3028305",
      "tier": 1,
      "rank": 10
+    },
+    {
+     "placeId": "Q3593206",
+     "tier": 2,
+     "rank": 11
     }
    ]
   },
@@ -70746,68 +70826,6 @@
      "placeId": "Q3531156",
      "tier": 2,
      "rank": 15
-    }
-   ]
-  },
-  {
-   "slug": "iles-region-93",
-   "name": "Îles de Provence-Alpes-Côte d'Azur",
-   "kind": "geo",
-   "themeId": "iles",
-   "labelId": null,
-   "geoLevel": "region",
-   "geoCode": "93",
-   "placeCount": 9,
-   "tierCounts": [
-    9,
-    0,
-    0
-   ],
-   "places": [
-    {
-     "placeId": "Q292516",
-     "tier": 1,
-     "rank": 1
-    },
-    {
-     "placeId": "Q975080",
-     "tier": 1,
-     "rank": 2
-    },
-    {
-     "placeId": "Q292564",
-     "tier": 1,
-     "rank": 3
-    },
-    {
-     "placeId": "Q1369366",
-     "tier": 1,
-     "rank": 4
-    },
-    {
-     "placeId": "Q1658544",
-     "tier": 1,
-     "rank": 5
-    },
-    {
-     "placeId": "Q3593460",
-     "tier": 1,
-     "rank": 6
-    },
-    {
-     "placeId": "Q292148",
-     "tier": 1,
-     "rank": 7
-    },
-    {
-     "placeId": "Q3420134",
-     "tier": 1,
-     "rank": 8
-    },
-    {
-     "placeId": "Q292106",
-     "tier": 1,
-     "rank": 9
     }
    ]
   },
@@ -75861,6 +75879,11 @@
    {
     "code": "29046",
     "name": "Douarnenez",
+    "parentCode": "29"
+   },
+   {
+    "code": "29058",
+    "name": "Fouesnant",
     "parentCode": "29"
    },
    {
