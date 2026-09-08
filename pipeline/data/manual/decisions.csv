@@ -2,7 +2,10 @@
 #
 # keep    : validé, et conservé même si un plancher venait à monter.
 # drop    : écarté du catalogue.
-# promote : remonté dans le classement.
+# promote : remonté dans le classement. Sur un lieu hors de sa collection
+#           nationale, il l'y fait ENTRER, à son rang, et rien de plus.
+# promote2: le fait entrer ET le monte d'un cran. À n'employer que là où
+#           `promote` ne ferait qu'entrer — ailleurs il vaut `promote`.
 # demote  : descendu dans le classement.
 #
 # Ce fichier est la mémoire de la curation. Le supprimer perd tout le travail
@@ -783,6 +786,7 @@ Q190063,keep,Île de la Cité,
 Q190171,keep,Mosset,
 Q19017521,drop,Abbaye Notre-Dame de l'Épeau,
 Q1902319,drop,Île de la Jatte,
+Q1902867,keep,Couvent Sainte-Marie de La Tourette,visite guidée et hébergement ; le access=private d'OSM vise les parties conventuelles
 Q1905802,drop,Fort Saint-Jean,
 Q1906882,keep,Palais du Pharo,
 Q190695,drop,Massif central,
