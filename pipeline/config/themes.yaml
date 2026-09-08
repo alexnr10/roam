@@ -407,6 +407,33 @@ themes:
     #
     # Écartés : Q99026497, qui est la charpente supportant les cloches et non
     # l'édifice, et Q750675, qui est le bien UNESCO lui-même et non une classe.
+    #
+    # ⚠️ TROU CONSTATÉ, ÉPINGLÉ : les ŒUVRES, par opposition aux édifices.
+    # Relevé sur l'Axe Majeur de Cergy-Pontoise, absent du catalogue et même de
+    # la collecte brute — jamais scoré, jamais soumis à la revue. `probe` le
+    # dit :
+    #
+    #     Axe majeur (Q15063077) · œuvre monumentale conçue par Dani Karavan
+    #     classes déclarées : œuvre d'art (Q838948)
+    #     thème(s) qui la reconnaissent : AUCUN · déjà collectée : NON
+    #
+    # Les vingt-six lignes `wikidata_classes` du fichier décrivent toutes des
+    # BÂTIMENTS — arc de triomphe, obélisque, palais, tour, beffroi, opéra — ou
+    # des objets naturels. Une œuvre monumentale n'est ni l'un ni l'autre, donc
+    # aucun filet ne passe dessous. Ce n'est pas propre à Cergy : le Cyclop de
+    # Tinguely et les colonnes de Buren manquent pour la même raison.
+    #
+    # « Œuvre d'art » (Q838948) N'EST PAS ajoutée ici, et la règle du README
+    # tranche seule : une classe qui nomme une sorte de monument ramène toute la
+    # France avec elle et se borne d'elle-même ; « œuvre d'art » ne nomme pas un
+    # monument mais un statut, et ramènerait chaque statue de chaque place. Elle
+    # ne se borne pas — le plancher à six langues n'y suffirait pas, et l'Axe
+    # Majeur lui-même n'en a que trois.
+    #
+    # D'où l'épinglage, une ligne à la fois, dans data/manual/places.csv. Si les
+    # œuvres manquantes devenaient nombreuses, ce serait à `gaps --class Q838948`
+    # de dire s'il existe une classe plus étroite — « land art », « sculpture
+    # monumentale » — avant d'en déclarer une.
 
   - id: grottes
     name: Grottes et gouffres
