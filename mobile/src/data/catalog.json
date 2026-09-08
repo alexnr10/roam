@@ -23105,6 +23105,26 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Parc_botanique_de_Haute-Bretagne"
   },
   {
+   "id": "Q1648147",
+   "slug": "mourre-negre",
+   "name": "Mourre Nègre",
+   "themeId": "sommets",
+   "lat": 43.815415,
+   "lon": 5.467228,
+   "radiusM": 1000,
+   "score": 68.4,
+   "departement": "Vaucluse",
+   "departementCode": "84",
+   "regionCode": "93",
+   "communeCode": "84033",
+   "communeName": "Castellet-en-Luberon",
+   "summary": "Le Mourre Nègre est le point culminant du massif du Luberon et s'élève à 1 125 mètres d'altitude. Ce sommet est arrondi et coiffé d'une antenne hertzienne, ce qui permet de le voir d'assez loin.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mourre%20n%C3%A8gre..jpg",
+   "imageAuthor": "Marchall",
+   "imageLicence": "CC BY-SA 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mourre_N%C3%A8gre"
+  },
+  {
    "id": "Q2940868",
    "slug": "cascade-du-rouget",
    "name": "Cascade du Rouget",
@@ -23143,26 +23163,6 @@
    "imageAuthor": "Didier Descouens",
    "imageLicence": "CC BY-SA 4.0",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Jardin_des_Martels"
-  },
-  {
-   "id": "Q1648147",
-   "slug": "mourre-negre",
-   "name": "Mourre Nègre",
-   "themeId": "sommets",
-   "lat": 43.815415,
-   "lon": 5.467228,
-   "radiusM": 1000,
-   "score": 68.3,
-   "departement": "Vaucluse",
-   "departementCode": "84",
-   "regionCode": "93",
-   "communeCode": "84033",
-   "communeName": "Castellet-en-Luberon",
-   "summary": "Le Mourre Nègre est le point culminant du massif du Luberon et s'élève à 1 125 mètres d'altitude. Ce sommet est arrondi et coiffé d'une antenne hertzienne, ce qui permet de le voir d'assez loin.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mourre%20n%C3%A8gre..jpg",
-   "imageAuthor": "Marchall",
-   "imageLicence": "CC BY-SA 3.0",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mourre_N%C3%A8gre"
   },
   {
    "id": "Q1799627",
