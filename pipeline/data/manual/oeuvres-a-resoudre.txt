@@ -80,24 +80,51 @@
 # que ce risque ne se réalise pas toujours.
 #
 #
-# ── 2. Architecture du XXe siècle — trou par les THÈMES, pas par la classe ─
+# ── 2. Architecture du XXe siècle ─────────────────────────────────────────
 #
 # Le catalogue tient déjà les villas (Savoye, Cavrois, Noailles, Majorelle) :
 # la classe « villa » fonctionne. Ce qui manque est l'architecture RELIGIEUSE
-# et COLLECTIVE du siècle, qu'aucun thème ne ramasse.
+# et COLLECTIVE du siècle.
+#
+# ⚠ Deux des cinq lieux annoncés ici n'étaient PAS des trous de collecte, et
+# la première version de cette liste se trompait sur eux. Elle cherchait les
+# absents par leur NOM dans le catalogue exporté ; il faut les chercher par
+# leur Q-ID dans data/raw, qui est l'état d'avant les filtres.
+#
+# VRAIS trous — absents de toute la collecte, à épingler :
+#
+#   Chapelle Notre-Dame-du-Haut   Ronchamp (70)     UNESCO   Q638250
+#   Cité radieuse                 Marseille (13)    UNESCO   Q2587975
+#   Familistère de Guise          Guise (02)                 Q1395337
 #
 # Ronchamp est le cas à regarder en premier, parce que son absence n'est pas
 # un oubli mais la conséquence d'une décision prise ailleurs : `cathedrales`
 # ne collecte que ce qui porte un TITRE — cathédrale, basilique — et la note
 # du thème le dit, « on laisse tomber les églises ». Notre-Dame-du-Haut est
-# une chapelle inscrite au patrimoine mondial. La décision reste sans doute
-# juste dans l'ensemble ; elle a ici une victime, à épingler.
+# une chapelle inscrite au patrimoine mondial.
 #
-#   Chapelle Notre-Dame-du-Haut          Ronchamp (70)        UNESCO
-#   La Cité radieuse                     Marseille (13)       UNESCO
-#   Couvent Sainte-Marie de La Tourette  Éveux (69)           UNESCO
-#   La Grande Arche                      Puteaux (92)
-#   Le Familistère de Guise              Guise (02)
+# FAUX trous, et chacun pour une raison différente :
+#
+#   Couvent Sainte-Marie de La Tourette  Éveux (69)  Q1902867
+#       COLLECTÉ (abbayes, 15 langues), écarté par le FILTRE D'ACCÈS :
+#       OpenStreetMap le dit fermé, `visitable=False`. C'est un faux positif
+#       — le couvent se visite avec un guide et on peut y loger — et le
+#       filtre prévoit l'échappatoire : « un lieu épinglé, le curateur reste
+#       le dernier mot ». Remède : `verdict Q1902867 keep`.
+#
+#       À noter : le filtre d'accès retire 107 lieux, et aucun ne passe sous
+#       les yeux du curateur — ils sont écartés AVANT la feuille de revue.
+#
+#   Grande Arche (arche de la Défense)   Puteaux (92)  Q216357
+#       AU CATALOGUE depuis toujours, 51 langues, 143 points, dans sa
+#       collection nationale. Elle y est au niveau 3 par une DÉCISION :
+#       `Q216357,demote` dans decisions.csv. Rien à ajouter, donc — seulement
+#       un verdict à revisiter si l'avis a changé.
+#
+# Écartés au passage : Q1412364 « unité d'habitation » est le PRINCIPE
+# d'urbanisme, pas un lieu. Q2974705 (Rezé) et Q3550791 (Briey) sont les
+# autres unités d'habitation françaises, absentes elles aussi — affaire de
+# spécialistes plutôt que de guide, mais les Q-ids sont notés.
 #
 #
 # ── 3. Lieux de mémoire ───────────────────────────────────────────────────
