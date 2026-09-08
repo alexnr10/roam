@@ -68,7 +68,6 @@ Q108338902,2,cirques,Reculée de Balerne
 Q108837387,2,rochers,Aiguille Percée
 Q109038270,2,gorges,Gorges de Saint-Georges
 Q109038273,2,gorges,Gorges du Verdouble
-Q109041952,3,plages,Presqu'île de Gennevilliers
 Q109045439,3,megalithes,Monument torréen de Foce
 Q1090492,2,chateaux,Château-Gaillard
 Q1090706,3,chateaux,Fort de Joux
@@ -418,7 +417,7 @@ Q1776236,3,abbayes,Abbaye de Valloires
 Q177657,2,grottes,Grotte de Villars
 Q1777218,2,monuments,Arc antique d'Orange
 Q17783615,2,phares,Phare de Contis
-Q1779659,2,monuments,Tour de l'Horloge
+Q1779659,3,monuments,Tour de l'Horloge
 Q178065,1,musees,Centre national d'art et de culture Georges-Pompidou
 Q1780937,1,ponts,Pont Julien
 Q1782606,1,maisons,Musée national Eugène-Delacroix
@@ -499,6 +498,7 @@ Q1895555,3,chateaux,Château de Fléchères
 Q189764,1,megalithes,Pont du Gard
 Q190063,1,iles,Île de la Cité
 Q190171,3,villages,Mosset
+Q1902867,3,abbayes,Couvent Sainte-Marie de La Tourette
 Q1906882,2,monuments,Palais du Pharo
 Q190827,2,villages,Autun
 Q191094,3,villages,Castelnou
@@ -787,6 +787,7 @@ Q2483597,3,musees,Musée Fesch
 Q2485743,3,sommets,Kastelberg
 Q24874504,3,plages,Plage de Clugny
 Q24874840,2,cascades,Cascade aux écrevisses
+Q24878675,3,plages,Pointe Allègre
 Q24878700,3,plages,Plage de l'Autre Bord
 Q2490344,3,musees,Musée national Adrien-Dubouché
 Q24937863,3,plages,Pointe de Perharidy
@@ -812,6 +813,7 @@ Q25675349,2,rochers,Cumpuleddu
 Q2570609,2,lacs,Lac d'Allos
 Q2572089,3,sommets,Monte d'Oro
 Q2574917,3,lacs,Lac de Gravelle
+Q2587975,3,monuments,Cité radieuse
 Q2588025,2,maisons,Maison d'Émile Zola
 Q258818,2,lacs,Lac de Sainte-Croix
 Q258911,3,villages,Lavardin
@@ -1771,6 +1773,7 @@ Q636272,3,villages,Saint-Antoine-l'Abbaye
 Q6381,2,villages,Sarlat-la-Canéda
 Q638239,3,villages,Pradelles
 Q638247,3,villages,Lavaudieu
+Q638250,2,monuments,Chapelle Notre-Dame-du-Haut
 Q638265,3,villages,Saint-Jean-de-Côle
 Q638392,3,villages,Séguret
 Q639713,1,forets,Forêt de Sénart
