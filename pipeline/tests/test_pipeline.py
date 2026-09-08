@@ -4118,6 +4118,40 @@ class TestMissingImages(unittest.TestCase):
         self.assertIsNone(nu.image_url)
         self.assertEqual(commons.demandes, [["File:Villa Savoye en 2014.jpg"]])
 
+    def test_an_article_lead_image_that_is_a_map_is_refused(self):
+        # L'image de tête d'un article est parfois sa carte de localisation :
+        # huit fiches du catalogue affichaient la France entière en guise de
+        # photo, la Cité radieuse de Marseille comprise. Le lieu doit rester
+        # SANS image — la fiche montre alors son repli, qui dit la vérité.
+        from roam_pipeline.fetch import enrich_missing_images
+
+        nu = self._lieu("Cité radieuse", article="Cité radieuse")
+        client = self._Faux({"Cité radieuse":
+                             "France_location_map-Regions_and_departements-2016.svg"})
+        commons = self._Commons()
+        with _capture():
+            self.assertEqual(enrich_missing_images([nu], client, commons), 0)
+        self.assertIsNone(nu.image_url)
+        # Refusée AVANT Commons : inutile de payer une requête pour une carte.
+        self.assertEqual(commons.demandes, [])
+
+    def test_a_real_photograph_is_not_taken_for_a_map(self):
+        from roam_pipeline.fetch import est_une_carte
+
+        # Le motif reste étroit à dessein. « Location map » est le nom que
+        # MediaWiki donne lui-même à ces fichiers ; élargir à tout « map »
+        # écarterait la photo du musée français de la carte à jouer.
+        for carte in ("France_location_map-Regions_and_departements-2016.svg",
+                      "Finistere_department_location_map.svg",
+                      "France_relief_location_map.jpg",
+                      "Iroise_sea_map-fr.svg"):
+            self.assertTrue(est_une_carte(carte), carte)
+        for photo in ("Familistère de Guise.jpg",
+                      "Musée Carte Jouer - Issy-les-Moulineaux.jpg",
+                      "Tour Eiffel Wikimedia Commons.jpg",
+                      "Old map exhibit.jpg"):
+            self.assertFalse(est_une_carte(photo), photo)
+
     def test_a_batch_without_an_answer_concludes_nothing(self):
         # Le troisième état du contrat de `credits`, et le seul qui ne soit pas
         # un verdict : un titre ABSENT du résultat dit que le lot a échoué, pas

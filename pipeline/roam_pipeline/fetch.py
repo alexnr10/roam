@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import logging
+import re
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -839,6 +840,32 @@ def credit_chosen_photos(
                 place.image_url = avant[place.wikidata_id]
 
 
+_CARTE = re.compile(r"location[ _-]map|[ _-]map-[a-z]{2}\b", re.IGNORECASE)
+
+
+def est_une_carte(nom: str) -> bool:
+    """Ce fichier est-il une CARTE plutôt qu'une photo du lieu ?
+
+    Le repli sur l'article demande à MediaWiki son « image de tête ». Pour un
+    article dont l'infobox porte une carte de localisation et rien d'autre,
+    c'est la carte qu'il rend — et huit fiches du catalogue affichaient ainsi
+    la France entière en guise de photo, la Cité radieuse comprise.
+
+    Deux règles. La première ne demande aucune liste : un SVG n'est jamais la
+    photographie d'un lieu. C'est un dessin vectoriel, donc une carte, un plan
+    ou un blason. Elle suffit à sept des huit cas.
+
+    La seconde nomme les cartes matricielles, qui existent aussi
+    (`France_relief_location_map.jpg`). Elle reste étroite à dessein : le motif
+    « location map » est le nom que MediaWiki donne lui-même à ces fichiers, et
+    élargir à tout `map` écarterait la photo d'un musée de la carte.
+
+    Refuser laisse le lieu SANS image, et c'est le bon résultat : la fiche
+    affiche alors son repli, qui dit la vérité, au lieu d'une image qui ment.
+    """
+    return nom.lower().endswith(".svg") or bool(_CARTE.search(nom))
+
+
 def enrich_missing_images(
     places: list[Place], client: WikipediaClient | None = None, commons=None
 ) -> int:
@@ -893,6 +920,20 @@ def enrich_missing_images(
 
     if not proposees:
         LOG.info("photos manquantes : aucun article n'a d'image de tête")
+        return 0
+
+    # L'image de tête d'un article est parfois sa carte de localisation.
+    cartes = [titre for titre, nom in proposees.items() if est_une_carte(nom)]
+    for titre in cartes:
+        del proposees[titre]
+    if cartes:
+        LOG.info(
+            "photos manquantes : %s image(s) d'article écartées, ce sont des "
+            "CARTES et non des photos — ces lieux restent sans image, ce qui "
+            "est la vérité",
+            len(cartes),
+        )
+    if not proposees:
         return 0
 
     # Vérification auprès de Commons, qui rapporte le crédit du même coup.

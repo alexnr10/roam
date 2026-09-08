@@ -11559,9 +11559,9 @@
    "communeCode": "69153",
    "communeName": "Poleymieux-au-Mont-d'Or",
    "summary": "Le musée Ampère est un musée de sciences et techniques consacré à l'histoire de l'électricité et ses applications et dédié à André-Marie Ampère (1775–1836). Le musée, situé à Poleymieux-au-Mont-d'Or dans la métropole de Lyon, est installé dans la maison où  André-Marie Ampère a passé une partie de son enfance et de sa jeunesse et parcourt également des aspects historiques autour de la période de la Révolution Française liés à la vie de la famille Ampère.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/France_location_map-Regions_and_departements-2016.svg",
-   "imageAuthor": "Superbenjamin",
-   "imageLicence": "CC BY-SA 4.0",
+   "imageUrl": null,
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_Amp%C3%A8re"
   },
   {
@@ -13419,9 +13419,9 @@
    "communeCode": "92012",
    "communeName": "Boulogne-Billancourt",
    "summary": "L'immeuble Molitor, aussi appelé immeuble 24 N.C., est un immeuble réalisé par Le Corbusier et Pierre Jeanneret, entre 1931 et 1934, sur la commune de Boulogne-Billancourt, à la limite de celle de Paris. Le site est inscrit, avec 16 autres œuvres architecturales de Le Corbusier, sur la liste du patrimoine mondial de l'UNESCO en 2016.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/France_location_map-Regions_and_departements-2016.svg",
-   "imageAuthor": "Superbenjamin",
-   "imageLicence": "CC BY-SA 4.0",
+   "imageUrl": null,
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Immeuble_Molitor"
   },
   {
@@ -14459,9 +14459,9 @@
    "communeCode": "13208",
    "communeName": "Marseille",
    "summary": "L'unité d'habitation de Marseille — également connue sous le nom de Cité radieuse de Marseille, Cité radieuse, Le Corbusier ou plus familièrement La Maison du fada — est une résidence édifiée entre 1947 et 1952 par l'architecte Charles-Édouard Jeanneret-Gris, plus connu sous le pseudonyme de Le Corbusier (1887-1965).\nLa Cité radieuse se trouve au 280, boulevard Michelet à Marseille dans le quartier de Sainte-Anne, dans le 8e arrondissement.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/France_location_map-Regions_and_departements-2016.svg",
-   "imageAuthor": "Superbenjamin",
-   "imageLicence": "CC BY-SA 4.0",
+   "imageUrl": null,
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cit%C3%A9_radieuse_de_Marseille"
   },
   {
@@ -19319,9 +19319,9 @@
    "communeCode": "89446",
    "communeName": "Vézelay",
    "summary": "La maison Zervos, surnommée « la Goulotte », est une maison de Vézelay rénovée et aménagée entre 1937 à 1943 par l'architecte Jean Badovici, avec la participation supposée d'Eileen Gray.\nConçue comme une maison de vacances, elle est généralement classée comme une œuvre représentative de l'architecture moderne de la première moitié du XXe siècle, dont Badovici était un ardent promoteur dans la revue L'Architecture vivante.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Yonne_location_map.svg",
-   "imageAuthor": "Flappiefh",
-   "imageLicence": "CC BY-SA 4.0",
+   "imageUrl": null,
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Maison_Zervos"
   },
   {
@@ -20363,26 +20363,6 @@
    "imageAuthor": null,
    "imageLicence": "CC BY-SA 2.0 fr",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Puy_Pariou"
-  },
-  {
-   "id": "Q2592438",
-   "slug": "gouffre-jean-bernard",
-   "name": "Gouffre Jean-Bernard",
-   "themeId": "grottes",
-   "lat": 46.104722,
-   "lon": 6.794444,
-   "radiusM": 200,
-   "score": 75.0,
-   "departement": "Haute-Savoie",
-   "departementCode": "74",
-   "regionCode": "84",
-   "communeCode": "74258",
-   "communeName": "Samoëns",
-   "summary": "Le gouffre Jean-Bernard est une cavité souterraine naturelle, possédant plusieurs entrées (15), toutes situées sur la commune française de Samoëns en Haute-Savoie (région Auvergne-Rhône-Alpes), dans le massif du Haut-Giffre.\nMi-août 2024, c’est la 7e plus profonde cavité naturelle au monde et la 174e plus longue.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/France_relief_location_map.jpg",
-   "imageAuthor": "Eric Gaba ( Sting - fr:Sting )",
-   "imageLicence": "CC BY-SA 4.0",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Gouffre_Jean-Bernard"
   },
   {
    "id": "Q3215504",
@@ -23525,6 +23505,26 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Maison_natale_de_Condorcet"
   },
   {
+   "id": "Q2592438",
+   "slug": "gouffre-jean-bernard",
+   "name": "Gouffre Jean-Bernard",
+   "themeId": "grottes",
+   "lat": 46.104722,
+   "lon": 6.794444,
+   "radiusM": 200,
+   "score": 67.0,
+   "departement": "Haute-Savoie",
+   "departementCode": "74",
+   "regionCode": "84",
+   "communeCode": "74258",
+   "communeName": "Samoëns",
+   "summary": "Le gouffre Jean-Bernard est une cavité souterraine naturelle, possédant plusieurs entrées (15), toutes situées sur la commune française de Samoëns en Haute-Savoie (région Auvergne-Rhône-Alpes), dans le massif du Haut-Giffre.\nMi-août 2024, c’est la 7e plus profonde cavité naturelle au monde et la 174e plus longue.",
+   "imageUrl": null,
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Gouffre_Jean-Bernard"
+  },
+  {
    "id": "Q2994484",
    "slug": "conservatoire-botanique-national-de-bailleul",
    "name": "Conservatoire botanique national de Bailleul",
@@ -24423,26 +24423,6 @@
    "imageAuthor": "Lorraine.Agostini",
    "imageLicence": "CC BY-SA 3.0",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pont-%C3%A9cluse_Saint-Amand"
-  },
-  {
-   "id": "Q3330714",
-   "slug": "musee-national-clemenceau-de-lattre",
-   "name": "Musée national Clemenceau-de-Lattre",
-   "themeId": "maisons",
-   "lat": 46.6751,
-   "lon": -0.849521,
-   "radiusM": 150,
-   "score": 64.6,
-   "departement": "Vendée",
-   "departementCode": "85",
-   "regionCode": "52",
-   "communeCode": "85154",
-   "communeName": "Mouilleron-Saint-Germain",
-   "summary": "Le musée national Clemenceau-de-Lattre, anciennement connu sous le nom de musée national des Deux Victoires, est un musée national situé à Mouilleron-en-Pareds dans le département de la Vendée et la région Pays de la Loire.\nIl est consacré aux vies de l'homme politique Georges Clemenceau et du militaire Jean de Lattre de Tassigny, les deux hommes étant tous deux natifs de Mouilleron-en-Pareds.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/France_location_map-Regions_and_departements-2016.svg",
-   "imageAuthor": "Superbenjamin",
-   "imageLicence": "CC BY-SA 4.0",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_national_Clemenceau-de-Lattre"
   },
   {
    "id": "Q15953040",
@@ -27283,6 +27263,26 @@
    "imageAuthor": "SiefkinDR",
    "imageLicence": "CC BY-SA 3.0",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Parc_du_Mugel"
+  },
+  {
+   "id": "Q3330714",
+   "slug": "musee-national-clemenceau-de-lattre",
+   "name": "Musée national Clemenceau-de-Lattre",
+   "themeId": "maisons",
+   "lat": 46.6751,
+   "lon": -0.849521,
+   "radiusM": 150,
+   "score": 56.6,
+   "departement": "Vendée",
+   "departementCode": "85",
+   "regionCode": "52",
+   "communeCode": "85154",
+   "communeName": "Mouilleron-Saint-Germain",
+   "summary": "Le musée national Clemenceau-de-Lattre, anciennement connu sous le nom de musée national des Deux Victoires, est un musée national situé à Mouilleron-en-Pareds dans le département de la Vendée et la région Pays de la Loire.\nIl est consacré aux vies de l'homme politique Georges Clemenceau et du militaire Jean de Lattre de Tassigny, les deux hommes étant tous deux natifs de Mouilleron-en-Pareds.",
+   "imageUrl": null,
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_national_Clemenceau-de-Lattre"
   },
   {
    "id": "Q22951316",
@@ -37379,9 +37379,9 @@
    "communeCode": "29217",
    "communeName": "Pont-Aven",
    "summary": "Le musée de Pont-Aven est un musée français situé à Pont-Aven, dans le département du Finistère, en Bretagne.\nCréé en 1985, rénové entre 2013 et 2016, le musée de Pont-Aven a pour objectifs de faire connaître l’œuvre des artistes inspirés par la Bretagne et plus particulièrement par Pont-Aven, depuis les années 1860, de développer un travail scientifique concernant cette période chronologique et de s’ouvrir à la création contemporaine.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Finistere_department_location_map.svg",
-   "imageAuthor": "Eric Gaba ( Sting - fr:Sting )",
-   "imageLicence": "CC BY-SA 3.0",
+   "imageUrl": null,
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_de_Pont-Aven"
   },
   {
@@ -39219,9 +39219,9 @@
    "communeCode": "29042",
    "communeName": "Crozon",
    "summary": "La presqu'île de Crozon est située dans le département du Finistère (région Bretagne) en face de Brest. Elle est englobée en totalité dans le parc naturel régional d'Armorique et les espaces maritimes qui l'entourent sont en partie englobés dans le parc naturel marin d'Iroise, créé en 2007.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Iroise_sea_map-fr.svg",
-   "imageAuthor": "Pinpin",
-   "imageLicence": "CC BY-SA 3.0",
+   "imageUrl": null,
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Presqu%27%C3%AEle_de_Crozon"
   },
   {
@@ -49316,32 +49316,32 @@
      "rank": 134
     },
     {
-     "placeId": "Q3330714",
+     "placeId": "Q20971734",
      "tier": 3,
      "rank": 135
     },
     {
-     "placeId": "Q20971734",
+     "placeId": "Q15627675",
      "tier": 3,
      "rank": 136
     },
     {
-     "placeId": "Q15627675",
+     "placeId": "Q2945212",
      "tier": 3,
      "rank": 137
     },
     {
-     "placeId": "Q2945212",
+     "placeId": "Q16303828",
      "tier": 3,
      "rank": 138
     },
     {
-     "placeId": "Q16303828",
+     "placeId": "Q30524595",
      "tier": 3,
      "rank": 139
     },
     {
-     "placeId": "Q30524595",
+     "placeId": "Q3330714",
      "tier": 3,
      "rank": 140
     },
@@ -55419,12 +55419,12 @@
      "rank": 8
     },
     {
-     "placeId": "Q2592438",
+     "placeId": "Q16536395",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q16536395",
+     "placeId": "Q1619525",
      "tier": 1,
      "rank": 10
     },
@@ -55439,7 +55439,7 @@
      "rank": 12
     },
     {
-     "placeId": "Q1619525",
+     "placeId": "Q2592438",
      "tier": 2,
      "rank": 13
     },
