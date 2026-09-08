@@ -35,11 +35,25 @@
 # Vallée des Saints porte bien des coordonnées et la commune de Carnoët,
 # malgré une description qui n'annonçait qu'un « projet associatif ».
 #
-# Les trois vont dans `monuments` et non dans `musees`, y compris les
-# Machines dont la classe est pourtant muséale : `monuments` est le
-# fourre-tout par conception, quand `musees` est le thème le plus embouteillé
-# du catalogue — deux cent soixante-quatorze candidats pour cinquante places,
-# où chaque entrée en éjecte une autre en silence.
+# Les Deux Plateaux et la Vallée des Saints vont dans `monuments`, le
+# fourre-tout. Les Machines de l'île vont dans `musees`, et le premier
+# raisonnement qui les mettait ailleurs était faux deux fois.
+#
+# Il disait que `musees` est le thème le plus embouteillé du catalogue et
+# qu'une entrée y éjecte une autre. C'est vrai des lieux collectés, pas des
+# lieux ÉPINGLÉS : collections.py réserve les lieux de places.csv avant
+# d'appliquer le plafond — « le plafond n'a pas à défaire ce geste ». Un
+# épinglage ne coûte donc sa place à personne.
+#
+# Il ignorait surtout l'effet sur la note. Une étoile se lit dans la
+# collection nationale du THÈME, et les deux barres n'ont rien à voir :
+# « Monuments » ne descend qu'à 82,2 quand « Musées » descend à 62,1. Les
+# Machines marquent 77,3 — sous `monuments` elles restaient hors collection,
+# donc une étoile par défaut ; sous `musees` elles entrent. Le mauvais thème
+# ne les rangeait pas seulement de travers, il les sous-notait.
+#
+# Et c'est le thème juste : on y entre avec un billet pour voir une
+# collection, ce qui est une visite de musée et pas un édifice remarquable.
 #
 # « Les Deux Plateaux » est le titre officiel ; la fiche s'appellera
 # « Colonnes de Buren » (names.csv). La recherche de l'app ne couvre que le
