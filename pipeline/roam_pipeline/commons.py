@@ -48,6 +48,30 @@ def file_title(image_url: str | None) -> str | None:
     return f"File:{nom}" if nom else None
 
 
+def _replier(net: str) -> str:
+    """« Unknown author Unknown author » → « Unknown author ».
+
+    Plusieurs modèles de Commons rendent leur libellé DEUX fois : une fois
+    pour l'œil, une fois dans un bloc masqué destiné aux machines. Les balises
+    retirées, les deux se retrouvent côte à côte, et quatre fiches du catalogue
+    citaient un auteur bègue.
+
+    Le repli n'a lieu que si la chaîne est EXACTEMENT elle-même deux fois, et
+    seulement si le motif répété contient une espace. Sans cette seconde
+    condition, un auteur qui s'appelle vraiment « Jean Jean » perdrait la
+    moitié de son nom — la règle doit réparer un artefact de balisage, pas
+    corriger les gens.
+    """
+    while True:
+        moitie, reste = divmod(len(net) - 1, 2)
+        if reste or moitie <= 0:
+            return net
+        gauche, milieu, droite = net[:moitie], net[moitie], net[moitie + 1:]
+        if milieu != " " or gauche != droite or " " not in gauche:
+            return net
+        net = gauche
+
+
 def texte(valeur: str | None) -> str | None:
     """Le texte d'un champ `extmetadata`, débarrassé de son HTML.
 
@@ -55,11 +79,14 @@ def texte(valeur: str | None) -> str | None:
     entière avec un logo. Une fiche n'affiche pas du HTML : on garde les mots,
     tous les mots. Un crédit se cite entier ou ne se cite pas ; c'est
     l'affichage qui décide de le tronquer à l'œil, pas la collecte.
+
+    Seule exception, et elle n'enlève aucun mot : la répétition intégrale que
+    produisent les modèles à doublon masqué — voir `_replier`.
     """
     if not valeur:
         return None
     net = _ESPACES.sub(" ", html.unescape(_BALISES.sub(" ", valeur))).strip()
-    return net or None
+    return _replier(net) or None
 
 
 class CommonsClient:

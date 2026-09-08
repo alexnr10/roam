@@ -3678,6 +3678,35 @@ class TestImageCredits(unittest.TestCase):
         self.assertIsNone(texte("<span> </span>"))
         self.assertIsNone(texte(None))
 
+    def test_a_doubled_credit_is_folded_back(self):
+        from roam_pipeline.commons import texte
+
+        # Plusieurs modèles de Commons rendent leur libellé deux fois : une
+        # fois pour l'œil, une fois dans un bloc masqué pour les machines. Les
+        # balises retirées, les deux se collent, et quatre fiches du catalogue
+        # citaient « Unknown author Unknown author ».
+        self.assertEqual(
+            texte('<span class="fn">Unknown author</span>'
+                  '<span style="display:none">Unknown author</span>'),
+            "Unknown author",
+        )
+        self.assertEqual(texte("Unknown author Unknown author"), "Unknown author")
+        self.assertEqual(texte("A B A B"), "A B")
+
+    def test_a_name_that_repeats_itself_is_left_alone(self):
+        from roam_pipeline.commons import texte
+
+        # Le garde-fou : le repli ne vaut que si le motif répété contient une
+        # espace. Sans lui, un auteur qui s'appelle vraiment « Jean Jean »
+        # perdrait la moitié de son nom — on répare un artefact de balisage,
+        # on ne corrige pas les gens.
+        self.assertEqual(texte("Jean Jean"), "Jean Jean")
+        self.assertEqual(texte("Benh LIEU SONG"), "Benh LIEU SONG")
+        self.assertEqual(texte("ros k @ getfunky_paris"), "ros k @ getfunky_paris")
+        # Une répétition qui n'est pas EXACTE ne se replie pas non plus.
+        self.assertEqual(texte("Unknown author Unknown artist"),
+                         "Unknown author Unknown artist")
+
     def test_a_place_already_credited_is_not_asked_again(self):
         from roam_pipeline.fetch import enrich_image_credits
 
