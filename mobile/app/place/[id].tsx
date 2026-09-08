@@ -12,14 +12,10 @@ import {
   useWindowDimensions,
 } from 'react-native';
 
-import {
-  getCollectionsForPlace,
-  getPlace,
-  getTierForPlace,
-  themeLabel,
-} from '../../src/data/catalog';
+import { getCollectionsForPlace, getPlace, themeLabel } from '../../src/data/catalog';
 import { evaluateCheckIn } from '../../src/lib/checkin';
 import { etoilesDe } from '../../src/lib/etoiles';
+import { palierMinuscule, rangSur } from '../../src/lib/paliers';
 import { formatDistance } from '../../src/lib/geo';
 import { setSimulatedPosition } from '../../src/lib/simulation';
 import { computeProgress } from '../../src/lib/progress';
@@ -34,7 +30,6 @@ import {
   Photo,
   Pill,
   ProgressBar,
-  TierDot,
 } from '../../src/ui/components';
 import { Etoiles } from '../../src/ui/Etoiles';
 
@@ -202,7 +197,7 @@ export default function PlaceScreen() {
       </Text>
 
       {memberships.map((collection) => {
-        const tier = getTierForPlace(collection, place.id);
+        const rang = collection.places.find((membre) => membre.placeId === place.id);
         const progress = computeProgress(collection, visits);
         return (
           <Pressable
@@ -210,26 +205,29 @@ export default function PlaceScreen() {
             style={styles.collectionRow}
             onPress={() => router.push(`/collection/${collection.slug}`)}
           >
-            <View style={styles.rowBetween}>
-              <View style={styles.tierLabel}>
-                {tier ? <TierDot tier={tier} /> : null}
-                <Text style={type.body} numberOfLines={1}>
-                  {collection.name}
-                </Text>
-              </View>
-              {/* Le niveau en cours, compté en lieux — la même langue que
-                  l'onglet Collections. Un pourcentage sur l'ensemble ici et un
-                  décompte là-bas décrivaient le même état sans se ressembler. */}
-              <Text style={type.small}>
-                N{progress.stage.tier} {progress.stage.visited}/{progress.stage.total}
-              </Text>
-            </View>
+            <Text style={type.body} numberOfLines={1}>
+              {collection.name}
+            </Text>
             <ProgressBar
               pct={progress.stage.pct}
               color={colors.tier[progress.stage.tier - 1]}
               height={6}
             />
-            {tier ? <Text style={type.small}>Niveau {tier} dans cette collection</Text> : null}
+            {/* Une seule phrase, parce que ce sont deux choses différentes et
+                qu'elles se confondaient : à gauche TA progression dans le
+                palier en cours, à droite la place DU LIEU dans la liste.
+                Affichées l'une sous l'autre, « les incontournables » semblait
+                qualifier le lieu — et disait le contraire de son rang.
+                Le palier est nommé, pas numéroté : un second barème chiffré à
+                côté des étoiles ferait deux échelles pour une seule idée. Et un
+                rang n'a aucun barème à apprendre. */}
+            <Text style={type.small}>
+              {progress.stage.visited}/{progress.stage.total}{' '}
+              {palierMinuscule(progress.stage.tier).replace(/^la |^les /, (mot) =>
+                mot === 'les ' ? 'des ' : 'de ',
+              )}
+              {rang ? ` · ce lieu est ${rangSur(rang.rank, collection.placeCount)}` : ''}
+            </Text>
           </Pressable>
         );
       })}
@@ -247,7 +245,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: spacing.md,
   },
-  tierLabel: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flex: 1 },
   collectionRow: {
     backgroundColor: colors.surface,
     borderWidth: 1,

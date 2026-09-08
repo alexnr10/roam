@@ -3,6 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } fr
 
 import { areas, places, themeLabel, themes } from '../../src/data/catalog';
 import { conquestByZone, shadeOf } from '../../src/lib/conquest';
+import { palierMinuscule } from '../../src/lib/paliers';
 import type { ZoneConquest, ZoneShade } from '../../src/lib/conquest';
 import { useVisits } from '../../src/store/visits';
 import { colors, conquest, conquestInk, conquestTrait, radius, spacing, type } from '../../src/theme';
@@ -10,7 +11,7 @@ import { ConquestMap, conquestOutlinesExist } from '../../src/ui/ConquestMap';
 import { BackBar, ChipRow, EmptyState, Pill, ProgressBar } from '../../src/ui/components';
 import { SegmentedControl } from '../../src/ui/components';
 import { ThemeIcon } from '../../src/ui/themeIcons';
-import type { AreaLevel } from '../../src/types';
+import type { AreaLevel, Tier } from '../../src/types';
 
 /**
  * L'écran de conquête : la carte coloriée, et ce qu'il reste à faire dessous.
@@ -260,7 +261,7 @@ function ZoneCard({
         {zone.allComplete && zone.playable ? (
           <Pill label="Territoire conquis" tone="primary" />
         ) : zone.overall.tier > 0 && zone.playable ? (
-          <Text style={type.small}>Niveau {zone.overall.tier}</Text>
+          <Text style={type.small}>{palierMinuscule(zone.overall.tier as Tier)} — fait</Text>
         ) : null}
       </View>
 

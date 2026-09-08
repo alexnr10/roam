@@ -4,17 +4,21 @@ import React, { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { getCollection, getPlace, themeLabel } from '../../src/data/catalog';
+import { PALIERS } from '../../src/lib/paliers';
 import { computeProgress, nextMilestone } from '../../src/lib/progress';
 import { useVisits } from '../../src/store/visits';
 import { LARGEUR_MAX, colors, radius, spacing, type } from '../../src/theme';
 import { BackBar, Card, Photo, Pill, ProgressBar, TierDot } from '../../src/ui/components';
 import type { Tier } from '../../src/types';
 
-const TIER_TITLES: Record<Tier, string> = {
-  1: 'Niveau 1 · les incontournables',
-  2: 'Niveau 2 · la deuxième ligne',
-  3: 'Niveau 3 · les pépites',
-};
+/**
+ * Les paliers d'une collection, nommés et non numérotés.
+ *
+ * L'étoile est déjà la note d'un lieu — nationale, dans sa catégorie. Un
+ * « niveau 3 » à côté d'« une étoile » ferait deux barèmes pour une seule idée,
+ * et sur la fiche de la maison du docteur Gachet on lisait les deux à la fois.
+ */
+const TIER_TITLES = PALIERS;
 
 export default function CollectionScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -66,7 +70,7 @@ export default function CollectionScreen() {
             <TierDot tier={stage.tier} size={14} />
             {/* Court : le titre complet du niveau est juste en dessous, en
                 tête de sa propre liste. */}
-            <Text style={type.subheading}>Niveau {stage.tier}</Text>
+            <Text style={type.subheading}>{PALIERS[stage.tier]}</Text>
           </View>
           <Text style={styles.pct}>
             {stage.visited}/{stage.total}

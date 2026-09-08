@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import type { CheckInReward } from '../lib/progress';
+import { PALIERS } from '../lib/paliers';
 import { colors, radius, spacing, themeEmoji, type } from '../theme';
 import type { Place } from '../types';
 
@@ -151,7 +152,7 @@ export function CheckInCelebration({
               >
                 <Text style={styles.highlightGlyph}>🏅</Text>
                 <View style={{ flex: 1 }}>
-                  <Text style={type.subheading}>Niveau {entry.tier} terminé</Text>
+                  <Text style={type.subheading}>{PALIERS[entry.tier]}, terminés</Text>
                   <Text style={type.small} numberOfLines={1}>
                     {entry.collection.name}
                   </Text>
