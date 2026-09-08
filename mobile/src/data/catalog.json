@@ -10185,6 +10185,26 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Montagne_Noire_(France)"
   },
   {
+   "id": "Q2317145",
+   "slug": "musee-renoir",
+   "name": "Musée Renoir",
+   "themeId": "maisons",
+   "lat": 43.66758,
+   "lon": 7.156954,
+   "radiusM": 150,
+   "score": 106.6,
+   "departement": "Alpes-Maritimes",
+   "departementCode": "06",
+   "regionCode": "93",
+   "communeCode": "06027",
+   "communeName": "Cagnes-sur-Mer",
+   "summary": "Le musée Renoir de Cagnes-sur-Mer ou Domaine des Collettes à Cagnes-sur-Mer (Alpes-Maritimes), labellisé Musée de France, est dédié au peintre impressionniste Auguste Renoir (1841-1919).\nLe Domaine des Collettes est une villa située au 19 chemin des Collettes à Cagnes-sur-Mer, classée au titre des monuments historiques et labellisée « Patrimoine du XXe siècle ».",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cagnes-sur-Mer%20-%20Mus%C3%A9e%20Renoir%20-%20Maison%20-1.JPG",
+   "imageAuthor": "MOSSOT",
+   "imageLicence": "CC BY-SA 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_Renoir"
+  },
+  {
    "id": "Q1139060",
    "slug": "pic-du-midi-de-bigorre",
    "name": "Pic du Midi de Bigorre",
@@ -10203,26 +10223,6 @@
    "imageAuthor": "The original uploader was Nathan Hamblen at French Wikipedia .",
    "imageLicence": "CC BY-SA 3.0",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pic_du_Midi_de_Bigorre"
-  },
-  {
-   "id": "Q2317145",
-   "slug": "musee-renoir",
-   "name": "Musée Renoir",
-   "themeId": "maisons",
-   "lat": 43.66758,
-   "lon": 7.156954,
-   "radiusM": 150,
-   "score": 106.5,
-   "departement": "Alpes-Maritimes",
-   "departementCode": "06",
-   "regionCode": "93",
-   "communeCode": "06027",
-   "communeName": "Cagnes-sur-Mer",
-   "summary": "Le musée Renoir de Cagnes-sur-Mer ou Domaine des Collettes à Cagnes-sur-Mer (Alpes-Maritimes), labellisé Musée de France, est dédié au peintre impressionniste Auguste Renoir (1841-1919).\nLe Domaine des Collettes est une villa située au 19 chemin des Collettes à Cagnes-sur-Mer, classée au titre des monuments historiques et labellisée « Patrimoine du XXe siècle ».",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cagnes-sur-Mer%20-%20Mus%C3%A9e%20Renoir%20-%20Maison%20-1.JPG",
-   "imageAuthor": "MOSSOT",
-   "imageLicence": "CC BY-SA 3.0",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_Renoir"
   },
   {
    "id": "Q752519",
@@ -38419,9 +38419,9 @@
    "communeCode": "02361",
    "communeName": "Guise",
    "summary": "Le familistère de Guise, situé dans la commune de Guise, dans le département de l'Aisne, est étymologiquement un « établissement où plusieurs familles ou individus vivent ensemble dans une sorte de communauté et trouvent dans des magasins coopératifs ce qui leur est nécessaire ». Construit par l'industriel Jean-Baptiste André Godin pour l'hébergement de ses ouvriers et inspiré du phalanstère de Charles Fourier, le familistère est un haut lieu de l’histoire économique et sociale des XIXe et XXe siècles.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Familist%C3%A8re-guise.jpg",
-   "imageAuthor": "Unknown author Unknown author",
-   "imageLicence": "Public domain",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Jean-Baptiste_Andr%C3%A9_Godin-GUISE-Familist%C3%A8re_de_Guise-1859-1884.jpg",
+   "imageAuthor": "jsmaur",
+   "imageLicence": "CC BY-SA 2.0",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Familist%C3%A8re_de_Guise"
   },
   {
