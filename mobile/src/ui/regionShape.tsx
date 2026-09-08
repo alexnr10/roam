@@ -42,12 +42,16 @@ export function SilhouetteRegion({
  */
 export function MiniatureFrance({
   couleurs,
-  largeur = 132,
-  hauteur = 128,
+  cote = 124,
 }: {
   couleurs?: Record<string, string>;
-  largeur?: number;
-  hauteur?: number;
+  /**
+   * Le côté de la vignette. CARRÉ, parce que le contenu l'est : projetée comme
+   * sur la carte, la France métropolitaine tient dans un carré, Corse comprise.
+   * Un cadre plus large laissait une bande vide et faisait flotter la Corse
+   * contre le texte voisin.
+   */
+  cote?: number;
 }) {
   const codes = [...REGIONS.keys()].filter((code) => !OUTRE_MER.has(code));
   // Le cadre commun : l'emprise de toutes les régions dessinées, réunies.
@@ -64,9 +68,8 @@ export function MiniatureFrance({
       [-180, -90],
     ],
   );
-  const cote = Math.min(largeur, hauteur);
   return (
-    <Svg width={largeur} height={hauteur} viewBox={`0 0 ${cote} ${cote}`}>
+    <Svg width={cote} height={cote} viewBox={`0 0 ${cote} ${cote}`}>
       {codes.map((code) => (
         <Path
           key={code}

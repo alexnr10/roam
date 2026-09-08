@@ -227,11 +227,6 @@ function ZoneCard({
   const shade = shadeOf(zone);
   const encre = encreDe(shade);
   const trait = traitDe(shade);
-  const done = zone.themes.filter((entry) => entry.state.complete);
-  const active = zone.themes.filter(
-    (entry) => !entry.state.complete && entry.state.visited > 0,
-  );
-
   return (
     <Pressable
       onPress={onPress}
@@ -265,29 +260,41 @@ function ZoneCard({
         ) : null}
       </View>
 
-      {done.length > 0 && (
-        <View style={styles.chips}>
-          {done.map((entry) => (
-            <Pill
-              key={entry.themeId}
-              label={`${themeLabel(entry.themeId)} ✓`}
-              tone="verified"
-            />
-          ))}
+      {/* Les collections du territoire, TOUJOURS visibles.
+          Elles n'apparaissaient qu'une fois entamées : une carte de conquête
+          vierge — c'est-à-dire celle de tout le monde au premier lancement — ne
+          montrait que des pourcentages à zéro, et ne disait nulle part ce qu'il
+          y a À FAIRE ici. Or c'est la seule chose qui donne envie d'y aller.
+          L'icône plutôt que le nom : six collections tiennent sur deux lignes
+          là où six libellés en prenaient quatre. */}
+      {zone.themes.length > 0 ? (
+        <View style={styles.collections}>
+          {zone.themes.slice(0, 8).map((entry) => {
+            const fini = entry.state.complete;
+            return (
+              <View
+                key={entry.themeId}
+                style={[styles.collection, fini && styles.collectionFinie]}
+              >
+                <ThemeIcon
+                  themeId={entry.themeId}
+                  size={16}
+                  color={fini ? colors.surface : colors.muted}
+                  strokeWidth={1.8}
+                />
+                <Text style={[styles.collectionTexte, fini && { color: colors.surface }]}>
+                  {entry.state.visited}/{entry.state.total}
+                </Text>
+              </View>
+            );
+          })}
+          {zone.themes.length > 8 ? (
+            <Text style={[type.small, { alignSelf: 'center' }]}>
+              +{zone.themes.length - 8}
+            </Text>
+          ) : null}
         </View>
-      )}
-
-      {active.length > 0 && (
-        <View style={styles.chips}>
-          {active.slice(0, 4).map((entry) => (
-            <Pill
-              key={entry.themeId}
-              label={`${themeLabel(entry.themeId)} ${entry.state.visited}/${entry.state.total}`}
-              tone="muted"
-            />
-          ))}
-        </View>
-      )}
+      ) : null}
 
       {!zone.playable ? (
         <Text style={type.tiny}>
@@ -331,5 +338,18 @@ const styles = StyleSheet.create({
   marker: { width: 10, height: 10, borderRadius: 5 },
   pct: { ...type.subheading, marginLeft: 'auto' },
   foot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
+  collections: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  collection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  collectionFinie: { backgroundColor: conquest.theme, borderColor: conquest.theme },
+  collectionTexte: { fontSize: 13, color: colors.muted, fontVariant: ['tabular-nums'] },
 });

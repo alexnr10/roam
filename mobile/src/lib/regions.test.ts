@@ -4,6 +4,7 @@ import {
   anneauDuMonde,
   centreDe,
   cheminSvg,
+  cheminSvgDans,
   contient,
   emprise,
   prochaineOuverture,
@@ -324,5 +325,39 @@ describe('cheminSvg', () => {
     // et Ouessant disparaissent de la silhouette.
     const chemin = cheminSvg(REGIONS.get('53')!.geometry, 30);
     expect((chemin.match(/M/g) ?? []).length).toBeGreaterThan(10);
+  });
+});
+
+describe('la projection du croquis', () => {
+  it('donne à la France la proportion de la carte, pas celle des degrés bruts', () => {
+    // Porter les latitudes telles quelles aplatit le dessin : à la hauteur de
+    // la France, un degré de longitude ne vaut que 0,69 degré de latitude sur
+    // le terrain. Le croquis y perdait un tiers de sa hauteur et ne
+    // ressemblait plus à la carte qu'il ouvre.
+    const metropole = [...REGIONS.keys()].filter((code) => code.length === 2 && code >= '11');
+    const bornes = metropole.reduce(
+      (acc, code) => {
+        const b = emprise(REGIONS.get(code)!.geometry);
+        return [
+          [Math.min(acc[0][0], b[0][0]), Math.min(acc[0][1], b[0][1])],
+          [Math.max(acc[1][0], b[1][0]), Math.max(acc[1][1], b[1][1])],
+        ] as [[number, number], [number, number]];
+      },
+      [
+        [180, 90],
+        [-180, -90],
+      ] as [[number, number], [number, number]],
+    );
+    const chemin = cheminSvgDans(REGIONS.get('11')!.geometry, bornes, 100);
+    const points = chemin
+      .match(/-?\d+(\.\d+)?\s-?\d+(\.\d+)?/g)!
+      .map((p) => p.split(' ').map(Number));
+    const xs = points.map((p) => p[0]);
+    const ys = points.map((p) => p[1]);
+    // L'Île-de-France est un peu plus large que haute, mais de peu : à plat,
+    // elle paraissait deux fois plus large.
+    const rapport = (Math.max(...ys) - Math.min(...ys)) / (Math.max(...xs) - Math.min(...xs));
+    expect(rapport).toBeGreaterThan(0.75);
+    expect(rapport).toBeLessThan(1.3);
   });
 });

@@ -307,6 +307,19 @@ export function prochaineOuverture(
 }
 
 /**
+ * La latitude, projetée comme sur la carte.
+ *
+ * C'est la formule de Mercator, celle qu'emploie MapLibre : plus on monte vers
+ * le pôle, plus un degré de latitude occupe de place à l'écran. Sans elle, un
+ * croquis dessiné à partir de degrés bruts est écrasé en hauteur — et il ne
+ * ressemble plus à la carte dont il est censé être la vignette.
+ */
+function mercator(lat: number): number {
+  const borne = Math.max(-85, Math.min(85, lat));
+  return (180 / Math.PI) * Math.log(Math.tan(Math.PI / 4 + (borne * Math.PI) / 360));
+}
+
+/**
  * La silhouette d'une région, en tracé SVG.
  *
  * Une liste de dix-huit noms se lit ; une liste de dix-huit FORMES se
@@ -333,8 +346,16 @@ export function cheminSvgDans(
   bornes: Emprise,
   taille: number,
 ): string {
+  // Mercator, comme la carte.
+  //
+  // Porter les latitudes telles quelles APLATIT le dessin : à la hauteur de la
+  // France, un degré de longitude ne vaut que 0,69 degré de latitude sur le
+  // terrain. La France y perdait un tiers de sa hauteur, et le croquis ne
+  // ressemblait plus à la carte qu'il ouvre.
+  const bas = mercator(bornes[0][1]);
+  const haut = mercator(bornes[1][1]);
   const largeur = bornes[1][0] - bornes[0][0];
-  const hauteur = bornes[1][1] - bornes[0][1];
+  const hauteur = haut - bas;
   if (largeur <= 0 || hauteur <= 0) return '';
   // Le facteur commun aux deux axes : une région étirée pour remplir le carré
   // ne se reconnaîtrait plus.
@@ -342,7 +363,7 @@ export function cheminSvgDans(
   const margeX = (taille - largeur * echelle) / 2;
   const margeY = (taille - hauteur * echelle) / 2;
   const x = (lon: number) => margeX + (lon - bornes[0][0]) * echelle;
-  const y = (lat: number) => margeY + (bornes[1][1] - lat) * echelle;
+  const y = (lat: number) => margeY + (haut - mercator(lat)) * echelle;
 
   const morceaux: string[] = [];
   for (const polygone of polygones(geometry)) {
