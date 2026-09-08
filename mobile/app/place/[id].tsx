@@ -20,6 +20,7 @@ import { setSimulatedPosition } from '../../src/lib/simulation';
 import { computeProgress } from '../../src/lib/progress';
 import { useCheckIn } from '../../src/lib/useCheckIn';
 import { useLocation } from '../../src/lib/useLocation';
+import { useEnvies } from '../../src/store/envies';
 import { useVisits } from '../../src/store/visits';
 import { LARGEUR_MAX, colors, largeurUtile, radius, spacing, type } from '../../src/theme';
 import {
@@ -38,6 +39,7 @@ export default function PlaceScreen() {
   const insets = useSafeAreaInsets();
   const { width: ecran } = useWindowDimensions();
   const { visits, visitedIds, removeVisit } = useVisits();
+  const { envieIds, basculer } = useEnvies();
   const checkIn = useCheckIn();
   const { position } = useLocation();
 
@@ -57,6 +59,7 @@ export default function PlaceScreen() {
   }
 
   const visited = visitedIds.has(place.id);
+  const veutVoir = envieIds.has(place.id);
   const visit = visits.find((entry) => entry.placeId === place.id);
   const evaluation = evaluateCheckIn(place, position);
 
@@ -171,6 +174,16 @@ export default function PlaceScreen() {
               Une visite déclarée compte dans tes pourcentages, mais n'est pas
               marquée « vérifiée ».
             </Text>
+
+            {/* L'autre geste possible sur une fiche : pas « j'y étais » mais
+                « j'irai ». Il n'apparaît que sur un lieu non visité — une fois
+                validé, l'envie n'a plus d'objet et la liste s'en débarrasse
+                d'elle-même. */}
+            <Button
+              label={veutVoir ? 'Retirer de mes envies' : 'Ajouter à mes envies'}
+              tone="secondary"
+              onPress={() => basculer(place.id)}
+            />
 
             {/* Mode démo, web uniquement : éprouver le moment de validation
                 sans faire la route. Jamais embarqué sur téléphone. */}

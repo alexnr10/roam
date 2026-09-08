@@ -4,6 +4,7 @@ import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { CelebrationProvider } from '../src/store/celebration';
+import { EnviesProvider } from '../src/store/envies';
 import { VisitsProvider } from '../src/store/visits';
 import { colors } from '../src/theme';
 
@@ -11,6 +12,9 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <VisitsProvider>
+        {/* Dans VisitsProvider, et pas à côté : la liste d'envies lit les
+            visites pour retirer d'elle-même un lieu qu'on vient de valider. */}
+        <EnviesProvider>
         <CelebrationProvider>
         <StatusBar style="dark" />
         <Stack
@@ -30,6 +34,7 @@ export default function RootLayout() {
           <Stack.Screen name="reconnaitre" options={{ headerShown: false }} />
         </Stack>
         </CelebrationProvider>
+        </EnviesProvider>
       </VisitsProvider>
     </SafeAreaProvider>
   );

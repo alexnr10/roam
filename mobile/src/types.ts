@@ -120,6 +120,19 @@ export type Visit = {
   distanceM?: number;
 };
 
+/**
+ * Un lieu qu'on s'est promis d'aller voir.
+ *
+ * Roam est un guide avant d'être une collection : le carnet de visites dit
+ * d'où l'on vient, celui-ci dit où l'on va. Les deux ne se mélangent jamais —
+ * une envie réalisée SORT de la liste, elle n'y reste pas cochée.
+ */
+export type Envie = {
+  placeId: string;
+  /** Sert à montrer les dernières envies en premier. */
+  addedAt: string;
+};
+
 export type Coordinates = {
   latitude: number;
   longitude: number;

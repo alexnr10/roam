@@ -5,19 +5,24 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { buildLabel } from '../../src/lib/build';
 import { collections, places } from '../../src/data/catalog';
 import { computeProgress, earnedBadges, nextMilestone, type Badge } from '../../src/lib/progress';
+import { parDateDecroissante } from '../../src/lib/envies';
 import { rank, shortlists } from '../../src/lib/shortlist';
 import { useLocation } from '../../src/lib/useLocation';
-import { getPlacesInCollection } from '../../src/data/catalog';
+import { getPlace, getPlacesInCollection } from '../../src/data/catalog';
+import { useEnvies } from '../../src/store/envies';
 import { useVisits } from '../../src/store/visits';
 import { LARGEUR_MAX, colors, conquest, fonts, radius, spacing, type } from '../../src/theme';
 import { Button, Card, EmptyState, Pill, ProgressBar } from '../../src/ui/components';
-import { IconeRosette } from '../../src/ui/icons';
+import { IconeCroix, IconeRosette } from '../../src/ui/icons';
+import { Etoiles } from '../../src/ui/Etoiles';
+import { etoilesDe } from '../../src/lib/etoiles';
 import { MiniatureFrance } from '../../src/ui/regionShape';
 import { conquestByZone, shadeOf } from '../../src/lib/conquest';
 import { areas } from '../../src/data/catalog';
 
 export default function ProfileScreen() {
   const { visits, reset } = useVisits();
+  const { envies, retirer } = useEnvies();
   const router = useRouter();
   const { position } = useLocation();
 
@@ -40,6 +45,22 @@ export default function ProfileScreen() {
     );
     return shortlists(classe, 3).almostDone;
   }, [visits, position]);
+
+  /**
+   * Les lieux qu'on s'est promis d'aller voir, les derniers ajoutés en tête.
+   *
+   * Un identifiant peut ne plus rien désigner : le catalogue se reconstruit, et
+   * un lieu qui en sort laisserait une ligne vide. On filtre donc sur ce que le
+   * catalogue connaît aujourd'hui, sans toucher au stockage — l'envie
+   * réapparaîtra si le lieu revient.
+   */
+  const mesEnvies = useMemo(
+    () =>
+      parDateDecroissante(envies)
+        .map((envie) => getPlace(envie.placeId))
+        .filter((place): place is NonNullable<typeof place> => Boolean(place)),
+    [envies],
+  );
 
   /**
    * La couleur de chaque région dans la vignette.
@@ -100,6 +121,56 @@ export default function ProfileScreen() {
           <Text style={styles.lien}>Voir la carte →</Text>
         </View>
       </Pressable>
+
+      {/* Mes envies AVANT « à un lieu près » : l'une est une décision qu'on a
+          prise, l'autre une suggestion du classement. Ce qu'on a choisi
+          soi-même passe devant ce qu'on nous propose. */}
+      <View style={{ marginBottom: spacing.lg }}>
+        <Text style={type.heading}>Mes envies</Text>
+        <Text style={[type.small, { marginBottom: spacing.md }]}>
+          {mesEnvies.length
+            ? `${mesEnvies.length} lieu${mesEnvies.length > 1 ? 'x' : ''} que tu t'es promis d'aller voir`
+            : 'Là où tu comptes aller'}
+        </Text>
+        {mesEnvies.length === 0 ? (
+          <Card>
+            <EmptyState
+              title="Rien pour l'instant"
+              body="Sur la fiche d'un lieu, « Ajouter à mes envies » le range ici. Il en sortira tout seul le jour où tu l'auras validé."
+            />
+          </Card>
+        ) : (
+          mesEnvies.map((place) => (
+            <View key={place.id} style={styles.envie}>
+              <Pressable
+                style={{ flex: 1 }}
+                onPress={() => router.push(`/place/${place.id}`)}
+              >
+                <Text style={type.subheading} numberOfLines={1}>
+                  {place.name}
+                </Text>
+                <View style={styles.envieLigne}>
+                  <Etoiles note={etoilesDe(place.id)} taille={12} />
+                  <Text style={type.small} numberOfLines={1}>
+                    {place.communeName ?? place.departement ?? ''}
+                  </Text>
+                </View>
+              </Pressable>
+              {/* Retirer sans ouvrir la fiche : une liste d'envies se raye
+                  aussi vite qu'elle se remplit. */}
+              <Pressable
+                onPress={() => retirer(place.id)}
+                accessibilityRole="button"
+                accessibilityLabel={`Retirer ${place.name} de mes envies`}
+                hitSlop={10}
+                style={styles.envieCroix}
+              >
+                <IconeCroix size={16} color={colors.muted} />
+              </Pressable>
+            </View>
+          ))
+        )}
+      </View>
 
       {aUnLieuPres.length ? (
         <View style={{ marginBottom: spacing.lg }}>
@@ -237,6 +308,29 @@ const styles = StyleSheet.create({
     padding: 18,
     marginBottom: spacing.lg,
     gap: spacing.sm,
+  },
+  envie: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.md,
+    paddingLeft: spacing.md,
+    // Moins à droite : la croix porte déjà sa propre marge de touche.
+    paddingRight: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  envieLigne: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  envieCroix: {
+    padding: spacing.sm,
   },
   presque: {
     backgroundColor: colors.surface,
