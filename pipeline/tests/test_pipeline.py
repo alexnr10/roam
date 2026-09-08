@@ -4118,6 +4118,50 @@ class TestMissingImages(unittest.TestCase):
         self.assertIsNone(nu.image_url)
         self.assertEqual(commons.demandes, [["File:Villa Savoye en 2014.jpg"]])
 
+    def test_a_doubled_credit_already_in_place_is_folded(self):
+        # `texte()` ne bégaie plus, mais il ne relit pas ce qui est déjà rangé :
+        # un crédit n'est redemandé que si le FICHIER change. La valeur fautive
+        # resterait donc pour toujours — et elle est revenue une fois, par un
+        # `enrich` lancé avant un `git pull`.
+        from roam_pipeline.fetch import fold_doubled_credits
+
+        begue = self._lieu("Lac d'Oô")
+        begue.image_author = "Unknown author Unknown author"
+        juste = self._lieu("Tour Eiffel")
+        juste.image_author = "Benh LIEU SONG"
+        sans = self._lieu("Sans crédit")
+        with _capture():
+            self.assertEqual(fold_doubled_credits([begue, juste, sans]), 1)
+        self.assertEqual(begue.image_author, "Unknown author")
+        self.assertEqual(juste.image_author, "Benh LIEU SONG")
+        self.assertIsNone(sans.image_author)
+
+    def test_a_map_already_in_place_is_removed(self):
+        # Le filtre ne regarde que les lieux SANS image : il ne défait pas
+        # celles qu'une exécution plus ancienne a laissées. Il a suffi d'un
+        # `enrich` lancé avant un `git pull` pour que quatre-vingt-deux cartes
+        # reviennent, créditées cette fois. La passe rend le nettoyage
+        # automatique au lieu de dépendre d'une retouche du dépôt.
+        from roam_pipeline.fetch import drop_map_images
+
+        carte = self._lieu("Cité radieuse", article="Cité radieuse")
+        carte.image_url = ("https://commons.wikimedia.org/wiki/Special:FilePath/"
+                           "France_location_map-Regions_and_departements-2016.svg")
+        carte.image_author, carte.image_licence = "Superbenjamin", "CC BY-SA 4.0"
+        carte.image_credit_for = "File:France location map.svg"
+        vraie = self._lieu("Pont du Gard", article="Pont du Gard")
+        vraie.image_url = ("https://commons.wikimedia.org/wiki/Special:FilePath/"
+                           "Pont%20du%20Gard%20BLS.jpg")
+        vraie.image_author = "Un photographe"
+        with _capture():
+            self.assertEqual(drop_map_images([carte, vraie]), 1)
+        self.assertIsNone(carte.image_url)
+        self.assertIsNone(carte.image_author)
+        self.assertIsNone(carte.image_credit_for)
+        # La vraie photo ne bouge pas.
+        self.assertIn("Pont", vraie.image_url)
+        self.assertEqual(vraie.image_author, "Un photographe")
+
     def test_an_article_lead_image_that_is_a_map_is_refused(self):
         # L'image de tête d'un article est parfois sa carte de localisation :
         # huit fiches du catalogue affichaient la France entière en guise de

@@ -47,6 +47,8 @@ from .fetch import (
     enrich_visitors,
     enrich_article_sizes,
     credit_chosen_photos,
+    drop_map_images,
+    fold_doubled_credits,
     enrich_image_credits,
     enrich_missing_images,
     enrich_pageviews,
@@ -483,7 +485,13 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     # fichiers seulement. C'est une passe courte, mais elle demande le réseau
     # de Commons — on la garde optionnelle comme les autres.
     if args.images:
-        # D'ABORD le repli sur l'article : une photo trouvée ici doit être
+        # AVANT tout : retirer les cartes qu'une exécution plus ancienne aurait
+        # laissées. Le repli ne regarde que les lieux sans image, donc il ne les
+        # défait pas tout seul — et un `enrich` lancé avant un `git pull` suffit
+        # à les faire revenir.
+        drop_map_images(places)
+        fold_doubled_credits(places)
+        # PUIS le repli sur l'article : une photo trouvée ici doit être
         # créditée comme les autres, et le crédit se demande ensuite.
         enrich_missing_images(places)
         # Les photos CHOISIES le temps de la demande, puis rendues.

@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import wikidata as wd
+from .commons import _replier, file_title
 from .wikipedia import BATCH, EXTRACT_BATCH, WikipediaClient, title_from_url
 from .config import Config, Label, Theme
 from .geo import normalize_dept_code, region_of
@@ -864,6 +865,61 @@ def est_une_carte(nom: str) -> bool:
     affiche alors son repli, qui dit la vérité, au lieu d'une image qui ment.
     """
     return nom.lower().endswith(".svg") or bool(_CARTE.search(nom))
+
+
+def fold_doubled_credits(places: list[Place]) -> int:
+    """Replie un crédit déjà rangé qui se répète — « X X » → « X ».
+
+    `texte()` ne bégaie plus, mais il ne relit pas ce qui est déjà en place :
+    le crédit d'une photo n'est redemandé que si le FICHIER change. Une valeur
+    fautive rangée par une version antérieure y resterait donc pour toujours,
+    et il a suffi d'un `enrich` lancé avant un `git pull` pour que les quatre
+    « Unknown author Unknown author » reviennent.
+
+    Le même repli, appliqué au stock : c'est la seule façon que la correction
+    rattrape ce qu'elle n'avait pas écrit elle-même.
+    """
+    replies = 0
+    for place in places:
+        if not place.image_author:
+            continue
+        court = _replier(place.image_author)
+        if court != place.image_author:
+            place.image_author = court
+            replies += 1
+    if replies:
+        LOG.info("%s crédit(s) d'auteur repliés, ils se répétaient", replies)
+    return replies
+
+
+def drop_map_images(places: list[Place]) -> int:
+    """Retire les images qui sont des cartes, où qu'elles aient été posées.
+
+    `enrich_missing_images` refuse désormais d'en poser — mais il ne regarde
+    que les lieux SANS image, donc il ne défait pas celles qu'une exécution
+    plus ancienne a laissées. Il a suffi d'un `enrich` lancé avant un `git
+    pull` pour que quatre-vingt-deux cartes reviennent, créditées cette fois,
+    et qu'un effacement fait à la main dans le dépôt soit à refaire.
+
+    Cette passe rend la réparation automatique : elle tourne avant le repli sur
+    article, vide ce qui est une carte, et le repli tente alors de nouveau sa
+    chance — pour refuser proprement, ou pour trouver mieux entre-temps.
+    """
+    retirees = 0
+    for place in places:
+        titre = file_title(place.image_url)
+        if not titre or not est_une_carte(titre):
+            continue
+        place.image_url = None
+        place.image_author = place.image_licence = place.image_credit_for = None
+        retirees += 1
+    if retirees:
+        LOG.info(
+            "%s image(s) retirées : ce sont des CARTES ou des dessins, pas des "
+            "photos de lieu — le repli sur article va retenter, et refuser",
+            retirees,
+        )
+    return retirees
 
 
 def enrich_missing_images(
