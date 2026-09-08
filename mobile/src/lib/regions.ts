@@ -368,7 +368,21 @@ export function prochaineOuverture(
  * inversion la France se dessinerait la tête en bas.
  */
 export function cheminSvg(geometry: Geometrie, taille: number): string {
-  const bornes = emprise(geometry);
+  return cheminSvgDans(geometry, emprise(geometry), taille);
+}
+
+/**
+ * Le même tracé, mais projeté dans une emprise IMPOSÉE.
+ *
+ * C'est ce qui permet de dessiner treize régions dans une seule vignette : sans
+ * cadre commun, chacune remplirait la boîte pour son compte et la France
+ * deviendrait un tas de formes empilées.
+ */
+export function cheminSvgDans(
+  geometry: Geometrie,
+  bornes: Emprise,
+  taille: number,
+): string {
   const largeur = bornes[1][0] - bornes[0][0];
   const hauteur = bornes[1][1] - bornes[0][1];
   if (largeur <= 0 || hauteur <= 0) return '';

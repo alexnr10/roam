@@ -72,6 +72,34 @@ export const conquest = {
   total: colors.primary,
 };
 
+/**
+ * Les couleurs de la conquête, mais pour l'ENCRE et le trait.
+ *
+ * `conquest` donne des couleurs d'APLAT : posées sur une carte, sous un liseré,
+ * elles disent la progression sans crier. Les reprendre pour un pourcentage et
+ * pour une jauge était une erreur de nature — la terre cuite pâle tient 1,04:1
+ * sur le sable, c'est-à-dire rien du tout : le chiffre était invisible et la
+ * jauge semblait vide même à moitié pleine.
+ *
+ * Une couleur de remplissage n'est pas une couleur d'écriture. Deux jeux :
+ * `conquestInk` pour ce qui se lit (au-dessus de 4,5:1), `conquestTrait` pour
+ * ce qui se voit — pastilles et jauges, où le contraste de forme suffit.
+ */
+export const conquestInk = {
+  empty: colors.muted,
+  started: colors.primary,
+  /** L'or d'un thème achevé, assez foncé pour être lu : 4,99:1 sur le sable. */
+  theme: '#7E5F16',
+  total: colors.primary,
+};
+
+export const conquestTrait = {
+  empty: colors.surfaceAlt,
+  started: colors.primaryLight,
+  theme: conquest.theme,
+  total: colors.primary,
+};
+
 export const spacing = {
   xs: 4,
   sm: 8,

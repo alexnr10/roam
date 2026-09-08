@@ -87,3 +87,11 @@ export const IconeCroix = (props: Props) => (
 
 /** Le chevron d'une ligne de liste, pointe à droite. */
 export const IconeChevronDroit = (props: Props) => <Trace {...props} d={['m9.5 5 7 7-7 7']} />;
+
+/** Une rosette : le badge, dessiné. */
+export const IconeRosette = (props: Props) => (
+  <Trace
+    {...props}
+    d={['M12 3a6 6 0 1 0 0 12 6 6 0 0 0 0-12z', 'M8.5 14.5 7 21l5-2.5 5 2.5-1.5-6.5']}
+  />
+);

@@ -5,10 +5,11 @@ import { areas, places, themeLabel, themes } from '../../src/data/catalog';
 import { conquestByZone, shadeOf } from '../../src/lib/conquest';
 import type { ZoneConquest, ZoneShade } from '../../src/lib/conquest';
 import { useVisits } from '../../src/store/visits';
-import { colors, conquest, radius, spacing, type } from '../../src/theme';
+import { colors, conquest, conquestInk, conquestTrait, radius, spacing, type } from '../../src/theme';
 import { ConquestMap, conquestOutlinesExist } from '../../src/ui/ConquestMap';
 import { BackBar, ChipRow, EmptyState, Pill, ProgressBar } from '../../src/ui/components';
 import { SegmentedControl } from '../../src/ui/components';
+import { ThemeIcon } from '../../src/ui/themeIcons';
 import type { AreaLevel } from '../../src/types';
 
 /**
@@ -28,8 +29,14 @@ type LevelCopy = {
   feminine: boolean;
 };
 
+/**
+ * Les échelles de la conquête.
+ *
+ * Les communes en sont sorties : le catalogue ne les rattache pas encore, et
+ * un quatrième segment faisait déborder « Départements » de sa case — trois
+ * mots qui se chevauchent valent moins qu'une échelle en moins.
+ */
 const LEVELS: LevelCopy[] = [
-  { value: 'commune', label: 'Communes', one: 'commune', many: 'communes', feminine: true },
   {
     value: 'departement',
     label: 'Départements',
@@ -44,18 +51,11 @@ const LEVELS: LevelCopy[] = [
 const plural = (count: number, singular: string, many: string) =>
   `${count} ${count > 1 ? many : singular}`;
 
-function shadeColor(shade: ZoneShade): string {
-  switch (shade.kind) {
-    case 'total':
-      return conquest.total;
-    case 'theme':
-      return conquest.theme;
-    case 'started':
-      return conquest.started;
-    case 'empty':
-      return conquest.empty;
-  }
-}
+/** Ce qui se LIT : un pourcentage, un libellé. Toujours au-dessus de 4,5:1. */
+const encreDe = (shade: ZoneShade): string => conquestInk[shade.kind];
+
+/** Ce qui se VOIT : une pastille, une jauge. Le contraste de forme suffit. */
+const traitDe = (shade: ZoneShade): string => conquestTrait[shade.kind];
 
 export default function ConquestScreen() {
   const { visits } = useVisits();
@@ -73,9 +73,17 @@ export default function ConquestScreen() {
   // évite de filtrer sur du vide.
   const themeOptions = useMemo(
     () => [
-      { value: null, label: 'Tous les thèmes' },
+      { value: null, label: 'Tous' },
       ...themes
-        .map((entry) => ({ value: entry.id, label: entry.name }))
+        .map((entry) => ({
+          value: entry.id,
+          // Le nom court, comme au-dessus de la carte : « Monuments et édifices
+          // remarquables » occupe à lui seul la largeur d'un téléphone.
+          label: entry.nameShort || entry.name,
+          icone: (couleur: string) => (
+            <ThemeIcon themeId={entry.id} size={19} color={couleur} />
+          ),
+        }))
         .sort((a, b) => a.label.localeCompare(b.label, 'fr')),
     ],
     [],
@@ -99,7 +107,10 @@ export default function ConquestScreen() {
   const drawn = conquestOutlinesExist(level);
   // Assez haut pour que la France tienne en entier, assez bas pour qu'il reste
   // de la liste sous le pouce.
-  const mapHeight = Math.max(220, Math.min(360, height * 0.42));
+  // Plus basse qu'avant : au-dessus d'elle il y a le retour, l'échelle et les
+  // thèmes, en dessous la liste. À quarante-deux pour cent de la hauteur, les
+  // pastilles de thèmes se retrouvaient coincées contre la carte.
+  const mapHeight = Math.max(180, Math.min(300, height * 0.32));
 
   const focused = selected ? zones.filter((zone) => zone.area.code === selected) : zones;
   const focusedName = selected
@@ -213,7 +224,8 @@ function ZoneCard({
   onPress: () => void;
 }) {
   const shade = shadeOf(zone);
-  const color = shadeColor(shade);
+  const encre = encreDe(shade);
+  const trait = traitDe(shade);
   const done = zone.themes.filter((entry) => entry.state.complete);
   const active = zone.themes.filter(
     (entry) => !entry.state.complete && entry.state.visited > 0,
@@ -222,26 +234,21 @@ function ZoneCard({
   return (
     <Pressable
       onPress={onPress}
-      style={[styles.card, shade.kind !== 'empty' && { borderColor: color }]}
+      style={[styles.card, shade.kind !== 'empty' && { borderColor: trait }]}
     >
       <View style={styles.head}>
         {/* Le bandeau porte la couleur du territoire : c'est exactement ce que
             la carte montre, en aplat, au même endroit du même vocabulaire. */}
-        <View style={[styles.marker, { backgroundColor: color }]} />
+        <View style={[styles.marker, { backgroundColor: trait }]} />
         <Text style={type.subheading} numberOfLines={1}>
           {zone.area.name}
         </Text>
-        <Text
-          style={[
-            styles.pct,
-            { color: shade.kind === 'empty' ? colors.muted : color },
-          ]}
-        >
+        <Text style={[styles.pct, { color: encre }]}>
           {zone.overall.pct}%
         </Text>
       </View>
 
-      <ProgressBar pct={zone.overall.pct} color={color} />
+      <ProgressBar pct={zone.overall.pct} color={trait} />
 
       <View style={styles.foot}>
         <Text style={type.small}>
@@ -297,7 +304,7 @@ function ZoneCard({
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
-  controls: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg },
+  controls: { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, gap: spacing.sm },
   map: {
     marginHorizontal: spacing.lg,
     marginTop: spacing.md,

@@ -9,8 +9,12 @@ import { rank, shortlists } from '../../src/lib/shortlist';
 import { useLocation } from '../../src/lib/useLocation';
 import { getPlacesInCollection } from '../../src/data/catalog';
 import { useVisits } from '../../src/store/visits';
-import { LARGEUR_MAX, colors, radius, spacing, type } from '../../src/theme';
+import { LARGEUR_MAX, colors, conquest, fonts, radius, spacing, type } from '../../src/theme';
 import { Button, Card, EmptyState, Pill, ProgressBar } from '../../src/ui/components';
+import { IconeRosette } from '../../src/ui/icons';
+import { MiniatureFrance } from '../../src/ui/regionShape';
+import { conquestByZone, shadeOf } from '../../src/lib/conquest';
+import { areas } from '../../src/data/catalog';
 
 export default function ProfileScreen() {
   const { visits, reset } = useVisits();
@@ -37,6 +41,21 @@ export default function ProfileScreen() {
     return shortlists(classe, 3).almostDone;
   }, [visits, position]);
 
+  /**
+   * La couleur de chaque région dans la vignette.
+   *
+   * La même que sur la carte de conquête : une vignette qui montrerait autre
+   * chose que l'écran qu'elle ouvre ne servirait à rien.
+   */
+  const teintes = useMemo(() => {
+    const par: Record<string, string> = {};
+    for (const zone of conquestByZone(places, areas.region, 'region', visits, null)) {
+      const shade = shadeOf(zone);
+      if (shade.kind !== 'empty') par[zone.area.code] = conquest[shade.kind];
+    }
+    return par;
+  }, [visits]);
+
   const confirmReset = () =>
     Alert.alert(
       'Tout effacer ?',
@@ -62,25 +81,25 @@ export default function ProfileScreen() {
     >
       <View style={styles.stats}>
         <Stat value={visits.length} label="lieux validés" />
-        {/* Déclaré vs vérifié : les deux comptent, seul le second est prouvé. */}
-        <Stat value={verified} label="dont vérifiés GPS" />
+        {/* Déclaré vs vérifié : les deux comptent, seul le second est prouvé —
+            d'où la seconde voix, la sauge, plutôt que la terre cuite. */}
+        <Stat value={verified} label="dont vérifiés GPS" couleur={colors.verified} />
         <Stat value={badges.length} label="badges" />
       </View>
 
       {/* La conquête et le quadrillage vivent ici : ce sont des récompenses, et
           une récompense ne réclame pas le quart de la barre d'onglets. */}
-      <Card style={{ marginBottom: spacing.lg, gap: spacing.sm }}>
-        <Text style={type.subheading}>Ta carte de conquête</Text>
-        <Text style={type.small}>
-          Les départements et les régions se colorent à mesure que tu termines leurs
-          collections.
-        </Text>
-        <Button
-          label="Voir la carte"
-          tone="secondary"
-          onPress={() => router.push('/conquete')}
-        />
-      </Card>
+      <Pressable style={styles.conquete} onPress={() => router.push('/conquete')}>
+        <MiniatureFrance couleurs={teintes} />
+        <View style={{ flex: 1, gap: spacing.sm }}>
+          <Text style={type.heading}>Ta carte de conquête</Text>
+          <Text style={type.small}>
+            Les départements et les régions se colorent à mesure que tu termines
+            leurs collections.
+          </Text>
+          <Text style={styles.lien}>Voir la carte →</Text>
+        </View>
+      </Pressable>
 
       {aUnLieuPres.length ? (
         <View style={{ marginBottom: spacing.lg }}>
@@ -114,15 +133,15 @@ export default function ProfileScreen() {
       {/* Le quadrillage, à portée du premier écran : une application de
           collection qui démarre à zéro ne dit rien de son propriétaire, alors
           que la moitié de ce qu'il a vu dans sa vie est au catalogue. */}
-      <Card style={{ marginBottom: spacing.lg, gap: spacing.sm }}>
-        <Text style={type.subheading}>Tu y es sûrement déjà allé</Text>
+      <View style={styles.reconnaissance}>
+        <Text style={type.heading}>Tu y es sûrement déjà allé</Text>
         <Text style={type.small}>
           {places.length} lieux au catalogue, et une vie de voyages derrière toi. Passe-les
           en photos et coche ce que tu reconnais — c'est plus rapide que de les chercher
           un par un.
         </Text>
         <Button label="Reconnaître mes lieux" onPress={() => router.push('/reconnaitre')} />
-      </Card>
+      </View>
 
       <Text style={[type.heading, { marginBottom: spacing.md }]}>Badges</Text>
 
@@ -137,7 +156,10 @@ export default function ProfileScreen() {
         <View style={styles.badges}>
           {badges.map((badge) => (
             <View key={badge.id} style={styles.badge}>
-              <Text style={styles.badgeGlyph}>{badge.kind === 'tier' ? '🏅' : '🎖️'}</Text>
+              <IconeRosette
+                size={22}
+                color={badge.kind === 'tier' ? colors.primary : conquest.theme}
+              />
               <View style={{ flex: 1 }}>
                 <Text style={type.body} numberOfLines={1}>
                   {badge.collectionName}
@@ -166,10 +188,18 @@ export default function ProfileScreen() {
   );
 }
 
-function Stat({ value, label }: { value: number; label: string }) {
+function Stat({
+  value,
+  label,
+  couleur = colors.primary,
+}: {
+  value: number;
+  label: string;
+  couleur?: string;
+}) {
   return (
     <View style={styles.stat}>
-      <Text style={styles.statValue}>{value}</Text>
+      <Text style={[styles.statValue, { color: couleur }]}>{value}</Text>
       <Text style={[type.small, { textAlign: 'center' }]}>{label}</Text>
     </View>
   );
@@ -188,7 +218,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     gap: spacing.xs,
   },
-  statValue: { fontSize: 26, fontWeight: '700', color: colors.primary },
+  statValue: { fontSize: 28, fontFamily: fonts.display, color: colors.primary },
+  conquete: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.xl,
+    padding: 18,
+    marginBottom: spacing.lg,
+  },
+  lien: { fontSize: 15, fontWeight: '600', color: colors.primary },
+  reconnaissance: {
+    backgroundColor: colors.primarySoft,
+    borderRadius: radius.xl,
+    padding: 18,
+    marginBottom: spacing.lg,
+    gap: spacing.sm,
+  },
   presque: {
     backgroundColor: colors.surface,
     borderWidth: 1,
@@ -209,5 +258,4 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: spacing.md,
   },
-  badgeGlyph: { fontSize: 22 },
 });

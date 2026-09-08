@@ -374,17 +374,41 @@ export const FALLBACK_STYLE = {
  */
 export async function resolveBasemap(
   timeoutMs = 5000,
+  depouille = false,
 ): Promise<{ style: unknown; degraded: boolean }> {
   for (const url of BASEMAP_STYLES) {
     try {
       const response = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
       if (!response.ok) continue;
-      return { style: repeindre(await response.json()), degraded: false };
+      const repeint = repeindre(await response.json());
+      return { style: depouille ? depouiller(repeint) : repeint, degraded: false };
     } catch {
       // Fond suivant.
     }
   }
   return { style: FALLBACK_STYLE, degraded: true };
+}
+
+/**
+ * Le fond réduit à la terre et à l'eau.
+ *
+ * La carte de conquête n'est pas une carte où l'on va : c'est un tableau de
+ * progression, où chaque territoire est un aplat qu'on colorie. Les routes vues
+ * à travers un aplat à quarante-cinq pour cent deviennent des traits qui ne
+ * disent rien — ni une ville, ni une frontière, ni un chemin : du bruit.
+ *
+ * Restent le sol et l'eau : ils donnent une côte et une mer, donc de quoi
+ * reconnaître la France. Tout le reste, y compris les noms de lieux, appartient
+ * à la carte où l'on cherche quoi faire.
+ */
+export function depouiller(style: any) {
+  const s = JSON.parse(JSON.stringify(style));
+  s.layers = (s.layers ?? []).filter((layer: any) => {
+    if (layer.type === 'background') return true;
+    const src = layer['source-layer'];
+    return (src === 'water' || src === 'waterway') && layer.type !== 'symbol';
+  });
+  return s;
 }
 
 /**

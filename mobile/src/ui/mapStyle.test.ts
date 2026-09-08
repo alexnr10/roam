@@ -6,6 +6,7 @@ import {
   REGION_TONE_BY_CODE,
   mapColors,
   TRANSITION,
+  depouiller,
   opaciteDesAplats,
   opaciteEnCascade,
   pasDeCascade,
@@ -285,5 +286,33 @@ describe('opaciteEnCascade', () => {
   it('respecte le retrait du niveau 3', () => {
     const plein = evaluer(opaciteEnCascade(9999, 12), { tier: 3, rang: 0 });
     expect(plein).toBeCloseTo(0.8, 10);
+  });
+});
+
+describe('depouiller', () => {
+  const repeint = repeindre({
+    version: 8,
+    sources: {},
+    layers: [
+      { id: 'background', type: 'background', paint: {} },
+      { id: 'water', type: 'fill', 'source-layer': 'water', paint: {} },
+      { id: 'waterway', type: 'line', 'source-layer': 'waterway', paint: {} },
+      { id: 'water-name', type: 'symbol', 'source-layer': 'water', layout: {}, paint: {} },
+      { id: 'highway-motorway', type: 'line', 'source-layer': 'transportation', paint: {} },
+      { id: 'landcover-wood', type: 'fill', 'source-layer': 'landcover', paint: {} },
+      { id: 'building', type: 'fill', 'source-layer': 'building', paint: {} },
+      { id: 'place-city', type: 'symbol', 'source-layer': 'place', layout: {}, paint: {} },
+    ],
+  });
+
+  it('ne garde que le sol et l’eau', () => {
+    // Une route vue à travers un aplat de conquête à quarante-cinq pour cent
+    // devient un trait qui ne dit rien : ni ville, ni frontière, ni chemin.
+    const ids = depouiller(repeint).layers.map((couche: { id: string }) => couche.id);
+    expect(ids).toEqual(['background', 'water', 'waterway']);
+  });
+
+  it('laisse la carte principale intacte', () => {
+    expect(repeint.layers.length).toBeGreaterThan(3);
   });
 });

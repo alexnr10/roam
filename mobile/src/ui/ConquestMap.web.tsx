@@ -84,7 +84,10 @@ export function ConquestMap({ zones, level, selectedCode, onSelectZone }: Conque
     prepareMapLibre();
 
     (async () => {
-      const { style, degraded: noBasemap } = await resolveBasemap();
+      // Dépouillé : la conquête est un tableau de progression, pas une carte
+      // où l'on va. Les routes vues à travers un aplat de couleur ne disent
+      // rien — ni ville, ni frontière, ni chemin.
+      const { style, degraded: noBasemap } = await resolveBasemap(5000, true);
       if (cancelled || !container.current) return;
       setDegraded(noBasemap);
 
