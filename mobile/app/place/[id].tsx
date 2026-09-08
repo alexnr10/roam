@@ -19,6 +19,7 @@ import {
   themeLabel,
 } from '../../src/data/catalog';
 import { evaluateCheckIn } from '../../src/lib/checkin';
+import { etoilesDe } from '../../src/lib/etoiles';
 import { formatDistance } from '../../src/lib/geo';
 import { setSimulatedPosition } from '../../src/lib/simulation';
 import { computeProgress } from '../../src/lib/progress';
@@ -35,6 +36,7 @@ import {
   ProgressBar,
   TierDot,
 } from '../../src/ui/components';
+import { Etoiles } from '../../src/ui/Etoiles';
 
 export default function PlaceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -102,6 +104,11 @@ export default function PlaceScreen() {
         </Text>
       ) : null}
       <Text style={[type.title, { marginTop: spacing.md }]}>{place.name}</Text>
+      {/* La note AVANT la ligne de contexte : c'est ce qu'on cherche en
+          arrivant sur une fiche — est-ce que ça vaut le déplacement ? */}
+      <View style={{ marginTop: spacing.xs }}>
+        <Etoiles note={etoilesDe(place.id)} taille={16} mention />
+      </View>
       <Text style={[type.small, { marginTop: spacing.xs }]}>
         {themeLabel(place.themeId)}
         {place.departement ? ` · ${place.departement}` : ''}
@@ -222,7 +229,7 @@ export default function PlaceScreen() {
               color={colors.tier[progress.stage.tier - 1]}
               height={6}
             />
-            {tier ? <Text style={type.small}>Ce lieu est de niveau {tier}</Text> : null}
+            {tier ? <Text style={type.small}>Niveau {tier} dans cette collection</Text> : null}
           </Pressable>
         );
       })}

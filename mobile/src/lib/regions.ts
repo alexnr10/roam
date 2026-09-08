@@ -1,6 +1,5 @@
-import { areas, collections, places } from '../data/catalog';
+import { areas, places } from '../data/catalog';
 import { outlinesFor } from '../data/outlines';
-import type { Tier } from '../types';
 
 /**
  * Ce qu'il faut savoir d'une région pour la dessiner et l'ouvrir.
@@ -196,55 +195,6 @@ const regionParDepartement = new Map(
 
 export const regionDuDepartement = (code: string): string | null =>
   regionParDepartement.get(code) ?? null;
-
-/**
- * Le niveau d'un lieu DANS la région qu'on regarde.
- *
- * Roam n'a pas de niveau absolu : le niveau est relatif à une collection, et un
- * lieu peut être premier de son département et anonyme à l'échelle du pays.
- * Pour dimensionner une pastille il faut donc choisir un point de vue, et le
- * seul qui ait un sens quand une région est ouverte, c'est cette région.
- *
- * « Le meilleur d'Occitanie » classe quatre-vingts lieux sur deux cent
- * soixante-douze : douze au premier niveau, vingt-sept au deuxième. Les autres
- * restent au troisième. C'est une hiérarchie qui se lit d'un coup d'œil, là où
- * prendre le meilleur niveau toutes collections confondues donnerait quatre-
- * vingt-seize incontournables dans une seule région — donc aucun.
- *
- * Les cinq régions d'outre-mer n'ont pas de collection régionale : on retombe
- * alors sur leurs collections départementales, sans quoi les huit lieux de
- * Mayotte seraient huit points identiques.
- */
-const niveauxParRegion = new Map<string, Map<string, Tier>>();
-
-export function niveauxDe(regionCode: string): Map<string, Tier> {
-  const connu = niveauxParRegion.get(regionCode);
-  if (connu) return connu;
-
-  const niveaux = new Map<string, Tier>();
-  const regionale = collections.find(
-    (collection) =>
-      collection.geoLevel === 'region' &&
-      collection.geoCode === regionCode &&
-      !collection.themeId,
-  );
-
-  if (regionale) {
-    for (const membre of regionale.places) niveaux.set(membre.placeId, membre.tier);
-  } else {
-    for (const collection of collections) {
-      if (collection.geoLevel !== 'departement' || collection.themeId) continue;
-      if (regionDuDepartement(collection.geoCode ?? '') !== regionCode) continue;
-      for (const membre of collection.places) {
-        const vu = niveaux.get(membre.placeId);
-        if (vu === undefined || membre.tier < vu) niveaux.set(membre.placeId, membre.tier);
-      }
-    }
-  }
-
-  niveauxParRegion.set(regionCode, niveaux);
-  return niveaux;
-}
 
 /** Les lieux d'une région. Le catalogue porte déjà le rattachement. */
 export function lieuxDe(regionCode: string) {

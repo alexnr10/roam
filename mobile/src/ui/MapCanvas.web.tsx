@@ -12,7 +12,6 @@ import {
   REGIONS,
   centreDe,
   emprise,
-  niveauxDe,
   partDuCadre,
   prochaineOuverture,
   rangDepuisLeCentre,
@@ -20,6 +19,7 @@ import {
   regionDuDepartement,
   voile,
 } from '../lib/regions';
+import { etoilesDe } from '../lib/etoiles';
 import { colors, spacing, type } from '../theme';
 import type { Place } from '../types';
 import type { MapCanvasProps } from './MapCanvas';
@@ -73,7 +73,6 @@ function toFeatureCollection(
   visitedIds: ReadonlySet<string>,
   regionOuverte: string | null,
 ): GeoJSON.FeatureCollection<GeoJSON.Point> {
-  const niveaux = regionOuverte ? niveauxDe(regionOuverte) : null;
   const contour = regionOuverte ? REGIONS.get(regionOuverte) : undefined;
   // L'ordre d'apparition : du centre de la région vers les bords. Il est
   // calculé une fois, ici, et voyage avec les points — l'animation n'a plus
@@ -90,10 +89,12 @@ function toFeatureCollection(
         id: place.id,
         name: place.name,
         visited: visitedIds.has(place.id) ? 1 : 0,
-        // Roam n'a pas de niveau absolu : le niveau est relatif à une
-        // collection. Celui qui a un sens ici est celui de la région ouverte —
-        // c'est le point de vue depuis lequel on regarde.
-        tier: niveaux?.get(place.id) ?? 3,
+        // La taille d'une pastille dit la note NATIONALE, dans sa catégorie :
+        // trois étoiles font le gros point. Un classement relatif à la région
+        // ouverte changeait de sens d'un vol à l'autre — le même château
+        // grossissait en passant la frontière, ce qu'aucune carte ne devrait
+        // faire.
+        tier: 4 - etoilesDe(place.id),
         rang: rangs[index],
       },
     })),

@@ -6,8 +6,6 @@ import {
   cheminSvg,
   contient,
   emprise,
-  lieuxDe,
-  niveauxDe,
   prochaineOuverture,
   rangDepuisLeCentre,
   regionAu,
@@ -109,35 +107,6 @@ describe('voile', () => {
     // C'est ce percement qui fait apparaître Mayotte quand on dérive vers
     // l'océan Indien, sans qu'aucun encart n'ait à l'annoncer.
     expect(percé.geometry.coordinates.length).toBeGreaterThan(REGIONS.size);
-  });
-});
-
-describe('niveauxDe', () => {
-  it('classe l’Occitanie par sa collection régionale', () => {
-    const niveaux = niveauxDe('76');
-    const lieux = lieuxDe('76');
-    const premiers = lieux.filter((place) => niveaux.get(place.id) === 1).length;
-    // Une dizaine d'incontournables sur deux cent soixante-douze. Prendre le
-    // meilleur niveau toutes collections confondues en donnerait quatre-vingt-
-    // seize, c'est-à-dire aucun.
-    expect(premiers).toBeGreaterThan(5);
-    expect(premiers).toBeLessThan(20);
-  });
-
-  it('classe Mayotte malgré l’absence de collection régionale', () => {
-    const niveaux = niveauxDe('06');
-    const lieux = lieuxDe('06');
-    expect(lieux.length).toBeGreaterThan(0);
-    expect(lieux.some((place) => niveaux.has(place.id))).toBe(true);
-  });
-
-  it('donne un niveau à au moins un lieu de CHAQUE région', () => {
-    for (const code of REGIONS.keys()) {
-      const lieux = lieuxDe(code);
-      if (lieux.length === 0) continue;
-      const niveaux = niveauxDe(code);
-      expect(lieux.some((place) => niveaux.has(place.id))).toBe(true);
-    }
   });
 });
 

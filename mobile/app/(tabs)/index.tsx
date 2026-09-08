@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { places as allPlaces, themeLabel, themes } from '../../src/data/catalog';
 import { bandeau } from '../../src/lib/carte';
+import { etoilesDe } from '../../src/lib/etoiles';
 import { nomDeRegion } from '../../src/lib/regions';
 import { evaluateCheckIn, suggestCheckIn } from '../../src/lib/checkin';
 import { distanceToPlace, formatDistance } from '../../src/lib/geo';
@@ -25,6 +26,7 @@ import {
 import { MapCanvas } from '../../src/ui/MapCanvas';
 import { IconeChevron, IconeCroix } from '../../src/ui/icons';
 import { ThemeIcon } from '../../src/ui/themeIcons';
+import { Etoiles } from '../../src/ui/Etoiles';
 import type { Place } from '../../src/types';
 
 /** Combien de vignettes dans le bandeau. Au-delà, on fait défiler pour rien. */
@@ -316,6 +318,7 @@ export default function MapScreen() {
                 <Text style={type.subheading} numberOfLines={2}>
                   {choisi.name}
                 </Text>
+                <Etoiles note={etoilesDe(choisi.id)} taille={13} />
                 <Text style={type.small} numberOfLines={1}>
                   {themeLabel(choisi.themeId)}
                   {choisi.communeName ? ` · ${choisi.communeName}` : ''}
@@ -368,9 +371,12 @@ export default function MapScreen() {
                   <Text style={[type.body, styles.nom]} numberOfLines={1}>
                     {item.name}
                   </Text>
-                  <Text style={type.small} numberOfLines={1}>
-                    {distance(item) ?? item.communeName ?? item.departement ?? ''}
-                  </Text>
+                  <View style={styles.ligneVignette}>
+                    <Etoiles note={etoilesDe(item.id)} taille={12} />
+                    <Text style={type.small} numberOfLines={1}>
+                      {distance(item) ?? item.communeName ?? item.departement ?? ''}
+                    </Text>
+                  </View>
                 </Pressable>
               )}
             />
@@ -425,6 +431,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   titreBandeau: { paddingHorizontal: spacing.lg, paddingBottom: 4 },
+  ligneVignette: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   credit: {
     fontSize: 10,
     color: '#7A6E5C',
