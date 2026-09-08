@@ -154,8 +154,8 @@
 # coordonnées et communes présentes, aucune classe écartée.
 #
 #   Village martyr d'Oradour-sur-Glane  Q51300191  monuments
-#   Camp des Milles                     Q481647    monuments
-#   Caverne du Dragon                   Q2943295   monuments
+#   Camp des Milles                     Q481647    musees
+#   Caverne du Dragon                   Q2943295   musees
 #
 # Oradour valait le doublon de recherche annoncé : la commune (Q190974) et le
 # VILLAGE MARTYR (Q51300191) sont deux entités distinctes chez Wikidata, et
@@ -163,17 +163,20 @@
 # passage : Q836897, le massacre, qui est un événement et non un lieu ; un
 # livre de Jens Kruuse ; le cimetière communal ; et une rue de Toulouse.
 #
-# Les trois vont dans `monuments`, et deux fois CONTRE ce que dit la classe.
-# Wikidata range Oradour sous « village » : le mettre dans le thème `villages`
-# le ferait figurer parmi les villages de caractère, entre Gordes et
-# Rocamadour, ce qui serait indécent. Et la Caverne du Dragon est une
-# « carrière » : `grottes` est le thème des cavités naturelles, or celle-ci
-# est creusée de main d'homme et se visite comme un musée. La classe dit ce
-# qu'une chose EST ; le thème dit ce qu'on vient y faire.
+# Aucun des trois ne suit sa classe, et c'est la règle qu'ils illustrent : la
+# classe dit ce qu'une chose EST, le thème dit ce qu'on vient y FAIRE.
 #
-# Le Camp des Milles pourrait aller dans `musees` — on y visite une
-# exposition dans l'ancienne tuilerie — et un `retheme` suffirait. Il est
-# rangé avec les deux autres pour que les trois lieux de mémoire se tiennent.
+# Oradour est classé « village » chez Wikidata. Le ranger dans le thème
+# `villages` le ferait figurer parmi les villages de caractère, entre Gordes
+# et Rocamadour, ce qui serait indécent. Il va dans `monuments` : on visite
+# des ruines à ciel ouvert, pas un musée.
+#
+# Le Camp des Milles est classé « camp de concentration » et la Caverne du
+# Dragon « carrière ». Tous deux vont dans `musees`, sur décision du curateur
+# et pour la même raison : on y entre avec un billet pour parcourir une
+# exposition — dans l'ancienne tuilerie pour l'un, et pour l'autre la caverne
+# EST le musée du Chemin des Dames. `grottes` aurait été faux deux fois, la
+# cavité étant creusée de main d'homme.
 #
 #
 # ── 4. Patrimoine industriel ── TRAITÉ ───────────────────────────────────
