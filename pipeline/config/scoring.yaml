@@ -90,18 +90,53 @@ scoring:
 # qu'il vaut le déplacement.
 #
 # Même règle à trois états que l'ouverture au public, et pour la même raison :
-# un lieu sans chiffre ne perd RIEN. Wikidata ne renseigne la fréquentation que
-# d'une minorité de sites ; pénaliser les autres reviendrait à noter le zèle
-# des contributeurs. Bonus seul, jamais de malus.
+# un lieu sans chiffre ne subit aucun MALUS. Wikidata ne renseigne la
+# fréquentation que d'une minorité de sites ; les pénaliser reviendrait à noter
+# le zèle des contributeurs. Bonus seul, jamais de retranchement.
+#
+# ⚠️ Mais « aucun malus » ne veut PAS dire « ne perd rien », et cette nuance a
+# été payée cher. Les niveaux et les plafonds sont des CLASSEMENTS : un bonus
+# accordé à quelques-uns y est une punition pour tous les autres. La règle des
+# trois états protège du malus, pas du rang.
+#
+# Mesuré : la couverture est de onze pour cent, et les absents ne sont pas des
+# lieux obscurs — Chambord, le Pont du Gard, la Sainte-Chapelle,
+# Vaux-le-Vicomte et la Tapisserie de Bayeux ne portent AUCUN chiffre. À
+# poids 10, Chambord et le Pont du Gard sortaient des huit premiers du
+# catalogue ; à poids nul ils y sont quatrième et cinquième.
+#
+# La donnée est mauvaise deux fois. Par sa couverture, et par son exactitude :
+# le dixième lieu de France par la fréquentation y est le jardin japonais de
+# Nantes avec un million deux cent mille entrées, devant le musée d'Orsay ; et
+# le musée de l'Histoire de France y porte huit millions cent soixante-dix-sept
+# mille, soit le chiffre du château de Versailles dans lequel il se trouve.
+# Deux erreurs visibles à l'œil nu sur deux cent vingt-deux valeurs.
 visitors:
   # Résolue par `suggest-qids --property`, vérifiable par `verify-qids`.
   # Une propriété erronée ne lève rien — elle rend zéro résultat, en silence.
   property: P1174        # nombre de visiteurs par an
   search: null
-  # Poids À CALIBRER sur les chiffres réels : `build` affiche la couverture et
-  # la distribution. Trop haut, la fréquentation écrase tout le reste ; trop
-  # bas, Giverny reste au niveau 3 de sa propre collection.
-  weight: 10.0
+  # CALIBRÉ, à dix puis à cinq. La mesure a porté sur cinq constructions
+  # complètes, à 10, 7, 5, 3 et 0 :
+  #
+  #     poids   lieux   entrent  sortent   étoiles changées
+  #        10    2036         —        —                  —
+  #         7    2037         3        2                 32
+  #         5    2036         9        9                 52
+  #         3    2037        20       19                 72
+  #         0    2038        30       28                 96
+  #
+  # La composition du catalogue ne bouge pas : ce poids ne décide pas QUI est
+  # au catalogue, il décide comment il est NOTÉ. Cinq divise par deux la
+  # punition infligée aux quatre-vingt-neuf pour cent sans donnée, sans jeter
+  # un signal juste là où il existe. Le Louvre-Lens et Chaumont-sur-Loire
+  # perdent une étoile ; Chambord, la Sainte-Chapelle et Vaux-le-Vicomte en
+  # gagnent une.
+  #
+  # Pas zéro : la fréquentation réelle reste la seule chose que le score
+  # mesure qui ne soit pas de la documentation. Le problème est la donnée, pas
+  # l'idée — si la couverture s'améliore un jour, ce poids peut remonter.
+  weight: 5.0
   # Le score suit log1p(visiteurs / scale) : dix mille visiteurs valent un
   # demi-poids, dix millions en valent sept. L'écart qui compte est celui entre
   # un musée de sous-préfecture et un site national, pas entre le Louvre et
