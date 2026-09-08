@@ -22,11 +22,29 @@
 #
 # Même cas exact que l'Axe Majeur. Aucune ne peut entrer par une classe.
 #
-# RETENUES par le curateur, Q-ids résolus sur `suggest-qids` :
+# RETENUES, résolues, vérifiées sur `probe` et ÉPINGLÉES dans places.csv :
 #
 #   Les Deux Plateaux (colonnes de Buren) Paris (75)      Q3232046
 #   La Vallée des Saints                  Carnoët (22)    Q3554061
 #   Les Machines de l'île                 Nantes (44)     Q1820547
+#
+# Les deux inquiétudes soulevées avant le probe sont levées, et c'est pour
+# cela qu'on l'attendait. Les Machines de l'île déclarent « espace
+# d'exposition » et « projet artistique » — rien du registre des parcs de
+# loisirs, donc aucune des classes que le catalogue écarte globalement. La
+# Vallée des Saints porte bien des coordonnées et la commune de Carnoët,
+# malgré une description qui n'annonçait qu'un « projet associatif ».
+#
+# Les trois vont dans `monuments` et non dans `musees`, y compris les
+# Machines dont la classe est pourtant muséale : `monuments` est le
+# fourre-tout par conception, quand `musees` est le thème le plus embouteillé
+# du catalogue — deux cent soixante-quatorze candidats pour cinquante places,
+# où chaque entrée en éjecte une autre en silence.
+#
+# « Les Deux Plateaux » est le titre officiel ; la fiche s'appellera
+# « Colonnes de Buren » (names.csv). La recherche de l'app ne couvre que le
+# nom, la commune et le département : sous son titre officiel, l'œuvre serait
+# introuvable pour qui tape « Buren », c'est-à-dire pour tout le monde.
 #
 # ÉCARTÉES, et c'est une décision éditoriale, pas un échec de résolution :
 #
