@@ -1,10 +1,11 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useRef, useState } from 'react';
 import { FlatList, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { places as allPlaces, themeLabel, themes } from '../../src/data/catalog';
 import { bandeau } from '../../src/lib/carte';
+import { nomDeRegion } from '../../src/lib/regions';
 import { evaluateCheckIn, suggestCheckIn } from '../../src/lib/checkin';
 import { distanceToPlace, formatDistance } from '../../src/lib/geo';
 import { useCheckIn } from '../../src/lib/useCheckIn';
@@ -12,7 +13,7 @@ import { useLocation } from '../../src/lib/useLocation';
 import { useRoulette } from '../../src/lib/roulette';
 import { MIN_CARACTERES, search } from '../../src/lib/search';
 import { useVisits } from '../../src/store/visits';
-import { LARGEUR_MAX, colors, spacing, radius, type } from '../../src/theme';
+import { LARGEUR_MAX, colors, elevation, fonts, spacing, radius, type } from '../../src/theme';
 import {
   Button,
   ChipRow,
@@ -22,6 +23,8 @@ import {
   SearchField,
 } from '../../src/ui/components';
 import { MapCanvas } from '../../src/ui/MapCanvas';
+import { IconeChevron, IconeCroix } from '../../src/ui/icons';
+import { ThemeIcon } from '../../src/ui/themeIcons';
 import type { Place } from '../../src/types';
 
 /** Combien de vignettes dans le bandeau. Au-delà, on fait défiler pour rien. */
@@ -70,6 +73,13 @@ const VIGNETTE_LARGEUR_PHOTO = VIGNETTE - 2 * spacing.sm - 2;
  */
 export default function MapScreen() {
   const router = useRouter();
+  // Une région demandée depuis Explorer : « touche une région, elle s'ouvre sur
+  // la carte ». Le nonce distingue deux appuis sur la MÊME région — sans lui,
+  // rouvrir la Bretagne après l'avoir refermée ne changerait aucun paramètre.
+  const { region: regionDemandee, n } = useLocalSearchParams<{
+    region?: string;
+    n?: string;
+  }>();
   const insets = useSafeAreaInsets();
   const { visitedIds } = useVisits();
   const checkIn = useCheckIn();
@@ -78,6 +88,16 @@ export default function MapScreen() {
   const [query, setQuery] = useState('');
   const [choisi, setChoisi] = useState<Place | null>(null);
   const [auMilieu, setAuMilieu] = useState<Place | null>(null);
+  /**
+   * La région ouverte sur la carte — la carte en décide, l'écran s'y adapte.
+   *
+   * C'est elle qui titre le bandeau et fait paraître la pastille de retour.
+   * Sans ça, l'écran continuait d'annoncer « autour de toi » en montrant les
+   * lieux d'une région où l'on n'est pas.
+   */
+  const [regionOuverte, setRegionOuverte] = useState<string | null>(null);
+  /** Un compteur, pas un booléen : chaque incrément est UN retour demandé. */
+  const [retourFrance, setRetourFrance] = useState(0);
   const rail = useRef<FlatList<Place> | null>(null);
   // Sur un ordinateur, la molette ne défile que verticalement : le bandeau
   // restait bloqué sur les trois vignettes visibles, sans indice qu'il y en
@@ -96,17 +116,44 @@ export default function MapScreen() {
       // vingt-trois. Le nom complet reste sur la page de la collection.
       { value: null, label: 'Tous' },
       ...themes
-        .map((entry) => ({ value: entry.id, label: entry.nameShort || entry.name }))
+        .map((entry) => ({
+          value: entry.id,
+          label: entry.nameShort || entry.name,
+          // Vingt-trois icônes dessinées, au même gabarit : un emoji est rendu
+          // par le système, donc jamais deux fois pareil, et « ⛪ » servait à la
+          // fois pour les abbayes et pour les cathédrales.
+          icone: (couleur: string) => (
+            <ThemeIcon themeId={entry.id} size={19} color={couleur} />
+          ),
+        }))
         .sort((a, b) => a.label.localeCompare(b.label, 'fr')),
     ],
     [],
   );
 
-  /** Ce que le bandeau montre : le plus proche d'abord, ou le mieux classé. */
-  const vignettes = useMemo(
-    () => bandeau(visible, position, BANDEAU),
-    [visible, position],
+  /**
+   * Ce que le bandeau montre.
+   *
+   * Une région ouverte, ce sont SES lieux : la carte et le bandeau doivent
+   * raconter la même chose, sans quoi on fait défiler des vignettes qui ne
+   * correspondent à rien de ce qu'on regarde. Sinon, le plus proche d'abord —
+   * ou le mieux classé quand on ne sait pas où est l'utilisateur.
+   */
+  const dansLaRegion = useMemo(
+    () => (regionOuverte ? visible.filter((p) => p.regionCode === regionOuverte) : visible),
+    [visible, regionOuverte],
   );
+  const vignettes = useMemo(
+    () => bandeau(dansLaRegion, position, BANDEAU),
+    [dansLaRegion, position],
+  );
+
+  /** Le titre du bandeau : ce qu'on regarde, en toutes lettres. */
+  const titreDuBandeau = regionOuverte
+    ? `${dansLaRegion.length} LIEU${dansLaRegion.length > 1 ? 'X' : ''} EN ${nomDeRegion(
+        regionOuverte,
+      ).toUpperCase()}`
+    : 'AUTOUR DE TOI';
 
   /**
    * La recherche ignore le thème : quelqu'un qui tape « etretat » ne veut pas
@@ -140,6 +187,9 @@ export default function MapScreen() {
           // retour, la fiche restait ouverte pour de bon et les lieux voisins
           // disparaissaient jusqu'au changement d'onglet.
           onDeselect={() => setChoisi(null)}
+          onRegionChange={setRegionOuverte}
+          retour={retourFrance}
+          ouvrir={regionDemandee ? `${regionDemandee}#${n ?? ''}` : null}
           highlightedId={enAvant?.id ?? suggestion?.id ?? null}
           focus={enAvant ? { lat: enAvant.lat, lon: enAvant.lon } : null}
         />
@@ -155,6 +205,24 @@ export default function MapScreen() {
           {enRecherche ? null : (
             <ChipRow options={themeOptions} value={theme} onChange={setTheme} />
           )}
+          {/* La pastille de retour n'existe qu'une fois une région ouverte.
+              Dézoomer referme aussi — mais un chemin qu'on VOIT vaut mieux
+              qu'un geste qu'il faut deviner. */}
+          {!enRecherche && regionOuverte ? (
+            <Pressable
+              style={styles.retourRegion}
+              onPress={() => setRetourFrance(retourFrance + 1)}
+              accessibilityRole="button"
+              accessibilityLabel="Revenir à la France entière"
+            >
+              <IconeChevron size={17} color={colors.surface} />
+              <Text style={styles.retourFrance}>France</Text>
+              <View style={styles.retourFilet} />
+              <Text style={styles.retourNom} numberOfLines={1}>
+                {nomDeRegion(regionOuverte)}
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
       </View>
 
@@ -263,10 +331,12 @@ export default function MapScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Fermer"
               >
-                <Text style={styles.fermerTexte}>✕</Text>
+                <IconeCroix size={18} color={colors.muted} />
               </Pressable>
             </Pressable>
           ) : (
+            <>
+            <Text style={[type.kicker, styles.titreBandeau]}>{titreDuBandeau}</Text>
             <FlatList
               ref={rail}
               data={vignettes}
@@ -304,6 +374,7 @@ export default function MapScreen() {
                 </Pressable>
               )}
             />
+            </>
           )}
 
           {Platform.OS === 'web' && simulated ? (
@@ -311,6 +382,13 @@ export default function MapScreen() {
               Mode démo : ta position est simulée.
             </Text>
           ) : null}
+
+          {/* La Licence ouverte exige la mention des contours, et les licences
+              de Commons celle des photos. Ce n'est pas une politesse. */}
+          <Text style={styles.credit} numberOfLines={2}>
+            Contours IGN Admin Express — Licence ouverte (Etalab) · Photos Wikimedia
+            Commons
+          </Text>
           </View>
         </View>
       ) : null}
@@ -320,6 +398,40 @@ export default function MapScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
+  retourRegion: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 6,
+    height: 42,
+    paddingHorizontal: 14,
+    marginHorizontal: spacing.md,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primary,
+    ...elevation.flottant,
+  },
+  retourFrance: { fontSize: 15, fontWeight: '600', color: colors.surface },
+  retourFilet: {
+    width: 1,
+    height: 18,
+    backgroundColor: colors.surface,
+    opacity: 0.4,
+    marginHorizontal: 2,
+  },
+  retourNom: {
+    fontSize: 16,
+    fontFamily: fonts.display,
+    color: colors.surface,
+    flexShrink: 1,
+  },
+  titreBandeau: { paddingHorizontal: spacing.lg, paddingBottom: 4 },
+  credit: {
+    fontSize: 10,
+    color: '#7A6E5C',
+    textAlign: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingTop: 6,
+  },
   // Un cadre pleine largeur, une colonne bornée au milieu : `alignSelf` ne
   // centre RIEN sur un élément posé en absolu — `left: 0` et `right: 0` gagnent,
   // et la barre restait collée au bord gauche d'un écran d'ordinateur.

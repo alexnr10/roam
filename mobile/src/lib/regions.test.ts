@@ -3,6 +3,7 @@ import {
   REGIONS,
   anneauDuMonde,
   centreDe,
+  cheminSvg,
   contient,
   emprise,
   lieuxDe,
@@ -316,5 +317,43 @@ describe('prochaineOuverture', () => {
 
   it('reste ouverte en dérivant vers la mer, sans dézoom', () => {
     expect(prochaineOuverture({ region: '75', ancre: 6 }, null, 6).region).toBe('75');
+  });
+});
+
+describe('cheminSvg', () => {
+  it('tient dans la boîte demandée', () => {
+    const chemin = cheminSvg(REGIONS.get('53')!.geometry, 30);
+    const nombres = chemin.match(/-?\d+(\.\d+)?/g)!.map(Number);
+    expect(Math.min(...nombres)).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...nombres)).toBeLessThanOrEqual(30.01);
+  });
+
+  it('ne déforme pas la silhouette', () => {
+    // Une région étirée pour remplir le carré ne se reconnaîtrait plus : le
+    // facteur d'échelle est commun aux deux axes, donc le plus grand côté du
+    // tracé touche la boîte et l'autre non.
+    const chemin = cheminSvg(REGIONS.get('94')!.geometry, 30);
+    const points = chemin.match(/-?\d+(\.\d+)?\s-?\d+(\.\d+)?/g)!.map((p) => p.split(' ').map(Number));
+    const largeur = Math.max(...points.map((p) => p[0])) - Math.min(...points.map((p) => p[0]));
+    const hauteur = Math.max(...points.map((p) => p[1])) - Math.min(...points.map((p) => p[1]));
+    // La Corse est bien plus haute que large : c'est la hauteur qui remplit.
+    expect(hauteur).toBeCloseTo(30, 1);
+    expect(largeur).toBeLessThan(24);
+  });
+
+  it('dessine CHAQUE région, outre-mer compris', () => {
+    for (const code of REGIONS.keys()) {
+      expect([code, cheminSvg(REGIONS.get(code)!.geometry, 30).startsWith('M')]).toEqual([
+        code,
+        true,
+      ]);
+    }
+  });
+
+  it('n’oublie aucune île', () => {
+    // Onze polygones pour la Bretagne : autant de sous-tracés, sinon Belle-Île
+    // et Ouessant disparaissent de la silhouette.
+    const chemin = cheminSvg(REGIONS.get('53')!.geometry, 30);
+    expect((chemin.match(/M/g) ?? []).length).toBeGreaterThan(10);
   });
 });

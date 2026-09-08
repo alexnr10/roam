@@ -3,15 +3,17 @@ import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {
-  areas,
   collections,
   getPlacesInCollection,
   places as toutes,
 } from '../../src/data/catalog';
-import { autourDeToi, chercheCollections, parRegion, territoireDe } from '../../src/lib/explorer';
+import { autourDeToi, chercheCollections, territoireDe } from '../../src/lib/explorer';
 import { useLocation } from '../../src/lib/useLocation';
 import { LARGEUR_MAX, colors, radius, spacing, type } from '../../src/theme';
 import { Photo, SearchField } from '../../src/ui/components';
+import { IconeChevronDroit } from '../../src/ui/icons';
+import { SilhouetteRegion } from '../../src/ui/regionShape';
+import { REGIONS, nomDeRegion } from '../../src/lib/regions';
 import type { Collection } from '../../src/types';
 
 /**
@@ -33,18 +35,37 @@ export default function ExplorerScreen() {
   const router = useRouter();
   const { position } = useLocation();
   const [query, setQuery] = useState('');
-  const [region, setRegion] = useState<string | null>(null);
 
   const ici = useMemo(() => territoireDe(toutes, position), [position]);
   const proches = useMemo(
     () => autourDeToi(collections, ici.departement, ici.region),
     [ici.departement, ici.region],
   );
-  const territoires = useMemo(
-    () => parRegion(collections, areas.region, areas.departement),
-    [],
-  );
   const trouvees = useMemo(() => chercheCollections(collections, query), [query]);
+
+  /**
+   * Les régions, avec leur nombre de lieux — et l'outre-mer à part.
+   *
+   * À part dans la LISTE, pas dans le traitement : même ligne, même
+   * silhouette, même geste. L'intertitre ne fait que les rendre trouvables.
+   */
+  const regionsCarte = useMemo(() => {
+    const compte = new Map<string, number>();
+    for (const lieu of toutes) {
+      if (!lieu.regionCode) continue;
+      compte.set(lieu.regionCode, (compte.get(lieu.regionCode) ?? 0) + 1);
+    }
+    return [...REGIONS.keys()]
+      .map((code) => ({ code, nom: nomDeRegion(code), lieux: compte.get(code) ?? 0 }))
+      .filter((entree) => entree.lieux > 0)
+      .sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
+  }, []);
+  const metropole = regionsCarte.filter((entree) => !OUTRE_MER.has(entree.code));
+  const outreMer = regionsCarte.filter((entree) => OUTRE_MER.has(entree.code));
+
+  /** Le retour sur la carte, région ouverte. Le nonce distingue deux appuis. */
+  const ouvrirSurLaCarte = (code: string) =>
+    router.push({ pathname: '/', params: { region: code, n: String(Date.now()) } });
   const enRecherche = query.trim().length >= 2;
 
   const themes = collections.filter((c) => c.kind === 'theme');
@@ -101,33 +122,69 @@ export default function ExplorerScreen() {
             router={router}
           />
 
-          <Text style={type.heading}>Par région</Text>
+          <Text style={[type.heading, { marginTop: spacing.xl }]}>Par région</Text>
           <Text style={[type.small, { marginBottom: spacing.md }]}>
-            Pour préparer un voyage — touche une région pour voir ses collections
+            Touche une région : elle s'ouvre sur la carte, cadrée, avec ses lieux
           </Text>
-          {territoires.map((territoire) => (
-            <View key={territoire.code}>
-              <Pressable
-                style={styles.region}
-                onPress={() =>
-                  setRegion(region === territoire.code ? null : territoire.code)
-                }
-              >
-                <Text style={type.subheading}>{territoire.nom}</Text>
-                <Text style={type.small}>
-                  {territoire.collections.length} · {region === territoire.code ? '▾' : '▸'}
-                </Text>
-              </Pressable>
-              {region === territoire.code
-                ? territoire.collections.map((collection) => (
-                    <Carte key={collection.slug} collection={collection} router={router} />
-                  ))
-                : null}
-            </View>
+          {metropole.map((entree) => (
+            <LigneRegion key={entree.code} entree={entree} onOuvrir={ouvrirSurLaCarte} />
           ))}
+
+          {/* L'outre-mer a sa porte d'entrée, et c'est ICI qu'elle est.
+              Sur la carte, cadrée sur la métropole, ces cinq régions sont hors
+              écran : personne ne les trouve en faisant glisser au hasard. Un
+              encart dans un coin de la carte aurait menti sur ce qu'elles sont
+              — ce sont des régions comme les autres, et elles figurent donc
+              dans la même liste, avec leur silhouette et leur décompte. */}
+          {outreMer.length ? (
+            <>
+              <Text style={[type.kicker, { marginTop: spacing.xl }]}>Outre-mer</Text>
+              <Text style={[type.small, { marginBottom: spacing.md }]}>
+                Cinq régions comme les autres — la seule porte d'entrée qui ne demande
+                pas de savoir qu'elles existent
+              </Text>
+              {outreMer.map((entree) => (
+                <LigneRegion key={entree.code} entree={entree} onOuvrir={ouvrirSurLaCarte} />
+              ))}
+            </>
+          ) : null}
         </>
       )}
     </ScrollView>
+  );
+}
+
+/** Les cinq régions d'outre-mer, par leur code INSEE. */
+const OUTRE_MER = new Set(['01', '02', '03', '04', '06']);
+
+/**
+ * Une région, en une ligne.
+ *
+ * Une liste de dix-huit noms se lit ; une liste de dix-huit FORMES se
+ * reconnaît. La silhouette porte le sable de la région sur la carte : on la
+ * retrouve d'un écran à l'autre sans avoir à la nommer.
+ */
+function LigneRegion({
+  entree,
+  onOuvrir,
+}: {
+  entree: { code: string; nom: string; lieux: number };
+  onOuvrir: (code: string) => void;
+}) {
+  return (
+    <Pressable
+      style={styles.ligneRegion}
+      onPress={() => onOuvrir(entree.code)}
+      accessibilityRole="button"
+      accessibilityLabel={`Ouvrir ${entree.nom} sur la carte`}
+    >
+      <SilhouetteRegion code={entree.code} />
+      <Text style={[type.subheading, { flex: 1 }]} numberOfLines={1}>
+        {entree.nom}
+      </Text>
+      <Text style={type.small}>{entree.lieux} lieux</Text>
+      <IconeChevronDroit size={16} color={colors.locked} />
+    </Pressable>
   );
 }
 
@@ -208,12 +265,12 @@ const styles = StyleSheet.create({
     padding: spacing.sm,
     marginBottom: spacing.sm,
   },
-  region: {
+  ligneRegion: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.md,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    gap: 13,
+    height: 56,
+    borderTopWidth: 1,
     borderTopColor: colors.border,
   },
 });

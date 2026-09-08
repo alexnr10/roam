@@ -356,6 +356,43 @@ export function prochaineOuverture(
   return { region: actuelle.region, ancre: Math.max(actuelle.ancre, zoom) };
 }
 
+/**
+ * La silhouette d'une région, en tracé SVG.
+ *
+ * Une liste de dix-huit noms se lit ; une liste de dix-huit FORMES se
+ * reconnaît. C'est ce qui permet de trouver la Bretagne sans lire, et
+ * accessoirement de comprendre que les cinq d'outre-mer sont des régions comme
+ * les autres — elles y figurent avec leur dessin, pas avec un astérisque.
+ *
+ * Les latitudes sont inversées : en SVG l'axe vertical descend, et sans cette
+ * inversion la France se dessinerait la tête en bas.
+ */
+export function cheminSvg(geometry: Geometrie, taille: number): string {
+  const bornes = emprise(geometry);
+  const largeur = bornes[1][0] - bornes[0][0];
+  const hauteur = bornes[1][1] - bornes[0][1];
+  if (largeur <= 0 || hauteur <= 0) return '';
+  // Le facteur commun aux deux axes : une région étirée pour remplir le carré
+  // ne se reconnaîtrait plus.
+  const echelle = taille / Math.max(largeur, hauteur);
+  const margeX = (taille - largeur * echelle) / 2;
+  const margeY = (taille - hauteur * echelle) / 2;
+  const x = (lon: number) => margeX + (lon - bornes[0][0]) * echelle;
+  const y = (lat: number) => margeY + (bornes[1][1] - lat) * echelle;
+
+  const morceaux: string[] = [];
+  for (const polygone of polygones(geometry)) {
+    for (const anneau of polygone) {
+      if (anneau.length < 3) continue;
+      const points = anneau.map(
+        ([lon, lat]) => `${x(lon).toFixed(2)} ${y(lat).toFixed(2)}`,
+      );
+      morceaux.push(`M${points[0]}L${points.slice(1).join('L')}Z`);
+    }
+  }
+  return morceaux.join('');
+}
+
 /** Le centre d'une emprise. */
 export function centreDe(bornes: Emprise): [number, number] {
   return [(bornes[0][0] + bornes[1][0]) / 2, (bornes[0][1] + bornes[1][1]) / 2];

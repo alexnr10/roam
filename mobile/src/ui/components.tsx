@@ -15,6 +15,8 @@ import {
 import { photoUrl } from '../lib/photo';
 import { useRoulette } from '../lib/roulette';
 import { colors, radius, spacing, themeEmoji, type } from '../theme';
+import { IconeChevron, IconeCroix, IconeLoupe } from './icons';
+import { ThemeIcon } from './themeIcons';
 import type { Tier } from '../types';
 
 /**
@@ -58,11 +60,17 @@ export function Photo({
   };
 
   if (!src) {
+    // Le repli d'une photo manquante : l'icône du thème, dessinée. Un emoji
+    // change de dessin d'un système à l'autre, et une grille de vignettes en
+    // devenait un patchwork de styles.
     return (
       <View style={[cadre, styles.sansPhoto]}>
-        <Text style={{ fontSize: Math.round(Math.min(width, height) * 0.42) }}>
-          {themeEmoji[themeId] ?? '📍'}
-        </Text>
+        <ThemeIcon
+          themeId={themeId}
+          size={Math.round(Math.min(width, height) * 0.42)}
+          color={colors.locked}
+          strokeWidth={1.6}
+        />
       </View>
     );
   }
@@ -158,7 +166,7 @@ export function TierDot({ tier, size = 10 }: { tier: Tier; size?: number }) {
  * vers la carte quand il n'y a réellement rien derrière : on ne doit jamais
  * pouvoir rester bloqué.
  */
-export function BackBar({ label = 'Retour' }: { label?: string }) {
+export function BackBar({ label = 'Carte' }: { label?: string }) {
   const router = useRouter();
   return (
     <Pressable
@@ -168,7 +176,7 @@ export function BackBar({ label = 'Retour' }: { label?: string }) {
       accessibilityLabel={label}
       hitSlop={12}
     >
-      <Text style={styles.backArrow}>←</Text>
+      <IconeChevron size={20} color={colors.primary} />
       <Text style={styles.backLabel}>{label}</Text>
     </Pressable>
   );
@@ -179,7 +187,12 @@ export function ChipRow<T extends string>({
   value,
   onChange,
 }: {
-  options: Array<{ value: T | null; label: string }>;
+  /** `icone` reçoit la couleur d'encre : une pastille choisie s'inverse. */
+  options: Array<{
+    value: T | null;
+    label: string;
+    icone?: (couleur: string) => React.ReactNode;
+  }>;
   value: T | null;
   onChange: (value: T | null) => void;
 }) {
@@ -203,6 +216,7 @@ export function ChipRow<T extends string>({
             accessibilityRole="button"
             accessibilityState={{ selected }}
           >
+            {option.icone?.(selected ? colors.surface : colors.text)}
             <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
               {option.label}
             </Text>
@@ -318,7 +332,7 @@ export function SearchField({
 }) {
   return (
     <View style={styles.search}>
-      <Text style={styles.searchIcon}>🔍</Text>
+      <IconeLoupe size={18} color={colors.muted} />
       <TextInput
         value={value}
         onChangeText={onChange}
@@ -337,7 +351,7 @@ export function SearchField({
           accessibilityLabel="Effacer la recherche"
           hitSlop={8}
         >
-          <Text style={styles.searchClear}>✕</Text>
+          <IconeCroix size={18} color={colors.muted} />
         </Pressable>
       ) : null}
     </View>
@@ -357,23 +371,25 @@ const styles = StyleSheet.create({
     paddingRight: spacing.lg,
     marginBottom: spacing.sm,
   },
-  backArrow: { fontSize: 24, color: colors.primary, lineHeight: 26 },
   backLabel: { fontSize: 17, color: colors.primary, fontWeight: '600' },
   chipRow: { gap: spacing.xs, paddingVertical: spacing.xs, paddingRight: spacing.lg },
   // Treize pixels de texte dans six de marge : il fallait zoomer pour lire les
   // thèmes, et la pastille faisait trente-deux points de haut là où le pouce en
   // demande quarante-quatre.
   chip: {
-    paddingHorizontal: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: radius.pill,
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
   chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chipText: { fontSize: 15, color: colors.muted },
-  chipTextSelected: { color: '#FFFFFF', fontWeight: '600' },
+  chipText: { fontSize: 15, color: colors.text },
+  chipTextSelected: { color: colors.surface, fontWeight: '600' },
   track: { backgroundColor: colors.surfaceAlt, overflow: 'hidden', width: '100%' },
   search: {
     flexDirection: 'row',
@@ -415,21 +431,24 @@ const styles = StyleSheet.create({
   segmentTextSelected: { color: colors.text },
   // Quarante-quatre points de haut au minimum, c'est la taille d'un pouce.
   button: {
-    paddingVertical: spacing.lg,
+    // Cinquante-deux points de haut, et en pastille : tout ce qui se touche
+    // est rond, tout ce qui contient est arrondi.
+    height: 52,
+    justifyContent: 'center',
     paddingHorizontal: spacing.lg,
-    borderRadius: radius.md,
+    borderRadius: radius.pill,
     alignItems: 'center',
   },
   buttonPrimary: { backgroundColor: colors.primary },
   buttonSecondary: {
     backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.primary,
   },
   buttonDisabled: { backgroundColor: colors.surfaceAlt },
   buttonText: { fontSize: 17, fontWeight: '700' },
-  buttonTextPrimary: { color: '#FFFFFF' },
-  buttonTextSecondary: { color: colors.text },
+  buttonTextPrimary: { color: colors.surface },
+  buttonTextSecondary: { color: colors.primary },
   card: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,

@@ -48,6 +48,22 @@ export type MapCanvasProps = {
    * bandeau et montrer la pastille de retour.
    */
   onRegionChange?: (code: string | null) => void;
+  /**
+   * Demande de retour à la France entière.
+   *
+   * Un compteur plutôt qu'un booléen : chaque incrément est UN retour demandé,
+   * et deux retours d'affilée se distinguent. Dézoomer referme aussi, mais un
+   * chemin qu'on voit vaut mieux qu'un geste qu'il faut deviner.
+   */
+  retour?: number;
+  /**
+   * Une région à ouvrir, demandée depuis un autre écran.
+   *
+   * De la forme `code#nonce` : le nonce distingue deux demandes portant sur la
+   * même région, sans quoi rouvrir la Bretagne après l'avoir refermée ne
+   * changerait rien.
+   */
+  ouvrir?: string | null;
 };
 
 /**

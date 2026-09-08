@@ -132,6 +132,8 @@ export function MapCanvas({
   focus,
   onDeselect,
   onRegionChange,
+  retour,
+  ouvrir: demande,
 }: MapCanvasProps) {
   const container = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreMap | null>(null);
@@ -774,6 +776,52 @@ export function MapCanvas({
         : (OPACITE_PLEINE as never),
     );
   }, [ready, highlightedId]);
+
+  /**
+   * Une région demandée depuis un autre écran.
+   *
+   * C'est la porte d'entrée de l'outre-mer : cadrée sur la métropole, la
+   * Guadeloupe est à six mille kilomètres hors de l'écran, et personne ne l'y
+   * trouve en faisant glisser au hasard. La liste d'Explorer y mène, et la
+   * carte fait le même vol que sur un clic.
+   */
+  useEffect(() => {
+    const instance = map.current;
+    if (!ready || !instance || !demande) return;
+    const code = demande.split('#')[0];
+    if (!REGIONS.has(code)) return;
+    poserSurvol(instance, survolee.current, false);
+    survolee.current = null;
+    ouverteRef.current = code;
+    zoomOuverture.current = null;
+    setOuverte(code);
+    onRegion.current?.(code);
+    ouvrir(instance, code);
+  }, [ready, demande]);
+
+  /**
+   * Le retour à la France, par la pastille.
+   *
+   * Les lieux s'effacent AVANT que la caméra ne bouge — cent soixante
+   * millisecondes — pour qu'on ne les voie pas glisser pendant le recul. Fermer
+   * la région déclenche ce fondu ; le vol part quand il est fini.
+   */
+  useEffect(() => {
+    const instance = map.current;
+    if (!ready || !instance || !retour) return;
+    ouverteRef.current = null;
+    zoomOuverture.current = null;
+    setOuverte(null);
+    onRegion.current?.(null);
+    const depart = setTimeout(() => {
+      instance.fitBounds(FRANCE_BOUNDS, {
+        padding: 12,
+        duration: TRANSITION.retour.zoom,
+        easing: bezier(TRANSITION.courbe),
+      });
+    }, TRANSITION.retour.lieux);
+    return () => clearTimeout(depart);
+  }, [ready, retour]);
 
   // Recentrage sur un lieu choisi ailleurs — dans le bandeau, dans la
   // recherche. Sans lui, toucher une vignette ne dit pas où elle se trouve.
