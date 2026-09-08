@@ -40,3 +40,6 @@ Q15063077,monuments,Axe Majeur de Cergy — classe « œuvre d'art » Q838948, q
 Q3232046,monuments,Les Deux Plateaux — classes « installation » Q20437094, « fontaine » et « œuvre d'art » : aucun thème ne les déclare
 Q3554061,monuments,Vallée des Saints à Carnoët — classes « statue » Q179700 et « monument » Q4989906, trop génériques pour être collectées
 Q1820547,musees,Les Machines de l'île à Nantes — classe « espace d'exposition » Q18123390 ; on y entre avec un billet pour voir une collection, et la barre de « monuments » la condamnait à une étoile
+Q638250,monuments,Chapelle de Ronchamp — classes « chapelle » Q108325 et « église » Q16970 ; `cathedrales` ne prend que les édifices à TITRE, décision assumée dont elle est la victime
+Q2587975,monuments,Cité radieuse de Marseille — classes « immeuble d'habitation » Q13402009 et « habitat collectif », inexploitables comme thèmes
+Q1395337,musees,Familistère de Guise — classe « phalanstère » Q204767 ; rangé en musées non par sa classe mais par sa visite, qui se fait au billet

@@ -91,11 +91,31 @@
 # absents par leur NOM dans le catalogue exporté ; il faut les chercher par
 # leur Q-ID dans data/raw, qui est l'état d'avant les filtres.
 #
-# VRAIS trous — absents de toute la collecte, à épingler :
+# VRAIS trous — vérifiés sur `probe` et ÉPINGLÉS dans places.csv :
 #
-#   Chapelle Notre-Dame-du-Haut   Ronchamp (70)     UNESCO   Q638250
-#   Cité radieuse                 Marseille (13)    UNESCO   Q2587975
-#   Familistère de Guise          Guise (02)                 Q1395337
+#   Chapelle Notre-Dame-du-Haut   Ronchamp (70)   Q638250    monuments
+#   Cité radieuse                 Marseille (13)  Q2587975   monuments
+#   Familistère de Guise          Guise (02)      Q1395337   musees
+#
+# Aucune classe écartée, coordonnées présentes sur les trois : les deux
+# accidents redoutés depuis l'Axe Majeur sont hors de cause.
+#
+# Ronchamp porte TRENTE-NEUF versions linguistiques. C'est plus que la plupart
+# des lieux du catalogue, et sa classe est « église » — celle que le thème
+# `cathedrales` écarte explicitement. Le trou n'est donc pas un oubli de
+# collecte : c'est le prix d'une décision, et il se paie sur le seul édifice
+# du XXe siècle au patrimoine mondial qui soit une chapelle.
+#
+# Le Familistère va dans `musees` alors que sa classe dit « phalanstère », et
+# la décision est éditoriale, pas documentaire : on y entre au billet pour
+# visiter, ce qui est une visite de musée et non un édifice qu'on regarde de
+# la rue. Le thème change aussi sa note — la barre du niveau 2 est à 62,1 chez
+# les Musées contre 92,9 chez les Monuments.
+#
+# ⚠ La Cité radieuse a « Sainte-Anne » pour commune chez Wikidata, qui est un
+# QUARTIER de Marseille et non une commune. C'est exactement ce qui a envoyé
+# l'Axe Majeur dans les Yvelines. Le rattachement par coordonnées doit
+# corriger — à VÉRIFIER après le build : département attendu 13.
 #
 # Ronchamp est le cas à regarder en premier, parce que son absence n'est pas
 # un oubli mais la conséquence d'une décision prise ailleurs : `cathedrales`
