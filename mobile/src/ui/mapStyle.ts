@@ -508,6 +508,24 @@ export function tailleDesGlyphes(): unknown[] {
   return ['interpolate', ['linear'], ['zoom'], 6, 0.55, 9, 0.68, 13, 0.78];
 }
 
+/**
+ * L'effacement des tracés administratifs quand on approche.
+ *
+ * Nos contours sont simplifiés — il le faut, les tracés bruts de l'IGN pèsent
+ * plusieurs mégaoctets. À l'échelle d'une région, la simplification ne se voit
+ * pas. À l'échelle d'une île, si : notre trait passe à côté de la vraie côte
+ * que les tuiles dessinent juste en dessous, et les deux se contredisent à
+ * l'écran.
+ *
+ * Plutôt que d'alourdir le fichier pour un détail qu'on ne regarde qu'une fois
+ * zoomé, on retire le trait au moment où il devient faux. Il n'a d'ailleurs
+ * plus rien à dire là : une fois dans une région, sa frontière n'est plus une
+ * information, c'est un souvenir.
+ */
+export function opaciteDesTraits(maximum = 1): unknown[] {
+  return ['interpolate', ['linear'], ['zoom'], 8.2, maximum, 10.5, 0];
+}
+
 /** L'expression qui donne son sable à chaque région. Un coloriage, pas un hachage. */
 export function tonsDesRegions(): unknown[] {
   const cas: unknown[] = ['match', ['get', 'code']];

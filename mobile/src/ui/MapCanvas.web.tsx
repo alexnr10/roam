@@ -35,6 +35,7 @@ import {
   OPACITE_PLEINE,
   opaciteDesAplats,
   opaciteEnCascade,
+  opaciteDesTraits,
   pasDeCascade,
   rayonDesPastilles,
   tailleDesGlyphes,
@@ -173,6 +174,19 @@ export function MapCanvas({
   const attenuation = useRef(1);
   const image = useRef<number | null>(null);
   const imageAplats = useRef<number | null>(null);
+  /**
+   * Le lieu mis en avant, gardé en référence.
+   *
+   * L'opacité des pastilles a deux maîtres : la cascade d'arrivée dans une
+   * région, et la mise en retrait des autres lieux quand on en touche un. Le
+   * second écrasait la première — une position GPS qui arrive au mauvais moment
+   * changeait le lieu suggéré, et les deux cent soixante-douze pastilles
+   * surgissaient d'un coup au milieu de leur cascade. C'est le « pas fluide,
+   * mais rarement » : il fallait que ça tombe pendant les neuf cents
+   * millisecondes du vol.
+   */
+  const misEnAvant = useRef<string | null>(highlightedId ?? null);
+  misEnAvant.current = highlightedId ?? null;
 
   byId.current = new Map(places.map((place) => [place.id, place]));
   onSelect.current = onSelectPlace;
@@ -241,6 +255,15 @@ export function MapCanvas({
     if (image.current !== null) cancelAnimationFrame(image.current);
     image.current = null;
   }, []);
+
+  /** L'opacité des pastilles hors animation : pleine, ou en retrait. */
+  const opaciteAuRepos = React.useCallback(
+    () =>
+      (misEnAvant.current
+        ? ['case', ['==', ['get', 'id'], misEnAvant.current], 1, 0.55]
+        : OPACITE_PLEINE) as never,
+    [],
+  );
 
   const [ouverte, setOuverte] = useState<string | null>(null);
   const [degraded, setDegraded] = useState(false);
@@ -338,7 +361,7 @@ export function MapCanvas({
           source: VOILE_SRC,
           paint: {
             'fill-color': OUT_OF_SCOPE_VEIL.color,
-            'fill-opacity': OUT_OF_SCOPE_VEIL.opacity,
+            'fill-opacity': opaciteDesTraits(OUT_OF_SCOPE_VEIL.opacity) as never,
           },
         });
 
@@ -362,7 +385,7 @@ export function MapCanvas({
             paint: {
               'line-color': REGION_LINES.shadow,
               'line-width': REGION_LINES.shadowWidth,
-              'line-opacity': REGION_LINES.shadowOpacity,
+              'line-opacity': opaciteDesTraits(REGION_LINES.shadowOpacity) as never,
               'line-translate': REGION_LINES.shadowOffset,
             },
           });
@@ -392,6 +415,7 @@ export function MapCanvas({
             paint: {
               'line-color': REGION_LINES.seam,
               'line-width': REGION_LINES.seamWidth,
+              'line-opacity': opaciteDesTraits() as never,
             },
           });
         }
@@ -413,7 +437,7 @@ export function MapCanvas({
             filter: ['in', ['get', 'code'], ['literal', []]],
             paint: {
               'line-color': REGION_LINES.shadow,
-              'line-opacity': 0.5,
+              'line-opacity': opaciteDesTraits(0.5) as never,
               'line-width': 1.1,
               'line-dasharray': [4, 4],
             },
@@ -430,6 +454,7 @@ export function MapCanvas({
             paint: {
               'line-color': REGION_LINES.chosen,
               'line-width': REGION_LINES.chosenWidth,
+              'line-opacity': opaciteDesTraits() as never,
             },
           });
         }
@@ -488,6 +513,23 @@ export function MapCanvas({
           },
         });
 
+        // Le lieu mis en avant : un ANNEAU autour de sa pastille, pas un
+        // disque par-dessus. Un disque plein recouvrait le symbole du thème —
+        // toucher un lieu trois étoiles lui faisait perdre son icône au moment
+        // précis où on le regardait.
+        instance.addLayer({
+          id: 'place-highlight',
+          type: 'circle',
+          source: SOURCE,
+          filter: ['==', ['get', 'id'], '__none__'],
+          paint: {
+            'circle-opacity': 0,
+            'circle-radius': ['+', rayonDesPastilles(), 4] as never,
+            'circle-stroke-width': 2.4,
+            'circle-stroke-color': colors.primary,
+          },
+        });
+
         // Le symbole du thème, en clair sur le disque. Seules les deux
         // premières notes en portent un : mille deux cent soixante-neuf lieux à
         // une étoile, tous surmontés d'un symbole, feraient une carte illisible.
@@ -505,20 +547,6 @@ export function MapCanvas({
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
           } as never,
-        });
-
-        // Le lieu mis en avant, par-dessus tout le reste.
-        instance.addLayer({
-          id: 'place-highlight',
-          type: 'circle',
-          source: SOURCE,
-          filter: ['==', ['get', 'id'], '__none__'],
-          paint: {
-            'circle-color': colors.primary,
-            'circle-radius': 8.5,
-            'circle-stroke-width': 2.2,
-            'circle-stroke-color': mapColors.halo,
-          },
         });
 
         // ── Les noms de départements ─────────────────────────────────────
@@ -729,7 +757,7 @@ export function MapCanvas({
         opacifier(instance, ['*', OPACITE_PLEINE, 1 - avancement] as never);
       }, () => {
         source.setData({ type: 'FeatureCollection', features: [] });
-        opacifier(instance, OPACITE_PLEINE as never);
+        opacifier(instance, opaciteAuRepos());
       });
       return;
     }
@@ -740,7 +768,7 @@ export function MapCanvas({
     if (!changementDeRegion) {
       // Un filtre de thème, une visite validée : la liste change, mais on ne
       // rejoue pas l'arrivée dans la région — on n'y arrive pas deux fois.
-      opacifier(instance, OPACITE_PLEINE as never);
+      opacifier(instance, opaciteAuRepos());
       return;
     }
 
@@ -750,7 +778,7 @@ export function MapCanvas({
     animer(TRANSITION.lieux.delai + cascade, (avancement, ecoule) => {
       opacifier(instance, opaciteEnCascade(ecoule - TRANSITION.lieux.delai, pas) as never);
     }, () => {
-      opacifier(instance, OPACITE_PLEINE as never);
+      opacifier(instance, opaciteAuRepos());
     });
   }, [ready, places, visitedIds, ouverte]);
 
@@ -815,18 +843,11 @@ export function MapCanvas({
     ]);
     // Un point touché : les autres reculent, pour qu'on voie lequel on a pris.
     //
-    // Sauf pendant l'arrivée dans une région : rendre son opacité pleine à la
-    // couche couperait la cascade en cours, et les pastilles surgiraient d'un
-    // coup. La cascade repose elle-même sur l'opacité pleine en terminant.
-    if (!highlightedId && image.current !== null) return;
-    if (map.current) {
-      opacifier(
-        map.current,
-        highlightedId
-          ? (['case', ['==', ['get', 'id'], highlightedId], 1, 0.55] as never)
-          : (OPACITE_PLEINE as never),
-      );
-    }
+    // Jamais pendant une animation, dans un sens comme dans l'autre : écrire
+    // l'opacité ici couperait la cascade en cours, et les pastilles
+    // surgiraient d'un coup. La cascade se termine elle-même sur cet état.
+    if (image.current !== null) return;
+    if (map.current) opacifier(map.current, opaciteAuRepos());
   }, [ready, highlightedId]);
 
   /**

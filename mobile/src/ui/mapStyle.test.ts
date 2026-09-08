@@ -9,6 +9,7 @@ import {
   TRANSITION,
   depouiller,
   opaciteDesAplats,
+  opaciteDesTraits,
   opaciteEnCascade,
   pasDeCascade,
   rayonDesPastilles,
@@ -357,5 +358,26 @@ describe('ETOILE_COULEURS', () => {
       parseInt(hex.slice(1, 3), 16) + parseInt(hex.slice(3, 5), 16) + parseInt(hex.slice(5, 7), 16);
     expect(clarte(valeurs[0])).toBeLessThan(clarte(valeurs[1]));
     expect(clarte(valeurs[1])).toBeLessThan(clarte(valeurs[2]));
+  });
+});
+
+describe('opaciteDesTraits', () => {
+  it('efface les contours administratifs quand on approche', () => {
+    // Nos contours sont simplifiés ; à l'échelle d'une île, notre trait passe à
+    // côté de la vraie côte que les tuiles dessinent juste en dessous. Le
+    // retirer là où il devient faux vaut mieux que d'alourdir le fichier — et
+    // une frontière de région n'a plus rien à dire quand on est dedans.
+    const expression = opaciteDesTraits();
+    expect(expression[0]).toBe('interpolate');
+    const [zoomBas, opaciteBasse, zoomHaut, opaciteHaute] = expression.slice(3) as number[];
+    expect(opaciteBasse).toBe(1);
+    expect(opaciteHaute).toBe(0);
+    expect(zoomHaut).toBeGreaterThan(zoomBas);
+  });
+
+  it('respecte l’opacité maximale demandée', () => {
+    // L'ombre des régions vit à 0,35 : l'effacement ne doit pas la rendre plus
+    // présente qu'elle ne l'était.
+    expect((opaciteDesTraits(0.35).slice(3) as number[])[1]).toBe(0.35);
   });
 });
