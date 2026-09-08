@@ -41,11 +41,33 @@
 # Ce n'est pas un problème de label mais de collecte, et il se traite comme
 # les œuvres monumentales : suggest-qids, puis probe, puis places.csv.
 #
-#   Baie de Somme                          (80)
-#   Havre du Payré                         (85)
-#   Marais de Brouage                      (17)
-#   Gorges de la Cesse et du Brian         (34)
-#   Ocres du Luberon                       (84)
+#   Baie de Somme        (80)   Q1741383 résolu, à passer au probe puis à
+#                               épingler. Les autres candidats étaient des
+#                               entités de PROTECTION — réserve naturelle,
+#                               site Ramsar, parc régional — et non le lieu
+#                               qu'on visite ; deux autres étaient un
+#                               bailleur social et une société de services.
+#
+#   Havre du Payré       (85)   `suggest-qids` ne rend RIEN. À rechercher
+#                               autrement : « Payré », « Talmont-Saint-
+#                               Hilaire ». S'il n'existe pas chez Wikidata,
+#                               ce site restera sans représentant.
+#
+# Deux autres sont réglés SANS collecte, par le même raisonnement que le pont
+# transbordeur : le catalogue possédait déjà un composant du site.
+#
+#   Marais de Brouage    (17)   Brouage (Q3308728, 99,6 pts), le village
+#                               fortifié au cœur du marais.
+#   Ocres du Luberon     (84)   Roussillon (Q321139, 148 pts), le village
+#                               des ocres. Le Colorado provençal de Rustrel
+#                               (Q2984389) est un second composant possible,
+#                               absent du catalogue — à ajouter si l'on veut
+#                               le site en deux fiches.
+#
+# Et un était un FAUX problème, comme le Concors : les gorges de la Cesse et
+# du Brian n'ont pas d'entité Wikidata, mais leur site officiel s'appelle
+# « Cité de Minerve, Gorges de la Cesse et du Brian » — et Minerve (Q660013)
+# est étiquetée depuis toujours. Le site est représenté.
 #
 #
 #
