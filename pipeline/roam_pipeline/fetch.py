@@ -225,6 +225,10 @@ def fetch_listed_places(
                 LOG.warning("%s : sans coordonnées ou sans nom — ignoré", qid)
                 continue
             place.pinned = pinned
+            # L'ORIGINE de l'épingle, et non son seul effet : plus tard, un
+            # verdict `keep` posera `pinned` lui aussi, et les plafonds ne
+            # réservent leur place qu'aux lieux venus de places.csv.
+            place.pinned_by_hand = pinned
             place.source = source
             existing = by_qid.get(qid)
             if existing is None or _completeness(place) > _completeness(existing):

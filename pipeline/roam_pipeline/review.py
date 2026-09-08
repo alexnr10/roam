@@ -107,6 +107,9 @@ def apply_decisions(
     counted: set[str] = set()
 
     for place in places:
+        # AVANT que le verdict ne parle : à cet instant, `pinned` ne peut venir
+        # que de places.csv, et c'est la seule occasion de le savoir.
+        place.pinned_by_hand = place.pinned
         decision, _note = decisions.get(place.wikidata_id, ("", ""))
         # Compté une fois par LIEU, pas par ligne : un même lieu peut figurer
         # sous deux thèmes avant le dédoublonnage, et le décompte affiché

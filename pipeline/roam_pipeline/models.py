@@ -119,6 +119,23 @@ class Place:
     # traiter comme des dispenses remplissait le plafond des cathédrales avant
     # qu'une seule région n'ait eu sa part.
     kept_in_review: bool = False
+    # Épinglé DANS places.csv, par opposition à épinglé par un verdict `keep`.
+    #
+    # Les deux posent `pinned`, et les plafonds ne réservent leur place qu'aux
+    # premiers — un `keep` veut dire « celui-ci ne me choque pas », il y en a
+    # mille cinq cent cinquante-cinq, et les traiter en dispenses remplissait
+    # les plafonds avant qu'aucune région n'ait eu sa part.
+    #
+    # Les distinguer par « pinned mais pas kept_in_review » PARAISSAIT suffire.
+    # Ça ne l'était pas : un lieu de places.csv que le curateur valide en revue
+    # porte les deux drapeaux, perd sa réservation, et tombe sous le plafond de
+    # son thème. Le Familistère de Guise a disparu du catalogue exactement
+    # ainsi — épinglé à la main, puis gardé en revue, donc écarté.
+    #
+    # Le drapeau est posé par `apply_decisions`, qui photographie l'état
+    # d'AVANT que la revue ne parle : à ce moment, `pinned` ne peut venir que
+    # de places.csv.
+    pinned_by_hand: bool = False
     # D'où vient ce lieu. « wikidata » : trouvé par sa classe, comme la
     # majorité. « osm » : trouvé parce qu'OpenStreetMap atteste qu'il accueille
     # du public, alors que Wikidata ne le classait nulle part. Cette origine ne

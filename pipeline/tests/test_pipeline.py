@@ -4809,9 +4809,29 @@ class TestThemeCap(unittest.TestCase):
         gros = [self._lieu(f"Cathédrale {i}", "cathedrales", 200 - i, "75")
                 for i in range(5)]
         epingle = self._lieu("Choisie à la main", "cathedrales", 5, "75")
-        epingle.pinned = True
+        epingle.pinned = epingle.pinned_by_hand = True
         gardes = self._cape(gros + [epingle], mini=0)
         self.assertIn("Choisie à la main", {p.name for p in gardes})
+
+    def test_a_hand_pinned_place_keeps_its_seat_after_a_keep(self):
+        # CE QUI EST ARRIVÉ AU FAMILISTÈRE DE GUISE. Épinglé dans places.csv,
+        # puis validé en revue : il portait donc `pinned` ET `kept_in_review`,
+        # la condition d'alors lisait « pinned mais pas kept_in_review », et il
+        # perdait sa réservation au moment précis où le curateur l'approuvait.
+        # Il a disparu du catalogue sans qu'une seule ligne le dise.
+        from roam_pipeline.review import apply_decisions
+
+        gros = [self._lieu(f"Cathédrale {i}", "cathedrales", 200 - i, "75")
+                for i in range(5)]
+        epingle = self._lieu("Épinglée puis gardée", "cathedrales", 5, "75")
+        epingle.pinned = epingle.pinned_by_hand = True
+        with _capture():
+            lot, _ = apply_decisions(gros + [epingle],
+                                     {epingle.wikidata_id: ("keep", "")})
+        self.assertTrue(epingle.kept_in_review)   # la revue a bien parlé
+        self.assertTrue(epingle.pinned_by_hand)   # l'origine, elle, ne bouge pas
+        gardes = self._cape(lot, mini=0)
+        self.assertIn("Épinglée puis gardée", {p.name for p in gardes})
 
     def test_a_review_keep_is_not_a_free_pass(self):
         # `keep` pose le même drapeau qu'un épinglage à la main, et il y en a
@@ -4964,7 +4984,7 @@ class TestCommuneCap(unittest.TestCase):
         # le plafond n'a pas à défaire ce geste.
         lieux = [self._lieu(f"Musée {i}", "musees", 100 - i, "Paris", "75101")
                  for i in range(8)]
-        lieux[-1].pinned = True
+        lieux[-1].pinned = lieux[-1].pinned_by_hand = True
         gardes = self._cape(lieux)
         self.assertIn("Musée 7", {p.name for p in gardes})
         self.assertEqual(len(gardes), 6)

@@ -997,8 +997,15 @@ def apply_theme_cap(places: list[Place], config: Config) -> list[Place]:
         # et il y en a mille cinq cent cinquante-cinq : les compter comme des
         # dispenses remplissait le plafond avant qu'une région n'ait eu sa part,
         # et les quatre cathédrales d'outre-mer tombaient quand même.
+        #
+        # La condition lisait « pinned mais pas kept_in_review », ce qui
+        # paraissait dire la même chose et disait autre chose : un lieu de
+        # places.csv que le curateur VALIDE en revue porte les deux drapeaux.
+        # Il perdait donc sa réservation au moment précis où on l'approuvait.
+        # Le Familistère de Guise a disparu du catalogue ainsi, épinglé puis
+        # gardé. `pinned_by_hand` retient l'origine au lieu de la déduire.
         for place in lot:
-            if place.pinned and not place.kept_in_review:
+            if place.pinned_by_hand:
                 reserve(place)
         # Une région n'a droit à sa garantie que si le thème y EXISTE. Sans
         # cette condition, le minimum forçait un lieu « côtier » dans chaque
@@ -1145,7 +1152,7 @@ def apply_commune_cap(places: list[Place], config: Config) -> list[Place]:
         # que ce dernier se situe à la fin du classement c'est normal qu'il
         # sorte. » Vient ensuite la hiérarchie de revue, puis le score.
         lot.sort(key=lambda place: (
-            not (place.pinned and not place.kept_in_review),
+            not place.pinned_by_hand,
             place.tier_shift,
             -place.score,
         ))
