@@ -1,3 +1,4 @@
+import { colors } from '../theme';
 import { REGIONS } from '../lib/regions';
 import {
   ETOILE_COULEURS,
@@ -348,16 +349,108 @@ describe('rayonDesPastilles', () => {
   });
 });
 
+/** Le canal linéaire d'un octet sRGB. */
+function canal(octet: number): number {
+  const c = octet / 255;
+  return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+}
+
+/** Luminance relative, au sens WCAG. */
+function luminance(hex: string): number {
+  const [r, g, b] = [1, 3, 5].map((i) => canal(parseInt(hex.slice(i, i + 2), 16)));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/** Le rapport de contraste entre deux couleurs opaques. */
+function contraste(a: string, b: string): number {
+  const [x, y] = [luminance(a), luminance(b)];
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+}
+
+/** Une couleur posée sur une autre, avec son opacité. */
+function pose(dessus: string, dessous: string, opacite: number): string {
+  const melange = [1, 3, 5].map((i) => {
+    const f = parseInt(dessus.slice(i, i + 2), 16);
+    const d = parseInt(dessous.slice(i, i + 2), 16);
+    return Math.round(f * opacite + d * (1 - opacite));
+  });
+  return `#${melange.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+}
+
+/** La chroma OKLCH : à quel point une couleur appelle l'œil. */
+function chroma(hex: string): number {
+  const [r, g, b] = [1, 3, 5].map((i) => canal(parseInt(hex.slice(i, i + 2), 16)));
+  const cube = (x: number) => (x > 0 ? Math.cbrt(x) : 0);
+  const l = cube(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = cube(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = cube(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  const a = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
+  const bb = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+  return Math.hypot(a, bb);
+}
+
 describe('ETOILE_COULEURS', () => {
-  it('donne trois teintes distinctes, de la plus forte à la plus effacée', () => {
-    const valeurs = [ETOILE_COULEURS[3], ETOILE_COULEURS[2], ETOILE_COULEURS[1]];
-    expect(new Set(valeurs).size).toBe(3);
-    // Du plus foncé au plus clair : la note se lit à la valeur, pas seulement
-    // à la teinte — ce qui la garde lisible en noir et blanc.
-    const clarte = (hex: string) =>
-      parseInt(hex.slice(1, 3), 16) + parseInt(hex.slice(3, 5), 16) + parseInt(hex.slice(5, 7), 16);
-    expect(clarte(valeurs[0])).toBeLessThan(clarte(valeurs[1]));
-    expect(clarte(valeurs[1])).toBeLessThan(clarte(valeurs[2]));
+  it('donne trois couleurs distinctes', () => {
+    expect(new Set([ETOILE_COULEURS[3], ETOILE_COULEURS[2], ETOILE_COULEURS[1]]).size).toBe(3);
+  });
+
+  it('garde la note la plus basse lisible sur tous les fonds de la carte', () => {
+    // LE test de ce bloc, et celui qui manquait. La couleur d'une étoile a
+    // longtemps été choisie pour sa place dans une famille ; personne ne l'avait
+    // mesurée sur ce qu'elle recouvre. Le beige de la note la plus basse tenait
+    // 1,52:1 sur un axe routier — invisible, sur le plus petit disque de la
+    // carte et les deux tiers du catalogue.
+    //
+    // Le plancher ne vaut QUE pour cette note-là, et c'est voulu : elle est la
+    // seule pastille nue. Les deux autres portent le symbole de leur thème,
+    // dessiné en sable clair — un disque large avec un dessin dedans se lit par
+    // son contraste INTERNE (5,72:1 pour trois étoiles, 3,03:1 pour deux), et
+    // une route qui passe derrière ne l'efface pas. Un point de trois pixels
+    // n'a pas de dedans : il n'existe que par ce qu'il y a derrière lui.
+    const fonds = {
+      ...Object.fromEntries(
+        Object.entries(REGION_TONES).map(([nom, ton]) => [
+          `aplat ${nom}`,
+          pose(ton, mapColors.earth, OPACITE_REGION_OUVERTE),
+        ]),
+      ),
+      'route majeure': mapColors.road,
+      'route mineure': mapColors.roadMinor,
+      'espace vert': mapColors.green,
+      bâti: mapColors.built,
+    };
+    // 2:1 est bas pour du texte ; c'est le plancher qui convient à une forme
+    // pleine de plusieurs pixels, qu'on repère à sa masse et non à son dessin.
+    // En dessous, le disque se fond dans le fond.
+    const nue = ETOILE_COULEURS[1];
+    const trop_pale: string[] = [];
+    for (const [nom, fond] of Object.entries(fonds)) {
+      const ratio = contraste(nue, fond);
+      if (ratio <= 2) trop_pale.push(`1★ ${nue} sur ${nom} : ${ratio.toFixed(2)}:1`);
+    }
+    expect(trop_pale).toEqual([]);
+  });
+
+  it('garde un symbole lisible sur les deux pastilles qui en portent un', () => {
+    // Le pendant du test précédent : ce qui tient les deux premières notes,
+    // c'est leur dedans. Si une terre cuite s'éclaircissait au point que le
+    // symbole sable ne s'y détache plus, ces pastilles perdraient la seule
+    // chose qui les fait lire sur un fond chargé.
+    expect(contraste(ETOILE_COULEURS[3], colors.bg)).toBeGreaterThan(4.5);
+    expect(contraste(ETOILE_COULEURS[2], colors.bg)).toBeGreaterThan(3);
+  });
+
+  it('réserve la terre cuite aux deux premières notes', () => {
+    // La hiérarchie ne passe PLUS par la valeur : deux et une étoiles ne se
+    // tenaient qu'à cinq pour cent l'une de l'autre, ce qui ne se voyait pas,
+    // et l'exiger obligeait la plus petite pastille à être aussi la plus pâle.
+    // Elle passe par la taille (rayons 9 / 5,5 / 3), par le symbole que seules
+    // les deux premières notes portent, et par la saturation testée ici.
+    expect(chroma(ETOILE_COULEURS[1])).toBeLessThan(chroma(ETOILE_COULEURS[2]) / 3);
+    expect(chroma(ETOILE_COULEURS[1])).toBeLessThan(chroma(ETOILE_COULEURS[3]) / 3);
+    // Et la note la plus haute reste l'encre la plus foncée de la carte.
+    expect(luminance(ETOILE_COULEURS[3])).toBeLessThan(luminance(ETOILE_COULEURS[2]));
+    expect(luminance(ETOILE_COULEURS[3])).toBeLessThan(luminance(ETOILE_COULEURS[1]));
   });
 });
 

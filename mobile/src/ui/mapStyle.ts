@@ -455,14 +455,39 @@ export const TRANSITION = {
 /**
  * La couleur d'une pastille, selon sa note.
  *
- * Trois tons de la même famille, du plus foncé au plus effacé. La FORME dit
- * déjà la catégorie — le symbole du thème est posé dessus — donc la couleur n'a
- * qu'une chose à dire, et elle la dit seule.
+ * Deux terres cuites pour les deux premières notes, une encre pour la
+ * troisième. La FORME dit déjà la catégorie — le symbole du thème est posé
+ * dessus — donc la couleur n'a qu'une chose à dire, et elle la dit seule.
+ *
+ * ## Pourquoi la troisième n'est plus un sable
+ *
+ * Elle l'a été : `#A2907A`, choisi pour prolonger la famille du fond en la
+ * gardant discrète. C'était l'erreur, et elle se mesure. Sur l'aplat d'une
+ * région ouverte ce beige tenait 2,52:1 ; sur un axe routier, 1,52:1 — soit
+ * rien du tout. Or c'est le plus petit disque de la carte (trois pixels de
+ * rayon), et il portait aussi la valeur la plus faible : la taille et le
+ * contraste s'effaçaient dans le même sens, au lieu de se compenser. Douze
+ * cent soixante-neuf lieux, soit près des deux tiers du catalogue, étaient donc
+ * les plus durs à voir.
+ *
+ * `#776F62` est `colors.muted` — l'encre discrète de l'app — éclaircie juste
+ * assez pour rester sous la terre cuite : 4,05:1 sur l'aplat, 2,44:1 sur la
+ * route, deux fois mieux dans les deux cas.
+ *
+ * ## Ce qui porte la hiérarchie, du coup
+ *
+ * Pas la valeur. Elle ne le pouvait déjà plus : deux et une étoiles ne se
+ * tenaient qu'à cinq pour cent l'une de l'autre, indiscernables. Ce qui la
+ * porte vraiment, c'est la TAILLE — neuf, cinq et demi, trois de rayon, donc
+ * neuf fois plus de surface d'un bout à l'autre — le SYMBOLE, que seules les
+ * deux premières notes reçoivent, et la SATURATION : la terre cuite appelle
+ * l'œil (chroma 0,11 et 0,13), l'encre ne l'appelle pas (0,02). Un lieu à une
+ * étoile se voit maintenant ; il ne se réclame pas pour autant.
  */
 export const ETOILE_COULEURS = {
   3: colors.primary,
   2: colors.primaryLight,
-  1: '#A2907A',
+  1: '#776F62',
 } as const;
 
 /**
