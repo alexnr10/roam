@@ -3636,7 +3636,7 @@ def build_parser() -> argparse.ArgumentParser:
              "promote, demote)")
     verdict.add_argument("wikidata_id")
     verdict.add_argument("decision", nargs="?", default="",
-                         help="keep, drop, promote ou demote")
+                         help="keep, drop, promote, promote2 ou demote — `promote2` fait entrer un lieu dans sa collection nationale ET l'y monte d'un cran")
     verdict.add_argument("--note", help="pourquoi ce verdict")
     verdict.add_argument("--clear", action="store_true",
                          help="retirer le verdict et rendre le lieu à l'automatique")
