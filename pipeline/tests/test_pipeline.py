@@ -63,6 +63,7 @@ from roam_pipeline.models import (
 from roam_pipeline import outlines
 from roam_pipeline import wikidata as wd
 from roam_pipeline.fetch import (
+    enrich_article_sizes,
     REMEDIES, diagnose_missing, enrich_departements, stale_themes,
 )
 from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from_insee
@@ -4030,6 +4031,58 @@ class TestCreditWithChosenPhotos(unittest.TestCase):
         lieu = self._lieu("Tour Eiffel", "Q1", photo_url("Wikidata.jpg"))
         credit_chosen_photos([lieu], {}, lambda places: 0)
         self.assertEqual(lieu.image_url, photo_url("Wikidata.jpg"))
+
+
+class TestArticleSizes(unittest.TestCase):
+    """« taille d'article renseignée pour 9729/9730 » — et le 9730e ?
+
+    Le compteur s'arrêtait là. Un titre que Wikipédia ne rend pas est un
+    article supprimé ou renommé sans redirection ; le lieu garde alors la
+    taille de la passe précédente, une valeur qui vieillit en silence. Savoir
+    LEQUEL est la seule chose qui permette d'agir.
+    """
+
+    @staticmethod
+    def _lieu(nom, article):
+        lieu = make_place(nom, wikidata_id=f"Q{abs(hash(nom)) % 99991}")
+        lieu.wikipedia_url = f"https://fr.wikipedia.org/wiki/{article.replace(' ', '_')}"
+        return lieu
+
+    class _Faux:
+        """Wikipédia, qui ne connaît qu'une partie des titres demandés."""
+
+        def __init__(self, connus):
+            self.connus = connus
+
+        def article_sizes(self, titles):
+            return {t: self.connus[t] for t in titles if t in self.connus}
+
+    class _Casse:
+        def article_sizes(self, titles):
+            raise RuntimeError("réseau")
+
+    def test_an_unknown_article_is_named(self):
+        vivant = self._lieu("Pont du Gard", "Pont du Gard")
+        mort = self._lieu("Lieu disparu", "Article supprimé")
+        client = self._Faux({"Pont du Gard": 40000})
+        with self.assertLogs("roam_pipeline.fetch", level="WARNING") as journal:
+            trouves = enrich_article_sizes([vivant, mort], client)
+        self.assertEqual(trouves, 1)
+        self.assertEqual(vivant.article_bytes, 40000)
+        dit = "\n".join(journal.output)
+        self.assertIn("Article supprimé", dit)
+        self.assertIn("Lieu disparu", dit)   # le NOM du lieu, pas que le titre
+
+    def test_a_failed_batch_is_not_an_unknown_article(self):
+        # La distinction du contrat : un lot qui échoue ne dit RIEN de ses
+        # titres. Les compter comme introuvables ferait accuser Wikipédia
+        # d'avoir supprimé des articles qu'on n'a jamais réussi à demander.
+        lieu = self._lieu("Pont du Gard", "Pont du Gard")
+        with self.assertLogs("roam_pipeline.fetch", level="ERROR") as journal:
+            self.assertEqual(enrich_article_sizes([lieu], self._Casse()), 0)
+        dit = "\n".join(journal.output)
+        self.assertIn("échoué", dit)
+        self.assertNotIn("Wikipédia ne connaît pas", dit)
 
 
 class TestMissingImages(unittest.TestCase):

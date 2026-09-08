@@ -746,6 +746,9 @@ def enrich_article_sizes(places: list[Place], client: WikipediaClient | None = N
 
     titles = sorted(by_title)
     found = 0
+    # Les titres qu'un lot RÉUSSI n'a pas rendus : Wikipédia ne les connaît
+    # pas. Un lot échoué n'en dit rien, et ses titres ne comptent donc pas ici.
+    introuvables: list[str] = []
     for index, batch in enumerate(wd.chunked(titles, 50), start=1):
         try:
             sizes = client.article_sizes(batch)
@@ -756,8 +759,24 @@ def enrich_article_sizes(places: list[Place], client: WikipediaClient | None = N
             for place in by_title[title]:
                 place.article_bytes = size
             found += 1
+        introuvables.extend(t for t in batch if t not in sizes)
 
     LOG.info("taille d'article renseignée pour %s/%s articles", found, len(titles))
+    # Un compteur qui s'arrête à « 9729/9730 » ne permet pas d'agir : il faut
+    # savoir LEQUEL. L'article a été supprimé ou renommé sans laisser de
+    # redirection, et le lieu garde alors la taille de la passe précédente —
+    # une valeur qui vieillit en silence. Le remède est de corriger le lien sur
+    # Wikidata, ou d'écarter le lieu s'il n'a plus d'article.
+    if introuvables:
+        LOG.warning(
+            "%s article(s) que Wikipédia ne connaît pas — lien à corriger sur "
+            "Wikidata, sans quoi la taille gardée vieillit sans le dire : %s",
+            len(introuvables),
+            ", ".join(
+                f"{titre} ({', '.join(p.name for p in by_title[titre][:2])})"
+                for titre in introuvables[:8]
+            ),
+        )
     return found
 
 
