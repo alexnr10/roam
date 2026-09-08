@@ -147,20 +147,55 @@
 # spécialistes plutôt que de guide, mais les Q-ids sont notés.
 #
 #
-# ── 3. Lieux de mémoire ───────────────────────────────────────────────────
+# ── 3. Lieux de mémoire ── TRAITÉ ────────────────────────────────────────
 #
-# Verdun est couvert (fort de Douaumont, mémorial, forêt domaniale) et ne
-# demande rien. Ceux-ci ne sont ni un monument, ni un musée, ni un village de
-# caractère — aucun thème ne les nomme.
+# Verdun était déjà couvert (fort de Douaumont, mémorial, forêt domaniale) et
+# n'a rien demandé. Les trois autres sont ÉPINGLÉS, vérifiés sur probe :
+# coordonnées et communes présentes, aucune classe écartée.
 #
-#   Oradour-sur-Glane, village martyr     Oradour-sur-Glane (87)
-#   Camp des Milles                       Aix-en-Provence (13)
-#   Caverne du Dragon, Chemin des Dames   Oulches-la-Vallée-Foulon (02)
+#   Village martyr d'Oradour-sur-Glane  Q51300191  monuments
+#   Camp des Milles                     Q481647    monuments
+#   Caverne du Dragon                   Q2943295   monuments
+#
+# Oradour valait le doublon de recherche annoncé : la commune (Q190974) et le
+# VILLAGE MARTYR (Q51300191) sont deux entités distinctes chez Wikidata, et
+# c'est la seconde qu'on visite — les ruines conservées en l'état. Écartés au
+# passage : Q836897, le massacre, qui est un événement et non un lieu ; un
+# livre de Jens Kruuse ; le cimetière communal ; et une rue de Toulouse.
+#
+# Les trois vont dans `monuments`, et deux fois CONTRE ce que dit la classe.
+# Wikidata range Oradour sous « village » : le mettre dans le thème `villages`
+# le ferait figurer parmi les villages de caractère, entre Gordes et
+# Rocamadour, ce qui serait indécent. Et la Caverne du Dragon est une
+# « carrière » : `grottes` est le thème des cavités naturelles, or celle-ci
+# est creusée de main d'homme et se visite comme un musée. La classe dit ce
+# qu'une chose EST ; le thème dit ce qu'on vient y faire.
+#
+# Le Camp des Milles pourrait aller dans `musees` — on y visite une
+# exposition dans l'ancienne tuilerie — et un `retheme` suffirait. Il est
+# rangé avec les deux autres pour que les trois lieux de mémoire se tiennent.
 #
 #
-# ── 4. Patrimoine industriel ──────────────────────────────────────────────
+# ── 4. Patrimoine industriel ── TRAITÉ ───────────────────────────────────
 #
-#   Centre historique minier de Lewarde   Lewarde (59)        UNESCO
+#   Centre historique minier de Lewarde  Q2945654  musees
+#
+# Ce n'était PAS un trou de collecte : il était collecté depuis toujours,
+# rangé en `musees`, et le PLANCHER de notoriété l'écartait — quatre versions
+# linguistiques pour un plancher à douze. Un musée du bassin minier classé au
+# patrimoine mondial, mesuré sur le nombre de langues de Wikipédia.
+#
+# Réglé par un `verdict keep`, qui pose `pinned`, et le plancher le dit
+# lui-même : « un lieu épinglé par le curateur passe outre : le plancher
+# mesure la documentation d'un lieu, pas son intérêt. Giverny et le château
+# d'Auvers-sur-Oise attirent le monde entier sans être documentés en dix
+# langues. »
+#
+# Troisième lieu de cette liste que la collecte tenait déjà et qu'un filtre
+# écartait, après La Tourette (filtre d'accès) et la Grande Arche (verdict
+# `demote`). La leçon vaut d'être retenue : chercher un absent par son NOM
+# dans le catalogue exporté ne prouve rien — il faut le chercher par son Q-ID
+# dans data/raw, qui est l'état d'avant les filtres.
 #
 #
 # ── ⚠ LA PHOTO : la moitié de cette liste arrivera sans image ─────────────
