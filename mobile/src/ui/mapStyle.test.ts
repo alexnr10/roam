@@ -1,5 +1,6 @@
 import { REGIONS } from '../lib/regions';
 import {
+  ETOILE_COULEURS,
   OPACITE_REGION_OUVERTE,
   REGION_FILL_OPACITY,
   REGION_TONES,
@@ -10,6 +11,7 @@ import {
   opaciteDesAplats,
   opaciteEnCascade,
   pasDeCascade,
+  rayonDesPastilles,
   repeindre,
   tonsDesRegions,
 } from './mapStyle';
@@ -314,5 +316,46 @@ describe('depouiller', () => {
 
   it('laisse la carte principale intacte', () => {
     expect(repeint.layers.length).toBeGreaterThan(3);
+  });
+});
+
+describe('rayonDesPastilles', () => {
+  it('donne aux deux premières notes de quoi porter un symbole', () => {
+    // Un disque de moins de sept pixels de rayon ne peut pas accueillir une
+    // icône lisible : le symbole y deviendrait une tache.
+    const expression = rayonDesPastilles();
+    for (let i = 3; i < expression.length; i += 2) {
+      const parNote = expression[i + 1] as unknown[];
+      // ['match', ['get','tier'], 1, grand, 2, moyen, petit]
+      const [troisEtoiles, deuxEtoiles, uneEtoile] = [parNote[3], parNote[5], parNote[6]];
+      expect(troisEtoiles).toBeGreaterThan(deuxEtoiles as number);
+      // Trois tailles franchement distinctes : une pastille à deux étoiles
+      // aussi large qu'une à trois, mais sans symbole, paraissait incomplète
+      // plutôt que moindre.
+      expect(deuxEtoiles).toBeGreaterThan((uneEtoile as number) * 1.4);
+      expect(troisEtoiles).toBeGreaterThan((deuxEtoiles as number) * 1.4);
+      // Une étoile reste un point : mille deux cent soixante-neuf lieux à cette
+      // note, tous porteurs d'un symbole, feraient une carte illisible.
+      expect(uneEtoile).toBeLessThan(5);
+    }
+  });
+
+  it('grossit avec le zoom', () => {
+    const expression = rayonDesPastilles();
+    const zooms = expression.filter((_, i) => i >= 3 && i % 2 === 1) as number[];
+    expect(zooms).toEqual([...zooms].sort((a, b) => a - b));
+  });
+});
+
+describe('ETOILE_COULEURS', () => {
+  it('donne trois teintes distinctes, de la plus forte à la plus effacée', () => {
+    const valeurs = [ETOILE_COULEURS[3], ETOILE_COULEURS[2], ETOILE_COULEURS[1]];
+    expect(new Set(valeurs).size).toBe(3);
+    // Du plus foncé au plus clair : la note se lit à la valeur, pas seulement
+    // à la teinte — ce qui la garde lisible en noir et blanc.
+    const clarte = (hex: string) =>
+      parseInt(hex.slice(1, 3), 16) + parseInt(hex.slice(3, 5), 16) + parseInt(hex.slice(5, 7), 16);
+    expect(clarte(valeurs[0])).toBeLessThan(clarte(valeurs[1]));
+    expect(clarte(valeurs[1])).toBeLessThan(clarte(valeurs[2]));
   });
 });

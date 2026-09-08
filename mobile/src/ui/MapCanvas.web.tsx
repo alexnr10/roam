@@ -31,15 +31,19 @@ import {
   OUT_OF_SCOPE_VEIL,
   REGION_LINES,
   SEUIL_REGION,
+  ETOILE_COULEURS,
   OPACITE_PLEINE,
   opaciteDesAplats,
   opaciteEnCascade,
   pasDeCascade,
+  rayonDesPastilles,
+  tailleDesGlyphes,
   tonsDesRegions,
   TRANSITION,
   mapColors,
   resolveBasemap,
 } from './mapStyle';
+import { poserLesGlyphes } from './glyphes';
 import { prepareMapLibre } from './maplibreSetup';
 
 /**
@@ -95,6 +99,7 @@ function toFeatureCollection(
         // grossissait en passant la frontière, ce qu'aucune carte ne devrait
         // faire.
         tier: 4 - etoilesDe(place.id),
+        themeId: place.themeId,
         rang: rangs[index],
       },
     })),
@@ -190,17 +195,32 @@ export function MapCanvas({
       surFin?: () => void,
     ) => {
       const debut = performance.now();
+      let fini = false;
+      const finir = () => {
+        if (fini) return;
+        fini = true;
+        registre.current = null;
+        clearTimeout(filet);
+        surImage(1, duree);
+        surFin?.();
+      };
       const pas = () => {
         const ecoule = performance.now() - debut;
         const avancement = Math.min(1, ecoule / duree);
+        if (avancement >= 1) return finir();
         surImage(avancement, ecoule);
-        if (avancement < 1) {
-          registre.current = requestAnimationFrame(pas);
-        } else {
-          registre.current = null;
-          surFin?.();
-        }
+        registre.current = requestAnimationFrame(pas);
       };
+      /**
+       * Le filet.
+       *
+       * `requestAnimationFrame` ne s'exécute pas dans un onglet en arrière-plan
+       * et se fait rationner sur une machine chargée : l'animation s'arrête
+       * alors en chemin, et les lieux restent à l'opacité où elle les a laissés
+       * — invisibles. Une animation qui ne finit pas doit quand même AVOIR
+       * fini.
+       */
+      const filet = setTimeout(finir, duree + 150);
       if (registre.current !== null) cancelAnimationFrame(registre.current);
       registre.current = requestAnimationFrame(pas);
     },
@@ -429,24 +449,62 @@ export function MapCanvas({
 
         // Un niveau, une couleur, une taille — repris partout : carte, listes,
         // badges. Aucun chiffre, aucun regroupement.
+        // Le disque porte la NOTE, par sa couleur et sa taille ; le symbole
+        // posé dessus porte la CATÉGORIE. Deux choses à dire, deux moyens de
+        // les dire — au lieu d'une taille de rond qui devait tout faire.
         instance.addLayer({
           id: 'place',
           type: 'circle',
           source: SOURCE,
           paint: {
             'circle-color': [
+              'match',
+              ['get', 'tier'],
+              1,
+              ETOILE_COULEURS[3],
+              2,
+              ETOILE_COULEURS[2],
+              ETOILE_COULEURS[1],
+            ] as never,
+            'circle-opacity': OPACITE_PLEINE as never,
+            'circle-radius': rayonDesPastilles() as never,
+            // Un lieu validé change de CONTOUR, pas de remplissage. Le repeindre
+            // en vert ajoutait une quatrième couleur à une carte qui en portait
+            // déjà trois, et faisait perdre au passage ce que le lieu vaut.
+            'circle-stroke-width': [
+              'case',
+              ['==', ['get', 'visited'], 1],
+              2.6,
+              ['<=', ['get', 'tier'], 2],
+              1.6,
+              0,
+            ] as never,
+            'circle-stroke-color': [
               'case',
               ['==', ['get', 'visited'], 1],
               mapColors.visited,
-              ['==', ['get', 'tier'], 1],
-              colors.primary,
-              mapColors.todo,
-            ],
-            'circle-opacity': OPACITE_PLEINE as never,
-            'circle-radius': ['match', ['get', 'tier'], 1, 5.2, 2, 4, 3] as never,
-            'circle-stroke-width': ['match', ['get', 'tier'], 1, 1.3, 0] as never,
-            'circle-stroke-color': mapColors.halo,
+              mapColors.halo,
+            ] as never,
           },
+        });
+
+        // Le symbole du thème, en clair sur le disque. Seules les deux
+        // premières notes en portent un : mille deux cent soixante-neuf lieux à
+        // une étoile, tous surmontés d'un symbole, feraient une carte illisible.
+        poserLesGlyphes(instance, colors.bg);
+        instance.addLayer({
+          id: 'place-glyphe',
+          type: 'symbol',
+          source: SOURCE,
+          filter: ['==', ['get', 'tier'], 1],
+          layout: {
+            'icon-image': ['concat', 'theme-', ['get', 'themeId']],
+            'icon-size': tailleDesGlyphes(),
+            // Jamais masqué par collision : deux lieux voisins doivent tous
+            // deux garder leur pastille, sinon la carte ment sur ce qu'il y a.
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true,
+          } as never,
         });
 
         // Le lieu mis en avant, par-dessus tout le reste.
@@ -668,14 +726,10 @@ export function MapCanvas({
       // Le fondu de sortie s'applique aux points ENCORE en place : les vider
       // d'abord ne laisserait rien à effacer.
       animer(TRANSITION.retour.lieux, (avancement) => {
-        instance.setPaintProperty('place', 'circle-opacity', [
-          '*',
-          OPACITE_PLEINE,
-          1 - avancement,
-        ] as never);
+        opacifier(instance, ['*', OPACITE_PLEINE, 1 - avancement] as never);
       }, () => {
         source.setData({ type: 'FeatureCollection', features: [] });
-        instance.setPaintProperty('place', 'circle-opacity', OPACITE_PLEINE as never);
+        opacifier(instance, OPACITE_PLEINE as never);
       });
       return;
     }
@@ -686,21 +740,17 @@ export function MapCanvas({
     if (!changementDeRegion) {
       // Un filtre de thème, une visite validée : la liste change, mais on ne
       // rejoue pas l'arrivée dans la région — on n'y arrive pas deux fois.
-      instance.setPaintProperty('place', 'circle-opacity', OPACITE_PLEINE as never);
+      opacifier(instance, OPACITE_PLEINE as never);
       return;
     }
 
     const pas = pasDeCascade(dedans.length);
     const cascade = pas * Math.max(0, dedans.length - 1) + TRANSITION.lieux.apparition;
-    instance.setPaintProperty('place', 'circle-opacity', opaciteEnCascade(0, pas) as never);
+    opacifier(instance, opaciteEnCascade(0, pas) as never);
     animer(TRANSITION.lieux.delai + cascade, (avancement, ecoule) => {
-      instance.setPaintProperty(
-        'place',
-        'circle-opacity',
-        opaciteEnCascade(ecoule - TRANSITION.lieux.delai, pas) as never,
-      );
+      opacifier(instance, opaciteEnCascade(ecoule - TRANSITION.lieux.delai, pas) as never);
     }, () => {
-      instance.setPaintProperty('place', 'circle-opacity', OPACITE_PLEINE as never);
+      opacifier(instance, OPACITE_PLEINE as never);
     });
   }, [ready, places, visitedIds, ouverte]);
 
@@ -769,13 +819,14 @@ export function MapCanvas({
     // couche couperait la cascade en cours, et les pastilles surgiraient d'un
     // coup. La cascade repose elle-même sur l'opacité pleine en terminant.
     if (!highlightedId && image.current !== null) return;
-    map.current?.setPaintProperty(
-      'place',
-      'circle-opacity',
-      highlightedId
-        ? (['case', ['==', ['get', 'id'], highlightedId], 1, 0.55] as never)
-        : (OPACITE_PLEINE as never),
-    );
+    if (map.current) {
+      opacifier(
+        map.current,
+        highlightedId
+          ? (['case', ['==', ['get', 'id'], highlightedId], 1, 0.55] as never)
+          : (OPACITE_PLEINE as never),
+      );
+    }
   }, [ready, highlightedId]);
 
   /**
@@ -936,6 +987,25 @@ function cadreLibre(instance: MapLibreMap): Emprise {
       Math.max(hautGauche.lat, basDroite.lat),
     ],
   ];
+}
+
+/**
+ * L'opacité des lieux — disque ET symbole d'un seul geste.
+ *
+ * Les deux couches ne font qu'un point à l'écran : les animer séparément
+ * laisserait un symbole flotter sans sa pastille pendant la cascade.
+ */
+function opacifier(instance: MapLibreMap, expression: never) {
+  if (instance.getLayer('place')) {
+    instance.setPaintProperty('place', 'circle-opacity', expression);
+    // Le CONTOUR aussi, sans quoi la cascade laisse voir des anneaux vides :
+    // `circle-stroke-opacity` est une propriété à part, et elle vaut un par
+    // défaut. Les pastilles arrivaient donc en cerceaux avant de se remplir.
+    instance.setPaintProperty('place', 'circle-stroke-opacity', expression);
+  }
+  if (instance.getLayer('place-glyphe')) {
+    instance.setPaintProperty('place-glyphe', 'icon-opacity', expression);
+  }
 }
 
 /** Le survol d'une région, par `feature-state`. */

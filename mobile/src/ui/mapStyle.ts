@@ -452,6 +452,62 @@ export const TRANSITION = {
   padding: 28,
 };
 
+/**
+ * La couleur d'une pastille, selon sa note.
+ *
+ * Trois tons de la même famille, du plus foncé au plus effacé. La FORME dit
+ * déjà la catégorie — le symbole du thème est posé dessus — donc la couleur n'a
+ * qu'une chose à dire, et elle la dit seule.
+ */
+export const ETOILE_COULEURS = {
+  3: colors.primary,
+  2: colors.primaryLight,
+  1: '#A2907A',
+} as const;
+
+/**
+ * Le rayon d'une pastille.
+ *
+ * Les deux premières notes portent le symbole de leur thème : il leur faut un
+ * disque assez large pour l'accueillir. La troisième reste un point — mille
+ * deux cent soixante-neuf lieux à une étoile, tous porteurs d'un symbole,
+ * feraient une carte illisible là où on cherche justement à voir clair.
+ */
+export function rayonDesPastilles(): unknown[] {
+  const parNote = (petit: number, moyen: number, grand: number) => [
+    'match',
+    ['get', 'tier'],
+    1,
+    grand,
+    2,
+    moyen,
+    petit,
+  ];
+  return [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    6,
+    parNote(3, 5.5, 9),
+    9,
+    parNote(3.6, 6.5, 11.5),
+    13,
+    parNote(4.5, 7.5, 13.5),
+  ];
+}
+
+/**
+ * La taille du symbole posé sur la pastille.
+ *
+ * Seule la première note en porte un. Ce n'est pas une économie de place :
+ * le symbole devient alors une DISTINCTION — il ne dit pas seulement de quoi
+ * il s'agit, il dit que ce lieu-là vaut le voyage. Cent deux symboles dans une
+ * région en faisaient un fond d'écran.
+ */
+export function tailleDesGlyphes(): unknown[] {
+  return ['interpolate', ['linear'], ['zoom'], 6, 0.55, 9, 0.68, 13, 0.78];
+}
+
 /** L'expression qui donne son sable à chaque région. Un coloriage, pas un hachage. */
 export function tonsDesRegions(): unknown[] {
   const cas: unknown[] = ['match', ['get', 'code']];

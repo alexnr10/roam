@@ -18,7 +18,14 @@ import { colors } from '../theme';
  * Les tracés sont en LIGNE, jamais en aplat : une icône pleine à 18 points se
  * referme et devient une tache, et il en faut 23 sur une même rangée.
  */
-const TRACES: Record<string, string[]> = {
+/**
+ * Les tracés, à la disposition de la carte aussi.
+ *
+ * MapLibre ne sait pas dessiner un composant React : il lui faut des IMAGES.
+ * Les mêmes chemins servent donc aux deux — une icône de thème est la même
+ * qu'on la voie sur une pastille de filtre ou posée sur la carte.
+ */
+export const TRACES: Record<string, string[]> = {
   chateaux: [
     'M4 20V10h16v10',
     'M4 10V6h3v2.5h3.5V6h3v2.5H17V6h3v4',
