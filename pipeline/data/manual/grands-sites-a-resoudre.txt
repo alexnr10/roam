@@ -1,0 +1,63 @@
+# Grands Sites de France : ce qui manque encore, et pourquoi.
+#
+# Le label vient de DEUX sources, et c'est voulu : la propriété Wikidata
+# Q1154112 n'en trouve que dix-neuf — « Wikidata est ici en retard sur la
+# liste officielle, c'est une limite connue » (config/labels.yaml) — et
+# grand-site-de-france.csv complète à la main. La collection en compte
+# cinquante et un pour cinquante sites officiels, un site pouvant être
+# représenté par plusieurs de ses composants.
+#
+# ⚠️ Le CSV est lu au FETCH, pas au build : y ajouter une ligne ne change
+# rien tant que le thème du lieu n'a pas été recollecté.
+#
+#
+# ── Corrigé ───────────────────────────────────────────────────────────────
+#
+#   Rocamadour  Q22939731 → Q382628
+#       Le Q-id inscrit désignait la BASILIQUE Saint-Sauveur, pas le site.
+#       Le label — et son bonus de vingt points — se posait donc sur une
+#       église à l'intérieur du Grand Site, pendant que le village, qu'on
+#       vient voir, n'était pas étiqueté.
+#
+# ── Ajoutés : au catalogue, mais absents de la liste ──────────────────────
+#
+#   Site d'Étretat        Q113840948  ┐ « Falaises d'Etretat, Côte d'Albâtre »
+#   Porte d'Aval          Q17373121   ┘
+#   Gorges de la Jonte    Q2051933      « Gorges du Tarn, de la Jonte… »
+#   Dune Dewulf           Q26700542     « Dunes de Flandre »
+#
+#   Deux entrées pour un même site officiel suit l'usage déjà en place :
+#   Cap Blanc-Nez ET Cap Gris-Nez pour « Les Deux-Caps », Îles Sanguinaires
+#   ET Pointe de la Parata pour un seul site.
+#
+#
+# ── Absents du CATALOGUE : rien à étiqueter tant qu'ils n'existent pas ────
+#
+# Ce n'est pas un problème de label mais de collecte, et il se traite comme
+# les œuvres monumentales : suggest-qids, puis probe, puis places.csv.
+#
+#   Baie de Somme                          (80)
+#   Havre du Payré                         (85)
+#   Estuaire de la Charente, arsenal       (17)
+#   Marais de Brouage                      (17)
+#   Gorges de la Cesse et du Brian         (34)
+#   Ocres du Luberon                       (84)
+#
+#   À vérifier avant de les chercher : le catalogue porte déjà le pont
+#   transbordeur de Rochefort (Q924757), qui appartient au site « Estuaire de
+#   la Charente - Arsenal de Rochefort ». L'inscrire suffirait peut-être à
+#   représenter ce site, comme la Dune Dewulf représente les Dunes de
+#   Flandre. Décision du curateur.
+#
+#
+# ── Faux problèmes, vérifiés ──────────────────────────────────────────────
+#
+#   Le Concors : absent du catalogue, mais son site officiel
+#   « Concors-Sainte-Victoire » est représenté par la Montagne
+#   Sainte-Victoire (Q1518970), déjà étiquetée.
+#
+#   Le Marais poitevin (Q1754337) est étiqueté par la propriété Wikidata,
+#   sans passer par le CSV — comme le Puy de Dôme, Bibracte, Puy Mary, la
+#   Pointe du Raz, Solutré, Vergisson, la Camargue gardoise, Saint-Guilhem
+#   et le Pont du Gard. Ne pas les chercher dans le CSV : ils n'y sont pas,
+#   et c'est normal.
