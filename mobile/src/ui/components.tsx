@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 import {
   Image,
   PixelRatio,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,7 +13,7 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import { ENTETES, photoUrl } from '../lib/photo';
+import { photoUrl, sourceDeLaPhoto } from '../lib/photo';
 import { useRoulette } from '../lib/roulette';
 import { colors, radius, spacing, themeEmoji, type } from '../theme';
 import { IconeChevron, IconeCroix, IconeLoupe } from './icons';
@@ -80,8 +81,9 @@ export function Photo({
       accessibilityIgnoresInvertColors
       // L'agent utilisateur : Wikimedia refuse par un 403 les clients qui ne
       // se nomment pas, et le repli faisait alors passer un lieu photographié
-      // pour un lieu sans photo.
-      source={{ uri: src, headers: ENTETES }}
+      // pour un lieu sans photo. La FORME de la source décide s'il arrive
+      // jusqu'à la requête — voir `sourceDeLaPhoto`.
+      source={sourceDeLaPhoto(src, Platform.OS === 'android')}
       onError={(evenement) => {
         // Le repli est silencieux À L'ÉCRAN — c'est voulu, un cadre vide sur
         // toute une liste donne une application cassée. Mais il l'était aussi

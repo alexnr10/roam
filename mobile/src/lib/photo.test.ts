@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { AGENT, CONTACT, DENSITE_MAX, ENTETES, PALIERS, VERSION, palier, photoUrl } from './photo';
+import { AGENT, CONTACT, DENSITE_MAX, ENTETES, PALIERS, VERSION, palier, photoUrl, sourceDeLaPhoto } from './photo';
 
 const NUE =
   'https://commons.wikimedia.org/wiki/Special:FilePath/Tour%20Eiffel.jpg';
@@ -91,5 +91,36 @@ describe("l'agent utilisateur", () => {
 
   it("s'envoie sous le nom que le protocole attend", () => {
     expect(ENTETES['User-Agent']).toBe(AGENT);
+  });
+});
+
+describe('sourceDeLaPhoto', () => {
+  // `<Image source={{ uri, headers }} />` PERD les en-têtes sur Android : dans
+  // `Image.android.js`, ils ne sont extraits que d'une source en TABLEAU. Nos
+  // requêtes partaient donc sous l'agent d'OkHttp, que Wikimedia refuse.
+
+  it('enveloppe la source dans un tableau sur Android', () => {
+    const source = sourceDeLaPhoto('https://exemple/x.jpg', true);
+    expect(Array.isArray(source)).toBe(true);
+    expect(source).toHaveLength(1);
+  });
+
+  it('la laisse en objet ailleurs', () => {
+    // `react-native-web` teste `!Array.isArray(source)` : un tableau y
+    // donnerait une image sans adresse. iOS lit les en-têtes dans l'objet.
+    const source = sourceDeLaPhoto('https://exemple/x.jpg', false);
+    expect(Array.isArray(source)).toBe(false);
+  });
+
+  it("porte l'agent dans les deux formes", () => {
+    // C'est le seul point qui compte : quelle que soit la plateforme, la
+    // requête doit se nommer.
+    for (const android of [true, false]) {
+      const source = sourceDeLaPhoto('https://exemple/x.jpg', android);
+      const premier = Array.isArray(source) ? source[0] : source;
+      expect(premier.uri).toBe('https://exemple/x.jpg');
+      expect(premier.headers).toEqual(ENTETES);
+      expect(premier.headers['User-Agent']).toBe(AGENT);
+    }
   });
 });

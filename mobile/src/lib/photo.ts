@@ -44,6 +44,33 @@ export const AGENT = `Roam/${VERSION} (${CONTACT})`;
 /** Les en-têtes de toute requête vers Commons. */
 export const ENTETES: Record<string, string> = { 'User-Agent': AGENT };
 
+/** Ce qu'on passe à `<Image source>` : un objet, ou un tableau d'un seul. */
+export type SourcePhoto =
+  | { uri: string; headers: Record<string, string> }
+  | [{ uri: string; headers: Record<string, string> }];
+
+/**
+ * La source d'une photo, dans la forme que la plateforme sait lire.
+ *
+ * `<Image source={{ uri, headers }} />` PERD les en-têtes sur Android. Dans
+ * `Image.android.js` de React Native, ils ne sont extraits que si la source est
+ * un TABLEAU : la branche qui traite un objet simple ne garde que `uri`,
+ * `width` et `height`, et rien ne signale ce qu'elle laisse tomber. Nos
+ * requêtes partaient donc sous l'agent d'OkHttp, que Wikimedia refuse — et
+ * `curl` l'a montré : notre agent obtient 200, `okhttp/4.12.0` obtient 403,
+ * sur la même adresse.
+ *
+ * Un tableau d'un seul élément suffit à les faire passer. Mais il ne peut pas
+ * être la forme universelle : `react-native-web` ne résout que l'objet — il
+ * teste `!Array.isArray(source)` — et un tableau y donnerait une image sans
+ * adresse. iOS, lui, lit les en-têtes dans l'objet. C'est donc bien une
+ * particularité d'Android, et elle est traitée comme telle.
+ */
+export function sourceDeLaPhoto(uri: string, android: boolean): SourcePhoto {
+  const source = { uri, headers: ENTETES };
+  return android ? [source] : source;
+}
+
 /** Les seules largeurs que l'application demande. */
 export const PALIERS = [200, 400, 800, 1200] as const;
 
