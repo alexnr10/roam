@@ -8,6 +8,7 @@ import {
   places as toutes,
 } from '../../src/data/catalog';
 import { autourDeToi, chercheCollections, territoireDe } from '../../src/lib/explorer';
+import { useCatalogue } from '../../src/lib/useCatalogue';
 import { useLocation } from '../../src/lib/useLocation';
 import { LARGEUR_MAX, colors, radius, spacing, type } from '../../src/theme';
 import { Photo, SearchField } from '../../src/ui/components';
@@ -32,16 +33,21 @@ import type { Collection } from '../../src/types';
  * aller ce week-end.
  */
 export default function ExplorerScreen() {
+  // Le catalogue peut changer de pays sous nos pieds : on s'y abonne.
+  const catalogue = useCatalogue();
   const router = useRouter();
   const { position } = useLocation();
   const [query, setQuery] = useState('');
 
-  const ici = useMemo(() => territoireDe(toutes, position), [position]);
+  const ici = useMemo(() => territoireDe(toutes, position), [position, catalogue]);
   const proches = useMemo(
     () => autourDeToi(collections, ici.departement, ici.region),
     [ici.departement, ici.region],
   );
-  const trouvees = useMemo(() => chercheCollections(collections, query), [query]);
+  const trouvees = useMemo(
+    () => chercheCollections(collections, query),
+    [query, catalogue],
+  );
 
   /**
    * Les régions, avec leur nombre de lieux — et l'outre-mer à part.

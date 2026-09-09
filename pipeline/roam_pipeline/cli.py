@@ -3106,8 +3106,77 @@ def cmd_export_app(args: argparse.Namespace, config: Config) -> int:
 
     write_app_catalog(places, collections, config, args.to)
     print(f"Catalogue écrit dans {args.to}")
+
+    # Et le même catalogue SERVI, pour les pays que l'application ne porte pas
+    # en elle. Celui du pays de départ y figure aussi : la duplication ne coûte
+    # que quelques mégaoctets dans le dépôt, et elle évite un cas particulier
+    # — l'application demande un pays, elle reçoit un fichier, quel qu'il soit.
+    ecrites = ecrire_catalogues_servis(places, collections, config, args.catalogues)
+    for ligne in ecrites:
+        print(f"  {ligne}")
     print("Relance l'application : elle le lira au prochain démarrage.")
     return 0
+
+
+def ecrire_catalogues_servis(places, collections, config, dossier: Path) -> list[str]:
+    """Un fichier par pays, plus l'index qui dit où chacun se trouve.
+
+    L'application embarque le catalogue de son pays de départ — il doit être là
+    au premier lancement, sans réseau. Les autres se téléchargent, et il leur
+    faut donc une adresse et une EMPRISE : c'est l'emprise qui permet à la
+    carte de savoir, en se déplaçant, qu'elle vient d'entrer dans un autre
+    pays et qu'il est temps d'en charger le catalogue.
+
+    Les emprises viennent des contours de `geo-layers`, une par territoire.
+    Un seul grand rectangle autour de la France couvrirait la Suisse et la
+    Belgique ; cent une boîtes départementales, non — et elles pèsent trois
+    kilo-octets.
+    """
+    from .localisation import couches_du_pays
+
+    dossier.mkdir(parents=True, exist_ok=True)
+    par_pays: dict[str, list] = defaultdict(list)
+    for place in places:
+        par_pays[place.country_code or config.country.code].append(place)
+
+    emprises: list[list[float]] = []
+    couches = couches_du_pays(config, DEFAULT_GEO)
+    if "departement" in couches:
+        emprises = [
+            [round(v, 4) for v in zone.bbox]
+            for zone in couches["departement"].zones
+            if zone.bbox[2] >= zone.bbox[0]
+        ]
+
+    lignes: list[str] = []
+    index: list[dict] = []
+    for code, lot in sorted(par_pays.items()):
+        garde = {p.wikidata_id for p in lot}
+        cols = [
+            c for c in collections
+            if any(cp.place_id in garde for cp in c.places)
+        ]
+        chemin = dossier / f"{code.lower()}.json"
+        write_app_catalog(lot, cols, config, chemin)
+        taille = chemin.stat().st_size / 1024
+        index.append({
+            "code": code,
+            "name": config.country.name if code == config.country.code else code,
+            "fichier": chemin.name,
+            "lieux": len(lot),
+            # L'emprise n'est connue que pour le pays du dépôt : c'est le seul
+            # dont on ait les contours ici. Un pays collecté ailleurs apportera
+            # les siennes avec son propre `export-app`.
+            "emprises": emprises if code == config.country.code else [],
+        })
+        lignes.append(f"{code} : {len(lot)} lieux, {taille:.0f} Ko → {chemin}")
+
+    (dossier / "index.json").write_text(
+        json.dumps({"pays": index}, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    lignes.append(f"index : {len(index)} pays → {dossier / 'index.json'}")
+    return lignes
 
 
 APP_OUTLINES = BASE_DIR.parent / "mobile" / "src" / "data" / "outlines.json"
@@ -3752,6 +3821,10 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("stats", help="statistiques du catalogue construit")
 
     app = sub.add_parser("export-app", help="écrit le catalogue dans l'application")
+    app.add_argument(
+        "--catalogues", type=Path, default=BASE_DIR.parent / "catalogues",
+        help="dossier des catalogues SERVIS, un par pays, versionnés dans le "
+             "dépôt et téléchargés par l'application quand elle change de pays")
     app.add_argument("--to", type=Path, default=APP_CATALOG, help="fichier de destination")
 
     couches = sub.add_parser(

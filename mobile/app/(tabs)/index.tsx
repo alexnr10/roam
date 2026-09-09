@@ -4,6 +4,8 @@ import { FlatList, Platform, Pressable, StyleSheet, Text, View } from 'react-nat
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { places as allPlaces, themeLabel, themes } from '../../src/data/catalog';
+import { useCatalogue } from '../../src/lib/useCatalogue';
+import { usePays } from '../../src/store/pays';
 import { bandeau } from '../../src/lib/carte';
 import { etoilesDe } from '../../src/lib/etoiles';
 import { nomDeRegion } from '../../src/lib/regions';
@@ -106,9 +108,14 @@ export default function MapScreen() {
   // avait trente.
   useRoulette(rail);
 
+  // Le catalogue peut changer de pays sous nos pieds — c'est même le but :
+  // on se promène, on passe la frontière, il suit. `version` entre donc dans
+  // les dépendances de tout ce qui en dérive.
+  const version = useCatalogue();
+  const { regarder } = usePays();
   const visible = useMemo(
     () => (theme ? allPlaces.filter((p) => p.themeId === theme) : allPlaces),
-    [theme],
+    [theme, version],
   );
 
   const themeOptions = useMemo(
@@ -161,7 +168,7 @@ export default function MapScreen() {
    * La recherche ignore le thème : quelqu'un qui tape « etretat » ne veut pas
    * s'entendre dire que ce lieu est hors du thème choisi trois écrans plus tôt.
    */
-  const resultats = useMemo(() => search(allPlaces, query), [query]);
+  const resultats = useMemo(() => search(allPlaces, query), [query, version]);
   const enRecherche = query.trim().length >= MIN_CARACTERES;
 
   // La validation vient à l'utilisateur, pas l'inverse.
@@ -190,6 +197,7 @@ export default function MapScreen() {
           // disparaissaient jusqu'au changement d'onglet.
           onDeselect={() => setChoisi(null)}
           onRegionChange={setRegionOuverte}
+          onCentre={regarder}
           retour={retourFrance}
           ouvrir={regionDemandee ? `${regionDemandee}#${n ?? ''}` : null}
           highlightedId={enAvant?.id ?? suggestion?.id ?? null}

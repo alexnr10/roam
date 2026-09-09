@@ -49,6 +49,14 @@ export type MapCanvasProps = {
    */
   onRegionChange?: (code: string | null) => void;
   /**
+   * Le centre de la vue, après chaque déplacement.
+   *
+   * C'est par là que le catalogue change de pays sans qu'on le demande : la
+   * carte ne sait rien des pays, elle dit seulement où l'on regarde, et le
+   * magasin en tire ce qu'il faut charger.
+   */
+  onCentre?: (lon: number, lat: number) => void;
+  /**
    * Demande de retour à la France entière.
    *
    * Un compteur plutôt qu'un booléen : chaque incrément est UN retour demandé,
@@ -91,6 +99,7 @@ export function MapCanvas({
   highlightedId,
   focus,
   onDeselect,
+  onCentre,
 }: MapCanvasProps) {
   if (!Maps) {
     return (
@@ -127,6 +136,7 @@ export function MapCanvas({
       highlightedId={highlightedId}
       focus={focus}
       onDeselect={onDeselect}
+      onCentre={onCentre}
     />
   );
 }
@@ -147,6 +157,7 @@ function NativeMap({
   highlightedId,
   focus,
   onDeselect,
+  onCentre,
 }: {
   MapView: typeof import('react-native-maps').default;
   Marker: typeof import('react-native-maps').Marker;
@@ -157,6 +168,7 @@ function NativeMap({
   highlightedId?: string | null;
   focus?: { lat: number; lon: number } | null;
   onDeselect?: () => void;
+  onCentre?: (lon: number, lat: number) => void;
 }) {
   const [cadre, setCadre] = useState<Cadre | null>(null);
   const vue = useRef<import('react-native-maps').default | null>(null);
@@ -199,14 +211,16 @@ function NativeMap({
         longitude: number;
         latitudeDelta: number;
         longitudeDelta: number;
-      }) =>
+      }) => {
+        // Même question que sur le web, au même moment : où regarde-t-on ?
+        onCentre?.(vue.longitude, vue.latitude);
         setCadre({
           sud: vue.latitude - vue.latitudeDelta / 2,
           nord: vue.latitude + vue.latitudeDelta / 2,
           ouest: vue.longitude - vue.longitudeDelta / 2,
           est: vue.longitude + vue.longitudeDelta / 2,
-        })
-      }
+        });
+      }}
     >
       {dessines.map((place) => {
         const visited = visitedIds.has(place.id);

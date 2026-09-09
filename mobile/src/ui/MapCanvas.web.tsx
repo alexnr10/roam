@@ -139,6 +139,7 @@ export function MapCanvas({
   focus,
   onDeselect,
   onRegionChange,
+  onCentre,
   retour,
   ouvrir: demande,
 }: MapCanvasProps) {
@@ -151,6 +152,7 @@ export function MapCanvas({
   const onSelect = useRef(onSelectPlace);
   const onVide = useRef(onDeselect);
   const onRegion = useRef(onRegionChange);
+  const onCentreRef = useRef(onCentre);
   const survolee = useRef<string | null>(null);
   // La région ouverte vit aussi dans une référence : `moveend` est posé une
   // fois pour toutes et doit comparer à l'état courant, pas à celui du rendu
@@ -192,6 +194,7 @@ export function MapCanvas({
   onSelect.current = onSelectPlace;
   onVide.current = onDeselect;
   onRegion.current = onRegionChange;
+  onCentreRef.current = onCentre;
 
   /**
    * Une animation, en une fonction.
@@ -321,6 +324,11 @@ export function MapCanvas({
         return;
       }
       map.current = instance;
+      // La carte elle-même, pour piloter l'application depuis un script de
+      // contrôle : éprouver un déplacement de la France à l'Italie demanderait
+      // sinon trente glissements de souris. Réservé au mode `?debug`, donc
+      // absent de l'application publiée.
+      if (debogage()) (window as unknown as { __carte?: unknown }).__carte = instance;
       created = instance;
       // MapLibre refuse une couche mal formée par un ÉVÉNEMENT, pas par une
       // exception : sans cette écoute, une couche peut manquer sans qu'aucune
@@ -652,6 +660,10 @@ export function MapCanvas({
         // c'est le geste que tout le monde tente en premier, et il n'y a rien
         // à apprendre.
         instance.on('moveend', () => {
+          // Avant tout le reste : où regarde-t-on ? C'est de cette seule
+          // question que dépend le pays, et elle ne coûte rien.
+          const centre = instance.getCenter();
+          onCentreRef.current?.(centre.lng, centre.lat);
           const zoom = instance.getZoom();
           const vue = regionSousLaCamera(instance);
           const suite = prochaineOuverture(

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { areas, places, themeLabel, themes } from '../../src/data/catalog';
+import { useCatalogue } from '../../src/lib/useCatalogue';
 import { conquestByZone, shadeOf } from '../../src/lib/conquest';
 import { palierMinuscule } from '../../src/lib/paliers';
 import type { ZoneConquest, ZoneShade } from '../../src/lib/conquest';
@@ -59,6 +60,8 @@ const encreDe = (shade: ZoneShade): string => conquestInk[shade.kind];
 const traitDe = (shade: ZoneShade): string => conquestTrait[shade.kind];
 
 export default function ConquestScreen() {
+  // Le catalogue peut changer de pays sous nos pieds : on s'y abonne.
+  const catalogue = useCatalogue();
   const { visits } = useVisits();
   const [level, setLevel] = useState<AreaLevel>('departement');
   const [selected, setSelected] = useState<string | null>(null);
@@ -67,7 +70,7 @@ export default function ConquestScreen() {
 
   const zones = useMemo(
     () => conquestByZone(places, areas[level], level, visits, theme),
-    [level, visits, theme],
+    [level, visits, theme, catalogue],
   );
 
   // Un thème n'a pas partout de quoi jouer ; ne proposer que ceux du catalogue

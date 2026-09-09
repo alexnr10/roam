@@ -74,8 +74,23 @@ const abonnes = new Set<() => void>();
 
 export function surChangement(refaire: () => void): () => void {
   abonnes.add(refaire);
-  return () => abonnes.delete(refaire);
+  return () => {
+    abonnes.delete(refaire);
+  };
 }
+
+let version = 0;
+
+/**
+ * Combien de fois le catalogue a changé.
+ *
+ * Sert de « signature » à `useSyncExternalStore` : un écran qui lit le
+ * catalogue s'y abonne et se redessine quand elle bouge. Sans cela, changer de
+ * pays remplacerait bien les données et laisserait les anciennes à l'écran —
+ * React ne redessine que ce dont l'état a changé, et de son point de vue rien
+ * n'aurait changé.
+ */
+export const versionDuCatalogue = (): number => version;
 
 /**
  * Remplace le catalogue courant. C'est le seul chemin par lequel il change.
@@ -85,6 +100,7 @@ export function surChangement(refaire: () => void): () => void {
  */
 export function chargerCatalogue(source: Catalog): void {
   catalogue = source;
+  version += 1;
   places = source.places;
   collections = source.collections;
   themes = source.themes;

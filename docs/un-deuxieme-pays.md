@@ -284,22 +284,44 @@ table des départements — d'où un abonnement `surChangement` auquel ces
 modules-là se raccrochent. Deux tests échouent si on le retire : c'est le
 pire des défauts, une carte italienne notée à la française, qui ne plante pas.
 
-**La navigation est remontée à chaque bascule**, par une clé sur la pile. Ce
-n'est pas un raccourci : changer de pays n'est pas un rafraîchissement, c'est
-un changement de sujet. Rester sur la fiche du Colisée en affichant la France
-serait faux. La clé est posée SOUS les magasins, si bien que les visites et
-les envies survivent — elles sont indexées par identifiant de lieu, qui est
-mondial, et revenir en France c'est retrouver son carnet intact.
+**Les écrans s'abonnent au catalogue** par `useCatalogue`, un
+`useSyncExternalStore` sur la version. La première version remontait la
+navigation à chaque bascule ; c'était plus simple et c'était faux — remonter
+la pile en pleine promenade rend la carte à son point de départ, soit
+exactement le contraire d'invisible.
+
+Les visites et les envies, elles, ne bougent pas : indexées par identifiant de
+lieu, qui est mondial. Revenir en France, c'est retrouver son carnet intact.
 
 **Le sélecteur est invisible tant qu'un seul pays est disponible.** Un choix à
 une entrée n'est pas un choix, c'est un encombrement — même règle que pour le
 suffixe des adresses de collections.
 
-### Ce qu'il reste à décider, et ce n'est pas du code
+### La bascule est INVISIBLE : elle se fait à la carte
 
-`PAYS` porte une `url` par pays, à renseigner : c'est une décision
-d'HÉBERGEMENT. Le dépôt ferait l'affaire — les catalogues y sont déjà
-versionnés et servis en HTTPS.
+Pas de menu, pas de question. On se promène, on passe la frontière, le
+catalogue suit — c'est la carte qui est déjà le geste. Mesuré sur
+l'application construite, en pilotant la carte de Paris à Rome puis retour :
+
+    Paris                    2 081 lieux, 203 collections
+    → Rome                       3 lieux,   1 collection    (it.json téléchargé)
+    → Lyon                   2 081 lieux, 203 collections   (aucune requête)
+    → Naples                     3 lieux,   1 collection    (aucune requête)
+
+    réseau total : index.json + it.json
+
+Deux règles font tout le confort, et elles sont pures et testées. **On ne
+bascule que si l'on est SORTI du pays courant** : les emprises se chevauchent
+le long d'une frontière, et sans cette hystérésis, se promener autour du mont
+Blanc ferait clignoter le catalogue à chaque mouvement de doigt. **On ne
+bascule que vers UN seul candidat** : au-dessus d'un point qui appartient à
+deux voisins sans appartenir au courant, deviner serait pire que ne rien
+faire.
+
+Les catalogues sont servis par le DÉPÔT, en HTTPS et gratuitement :
+`catalogues/index.json` dit ce qui existe et où, `catalogues/<pays>.json`
+porte chacun. Une version du catalogue va donc toujours avec la version de
+l'application qui la lit. `export-app` les écrit.
 
 ### Ce qu'il reste à faire, côté application
 

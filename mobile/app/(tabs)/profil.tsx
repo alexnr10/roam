@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { buildLabel } from '../../src/lib/build';
+import { useCatalogue } from '../../src/lib/useCatalogue';
 import { collections, places } from '../../src/data/catalog';
 import { computeProgress, earnedBadges, nextMilestone, type Badge } from '../../src/lib/progress';
 import { parDateDecroissante } from '../../src/lib/envies';
@@ -22,6 +23,8 @@ import { conquestByZone, shadeOf } from '../../src/lib/conquest';
 import { areas } from '../../src/data/catalog';
 
 export default function ProfileScreen() {
+  // Le catalogue peut changer de pays sous nos pieds : on s'y abonne.
+  const catalogue = useCatalogue();
   const { visits, reset } = useVisits();
   const { envies, retirer } = useEnvies();
   const router = useRouter();
@@ -45,7 +48,7 @@ export default function ProfileScreen() {
       position,
     );
     return shortlists(classe, 3).almostDone;
-  }, [visits, position]);
+  }, [visits, position, catalogue]);
 
   /**
    * Les lieux qu'on s'est promis d'aller voir, les derniers ajoutés en tête.
@@ -60,7 +63,7 @@ export default function ProfileScreen() {
       parDateDecroissante(envies)
         .map((envie) => getPlace(envie.placeId))
         .filter((place): place is NonNullable<typeof place> => Boolean(place)),
-    [envies],
+    [envies, catalogue],
   );
 
   /**

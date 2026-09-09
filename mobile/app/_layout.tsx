@@ -5,7 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { CelebrationProvider } from '../src/store/celebration';
 import { EnviesProvider } from '../src/store/envies';
-import { PaysProvider, usePays } from '../src/store/pays';
+import { PaysProvider } from '../src/store/pays';
 import { VisitsProvider } from '../src/store/visits';
 import { colors } from '../src/theme';
 
@@ -21,36 +21,7 @@ export default function RootLayout() {
         <EnviesProvider>
         <CelebrationProvider>
         <StatusBar style="dark" />
-        <Navigation />
-        </CelebrationProvider>
-        </EnviesProvider>
-      </VisitsProvider>
-      </PaysProvider>
-    </SafeAreaProvider>
-  );
-}
-
-/**
- * La navigation, REMONTÉE à chaque changement de pays.
- *
- * Le catalogue est un module : le remplacer change ce que `places` et
- * `collections` valent, mais aucun écran ne le sait — React ne redessine que
- * ce dont l'état a bougé, et l'état n'a pas bougé.
- *
- * Une clé sur la pile règle cela d'un mot, et c'est aussi la bonne SÉMANTIQUE :
- * changer de pays n'est pas un rafraîchissement, c'est un changement de sujet.
- * Rester sur la fiche du Colisée en affichant la France serait faux ; la pile
- * repart de la carte, du bon pays.
- *
- * La clé est posée ICI, sous les magasins : visites, envies et catalogue leur
- * survivent. Un carnet de visites rechargé depuis le stockage à chaque bascule
- * clignoterait à vide.
- */
-function Navigation() {
-  const { pays } = usePays();
-  return (
-    <React.Fragment key={pays}>
-      <Stack
+        <Stack
           screenOptions={{
             headerStyle: { backgroundColor: colors.bg },
             headerTitleStyle: { color: colors.text },
@@ -65,7 +36,11 @@ function Navigation() {
           <Stack.Screen name="place/[id]" options={{ headerShown: false }} />
           <Stack.Screen name="collection/[slug]" options={{ headerShown: false }} />
           <Stack.Screen name="reconnaitre" options={{ headerShown: false }} />
-      </Stack>
-    </React.Fragment>
+        </Stack>
+        </CelebrationProvider>
+        </EnviesProvider>
+      </VisitsProvider>
+      </PaysProvider>
+    </SafeAreaProvider>
   );
 }
