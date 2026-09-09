@@ -5,11 +5,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { attributionDesContours, outlinesFor } from '../data/outlines';
-import { shadeOf } from '../lib/conquest';
-import type { ZoneConquest } from '../lib/conquest';
-import { colors, conquest, radius, spacing, type } from '../theme';
+import { colors, radius, spacing, type } from '../theme';
 import type { AreaLevel } from '../types';
 import type { ConquestMapProps } from './ConquestMap';
+import {
+  aPeindre,
+  couleurDesTerritoires,
+  opaciteDesTerritoires,
+} from './conquete';
 import { FRANCE_BOUNDS, resolveBasemap } from './mapStyle';
 import { prepareMapLibre } from './maplibreSetup';
 
@@ -43,19 +46,6 @@ export const conquestOutlinesExist = (level: AreaLevel): boolean =>
 
 const SOURCE = 'territoires';
 
-/** Opacité maximale d'un territoire entamé, avant d'avoir fini quoi que ce soit. */
-const STARTED_MAX_OPACITY = 0.55;
-
-type Painted = { code: string; shade: string; pct: number };
-
-function paintOf(zones: ZoneConquest[]): Painted[] {
-  return zones.map((zone) => ({
-    code: zone.area.code,
-    shade: shadeOf(zone).kind,
-    pct: zone.overall.pct,
-  }));
-}
-
 export function ConquestMap({ zones, level, selectedCode, onSelectZone }: ConquestMapProps) {
   const container = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreMap | null>(null);
@@ -74,7 +64,7 @@ export function ConquestMap({ zones, level, selectedCode, onSelectZone }: Conque
   const [ready, setReady] = useState(false);
 
   const outlines = useMemo(() => outlinesFor(level), [level]);
-  const shades = useMemo(() => paintOf(zones), [zones]);
+  const shades = useMemo(() => aPeindre(zones), [zones]);
 
   useEffect(() => {
     if (!container.current || map.current) return;
@@ -127,37 +117,14 @@ export function ConquestMap({ zones, level, selectedCode, onSelectZone }: Conque
           id: 'territoire',
           type: 'fill',
           source: SOURCE,
+          // Les couleurs viennent de `conquete.ts`, partagées avec la carte
+          // native — où la même question se pose sans `feature-state`. Un
+          // territoire entamé y pâlit à proportion de ce qu'il reste : sans ce
+          // dégradé la carte serait binaire et ne montrerait aucune progression
+          // entre le premier lieu et le dernier.
           paint: {
-            'fill-color': [
-              'match',
-              ['coalesce', ['feature-state', 'shade'], 'empty'],
-              'total',
-              conquest.total,
-              'theme',
-              conquest.theme,
-              'started',
-              conquest.total,
-              conquest.empty,
-            ],
-            // Un territoire entamé pâlit à proportion de ce qu'il reste : sans
-            // ce dégradé la carte serait binaire et ne montrerait aucune
-            // progression entre le premier lieu et le dernier.
-            'fill-opacity': [
-              'case',
-              ['==', ['coalesce', ['feature-state', 'shade'], 'empty'], 'started'],
-              [
-                'interpolate',
-                ['linear'],
-                ['coalesce', ['feature-state', 'pct'], 0],
-                0,
-                0.08,
-                100,
-                STARTED_MAX_OPACITY,
-              ],
-              ['==', ['coalesce', ['feature-state', 'shade'], 'empty'], 'empty'],
-              0.45,
-              0.85,
-            ],
+            'fill-color': couleurDesTerritoires() as never,
+            'fill-opacity': opaciteDesTerritoires() as never,
           },
         });
 
