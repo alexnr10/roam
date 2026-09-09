@@ -199,8 +199,73 @@ absents ne font pas le total. **Dix-sept montagnes italiennes sont déjà dans
 la collecte française** : le Mont Blanc, le massif du Mont-Cenis, le mont
 Clapier, le mont Chaberton. Elles portent deux pays chez Wikidata.
 
-Un catalogue par pays devra trancher : ces lieux appartiennent-ils aux deux,
-ou à un seul ? La question vaut pour toute la frontière alpine et pyrénéenne.
+**Décision du curateur : ils appartiennent aux DEUX.** Qui valide le Mont
+Blanc le valide en France et en Italie. C'est le bon choix pour un guide —
+on y est allé, la frontière est une abstraction — et il a une conséquence
+technique : le pays n'est pas un attribut du lieu mais une APPARTENANCE
+multiple, et une visite se propage à toutes les collections nationales qui
+contiennent le lieu. La question vaut pour tout l'arc alpin et les Pyrénées.
+
+## Combien de lieux ferait le catalogue italien ?
+
+**Environ 2 500, dans une fourchette de 2 200 à 2 800**, à configuration
+égale. Le raisonnement, parce que le chiffre seul ne sert à rien :
+
+### La taille d'un catalogue n'est pas fixée par l'offre
+
+    collecte française                              10 955 lieux
+    au-dessus du plancher de leur thème               3 659
+    au catalogue                                      2 079
+        dont repêchés SOUS le plancher                  470
+
+**Mille cinq cent quatre-vingts lieux franchissent leur plancher et sont
+coupés quand même** — par le plafond communal, le plafond de thème, le
+dédoublonnage, le filtre d'accès et la revue. Le plancher n'est pas la
+contrainte qui mord : ce sont les plafonds.
+
+### C'est donc la grille administrative qui donne l'ordre de grandeur
+
+    France   101 départements · médiane 16 lieux · moyenne 20,6 · max 64
+    Italie   107 provinces
+
+À moyenne égale, 107 × 20,6 ≈ **2 200**. L'Italie étant mieux documentée, la
+médiane monte et les repêchages diminuent : d'où le centre à 2 500.
+
+### L'offre italienne est le double, et ça ne change pas le compte
+
+    lieux à ≥12 langues, collecte française          1 306
+    lieux à ≥12 langues, vivier italien réel        ~2 575
+
+Le double. Mais l'offre excédentaire est absorbée par les plafonds : elle
+change la QUALITÉ du catalogue, pas sa taille. Et les étoiles se
+normalisent d'elles-mêmes — les niveaux sont proportionnels à leur
+collection, pas absolus — ce qui est exactement l'effet recherché : trois
+étoiles en Italie voudront dire « le haut de l'Italie », comme en France.
+
+### Trois décisions déplaceraient le chiffre, et elles ne sont pas prises
+
+**Le plancher des églises.** Q16970 en compte 637 à huit langues. À lui seul
+il peut ajouter plusieurs centaines de candidats — ou zéro si on ne le
+déclare pas.
+
+**`catalogue_cap: 80` sur `cathedrales`.** En France il borne les cathédrales
+et basiliques. En Italie, il bornerait cathédrales + basiliques mineures +
+églises à QUATRE-VINGTS lieux au total, alors que le recensement en donne
+déjà 460 à douze langues. Pour un pays dont les églises sont le patrimoine
+principal, ce plafond est un contresens.
+
+**`max_per_commune: 6`.** Paris a sa dérogation, écrite en toutes lettres.
+Rome, Florence, Venise et Naples en demanderont chacune une — Paris pèse 59
+lieux au catalogue français, et Rome n'est pas moins riche.
+
+### Ce qui transformerait l'estimation en mesure
+
+    python -m roam_pipeline gaps --pays Q38 --min-sitelinks 6
+
+Le recensement à douze langues ne voit que le sommet : la médiane du
+catalogue français est à HUIT langues. Refait à six, le même tableau donne le
+vivier aux planchers réellement utilisés, et le compte cesse d'être une
+projection.
 
 ## Mesurer avant de s'engager
 
