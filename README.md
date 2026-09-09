@@ -22,6 +22,7 @@ valent le déplacement. Une collection doit rester finissable, sinon il n'y a pl
 | Badges et progression | ✅ prototype |
 | Animation de validation | ✅ prototype |
 | Carte de conquête (territoires colorés) | 📐 conçue, cf. `docs/carte-de-conquete.md` |
+| Un deuxième pays | 📐 évalué et chiffré, cf. `docs/un-deuxieme-pays.md` |
 | Contribution communautaire | ⏳ à venir |
 | Social | ⏳ v2 |
 
@@ -31,6 +32,7 @@ valent le déplacement. Une collection doit rester finissable, sinon il n'y a pl
 docs/       concept.md, curation-charter.md — lire en premier
             demarrage.md — installer et lancer l'app
             carte-de-conquete.md — coloriage des territoires (conception)
+            un-deuxieme-pays.md — ce que coûterait un portage, mesuré
 db/         schema.sql, bouchons Supabase et script de validation locale
 pipeline/   collecte Wikidata, scoring, construction des collections
 mobile/     application Expo — carte, validation GPS, collections, badges

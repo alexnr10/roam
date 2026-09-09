@@ -31,6 +31,8 @@ def fetch_theme(
     client: wd.SparqlClient,
     theme: Theme,
     label_members: dict[str, set[str]] | None = None,
+    *,
+    country: str,
 ) -> list[Place]:
     """Lieux candidats pour un thème.
 
@@ -73,7 +75,7 @@ def fetch_theme(
         for row in _paged(
             client,
             lambda limit, offset, q=class_qid, f=floor: wd.theme_query(
-                [q], f, limit=limit, offset=offset
+                [q], f, limit=limit, offset=offset, country=country
             ),
         ):
             place = _row_to_place(row, theme)
@@ -1480,7 +1482,9 @@ def enrich_visitors(
     return served
 
 
-def fetch_label_members(client: wd.SparqlClient, label: Label, manual_dir: Path) -> set[str]:
+def fetch_label_members(
+    client: wd.SparqlClient, label: Label, manual_dir: Path, *, country: str,
+) -> set[str]:
     """Q-ids des lieux portant un label.
 
     La liste manuelle s'AJOUTE toujours à ce que Wikidata rend, au lieu de s'y
@@ -1507,7 +1511,8 @@ def fetch_label_members(client: wd.SparqlClient, label: Label, manual_dir: Path)
         )
         return set()
 
-    rows = client.query(wd.label_members_query(label.query_kind, label.qid or ""))
+    rows = client.query(
+        wd.label_members_query(label.query_kind, label.qid or "", country=country))
     qids = {qid for qid in (wd.qid_from_uri(r.get("item")) for r in rows) if qid}
     ajoutes = complement - qids
     if ajoutes:
@@ -1586,7 +1591,8 @@ def run_fetch(
     label_members: dict[str, set[str]] = {}
     for label in config.labels:
         try:
-            label_members[label.id] = fetch_label_members(client, label, manual_dir)
+            label_members[label.id] = fetch_label_members(
+                client, label, manual_dir, country=config.country.qid)
         except Exception as exc:  # un label en échec ne doit pas tuer la collecte
             LOG.error("label %s : collecte échouée (%s)", label.id, exc)
             label_members[label.id] = set()
@@ -1595,7 +1601,8 @@ def run_fetch(
     failed: list[str] = []
     for theme in themes:
         try:
-            places.extend(fetch_theme(client, theme, label_members))
+            places.extend(
+                fetch_theme(client, theme, label_members, country=config.country.qid))
         except Exception as exc:
             LOG.error("thème %s : collecte échouée (%s)", theme.id, exc)
             failed.append(theme.id)

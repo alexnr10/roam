@@ -71,7 +71,7 @@ from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from
 from roam_pipeline.cli import (
     _known_qids, _pending_terms, _probe_verdict, census, cmd_pin, cmd_retention,
     cmd_verdict,
-    empty_themes,
+    empty_themes, pays_demande,
 )
 from roam_pipeline.wikipedia import title_from_url
 from roam_pipeline.discover import (
@@ -2756,7 +2756,7 @@ class TestGapCensus(unittest.TestCase):
     def test_the_count_is_aggregated_by_the_server(self):
         # La version paginée retriait des dizaines de milliers de lignes à
         # chaque page et mourait en 504. L'agrégation se fait chez WDQS.
-        sparql = class_census_query(12)
+        sparql = class_census_query(12, country="Q142")
         self.assertIn("COUNT(DISTINCT ?item)", sparql)
         self.assertIn("GROUP BY ?class", sparql)
         self.assertNotIn("OFFSET", sparql)
@@ -2764,13 +2764,13 @@ class TestGapCensus(unittest.TestCase):
     def test_members_are_bounded_by_their_classes(self):
         # C'est la classe qui mène la requête, pas l'ensemble des lieux de
         # France : d'où un coût sans rapport.
-        sparql = class_members_query(["Q3947", "Q23413"], 12)
+        sparql = class_members_query(["Q3947", "Q23413"], 12, country="Q142")
         self.assertIn("VALUES ?class { wd:Q3947 wd:Q23413 }", sparql)
 
     def test_the_threshold_table_counts_every_floor_at_once(self):
         # Baisser un plancher se décide sur un nombre, et ce nombre ne doit pas
         # coûter une demi-heure de collecte.
-        sparql = class_thresholds_query("Q3947", [2, 8])
+        sparql = class_thresholds_query("Q3947", [2, 8], country="Q142")
         self.assertIn("SUM(IF(?sitelinks >= 2, 1, 0)) AS ?n2", sparql)
         self.assertIn("SUM(IF(?sitelinks >= 8, 1, 0)) AS ?n8", sparql)
 
@@ -2785,7 +2785,7 @@ class TestGapCensus(unittest.TestCase):
     def test_the_threshold_query_filters_nothing(self):
         # Compter à partir de zéro n'a de sens que si la requête ne coupe pas
         # elle-même sur la notoriété.
-        sparql = class_thresholds_query("Q3947", [0, 2])
+        sparql = class_thresholds_query("Q3947", [0, 2], country="Q142")
         self.assertIn("SUM(IF(?sitelinks >= 0, 1, 0)) AS ?n0", sparql)
         self.assertNotIn("FILTER(?sitelinks", sparql)
 
@@ -4758,7 +4758,7 @@ class TestRelabelCannotCreatePlaces(unittest.TestCase):
             with _capture() as sortie:
                 with unittest.mock.patch("roam_pipeline.cli.wd.SparqlClient"), \
                      unittest.mock.patch("roam_pipeline.cli.fetch_label_members",
-                                         side_effect=lambda _c, l, _m: membres.get(l.id, set())):
+                                         side_effect=lambda _c, l, _m, country: membres.get(l.id, set())):
                     cmd_relabel(args, CONFIG)
             return sortie.getvalue()
 
@@ -4838,7 +4838,7 @@ class TestLabelCasings(unittest.TestCase):
                          ["Val Suzon", "val Suzon"])
 
     def test_the_query_carries_every_form(self):
-        requete = wd.label_lookup_query(["Forêt de Bercé"], "Q4421")
+        requete = wd.label_lookup_query(["Forêt de Bercé"], "Q4421", country="Q142")
         self.assertIn('"Forêt de Bercé"@fr', requete)
         self.assertIn('"forêt de Bercé"@fr', requete)
 
@@ -4855,14 +4855,15 @@ class TestLabelQueryKinds(unittest.TestCase):
     def test_the_five_shapes_build_a_query(self):
         for kind in ("heritage", "member_of", "instance", "operator", "owner"):
             with self.subTest(kind):
-                requete = wd.label_members_query(kind, "Q2945551")
+                requete = wd.label_members_query(kind, "Q2945551", country="Q142")
                 self.assertIn("wd:Q2945551", requete)
                 self.assertIn("SELECT DISTINCT ?item", requete)
 
     def test_each_shape_asks_a_different_property(self):
         proprietes = set()
         for kind in ("heritage", "member_of", "instance", "operator", "owner"):
-            ligne = next(l for l in wd.label_members_query(kind, "Q2945551").splitlines()
+            ligne = next(l for l in wd.label_members_query(
+                kind, "Q2945551", country="Q142").splitlines()
                          if "wd:Q2945551" in l)
             proprietes.add(ligne.strip())
         self.assertEqual(len(proprietes), 5)
@@ -4872,7 +4873,7 @@ class TestLabelQueryKinds(unittest.TestCase):
         # elle donnerait zéro membre et on chercherait ailleurs pendant une
         # demi-heure de collecte.
         with self.assertRaises(ValueError):
-            wd.label_members_query("exploitant", "Q2945551")
+            wd.label_members_query("exploitant", "Q2945551", country="Q142")
 
 
 class TestThemeCap(unittest.TestCase):
@@ -5826,6 +5827,63 @@ class TestVerdict(unittest.TestCase):
             with self.subTest(verdict):
                 _code, _t, decisions, _csv = self._run(brut, "Q1", decision=verdict)
                 self.assertEqual(decisions["Q1"][0], verdict)
+
+
+class TestCountryParameter(unittest.TestCase):
+    """Le pays est une donnée, plus une valeur en dur dans six requêtes.
+
+    Tant qu'il vivait dans `wikidata.py`, rien dans la configuration ne disait
+    que ce catalogue parlait de la France — et mesurer ce qu'un autre pays
+    rapporterait demandait d'éditer le code.
+    """
+
+    def test_the_configured_country_is_france(self):
+        self.assertEqual(CONFIG.country.qid, "Q142")
+        self.assertEqual(CONFIG.country.code, "FR")
+        self.assertEqual(CONFIG.country.de_form, "de France")
+
+    def test_every_country_bound_query_asks_the_country_it_is_given(self):
+        # Le vrai risque n'est pas qu'une requête refuse un pays : c'est
+        # qu'elle en garde un autre en silence. On vérifie donc les deux sens.
+        requetes = {
+            "theme": wd.theme_query(["Q1"], 3, country="Q38"),
+            "recensement": wd.class_census_query(5, country="Q38"),
+            "membres de classe": wd.class_members_query(["Q1"], 5, country="Q38"),
+            "planchers": wd.class_thresholds_query("Q1", [0, 4], country="Q38"),
+            "membres de label": wd.label_members_query("heritage", "Q9", country="Q38"),
+            "recherche par nom": wd.label_lookup_query(["Rome"], "Q515", country="Q38"),
+        }
+        for nom, requete in requetes.items():
+            with self.subTest(nom):
+                self.assertIn("wd:Q38", requete)
+                self.assertNotIn("Q142", requete)
+
+    def test_the_country_cannot_be_forgotten(self):
+        # Il est OBLIGATOIRE et sans valeur par défaut, à dessein : un défaut
+        # se laisse oublier, et l'oublier ferait collecter la France en croyant
+        # collecter l'Italie — sans lever la moindre erreur.
+        with self.assertRaises(TypeError):
+            wd.theme_query(["Q1"], 3)
+
+    def test_the_command_line_country_wins_over_the_repository(self):
+        args = argparse.Namespace(pays="Q38")
+        self.assertEqual(pays_demande(args, CONFIG), "Q38")
+
+    def test_without_the_option_the_repository_country_is_used(self):
+        for valeur in (None, "", "   "):
+            with self.subTest(repr(valeur)):
+                args = argparse.Namespace(pays=valeur)
+                self.assertEqual(pays_demande(args, CONFIG), "Q142")
+        # Une commande qui n'a pas l'option du tout ne doit pas casser.
+        self.assertEqual(pays_demande(argparse.Namespace(), CONFIG), "Q142")
+
+    def test_a_country_that_is_not_a_qid_is_refused(self):
+        # « Italie » ne lèverait rien chez WDQS : la requête rendrait zéro
+        # résultat, et on conclurait que l'Italie n'a pas de châteaux.
+        for faux in ("Italie", "38", "Q38a"):
+            with self.subTest(faux):
+                with self.assertRaises(SystemExit):
+                    pays_demande(argparse.Namespace(pays=faux), CONFIG)
 
 
 class TestMergeDecisions(unittest.TestCase):

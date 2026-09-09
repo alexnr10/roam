@@ -9,7 +9,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from .config import Config
-from .geo import FRANCE, departements, regions
+from .geo import country_area, departements, regions
 from .alerts import alerts_for
 from .score import score_breakdown
 from .models import Collection, Place
@@ -356,15 +356,18 @@ def write_seed_sql(
         )
 
     lines += ["", "-- Découpage administratif"]
+    pays = country_area(config)
+    racine = f"country:{pays.code}"
     lines.append(
         "insert into geo_areas (id, level, code, name, parent_id) values "
-        "('country:FR', 'country', 'FR', 'France', null) on conflict (id) do nothing;"
+        f"({_sql_str(racine)}, 'country', {_sql_str(pays.code)}, "
+        f"{_sql_str(pays.name)}, null) on conflict (id) do nothing;"
     )
     for region in regions().values():
         lines.append(
             "insert into geo_areas (id, level, code, name, parent_id) values "
             f"({_sql_str(region.id)}, 'region', {_sql_str(region.code)}, "
-            f"{_sql_str(region.name)}, 'country:FR') on conflict (id) do nothing;"
+            f"{_sql_str(region.name)}, {_sql_str(racine)}) on conflict (id) do nothing;"
         )
     for dept in departements().values():
         parent = f"region:{dept.parent_code}" if dept.parent_code else None
@@ -1348,12 +1351,13 @@ def write_app_catalog(
     # Répertoire des territoires effectivement occupés par le catalogue. Sans
     # lui, l'application afficherait « 15 » au lieu de « Cantal », et devrait
     # embarquer les 35 000 communes de France pour n'en nommer que mille.
+    pays = country_area(config)
     used_regions = {p.region_code for p in places if p.wikidata_id in used and p.region_code}
     used_depts = {
         p.departement_code for p in places if p.wikidata_id in used and p.departement_code
     }
     areas = {
-        "country": [{"code": FRANCE.code, "name": FRANCE.name, "deForm": FRANCE.de_form}],
+        "country": [{"code": pays.code, "name": pays.name, "deForm": pays.de_form}],
         "region": [
             {"code": code, "name": zone.name, "deForm": zone.de_form}
             for code, zone in sorted(regions().items())

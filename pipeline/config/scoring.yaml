@@ -379,6 +379,30 @@ collections:
     - plages-region-93        # Littoral et plages de Provence-Alpes-Côte d'Azur
 
 geo:
+  # LE PAYS COLLECTÉ.
+  #
+  # Il n'était écrit nulle part : « Q142 » vivait en dur dans six requêtes
+  # SPARQL, et rien dans la configuration ne disait que ce catalogue parlait de
+  # la France. C'est le premier pas vers un deuxième pays — et, tout de suite,
+  # ce qui permet de MESURER un pays sans rien engager : `gaps --pays Q38`
+  # compte ce que l'Italie rapporterait, sans toucher au catalogue français.
+  #
+  # `qid` est le pays chez Wikidata (propriété P17). `code` et `name`
+  # identifient le pays dans le catalogue exporté, et `de_form` porte le
+  # complément de nom que le français ne sait pas dériver — « de France »,
+  # mais « des Pays-Bas », « du Portugal », « d'Italie ».
+  #
+  # ⚠ Changer ce bloc ne suffit PAS à changer de pays. Le rattachement
+  # administratif passe encore par les API de l'État français, les contours
+  # sont ceux de l'IGN, et les référentiels de `data/reference` sont les
+  # départements et régions. Ce bloc rend les REQUÊTES paramétrables ; le reste
+  # est décrit dans l'évaluation de portage.
+  country:
+    qid: Q142
+    code: FR
+    name: France
+    de_form: de France
+
   # Niveaux géographiques pour lesquels on dérive des collections.
   levels: [departement, region, country]
   # Croisements thème × géographie (ex. « Châteaux de Dordogne »).

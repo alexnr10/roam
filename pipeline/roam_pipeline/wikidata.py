@@ -21,6 +21,13 @@ SEARCH_ENDPOINT = "https://www.wikidata.org/w/api.php"
 USER_AGENT = "RoamCatalogBot/0.1 (https://github.com/alexnr10/roam) python-requests"
 
 # France, et propriétés utilisées par les requêtes
+# Le pays collecté par défaut. Ce n'est PAS le pays des requêtes : chacune le
+# reçoit en paramètre obligatoire, et `config.country.qid` le fournit. Le défaut
+# ne sert qu'aux tests et aux appels directs.
+#
+# Obligatoire et non optionnel, à dessein : un paramètre à valeur par défaut se
+# laisse oublier, et l'oublier ferait collecter la France en croyant collecter
+# l'Italie — une erreur qui ne lève rien et qu'on ne verrait qu'au catalogue.
 Q_FRANCE = "Q142"
 P_INSTANCE_OF = "P31"
 P_SUBCLASS_OF = "P279"
@@ -221,6 +228,8 @@ def theme_query(
     min_sitelinks: int,
     limit: int | None = None,
     offset: int = 0,
+    *,
+    country: str,
 ) -> str:
     """Lieux français d'un thème, avec notoriété et commune de rattachement.
 
@@ -240,7 +249,7 @@ SELECT DISTINCT ?item ?itemLabel ?coord ?sitelinks ?image ?commons ?elevation ?a
 WHERE {{
   VALUES ?class {{ {values} }}
   ?item wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* ?class .
-  ?item wdt:{P_COUNTRY} wd:{Q_FRANCE} .
+  ?item wdt:{P_COUNTRY} wd:{country} .
   ?item wdt:{P_COORDINATE} ?coord .
   ?item wikibase:sitelinks ?sitelinks .
   FILTER(?sitelinks >= {min_sitelinks})
@@ -336,15 +345,15 @@ SELECT DISTINCT ?item ?class ?classLabel WHERE {{
 """
 
 
-#: Le corps commun du recensement : ce qui est en France, situé, et documenté.
-def _notable_body(min_sitelinks: int) -> str:
-    return f"""  ?item wdt:{P_COUNTRY} wd:{Q_FRANCE} .
+#: Le corps commun du recensement : ce qui est dans le pays, situé, et documenté.
+def _notable_body(min_sitelinks: int, country: str) -> str:
+    return f"""  ?item wdt:{P_COUNTRY} wd:{country} .
   ?item wdt:{P_COORDINATE} ?coord .
   ?item wikibase:sitelinks ?sitelinks .
   FILTER(?sitelinks >= {min_sitelinks})"""
 
 
-def class_census_query(min_sitelinks: int, limit: int = 300) -> str:
+def class_census_query(min_sitelinks: int, limit: int = 300, *, country: str) -> str:
     """Combien de lieux français notoires par CLASSE déclarée.
 
     Première moitié du recensement des trous. L'agrégation se fait chez WDQS :
@@ -356,7 +365,7 @@ def class_census_query(min_sitelinks: int, limit: int = 300) -> str:
     """
     return f"""
 SELECT ?class (COUNT(DISTINCT ?item) AS ?n) WHERE {{
-{_notable_body(min_sitelinks)}
+{_notable_body(min_sitelinks, country)}
   ?item wdt:{P_INSTANCE_OF} ?class .
 }}
 GROUP BY ?class
@@ -365,7 +374,9 @@ LIMIT {limit}
 """
 
 
-def class_members_query(class_qids: list[str], min_sitelinks: int) -> str:
+def class_members_query(
+    class_qids: list[str], min_sitelinks: int, *, country: str
+) -> str:
     """Les lieux notoires de ces classes, pour en soustraire ce qu'on possède.
 
     Seconde moitié. Bornée par `VALUES` : c'est la classe qui mène la requête,
@@ -376,13 +387,15 @@ def class_members_query(class_qids: list[str], min_sitelinks: int) -> str:
 SELECT ?class ?item ?itemLabel WHERE {{
   VALUES ?class {{ {values} }}
   ?item wdt:{P_INSTANCE_OF} ?class .
-{_notable_body(min_sitelinks)}
+{_notable_body(min_sitelinks, country)}
   SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
 }}
 """
 
 
-def class_thresholds_query(class_qid: str, thresholds: list[int]) -> str:
+def class_thresholds_query(
+    class_qid: str, thresholds: list[int], *, country: str
+) -> str:
     """Combien de lieux d'une classe survivent à chaque plancher de collecte.
 
     Répond à « si je descends le plancher à quatre, combien de lieux en plus ? »
@@ -396,7 +409,7 @@ SELECT
 {lines}
 WHERE {{
   ?item wdt:{P_INSTANCE_OF} wd:{class_qid} .
-  ?item wdt:{P_COUNTRY} wd:{Q_FRANCE} .
+  ?item wdt:{P_COUNTRY} wd:{country} .
   ?item wdt:{P_COORDINATE} ?coord .
   ?item wikibase:sitelinks ?sitelinks .
 }}
@@ -448,7 +461,7 @@ SELECT ?item ?visitors WHERE {{
 """
 
 
-def label_members_query(kind: str, qid: str) -> str:
+def label_members_query(kind: str, qid: str, *, country: str) -> str:
     """Membres d'un label. `kind` ∈ {heritage, member_of, instance, operator, owner}."""
     predicate = {
         "heritage": f"wdt:{P_HERITAGE}",
@@ -467,7 +480,7 @@ def label_members_query(kind: str, qid: str) -> str:
     return f"""
 SELECT DISTINCT ?item WHERE {{
   ?item {predicate[kind]} wd:{qid} .
-  ?item wdt:{P_COUNTRY} wd:{Q_FRANCE} .
+  ?item wdt:{P_COUNTRY} wd:{country} .
 }}
 """
 
@@ -492,7 +505,9 @@ def label_casings(nom: str) -> list[str]:
     return list(dict.fromkeys(formes))
 
 
-def label_lookup_query(names: list[str], class_qid: str) -> str:
+def label_lookup_query(
+    names: list[str], class_qid: str, *, country: str
+) -> str:
     """Q-ids français dont le libellé français est EXACTEMENT l'un de ces noms.
 
     Sert à saisir une liste officielle : le ministère et les associations
@@ -514,7 +529,7 @@ SELECT DISTINCT ?nom ?item ?itemLabel WHERE {{
   VALUES ?nom {{ {values} }}
   ?item rdfs:label ?nom .
   ?item wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* wd:{class_qid} .
-  ?item wdt:{P_COUNTRY} wd:{Q_FRANCE} .
+  ?item wdt:{P_COUNTRY} wd:{country} .
   SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
 }}
 """

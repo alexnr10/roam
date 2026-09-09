@@ -55,6 +55,19 @@ def departements() -> dict[str, Area]:
     return out
 
 
+# Le pays du catalogue, sous la forme d'une zone comme les autres.
+#
+# Il vient de `scoring.yaml` : c'est la même donnée que le Q-id des requêtes, et
+# deux sources pour un seul pays finiraient par diverger.
+def country_area(config) -> Area:
+    return Area(
+        code=config.country.code, name=config.country.name,
+        de_form=config.country.de_form, level="country",
+    )
+
+
+#: Le pays par défaut, pour les appels qui n'ont pas de configuration sous la
+#: main. Tout ce qui EXPORTE doit passer par `country_area`.
 FRANCE = Area(code="FR", name="France", de_form="de France", level="country")
 
 

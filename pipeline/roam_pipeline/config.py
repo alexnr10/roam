@@ -254,7 +254,26 @@ class CollectionRules:
 
 
 @dataclass(frozen=True)
+class Country:
+    """Le pays que ce catalogue décrit.
+
+    Un catalogue Roam parle d'UN pays : les étoiles disent un rang dans une
+    collection nationale, et comparer une plage corse à une plage sarde n'a
+    aucun sens pour qui visite l'une des deux.
+
+    Le Q-id part dans les requêtes SPARQL (P17) ; le code, le nom et la forme
+    en « de » servent le catalogue exporté et les noms de collections.
+    """
+
+    qid: str
+    code: str
+    name: str
+    de_form: str
+
+
+@dataclass(frozen=True)
 class Config:
+    country: Country
     themes: list[Theme]
     labels: list[Label]
     scoring: Scoring
@@ -387,7 +406,14 @@ def load_config(config_dir: Path | None = None) -> Config:
         raise ValueError("`pageviews.scale` doit être positif")
 
     _validate(themes, labels, exclusions, visitors)
+    pays = raw["geo"]["country"]
+    country = Country(
+        qid=str(pays["qid"]), code=str(pays["code"]),
+        name=str(pays["name"]), de_form=str(pays["de_form"]),
+    )
+
     return Config(
+        country=country,
         themes=themes,
         labels=labels,
         scoring=scoring,

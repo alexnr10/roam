@@ -157,13 +157,14 @@ def cmd_label_probe(args: argparse.Namespace, config: Config) -> int:
         print(f"« {qid} » n'est pas un identifiant Wikidata.", file=sys.stderr)
         return 1
 
+    pays = pays_demande(args, config)
     client = wd.SparqlClient()
     for ligne in client.query(wd.entity_labels_query([qid])):
         libelle = ligne.get("itemLabel") or qid
         description = ligne.get("itemDescription") or ""
         print(f"{qid} — {libelle}" + (f" ({description})" if description else ""))
 
-    print("\nMembres français, par façon d'interroger :\n")
+    print(f"\nMembres ({pays}), par façon d'interroger :\n")
     trouve = False
     for kind, explication in (
         ("heritage", "désignation patrimoniale (P1435) — celle des sites classés"),
@@ -173,7 +174,8 @@ def cmd_label_probe(args: argparse.Namespace, config: Config) -> int:
         ("owner", "propriété de (P127)"),
     ):
         try:
-            membres = list(client.query(wd.label_members_query(kind, qid)))
+            membres = list(client.query(
+                wd.label_members_query(kind, qid, country=pays)))
         except Exception as erreur:  # noqa: BLE001 — un miroir en panne n'est pas un verdict
             print(f"    {kind:10s} : requête en échec ({erreur})")
             continue
@@ -402,7 +404,8 @@ def cmd_relabel(args: argparse.Namespace, config: Config) -> int:
     members: dict[str, set[str]] = {}
     for label in config.labels:
         try:
-            members[label.id] = fetch_label_members(client, label, args.manual)
+            members[label.id] = fetch_label_members(
+                client, label, args.manual, country=config.country.qid)
         except Exception as erreur:  # noqa: BLE001 — un label en échec n'est pas fatal
             LOG.error("label %s : collecte échouée (%s)", label.id, erreur)
             members[label.id] = set()
@@ -1041,7 +1044,7 @@ class _FauxLieu:
 
 
 def _resolve_chez_wikidata(
-    noms: list[str], class_qid: str
+    noms: list[str], class_qid: str, country: str = wd.Q_FRANCE,
 ) -> tuple[list[tuple[str, "_FauxLieu"]], dict[str, list[tuple[str, str]]]]:
     """Retrouve des noms chez Wikidata, bornés par une classe.
 
@@ -1060,7 +1063,8 @@ def _resolve_chez_wikidata(
     par_nom: dict[str, list[tuple[str, str]]] = defaultdict(list)
     for batch in wd.chunked(noms, 150):
         try:
-            rows = client.query(wd.label_lookup_query(batch, class_qid))
+            rows = client.query(
+                wd.label_lookup_query(batch, class_qid, country=country))
         except Exception as erreur:  # noqa: BLE001
             print(f"    recherche Wikidata en échec ({erreur})", file=sys.stderr)
             continue
@@ -1185,7 +1189,8 @@ def cmd_resolve_list(args: argparse.Namespace, config: Config) -> int:
     # liste de villages serait une erreur muette.
     ambigus: dict[str, list[tuple[str, str]]] = {}
     if args.classe:
-        trouves, ambigus = _resolve_chez_wikidata(noms, args.classe)
+        trouves, ambigus = _resolve_chez_wikidata(
+            noms, args.classe, config.country.qid)
         surs.extend(trouves)
         pris = {nom for nom, _ in trouves} | set(ambigus)
         noms = [nom for nom in noms if nom not in pris]
@@ -1717,7 +1722,7 @@ def _probe_verdict(
     manual = "  Remède : l'inscrire dans `data/manual/places.csv` — les lieux "
     out: list[str] = []
 
-    if entry.get("country_qid") != wd.Q_FRANCE:
+    if entry.get("country_qid") != config.country.qid:
         out.append("⚠ pas de propriété « pays » = France : INVISIBLE à toutes les "
                    "requêtes de thème, qui l'exigent pour borner la collecte.")
         out.append(manual + "manuels échappent à toute la chaîne de collecte.")
@@ -1952,6 +1957,23 @@ def cmd_retention(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def pays_demande(args: argparse.Namespace, config: Config) -> str:
+    """Le pays à interroger : celui de la ligne de commande, sinon celui du dépôt.
+
+    `--pays` ne change RIEN au catalogue : il ne sert qu'aux commandes de
+    mesure, pour compter ce qu'un autre pays rapporterait avant de s'engager.
+    Le pays du catalogue, lui, se change dans `scoring.yaml` — et changer ce
+    bloc ne suffit pas à porter le pipeline, le rattachement administratif et
+    les contours restant français.
+    """
+    demande = (getattr(args, "pays", None) or "").strip()
+    if not demande:
+        return config.country.qid
+    if not (demande.startswith("Q") and demande[1:].isdigit()):
+        raise SystemExit(f"--pays attend un Q-id, pas « {demande} ».")
+    return demande
+
+
 def cmd_gaps(args: argparse.Namespace, config: Config) -> int:
     """Quelles classes de lieux nous échappent ?
 
@@ -1974,14 +1996,15 @@ def cmd_gaps(args: argparse.Namespace, config: Config) -> int:
 
     known = _known_qids(raw_path)
     owned = set(_class_owners(config))
+    pays = pays_demande(args, config)
     client = wd.SparqlClient()
 
     if args.klass:
-        return _print_thresholds(client, args.klass, known, config)
+        return _print_thresholds(client, args.klass, known, config, pays)
 
-    print(f"Décompte des lieux français à {args.min_sitelinks} langues ou plus…")
+    print(f"Décompte des lieux de {pays} à {args.min_sitelinks} langues ou plus…")
     counts: dict[str, int] = {}
-    for row in client.query(wd.class_census_query(args.min_sitelinks)):
+    for row in client.query(wd.class_census_query(args.min_sitelinks, country=pays)):
         class_qid = wd.qid_from_uri(row.get("class"))
         if class_qid:
             counts[class_qid] = int(row.get("n") or 0)
@@ -2006,7 +2029,8 @@ def cmd_gaps(args: argparse.Namespace, config: Config) -> int:
     manques: list[str] = []
     for batch in wd.chunked(candidates, 4):
         try:
-            rows.extend(client.query(wd.class_members_query(batch, args.min_sitelinks)))
+            rows.extend(client.query(
+                wd.class_members_query(batch, args.min_sitelinks, country=pays)))
         except Exception as exc:
             LOG.warning("classes non examinées (%s) : %s", exc, ", ".join(batch))
             manques.extend(batch)
@@ -2051,21 +2075,24 @@ def _entity_labels(client, qids: list[str]) -> dict[str, str]:
     return labels
 
 
-def _print_thresholds(client, class_qid: str, known: set[str], config: Config) -> int:
+def _print_thresholds(
+    client, class_qid: str, known: set[str], config: Config, country: str,
+) -> int:
     """Ce que changerait chaque plancher, pour une classe donnée.
 
     Baisser un plancher se décide sur un nombre, pas sur une impression — et
     le nombre ne devrait pas coûter une demi-heure de collecte à obtenir.
     """
     label = _entity_labels(client, [class_qid]).get(class_qid, class_qid)
-    rows = client.query(wd.class_thresholds_query(class_qid, THRESHOLDS))
+    rows = client.query(wd.class_thresholds_query(class_qid, THRESHOLDS, country=country))
     if not rows:
-        print(f"{class_qid} : aucun lieu français situé de cette classe.")
+        print(f"{class_qid} : aucun lieu situé de cette classe en {country}.")
         return 0
 
     row = rows[0]
     current = dict(_class_owners(config)).get(class_qid)
-    print(f"\n{label} ({class_qid}) — lieux français situés, par plancher de collecte\n")
+    print(f"\n{label} ({class_qid}) — lieux situés en {country}, "
+          "par plancher de collecte\n")
     print("      " + "".join(f"{'≥' + str(t):>8}" for t in THRESHOLDS))
     print("      " + "".join(f"{row.get('n' + str(t), '0'):>8}" for t in THRESHOLDS))
     if current:
@@ -3545,6 +3572,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     gaps.add_argument("--limit", type=int, default=30, help="classes affichées")
     gaps.add_argument(
+        "--pays", metavar="QID",
+        help="interroger un AUTRE pays que celui du dépôt, par son Q-id "
+             "(Q38 pour l'Italie). Ne touche à rien : c'est la façon de "
+             "compter ce qu'un pays rapporterait avant de s'y engager.",
+    )
+    gaps.add_argument(
         "--class", dest="klass", metavar="QID",
         help="au lieu du recensement : ce que changerait chaque plancher pour CETTE classe",
     )
@@ -3647,6 +3680,12 @@ def build_parser() -> argparse.ArgumentParser:
         "label-probe",
         help="par quelle propriété un label rattache-t-il ses membres ? (réseau requis)")
     sonde.add_argument("wikidata_id")
+    sonde.add_argument(
+        "--pays", metavar="QID",
+        help="chercher les membres dans un AUTRE pays que celui du dépôt "
+             "(Q38 pour l'Italie) — pour savoir si une liste nationale "
+             "étrangère est exploitable avant de la déclarer.",
+    )
 
     sub.add_parser(
         "fantomes",

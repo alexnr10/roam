@@ -15,7 +15,7 @@ import unicodedata
 from collections import Counter, defaultdict
 
 from .config import Config
-from .geo import FRANCE, area, departements, region_of, regions
+from .geo import area, departements, region_of, regions
 from .models import Collection, CollectionPlace, Place
 from .score import assign_tiers, rescued
 
@@ -610,7 +610,7 @@ def build_geo_collections(places: list[Place], config: Config) -> list[Collectio
     for level in config.collections.geo_levels:
         buckets: dict[str, list[Place]] = defaultdict(list)
         for place in places:
-            code = _geo_code(place, level)
+            code = _geo_code(place, level, config.country.code)
             if code:
                 buckets[code].append(place)
 
@@ -688,7 +688,7 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
         buckets: dict[tuple[str, str], list[Place]] = defaultdict(list)
         par_zone: Counter[str] = Counter()
         for place in places:
-            code = _geo_code(place, level)
+            code = _geo_code(place, level, config.country.code)
             if code:
                 buckets[(place.theme_id, code)].append(place)
                 par_zone[code] += 1
@@ -777,13 +777,13 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
     return out
 
 
-def _geo_code(place: Place, level: str) -> str | None:
+def _geo_code(place: Place, level: str, country_code: str) -> str | None:
     if level == "departement":
         return place.departement_code
     if level == "region":
         return place.region_code
     if level == "country":
-        return FRANCE.code
+        return country_code
     return None
 
 
