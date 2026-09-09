@@ -15,15 +15,21 @@ from __future__ import annotations
 import math
 import re
 import unicodedata
+from collections import Counter, defaultdict
 
 from .config import Config
 from .models import Place
 
 
-def _nom_nu(nom: str) -> str:
-    """Le nom, sans accents ni ponctuation, pour comparer des graphies."""
+def _mots(nom: str) -> list[str]:
+    """Les mots d'un nom, sans accents ni ponctuation, à partir de quatre lettres.
+
+    Quatre, parce que « Eu » — la commune de Seine-Maritime — a déjà servi de
+    sous-chaîne à la moitié de la France sur une recherche par nom. Un mot trop
+    court ne distingue rien.
+    """
     sans = unicodedata.normalize("NFD", nom or "").encode("ascii", "ignore").decode()
-    return re.sub(r"[^a-z0-9]+", " ", sans.lower()).strip()
+    return [m for m in re.split(r"[^a-z0-9]+", sans.lower()) if len(m) >= 4]
 
 
 def _metres(a: Place, b: Place) -> float:
@@ -33,15 +39,17 @@ def _metres(a: Place, b: Place) -> float:
     )
 
 
-#: Longueur minimale d'un nom pour servir de préfixe.
+#: Au-delà de combien de noms un mot cesse d'être distinctif.
 #
-# Sans elle, la commune d'« Eu » serait le préfixe de la moitié de la France.
-# C'est une erreur déjà commise, sur une recherche par sous-chaîne : le
-# garde-fou est écrit ici pour qu'elle ne se refasse pas.
-_NOM_MINIMAL = 8
+# « saint », « château », « grand » reviennent des centaines de fois : ils ne
+# désignent personne. « lascaux » apparaît deux fois, « cosquer » trois. Le
+# seuil se lit donc dans la collection elle-même plutôt que dans une liste de
+# mots vides écrite à la main — ce qui vaut aussi pour un autre pays, où la
+# liste serait à réécrire et le comptage, lui, marche tout seul.
+_MOT_COMMUN = 5
 
-#: Un fac-similé n'est pas sur le site : Lascaux IV est à 800 m de la grotte,
-#: Cosquer Méditerranée à vingt kilomètres de la calanque.
+#: Un fac-similé n'est pas sur le site : Lascaux IV est à 500 m de la grotte,
+#: Cosquer Méditerranée à douze kilomètres de la calanque.
 _PORTEE_M = 25_000
 
 
@@ -49,37 +57,51 @@ def remplacants(places: list[Place]) -> dict[str, Place]:
     """Pour chaque lieu FERMÉ, ce qu'on visite à sa place — quand ça existe.
 
     La grotte de Lascaux est au catalogue et ne se visite pas ; ce qu'on visite
-    est Lascaux IV, qui n'était collecté sous aucun nom. Chauvet, elle, avait
-    son fac-similé. Rien ne signalait la différence : un lieu fermé et un lieu
-    fermé-mais-doublé se ressemblent trait pour trait dans les données.
+    est Lascaux IV, à cinq cents mètres. Chauvet, elle, avait son fac-similé.
+    Rien ne signalait la différence : un lieu fermé et un lieu fermé-mais-doublé
+    se ressemblent trait pour trait dans les données.
 
-    La règle est le NOM PARTAGÉ en préfixe : « grotte chauvet » ouvre sur
-    « grotte chauvet 2 ardeche ». C'est étroit à dessein — le voisin visitable
-    le plus proche, lui, rend n'importe quoi : sur les cent douze lieux fermés
-    de la collecte, il proposait le château d'en face et le menhir d'à côté.
+    La règle est le MOT RARE PARTAGÉ, à moins de vingt-cinq kilomètres. Deux
+    autres ont été essayées et mesurées sur les cent douze lieux fermés de la
+    collecte :
+
+    - le voisin visitable le plus proche : il propose le château d'en face et
+      le menhir d'à côté, sur presque tous ;
+    - le nom en préfixe : un seul résultat, Chauvet — il rate Lascaux IV, dont
+      le nom ne commence pas par celui de la grotte.
+
+    Le mot rare en trouve treize, dont les trois qui comptent. Ce qu'il rend
+    n'est pas un verdict mais une piste : « Grotte de Bruniquel → Châteaux de
+    Bruniquel » est une bonne réponse pour un guide, et c'est au curateur de le
+    dire.
     """
-    par_nom: list[tuple[str, Place]] = [
-        (_nom_nu(p.name), p) for p in places if p.visitable is not False
-    ]
+    par_mot: dict[str, list[Place]] = defaultdict(list)
+    frequence: Counter[str] = Counter()
+    for place in places:
+        vus = set(_mots(place.name))
+        frequence.update(vus)
+        if place.visitable is not False:
+            for mot in vus:
+                par_mot[mot].append(place)
+
     trouves: dict[str, Place] = {}
     for place in places:
         if place.visitable is not False:
             continue
-        nu = _nom_nu(place.name)
-        if len(nu) < _NOM_MINIMAL:
-            continue
-        for autre_nu, autre in par_nom:
-            if autre.wikidata_id == place.wikidata_id:
-                continue
-            # Un préfixe SUIVI D'UNE FRONTIÈRE de mot : « grotte chauvet »
-            # ouvre sur « grotte chauvet 2 », pas sur « grotte chauveterie ».
-            if not autre_nu.startswith(nu) or (
-                len(autre_nu) > len(nu) and autre_nu[len(nu)] != " "
-            ):
-                continue
-            if _metres(place, autre) <= _PORTEE_M:
-                trouves[place.wikidata_id] = autre
-                break
+        rares = [m for m in _mots(place.name) if frequence[m] <= _MOT_COMMUN]
+        candidats = {
+            autre.wikidata_id: autre
+            for mot in rares
+            for autre in par_mot.get(mot, ())
+            if autre.wikidata_id != place.wikidata_id
+        }
+        proches = [
+            (_metres(place, autre), autre)
+            for autre in candidats.values()
+            if _metres(place, autre) <= _PORTEE_M
+        ]
+        if proches:
+            trouves[place.wikidata_id] = min(proches, key=lambda x: (x[0], x[1].name))[1]
     return trouves
 
 

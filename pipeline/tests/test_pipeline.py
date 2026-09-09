@@ -6171,6 +6171,14 @@ class TestReplacements(unittest.TestCase):
         trouves = alerts_module.remplacants([grotte, facsimile])
         self.assertEqual(trouves["Q374096"].wikidata_id, "Q19951965")
 
+    def test_the_replica_is_found_even_when_the_name_does_not_start_alike(self):
+        # LE cas que la règle du préfixe ratait : « Lascaux IV » ne commence
+        # pas par « Grotte de Lascaux ». C'est le mot RARE qui les relie.
+        grotte = self._lieu("Grotte de Lascaux", "Q172125", False, lat=45.0533, lon=1.1747)
+        replique = self._lieu("Lascaux IV", "Q112911610", True, lat=45.0582, lon=1.1697)
+        trouves = alerts_module.remplacants([grotte, replique])
+        self.assertEqual(trouves["Q172125"].wikidata_id, "Q112911610")
+
     def test_a_closed_place_without_one_is_named_as_such(self):
         # LE cas de Lascaux : fermé, au catalogue, et rien ne le remplace.
         lascaux = self._lieu("Grotte de Lascaux", "Q172125", False)
@@ -6186,20 +6194,22 @@ class TestReplacements(unittest.TestCase):
         alertes = alerts_module.alerts_for(grotte, CONFIG, trouves)
         self.assertTrue(any("Grotte Chauvet 2" in a for a in alertes))
 
-    def test_a_short_name_is_never_a_prefix(self):
-        # La commune d'« Eu » a déjà servi de sous-chaîne à la moitié de la
-        # France, sur une recherche par nom. Le garde-fou est écrit pour que
-        # l'erreur ne se refasse pas.
-        eu = make_place("Eu", theme="villages", wikidata_id="Q211593", visitable=False)
-        autre = make_place("Europe-Park", theme="villages", wikidata_id="Q2", visitable=True)
-        self.assertEqual(alerts_module.remplacants([eu, autre]), {})
+    def test_a_common_word_links_nothing(self):
+        # « grotte » revient des centaines de fois dans la collecte : il ne
+        # désigne personne. Le seuil se lit dans la collection elle-même —
+        # ce qui vaut aussi pour un autre pays, où une liste de mots vides
+        # écrite à la main serait à réécrire.
+        ferme = self._lieu("Grotte de Machin", "Q1", False)
+        voisines = [self._lieu(f"Grotte de Truc {i}", f"Q{i + 10}", True, lat=44.35 + i / 1000)
+                    for i in range(6)]
+        self.assertEqual(alerts_module.remplacants([ferme, *voisines]), {})
 
-    def test_a_prefix_must_end_on_a_word(self):
-        # « grotte chauvet » ouvre sur « grotte chauvet 2 », pas sur
-        # « grotte chauveterie ».
-        ferme = self._lieu("Grotte Chauvet", "Q1", False)
-        piege = self._lieu("Grotte Chauveterie", "Q2", True)
-        self.assertEqual(alerts_module.remplacants([ferme, piege]), {})
+    def test_a_short_word_is_never_distinctive(self):
+        # Quatre lettres au minimum : « Eu », la commune de Seine-Maritime, a
+        # déjà servi de sous-chaîne à la moitié de la France.
+        eu = make_place("Eu", theme="villages", wikidata_id="Q211593", visitable=False)
+        autre = make_place("Abbaye du Val", theme="abbayes", wikidata_id="Q2", visitable=True)
+        self.assertEqual(alerts_module.remplacants([eu, autre]), {})
 
     def test_a_replica_too_far_away_is_not_one(self):
         ferme = self._lieu("Grotte Chauvet", "Q1", False, lat=44.35)
