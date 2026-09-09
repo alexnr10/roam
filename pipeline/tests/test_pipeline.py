@@ -2165,11 +2165,22 @@ class TestProbe(unittest.TestCase):
     GENERIQUE = [("maisons", "maison", 8)]
 
     def test_a_missing_country_is_named_first(self):
-        # `theme_query` exige P17 = France. Sans elle, aucun thème ne peut voir
-        # l'entité — et c'est invisible depuis le catalogue.
+        # `theme_query` exige P17 = le pays du catalogue. Sans elle, aucun
+        # thème ne peut voir l'entité — et c'est invisible depuis le catalogue.
         lines = _probe_verdict(self._entry(country="", country_qid=""), self.MAISONS, CONFIG, False)
         self.assertIn("pays", lines[0])
-        self.assertTrue(any("manual/places.csv" in line for line in lines))
+        self.assertIn("France", lines[0])
+
+    def test_a_foreign_place_is_not_told_to_pin_itself(self):
+        # `places.csv` était proposé en remède, et c'était un conseil qui ne
+        # peut pas marcher : un lieu étranger épinglé entre sans département,
+        # et `require_departement` le retire aussitôt. Sonder un lieu italien
+        # depuis un dépôt français est une question de PÉRIMÈTRE, pas un
+        # défaut du lieu — le message doit le dire, et renvoyer au portage.
+        lines = _probe_verdict(
+            self._entry(country="Italie", country_qid="Q38"), self.MAISONS, CONFIG, False)
+        self.assertFalse(any("places.csv" in line for line in lines))
+        self.assertTrue(any("un-deuxieme-pays" in line for line in lines))
 
     def test_a_foreign_country_blocks_too(self):
         lines = _probe_verdict(

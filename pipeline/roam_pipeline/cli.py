@@ -1723,9 +1723,21 @@ def _probe_verdict(
     out: list[str] = []
 
     if entry.get("country_qid") != config.country.qid:
-        out.append("⚠ pas de propriété « pays » = France : INVISIBLE à toutes les "
-                   "requêtes de thème, qui l'exigent pour borner la collecte.")
-        out.append(manual + "manuels échappent à toute la chaîne de collecte.")
+        # Le pays du CATALOGUE, pas « France » en dur : sonder un lieu italien
+        # depuis un dépôt français disait « pas de propriété pays = France »
+        # sur une entité qui porte parfaitement la sienne. Le défaut n'est pas
+        # sur le lieu, il est sur le périmètre.
+        out.append(f"⚠ ce lieu n'est pas en {config.country.name}, qui est le "
+                   f"pays de ce catalogue ({config.country.qid}) : INVISIBLE à "
+                   "toutes les requêtes de thème, qui bornent la collecte au "
+                   "pays.")
+        # Épingler à la main n'a de sens que DANS le périmètre : un lieu
+        # étranger inscrit dans places.csv entrerait au catalogue sans
+        # département ni région, donc sans aucune collection géographique.
+        out.append("  Ce n'est pas un défaut du lieu : c'est le périmètre du "
+                   "catalogue. Changer de pays se décide dans `scoring.yaml` "
+                   "(`geo.country`) et demande bien plus que ce bloc — voir "
+                   "`docs/un-deuxieme-pays.md`.")
         return out
 
     if not entry["coord"]:
@@ -3263,7 +3275,7 @@ def _print_stats(places, collections, raw=None, config: Config | None = None) ->
         _print_visitor_coverage(places, config)
 
     source = raw if raw is not None else places
-    _print_sitelink_distribution(source, config_floors())
+    _print_sitelink_distribution(source, config_floors(config))
     if config is not None and hasattr(source[0] if source else None, "theme_id"):
         _print_rescue_distribution(source, config)
     print()
@@ -3310,14 +3322,20 @@ def _print_visitor_coverage(places, config: Config) -> None:
           "à laquelle comparer)")
 
 
-def config_floors() -> dict[str, int]:
-    """Plancher éditorial courant de chaque thème, pour repérer la colonne active."""
+def config_floors(config: Config | None = None) -> dict[str, int]:
+    """Plancher éditorial courant de chaque thème, pour repérer la colonne active.
+
+    La configuration DÉJÀ CHARGÉE plutôt qu'une relecture du dossier par défaut :
+    `--config` désigne un dossier, donc un jour un pays, et cette fonction
+    aurait affiché les planchers français sous un tableau italien.
+    """
     from .config import load_config
 
     try:
-        return {theme.id: theme.min_sitelinks for theme in load_config().themes}
+        themes = (config or load_config()).themes
     except Exception:
         return {}
+    return {theme.id: theme.min_sitelinks for theme in themes}
 
 
 SITELINK_STEPS = (2, 4, 6, 8, 10, 15, 20, 30)

@@ -119,6 +119,89 @@ classe « forêt domaniale » ne voyait même pas Fontainebleau.
 Les planchers d'un pays neuf méritent donc plus d'attention que les français
 n'en ont reçu au départ, pas moins.
 
+## Ce que l'Italie a répondu, mesuré
+
+`gaps --pays Q38`, plancher 12 langues : **11 914 lieux notoires non
+collectés**. Le chiffre est trompeur, et c'est la première leçon.
+
+    communes, frazioni, anciennes communes, provinces,
+    municipi, villes, communes éparses                    8 750
+    batailles, fleuves, Grands Prix, éditions sportives,
+    stades, stations de métro, gares                        589
+                                                         ──────
+                                                          9 339   (78 %)
+
+Wikidata documente chaque *comune* italien en douze langues et plus : ce sont
+des articles produits en série, pas des lieux de visite. Le vivier réel est
+d'environ **2 575 lieux**, à un plancher déjà très haut.
+
+### Un « ✗ » de `gaps` ne veut pas dire « invisible »
+
+`census()` marque `✗` une classe qui n'est pas ÉCRITE dans `themes.yaml`. Or
+`theme_query` remonte les sous-classes (`P31/P279*`) : une classe italienne
+rangée sous une classe déclarée est collectée quand même. Six lignes du
+recensement paraissaient être des angles morts ; `probe` les a démenties.
+
+    palais Carignan (Q19829) — palais muséal, palais urbain, palazzo,
+                               musée national italien
+        ✓ monuments via « palais »   ✓ musees via « musée »
+        ✓ maisons   via « maison »
+
+    basilique Santa Maria Novella (Q51175) — basilique mineure, musée d'un
+                               organisme public, musée, musée religieux
+        ✓ cathedrales via « basilique mineure »   ✓ musees via « musée »
+
+Les quatre classes « musée » propres à l'Italie et `palazzo` sont donc déjà
+couvertes. Et le dédoublonnage tranche bien : le palais Carignan entre par
+`maisons` via une classe GÉNÉRIQUE, qui perd contre une classe précise ; il
+part en `musees`, déclaré avant `monuments`. Santa Maria Novella part en
+`cathedrales`, déclaré avant `musees`. Deux bons classements sans rien
+toucher.
+
+Leçon d'outil : lire `gaps` comme une liste de SUSPECTS, et confirmer chacun
+par `probe` avant de déclarer une classe.
+
+### Le seul vrai angle mort : les églises
+
+    église (Q16970) — lieux situés en Italie, par plancher
+
+      ≥0     ≥1     ≥2    ≥3    ≥4    ≥6   ≥8  ≥10  ≥12  ≥15  ≥20
+    56648  26882  13199  3699  2125  1007  637  372  264  156   78
+
+Preuve par un cas : *Santa Maria Novella de Chiusi* (Q3673502) ne déclare que
+« église », et `probe` répond « thème(s) qui la reconnaissent : AUCUN ».
+
+`themes.yaml` écarte Q16970 explicitement, et la note dit pourquoi : le thème
+`cathedrales` ne prend que ce qui porte un TITRE. C'est juste en France. En
+Italie, le patrimoine religieux majeur s'appelle *chiesa* — et les grandes
+basiliques florentines s'en tirent par leur titre de basilique mineure, mais
+pas le reste.
+
+La falaise est entre 2 et 3 langues (13 199 → 3 699). À 8, il reste 637
+églises italiennes : borné, et du même ordre que ce que les autres classes
+génériques rapportent.
+
+### La conséquence architecturale, qui n'était pas prévue
+
+**`themes.yaml` doit devenir propre à chaque pays**, pas seulement le scoring.
+La même classe doit être ÉCARTÉE en France et COLLECTÉE en Italie, ce qu'un
+fichier global ne peut pas dire.
+
+Bonne nouvelle : ça ne demande aucun code. `--config` désigne déjà un
+DOSSIER — `config/fr/` et `config/it/` suffisent. C'est aussi pour cela que
+`config_floors()` ne relit plus le dossier par défaut : elle aurait affiché
+les planchers français sous un tableau italien.
+
+### Les lieux qui appartiennent à deux pays
+
+`montagne : 227 absents sur 244` — la seule ligne du recensement où les
+absents ne font pas le total. **Dix-sept montagnes italiennes sont déjà dans
+la collecte française** : le Mont Blanc, le massif du Mont-Cenis, le mont
+Clapier, le mont Chaberton. Elles portent deux pays chez Wikidata.
+
+Un catalogue par pays devra trancher : ces lieux appartiennent-ils aux deux,
+ou à un seul ? La question vaut pour toute la frontière alpine et pyrénéenne.
+
 ## Mesurer avant de s'engager
 
 Rien de tout cela n'est nécessaire pour COMPTER ce qu'un pays rapporterait :
