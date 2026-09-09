@@ -370,6 +370,42 @@ le recensement perd donc en priorité ce pour quoi on le lance.
 `gaps` réessaie désormais classe par classe après un lot perdu — une seule
 reste alors hors de portée, pas ses trois voisines.
 
+### Ce qu'on sait déjà pour écrire `config/it/`
+
+Trois planchers mesurés, à ne pas remesurer. Les tableaux sont ceux de
+`gaps --pays Q38 --class <QID>`, lieux italiens situés par plancher :
+
+    église (Q16970)
+      ≥0     ≥1     ≥2    ≥3    ≥4    ≥6   ≥8  ≥10  ≥12  ≥15  ≥20
+    56648  26882  13199  3699  2125  1007  637  372  264  156   78
+
+    villa (Q3950)
+      ≥0     ≥1     ≥2    ≥3    ≥4    ≥6   ≥8  ≥10  ≥12  ≥15  ≥20
+     4704   2376   1322   577   275   107   50   35   24   10    4
+
+**Villas : `Q3950` en classe PRÉCISE de son thème, plancher 3.** Aujourd'hui
+elles n'entrent que par la porte générique « maison » à 8 langues, ce qui en
+capte cinquante. À 3, elles sont 577 collectées et 275 franchissent le
+plancher d'affichage du thème (4) : c'est un gain net d'environ 225 lieux,
+soit 7 % du catalogue italien estimé. Le 3 est choisi comme pour les forêts —
+une langue sous le plancher d'affichage, pour laisser de quoi repêcher.
+
+⚠ Mais 275 villas dans `maisons`, qui en compte 143 en France, noieraient les
+maisons sous les villas. Les villas palladiennes de Vénétie et les villas
+médicéennes sont deux séries du patrimoine mondial : elles méritent
+probablement un thème à elles. Décision de curation, pas de configuration.
+
+**Églises : le plancher n'est pas le problème, le PLAFOND l'est.** À 6
+langues, 1 007 églises ; à 8, 637 ; à 10, 372. Mais `cathedrales` porte un
+`catalogue_cap: 80`, et l'Italie présente déjà, au-dessus du plancher
+d'affichage de ce thème, environ 900 candidats — 372 églises, 362 basiliques
+mineures, 169 cathédrales. Quatre-vingts places pour neuf cents prétendants,
+dans le pays dont les églises SONT le patrimoine principal.
+
+`config/it/` devra donc, sur ce thème, faire deux choses à la fois : déclarer
+`Q16970` — en classe générique à 8, ou précise à 6 — et relever ou retirer le
+`catalogue_cap`. L'un sans l'autre ne sert à rien.
+
 ### Trois décisions déplaceraient le chiffre, et elles ne sont pas prises
 
 **Le plancher des églises.** Q16970 en compte 637 à huit langues. À lui seul
