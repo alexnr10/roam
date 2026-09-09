@@ -1,4 +1,4 @@
-import { collections } from '../data/catalog';
+import { collections, surChangement } from '../data/catalog';
 
 /**
  * Les étoiles : la valeur d'un lieu, dans sa catégorie, à l'échelle du pays.
@@ -40,17 +40,31 @@ export const MENTIONS: Record<Etoiles, string> = {
   1: 'À voir en passant',
 };
 
-const parLieu = new Map<string, Etoiles>();
-for (const collection of collections) {
-  // La collection NATIONALE d'un thème : pas de code géographique.
-  if (collection.kind !== 'theme' || collection.geoCode) continue;
-  for (const membre of collection.places) {
-    // Niveau 1 → trois étoiles, niveau 3 → une.
-    const note = (4 - membre.tier) as Etoiles;
-    const connu = parLieu.get(membre.placeId);
-    if (connu === undefined || note > connu) parLieu.set(membre.placeId, note);
+let parLieu = new Map<string, Etoiles>();
+
+/**
+ * La note se déduit du catalogue, donc elle se REFAIT quand il change.
+ *
+ * Sans cet abonnement, changer de pays laissait les étoiles du précédent :
+ * une carte italienne notée à la française, où presque tout vaudrait une
+ * étoile faute d'être dans une collection qu'on n'a plus.
+ */
+function indexer(): void {
+  parLieu = new Map<string, Etoiles>();
+  for (const collection of collections) {
+    // La collection NATIONALE d'un thème : pas de code géographique.
+    if (collection.kind !== 'theme' || collection.geoCode) continue;
+    for (const membre of collection.places) {
+      // Niveau 1 → trois étoiles, niveau 3 → une.
+      const note = (4 - membre.tier) as Etoiles;
+      const connu = parLieu.get(membre.placeId);
+      if (connu === undefined || note > connu) parLieu.set(membre.placeId, note);
+    }
   }
 }
+
+indexer();
+surChangement(indexer);
 
 export const etoilesDe = (placeId: string): Etoiles => parLieu.get(placeId) ?? 1;
 

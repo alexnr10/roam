@@ -13,6 +13,7 @@ import { useEnvies } from '../../src/store/envies';
 import { useVisits } from '../../src/store/visits';
 import { LARGEUR_MAX, colors, conquest, fonts, radius, spacing, type } from '../../src/theme';
 import { Button, Card, EmptyState, Pill, ProgressBar } from '../../src/ui/components';
+import { SelecteurDePays } from '../../src/ui/SelecteurDePays';
 import { IconeCroix, IconeRosette } from '../../src/ui/icons';
 import { Etoiles } from '../../src/ui/Etoiles';
 import { etoilesDe } from '../../src/lib/etoiles';
@@ -243,6 +244,9 @@ export default function ProfileScreen() {
       )}
 
       <View style={{ marginTop: spacing.xl, gap: spacing.md }}>
+        {/* Le pays, avant le décompte qui en dépend : lire « 2 079 lieux »
+            sans savoir de quel pays on parle n'apprend rien. */}
+        <SelecteurDePays />
         <Text style={type.small}>
           Catalogue de démonstration : {places.length} lieux, {collections.length}{' '}
           collections.

@@ -118,7 +118,8 @@ code du deuxième pays, pas après.
         (département et région ; la commune reste à Wikidata)
     contours étrangers (source + machinerie existante)       ~1 j
     collections partitionnées par pays                     2–3 j   ← FAIT
-    app : littéraux, libellés, voile, carte de conquête      ~2 j
+    app : sélecteur de pays et chargement à la demande       ~2 j   ← FAIT
+        (reste : contours du pays, libellés, voile)
     calibration des planchers sur données étrangères       1–2 j
                                                           ─────
                                                            9–12 j
@@ -258,6 +259,54 @@ Ce qui reste, côté application : elle affiche aujourd'hui TOUTES les
 collections du catalogue. Avec deux pays, il lui faudra n'en montrer qu'un à
 la fois — et c'est là que se posera la question du chargement à la demande,
 celle que les 22 Mo de contours américains rendent inévitable.
+
+## Le sélecteur de pays, tel qu'il est fait
+
+Un catalogue par pays, **un seul chargé à la fois**, et deux exigences
+opposées à tenir ensemble : pouvoir changer de pays depuis chez soi — on
+prépare un voyage avant de partir — sans que ce soit une corvée.
+
+    France → Italie   186 ms   premier chargement
+    Italie → France    89 ms   déjà en main, aucune requête
+    France → Italie    70 ms   déjà en main
+    Italie → France    76 ms
+
+Mesuré sur l'application construite, en attendant que le compte de lieux
+change à l'écran — pas un délai fixe. Un pays déjà visité revient donc sans
+rien demander à personne.
+
+**Le catalogue est un lien vivant.** `places`, `collections`, `themes` et
+`areas` sont des `let` exportés : en modules ES, une importation est un lien,
+pas une copie, et les quinze modules qui les lisent voient le nouveau
+catalogue sans changer d'une ligne. Ce qui ne suit pas tout seul, ce sont les
+valeurs dérivées UNE FOIS au chargement — les étoiles, les noms de région, la
+table des départements — d'où un abonnement `surChangement` auquel ces
+modules-là se raccrochent. Deux tests échouent si on le retire : c'est le
+pire des défauts, une carte italienne notée à la française, qui ne plante pas.
+
+**La navigation est remontée à chaque bascule**, par une clé sur la pile. Ce
+n'est pas un raccourci : changer de pays n'est pas un rafraîchissement, c'est
+un changement de sujet. Rester sur la fiche du Colisée en affichant la France
+serait faux. La clé est posée SOUS les magasins, si bien que les visites et
+les envies survivent — elles sont indexées par identifiant de lieu, qui est
+mondial, et revenir en France c'est retrouver son carnet intact.
+
+**Le sélecteur est invisible tant qu'un seul pays est disponible.** Un choix à
+une entrée n'est pas un choix, c'est un encombrement — même règle que pour le
+suffixe des adresses de collections.
+
+### Ce qu'il reste à décider, et ce n'est pas du code
+
+`PAYS` porte une `url` par pays, à renseigner : c'est une décision
+d'HÉBERGEMENT. Le dépôt ferait l'affaire — les catalogues y sont déjà
+versionnés et servis en HTTPS.
+
+### Ce qu'il reste à faire, côté application
+
+Les CONTOURS restent français : `outlines.json` est versionné avec
+l'application, et la vignette de conquête montre encore la France sous un
+catalogue italien. C'est le même travail que `geo-layers` côté pipeline, mais
+pour la carte : une source de contours par pays.
 
 ## L'objectif n'est pas le volume
 

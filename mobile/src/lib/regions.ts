@@ -1,4 +1,4 @@
-import { areas, places } from '../data/catalog';
+import { areas, places, surChangement } from '../data/catalog';
 import { outlinesFor } from '../data/outlines';
 
 /**
@@ -86,14 +86,34 @@ export function contient(geometry: Geometrie, lon: number, lat: number): boolean
   return false;
 }
 
-const contours = outlinesFor('region');
-
 /** Les contours de région, indexés par code INSEE. */
-export const REGIONS = new Map<string, GeoJSON.Feature<Geometrie, { code: string; nom: string }>>(
-  (contours?.features ?? []).map((feature) => [feature.properties.code, feature]),
-);
+export let REGIONS = new Map<string, GeoJSON.Feature<Geometrie, { code: string; nom: string }>>();
 
-const nomsDeRegion = new Map(areas.region.map((area) => [area.code, area.name]));
+let nomsDeRegion = new Map<string, string>();
+let regionParDepartement = new Map<string, string>();
+
+/**
+ * Tout ce que ce module dérive du catalogue, refait quand le catalogue change.
+ *
+ * Un pays a ses régions, ses départements et ses contours : garder ceux du
+ * précédent après un changement de pays donnerait une carte française avec des
+ * lieux italiens dessus.
+ */
+function indexer(): void {
+  const contours = outlinesFor('region');
+  REGIONS = new Map(
+    (contours?.features ?? []).map((feature) => [feature.properties.code, feature]),
+  );
+  nomsDeRegion = new Map(areas.region.map((area) => [area.code, area.name]));
+  regionParDepartement = new Map(
+    areas.departement
+      .filter((area) => area.parentCode)
+      .map((area) => [area.code, area.parentCode as string]),
+  );
+}
+
+indexer();
+surChangement(indexer);
 
 export const nomDeRegion = (code: string): string =>
   nomsDeRegion.get(code) ?? REGIONS.get(code)?.properties.nom ?? code;
@@ -187,12 +207,6 @@ export function voile(): GeoJSON.Feature<GeoJSON.Polygon> {
 }
 
 /** Région d'un département, par son code. */
-const regionParDepartement = new Map(
-  areas.departement
-    .filter((area) => area.parentCode)
-    .map((area) => [area.code, area.parentCode as string]),
-);
-
 export const regionDuDepartement = (code: string): string | null =>
   regionParDepartement.get(code) ?? null;
 
