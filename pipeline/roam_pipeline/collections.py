@@ -66,6 +66,29 @@ def dedupe(places: list[Place]) -> list[Place]:
     Ce qui reste douteux n'est pas perdu : `twins` le signale au curateur, qui
     tranche. Écarter automatiquement est irréversible ; c'est pour cela que la
     règle doit être plus prudente que le contraire.
+
+    **Un lieu ÉPINGLÉ ne cède pas à la SECONDE bande.** Cosquer Méditerranée,
+    inscrit à la main parce que la grotte est sous la mer, a disparu du
+    catalogue sans un mot : à soixante-seize mètres, le MuCEM partage avec lui
+    le mot « Méditerranée », qui à Marseille distingue à peu près autant que
+    « saint ». Deux visites, deux billets, et la mieux notée l'emportait.
+
+    Un épinglage est une décision explicite ; une distance et un mot partagé
+    sont une heuristique. C'est la même règle que partout ailleurs ici — le
+    plancher de notoriété, le plafond de thème et le plafond communal cèdent
+    déjà devant `pinned`.
+
+    La PREMIÈRE bande, elle, ne cède pas : sous trente mètres, il n'y a qu'une
+    emprise au sol, et l'épinglage ne dit rien du contraire. Garder un lieu
+    veut dire « celui-ci mérite le catalogue », jamais « ces deux fiches sont
+    deux visites ». Protéger là aussi a fait revenir le musée des Beaux-Arts
+    d'Arras ET l'abbaye Saint-Vaast qui l'abrite, au même point à la virgule
+    près, puis le pont Ambroix et la voie Domitienne qu'il porte.
+
+    L'ordre, lui, reste celui des scores. Faire passer les épinglés en tête les
+    aurait transformés en attracteurs : Cosquer, arrivé le premier, écartait à
+    son tour le MuCEM. Un épinglage protège celui qui le porte, il ne prend
+    rien à personne.
     """
     kept: list[Place] = []
     by_theme: dict[str, list[Place]] = defaultdict(list)
@@ -77,8 +100,12 @@ def dedupe(places: list[Place]) -> list[Place]:
             ecart = haversine_m(place.lat, place.lon, other.lat, other.lon)
             if ecart >= DUPLICATE_DISTANCE_M:
                 continue
-            if ecart < SAME_FOOTPRINT_M or (
-                _mots_distinctifs(place.name, place.commune_name)
+            if ecart < SAME_FOOTPRINT_M:
+                jumeau = (other, ecart)
+                break
+            if (
+                not place.pinned
+                and _mots_distinctifs(place.name, place.commune_name)
                 & _mots_distinctifs(other.name, other.commune_name)
             ):
                 jumeau = (other, ecart)

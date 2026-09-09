@@ -39325,6 +39325,26 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_des_Antiquit%C3%A9s_(Rouen)"
   },
   {
+   "id": "Q112242217",
+   "slug": "cosquer-mediterranee",
+   "name": "Cosquer Méditerranée",
+   "themeId": "musees",
+   "lat": 43.29718,
+   "lon": 5.362012,
+   "radiusM": 120,
+   "score": 56.8,
+   "departement": "Bouches-du-Rhône",
+   "departementCode": "13",
+   "regionCode": "93",
+   "communeCode": "13202",
+   "communeName": "Marseille",
+   "summary": "Cosquer Méditerranée est un centre d'interprétation situé à la Villa Méditerranée, à Marseille, dans les Bouches-du-Rhône. Ouvert au public le 4 juin 2022, il abrite une réplique partielle de la grotte Cosquer (située aussi sur la commune de Marseille) et de ses œuvres pariétales les plus marquantes.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Panneau%20des%20chevaux%20-%20Cosquer%20M%C3%A9diterran%C3%A9e.jpg",
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cosquer_M%C3%A9diterran%C3%A9e"
+  },
+  {
    "id": "Q3578597",
    "slug": "ecomusee-de-martinique",
    "name": "Écomusée de Martinique",
@@ -53205,11 +53225,11 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "13",
-   "placeCount": 64,
+   "placeCount": 65,
    "tierCounts": [
     15,
     32,
-    17
+    18
    ],
    "places": [
     {
@@ -53328,12 +53348,12 @@
      "rank": 23
     },
     {
-     "placeId": "Q281494",
+     "placeId": "Q83013",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q83013",
+     "placeId": "Q281494",
      "tier": 2,
      "rank": 25
     },
@@ -53358,37 +53378,37 @@
      "rank": 29
     },
     {
-     "placeId": "Q972128",
+     "placeId": "Q1955741",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q1955741",
+     "placeId": "Q972128",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q740250",
+     "placeId": "Q3329666",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q306146",
+     "placeId": "Q740250",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q450348",
+     "placeId": "Q306146",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q3064717",
+     "placeId": "Q450348",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q3329666",
+     "placeId": "Q3064717",
      "tier": 2,
      "rank": 36
     },
@@ -53398,37 +53418,37 @@
      "rank": 37
     },
     {
-     "placeId": "Q2172329",
+     "placeId": "Q1795927",
      "tier": 2,
      "rank": 38
     },
     {
-     "placeId": "Q1788518",
+     "placeId": "Q2172329",
      "tier": 2,
      "rank": 39
     },
     {
-     "placeId": "Q2243437",
+     "placeId": "Q1788518",
      "tier": 2,
      "rank": 40
     },
     {
-     "placeId": "Q89272148",
+     "placeId": "Q481647",
      "tier": 2,
      "rank": 41
     },
     {
-     "placeId": "Q2933591",
+     "placeId": "Q89272148",
      "tier": 2,
      "rank": 42
     },
     {
-     "placeId": "Q490364",
+     "placeId": "Q2933591",
      "tier": 2,
      "rank": 43
     },
     {
-     "placeId": "Q481647",
+     "placeId": "Q490364",
      "tier": 2,
      "rank": 44
     },
@@ -53458,17 +53478,17 @@
      "rank": 49
     },
     {
-     "placeId": "Q3098391",
+     "placeId": "Q2243437",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q34807869",
+     "placeId": "Q3098391",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q1795927",
+     "placeId": "Q34807869",
      "tier": 3,
      "rank": 52
     },
@@ -53478,22 +53498,22 @@
      "rank": 53
     },
     {
-     "placeId": "Q3523849",
+     "placeId": "Q2064741",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q2933592",
+     "placeId": "Q3523849",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q44218",
+     "placeId": "Q2933592",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q2064741",
+     "placeId": "Q44218",
      "tier": 3,
      "rank": 57
     },
@@ -53523,14 +53543,19 @@
      "rank": 62
     },
     {
-     "placeId": "Q3364353",
+     "placeId": "Q112242217",
      "tier": 3,
      "rank": 63
     },
     {
-     "placeId": "Q16802261",
+     "placeId": "Q3364353",
      "tier": 3,
      "rank": 64
+    },
+    {
+     "placeId": "Q16802261",
+     "tier": 3,
+     "rank": 65
     }
    ]
   },
@@ -64190,12 +64215,12 @@
      "rank": 22
     },
     {
-     "placeId": "Q1760862",
+     "placeId": "Q2452513",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q2452513",
+     "placeId": "Q1760862",
      "tier": 2,
      "rank": 24
     },
@@ -64225,12 +64250,12 @@
      "rank": 29
     },
     {
-     "placeId": "Q1994367",
+     "placeId": "Q965780",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q965780",
+     "placeId": "Q1994367",
      "tier": 2,
      "rank": 31
     },
@@ -64255,7 +64280,7 @@
      "rank": 35
     },
     {
-     "placeId": "Q1034146",
+     "placeId": "Q83013",
      "tier": 2,
      "rank": 36
     },
@@ -64300,7 +64325,7 @@
      "rank": 44
     },
     {
-     "placeId": "Q83013",
+     "placeId": "Q1034146",
      "tier": 3,
      "rank": 45
     },
@@ -64330,17 +64355,17 @@
      "rank": 50
     },
     {
-     "placeId": "Q321139",
+     "placeId": "Q1955741",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q1419757",
+     "placeId": "Q321139",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q1955741",
+     "placeId": "Q1419757",
      "tier": 3,
      "rank": 53
     },
@@ -64435,17 +64460,17 @@
      "rank": 71
     },
     {
-     "placeId": "Q1034136",
+     "placeId": "Q3329666",
      "tier": 3,
      "rank": 72
     },
     {
-     "placeId": "Q271085",
+     "placeId": "Q1034136",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q3329666",
+     "placeId": "Q271085",
      "tier": 3,
      "rank": 74
     },
@@ -64470,12 +64495,12 @@
      "rank": 78
     },
     {
-     "placeId": "Q1860484",
+     "placeId": "Q1795927",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q450348",
+     "placeId": "Q1860484",
      "tier": 3,
      "rank": 80
     }
@@ -70608,6 +70633,68 @@
      "placeId": "Q1789782",
      "tier": 2,
      "rank": 13
+    }
+   ]
+  },
+  {
+   "slug": "musees-departement-13",
+   "name": "Musées des Bouches-du-Rhône",
+   "kind": "geo",
+   "themeId": "musees",
+   "labelId": null,
+   "geoLevel": "departement",
+   "geoCode": "13",
+   "placeCount": 9,
+   "tierCounts": [
+    9,
+    0,
+    0
+   ],
+   "places": [
+    {
+     "placeId": "Q2808698",
+     "tier": 1,
+     "rank": 1
+    },
+    {
+     "placeId": "Q965780",
+     "tier": 1,
+     "rank": 2
+    },
+    {
+     "placeId": "Q83013",
+     "tier": 1,
+     "rank": 3
+    },
+    {
+     "placeId": "Q1955741",
+     "tier": 1,
+     "rank": 4
+    },
+    {
+     "placeId": "Q3329666",
+     "tier": 1,
+     "rank": 5
+    },
+    {
+     "placeId": "Q1795927",
+     "tier": 1,
+     "rank": 6
+    },
+    {
+     "placeId": "Q2064741",
+     "tier": 1,
+     "rank": 7
+    },
+    {
+     "placeId": "Q481647",
+     "tier": 1,
+     "rank": 8
+    },
+    {
+     "placeId": "Q112242217",
+     "tier": 1,
+     "rank": 9
     }
    ]
   },

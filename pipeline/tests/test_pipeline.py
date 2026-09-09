@@ -38,6 +38,7 @@ from roam_pipeline.collections import (
     build_theme_collections,
     diameter_km,
     DUPLICATE_DISTANCE_M,
+    SAME_FOOTPRINT_M,
     fantomes,
     _mix_themes,
     _rank_within_theme,
@@ -516,6 +517,52 @@ class TestDedupe(unittest.TestCase):
             lieu.commune_name = "Tours"
         score_all([a, b], CONFIG)
         self.assertEqual(len(dedupe([a, b])), 2)
+
+    def test_a_pinned_place_is_never_merged_away(self):
+        # Cosquer Méditerranée a disparu du catalogue sans un mot : à
+        # soixante-seize mètres, le MuCEM partage avec lui le mot
+        # « Méditerranée », qui à Marseille distingue à peu près autant que
+        # « saint ». Deux visites, deux billets — et le mieux noté l'emportait
+        # sur un lieu inscrit à la main, parce que la grotte est sous la mer.
+        #
+        # Un épinglage est une décision explicite ; une distance et un mot
+        # partagé sont une heuristique.
+        mucem = make_place("Musée des civilisations de l'Europe et de la "
+                           "Méditerranée", theme="musees",
+                           lat=43.29639, lon=5.36000, sitelinks=30)
+        cosquer = make_place("Cosquer Méditerranée", theme="musees",
+                             lat=43.29572, lon=5.36020, sitelinks=4)
+        cosquer.pinned = True
+        for lieu in (mucem, cosquer):
+            lieu.commune_name = "Marseille"
+        # Le piège tient à ce que la paire tombe dans la bande douteuse : au-delà
+        # de l'emprise commune, en deçà du seuil de proximité, avec un mot
+        # partagé. Si la distance sortait de là, le test ne prouverait rien.
+        ecart = haversine_m(mucem.lat, mucem.lon, cosquer.lat, cosquer.lon)
+        self.assertTrue(SAME_FOOTPRINT_M < ecart < DUPLICATE_DISTANCE_M, ecart)
+        score_all([mucem, cosquer], CONFIG)
+        self.assertGreater(mucem.score, cosquer.score)
+        self.assertEqual(
+            sorted(p.name for p in dedupe([mucem, cosquer])),
+            sorted([mucem.name, cosquer.name]),
+        )
+
+    def test_a_pinned_place_still_merges_on_the_same_footprint(self):
+        # L'épinglage protège de l'heuristique du nom, pas de la géométrie.
+        # Le musée des Beaux-Arts d'Arras EST dans l'abbaye Saint-Vaast — même
+        # point à la virgule près — et tous deux portent un « garder » du
+        # curateur : les protéger là faisait revenir les deux fiches d'une
+        # seule visite. Garder un lieu veut dire « celui-ci mérite le
+        # catalogue », jamais « ces deux fiches sont deux visites ».
+        abbaye = make_place("Abbaye Saint-Vaast", theme="musees",
+                            lat=50.291944, lon=2.773333, sitelinks=7)
+        musee = make_place("Musée des Beaux-Arts d'Arras", theme="musees",
+                           lat=50.291944, lon=2.773333, sitelinks=12)
+        for lieu in (abbaye, musee):
+            lieu.commune_name = "Arras"
+            lieu.pinned = True
+        score_all([abbaye, musee], CONFIG)
+        self.assertEqual(len(dedupe([abbaye, musee])), 1)
 
     def test_same_location_different_themes_are_kept(self):
         a = make_place("Site", theme="chateaux", lat=45.0, lon=2.0)
@@ -6210,6 +6257,37 @@ class TestReplacements(unittest.TestCase):
         eu = make_place("Eu", theme="villages", wikidata_id="Q211593", visitable=False)
         autre = make_place("Abbaye du Val", theme="abbayes", wikidata_id="Q2", visitable=True)
         self.assertEqual(alerts_module.remplacants([eu, autre]), {})
+
+    def test_a_village_never_replaces_the_monument_it_contains(self):
+        # L'abbaye Saint-Pierre de Beaulieu-sur-Dordogne ne se visite pas, et
+        # le catalogue annonçait « on visite Beaulieu-sur-Dordogne à la
+        # place » : le village porte le mot rare, à cent mètres. C'est là
+        # qu'elle est, pas ce qu'elle est devenue.
+        abbaye = make_place("Abbaye Saint-Pierre de Beaulieu-sur-Dordogne",
+                            theme="abbayes", wikidata_id="Q334416",
+                            visitable=False, lat=44.9783, lon=1.8383)
+        village = make_place("Beaulieu-sur-Dordogne", theme="villages",
+                             wikidata_id="Q60587245", visitable=None,
+                             lat=44.97833, lon=1.83833)
+        for lieu in (abbaye, village):
+            lieu.commune_name = "Beaulieu-sur-Dordogne"
+        self.assertEqual(alerts_module.remplacants([abbaye, village]), {})
+
+    def test_the_commune_name_still_links_a_true_replica(self):
+        # Et l'inverse ne doit pas casser : retirer les mots de la commune —
+        # ce que fait la déduplication — aurait effacé « lascaux », puisque la
+        # commune s'appelle Montignac-Lascaux. C'est le lieu ENTIER qui doit
+        # valoir sa commune, pas tel de ses mots.
+        grotte = make_place("Grotte de Lascaux", theme="grottes",
+                            wikidata_id="Q172125", visitable=False,
+                            lat=45.0533, lon=1.1747)
+        replique = make_place("Lascaux IV", theme="musees",
+                              wikidata_id="Q112911610", visitable=None,
+                              lat=45.0582, lon=1.1697)
+        for lieu in (grotte, replique):
+            lieu.commune_name = "Montignac-Lascaux"
+        trouves = alerts_module.remplacants([grotte, replique])
+        self.assertEqual(trouves["Q172125"].wikidata_id, "Q112911610")
 
     def test_a_replica_too_far_away_is_not_one(self):
         ferme = self._lieu("Grotte Chauvet", "Q1", False, lat=44.35)

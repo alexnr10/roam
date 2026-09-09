@@ -32,6 +32,27 @@ def _mots(nom: str) -> list[str]:
     return [m for m in re.split(r"[^a-z0-9]+", sans.lower()) if len(m) >= 4]
 
 
+def _est_sa_commune(place: Place) -> bool:
+    """Ce lieu EST sa commune — un village, pas un monument.
+
+    Un lieu fermé n'est jamais remplacé par la ville qui l'entoure : l'abbaye
+    Saint-Pierre de Beaulieu-sur-Dordogne ne se visite pas, et « on visite
+    Beaulieu-sur-Dordogne à la place » ne répond à personne — c'est là qu'elle
+    est, pas ce qu'elle est devenue.
+
+    Écarter le nom de la commune des mots distinctifs, comme le fait la
+    déduplication, ne marcherait pas ici : la commune de Lascaux IV s'appelle
+    Montignac-Lascaux, et « lascaux » — le seul mot qui relie le fac-similé à
+    la grotte — disparaîtrait avec elle. C'est le lieu ENTIER qui doit valoir
+    sa commune, et non tel de ses mots.
+    """
+    def cle(nom: str) -> str:
+        sans = unicodedata.normalize("NFD", nom or "").encode("ascii", "ignore").decode()
+        return re.sub(r"[^a-z0-9]+", "", sans.lower())
+
+    return bool(place.commune_name) and cle(place.name) == cle(place.commune_name)
+
+
 def _metres(a: Place, b: Place) -> float:
     return math.hypot(
         (a.lat - b.lat) * 110_540,
@@ -70,7 +91,8 @@ def remplacants(places: list[Place]) -> dict[str, Place]:
     - le nom en préfixe : un seul résultat, Chauvet — il rate Lascaux IV, dont
       le nom ne commence pas par celui de la grotte.
 
-    Le mot rare en trouve treize, dont les trois qui comptent. Ce qu'il rend
+    Le mot rare en trouve treize, dont les trois qui comptent. Un village ne
+    peut pas être ce remplaçant : voir `_est_sa_commune`. Ce qu'il rend
     n'est pas un verdict mais une piste : « Grotte de Bruniquel → Châteaux de
     Bruniquel » est une bonne réponse pour un guide, et c'est au curateur de le
     dire.
@@ -80,7 +102,7 @@ def remplacants(places: list[Place]) -> dict[str, Place]:
     for place in places:
         vus = set(_mots(place.name))
         frequence.update(vus)
-        if place.visitable is not False:
+        if place.visitable is not False and not _est_sa_commune(place):
             for mot in vus:
                 par_mot[mot].append(place)
 
