@@ -71,7 +71,7 @@ from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from
 from roam_pipeline.cli import (
     _known_qids, _pending_terms, _probe_verdict, census, cmd_pin, cmd_retention,
     cmd_verdict,
-    empty_themes, manquants_distincts, pays_demande,
+    cmd_gaps, empty_themes, manquants_distincts, pays_demande,
 )
 from roam_pipeline.wikipedia import title_from_url
 from roam_pipeline.discover import (
@@ -5838,6 +5838,69 @@ class TestVerdict(unittest.TestCase):
             with self.subTest(verdict):
                 _code, _t, decisions, _csv = self._run(brut, "Q1", decision=verdict)
                 self.assertEqual(decisions["Q1"][0], verdict)
+
+
+class TestGapBatchRetry(unittest.TestCase):
+    """Un lot perdu ne doit pas emporter les classes qui allaient bien.
+
+    Sur l'Italie, l'unique lot en échec portait « commune », « frazione »,
+    « église » et « montagne » — les quatre classes les plus fournies du pays,
+    donc précisément celles pour lesquelles on lançait la commande. La réponse
+    n'était pas refusée mais TRONQUÉE, ce qui arrive d'autant plus que la
+    classe est grosse.
+    """
+
+    class _Client:
+        """Refuse tout lot contenant la classe « énorme », seule ou non."""
+
+        ENORME = "Q1"
+
+        def __init__(self):
+            self.vu = []
+
+        def query(self, sparql):
+            self.vu.append(sparql)
+            if "wd:Q9 " in sparql or "?itemDescription" in sparql:
+                return []                      # requête de libellés
+            demandees = [q for q in ("Q1", "Q2", "Q3", "Q4")
+                         if f"wd:{q} " in sparql or f"wd:{q}}}" in sparql]
+            if "GROUP BY" in sparql:           # le recensement agrégé
+                return [{"class": f"http://www.wikidata.org/entity/{q}", "n": "500"}
+                        for q in ("Q1", "Q2", "Q3", "Q4")]
+            if self.ENORME in demandees:
+                raise ValueError("réponse tronquée")
+            return [
+                {"item": f"http://www.wikidata.org/entity/{q}0",
+                 "itemLabel": f"lieu {q}",
+                 "class": f"http://www.wikidata.org/entity/{q}"}
+                for q in demandees
+            ]
+
+    def _run(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            racine = Path(tmp)
+            (racine / "out").mkdir()
+            (racine / "out" / "places_raw.json").write_text("[]", encoding="utf-8")
+            args = argparse.Namespace(
+                out=racine / "out", min_sitelinks=6, limit=30, min_places=20,
+                klass=None, pays="Q38")
+            client = self._Client()
+            with unittest.mock.patch("roam_pipeline.wikidata.SparqlClient", lambda: client), \
+                    _capture() as sortie:
+                cmd_gaps(args, CONFIG)
+            return sortie.getvalue()
+
+    def test_the_three_healthy_classes_survive_their_neighbour(self):
+        texte = self._run()
+        # Le compte, pas la présence du Q-id : une classe perdue est NOMMÉE
+        # dans l'avertissement du bas, donc chercher « Q2 » dans le texte
+        # passerait aussi avec l'ancien code, qui les jetait toutes les quatre.
+        self.assertIn("3 LIEUX notoires non collectés", texte)
+
+    def test_what_stays_out_of_reach_is_named(self):
+        texte = self._run()
+        self.assertIn("N'ONT PAS PU", texte)
+        self.assertIn("Q1", texte)
 
 
 class TestGapTotalCountsPlaces(unittest.TestCase):

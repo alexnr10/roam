@@ -208,8 +208,13 @@ contiennent le lieu. La question vaut pour tout l'arc alpin et les Pyrénées.
 
 ## Combien de lieux ferait le catalogue italien ?
 
-**Environ 2 500, dans une fourchette de 2 200 à 2 800**, à configuration
-égale. Le raisonnement, parce que le chiffre seul ne sert à rien :
+**Environ 3 000, dans une fourchette de 2 600 à 3 600**, à configuration
+égale. Le raisonnement, parce que le chiffre seul ne sert à rien.
+
+> Ce chiffre a été révisé. La première estimation, 2 500, reposait sur un
+> vivier italien mal compté — `gaps` sommait des lignes et non des lieux. Une
+> fois l'outil corrigé et le recensement refait à six langues, le vivier
+> italien vaut **1,68 fois** le français, et l'estimation monte d'autant.
 
 ### La taille d'un catalogue n'est pas fixée par l'offre
 
@@ -228,10 +233,25 @@ contrainte qui mord : ce sont les plafonds.
     France   101 départements · médiane 16 lieux · moyenne 20,6 · max 64
     Italie   107 provinces
 
-À moyenne égale, 107 × 20,6 ≈ **2 200**. L'Italie étant mieux documentée, la
-médiane monte et les repêchages diminuent : d'où le centre à 2 500.
+À moyenne égale, 107 × 20,6 ≈ **2 200** — c'est le PLANCHER, celui d'un pays
+qui n'aurait pas plus à offrir que la France.
 
-### L'offre italienne est COMPARABLE à la française, pas double
+Mais la plupart des thèmes n'ont aucun `catalogue_cap` : un vivier plus riche
+se traduit donc bien par un catalogue plus gros. D'où le calcul, chaque
+facteur étant mesuré sur la France :
+
+    lieux au-dessus de leur plancher, France              3 659
+    × 1,68 (vivier italien)                              ≈ 6 150
+    × 65 %  taux de conservation HORS revue
+            (2 383 au catalogue sans aucun verdict)      ≈ 4 000
+    − 10 %  plafonds communaux, plus mordants dans
+            les villes d'art que dans Paris seul         ≈ 3 600
+    × 87 %  une revue d'égale sévérité (2 079 / 2 383)   ≈ 3 100
+
+D'où **3 000**, et une fourchette large — 2 600 à 3 600 — parce que chacun de
+ces facteurs est transposé et non observé.
+
+### L'offre italienne vaut 1,68 fois la française — mesuré
 
     ⚠ Le total de `gaps` sommait les colonnes « absents » de chaque classe.
     Une entité porte plusieurs classes — la basilique Santa Maria Novella est
@@ -252,13 +272,28 @@ Recensement italien à six langues : 24 065 lignes, dont
                                                           ──────
                                                            16 862   (70 %)
 
-Restent ~7 200 lignes de patrimoine, fortement redondantes. Le vivier
-DISTINCT est de l'ordre de 3 000 à 4 000, contre **3 144 lieux à six langues
-dans la collecte française**. Comparable, donc — pas double.
+Le recensement refait avec le total corrigé donne **6 318 lieux distincts
+pour 8 246 lignes**, quatre classes n'ayant pas pu être examinées — et pas
+n'importe lesquelles : commune, frazione, église et montagne, les quatre plus
+fournies. L'arithmétique boucle exactement :
 
-Cela ne déplace pas l'estimation, et c'est le point : la taille d'un
-catalogue est fixée par les plafonds et la grille administrative, pas par
-l'offre. Les étoiles, elles, se normalisent d'elles-mêmes — les niveaux sont
+    8 246 lignes vues + 15 819 lignes des quatre classes = 24 065
+
+Le vivier PATRIMONIAL distinct se reconstitue donc ainsi :
+
+    lieux distincts vus                                   6 318
+    − bruit visible (établissements humains, gares,
+      métros, fleuves, batailles, haltes, anciennes
+      communes et municipalités)                        − 2 792
+    + églises (952) et montagnes (797), mesurées au
+      passage précédent                                 + 1 749
+                                                        ───────
+    vivier patrimonial italien à six langues              5 275
+    vivier français à six langues                         3 144
+                                                        ───────
+    rapport                                                1,68
+
+Les étoiles, elles, se normalisent d'elles-mêmes — les niveaux sont
 proportionnels à leur collection, pas absolus — ce qui est exactement l'effet
 recherché : trois étoiles en Italie voudront dire « le haut de l'Italie ».
 
@@ -273,14 +308,39 @@ absents — Piazza Santa Trinita, Piazza San Sepolcro. En France une place est
 un carrefour ; en Italie c'est une destination, et le catalogue n'a aucun
 thème pour la recevoir. À trancher au moment d'écrire `config/it/`.
 
-**`palazzo` (Q2651004), 189, reste indécis.** Le palais Carignan est bien
-collecté, mais il déclare AUSSI « palais urbain » et « palais muséal », qui
-mènent à `palais` (Q16560) — sa route ne prouve donc rien sur `palazzo`. Un
-palazzo qui ne déclarerait que cette classe serait-il vu ? À vérifier par
-`probe` sur un palazzo de la liste avant de conclure.
+**`palazzo` (Q2651004), 189 : COUVERT.** Le cas propre a tranché — le palais
+des Conservateurs (Q64103) ne déclare QUE `palazzo`, et `probe` lui donne
+« ✓ monuments via palais ». La classe est donc sous `palais` (Q16560). Le
+palais Carignan ne prouvait rien, déclarant aussi « palais urbain » ; il
+fallait une entité à classe unique.
 
 **Deux classes utiles apparaissent, déjà collectées** : `château fort` (131)
 et `lac` (106). Elles n'étaient pas visibles à douze langues.
+
+### Ce qui reste à vérifier, et comment
+
+Quatre classes marquées `✗` restent indécises. Chacune se tranche par un
+`probe` sur une entité à CLASSE UNIQUE, comme pour `palazzo` :
+
+    musée privé (Q614316)          105   Museo Egizio de Turin, musée du cinéma
+    villa (Q3950)                  102   villas médicéennes, villa Torlonia
+    ensemble architectural         98    Santa Maria del Carmine, Rotonda
+    place (Q174782)                112   Piazza della Rotonda, Piazza Arringo
+
+Les deux premières comptent : le Museo Egizio est l'un des grands musées
+d'Italie, et les villas médicéennes et palladiennes sont au patrimoine
+mondial. Aucune n'est déclarée dans la configuration française, ce qui ne
+prouve rien — `palazzo` ne l'était pas non plus.
+
+### Le recensement peut perdre ses classes les plus grosses
+
+L'unique lot en échec de la mesure italienne portait commune, frazione,
+église et montagne. La réponse de WDQS n'était pas refusée mais TRONQUÉE
+(JSON incomplet), et c'est d'autant plus probable que la classe est fournie :
+le recensement perd donc en priorité ce pour quoi on le lance.
+
+`gaps` réessaie désormais classe par classe après un lot perdu — une seule
+reste alors hors de portée, pas ses trois voisines.
 
 ### Trois décisions déplaceraient le chiffre, et elles ne sont pas prises
 

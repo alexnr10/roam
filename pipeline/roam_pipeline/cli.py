@@ -2062,13 +2062,33 @@ def cmd_gaps(args: argparse.Namespace, config: Config) -> int:
     # rien s'il tait ce qu'il n'a pas pu regarder.
     rows: list[dict] = []
     manques: list[str] = []
-    for batch in wd.chunked(candidates, 4):
+
+    def lot(classes: list[str]) -> bool:
+        """Interroge un lot. Rend faux si WDQS n'a pas répondu."""
         try:
             rows.extend(client.query(
-                wd.class_members_query(batch, args.min_sitelinks, country=pays)))
-        except Exception as exc:
-            LOG.warning("classes non examinées (%s) : %s", exc, ", ".join(batch))
-            manques.extend(batch)
+                wd.class_members_query(classes, args.min_sitelinks, country=pays)))
+            return True
+        except Exception as exc:  # noqa: BLE001 — un miroir en panne n'est pas un verdict
+            LOG.warning("lot en échec (%s) : %s", exc, ", ".join(classes))
+            return False
+
+    for batch in wd.chunked(candidates, 4):
+        if lot(batch):
+            continue
+        # Un lot perdu, ce sont QUATRE angles morts — et pas n'importe lesquels.
+        # Sur l'Italie, l'unique lot en échec portait « commune », « frazione »,
+        # « église » et « montagne » : les quatre classes les plus fournies du
+        # pays, donc celles pour lesquelles on lançait la commande. La réponse
+        # n'était pas refusée mais TRONQUÉE (JSON incomplet), ce qui arrive
+        # d'autant plus que la classe est grosse.
+        #
+        # On réessaie donc classe par classe : une seule est alors trop grosse
+        # pour passer, pas ses trois voisines. Ce qui reste hors de portée est
+        # nommé, jamais tu.
+        for class_qid in batch:
+            if not lot([class_qid]):
+                manques.append(class_qid)
 
     classes = [c for c in census(rows, counts, known, owned) if c["manquants"]]
     labels = _entity_labels(client, [c["qid"] for c in classes[: args.limit]])
