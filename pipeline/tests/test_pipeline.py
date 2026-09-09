@@ -6095,6 +6095,55 @@ class TestLocalAttachment(unittest.TestCase):
         self.assertIn("geo-layers", " ".join(journal.output))
 
 
+class TestOutOfCountryIsNotAsked(unittest.TestCase):
+    """Ce que les contours ne peuvent pas contenir ne se demande pas au réseau.
+
+    Cinq cent quatre lieux restaient sans département après la passe locale.
+    Quatre cent quatre-vingt-dix-neuf sont en Polynésie, en Nouvelle-Calédonie,
+    à Wallis, à Saint-Barthélemy — des collectivités qui n'ONT pas de code de
+    département, et que le catalogue écarte à dessein. Les interroger coûtait
+    521 appels réseau à chaque `enrich`, pour 521 « non ».
+    """
+
+    def setUp(self):
+        polygones = [[[(2.0, 48.0), (3.0, 48.0), (3.0, 49.0), (2.0, 49.0)]]]
+        zone = localisation.Zone(code="77", name="", level="departement",
+                                 parent_code=None,
+                                 bbox=localisation._bbox(polygones),
+                                 polygones=polygones)
+        self.loc = localisation.Localisateur([zone])
+
+    def test_a_point_inside_is_plausible(self):
+        self.assertTrue(self.loc.dans_l_emprise(48.5, 2.5))
+
+    def test_a_point_just_outside_still_deserves_a_question(self):
+        # Une épave à quelques kilomètres de la côte, un sommet frontalier :
+        # les contours ne les contiennent pas, mais la question reste bonne.
+        self.assertTrue(self.loc.dans_l_emprise(48.5, 3.05))
+
+    def test_the_other_side_of_the_world_does_not(self):
+        # Nouméa, Papeete, Saint-Barthélemy : hors emprise, donc hors réseau.
+        for lat, lon in ((-22.27, 166.44), (-17.54, -149.57), (17.90, -62.85)):
+            with self.subTest(lat=lat):
+                self.assertFalse(self.loc.dans_l_emprise(lat, lon))
+
+    def test_the_network_is_not_called_for_them(self):
+        # Le comportement, pas seulement la géométrie : un client qui lèverait
+        # à la moindre requête prouve qu'aucune n'est partie.
+        class _Interdit:
+            def reverse(self, points):
+                raise AssertionError("le réseau ne devait pas être appelé")
+
+        loin = make_place("Cathédrale de Nouméa", theme="cathedrales",
+                          lat=-22.27, lon=166.44)
+        loin.departement_code = None
+        with _capture():
+            situes = fetch_module.enrich_departements(
+                [loin], address_client=_Interdit(), localisateur=self.loc)
+        self.assertEqual(situes, 0)
+        self.assertIsNone(loin.departement_code)
+
+
 class TestCountryParameter(unittest.TestCase):
     """Le pays est une donnée, plus une valeur en dur dans six requêtes.
 

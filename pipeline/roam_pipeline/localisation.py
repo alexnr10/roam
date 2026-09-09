@@ -178,6 +178,29 @@ class Localisateur:
                 return zone
         return None
 
+    def dans_l_emprise(self, lat: float, lon: float, marge_km: float = 10.0) -> bool:
+        """Le point est-il seulement PLAUSIBLE dans ce pays ?
+
+        Question grossière, et volontairement : elle ne dit pas où tombe le
+        point, elle dit s'il vaut la peine d'insister. Un lieu de Nouvelle-
+        Calédonie ou une épave au large de l'Irlande n'a rien à faire dans un
+        catalogue borné aux départements — et lui poser la question coûtait
+        cinq cent vingt et un appels réseau à chaque `enrich`, pour cinq cent
+        vingt et un « non ».
+
+        Les emprises viennent des contours eux-mêmes, une par territoire : à la
+        différence d'un grand rectangle autour du pays, elles ne recouvrent ni
+        la Suisse ni la mer d'Irlande. Rien ici n'est écrit en dur, donc rien
+        n'est à réécrire pour un autre pays.
+        """
+        dlat = marge_km / 110.54
+        dlon = marge_km / (111.32 * math.cos(math.radians(lat)) or 1.0)
+        return any(
+            ouest - dlon <= lon <= est + dlon and sud - dlat <= lat <= nord + dlat
+            for ouest, sud, est, nord in (z.bbox for z in self.zones)
+            if est >= ouest
+        )
+
     def autour(
         self, lat: float, lon: float, rayons: Sequence[int] = (500, 1500, 3000)
     ) -> Zone | None:

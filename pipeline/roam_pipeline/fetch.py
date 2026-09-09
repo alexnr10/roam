@@ -1196,6 +1196,7 @@ def enrich_communes(
     places: list[Place],
     address_client: AddressClient | None = None,
     commune_client: CommuneClient | None = None,
+    localisateur=None,
 ) -> int:
     """Rattache chaque lieu à sa commune, par ses coordonnées.
 
@@ -1213,6 +1214,14 @@ def enrich_communes(
     donc rien une fois qu'elle a abouti.
     """
     missing = [p for p in places if not p.commune_code]
+    # Même garde que pour le département : ne rien demander au réseau sur un
+    # point que les contours du pays ne peuvent pas contenir.
+    if localisateur is not None:
+        dedans = [p for p in missing if localisateur.dans_l_emprise(p.lat, p.lon)]
+        if len(dedans) < len(missing):
+            LOG.info("communes : %s lieux hors de l'emprise du pays — ignorés",
+                     len(missing) - len(dedans))
+        missing = dedans
     if not missing:
         LOG.info("communes : tous les lieux sont déjà rattachés")
         return 0
@@ -1366,8 +1375,26 @@ def enrich_departements(
         resolved += enrich_departements_localement(places, localisateur)
 
     missing = [p for p in places if not p.departement_code]
+    # Ce que les contours n'ont pas su situer se partage en deux, et une seule
+    # moitié mérite qu'on insiste. Cinq cent quatre lieux restaient sans
+    # département après la passe locale ; quatre cent quatre-vingt-dix-neuf
+    # sont en Polynésie, en Nouvelle-Calédonie, à Wallis, à Saint-Barthélemy —
+    # des collectivités qui n'ONT pas de code de département, et que le
+    # catalogue écarte à dessein. Les interroger coûtait cinq cent vingt et un
+    # appels réseau par `enrich`, pour cinq cent vingt et un « non ».
+    #
+    # L'emprise vient des contours eux-mêmes, pas d'un rectangle écrit en dur :
+    # rien à réécrire pour un autre pays.
+    if localisateur is not None:
+        dedans = [p for p in missing if localisateur.dans_l_emprise(p.lat, p.lon)]
+        if len(dedans) < len(missing):
+            LOG.info(
+                "rattachement : %s lieux hors de l'emprise du pays — aucun appel "
+                "réseau pour eux", len(missing) - len(dedans),
+            )
+        missing = dedans
     if not missing:
-        LOG.info("rattachement : tous les lieux ont déjà un département")
+        LOG.info("rattachement : plus rien à demander au réseau")
         return resolved
 
     LOG.info("rattachement : %s lieux sans département", len(missing))
