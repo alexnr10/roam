@@ -65,6 +65,7 @@ from .fetch import (
 )
 from .models import Collection, CollectionPlace, Place
 from .outlines import ATTRIBUTION as OUTLINE_ATTRIBUTION, DEFAULT_TOLERANCE_KM2
+from . import localisation
 from .outlines import export as export_outlines
 from .review import (
     CLEAR, DECISIONS, apply_decisions, apply_names, apply_photos, apply_themes,
@@ -83,6 +84,10 @@ DEFAULT_MANUAL = BASE_DIR / "data" / "manual"
 # La collecte, versionnée et découpée par thème. Ce n'est pas une sortie de
 # construction : c'est la donnée sur laquelle portent les décisions.
 DEFAULT_RAW = BASE_DIR / "data" / "raw"
+# Les contours administratifs qui servent au RATTACHEMENT (et non à l'affichage
+# de la carte). Lourds, reproductibles, donc hors de git : `geo-layers` les
+# télécharge une fois.
+DEFAULT_GEO = BASE_DIR / "data" / "reference" / "geo"
 # Le brouillon de revue, écrit par le serveur à chaque clic et relu par
 # `apply-review`. Il vit dans le dossier de sortie, donc hors de git : ce n'est
 # pas une mémoire, c'est le trajet entre le navigateur et `decisions.csv`.
@@ -474,7 +479,10 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     # recollecter, juste de rejouer `enrich` puis `build`.
     enrich_exclusions(client, places, config.exclusions.qids)
     enrich_visitors(client, places, config.visitors.property_id)
-    enrich_departements(places)
+    # Les contours d'abord, quand ils sont là : gratuits, instantanés, et sans
+    # dépendance à un service national. `geo-layers` les télécharge.
+    couches = localisation.couches_du_pays(config, args.geo)
+    enrich_departements(places, localisateur=couches.get("departement"))
     # Après le département : la commune fait autorité sur lui, et la corrige au
     # passage quand Wikidata l'avait mal rattaché.
     enrich_communes(places)
@@ -763,7 +771,9 @@ def cmd_adopt(args: argparse.Namespace, config: Config) -> int:
     # catalogue sans que rien ne l'ait regardé.
     enrich_exclusions(client, adopted, config.exclusions.qids)
     enrich_flags(client, adopted)
-    enrich_departements(adopted)
+    enrich_departements(
+        adopted,
+        localisateur=localisation.couches_du_pays(config, args.geo).get("departement"))
     enrich_article_sizes(adopted)
     if not args.skip_summaries:
         enrich_summaries(adopted)
@@ -2007,6 +2017,49 @@ def pays_demande(args: argparse.Namespace, config: Config) -> str:
     if not (demande.startswith("Q") and demande[1:].isdigit()):
         raise SystemExit(f"--pays attend un Q-id, pas « {demande} ».")
     return demande
+
+
+def cmd_geo_layers(args: argparse.Namespace, config: Config) -> int:
+    """Télécharge les contours qui servent au rattachement administratif.
+
+    Une fois pour toutes, et par pays. C'est ce qui remplace deux API de l'État
+    français par un calcul local — et c'est aussi ce qui rend le rattachement
+    possible dans un pays qui n'a pas d'équivalent à `geo.api.gouv.fr`.
+    """
+    import requests
+
+    if not config.layers:
+        print("Aucune couche déclarée dans `scoring.yaml` (`geo.layers`).",
+              file=sys.stderr)
+        return 1
+
+    dossier = args.geo / config.country.code.lower()
+    dossier.mkdir(parents=True, exist_ok=True)
+    manquantes = 0
+
+    for level, couche in sorted(config.layers.items()):
+        chemin = dossier / couche.fichier
+        if chemin.exists() and not args.force:
+            print(f"  {level:14} déjà là ({chemin.stat().st_size // 1024} Ko)")
+            continue
+        if not couche.url:
+            print(f"  {level:14} pas d'URL déclarée — à déposer à la main dans "
+                  f"{chemin}", file=sys.stderr)
+            manquantes += 1
+            continue
+        print(f"  {level:14} téléchargement…")
+        reponse = requests.get(couche.url, timeout=300)
+        reponse.raise_for_status()
+        chemin.write_bytes(reponse.content)
+        print(f"  {level:14} {len(reponse.content) // 1024} Ko → {chemin}")
+
+    # Le contrôle qui compte : la couche se relit-elle, et combien de
+    # territoires porte-t-elle ? Un fichier téléchargé mais illisible ne se
+    # signalerait qu'au prochain `enrich`, une demi-heure plus tard.
+    couches = localisation.couches_du_pays(config, args.geo)
+    for level, loc in sorted(couches.items()):
+        print(f"  {level:14} relu : {len(loc)} territoires")
+    return 1 if manquantes else 0
 
 
 def cmd_gaps(args: argparse.Namespace, config: Config) -> int:
@@ -3477,6 +3530,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--manual", type=Path, default=DEFAULT_MANUAL, help="listes manuelles")
     parser.add_argument("--raw", type=Path, default=DEFAULT_RAW,
                         help="collecte versionnée, un fichier par thème")
+    parser.add_argument("--geo", type=Path, default=DEFAULT_GEO,
+                        help="contours administratifs pour le rattachement")
     parser.add_argument("-v", "--verbose", action="store_true")
 
     sub = parser.add_subparsers(dest="command", required=True)
@@ -3699,6 +3754,12 @@ def build_parser() -> argparse.ArgumentParser:
     app = sub.add_parser("export-app", help="écrit le catalogue dans l'application")
     app.add_argument("--to", type=Path, default=APP_CATALOG, help="fichier de destination")
 
+    couches = sub.add_parser(
+        "geo-layers",
+        help="télécharge les contours du rattachement administratif (réseau requis)")
+    couches.add_argument("--force", action="store_true",
+                         help="retélécharger même si le fichier est déjà là")
+
     contours = sub.add_parser(
         "export-outlines",
         help="fabrique les contours des régions et départements (réseau requis)",
@@ -3840,6 +3901,7 @@ def main(argv: list[str] | None = None) -> int:
         "adjustments": cmd_adjustments,
         "check-lists": cmd_check_lists,
         "gaps": cmd_gaps,
+        "geo-layers": cmd_geo_layers,
         "retention": cmd_retention,
         "probe": cmd_probe,
         "rename": cmd_rename,

@@ -61,6 +61,8 @@ from roam_pipeline.geo import departements, normalize_dept_code, region_of, regi
 from roam_pipeline.models import (
     Collection, CollectionPlace, Place, display_name, slugify,
 )
+from roam_pipeline import fetch as fetch_module
+from roam_pipeline import localisation
 from roam_pipeline import outlines
 from roam_pipeline import wikidata as wd
 from roam_pipeline.fetch import (
@@ -5932,6 +5934,165 @@ class TestGapTotalCountsPlaces(unittest.TestCase):
 
     def test_a_row_without_an_entity_is_ignored(self):
         self.assertEqual(manquants_distincts([{"class": "x"}, {}], set()), 0)
+
+
+class TestLocalisation(unittest.TestCase):
+    """Rattacher un point à son territoire, sans aucun service national.
+
+    Le pipeline demandait son département à deux API de l'État français. Les
+    contours, eux, sont déjà téléchargés pour la carte de conquête : la même
+    donnée répond à la question, localement, et pour n'importe quel pays.
+    """
+
+    @staticmethod
+    def _carre(x0, y0, cote=1.0):
+        return [(x0, y0), (x0 + cote, y0), (x0 + cote, y0 + cote), (x0, y0 + cote)]
+
+    def _zone(self, code, polygones, name="", parent=None):
+        return localisation.Zone(
+            code=code, name=name, level="departement", parent_code=parent,
+            bbox=localisation._bbox(polygones), polygones=polygones)
+
+    def test_a_point_inside_and_a_point_outside(self):
+        zone = self._zone("01", [[self._carre(0, 0)]])
+        self.assertTrue(zone.contient(0.5, 0.5))
+        self.assertFalse(zone.contient(1.5, 0.5))
+        self.assertFalse(zone.contient(0.5, 1.5))
+
+    def test_a_vertex_at_the_ray_latitude_is_not_counted_twice(self):
+        # LE piège du pair-impair. Avec une comparaison symétrique, un sommet
+        # pile à la latitude du rayon compte pour ses DEUX arêtes, le nombre de
+        # croisements devient pair, et un point intérieur est déclaré dehors.
+        losange = [(0.0, 1.0), (1.0, 0.0), (2.0, 1.0), (1.0, 2.0)]
+        zone = self._zone("01", [[losange]])
+        self.assertTrue(zone.contient(1.0, 1.0))     # le rayon passe par deux sommets
+        self.assertFalse(zone.contient(-0.5, 1.0))
+        self.assertFalse(zone.contient(2.5, 1.0))
+
+    def test_a_hole_is_not_the_territory(self):
+        # Un anneau intérieur est un trou : une enclave, un lac fermé. Le point
+        # qui y tombe n'appartient pas au territoire qui l'entoure.
+        contour = self._carre(0, 0, 10)
+        trou = self._carre(4, 4, 2)
+        zone = self._zone("01", [[contour, trou]])
+        self.assertTrue(zone.contient(1.0, 1.0))
+        self.assertFalse(zone.contient(5.0, 5.0))
+
+    def test_a_territory_can_be_in_several_pieces(self):
+        # Une île et son continent : deux polygones, un seul territoire.
+        zone = self._zone("29", [[self._carre(0, 0)], [self._carre(5, 5)]])
+        self.assertTrue(zone.contient(0.5, 0.5))
+        self.assertTrue(zone.contient(5.5, 5.5))
+        self.assertFalse(zone.contient(3.0, 3.0))
+
+    def test_the_locator_picks_the_right_territory(self):
+        loc = localisation.Localisateur([
+            self._zone("01", [[self._carre(0, 0)]], "Un"),
+            self._zone("02", [[self._carre(10, 10)]], "Deux"),
+        ])
+        self.assertEqual(loc.contenant(0.5, 0.5).code, "01")
+        self.assertEqual(loc.contenant(10.5, 10.5).code, "02")
+        self.assertIsNone(loc.contenant(5.0, 5.0))
+
+    def test_a_territory_wider_than_a_cell_is_found_everywhere(self):
+        # L'index range par cases d'un degré ; un territoire qui en couvre
+        # plusieurs doit être trouvé depuis chacune, pas seulement la première.
+        loc = localisation.Localisateur([self._zone("33", [[self._carre(0, 0, 5)]])])
+        for lon, lat in ((0.5, 0.5), (2.5, 2.5), (4.5, 4.5)):
+            with self.subTest(lon=lon):
+                self.assertIsNotNone(loc.contenant(lat, lon))
+
+    def test_a_point_just_off_the_coast_is_attached(self):
+        # La plage de Pampelonne, dont Wikidata place le point à un kilomètre
+        # au large, n'appartenait à aucune commune — donc à aucun département,
+        # donc à aucune collection géographique.
+        loc = localisation.Localisateur([self._zone("83", [[self._carre(0, 0)]])])
+        au_large = 1.008          # ~900 m à l'est du bord, à cette latitude
+        self.assertIsNone(loc.contenant(0.5, au_large))
+        self.assertIsNotNone(loc.autour(0.5, au_large))
+
+    def test_a_point_truly_elsewhere_stays_unattached(self):
+        # C'est ce qui distingue la recherche aux alentours d'un rapprochement
+        # au contour le plus proche : elle ne rattache pas la Belgique.
+        loc = localisation.Localisateur([self._zone("59", [[self._carre(0, 0)]])])
+        self.assertIsNone(loc.autour(0.5, 3.0))
+
+    def test_geojson_is_read_with_the_keys_it_carries(self):
+        # Les clés varient d'un pays à l'autre — `code`/`nom` chez l'IGN, autre
+        # chose ailleurs. Le module n'en connaît aucune par cœur.
+        donnees = {"features": [
+            {"properties": {"cod": "IT21", "label": "Piémont", "reg": "1"},
+             "geometry": {"type": "Polygon", "coordinates": [self._carre(7, 45)]}},
+            {"properties": {"cod": "IT25"},          # sans géométrie : ignoré
+             "geometry": {}},
+            {"properties": {"label": "sans code"},   # sans code : ignoré
+             "geometry": {"type": "Polygon", "coordinates": [self._carre(0, 0)]}},
+        ]}
+        zones = localisation.zones_depuis_geojson(
+            donnees, "region", code_key="cod", name_key="label", parent_key="reg")
+        self.assertEqual([z.code for z in zones], ["IT21"])
+        self.assertEqual(zones[0].name, "Piémont")
+        self.assertEqual(zones[0].parent_code, "1")
+
+    def test_a_multipolygon_is_read_as_several_pieces(self):
+        donnees = {"features": [{
+            "properties": {"code": "29", "nom": "Finistère"},
+            "geometry": {"type": "MultiPolygon",
+                         "coordinates": [[self._carre(0, 0)], [self._carre(5, 5)]]},
+        }]}
+        zones = localisation.zones_depuis_geojson(donnees, "departement")
+        self.assertEqual(len(zones[0].polygones), 2)
+
+
+class TestLocalAttachment(unittest.TestCase):
+    """Le rattachement par les contours, branché dans `enrich`."""
+
+    @staticmethod
+    def _loc(code, x0=2.0, y0=48.0):
+        polygones = [[[(x0, y0), (x0 + 1, y0), (x0 + 1, y0 + 1), (x0, y0 + 1)]]]
+        zone = localisation.Zone(code=code, name="", level="departement",
+                                 parent_code=None,
+                                 bbox=localisation._bbox(polygones),
+                                 polygones=polygones)
+        return localisation.Localisateur([zone])
+
+    def test_it_fills_the_department_and_its_region(self):
+        lieu = make_place("Cascade", theme="cascades", lat=48.5, lon=2.5)
+        lieu.departement_code = None
+        lieu.region_code = None
+        with _capture():
+            situes = fetch_module.enrich_departements_localement([lieu], self._loc("77"))
+        self.assertEqual(situes, 1)
+        self.assertEqual(lieu.departement_code, "77")
+        # La région se déduit du département : les deux ne peuvent pas diverger.
+        self.assertEqual(lieu.region_code, "11")
+
+    def test_a_place_already_located_is_left_alone(self):
+        # Relancer la passe ne doit rien coûter ni rien écraser : Wikidata et
+        # la revue font autorité sur une heuristique géométrique.
+        lieu = make_place("Château", theme="chateaux", lat=48.5, lon=2.5)
+        lieu.departement_code = "75"
+        with _capture():
+            situes = fetch_module.enrich_departements_localement([lieu], self._loc("77"))
+        self.assertEqual(situes, 0)
+        self.assertEqual(lieu.departement_code, "75")
+
+    def test_a_place_outside_every_outline_stays_unlocated(self):
+        lieu = make_place("Machu Picchu", theme="megalithes", lat=-13.1, lon=-72.5)
+        lieu.departement_code = None
+        with _capture():
+            situes = fetch_module.enrich_departements_localement([lieu], self._loc("77"))
+        self.assertEqual(situes, 0)
+        self.assertIsNone(lieu.departement_code)
+
+    def test_a_missing_layer_is_not_an_error(self):
+        # `geo-layers` ne s'est pas encore lancé : le rattachement retombe sur
+        # ce qu'il faisait avant, et le dit. Il ne s'arrête pas.
+        with tempfile.TemporaryDirectory() as tmp:
+            with _capture(), self.assertLogs("roam_pipeline.localisation", "INFO") as journal:
+                couches = localisation.couches_du_pays(CONFIG, Path(tmp))
+        self.assertEqual(couches, {})
+        self.assertIn("geo-layers", " ".join(journal.output))
 
 
 class TestCountryParameter(unittest.TestCase):

@@ -56,3 +56,10 @@ dist/
 # elle, est versionnée : elle coûte vingt minutes de requêtes Overpass et
 # porte les seuls faits de terrain du catalogue.
 pipeline/data/out/candidates-*.csv
+
+# Contours administratifs du RATTACHEMENT (`geo-layers`). Trois mégaoctets pour
+# la France, davantage ailleurs, et parfaitement régénérables depuis une URL
+# écrite dans `scoring.yaml`. À ne pas confondre avec `mobile/src/data/
+# outlines.json`, qui est versionné : celui-là est simplifié, léger, et sert à
+# DESSINER la carte ; ceux-ci sont bruts et servent à CALCULER.
+pipeline/data/reference/geo/

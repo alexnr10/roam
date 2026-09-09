@@ -403,6 +403,28 @@ geo:
     name: France
     de_form: de France
 
+  # COUCHES DE CONTOURS, pour rattacher un lieu à son territoire sans réseau.
+  #
+  # Le pipeline demandait sa commune et son département à deux API de l'État
+  # français. Gratuites, sans clé, excellentes — et strictement françaises :
+  # c'était, de tout le pipeline, la dépendance la plus difficile à porter.
+  #
+  # Or on télécharge déjà ces contours pour dessiner la carte de conquête. La
+  # même donnée répond à « quel territoire contient ce point ? », localement et
+  # pour n'importe quel pays. Mesuré sur les 2 079 lieux du catalogue :
+  # 99,4 % d'accord avec les API, en 0,3 milliseconde par lieu.
+  #
+  # `code_key` et `name_key` nomment les propriétés du GeoJSON : elles varient
+  # d'un producteur à l'autre, et c'est tout ce qui change d'un pays à l'autre.
+  # `url` sert à `python -m roam_pipeline geo-layers`, qui télécharge une fois
+  # pour toutes dans `data/reference/geo/<pays>/`.
+  layers:
+    departement:
+      fichier: departements.geojson
+      code_key: code
+      name_key: nom
+      url: https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/departements-avec-outre-mer.geojson
+
   # Niveaux géographiques pour lesquels on dérive des collections.
   levels: [departement, region, country]
   # Croisements thème × géographie (ex. « Châteaux de Dordogne »).

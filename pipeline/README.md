@@ -49,7 +49,22 @@ python -m roam_pipeline stats
 
 # une fois pour toutes : les contours de la carte de conquête
 python -m roam_pipeline export-outlines
+
+# une fois pour toutes AUSSI : les contours qui servent au RATTACHEMENT.
+# Sans eux, `enrich` retombe sur les API de l'État français — plus lentes,
+# et inutilisables pour un autre pays.
+python -m roam_pipeline geo-layers
 ```
+
+### Deux jeux de contours, à ne pas confondre
+
+`export-outlines` produit `mobile/src/data/outlines.json` : **simplifié**,
+860 Ko, versionné, il sert à DESSINER la carte de conquête.
+
+`geo-layers` télécharge `data/reference/geo/<pays>/` : **brut**, 3,6 Mo,
+hors de git, il sert à CALCULER — « quel territoire contient ce point ? ».
+Simplifier ces contours-là déplacerait les frontières de quelques dizaines de
+mètres, ce qui est invisible à l'écran et faux pour un rattachement.
 
 ## Sorties (`data/out/`)
 

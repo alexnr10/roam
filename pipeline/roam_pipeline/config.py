@@ -254,6 +254,24 @@ class CollectionRules:
 
 
 @dataclass(frozen=True)
+class Layer:
+    """Une couche de contours administratifs, pour le rattachement local.
+
+    `code_key` et `name_key` nomment les propriétés du GeoJSON : elles varient
+    d'un producteur à l'autre, et c'est à peu près tout ce qui change d'un pays
+    à l'autre. Le reste — lire les polygones, indexer, tester un point — ne
+    connaît aucun pays.
+    """
+
+    level: str
+    fichier: str
+    code_key: str = "code"
+    name_key: str = "nom"
+    parent_key: str | None = None
+    url: str | None = None
+
+
+@dataclass(frozen=True)
 class Country:
     """Le pays que ce catalogue décrit.
 
@@ -274,6 +292,7 @@ class Country:
 @dataclass(frozen=True)
 class Config:
     country: Country
+    layers: dict[str, Layer]
     themes: list[Theme]
     labels: list[Label]
     scoring: Scoring
@@ -412,8 +431,20 @@ def load_config(config_dir: Path | None = None) -> Config:
         name=str(pays["name"]), de_form=str(pays["de_form"]),
     )
 
+    layers = {
+        level: Layer(
+            level=level, fichier=str(bloc["fichier"]),
+            code_key=str(bloc.get("code_key", "code")),
+            name_key=str(bloc.get("name_key", "nom")),
+            parent_key=(str(bloc["parent_key"]) if bloc.get("parent_key") else None),
+            url=(str(bloc["url"]) if bloc.get("url") else None),
+        )
+        for level, bloc in (raw["geo"].get("layers") or {}).items()
+    }
+
     return Config(
         country=country,
+        layers=layers,
         themes=themes,
         labels=labels,
         scoring=scoring,

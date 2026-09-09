@@ -66,14 +66,32 @@ la France en a 18 et 101. Le référentiel de `data/reference` fait 121 lignes.
 
 ## Ce qui reste à écrire
 
-**Le rattachement administratif, et c'est le seul vrai morceau.**
-`geocode.py` (309 lignes) repose sur `api-adresse.data.gouv.fr` et
-`geo.api.gouv.fr` : gratuits, sans clé, et strictement français.
+**Le rattachement administratif — FAIT pour le département.**
+`geocode.py` reposait sur `api-adresse.data.gouv.fr` et `geo.api.gouv.fr` :
+gratuits, sans clé, et strictement français.
 
-Proposition : **s'en passer partout, France comprise.** On télécharge déjà les
-contours des départements pour la carte de conquête ; rattacher un lieu à sa
-province par point-dans-polygone local, c'est zéro API, zéro service national,
-et ça vaut pour n'importe quel pays dont on a les contours.
+`localisation.py` répond désormais à la question localement, par
+point-dans-polygone sur les contours que `geo-layers` télécharge. Mesuré sur
+la collecte entière, en effaçant TOUS les départements pour voir ce que le
+calcul local retrouve seul :
+
+    10 422 / 10 955 lieux situés, en 3,8 secondes, sans réseau
+    99,35 % d'accord avec le verdict des API sur les 10 446 qu'elles situaient
+        39 désaccords · 29 non situés
+
+Et les 39 désaccords ne sont pas des erreurs : **trente d'entre eux sont des
+objets QUI SONT une frontière** — seize sommets (le Hohneck, le mont Granier,
+la cime de la Bonette), douze ponts et viaducs (un pont franchit une rivière,
+et une rivière sépare deux départements), deux gorges. Aucune des deux
+réponses n'y est plus vraie que l'autre. Deux autres cas — le jardin
+d'agronomie tropicale et le lac de Saint-Mandé, dans le bois de Vincennes —
+sont ceux où le contour a RAISON contre l'API : le bois appartient à Paris.
+
+Reste la COMMUNE, qui demanderait les trente-cinq mille contours communaux
+(46 Mo). Elle vient toujours de Wikidata et, pour la France, des API. Ce n'est
+pas bloquant pour un deuxième pays : les sondages italiens montrent que
+Wikidata renseigne la commune de tous les lieux testés — Turin, Rome,
+Florence, Velletri, Cesena.
 
 Le reste est mécanique : source des contours, référentiel des provinces,
 `de_form` en français pour des noms étrangers (« de Toscane », « des
@@ -96,7 +114,8 @@ code du deuxième pays, pas après.
 ## L'estimation
 
     paramétrage du pays (requête, config, référentiel)      ~1 j   ← FAIT
-    rattachement par point-dans-polygone                   2–3 j
+    rattachement par point-dans-polygone                   2–3 j   ← FAIT
+        (département et région ; la commune reste à Wikidata)
     contours étrangers (source + machinerie existante)       ~1 j
     collections partitionnées par pays                     2–3 j
     app : littéraux, libellés, voile, carte de conquête      ~2 j
