@@ -3,6 +3,11 @@
 // Les vingt-trois icônes de thèmes, en images, pour la couche de symboles de
 // la carte native. Leur source est `src/ui/themeIcons.tsx` : c'est là qu'on
 // modifie un tracé, et ce script réécrit ce fichier et les PNG voisins.
+//
+// Le `require` ne nomme QUE la densité de base : React Native choisit
+// lui-même le fichier `@2x` ou `@3x` selon l'écran, et transmet l'échelle
+// à MapLibre — sans quoi un bitmap de 44 pixels passe pour 44 points, et le
+// symbole déborde de sa pastille.
 
 import type { ImageRequireSource } from 'react-native';
 

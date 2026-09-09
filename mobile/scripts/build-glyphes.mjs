@@ -26,10 +26,24 @@ const here = dirname(fileURLToPath(import.meta.url));
 const racine = join(here, '..');
 const sortie = join(racine, 'assets', 'glyphes');
 
-/** Le côté du canevas, en points. Identique à `COTE` dans `src/ui/glyphes.ts`. */
+/** Le côté du glyphe, en POINTS. Identique à `COTE` dans `src/ui/glyphes.ts`. */
 const COTE = 22;
-/** Deux pixels par point : une icône rendue à sa taille logique arrive floue. */
-const DENSITE = 2;
+
+/**
+ * Les densités produites, et pourquoi il en faut plusieurs.
+ *
+ * React Native lit la densité dans le NOM du fichier : `x.png` vaut un pixel
+ * par point, `x@2x.png` deux, `x@3x.png` trois. Il choisit ensuite celui qui
+ * convient à l'écran et transmet l'échelle à MapLibre, qui en déduit la taille
+ * du symbole.
+ *
+ * N'écrire que `x.png` à 44 pixels revient donc à déclarer un symbole de
+ * quarante-quatre POINTS : sur la carte, les glyphes des lieux trois étoiles
+ * débordaient largement de leur pastille — deux fois trop grands, exactement.
+ * La taille demandée par `tailleDesGlyphes()` est la même des deux côtés ;
+ * c'est l'échelle déclarée qui manquait.
+ */
+const DENSITES = [1, 2, 3];
 
 /**
  * Les tracés, lus dans le module TypeScript.
@@ -76,23 +90,26 @@ const ENCRE = (() => {
 const page = `<!doctype html><meta charset="utf-8"><body style="margin:0">
 <script>
 const TRACES = ${JSON.stringify(traces)};
-const COTE = ${COTE}, DENSITE = ${DENSITE}, ENCRE = ${JSON.stringify(ENCRE)};
+const COTE = ${COTE}, DENSITES = ${JSON.stringify(DENSITES)}, ENCRE = ${JSON.stringify(ENCRE)};
 // Le dessin de \`src/ui/glyphes.ts\`, au trait près.
 window.rendre = () => {
   const sorties = {};
   for (const [themeId, chemins] of Object.entries(TRACES)) {
-    const cote = Math.round(COTE * DENSITE);
-    const canevas = document.createElement('canvas');
-    canevas.width = cote;
-    canevas.height = cote;
-    const ctx = canevas.getContext('2d');
-    ctx.scale(cote / 24, cote / 24);
-    ctx.strokeStyle = ENCRE;
-    ctx.lineWidth = 2.4;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    for (const chemin of chemins) ctx.stroke(new Path2D(chemin));
-    sorties[themeId] = canevas.toDataURL('image/png');
+    sorties[themeId] = {};
+    for (const densite of DENSITES) {
+      const cote = Math.round(COTE * densite);
+      const canevas = document.createElement('canvas');
+      canevas.width = cote;
+      canevas.height = cote;
+      const ctx = canevas.getContext('2d');
+      ctx.scale(cote / 24, cote / 24);
+      ctx.strokeStyle = ENCRE;
+      ctx.lineWidth = 2.4;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      for (const chemin of chemins) ctx.stroke(new Path2D(chemin));
+      sorties[themeId][densite] = canevas.toDataURL('image/png');
+    }
   }
   return sorties;
 };
@@ -110,12 +127,16 @@ await navigateur.close();
 
 mkdirSync(sortie, { recursive: true });
 for (const themeId of themes) {
-  const donnees = images[themeId];
-  if (!donnees) throw new Error(`glyphe manquant : ${themeId}`);
-  writeFileSync(
-    join(sortie, `${themeId}.png`),
-    Buffer.from(donnees.slice('data:image/png;base64,'.length), 'base64'),
-  );
+  for (const densite of DENSITES) {
+    const donnees = images[themeId]?.[densite];
+    if (!donnees) throw new Error(`glyphe manquant : ${themeId} @${densite}x`);
+    // `x.png`, `x@2x.png`, `x@3x.png` : c'est le nom qui porte l'échelle.
+    const suffixe = densite === 1 ? '' : `@${densite}x`;
+    writeFileSync(
+      join(sortie, `${themeId}${suffixe}.png`),
+      Buffer.from(donnees.slice('data:image/png;base64,'.length), 'base64'),
+    );
+  }
 }
 
 /**
@@ -132,6 +153,11 @@ const table = [
   '// Les vingt-trois icônes de thèmes, en images, pour la couche de symboles de',
   '// la carte native. Leur source est `src/ui/themeIcons.tsx` : c\'est là qu\'on',
   '// modifie un tracé, et ce script réécrit ce fichier et les PNG voisins.',
+  '//',
+  '// Le `require` ne nomme QUE la densité de base : React Native choisit',
+  '// lui-même le fichier `@2x` ou `@3x` selon l\'écran, et transmet l\'échelle',
+  '// à MapLibre — sans quoi un bitmap de 44 pixels passe pour 44 points, et le',
+  '// symbole déborde de sa pastille.',
   '',
   'import type { ImageRequireSource } from \'react-native\';',
   '',
@@ -142,4 +168,6 @@ const table = [
 ].join('\n');
 writeFileSync(join(racine, 'src', 'ui', 'glyphesNatifs.ts'), table);
 
-console.log(`${themes.length} glyphes écrits dans assets/glyphes/`);
+console.log(
+  `${themes.length} glyphes écrits dans assets/glyphes/, en ${DENSITES.join('x, ')}x`,
+);

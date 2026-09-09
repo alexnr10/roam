@@ -79,7 +79,16 @@ export function Photo({
     <Image
       accessibilityIgnoresInvertColors
       source={{ uri: src }}
-      onError={() => setRate(true)}
+      onError={(evenement) => {
+        // Le repli est silencieux À L'ÉCRAN — c'est voulu, un cadre vide sur
+        // toute une liste donne une application cassée. Mais il l'était aussi
+        // dans les journaux, et une photo qui ne vient jamais ressemblait
+        // exactement à un lieu qui n'en a pas. Le message du système dit la
+        // différence : un refus du serveur, un réseau absent, une adresse
+        // fausse.
+        console.warn('Roam : photo —', src, evenement.nativeEvent?.error);
+        setRate(true);
+      }}
       resizeMode="cover"
       style={cadre}
     />
