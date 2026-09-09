@@ -3,13 +3,17 @@ import { REGIONS } from '../lib/regions';
 import {
   ETOILE_COULEURS,
   OPACITE_REGION_OUVERTE,
+  OPACITE_PLEINE,
   REGION_FILL_OPACITY,
   REGION_TONES,
   REGION_TONE_BY_CODE,
   mapColors,
   TRANSITION,
   depouiller,
+  margeDeCamera,
   opaciteDesAplats,
+  opaciteDesAplatsNative,
+  opaciteDesPastilles,
   opaciteDesTraits,
   opaciteEnCascade,
   pasDeCascade,
@@ -53,6 +57,109 @@ describe('opaciteDesAplats', () => {
       expect(sortie[4]).toBe(0.85);
       expect(sortie[5]).toBe(paliers[i + 1]);
     }
+  });
+});
+
+describe('opaciteDesAplatsNative', () => {
+  // Les SDK d'Android et d'iOS ne connaissent pas `feature-state` : il n'existe
+  // que dans la version web de MapLibre. La question qu'il posait reste la
+  // même, elle se pose simplement dans l'expression.
+
+  it('ne mentionne jamais `feature-state`', () => {
+    const dedans = JSON.stringify(opaciteDesAplatsNative('53'));
+    const dehors = JSON.stringify(opaciteDesAplatsNative(null));
+    expect(dedans).not.toContain('feature-state');
+    expect(dehors).not.toContain('feature-state');
+  });
+
+  it('ne place `zoom` qu’en entrée de l’interpolation de premier niveau', () => {
+    // Même piège que sur le web, et il se referme de la même façon : une couche
+    // refusée par MapLibre manque en silence.
+    for (const expression of [opaciteDesAplatsNative(null), opaciteDesAplatsNative('53')]) {
+      expect(expression[0]).toBe('interpolate');
+      expect(cheminsDuZoom(expression)).toEqual(['/2']);
+    }
+  });
+
+  it('rend les paliers nus quand aucune région n’est ouverte', () => {
+    // Rien à distinguer : pas de `case` à faire évaluer pour chaque polygone à
+    // chaque image.
+    const expression = opaciteDesAplatsNative(null);
+    const paliers = REGION_FILL_OPACITY.slice(3) as number[];
+    for (let i = 0; i < paliers.length; i += 2) {
+      expect(expression[3 + i]).toBe(paliers[i]);
+      expect(expression[4 + i]).toBe(paliers[i + 1]);
+    }
+  });
+
+  it('fait tomber le voile de la seule région ouverte', () => {
+    const expression = opaciteDesAplatsNative('53', 0.55);
+    const paliers = REGION_FILL_OPACITY.slice(3) as number[];
+    for (let i = 0; i < paliers.length; i += 2) {
+      const sortie = expression[4 + i] as unknown[];
+      expect(sortie[0]).toBe('case');
+      expect(sortie[1]).toEqual(['==', ['get', 'code'], '53']);
+      expect(sortie[2]).toBe(OPACITE_REGION_OUVERTE);
+      // Les AUTRES régions : atténuées, pas effacées. Elles disent encore où
+      // l'on est dans le pays.
+      expect(sortie[3]).toBeCloseTo(paliers[i + 1] * 0.55, 10);
+    }
+  });
+
+  it('donne les mêmes paliers que la version web', () => {
+    // Une seule échelle d'opacité, deux façons de poser la question « est-ce
+    // la région ouverte ? ». Si les deux divergeaient, la carte n'aurait pas la
+    // même identité selon le téléphone.
+    const web = opaciteDesAplats();
+    const natif = opaciteDesAplatsNative(null);
+    const paliers = REGION_FILL_OPACITY.slice(3) as number[];
+    for (let i = 0; i < paliers.length; i += 2) {
+      expect(natif[3 + i]).toBe(web[3 + i]);
+      expect(natif[4 + i]).toBe((web[4 + i] as unknown[])[5]);
+    }
+  });
+});
+
+describe('opaciteDesPastilles', () => {
+  it('laisse le niveau 3 en retrait quand rien n’est touché', () => {
+    expect(opaciteDesPastilles(null)).toEqual(OPACITE_PLEINE);
+    expect(opaciteDesPastilles()).toEqual(OPACITE_PLEINE);
+  });
+
+  it('fait reculer les autres autour du lieu touché', () => {
+    // Le lieu touché garde sa pleine opacité, les autres reculent : sans cela,
+    // on ne voit pas lequel on a pris.
+    expect(opaciteDesPastilles('Q243')).toEqual([
+      'case',
+      ['==', ['get', 'id'], 'Q243'],
+      1,
+      0.55,
+    ]);
+  });
+});
+
+describe('margeDeCamera', () => {
+  it('réserve la place que prennent la recherche et le bandeau', () => {
+    // Cadrer une région sur la hauteur entière fait passer la Bretagne sous la
+    // barre de recherche et la Corse sous le bandeau.
+    const marge = margeDeCamera(390, 844);
+    expect(marge.top).toBe(196);
+    expect(marge.bottom).toBe(250);
+  });
+
+  it('ne demande jamais plus d’un tiers du cadre', () => {
+    // MapLibre refuse une marge plus grande que son conteneur : sur un écran
+    // court — un téléphone à l'horizontale — la maquette dépasserait.
+    const marge = margeDeCamera(320, 300);
+    expect(marge.top).toBeLessThanOrEqual(100);
+    expect(marge.bottom).toBeLessThanOrEqual(100);
+    expect(marge.top + marge.bottom).toBeLessThan(300);
+  });
+
+  it('garde une marge minimale sur un cadre minuscule', () => {
+    const marge = margeDeCamera(12, 12);
+    expect(marge.top).toBe(8);
+    expect(marge.left).toBe(8);
   });
 });
 
@@ -388,6 +495,34 @@ function chroma(hex: string): number {
   const bb = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
   return Math.hypot(a, bb);
 }
+
+describe('rayonDesPastilles — l’anneau du lieu mis en avant', () => {
+  it('n’enferme jamais `zoom` dans un calcul', () => {
+    // `["+", rayonDesPastilles(), 4]` enfermait `["zoom"]` dans une addition :
+    // MapLibre refuse alors la couche par un ÉVÉNEMENT, pas par une exception.
+    // L'anneau du lieu touché n'a jamais existé, sur aucune plateforme, et rien
+    // dans l'application ne le disait.
+    const expression = rayonDesPastilles(4);
+    expect(expression[0]).toBe('interpolate');
+    expect(cheminsDuZoom(expression)).toEqual(['/2']);
+  });
+
+  it('élargit chaque note de la marge demandée', () => {
+    const nu = rayonDesPastilles();
+    const large = rayonDesPastilles(4);
+    for (let i = 3; i < nu.length; i += 2) {
+      // Les paliers de zoom ne bougent pas…
+      expect(large[i]).toBe(nu[i]);
+      const avant = nu[i + 1] as number[];
+      const apres = large[i + 1] as number[];
+      // …et chacune des trois notes grossit d'autant : l'anneau entoure la
+      // pastille, il ne la remplace pas.
+      for (const rang of [3, 5, 6]) {
+        expect(apres[rang]).toBeCloseTo(avant[rang] + 4, 10);
+      }
+    }
+  });
+});
 
 describe('ETOILE_COULEURS', () => {
   it('donne trois couleurs distinctes', () => {

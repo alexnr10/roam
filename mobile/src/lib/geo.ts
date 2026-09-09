@@ -34,7 +34,7 @@ export function formatDistance(meters: number): string {
 
 /**
  * Emprise carte englobant une position et un rayon, pour cadrer la vue.
- * `latitudeDelta` / `longitudeDelta` sont les unités attendues par react-native-maps.
+ * `latitudeDelta` / `longitudeDelta` sont des demi-hauteurs en degrés.
  */
 export function regionAround(
   latitude: number,

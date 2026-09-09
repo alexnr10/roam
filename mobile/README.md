@@ -10,13 +10,27 @@ npm install
 npx expo start
 ```
 
-Puis scanner le QR code avec **Expo Go** sur ton téléphone. La géolocalisation
-fonctionne dans Expo Go ; si la carte native n'y est pas disponible, l'app le dit et
-reste utilisable — liste, validation et progression continuent de marcher.
+Puis scanner le QR code. La géolocalisation, les listes, la recherche, la validation
+et la progression marchent partout — y compris dans **Expo Go**, où l'app le dit
+franchement : la carte y affiche « carte indisponible ici » plutôt que de tomber.
+
+**La carte demande une application compilée.** MapLibre est un module natif, absent
+d'Expo Go par construction. Une seule compilation suffit, ensuite on développe comme
+avant :
+
+```bash
+npx eas-cli@latest build --platform android --profile development
+# puis, à chaque session :
+npx expo start --dev-client
+```
+
+À refaire uniquement quand une dépendance native change — pas à chaque modification
+de code.
 
 ```bash
 npm test           # logique métier (distances, validation, progression, badges)
 npm run typecheck  # TypeScript strict
+npm run glyphes    # réengendre les icônes de thèmes de la carte native
 npm run export:web # build web autonome dans dist/
 ```
 
@@ -26,15 +40,16 @@ npm run export:web # build web autonome dans dist/
 soit — pratique pour montrer la boucle à quelqu'un, ou pour se faire une idée depuis
 un téléphone sans serveur de développement.
 
-Deux différences avec l'app :
+Une seule différence avec l'app, et elle est volontaire :
 
-- **la carte tourne sur MapLibre**, avec les tuiles d'OpenFreeMap — un fond de carte
-  complet, gratuit, sans clé ni compte. Le natif utilise encore `react-native-maps`, qui
-  lui exige une clé Google dans une application autonome ;
 - **un bouton « me téléporter ici »** apparaît sur chaque fiche lieu, pour éprouver le
   moment de validation sans faire la route. Il est strictement réservé au web
   (`Platform.OS === 'web'`) : sur téléphone, seul le vrai GPS fait foi, sans quoi le
   jeu n'a plus de sens.
+
+La carte, elle, est la même des deux côtés : même moteur, mêmes couches, mêmes
+couleurs. C'est le web qui servait autrefois d'aperçu de ce que le natif ne savait
+pas faire ; il n'y a plus d'écart à montrer.
 
 ## Ce que fait le prototype
 
@@ -63,8 +78,8 @@ npx eas-cli@latest build --platform android --profile preview
 
 `npx` évite l'installation globale, qui échoue en `EACCES` sur un Mac.
 
-Rend un APK installable directement. La carte restera grise tant qu'aucune clé Google
-Maps n'est configurée — voir `../docs/demarrage.md`, qui détaille les options.
+Rend un APK installable directement. Aucune clé d'API : le fond de carte vient
+d'OpenFreeMap, qui sert des tuiles vectorielles sans compte.
 
 ## Organisation
 
@@ -79,6 +94,11 @@ src/lib/                logique métier pure — c'est ce qui est testé
 src/store/visits.tsx    carnet de visites, persisté
 src/data/               catalogue
 src/ui/                 composants et carte
+  MapCanvas.tsx         carte native (MapLibre)
+  MapCanvas.web.tsx     carte web (MapLibre GL JS)
+  couches.ts            LES COUCHES, pour les deux — une seule définition
+  mapStyle.ts           couleurs, expressions, fond repeint
+assets/glyphes/         icônes de thèmes en images, engendrées
 ```
 
 ## Limites connues
@@ -92,9 +112,16 @@ src/ui/                 composants et carte
   licence, pas une politesse.
 - **Pas de compte utilisateur** : tout est local à l'appareil. Le branchement Supabase
   viendra avec le vrai catalogue.
-- **Carte via `react-native-maps`**, choisi pour fonctionner dans Expo Go sans build
-  natif — c'est ce qui permet de tester sur son téléphone tout de suite. Le passage à
-  MapLibre + PMTiles est prévu quand il faudra un fond de carte personnalisé, gratuit
-  et disponible hors ligne.
+- **La carte demande une application compilée** : MapLibre est un module natif, et
+  Expo Go ne le porte pas. C'était le prix à payer pour que les deux plateformes
+  aient la MÊME carte — mêmes aplats de régions, mêmes pastilles graduées, mêmes
+  symboles de thèmes — au lieu d'une carte dessinée et d'une pluie d'épingles.
+- **Les fondus de la carte native sont plus simples que ceux du web** : les lieux
+  d'une région y arrivent en un fondu, là où le web les fait apparaître en cascade
+  depuis le centre. Animer image par image demanderait de traverser le pont soixante
+  fois par seconde ; le SDK natif interpole lui-même, mais d'un seul tenant.
+- **Pas encore de carte de conquête sur natif** : elle attend d'être portée sur le
+  même moteur. La liste, elle, fonctionne partout — et elle dit ce qu'il RESTE à
+  faire, là où un aplat de couleur ne dit que ce qui est fait.
 - **Pas de photo** pour l'instant : elle est prévue comme bonus optionnel, jamais
   comme condition de validation.

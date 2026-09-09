@@ -484,6 +484,33 @@ export const TRANSITION = {
  * l'œil (chroma 0,11 et 0,13), l'encre ne l'appelle pas (0,02). Un lieu à une
  * étoile se voit maintenant ; il ne se réclame pas pour autant.
  */
+/**
+ * La marge de caméra, ramenée au cadre réel.
+ *
+ * L'écran fait 844 points, mais la recherche, les filtres et la pastille de
+ * retour en mangent près de deux cents en haut, le bandeau et les onglets deux
+ * cent cinquante en bas. Cadrer sur la hauteur entière fait passer la Bretagne
+ * sous la barre de recherche et la Corse sous le bandeau.
+ *
+ * MapLibre refuse une marge plus grande que son conteneur : sur un cadre court
+ * — un téléphone à l'horizontale, une fenêtre d'ordinateur réduite — les
+ * valeurs de la maquette dépasseraient. On les borne donc à un tiers de chaque
+ * côté.
+ *
+ * Partagée par les deux cartes : c'est la même maquette qu'elles cadrent, et
+ * la marge est ce qui fait qu'une région « remplit l'écran » ici comme là.
+ */
+export function margeDeCamera(largeur: number, hauteur: number) {
+  const borne = (valeur: number, taille: number) =>
+    Math.max(8, Math.min(valeur, Math.floor(taille / 3)));
+  return {
+    top: borne(196, hauteur),
+    bottom: borne(250, hauteur),
+    left: borne(TRANSITION.padding, largeur),
+    right: borne(TRANSITION.padding, largeur),
+  };
+}
+
 export const ETOILE_COULEURS = {
   3: colors.primary,
   2: colors.primaryLight,
@@ -497,16 +524,24 @@ export const ETOILE_COULEURS = {
  * disque assez large pour l'accueillir. La troisième reste un point — mille
  * deux cent soixante-neuf lieux à une étoile, tous porteurs d'un symbole,
  * feraient une carte illisible là où on cherche justement à voir clair.
+ *
+ * `marge` élargit la même échelle, pour l'anneau du lieu mis en avant. C'est un
+ * PARAMÈTRE et non une addition au résultat, et la nuance n'en est pas une :
+ * `["+", rayonDesPastilles(), 4]` enferme `["zoom"]` dans une addition, ce que
+ * le format de style interdit hors de l'entrée d'un `interpolate`. MapLibre
+ * refusait donc la couche, et il la refusait par un ÉVÉNEMENT plutôt que par
+ * une exception — l'anneau n'a jamais existé, sur aucune plateforme, et rien
+ * ne le disait.
  */
-export function rayonDesPastilles(): unknown[] {
+export function rayonDesPastilles(marge = 0): unknown[] {
   const parNote = (petit: number, moyen: number, grand: number) => [
     'match',
     ['get', 'tier'],
     1,
-    grand,
+    grand + marge,
     2,
-    moyen,
-    petit,
+    moyen + marge,
+    petit + marge,
   ];
   return [
     'interpolate',
@@ -562,19 +597,10 @@ export function tonsDesRegions(): unknown[] {
 }
 
 /**
- * L'opacité des aplats, survol compris.
- *
- * `["zoom"]` n'a le droit d'apparaître qu'en ENTRÉE d'un `interpolate` ou d'un
- * `step` de premier niveau. Glisser l'interpolation dans une branche de `case`
- * — pour traiter le survol — produit une couche que MapLibre refuse, et il la
- * refuse par un événement `error`, pas par une exception : la couche manque, et
- * rien ne le dit. Les aplats étaient absents, donc invisibles et inclicables.
- *
- * On inverse donc l'imbrication : l'interpolation reste au sommet, et c'est
- * chacune de ses sorties qui porte le cas du survol.
+ * L'opacité des aplats, survol compris. La version WEB — voir `echelleDesAplats`.
  */
 export function opaciteDesAplats(attenuation = 1): unknown[] {
-  const survol = (valeur: number) => [
+  return echelleDesAplats((valeur) => [
     'case',
     // La région ouverte d'abord : son voile tombe quel que soit le zoom.
     ['boolean', ['feature-state', 'ouverte'], false],
@@ -585,17 +611,79 @@ export function opaciteDesAplats(attenuation = 1): unknown[] {
     // vol. Les faire pâlir à l'arrêt donnerait un clignotement, et après
     // l'atterrissage un deuxième temps mort.
     valeur * attenuation,
-  ];
+  ]);
+}
+
+/**
+ * La même chose, sans `feature-state` : la version NATIVE.
+ *
+ * Les SDK MapLibre d'Android et d'iOS ne connaissent pas `feature-state` — il
+ * n'existe que dans la version web. La question qu'il servait à poser est
+ * pourtant la même : « cette région-ci est-elle celle qui est ouverte ? » Elle
+ * se pose alors directement dans l'expression, en comparant le code de chaque
+ * polygone à celui qu'on tient.
+ *
+ * Ce que ça coûte : réécrire la couche à chaque changement de région, là où le
+ * web ne changeait qu'un état. Ce que ça coûte VRAIMENT : rien. Dix-huit
+ * régions, un rendu React quand on en ouvre une — pas soixante par seconde.
+ *
+ * Il n'y a pas de survol : sur un écran tactile, un doigt qui ne touche pas
+ * n'est nulle part.
+ */
+export function opaciteDesAplatsNative(
+  ouverte: string | null,
+  attenuation = 1,
+): unknown[] {
+  return echelleDesAplats((valeur) =>
+    ouverte
+      ? [
+          'case',
+          ['==', ['get', 'code'], ouverte],
+          OPACITE_REGION_OUVERTE,
+          valeur * attenuation,
+        ]
+      : valeur * attenuation,
+  );
+}
+
+/**
+ * L'échelle d'opacité des aplats, du pays à la rue.
+ *
+ * `["zoom"]` n'a le droit d'apparaître qu'en ENTRÉE d'un `interpolate` ou d'un
+ * `step` de premier niveau. Glisser l'interpolation dans une branche de `case`
+ * — pour traiter le survol — produit une couche que MapLibre refuse, et il la
+ * refuse par un événement `error`, pas par une exception : la couche manque, et
+ * rien ne le dit. Les aplats étaient absents, donc invisibles et inclicables.
+ *
+ * On inverse donc l'imbrication : l'interpolation reste au sommet, et c'est
+ * chacune de ses sorties que `sortie` décore. Web et natif ne diffèrent que
+ * par cette décoration.
+ */
+function echelleDesAplats(sortie: (valeur: number) => unknown): unknown[] {
   const stops = REGION_FILL_OPACITY.slice(3) as number[];
-  const sortie: unknown[] = ['interpolate', ['linear'], ['zoom']];
+  const expression: unknown[] = ['interpolate', ['linear'], ['zoom']];
   for (let i = 0; i < stops.length; i += 2) {
-    sortie.push(stops[i], survol(stops[i + 1]));
+    expression.push(stops[i], sortie(stops[i + 1]));
   }
-  return sortie;
+  return expression;
 }
 
 /** L'opacité d'une pastille au repos : le niveau 3 s'efface un peu. */
 export const OPACITE_PLEINE = ['match', ['get', 'tier'], 3, 0.8, 1];
+
+/**
+ * L'opacité d'une pastille : pleine, ou en retrait derrière celle qu'on touche.
+ *
+ * Le niveau 3 s'efface un peu même au repos, et un lieu touché fait reculer les
+ * autres pour qu'on voie lequel on a pris. Disque, contour et symbole la
+ * partagent : ils ne font qu'un point à l'écran, et les traiter séparément
+ * laisserait un symbole flotter sans sa pastille.
+ */
+export function opaciteDesPastilles(misEnAvant?: string | null): unknown {
+  return misEnAvant
+    ? ['case', ['==', ['get', 'id'], misEnAvant], 1, 0.55]
+    : OPACITE_PLEINE;
+}
 
 /**
  * Le pas de la cascade, resserré quand il y a foule.

@@ -28,22 +28,23 @@ import {
   CLUSTER_RADIUS,
   FRANCE_BOUNDS,
   ATTENUATION_AUTRES,
-  OUT_OF_SCOPE_VEIL,
-  REGION_LINES,
   SEUIL_REGION,
-  ETOILE_COULEURS,
+  margeDeCamera,
+  opaciteDesPastilles,
   OPACITE_PLEINE,
   opaciteDesAplats,
   opaciteEnCascade,
-  opaciteDesTraits,
   pasDeCascade,
-  rayonDesPastilles,
-  tailleDesGlyphes,
-  tonsDesRegions,
   TRANSITION,
-  mapColors,
   resolveBasemap,
 } from './mapStyle';
+import {
+  SOURCE_DEPTS,
+  SOURCE_LIEUX,
+  SOURCE_REGIONS,
+  SOURCE_VOILE,
+  couchesDeLaCarte,
+} from './couches';
 import { poserLesGlyphes } from './glyphes';
 import { prepareMapLibre } from './maplibreSetup';
 
@@ -67,10 +68,6 @@ import { prepareMapLibre } from './maplibreSetup';
 
 export const mapAvailable = true;
 
-const SOURCE = 'places';
-const REGIONS_SRC = 'regions';
-const DEPTS_SRC = 'departements';
-const VOILE_SRC = 'voile';
 
 
 function toFeatureCollection(
@@ -104,29 +101,6 @@ function toFeatureCollection(
         rang: rangs[index],
       },
     })),
-  };
-}
-
-/**
- * La marge de caméra, ramenée au cadre réel.
- *
- * L'écran fait 844 points, mais la recherche, les filtres et la pastille de
- * retour en mangent près de deux cents en haut, le bandeau et les onglets deux
- * cent cinquante en bas. Cadrer sur la hauteur entière fait passer la Bretagne
- * sous la barre de recherche et la Corse sous le bandeau.
- *
- * MapLibre refuse une marge plus grande que son conteneur : sur un cadre court
- * — un écran d'ordinateur en paysage, une fenêtre réduite — les valeurs de la
- * maquette dépasseraient. On les borne donc à un tiers de chaque côté.
- */
-export function margeDeCamera(largeur: number, hauteur: number) {
-  const borne = (valeur: number, taille: number) =>
-    Math.max(8, Math.min(valeur, Math.floor(taille / 3)));
-  return {
-    top: borne(196, hauteur),
-    bottom: borne(250, hauteur),
-    left: borne(TRANSITION.padding, largeur),
-    right: borne(TRANSITION.padding, largeur),
   };
 }
 
@@ -261,10 +235,7 @@ export function MapCanvas({
 
   /** L'opacité des pastilles hors animation : pleine, ou en retrait. */
   const opaciteAuRepos = React.useCallback(
-    () =>
-      (misEnAvant.current
-        ? ['case', ['==', ['get', 'id'], misEnAvant.current], 1, 0.55]
-        : OPACITE_PLEINE) as never,
+    () => opaciteDesPastilles(misEnAvant.current) as never,
     [],
   );
 
@@ -355,229 +326,53 @@ export function MapCanvas({
       instance.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
       instance.on('load', () => {
-        const contoursRegions = outlinesFor('region');
-        const contoursDepts = outlinesFor('departement');
+        const contours: Record<string, unknown> = {
+          [SOURCE_VOILE]: voile(),
+          [SOURCE_REGIONS]: outlinesFor('region'),
+          [SOURCE_DEPTS]: outlinesFor('departement'),
+          [SOURCE_LIEUX]: { type: 'FeatureCollection', features: [] },
+        };
 
-        // ── 1. Le voile hors-France ──────────────────────────────────────
-        // Le monde percé de la France. En dérivant vers l'Atlantique ou
-        // l'océan Indien, des trous nets apparaissent dans le sable : c'est
-        // ainsi qu'on découvre la Guadeloupe et Mayotte.
-        instance.addSource(VOILE_SRC, { type: 'geojson', data: voile() });
-        instance.addLayer({
-          id: 'voile',
-          type: 'fill',
-          source: VOILE_SRC,
-          paint: {
-            'fill-color': OUT_OF_SCOPE_VEIL.color,
-            'fill-opacity': opaciteDesTraits(OUT_OF_SCOPE_VEIL.opacity) as never,
-          },
-        });
-
-        if (contoursRegions) {
-          instance.addSource(REGIONS_SRC, {
+        for (const [id, data] of Object.entries(contours)) {
+          if (!data) continue;
+          instance.addSource(id, {
             type: 'geojson',
-            data: contoursRegions,
+            data: data as never,
             // Le survol passe par `feature-state`, qui a besoin d'un
-            // identifiant : sans lui, MapLibre n'a rien à quoi accrocher l'état.
-            promoteId: 'code',
-          });
-
-          // ── 2. L'ombre des régions ─────────────────────────────────────
-          // MapLibre ne sait faire ni ombre portée, ni filtre, ni mode de
-          // fusion sur un polygone. Une seconde couche de contour, large,
-          // translucide et décalée est le seul moyen — et il suffit.
-          instance.addLayer({
-            id: 'region-ombre',
-            type: 'line',
-            source: REGIONS_SRC,
-            paint: {
-              'line-color': REGION_LINES.shadow,
-              'line-width': REGION_LINES.shadowWidth,
-              'line-opacity': opaciteDesTraits(REGION_LINES.shadowOpacity) as never,
-              'line-translate': REGION_LINES.shadowOffset,
-            },
-          });
-
-          // ── 3. Les aplats ──────────────────────────────────────────────
-          // C'est ici que tient toute l'identité : l'opacité suit le zoom.
-          instance.addLayer({
-            id: 'region-aplat',
-            type: 'fill',
-            source: REGIONS_SRC,
-            paint: {
-              'fill-color': [
-                'case',
-                ['boolean', ['feature-state', 'hover'], false],
-                REGION_LINES.hover,
-                tonsDesRegions(),
-              ] as never,
-              'fill-opacity': opaciteDesAplats() as never,
-            },
-          });
-
-          // ── 4. Les coutures entre régions ──────────────────────────────
-          instance.addLayer({
-            id: 'region-couture',
-            type: 'line',
-            source: REGIONS_SRC,
-            paint: {
-              'line-color': REGION_LINES.seam,
-              'line-width': REGION_LINES.seamWidth,
-              'line-opacity': opaciteDesTraits() as never,
-            },
+            // identifiant : sans lui, MapLibre n'a rien à quoi accrocher
+            // l'état. Les lieux, eux, portent le leur dans la donnée.
+            ...(id === SOURCE_REGIONS || id === SOURCE_DEPTS
+              ? { promoteId: 'code' }
+              : {}),
+            // Le regroupement est désactivé (CLUSTER_MAX_ZOOM = 0) : on
+            // n'affiche aucun lieu à l'échelle du pays, donc il n'y a plus
+            // rien à regrouper. La source garde ses réglages pour que le
+            // rétablir soit une valeur à changer, pas une refonte.
+            ...(id === SOURCE_LIEUX
+              ? {
+                  cluster: CLUSTER_MAX_ZOOM > 0,
+                  clusterRadius: CLUSTER_RADIUS,
+                  clusterMaxZoom: CLUSTER_MAX_ZOOM,
+                }
+              : {}),
           });
         }
 
-        // ── 5. Les coutures de départements ──────────────────────────────
-        // Elles ne sont pas un étage de navigation : un deuxième clic
-        // obligatoire ajouterait un palier avant de voir un lieu. Elles ne
-        // servent que de repère DANS une région ouverte — « du côté du Gard ».
-        if (contoursDepts) {
-          instance.addSource(DEPTS_SRC, {
-            type: 'geojson',
-            data: contoursDepts,
-            promoteId: 'code',
-          });
-          instance.addLayer({
-            id: 'departement-couture',
-            type: 'line',
-            source: DEPTS_SRC,
-            filter: ['in', ['get', 'code'], ['literal', []]],
-            paint: {
-              'line-color': REGION_LINES.shadow,
-              'line-opacity': opaciteDesTraits(0.5) as never,
-              'line-width': 1.1,
-              'line-dasharray': [4, 4],
-            },
-          });
-        }
-
-        // ── 6. Le contour de la région ouverte ───────────────────────────
-        if (contoursRegions) {
-          instance.addLayer({
-            id: 'region-choisie',
-            type: 'line',
-            source: REGIONS_SRC,
-            filter: ['==', ['get', 'code'], '__aucune__'],
-            paint: {
-              'line-color': REGION_LINES.chosen,
-              'line-width': REGION_LINES.chosenWidth,
-              'line-opacity': opaciteDesTraits() as never,
-            },
-          });
-        }
-
-        // ── 7. Les lieux ─────────────────────────────────────────────────
-        instance.addSource(SOURCE, {
-          type: 'geojson',
-          data: { type: 'FeatureCollection', features: [] },
-          // Le regroupement est désactivé (CLUSTER_MAX_ZOOM = 0) : on n'affiche
-          // aucun lieu à l'échelle du pays, donc il n'y a plus rien à
-          // regrouper. La source garde ses réglages pour que le rétablir soit
-          // une valeur à changer, pas une refonte.
-          cluster: CLUSTER_MAX_ZOOM > 0,
-          clusterRadius: CLUSTER_RADIUS,
-          clusterMaxZoom: CLUSTER_MAX_ZOOM,
-        });
-
-        // Un niveau, une couleur, une taille — repris partout : carte, listes,
-        // badges. Aucun chiffre, aucun regroupement.
-        // Le disque porte la NOTE, par sa couleur et sa taille ; le symbole
-        // posé dessus porte la CATÉGORIE. Deux choses à dire, deux moyens de
-        // les dire — au lieu d'une taille de rond qui devait tout faire.
-        instance.addLayer({
-          id: 'place',
-          type: 'circle',
-          source: SOURCE,
-          paint: {
-            'circle-color': [
-              'match',
-              ['get', 'tier'],
-              1,
-              ETOILE_COULEURS[3],
-              2,
-              ETOILE_COULEURS[2],
-              ETOILE_COULEURS[1],
-            ] as never,
-            'circle-opacity': OPACITE_PLEINE as never,
-            'circle-radius': rayonDesPastilles() as never,
-            // Un lieu validé change de CONTOUR, pas de remplissage. Le repeindre
-            // en vert ajoutait une quatrième couleur à une carte qui en portait
-            // déjà trois, et faisait perdre au passage ce que le lieu vaut.
-            'circle-stroke-width': [
-              'case',
-              ['==', ['get', 'visited'], 1],
-              2.6,
-              ['<=', ['get', 'tier'], 2],
-              1.6,
-              0,
-            ] as never,
-            'circle-stroke-color': [
-              'case',
-              ['==', ['get', 'visited'], 1],
-              mapColors.visited,
-              mapColors.halo,
-            ] as never,
-          },
-        });
-
-        // Le lieu mis en avant : un ANNEAU autour de sa pastille, pas un
-        // disque par-dessus. Un disque plein recouvrait le symbole du thème —
-        // toucher un lieu trois étoiles lui faisait perdre son icône au moment
-        // précis où on le regardait.
-        instance.addLayer({
-          id: 'place-highlight',
-          type: 'circle',
-          source: SOURCE,
-          filter: ['==', ['get', 'id'], '__none__'],
-          paint: {
-            'circle-opacity': 0,
-            'circle-radius': ['+', rayonDesPastilles(), 4] as never,
-            'circle-stroke-width': 2.4,
-            'circle-stroke-color': colors.primary,
-          },
-        });
-
-        // Le symbole du thème, en clair sur le disque. Seules les deux
-        // premières notes en portent un : mille deux cent soixante-neuf lieux à
-        // une étoile, tous surmontés d'un symbole, feraient une carte illisible.
+        // Les vingt-trois symboles de thèmes, dessinés sur un canevas. Posés
+        // AVANT les couches : une couche de symboles dont l'image manque ne
+        // dessine rien, et ne le dit pas.
         poserLesGlyphes(instance, colors.bg);
-        instance.addLayer({
-          id: 'place-glyphe',
-          type: 'symbol',
-          source: SOURCE,
-          filter: ['==', ['get', 'tier'], 1],
-          layout: {
-            'icon-image': ['concat', 'theme-', ['get', 'themeId']],
-            'icon-size': tailleDesGlyphes(),
-            // Jamais masqué par collision : deux lieux voisins doivent tous
-            // deux garder leur pastille, sinon la carte ment sur ce qu'il y a.
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': true,
-          } as never,
-        });
 
-        // ── Les noms de départements ─────────────────────────────────────
-        // Un repère, pas une couche d'information : MapLibre en masque
-        // lui-même la plupart par collision, et c'est très bien ainsi.
-        if (contoursDepts && instance.getStyle()?.glyphs) {
-          instance.addLayer({
-            id: 'departement-nom',
-            type: 'symbol',
-            source: DEPTS_SRC,
-            filter: ['in', ['get', 'code'], ['literal', []]],
-            layout: {
-              'text-field': ['get', 'nom'],
-              'text-font': ['Noto Sans Regular'],
-              'text-size': 13,
-            },
-            paint: {
-              'text-color': '#5A4A38',
-              'text-opacity': 0.85,
-              'text-halo-color': mapColors.labelHalo,
-              'text-halo-width': 1.4,
-            },
-          });
+        // Les couches viennent de la table partagée avec la carte native :
+        // voir `couches.ts`. Elles étaient écrites deux fois, et les deux
+        // copies avaient déjà divergé en silence — l'anneau du lieu qu'on
+        // touche n'existait sur aucune des deux plateformes.
+        for (const couche of couchesDeLaCarte({
+          natif: false,
+          avecPolices: Boolean(instance.getStyle()?.glyphs),
+        })) {
+          if (!contours[couche.source]) continue;
+          instance.addLayer(couche as never);
         }
 
         // ── Gestes ───────────────────────────────────────────────────────
@@ -754,7 +549,7 @@ export function MapCanvas({
   useEffect(() => {
     const instance = map.current;
     if (!ready || !instance) return;
-    const source = instance.getSource(SOURCE) as GeoJSONSource | undefined;
+    const source = instance.getSource(SOURCE_LIEUX) as GeoJSONSource | undefined;
     if (!source) return;
 
     const changementDeRegion = ouverte !== regionPrecedente.current;
@@ -825,10 +620,10 @@ export function MapCanvas({
     // Le voile de la région ouverte tombe à 0,14 : c'est là que la vraie carte
     // apparaît. On repasse sur les dix-huit — c'est dix-huit, pas dix-huit
     // mille, et cela évite d'avoir à retenir laquelle était marquée.
-    if (instance.getSource(REGIONS_SRC)) {
+    if (instance.getSource(SOURCE_REGIONS)) {
       for (const code of REGIONS.keys()) {
         instance.setFeatureState(
-          { source: REGIONS_SRC, id: code },
+          { source: SOURCE_REGIONS, id: code },
           { ouverte: code === ouverte },
         );
       }
@@ -1043,8 +838,8 @@ function opacifier(instance: MapLibreMap, expression: never) {
 
 /** Le survol d'une région, par `feature-state`. */
 function poserSurvol(instance: MapLibreMap, code: string | null, actif: boolean) {
-  if (!code || !instance.getSource(REGIONS_SRC)) return;
-  instance.setFeatureState({ source: REGIONS_SRC, id: code }, { hover: actif });
+  if (!code || !instance.getSource(SOURCE_REGIONS)) return;
+  instance.setFeatureState({ source: SOURCE_REGIONS, id: code }, { hover: actif });
 }
 
 /**

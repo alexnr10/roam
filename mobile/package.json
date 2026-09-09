@@ -8,6 +8,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "glyphes": "node scripts/build-glyphes.mjs",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "export:web": "node scripts/sync-maplibre-worker.mjs && EXPO_OFFLINE=1 expo export --platform web --output-dir dist",
@@ -15,6 +16,7 @@
     "postinstall": "node scripts/sync-maplibre-worker.mjs"
   },
   "dependencies": {
+    "@maplibre/maplibre-react-native": "^11.3.10",
     "@react-native-async-storage/async-storage": "^3.1.1",
     "expo": "~57.0.15",
     "expo-constants": "~57.0.13",
@@ -28,7 +30,6 @@
     "react-dom": "^19.2.3",
     "react-native": "0.86.2",
     "react-native-gesture-handler": "~3.2.1",
-    "react-native-maps": "1.29.0",
     "react-native-safe-area-context": "~5.9.1",
     "react-native-screens": "~4.27.0",
     "react-native-svg": "^15.15.4",

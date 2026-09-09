@@ -1,47 +1,18 @@
 import type { Coordinates, Place } from '../types';
 
 /**
- * Ce que la carte montre, et dans quel ordre.
+ * L'ordre du bandeau sous la carte.
  *
  * L'application est d'abord un guide : on y cherche quoi faire autour de soi
- * ou sur la route d'un voyage. La carte n'est donc pas un décor, c'est l'écran
- * principal — et deux mille points ne s'y jettent pas tels quels.
+ * ou sur la route d'un voyage. Le bandeau répond à cette question en photos,
+ * et l'ordre où il les pose EST la réponse.
  *
- * Deux contraintes, l'une technique et l'autre humaine :
- *
- * 1. **Le cadre d'abord.** Un point hors de l'écran ne coûte rien à personne
- *    s'il n'est pas dessiné. Sur mobile natif, chaque marqueur est un
- *    composant : deux mille marqueurs pour vingt visibles, c'est la carte qui
- *    rame.
- * 2. **Le meilleur d'abord.** Quand le cadre en contient trop, on garde les
- *    mieux classés. Un guide qui montre tout ne recommande rien : à l'échelle
- *    d'une région, on veut les incontournables, pas les deux cents lieux qui
- *    se chevauchent.
+ * Il y avait ici, jusqu'à la carte native, un plafond de marqueurs : chacun
+ * était un composant React, et deux mille composants pour vingt points
+ * visibles faisaient ramer la carte. Les deux cartes dessinent maintenant
+ * leurs lieux dans une couche MapLibre, sur le processeur graphique — le
+ * plafond n'avait plus rien à plafonner.
  */
-
-export type Cadre = { ouest: number; sud: number; est: number; nord: number };
-
-export function dansLeCadre(place: Place, cadre: Cadre): boolean {
-  return (
-    place.lat >= cadre.sud &&
-    place.lat <= cadre.nord &&
-    place.lon >= cadre.ouest &&
-    place.lon <= cadre.est
-  );
-}
-
-/**
- * Les lieux à dessiner : ceux du cadre, les mieux classés d'abord, plafonnés.
- *
- * Le plafond ne s'applique qu'au DESSIN. La recherche, elle, continue de voir
- * tout le catalogue : ne pas trouver Étretat parce qu'on regarde les Alpes
- * serait absurde.
- */
-export function aDessiner(places: Place[], cadre: Cadre | null, plafond: number): Place[] {
-  const dedans = cadre ? places.filter((place) => dansLeCadre(place, cadre)) : places;
-  if (dedans.length <= plafond) return dedans;
-  return [...dedans].sort((a, b) => b.score - a.score).slice(0, plafond);
-}
 
 /** Distance en mètres entre deux points, par la formule de haversine. */
 function metres(a: Coordinates, lat: number, lon: number): number {
