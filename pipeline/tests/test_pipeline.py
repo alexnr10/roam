@@ -62,6 +62,7 @@ from roam_pipeline.models import (
     Collection, CollectionPlace, Place, display_name, slugify,
 )
 from roam_pipeline import fetch as fetch_module
+from roam_pipeline import alerts as alerts_module
 from roam_pipeline import collections as collections_module
 from roam_pipeline import localisation
 from roam_pipeline import outlines
@@ -6148,6 +6149,69 @@ class TestOutOfCountryIsNotAsked(unittest.TestCase):
                 [loin], address_client=_Interdit(), localisateur=self.loc)
         self.assertEqual(situes, 0)
         self.assertIsNone(loin.departement_code)
+
+
+class TestReplacements(unittest.TestCase):
+    """Un lieu fermé, et ce qu'on visite à sa place.
+
+    La grotte de Lascaux est au catalogue et ne se visite pas ; ce qu'on visite
+    est Lascaux IV, qui n'était collecté sous aucun nom. Chauvet, elle, avait
+    son fac-similé. Rien ne signalait la différence — un lieu fermé et un lieu
+    fermé-mais-doublé se ressemblent trait pour trait dans les données.
+    """
+
+    @staticmethod
+    def _lieu(nom, qid, visitable, lat=44.35, lon=1.17):
+        return make_place(nom, theme="grottes", wikidata_id=qid,
+                          visitable=visitable, lat=lat, lon=lon)
+
+    def test_the_replica_is_found_by_the_shared_name(self):
+        grotte = self._lieu("Grotte Chauvet", "Q374096", False)
+        facsimile = self._lieu("Grotte Chauvet 2 - Ardèche", "Q19951965", True, lat=44.37)
+        trouves = alerts_module.remplacants([grotte, facsimile])
+        self.assertEqual(trouves["Q374096"].wikidata_id, "Q19951965")
+
+    def test_a_closed_place_without_one_is_named_as_such(self):
+        # LE cas de Lascaux : fermé, au catalogue, et rien ne le remplace.
+        lascaux = self._lieu("Grotte de Lascaux", "Q172125", False)
+        trouves = alerts_module.remplacants([lascaux])
+        self.assertNotIn("Q172125", trouves)
+        alertes = alerts_module.alerts_for(lascaux, CONFIG, trouves)
+        self.assertTrue(any("rien ne le remplace" in a for a in alertes))
+
+    def test_the_alert_names_the_replacement_when_there_is_one(self):
+        grotte = self._lieu("Grotte Chauvet", "Q374096", False)
+        facsimile = self._lieu("Grotte Chauvet 2 - Ardèche", "Q19951965", True, lat=44.37)
+        trouves = alerts_module.remplacants([grotte, facsimile])
+        alertes = alerts_module.alerts_for(grotte, CONFIG, trouves)
+        self.assertTrue(any("Grotte Chauvet 2" in a for a in alertes))
+
+    def test_a_short_name_is_never_a_prefix(self):
+        # La commune d'« Eu » a déjà servi de sous-chaîne à la moitié de la
+        # France, sur une recherche par nom. Le garde-fou est écrit pour que
+        # l'erreur ne se refasse pas.
+        eu = make_place("Eu", theme="villages", wikidata_id="Q211593", visitable=False)
+        autre = make_place("Europe-Park", theme="villages", wikidata_id="Q2", visitable=True)
+        self.assertEqual(alerts_module.remplacants([eu, autre]), {})
+
+    def test_a_prefix_must_end_on_a_word(self):
+        # « grotte chauvet » ouvre sur « grotte chauvet 2 », pas sur
+        # « grotte chauveterie ».
+        ferme = self._lieu("Grotte Chauvet", "Q1", False)
+        piege = self._lieu("Grotte Chauveterie", "Q2", True)
+        self.assertEqual(alerts_module.remplacants([ferme, piege]), {})
+
+    def test_a_replica_too_far_away_is_not_one(self):
+        ferme = self._lieu("Grotte Chauvet", "Q1", False, lat=44.35)
+        loin = self._lieu("Grotte Chauvet 2", "Q2", True, lat=48.0)
+        self.assertEqual(alerts_module.remplacants([ferme, loin]), {})
+
+    def test_without_the_table_the_old_wording_stands(self):
+        # `alerts_for` sert aussi là où la collection entière n'est pas sous la
+        # main. Accuser un lieu de n'avoir pas de remplaçant sans avoir cherché
+        # serait pire que se taire.
+        ferme = self._lieu("Grotte de Lascaux", "Q172125", False)
+        self.assertIn("accès privé ou interdit", alerts_module.alerts_for(ferme, CONFIG))
 
 
 class TestCountryPartition(unittest.TestCase):

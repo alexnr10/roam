@@ -10,7 +10,7 @@ from pathlib import Path
 
 from .config import Config
 from .geo import country_area, departements, regions
-from .alerts import alerts_for
+from .alerts import alerts_for, remplacants
 from .score import score_breakdown
 from .models import Collection, Place
 from .review import name_hints, theme_from_name
@@ -585,6 +585,9 @@ def write_review_html(
     # le catalogue entier, et un thème déjà revu y laisserait des trous que le
     # filtre « à décider » rend béants — c'est ainsi que trois petits thèmes
     # défilaient en boucle avant le premier château.
+    # Calculé UNE fois : la recherche d'un remplaçant parcourt la collection,
+    # et la refaire par lieu coûterait deux mille parcours.
+    doubles = remplacants(places)
     rows = []
     for place in sorted(
         places,
@@ -640,7 +643,7 @@ def write_review_html(
                 "collections": len(membership.get(place.wikidata_id, [])),
                 "wikipedia": place.wikipedia_url or "",
                 "image": _thumbnail(place.image_url),
-                "alerts": alerts_for(place, config),
+                "alerts": alerts_for(place, config, doubles),
                 "visitable": place.visitable,
                 "hours": place.opening_hours,
                 "source": place.source,
