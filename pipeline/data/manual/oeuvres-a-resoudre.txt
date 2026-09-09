@@ -201,6 +201,45 @@
 # dans data/raw, qui est l'état d'avant les filtres.
 #
 #
+# ── 5. LES ÉTOILES ── TRAITÉ ─────────────────────────────────────────────
+#
+# La liste était épinglée, mais mal notée : huit de ces lieux valaient une
+# étoile, c'est-à-dire « hors de sa collection nationale » ou « tout en bas ».
+#
+# La cause est le `promote` lui-même. Sur un lieu hors collection, il sert
+# d'abord à le faire ENTRER, et son cran de montée y passe : les six premiers
+# entraient donc derniers de leur collection, aux rangs 62 à 64 sur 64. C'est
+# exactement ce que `promote2` a été écrit pour dire — entrer ET monter.
+#
+# Passés en `promote2` : les Deux Plateaux, la Vallée des Saints, les Machines
+# de l'île, Oradour, le Camp des Milles, la Caverne du Dragon, l'Axe Majeur et
+# le Familistère. Tous à deux étoiles, aux rangs 36 à 41.
+#
+# Mesuré avant d'être écrit, sur le catalogue entier : AUCUNE descente, aucun
+# lieu perdu, 2 079 lieux avant comme après. Une promotion double ne consomme
+# pas de place dans son niveau — c'est `sans_deplacement`, et c'est ce qui
+# distingue ce geste d'un épinglage, qui, lui, coûte son siège à quelqu'un.
+#
+# ⚠ DEUX EXCEPTIONS, et le piège vaut d'être écrit noir sur blanc.
+#
+# Lewarde et La Tourette RESTENT en `keep`. Les passer en `promote2` les
+# supprime du catalogue — vérifié, ils disparaissent de places.json. La raison
+# est dans `review.py` : seul `keep` pose `pinned`, et c'est `pinned` qui les
+# sauve, l'un du plancher de notoriété (4 langues pour un plancher à 12),
+# l'autre du filtre d'accès (OSM dit le couvent fermé). Un `promote2` marque
+# le lieu comme relu, pas comme épinglé — et la décision est documentée et
+# mesurée : ajouter `pinned` aux déplacements ferait entrer onze lieux sous le
+# plancher et coûterait leur place à trois musées explicitement gardés.
+#
+# Les huit autres ne risquaient rien parce qu'ils sont dans `places.csv`, qui
+# pose `pinned` avant que le verdict ne parle. La règle à retenir : un lieu
+# qui ne tient au catalogue QUE par son verdict `keep` ne doit pas changer de
+# verdict. S'il faut le monter, il faut d'abord l'épingler.
+#
+# Restent donc à une étoile, et c'est assumé : Lewarde et La Tourette (voir
+# ci-dessus), la Cité radieuse et la Grande Arche (`demote` du curateur).
+#
+#
 # ── ⚠ LA PHOTO : la moitié de cette liste arrivera sans image ─────────────
 #
 # Une photo vient de la propriété P18 de Wikidata, et P18 pointe sur
@@ -228,6 +267,21 @@
 #                    †1991), colonnes de Buren, Machines de l'île, Vallée
 #                    des Saints, Ronchamp / Cité radieuse / La Tourette
 #                    (Le Corbusier, †1965 — libre en 2036), Grande Arche.
+#
+# ⚠ CETTE PRÉDICTION EST LARGEMENT FAUSSE, et le catalogue construit le dit :
+# sur les huit « douteuses », SIX ont une photo — l'Axe Majeur, les colonnes
+# de Buren, les Machines de l'île, la Vallée des Saints, Ronchamp et la Grande
+# Arche. Deux seulement en manquent : la Cité radieuse et La Tourette.
+#
+# Le raisonnement juridique n'était pas faux, il était trop confiant. Commons
+# héberge en pratique des vues d'ensemble, des photos antérieures, des clichés
+# où l'œuvre n'est pas le sujet principal, et des versements faits par les
+# ayants droit eux-mêmes. La liberté de panorama dit ce qui est GARANTI, pas
+# ce qui existe.
+#
+# La leçon est de méthode, et c'est la deuxième fois qu'elle se paie sur ce
+# fichier : une prédiction se vérifie sur le catalogue construit avant d'être
+# écrite comme un fait. Ici, `place.imageUrl` de catalog.json suffisait.
 #
 # `photos.csv` ne sauve pas ces cas : il choisit un fichier SUR Commons, et
 # le problème est qu'il n'y en a pas. Le vrai remède est une photo prise par
