@@ -71,7 +71,7 @@ from roam_pipeline.geocode import AddressClient, CommuneClient, departement_from
 from roam_pipeline.cli import (
     _known_qids, _pending_terms, _probe_verdict, census, cmd_pin, cmd_retention,
     cmd_verdict,
-    empty_themes, pays_demande,
+    empty_themes, manquants_distincts, pays_demande,
 )
 from roam_pipeline.wikipedia import title_from_url
 from roam_pipeline.discover import (
@@ -5838,6 +5838,37 @@ class TestVerdict(unittest.TestCase):
             with self.subTest(verdict):
                 _code, _t, decisions, _csv = self._run(brut, "Q1", decision=verdict)
                 self.assertEqual(decisions["Q1"][0], verdict)
+
+
+class TestGapTotalCountsPlaces(unittest.TestCase):
+    """Le total de `gaps` compte des lieux, pas des lignes."""
+
+    @staticmethod
+    def _ligne(item, classe):
+        return {"item": f"http://www.wikidata.org/entity/{item}",
+                "class": f"http://www.wikidata.org/entity/{classe}"}
+
+    def test_a_place_with_four_classes_is_counted_once(self):
+        # LE défaut : la basilique Santa Maria Novella est « basilique
+        # mineure », « musée », « musée d'un organisme public » ET « musée
+        # religieux ». Sommer les colonnes la comptait quatre fois, et
+        # l'exagération porte précisément sur le patrimoine — c'est-à-dire là
+        # où on lit le tableau pour décider.
+        rows = [self._ligne("Q51175", c)
+                for c in ("Q120560", "Q33506", "Q124830213", "Q92755865")]
+        self.assertEqual(manquants_distincts(rows, set()), 1)
+
+    def test_places_already_known_do_not_count(self):
+        rows = [self._ligne("Q1", "Q10"), self._ligne("Q2", "Q10")]
+        self.assertEqual(manquants_distincts(rows, {"Q1"}), 1)
+
+    def test_distinct_places_across_classes_all_count(self):
+        rows = [self._ligne("Q1", "Q10"), self._ligne("Q2", "Q11"),
+                self._ligne("Q3", "Q10")]
+        self.assertEqual(manquants_distincts(rows, set()), 3)
+
+    def test_a_row_without_an_entity_is_ignored(self):
+        self.assertEqual(manquants_distincts([{"class": "x"}, {}], set()), 0)
 
 
 class TestCountryParameter(unittest.TestCase):

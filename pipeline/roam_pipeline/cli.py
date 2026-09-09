@@ -1820,6 +1820,29 @@ def cmd_check_lists(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def manquants_distincts(rows, known: set[str]) -> int:
+    """Combien de LIEUX distincts manquent, et non combien de lignes.
+
+    Le total affiché sommait les colonnes « absents » de chaque classe. Or une
+    entité porte plusieurs classes — la basilique Santa Maria Novella est à
+    elle seule « basilique mineure », « musée », « musée d'un organisme
+    public » et « musée religieux » — et se comptait donc quatre fois.
+
+    Sur l'Italie, la somme annonçait 24 065 lieux notoires non collectés là où
+    le nombre de lieux est nettement moindre, et l'écart n'est pas uniforme :
+    il est faible sur les communes, énorme sur le patrimoine, c'est-à-dire
+    précisément là où on lit le tableau pour décider. Un total qui exagère le
+    vivier d'un pays fait surestimer ce qu'il rapporterait.
+
+    Les comptes PAR CLASSE, eux, restent justes : chacun répond à « combien de
+    membres de cette classe nous manquent », et le doublon y a un sens.
+    """
+    return len({
+        qid for qid in (wd.qid_from_uri(row.get("item")) for row in rows)
+        if qid and qid not in known
+    })
+
+
 def census(rows, counts: dict[str, int], known: set[str], owned: set[str]) -> list[dict]:
     """Regroupe par classe les lieux notoires que le catalogue n'a pas.
 
@@ -2052,8 +2075,11 @@ def cmd_gaps(args: argparse.Namespace, config: Config) -> int:
     for entry in classes:
         entry["label"] = labels.get(entry["qid"], entry["qid"])
 
+    lignes = sum(c["manquants"] for c in classes)
+    distincts = manquants_distincts(rows, known)
     print(f"\n{len(known)} lieux au catalogue · "
-          f"{sum(c['manquants'] for c in classes)} lieux notoires non collectés.\n")
+          f"{distincts} LIEUX notoires non collectés "
+          f"({lignes} lignes : une entité porte plusieurs classes).\n")
     print(f"  {'classe':<38} {'absents':>8} {'sur':>6}   exemples")
     for entry in classes[: args.limit]:
         marque = "·" if entry["collectee"] else "✗"

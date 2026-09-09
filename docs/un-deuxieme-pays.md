@@ -231,16 +231,56 @@ contrainte qui mord : ce sont les plafonds.
 À moyenne égale, 107 × 20,6 ≈ **2 200**. L'Italie étant mieux documentée, la
 médiane monte et les repêchages diminuent : d'où le centre à 2 500.
 
-### L'offre italienne est le double, et ça ne change pas le compte
+### L'offre italienne est COMPARABLE à la française, pas double
 
-    lieux à ≥12 langues, collecte française          1 306
-    lieux à ≥12 langues, vivier italien réel        ~2 575
+    ⚠ Le total de `gaps` sommait les colonnes « absents » de chaque classe.
+    Une entité porte plusieurs classes — la basilique Santa Maria Novella est
+    à elle seule « basilique mineure », « musée », « musée d'un organisme
+    public » et « musée religieux » — et se comptait donc quatre fois. La
+    première lecture, « le double de l'offre française », était fausse pour
+    cette raison. Le total compte désormais des LIEUX distincts.
 
-Le double. Mais l'offre excédentaire est absorbée par les plafonds : elle
-change la QUALITÉ du catalogue, pas sa taille. Et les étoiles se
-normalisent d'elles-mêmes — les niveaux sont proportionnels à leur
-collection, pas absolus — ce qui est exactement l'effet recherché : trois
-étoiles en Italie voudront dire « le haut de l'Italie », comme en France.
+    L'écart n'est pas uniforme, et c'est ce qui le rend traître : nul sur les
+    communes, qui ne déclarent qu'une classe ; maximal sur le patrimoine,
+    c'est-à-dire précisément là où on lit le tableau pour décider.
+
+Recensement italien à six langues : 24 065 lignes, dont
+
+    communes, frazioni, établissements humains,
+    anciennes communes et municipalités                    15 204
+    gares, haltes, métros, fleuves, batailles               1 658
+                                                          ──────
+                                                           16 862   (70 %)
+
+Restent ~7 200 lignes de patrimoine, fortement redondantes. Le vivier
+DISTINCT est de l'ordre de 3 000 à 4 000, contre **3 144 lieux à six langues
+dans la collecte française**. Comparable, donc — pas double.
+
+Cela ne déplace pas l'estimation, et c'est le point : la taille d'un
+catalogue est fixée par les plafonds et la grille administrative, pas par
+l'offre. Les étoiles, elles, se normalisent d'elles-mêmes — les niveaux sont
+proportionnels à leur collection, pas absolus — ce qui est exactement l'effet
+recherché : trois étoiles en Italie voudront dire « le haut de l'Italie ».
+
+### Ce que le recensement à six langues a montré de plus
+
+**Les églises passent de 246 à 952.** L'angle mort ne s'élargit pas
+linéairement : c'est la classe qui grossit le plus vite quand le plancher
+descend, et c'est bien celle qui décide du catalogue italien.
+
+**La piazza est un thème que la France n'a pas.** `place (Q174782)`, 112
+absents — Piazza Santa Trinita, Piazza San Sepolcro. En France une place est
+un carrefour ; en Italie c'est une destination, et le catalogue n'a aucun
+thème pour la recevoir. À trancher au moment d'écrire `config/it/`.
+
+**`palazzo` (Q2651004), 189, reste indécis.** Le palais Carignan est bien
+collecté, mais il déclare AUSSI « palais urbain » et « palais muséal », qui
+mènent à `palais` (Q16560) — sa route ne prouve donc rien sur `palazzo`. Un
+palazzo qui ne déclarerait que cette classe serait-il vu ? À vérifier par
+`probe` sur un palazzo de la liste avant de conclure.
+
+**Deux classes utiles apparaissent, déjà collectées** : `château fort` (131)
+et `lac` (106). Elles n'étaient pas visibles à douze langues.
 
 ### Trois décisions déplaceraient le chiffre, et elles ne sont pas prises
 
