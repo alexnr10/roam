@@ -97,9 +97,11 @@ Q111207734,3,cascades,Cascades de Caraoucou
 Q1113596,3,megalithes,Combe-Capelle
 Q111974626,2,gorges,Gorges de Baudinard
 Q1120837,1,dunes-marais,Étang d'Urbino
+Q112242217,2,musees,Cosquer Méditerranée
 Q1122731,2,chateaux,Château du Clos Lucé
 Q1125842,3,chateaux,Château de la Verrerie
 Q112659724,2,cascades,Cascade de la Vis
+Q112911610,3,musees,Lascaux IV
 Q113389,2,chateaux,Château d'Azay-le-Rideau
 Q1137826,3,abbayes,Abbaye de Beaulieu-en-Rouergue
 Q1137837,3,sommets,Montagne de Céüse
@@ -724,7 +726,7 @@ Q22998303,3,maisons,Maison du Docteur Gachet
 Q23013104,3,plages,Plage de Sainte-Marguerite
 Q2302755,1,forets,Forêt de Compiègne
 Q2315399,3,abbayes,Abbaye de Saint-Antoine-l'Abbaye
-Q2317145,2,maisons,Musée Renoir
+Q2317145,3,maisons,Musée Renoir
 Q231720,3,villages,Honfleur
 Q2321630,2,sommets,Chamechaude
 Q2321914,3,chateaux,Château de Courances
@@ -937,6 +939,7 @@ Q2881810,2,jardins,Bambouseraie en Cévennes
 Q2882838,2,volcans,Banne d'Ordanche
 Q2886510,2,phares,Phare de Berck
 Q2887024,3,cathedrales,Basilique Saint-Michel de Bordeaux
+Q288912,2,lacs,Étang de Berre
 Q288968,1,lacs,Étang de Thau
 Q28911030,3,cascades,Cascade de Vaucoux
 Q28924,1,musees,Catacombes de Paris
@@ -1138,7 +1141,6 @@ Q3079075,3,forets,Forêt du Tapcal
 Q3079408,3,grottes,Fosse Dionne
 Q3080015,3,monuments,Four solaire de Mont-Louis
 Q3085786,2,monuments,Opéra municipal de Marseille
-Q3086101,3,musees,Musée Cantini
 Q3086934,2,musees,Musée des Beaux-Arts de Rouen
 Q3087510,2,grottes,Grotte de Cussac
 Q3089172,3,iles,Île de Terre-de-Haut
@@ -1248,7 +1250,7 @@ Q3215566,3,lacs,Lac de Tolla
 Q3215690,3,lacs,Lac des Truites
 Q3215691,3,lacs,Lac des Vieilles Forges
 Q3215699,3,lacs,Lac du Bourdon
-Q3215700,2,lacs,Lac du Bouchet
+Q3215700,3,lacs,Lac du Bouchet
 Q3215709,3,lacs,Lac du Crescent
 Q3215723,3,lacs,Lac du Malsaucy
 Q3215739,3,lacs,Lac du Sautet
@@ -1342,7 +1344,7 @@ Q3329298,3,maisons,Musée Pascal-Paoli
 Q3329311,3,maisons,Musée Pierre-Corneille
 Q3329313,3,maisons,Musée Pierre-Corneille
 Q3329324,3,maisons,"Musée Rabelais, Maison La Devinière"
-Q3329329,3,maisons,Musée Robert-Tatin
+Q3329329,2,maisons,Musée Robert-Tatin
 Q3329378,3,maisons,Musée Verlaine
 Q3329384,3,maisons,Musée Victor-Hugo
 Q3329394,3,maisons,Musée Zervos
@@ -1620,7 +1622,6 @@ Q389916,2,plages,Presque'île de Rhuys
 Q390418,1,ponts,Pont Alexandre-III
 Q390677,2,musees,Mémorial de Caen
 Q391128,3,villages,Vogüé
-Q391823,3,musees,Musée Rolin
 Q392278,2,lacs,Lac des Settons
 Q3962375,3,musees,Le Fâ
 Q3991,2,jardins,Parc de la Tête d'Or
