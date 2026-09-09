@@ -28,7 +28,8 @@ from roam_pipeline.raw import EXTRA_SHARD, read_raw, shards, write_raw
 from roam_pipeline.merge import merge_file, merge_text, split_conflict
 from roam_pipeline.wikipedia import WikipediaClient
 from roam_pipeline.review import (
-    CLEAR, DECISIONS, apply_decisions, apply_themes, name_hints, read_decisions,
+    CLEAR, DECISIONS, apply_decisions, apply_themes, merge_decisions, name_hints,
+    read_decisions,
     read_themes, theme_claims, theme_from_name, write_decisions, write_themes,
 )
 from roam_pipeline.collections import (
@@ -5825,6 +5826,43 @@ class TestVerdict(unittest.TestCase):
             with self.subTest(verdict):
                 _code, _t, decisions, _csv = self._run(brut, "Q1", decision=verdict)
                 self.assertEqual(decisions["Q1"][0], verdict)
+
+
+class TestMergeDecisions(unittest.TestCase):
+    """Une revue impose son verdict, jamais son silence sur la note."""
+
+    def test_a_review_without_a_note_keeps_the_one_already_written(self):
+        # LE défaut : la page de revue pousse une colonne `curator_note`
+        # toujours vide. Trois notes sont mortes d'un coup à la revue des
+        # forêts, dont celle qui disait pourquoi un lieu était gardé CONTRE un
+        # filtre — exactement ce qu'on ne peut pas retrouver après coup.
+        garde = {"Q1": ("keep", "abbatiale ouverte, tympan roman")}
+        fusion = merge_decisions(garde, {"Q1": ("keep", "")})
+        self.assertEqual(fusion["Q1"], ("keep", "abbatiale ouverte, tympan roman"))
+
+    def test_the_verdict_itself_is_replaced(self):
+        # L'inverse serait pire : un curateur qui se dédit doit être entendu.
+        garde = {"Q1": ("keep", "une raison")}
+        fusion = merge_decisions(garde, {"Q1": ("drop", "")})
+        self.assertEqual(fusion["Q1"], ("drop", "une raison"))
+
+    def test_a_note_that_is_written_wins(self):
+        garde = {"Q1": ("keep", "ancienne")}
+        fusion = merge_decisions(garde, {"Q1": ("keep", "nouvelle")})
+        self.assertEqual(fusion["Q1"][1], "nouvelle")
+
+    def test_verdicts_absent_from_the_review_are_untouched(self):
+        # Une revue ne porte que sur ce qu'elle a regardé : les trois mille
+        # autres décisions doivent traverser intactes.
+        garde = {"Q1": ("keep", "une raison"), "Q2": ("drop", "une autre")}
+        fusion = merge_decisions(garde, {"Q3": ("keep", "")})
+        self.assertEqual(fusion["Q1"], ("keep", "une raison"))
+        self.assertEqual(fusion["Q2"], ("drop", "une autre"))
+
+    def test_the_stored_decisions_are_not_modified_in_place(self):
+        garde = {"Q1": ("keep", "une raison")}
+        merge_decisions(garde, {"Q1": ("drop", "")})
+        self.assertEqual(garde, {"Q1": ("keep", "une raison")})
 
 
 class TestRethemeLosses(unittest.TestCase):

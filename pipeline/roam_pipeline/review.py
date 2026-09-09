@@ -90,6 +90,29 @@ def write_decisions(path: Path, decisions: dict[str, tuple[str, str]],
     LOG.info("décisions : %s verdicts conservés dans %s", len(decisions), path)
 
 
+def merge_decisions(
+    stored: dict[str, tuple[str, str]], fresh: dict[str, tuple[str, str]],
+) -> dict[str, tuple[str, str]]:
+    """Verse une revue dans les décisions gardées, sans perdre les notes.
+
+    La revue la plus récente l'emporte sur le VERDICT — se dédire doit se faire
+    en relisant le lieu, pas en éditant un fichier. Elle ne l'emporte pas sur
+    la note : la page de revue n'a aucun champ pour en écrire une et pousse une
+    colonne `curator_note` vide. Prendre ce vide pour une note effaçait, à
+    chaque passage d'un lieu en revue, la raison écrite par `verdict --note` —
+    trois d'un coup à la revue des forêts, alors que l'en-tête du fichier dit
+    ce qu'il est : « la mémoire de la curation ».
+
+    Le silence vaut donc « inchangé », comme il vaut déjà « inchangé » pour la
+    note d'un redressement de thème. Une note ne se remplace que là où elle
+    s'écrit : `verdict --note`.
+    """
+    fusionnees = dict(stored)
+    for qid, (verdict, note) in fresh.items():
+        fusionnees[qid] = (verdict, note or stored.get(qid, ("", ""))[1])
+    return fusionnees
+
+
 def apply_decisions(
     places: list[Place], decisions: dict[str, tuple[str, str]],
     strict: bool = False,

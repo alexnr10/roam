@@ -68,7 +68,8 @@ from .outlines import ATTRIBUTION as OUTLINE_ATTRIBUTION, DEFAULT_TOLERANCE_KM2
 from .outlines import export as export_outlines
 from .review import (
     CLEAR, DECISIONS, apply_decisions, apply_names, apply_photos, apply_themes,
-    diff_tiers, photo_file, read_decisions, read_names, read_photos, read_themes,
+    diff_tiers, merge_decisions, photo_file, read_decisions, read_names,
+    read_photos, read_themes,
     theme_claims, write_themes, read_snapshot, snapshot_is_safe, snapshot_losses,
     vanished, write_decisions, write_names, write_photos, write_snapshot,
 )
@@ -1437,7 +1438,20 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
     changed = sum(1 for qid, d in fresh.items() if decisions.get(qid, ("", ""))[0] != d[0])
     # La revue la plus récente l'emporte : revenir sur un verdict doit se faire
     # en relisant le lieu, pas en éditant un fichier.
-    decisions.update(fresh)
+    #
+    # Mais elle l'emporte sur le VERDICT, pas sur la note. La page de revue
+    # n'a aucun champ pour en écrire une : `feuille()` pousse une colonne
+    # `curator_note` toujours vide. Un `update` brut effaçait donc, à chaque
+    # passage d'un lieu en revue, la raison écrite par `verdict --note` —
+    # « site paléolithique visitable ; access=no d'OSM sur un accès
+    # particulier » disait POURQUOI ce lieu était gardé contre un filtre, et
+    # trois notes sont mortes d'un coup à la revue des forêts. Or l'en-tête du
+    # fichier dit ce qu'il est : « la mémoire de la curation ».
+    #
+    # Le silence vaut donc « inchangé », et non « effacé » — c'est déjà ce que
+    # font les redressements de thème vingt lignes plus bas. Remplacer une
+    # note reste possible là où on peut l'écrire : `verdict --note`.
+    decisions = merge_decisions(decisions, fresh)
     retires = [qid for qid in effaces if decisions.pop(qid, None) is not None]
 
     names = {p.wikidata_id: p.name for p in _load_places(args.out / "places_raw.json")}
