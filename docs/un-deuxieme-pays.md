@@ -117,7 +117,7 @@ code du deuxième pays, pas après.
     rattachement par point-dans-polygone                   2–3 j   ← FAIT
         (département et région ; la commune reste à Wikidata)
     contours étrangers (source + machinerie existante)       ~1 j
-    collections partitionnées par pays                     2–3 j
+    collections partitionnées par pays                     2–3 j   ← FAIT
     app : littéraux, libellés, voile, carte de conquête      ~2 j
     calibration des planchers sur données étrangères       1–2 j
                                                           ─────
@@ -228,6 +228,36 @@ on y est allé, la frontière est une abstraction — et il a une conséquence
 technique : le pays n'est pas un attribut du lieu mais une APPARTENANCE
 multiple, et une visite se propage à toutes les collections nationales qui
 contiennent le lieu. La question vaut pour tout l'arc alpin et les Pyrénées.
+
+## La partition par pays, telle qu'elle est faite
+
+**L'entonnoir n'a pas changé d'une ligne : il tourne une fois par pays.**
+`build_all` groupe les lieux par pays et déroule pour chacun la construction
+entière — plancher, plafond communal, plafond de thème, dédoublonnage,
+niveaux, repêchage par territoire. Tout ce qui CLASSE se fait donc à
+l'intérieur d'un pays, ce qui est exactement la promesse : le Colisée ne
+dispute pas sa place au Pont du Gard, et douze châteaux italiens très
+documentés ne repoussent aucun château français hors de sa collection
+nationale (c'est un test).
+
+**Le pays d'un lieu, VIDE, veut dire « celui du dépôt ».** Ce n'est pas une
+paresse : tant qu'un seul pays est collecté, écrire son code sur chacun des
+onze mille lieux n'apprendrait rien et ajouterait un champ constant à la
+collecte versionnée. Le jour où un lieu d'un autre pays entre dans le dépôt,
+c'est lui qui porte la mention — et lui seul. La collecte française n'a donc
+pas bougé d'une ligne.
+
+**Le suffixe d'adresse n'apparaît que s'il désambiguïse.** Un catalogue d'un
+seul pays garde `theme-chateaux` ; dès qu'un second arrive, tout devient
+`theme-chateaux-fr` et `theme-chateaux-it`. Deux exceptions à la règle du
+suffixe : « Le meilleur de France » porte déjà son pays dans son adresse
+(`geo-country-fr`), et `tiers.csv` est indexé par Q-id, donc un renommage
+d'adresses ne coûte aucune revue.
+
+Ce qui reste, côté application : elle affiche aujourd'hui TOUTES les
+collections du catalogue. Avec deux pays, il lui faudra n'en montrer qu'un à
+la fois — et c'est là que se posera la question du chargement à la demande,
+celle que les 22 Mo de contours américains rendent inévitable.
 
 ## L'objectif n'est pas le volume
 

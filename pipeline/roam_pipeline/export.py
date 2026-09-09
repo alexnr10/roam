@@ -1371,13 +1371,24 @@ def write_app_catalog(
     # Répertoire des territoires effectivement occupés par le catalogue. Sans
     # lui, l'application afficherait « 15 » au lieu de « Cantal », et devrait
     # embarquer les 35 000 communes de France pour n'en nommer que mille.
+    # Les pays PRÉSENTS au catalogue, pas seulement celui du dépôt : un lieu
+    # frontalier collecté par le voisin porte le sien, et l'application doit
+    # pouvoir le nommer.
     pays = country_area(config)
+    codes_pays = sorted(
+        {p.country_code for p in places if p.wikidata_id in used and p.country_code}
+        | {pays.code}
+    )
     used_regions = {p.region_code for p in places if p.wikidata_id in used and p.region_code}
     used_depts = {
         p.departement_code for p in places if p.wikidata_id in used and p.departement_code
     }
     areas = {
-        "country": [{"code": pays.code, "name": pays.name, "deForm": pays.de_form}],
+        "country": [
+            {"code": code, "name": pays.name if code == pays.code else code,
+             "deForm": pays.de_form if code == pays.code else code}
+            for code in codes_pays
+        ],
         "region": [
             {"code": code, "name": zone.name, "deForm": zone.de_form}
             for code, zone in sorted(regions().items())

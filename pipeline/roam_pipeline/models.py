@@ -171,6 +171,18 @@ class Place:
     # l'image de quelqu'un d'autre. On garde donc le titre du fichier crédité,
     # et l'export ne cite l'auteur que si les deux concordent.
     image_credit_for: str | None = None
+    # Le pays de ce lieu. VIDE veut dire « celui du dépôt », déclaré dans
+    # `scoring.yaml` (`geo.country`).
+    #
+    # Ce n'est pas une paresse : tant qu'un seul pays est collecté, écrire son
+    # code sur chacun des onze mille lieux n'apprendrait rien et alourdirait la
+    # collecte versionnée d'un champ constant. Le jour où un lieu d'un AUTRE
+    # pays entre dans le dépôt, c'est lui qui porte la mention — et lui seul.
+    #
+    # Tout ce qui CLASSE se fait à l'intérieur d'un pays : une étoile dit un
+    # rang dans une collection nationale, et le Colisée n'a pas à disputer sa
+    # place au Pont du Gard.
+    country_code: str = ""
     # Entré par une classe GÉNÉRIQUE (`broad_classes`) et non par une classe
     # propre au thème. Une porte large ne vaut pas une porte précise : le
     # dédoublonnage inter-thèmes s'en sert pour trancher.

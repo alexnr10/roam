@@ -62,6 +62,7 @@ from roam_pipeline.models import (
     Collection, CollectionPlace, Place, display_name, slugify,
 )
 from roam_pipeline import fetch as fetch_module
+from roam_pipeline import collections as collections_module
 from roam_pipeline import localisation
 from roam_pipeline import outlines
 from roam_pipeline import wikidata as wd
@@ -1302,11 +1303,16 @@ class TestExplain(unittest.TestCase):
         self.assertIn("ÉCARTÉ", output)
 
     def test_every_stage_of_the_build_is_replayed(self):
-        # La liste des étapes de `explain` doit suivre celle de `build_all` :
-        # c'est en la laissant diverger qu'on obtient une réponse fausse.
+        # La liste des étapes de `explain` doit suivre celle de la
+        # construction : c'est en la laissant diverger qu'on obtient une
+        # réponse fausse.
+        #
+        # On regarde `_build_un_pays` et non `build_all` : depuis la partition
+        # par pays, le premier porte l'entonnoir et le second ne fait que le
+        # dérouler une fois par pays.
         import inspect
         from roam_pipeline import cli
-        from roam_pipeline.collections import build_all
+        from roam_pipeline.collections import _build_un_pays as build_all
 
         source = inspect.getsource(cli.cmd_explain)
         for filtre in ("apply_geographic_scope", "dedupe_across_themes",
@@ -6142,6 +6148,91 @@ class TestOutOfCountryIsNotAsked(unittest.TestCase):
                 [loin], address_client=_Interdit(), localisateur=self.loc)
         self.assertEqual(situes, 0)
         self.assertIsNone(loin.departement_code)
+
+
+class TestCountryPartition(unittest.TestCase):
+    """Un catalogue par pays, et rien qui traverse la frontière.
+
+    Une étoile dit un rang dans une collection NATIONALE. Si les deux pays se
+    classaient ensemble, le Colisée disputerait sa place au Pont du Gard et
+    l'Italie noierait la Creuse — alors que celui qui visite l'Italie se moque
+    de savoir que les plages sont plus belles en France.
+    """
+
+    @staticmethod
+    def _lieux(n, pays, theme="chateaux", dept="15", **extra):
+        # Le score doit être calculé : sans lui tout le monde vaut zéro et le
+        # repêchage comme les niveaux n'ont plus rien à trancher.
+        return score_all([
+            make_place(f"{pays} {theme} {i}", theme=theme,
+                       wikidata_id=f"Q{pays or 'FR'}{theme[:3]}{i}",
+                       country_code=pays, sitelinks=30 - (i % 20),
+                       lat=45.0 + i * 0.05, lon=2.0 + i * 0.05,
+                       departement_code=dept, region_code="84",
+                       image_url="https://example.org/x.jpg", **extra)
+            for i in range(n)
+        ], CONFIG)
+
+    def _construire(self, lieux):
+        with _capture():
+            return build_all(lieux, CONFIG)
+
+    def test_one_country_needs_no_suffix(self):
+        # Un catalogue d'un seul pays n'a pas besoin de « -fr » dans chacune de
+        # ses adresses. Le pays du dépôt s'écrit sans mention, comme dans la
+        # collecte.
+        _, collections = self._construire(self._lieux(12, ""))
+        slugs = {c.slug for c in collections}
+        self.assertIn("theme-chateaux", slugs)
+        # « geo-country-fr » porte son pays de naissance : c'est son adresse,
+        # pas un suffixe. Aucune AUTRE collection n'en prend un.
+        self.assertEqual([s for s in slugs if s.endswith("-fr")], ["geo-country-fr"])
+
+    def test_two_countries_get_two_sets_of_collections(self):
+        lieux = self._lieux(12, "") + self._lieux(12, "IT", dept="21")
+        _, collections = self._construire(lieux)
+        slugs = {c.slug for c in collections}
+        self.assertIn("theme-chateaux-fr", slugs)
+        self.assertIn("theme-chateaux-it", slugs)
+        # Et « Le meilleur de France » ne devient pas « ...-fr-fr ».
+        self.assertNotIn("geo-country-fr-fr", slugs)
+
+    def test_a_place_only_ranks_against_its_compatriots(self):
+        # LE point. Douze châteaux italiens très documentés ne doivent pas
+        # repousser les français hors de leur propre collection nationale.
+        seuls = self._lieux(12, "")
+        _, sans = self._construire(seuls)
+        francais_seuls = next(c for c in sans if c.slug == "theme-chateaux")
+
+        italiens = self._lieux(12, "IT", dept="21")
+        _, avec = self._construire(seuls + italiens)
+        francais = next(c for c in avec if c.slug == "theme-chateaux-fr")
+
+        self.assertEqual(
+            [(cp.place_id, cp.tier) for cp in francais.places],
+            [(cp.place_id, cp.tier) for cp in francais_seuls.places],
+        )
+
+    def test_the_repository_country_comes_first(self):
+        lieux = self._lieux(12, "IT", dept="21") + self._lieux(12, "")
+        _, collections = self._construire(lieux)
+        premiers = [c.slug for c in collections]
+        self.assertTrue(premiers[0].endswith("-fr"),
+                        f"attendu le pays du dépôt en tête, obtenu {premiers[0]}")
+
+    def test_an_unmarked_place_belongs_to_the_repository_country(self):
+        lieu = make_place("Sans mention", theme="chateaux")
+        self.assertEqual(collections_module.pays_de(lieu, CONFIG), "FR")
+        lieu.country_code = "IT"
+        self.assertEqual(collections_module.pays_de(lieu, CONFIG), "IT")
+
+    def test_the_country_is_not_written_when_it_is_the_repository_s(self):
+        # Onze mille lieux, un champ constant : le fichier versionné n'a rien à
+        # y gagner. Seul un lieu d'un AUTRE pays porte la mention.
+        from roam_pipeline.raw import _payload
+        self.assertNotIn("country_code", _payload(make_place("Chambord")))
+        etranger = make_place("Colisée", country_code="IT")
+        self.assertEqual(_payload(etranger)["country_code"], "IT")
 
 
 class TestCountryParameter(unittest.TestCase):

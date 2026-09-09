@@ -13,6 +13,7 @@ import math
 import re
 import unicodedata
 from collections import Counter, defaultdict
+from dataclasses import replace
 
 from .config import Config
 from .geo import area, departements, region_of, regions
@@ -1604,7 +1605,64 @@ def rescue_thin_departements(
     return au_dessus + repeches
 
 
+def pays_de(place: Place, config: Config) -> str:
+    """Le pays d'un lieu. Vide veut dire « celui du dépôt ».
+
+    Tant qu'un seul pays est collecté, l'écrire sur chacun des onze mille lieux
+    n'apprendrait rien à personne et alourdirait la collecte versionnée d'un
+    champ constant. Le jour où un lieu d'un AUTRE pays entre dans le dépôt,
+    c'est lui qui porte la mention, et ce lieu-là seulement.
+    """
+    return place.country_code or config.country.code
+
+
 def build_all(places: list[Place], config: Config) -> tuple[list[Place], list[Collection]]:
+    """Construit un catalogue PAR PAYS, puis les met bout à bout.
+
+    Un catalogue parle d'un pays : une étoile dit un rang dans une collection
+    nationale, et savoir que les plages sont plus belles chez le voisin
+    n'intéresse personne qui visite celui-ci. Tout ce qui CLASSE — plancher,
+    plafond, dédoublonnage, niveaux, repêchage par territoire — doit donc se
+    faire à l'intérieur d'un pays, sinon l'Italie noierait la Creuse et le
+    Colisée disputerait sa place au Pont du Gard.
+
+    D'où cette forme : l'entonnoir n'a pas changé d'une ligne, il tourne
+    simplement une fois par pays.
+    """
+    par_pays: dict[str, list[Place]] = defaultdict(list)
+    for place in places:
+        par_pays[pays_de(place, config)].append(place)
+
+    # Le pays du dépôt d'abord, les autres par ordre alphabétique : ce qui est
+    # au sommet du fichier exporté doit être stable.
+    ordre = sorted(par_pays, key=lambda code: (code != config.country.code, code))
+    # Le suffixe n'apparaît QUE s'il désambiguïse. Un catalogue d'un seul pays
+    # n'a pas besoin de « theme-chateaux-fr » dans chacune de ses adresses ; le
+    # jour où un second pays arrive, tout le catalogue change de toute façon.
+    suffixe = len(ordre) > 1
+
+    retenus: list[Place] = []
+    collections: list[Collection] = []
+    for code in ordre:
+        if suffixe:
+            LOG.info("── catalogue de %s : %s lieux candidats", code, len(par_pays[code]))
+        lieux, cols = _build_un_pays(par_pays[code], config)
+        if suffixe:
+            # « Le meilleur de France » porte déjà son pays dans son adresse :
+            # la suffixer donnerait `geo-country-fr-fr`.
+            cols = [
+                col if col.geo_level == "country"
+                else replace(col, slug=f"{col.slug}-{code.lower()}")
+                for col in cols
+            ]
+        retenus.extend(lieux)
+        collections.extend(cols)
+    return retenus, collections
+
+
+def _build_un_pays(
+    places: list[Place], config: Config
+) -> tuple[list[Place], list[Collection]]:
     # L'ordre compte : on fixe d'abord le thème de chaque lieu, puis on lui
     # applique le plancher de CE thème, puis on écarte les doublons de lieu.
     #

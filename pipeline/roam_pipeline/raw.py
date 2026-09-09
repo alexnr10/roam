@@ -58,6 +58,10 @@ def _payload(place: Place) -> dict:
     versionné n'apporte rien et change en même temps que ce dont elle dérive.
     """
     payload = place.to_dict()
+    # Vide = le pays du dépôt. L'écrire sur chaque ligne ajouterait un champ
+    # constant à onze mille lieux, et un jour de diff pour zéro information.
+    if not payload.get("country_code"):
+        payload.pop("country_code", None)
     payload.pop("slug", None)
     return payload
 
