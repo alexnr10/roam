@@ -10,7 +10,8 @@ import React, {
 } from 'react';
 
 import { chargerCatalogue, paysCourant } from '../data/catalog';
-import { PAYS, PAYS_EMBARQUE, dejaCharge, lireIndex, obtenir } from '../data/catalogues';
+import { PAYS, PAYS_EMBARQUE, dejaCharge, lireIndex, obtenir, obtenirContours } from '../data/catalogues';
+import { chargerContours } from '../data/outlines';
 import { paysAAdopter } from '../lib/pays';
 
 const STORAGE_KEY = 'roam.pays.v1';
@@ -70,7 +71,13 @@ export function PaysProvider({ children }: { children: React.ReactNode }) {
     // qui n'existe pas.
     if (!dejaCharge(code)) setChargement(true);
     try {
-      chargerCatalogue(await obtenir(code));
+      const catalogue = await obtenir(code);
+      // Les contours AVANT le catalogue, et l'ordre n'est pas indifférent :
+      // c'est le catalogue qui déclenche la reconstruction de tout ce qui en
+      // dérive, dont la table des régions, qui lit les contours. Dans l'autre
+      // sens, la carte garderait un tour les frontières du pays précédent.
+      chargerContours(await obtenirContours(code));
+      chargerCatalogue(catalogue);
       setPays(code);
       setVersion((n) => n + 1);
       AsyncStorage.setItem(STORAGE_KEY, code).catch(() => {});

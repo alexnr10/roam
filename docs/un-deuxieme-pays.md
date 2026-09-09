@@ -118,8 +118,7 @@ code du deuxième pays, pas après.
         (département et région ; la commune reste à Wikidata)
     contours étrangers (source + machinerie existante)       ~1 j
     collections partitionnées par pays                     2–3 j   ← FAIT
-    app : sélecteur de pays et chargement à la demande       ~2 j   ← FAIT
-        (reste : contours du pays, libellés, voile)
+    app : bascule à la carte, chargement, contours          ~2 j   ← FAIT
     calibration des planchers sur données étrangères       1–2 j
                                                           ─────
                                                            9–12 j
@@ -323,12 +322,32 @@ Les catalogues sont servis par le DÉPÔT, en HTTPS et gratuitement :
 porte chacun. Une version du catalogue va donc toujours avec la version de
 l'application qui la lit. `export-app` les écrit.
 
-### Ce qu'il reste à faire, côté application
+### Les contours suivent le pays
 
-Les CONTOURS restent français : `outlines.json` est versionné avec
-l'application, et la vignette de conquête montre encore la France sous un
-catalogue italien. C'est le même travail que `geo-layers` côté pipeline, mais
-pour la carte : une source de contours par pays.
+`<pays>-contours.json` voyage avec le catalogue. Ceux du pays de départ
+restent EMBARQUÉS — la carte de conquête doit fonctionner au premier
+lancement, sans réseau. Ils sont écrits par `export-outlines`, qui copie le
+fichier de l'application plutôt que de le régénérer : deux tracés d'un même
+pays finiraient par diverger, et une frontière qui bouge d'un mètre entre deux
+versions se voit à l'écran — c'est tout le sujet de la jointivité.
+
+**Un pays sans contours n'est pas une erreur.** `outlinesFor` rend `null` et
+la carte de conquête retombe sur la liste, qui dit la même chose sans dessin.
+C'est ce qui permet d'ouvrir un pays avant d'avoir tracé ses frontières.
+
+Trois défauts trouvés en regardant l'écran italien, et corrigés :
+
+- l'onglet du pays annonçait « France » — écrit en dur — au-dessus d'un
+  catalogue italien ;
+- les échelles dessinables étaient une CONSTANTE de module, figée au
+  démarrage : la carte aurait proposé de colorier des départements qui
+  n'existent pas ;
+- « Aucune département au catalogue » — l'accord suivait le genre de la
+  région, pas celui du niveau affiché.
+
+Vérifié sur l'application construite : en Italie, l'onglet dit « Italie », les
+pastilles de thème ne montrent que « Monuments », et le message d'échelle vide
+s'accorde. En France, rien n'a bougé.
 
 ## L'objectif n'est pas le volume
 

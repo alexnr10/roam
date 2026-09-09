@@ -1,5 +1,5 @@
 import { areas } from './catalog';
-import { OUTLINE_ATTRIBUTION, outlinesFor } from './outlines';
+import { attributionDesContours, outlinesFor } from './outlines';
 
 describe('contours des territoires', () => {
   it('en fournit pour les régions et les départements', () => {
@@ -34,6 +34,6 @@ describe('contours des territoires', () => {
 
   it('emporte sa mention de source', () => {
     // Licence ouverte : citer la source est une obligation, pas un ornement.
-    expect(OUTLINE_ATTRIBUTION).toMatch(/Etalab/);
+    expect(attributionDesContours()).toMatch(/Etalab/);
   });
 });

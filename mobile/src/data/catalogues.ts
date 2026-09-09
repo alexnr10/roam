@@ -1,4 +1,5 @@
 import embarque from './catalog.json';
+import contoursEmbarques from './outlines.json';
 import type { Emprise, PaysConnu } from '../lib/pays';
 import type { Catalog } from '../types';
 
@@ -18,6 +19,14 @@ export type PaysDisponible = PaysConnu & {
   /** Absent = embarqué dans l'application, disponible hors ligne. */
   fichier?: string;
   lieux?: number;
+  /**
+   * Les contours administratifs de ce pays, s'il en a.
+   *
+   * Un pays peut très bien arriver sans : sa carte de conquête retombe alors
+   * sur la liste, qui dit la même chose sans dessin. C'est ce qui permet
+   * d'ouvrir un pays avant d'avoir tracé ses frontières.
+   */
+  contours?: string;
 };
 
 /**
@@ -44,6 +53,7 @@ export const PAYS: PaysDisponible[] = [
 ];
 
 const enMain = new Map<string, Catalog>([[PAYS_EMBARQUE, catalogueEmbarque]]);
+const contoursEnMain = new Map<string, unknown>([[PAYS_EMBARQUE, contoursEmbarques]]);
 
 export const dejaCharge = (code: string): boolean => enMain.has(code);
 export const catalogueDe = (code: string): Catalog | undefined => enMain.get(code);
@@ -68,7 +78,10 @@ export async function lireIndex(aller: typeof fetch = fetch): Promise<PaysDispon
     const reponse = await aller(`${BASE}/index.json`);
     if (!reponse.ok) return PAYS;
     const donnees = (await reponse.json()) as {
-      pays?: { code: string; name: string; fichier?: string; lieux?: number; emprises?: Emprise[] }[];
+      pays?: {
+        code: string; name: string; fichier?: string; lieux?: number;
+        emprises?: Emprise[]; contours?: string;
+      }[];
     };
     for (const entree of donnees.pays ?? []) {
       if (!entree.code) continue;
@@ -79,11 +92,16 @@ export async function lireIndex(aller: typeof fetch = fetch): Promise<PaysDispon
         emprises: entree.emprises ?? [],
         fichier: entree.fichier,
         lieux: entree.lieux,
+        contours: entree.contours,
       };
       // Le pays embarqué GARDE son catalogue local — on ne retéléchargera pas
       // ce qu'on a déjà — mais il gagne son emprise, sans laquelle la carte ne
       // saurait pas qu'on vient d'en sortir.
-      if (connu) Object.assign(connu, { emprises: complet.emprises, lieux: complet.lieux });
+      if (connu) {
+        Object.assign(connu, {
+          emprises: complet.emprises, lieux: complet.lieux, contours: complet.contours,
+        });
+      }
       else PAYS.push(complet);
     }
   } catch {
@@ -108,4 +126,32 @@ export async function obtenir(
   const catalogue = (await reponse.json()) as Catalog;
   enMain.set(code, catalogue);
   return catalogue;
+}
+
+
+/**
+ * Les contours d'un pays, ou null s'il n'en a pas.
+ *
+ * Ceux du pays embarqué sont déjà là : les redemander serait huit cent
+ * soixante kilo-octets pour rien. Un échec de téléchargement n'est pas une
+ * erreur non plus — la carte de conquête retombe sur la liste, et le
+ * catalogue, lui, est déjà chargé.
+ */
+export async function obtenirContours(
+  code: string,
+  aller: typeof fetch = fetch,
+): Promise<unknown | null> {
+  if (contoursEnMain.has(code)) return contoursEnMain.get(code) ?? null;
+
+  const pays = PAYS.find((p) => p.code === code);
+  if (!pays?.contours) return null;
+  try {
+    const reponse = await aller(`${BASE}/${pays.contours}`);
+    if (!reponse.ok) return null;
+    const donnees = await reponse.json();
+    contoursEnMain.set(code, donnees);
+    return donnees;
+  } catch {
+    return null;
+  }
 }

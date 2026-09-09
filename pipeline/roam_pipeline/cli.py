@@ -3159,6 +3159,7 @@ def ecrire_catalogues_servis(places, collections, config, dossier: Path) -> list
         chemin = dossier / f"{code.lower()}.json"
         write_app_catalog(lot, cols, config, chemin)
         taille = chemin.stat().st_size / 1024
+        contours = dossier / f"{code.lower()}-contours.json"
         index.append({
             "code": code,
             "name": config.country.name if code == config.country.code else code,
@@ -3168,6 +3169,9 @@ def ecrire_catalogues_servis(places, collections, config, dossier: Path) -> list
             # dont on ait les contours ici. Un pays collecté ailleurs apportera
             # les siennes avec son propre `export-app`.
             "emprises": emprises if code == config.country.code else [],
+            # Un pays peut arriver sans contours : sa carte de conquête retombe
+            # sur la liste, qui dit la même chose sans dessin.
+            **({"contours": contours.name} if contours.exists() else {}),
         })
         lignes.append(f"{code} : {len(lot)} lieux, {taille:.0f} Ko → {chemin}")
 
@@ -3199,6 +3203,16 @@ def cmd_export_outlines(args: argparse.Namespace, config: Config) -> int:
     for level, count in counts.items():
         print(f"  {level:<12} {count:>3} territoires")
     print(OUTLINE_ATTRIBUTION)
+
+    # Et la copie SERVIE, pour les pays que l'application ne porte pas en elle.
+    # Elle passe par le même fichier : deux tracés d'un même pays finiraient
+    # par diverger, et une frontière qui bouge d'un mètre entre deux versions
+    # se voit à l'écran — c'est tout le sujet de la jointivité.
+    servi = args.catalogues / f"{config.country.code.lower()}-contours.json"
+    servi.parent.mkdir(parents=True, exist_ok=True)
+    servi.write_bytes(args.to.read_bytes())
+    print(f"Copie servie : {servi} ({servi.stat().st_size / 1024:.0f} Ko)")
+    print("Relance `export-app` pour que l'index les annonce.")
     return 0
 
 
@@ -3838,6 +3852,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="fabrique les contours des régions et départements (réseau requis)",
     )
     contours.add_argument("--to", type=Path, default=APP_OUTLINES, help="fichier de destination")
+    contours.add_argument(
+        "--catalogues", type=Path, default=BASE_DIR.parent / "catalogues",
+        help="dossier des catalogues servis, où déposer la copie téléchargeable")
     contours.add_argument(
         "--tolerance",
         type=float,

@@ -4,7 +4,7 @@ import type { MapLayerMouseEvent, Map as MapLibreMap } from 'maplibre-gl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { OUTLINE_ATTRIBUTION, outlinesFor } from '../data/outlines';
+import { attributionDesContours, outlinesFor } from '../data/outlines';
 import { shadeOf } from '../lib/conquest';
 import type { ZoneConquest } from '../lib/conquest';
 import { colors, conquest, radius, spacing, type } from '../theme';
@@ -120,7 +120,7 @@ export function ConquestMap({ zones, level, selectedCode, onSelectZone }: Conque
           // chaîne, ce que l'identifiant natif de GeoJSON refuse — et « 2A »
           // n'est pas un nombre.
           promoteId: 'code',
-          attribution: OUTLINE_ATTRIBUTION,
+          attribution: attributionDesContours(),
         });
 
         instance.addLayer({

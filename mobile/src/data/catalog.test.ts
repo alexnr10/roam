@@ -1,6 +1,8 @@
 import { chargerCatalogue, areas, collections, getPlace, nomDuPays, places, paysCourant } from './catalog';
 import { etoilesDe } from '../lib/etoiles';
 import { nomDeRegion, regionDuDepartement } from '../lib/regions';
+import contoursFrancais from './outlines.json';
+import { chargerContours, niveauxDessinables, outlinesFor } from './outlines';
 import type { Catalog } from '../types';
 
 /**
@@ -80,5 +82,41 @@ describe('changer de catalogue', () => {
     const unFrancais = francais.places[0].id;
     chargerCatalogue(italien);
     expect(getPlace(unFrancais)).toBeUndefined();
+  });
+});
+
+describe('les contours suivent le pays', () => {
+  afterEach(() => {
+    chargerContours(contoursFrancais);
+    chargerCatalogue(francais);
+  });
+
+  it('un pays sans contours retombe sur la liste, sans planter', () => {
+    // Ouvrir un pays avant d'avoir tracé ses frontières doit rester possible :
+    // la carte de conquête dit alors la même chose sans dessin.
+    chargerContours(null);
+    chargerCatalogue(italien);
+    expect(outlinesFor('region')).toBeNull();
+    expect(niveauxDessinables()).toEqual([]);
+  });
+
+  it('les échelles dessinables sont RECALCULÉES, pas figées au démarrage', () => {
+    // C'était une constante de module : elle serait restée celle du pays de
+    // départ, et la carte aurait proposé de colorier des départements qui
+    // n'existent pas.
+    expect(niveauxDessinables().length).toBeGreaterThan(0);
+    chargerContours(null);
+    expect(niveauxDessinables()).toEqual([]);
+    chargerContours(contoursFrancais);
+    expect(niveauxDessinables().length).toBeGreaterThan(0);
+  });
+
+  it('rend ses contours au pays quand on y revient', () => {
+    chargerContours(null);
+    chargerCatalogue(italien);
+    chargerContours(contoursFrancais);
+    chargerCatalogue(francais);
+    expect(outlinesFor('region')).not.toBeNull();
+    expect(nomDeRegion('84')).not.toBe('84');
   });
 });

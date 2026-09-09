@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { areas, places, themeLabel, themes } from '../../src/data/catalog';
+import { nomDuPays } from '../../src/data/catalog';
 import { useCatalogue } from '../../src/lib/useCatalogue';
 import { conquestByZone, shadeOf } from '../../src/lib/conquest';
 import { palierMinuscule } from '../../src/lib/paliers';
@@ -47,7 +48,9 @@ const LEVELS: LevelCopy[] = [
     feminine: false,
   },
   { value: 'region', label: 'Régions', one: 'région', many: 'régions', feminine: true },
-  { value: 'country', label: 'France', one: 'pays', many: 'pays', feminine: true },
+  // Le libellé du pays se pose à l'exécution : « France » écrit en dur
+  // annonçait la France au-dessus d'un catalogue italien.
+  { value: 'country', label: '', one: 'pays', many: 'pays', feminine: true },
 ];
 
 const plural = (count: number, singular: string, many: string) =>
@@ -90,13 +93,18 @@ export default function ConquestScreen() {
         }))
         .sort((a, b) => a.label.localeCompare(b.label, 'fr')),
     ],
-    [],
+    [catalogue],
   );
 
   // Un code de département n'a aucun sens à l'échelle des régions.
   useEffect(() => setSelected(null), [level]);
 
-  const current = LEVELS.find((entry) => entry.value === level)!;
+  const niveaux = useMemo(
+    () => LEVELS.map((entry) =>
+      entry.value === 'country' ? { ...entry, label: nomDuPays() || 'Pays' } : entry),
+    [catalogue],
+  );
+  const current = niveaux.find((entry) => entry.value === level)!;
   const totals = useMemo(() => {
     const conquered = zones.filter((zone) => zone.allComplete && zone.playable).length;
     const partial = zones.filter(
@@ -128,7 +136,7 @@ export default function ConquestScreen() {
             faut donc pouvoir en ressortir. */}
         <BackBar />
         <SegmentedControl
-          options={LEVELS.map(({ value, label }) => ({ value, label }))}
+          options={niveaux.map(({ value, label }) => ({ value, label }))}
           value={level}
           onChange={setLevel}
         />
@@ -154,7 +162,7 @@ export default function ConquestScreen() {
       >
         {zones.length === 0 ? (
           <EmptyState
-            title={`Aucune ${current.one} au catalogue`}
+            title={`Aucun${current.feminine ? 'e' : ''} ${current.one} au catalogue`}
             body={
               level === 'commune'
                 ? "Le rattachement aux communes se fait par les coordonnées : relance `enrich` puis `export-app` dans le pipeline pour l'obtenir."
