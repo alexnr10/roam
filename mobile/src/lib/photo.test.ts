@@ -1,4 +1,7 @@
-import { DENSITE_MAX, PALIERS, palier, photoUrl } from './photo';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import { AGENT, CONTACT, DENSITE_MAX, ENTETES, PALIERS, VERSION, palier, photoUrl } from './photo';
 
 const NUE =
   'https://commons.wikimedia.org/wiki/Special:FilePath/Tour%20Eiffel.jpg';
@@ -59,5 +62,34 @@ describe('palier', () => {
     // rien qu'à lui.
     expect(palier(4000)).toBe(PALIERS[PALIERS.length - 1]);
     expect(PALIERS[PALIERS.length - 1]).toBe(1200);
+  });
+});
+
+describe("l'agent utilisateur", () => {
+  // Wikimedia refuse par un 403 — sans un mot d'explication — les clients qui
+  // ne se nomment pas. Les vignettes manquaient sur le téléphone alors que le
+  // web les montrait : un navigateur se nomme, le téléchargeur d'images
+  // d'Android n'envoyait que celui de sa bibliothèque.
+
+  it('donne un nom, une version et un contact', () => {
+    // Les trois que la politique demande. Un agent qui dit seulement « Roam »
+    // ne vaut pas mieux qu'un agent générique.
+    expect(AGENT).toContain('Roam/');
+    expect(AGENT).toContain(VERSION);
+    expect(AGENT).toContain(CONTACT);
+    expect(CONTACT).toMatch(/^https?:\/\//);
+  });
+
+  it("suit la version de l'application", () => {
+    // Une version qui ment est pire qu'une version absente : elle envoie
+    // Wikimedia chercher un défaut dans une livraison qui n'existe plus.
+    const app = JSON.parse(
+      readFileSync(join(__dirname, '..', '..', 'app.json'), 'utf8'),
+    );
+    expect(VERSION).toBe(app.expo.version);
+  });
+
+  it("s'envoie sous le nom que le protocole attend", () => {
+    expect(ENTETES['User-Agent']).toBe(AGENT);
   });
 });

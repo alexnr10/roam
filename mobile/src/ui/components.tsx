@@ -12,7 +12,7 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import { photoUrl } from '../lib/photo';
+import { ENTETES, photoUrl } from '../lib/photo';
 import { useRoulette } from '../lib/roulette';
 import { colors, radius, spacing, themeEmoji, type } from '../theme';
 import { IconeChevron, IconeCroix, IconeLoupe } from './icons';
@@ -78,7 +78,10 @@ export function Photo({
   return (
     <Image
       accessibilityIgnoresInvertColors
-      source={{ uri: src }}
+      // L'agent utilisateur : Wikimedia refuse par un 403 les clients qui ne
+      // se nomment pas, et le repli faisait alors passer un lieu photographié
+      // pour un lieu sans photo.
+      source={{ uri: src, headers: ENTETES }}
       onError={(evenement) => {
         // Le repli est silencieux À L'ÉCRAN — c'est voulu, un cadre vide sur
         // toute une liste donne une application cassée. Mais il l'était aussi

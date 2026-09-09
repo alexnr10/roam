@@ -21,6 +21,29 @@
  *    arrive.
  */
 
+/**
+ * Comment l'application se nomme auprès de Wikimedia.
+ *
+ * Wikimedia REFUSE — 403, sans un mot d'explication — les clients qui ne se
+ * présentent pas. Sa politique d'agent utilisateur demande un nom, une version
+ * et un moyen de contact, et elle vaut pour tout ce qui télécharge, images
+ * comprises. Un navigateur en a un ; le téléchargeur d'images d'Android
+ * n'envoie que celui de sa bibliothèque, et Commons le rejette.
+ *
+ * D'où des vignettes absentes sur le téléphone alors que le web les montrait,
+ * et un repli qui donnait à un lieu photographié l'apparence d'un lieu sans
+ * photo. Se nommer n'est pas un contournement : c'est ce que la politique
+ * demande, et c'est le prix d'un service qui ne facture rien.
+ *
+ * @see https://foundation.wikimedia.org/wiki/Policy:User-Agent_policy
+ */
+export const VERSION = '0.1.0';
+export const CONTACT = 'https://github.com/alexnr10/roam';
+export const AGENT = `Roam/${VERSION} (${CONTACT})`;
+
+/** Les en-têtes de toute requête vers Commons. */
+export const ENTETES: Record<string, string> = { 'User-Agent': AGENT };
+
 /** Les seules largeurs que l'application demande. */
 export const PALIERS = [200, 400, 800, 1200] as const;
 
