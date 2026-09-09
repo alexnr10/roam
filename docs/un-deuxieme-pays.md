@@ -126,17 +126,21 @@ code du deuxième pays, pas après.
 Dont environ six jours payés une seule fois ; le troisième pays coûterait deux
 à trois jours plus la calibration.
 
-## Une réserve, et elle n'est pas technique
+## Une réserve levée par le curateur
 
-La curation vaut ce que vaut la connaissance du pays. Descendre la Cité
-radieuse d'un niveau, ranger le Familistère en musée parce qu'on y entre au
-billet : ces jugements-là n'existeront pas pour l'Italie. Sans les labels
-nationaux, le catalogue italien reposera donc ENTIÈREMENT sur la documentation
-Wikipédia — exactement le mode de défaillance corrigé sur les forêts, où la
-classe « forêt domaniale » ne voyait même pas Fontainebleau.
+J'avais écrit ici que la curation vaut ce que vaut la connaissance du pays, et
+que les jugements portés sur la Cité radieuse ou le Familistère n'existeraient
+pas pour l'Italie. **C'est faux, et le curateur l'a corrigé** : la revue se
+fait sur les avis Google et les photos, pas sur une connaissance personnelle
+du terrain. C'était déjà le cas pour la France. La méthode se transporte donc
+telle quelle, et le catalogue italien sera relu aussi bien que le français.
 
-Les planchers d'un pays neuf méritent donc plus d'attention que les français
-n'en ont reçu au départ, pas moins.
+Ce qui reste vrai, en revanche, et sans rapport avec le curateur : sans les
+labels nationaux, la COLLECTE italienne repose entièrement sur la
+documentation Wikipédia — c'est le mode de défaillance corrigé sur les forêts,
+où « forêt domaniale » ne voyait même pas Fontainebleau. Les planchers d'un
+pays neuf méritent donc plus d'attention que les français n'en ont reçu au
+départ. C'est le travail de `gaps`, pas celui de la revue.
 
 ## Ce que l'Italie a répondu, mesuré
 
@@ -224,6 +228,50 @@ on y est allé, la frontière est une abstraction — et il a une conséquence
 technique : le pays n'est pas un attribut du lieu mais une APPARTENANCE
 multiple, et une visite se propage à toutes les collections nationales qui
 contiennent le lieu. La question vaut pour tout l'arc alpin et les Pyrénées.
+
+## L'objectif n'est pas le volume
+
+Le catalogue italien ne doit pas égaler le français en nombre. L'objectif,
+posé par le curateur : **les lieux les plus importants, répartis dans toutes
+les régions.** Ce qui suit chiffre ce que la configuration ACTUELLE
+produirait ; c'est un point de départ à borner, pas une cible.
+
+Et la répartition n'est pas donnée d'avance. Sur le catalogue français, elle
+va de 273 lieux à 8 :
+
+    Occitanie 273 · Auvergne-Rhône-Alpes 262 · Nouvelle-Aquitaine 232
+    PACA 200 · Île-de-France 154 · Grand Est 153 · Bretagne 148
+    …
+    Corse 51 · La Réunion 42 · Guadeloupe 22 · Martinique 12 · Mayotte 8
+
+Trois leviers existent déjà pour la corriger, et aucun n'est utilisé à fond :
+`min_per_departement` (un plancher par territoire, à 12), `max_per_departement`
+(un quota, posé sur les seuls jardins) et `catalogue_cap` (un plafond par
+thème, posé sur les seules cathédrales). Pour l'Italie, ce sont eux qui
+décideront de la taille, pas l'offre.
+
+## Éviter une revue de trois mille lieux
+
+La revue française a coûté 3 188 décisions. Décomposées :
+
+    2 080  sur des lieux qui SONT au catalogue        (la validation)
+      792  des `drop` — c'est-à-dire pourquoi ils n'y sont pas
+      316  sur des lieux qui n'y seraient pas entrés de toute façon
+
+Deux conséquences pour l'Italie.
+
+**Un catalogue plus petit fait une revue plus petite**, à peu près
+proportionnellement. Viser mille lieux, c'est viser mille à mille cinq cents
+décisions.
+
+**Relire par RÉGION plutôt que d'affilée.** Sur un classement national, le
+haut de liste est occupé par Rome, Florence et Venise : relire dans l'ordre,
+c'est relire les régions riches et se lasser avant le Molise. Vingt régions à
+cinquante lieux, c'est vingt séances courtes, et surtout c'est voir le haut de
+CHACUNE — ce qui est exactement l'objectif.
+
+La page de revue porte donc un sélecteur de région, à côté de celui des
+thèmes. Il sert déjà pour la France.
 
 ## Combien de lieux ferait le catalogue italien ?
 

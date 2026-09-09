@@ -610,6 +610,14 @@ def write_review_html(
                 "theme": config.theme(place.theme_id).name,
                 "themeId": place.theme_id,
                 "dept": dept.name if dept else "",
+                # La RÉGION, pour relire région par région. Sur un catalogue
+                # national, le classement met Paris et la Provence en tête et
+                # la Creuse à la fin : relire d'affilée, c'est relire les
+                # régions riches et abandonner les autres. Relire par région,
+                # c'est voir le haut de CHACUNE.
+                "region": (regions().get(place.region_code).name
+                           if place.region_code and regions().get(place.region_code)
+                           else ""),
                 # La commune, parce que le département ne suffit pas toujours à
                 # distinguer deux fiches. « Musée Pierre-Corneille » existe deux
                 # fois en Seine-Maritime — sa maison natale à Rouen et sa maison
@@ -678,6 +686,7 @@ def write_review_html(
         )
 
     themes = sorted({row["theme"] for row in rows})
+    regions_vues = sorted({row.get("region", "") for row in rows} - {""})
     payload = json.dumps(rows, ensure_ascii=False)
     # Seules les décisions qui portent sur un lieu de la page : un `drop` a fait
     # disparaître son lieu du catalogue, le rappeler ici n'aurait aucun sens.
@@ -697,6 +706,7 @@ def write_review_html(
     out_path.write_text(
         _REVIEW_TEMPLATE.replace("__DATA__", payload)
         .replace("__THEMES__", json.dumps(themes, ensure_ascii=False))
+        .replace("__REGIONS__", json.dumps(regions_vues, ensure_ascii=False))
         .replace("__DECIDED__", json.dumps(already, ensure_ascii=False))
         .replace("__RETHEMED__", json.dumps(corrected, ensure_ascii=False))
         .replace("__THEME_LIST__", json.dumps(catalogue, ensure_ascii=False))
@@ -794,6 +804,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
   <h1>__TITLE__</h1>
   <div class="bar">
     <select id="theme"><option value="">Tous les thèmes</option></select>
+    <select id="region"><option value="">Toutes les régions</option></select>
     <select id="tier">
       <option value="">Tous les niveaux</option>
       <option value="bouge">— ce qui a changé de niveau ou de thème —</option>
@@ -832,6 +843,7 @@ _REVIEW_TEMPLATE = """<!doctype html>
 <script>
 const DATA = __DATA__;
 const THEMES = __THEMES__;
+const REGIONS = __REGIONS__;
 // Les décisions déjà enregistrées dans `decisions.csv`, écrites dans la page
 // par `build`. C'est la mémoire qui voyage avec le dépôt ; le navigateur ne
 // garde que le travail de la soirée en cours.
@@ -918,13 +930,20 @@ for (const t of THEMES) {
   const o = document.createElement("option");
   o.value = t; o.textContent = t; themeSel.append(o);
 }
+const regionSel = document.getElementById("region");
+for (const r of REGIONS) {
+  const o = document.createElement("option");
+  o.value = r; o.textContent = r; regionSel.append(o);
+}
 
 function visible() {
   const theme = themeSel.value;
+  const region = regionSel.value;
   const tier = document.getElementById("tier").value;
   const state = document.getElementById("state").value;
   const retenus = DATA.filter(p => {
     if (theme && p.theme !== theme) return false;
+    if (region && p.region !== region) return false;
     // « bouge » n'est pas un niveau mais une raison de relire : un lieu validé
     // qui a changé de rang mérite un second regard, quel que soit son niveau.
     if (tier === "bouge") { if (!p.changed) return false; }
@@ -1185,11 +1204,12 @@ function render() {
   avis.hidden = masques <= 0;
   if (masques > 0) {
     avis.textContent = `${masques} lieux correspondent aussi, masqués par les `
-      + `autres filtres. Mets « Tout » et « Tous les thèmes » pour les voir.`;
+      + `autres filtres. Mets « Tout », « Tous les thèmes » et « Toutes les `
+      + `régions » pour les voir.`;
   }
 }
 
-for (const id of ["theme", "tier", "state"]) {
+for (const id of ["theme", "region", "tier", "state"]) {
   document.getElementById(id).onchange = render;
 }
 
