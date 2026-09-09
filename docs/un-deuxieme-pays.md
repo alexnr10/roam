@@ -317,20 +317,48 @@ fallait une entité à classe unique.
 **Deux classes utiles apparaissent, déjà collectées** : `château fort` (131)
 et `lac` (106). Elles n'étaient pas visibles à douze langues.
 
-### Ce qui reste à vérifier, et comment
+### Les classes indécises, sondées une à une
 
-Quatre classes marquées `✗` restent indécises. Chacune se tranche par un
-`probe` sur une entité à CLASSE UNIQUE, comme pour `palazzo` :
+    palazzo (Q2651004)             189   COUVERT — palais des Conservateurs,
+                                         classe unique, ✓ monuments via palais
+    musée privé (Q614316)          105   le CAS est couvert, la classe non
+                                         prouvée : le Museo Egizio déclare
+                                         cinq classes dont « musée national »
+                                         et « musée archéologique ». Enjeu
+                                         faible — un musée notable en déclare
+                                         presque toujours une autre.
+    villa (Q3950)                  102   COUVERT, mais SEULEMENT au-dessus de
+                                         8 langues (voir ci-dessous)
+    ensemble architectural (98)          non sondé
+    place (Q174782) (112)                non sondé — question de THÈME plutôt
+                                         que de classe
 
-    musée privé (Q614316)          105   Museo Egizio de Turin, musée du cinéma
-    villa (Q3950)                  102   villas médicéennes, villa Torlonia
-    ensemble architectural         98    Santa Maria del Carmine, Rotonda
-    place (Q174782)                112   Piazza della Rotonda, Piazza Arringo
+### Les villas italiennes tombent dans un trou de quatre langues
 
-Les deux premières comptent : le Museo Egizio est l'un des grands musées
-d'Italie, et les villas médicéennes et palladiennes sont au patrimoine
-mondial. Aucune n'est déclarée dans la configuration française, ce qui ne
-prouve rien — `palazzo` ne l'était pas non plus.
+La villa Torlonia de Rome ne déclare QUE `villa` (Q3950), et sa seule route
+est « ✓ maisons via **maison** — exige 8 langues ». Or `maisons` AFFICHE à
+partir de 4. Entre 4 et 8 langues, une villa italienne est donc affichable
+par le thème et collectée par personne.
+
+Le plancher de 8 est celui de la classe GÉNÉRIQUE `maison` (Q3947), et il a
+été posé pour la France, où le collecter plus bas ramènerait tous les
+pavillons du pays. En Italie, `villa` n'est pas une catégorie d'habitation
+mais de monument — les villas médicéennes et palladiennes sont au patrimoine
+mondial.
+
+Le remède, dans `config/it/`, est de déclarer `Q3950` en classe PRÉCISE du
+thème plutôt que de compter sur la porte générique : le plancher redevient
+celui du thème, et l'entrée cesse d'être marquée `via_broad_class`, ce qui
+lui faisait perdre tout dédoublonnage contre une classe précise d'un autre
+thème.
+
+C'est le DEUXIÈME exemple, après les églises, d'une décision juste pour la
+France et fausse pour l'Italie. Deux suffisent à confirmer que `themes.yaml`
+doit être propre à chaque pays.
+
+    python -m roam_pipeline gaps --pays Q38 --class Q3950
+
+donnera le plancher, comme Q4421 l'a donné pour les forêts.
 
 ### Le recensement peut perdre ses classes les plus grosses
 
