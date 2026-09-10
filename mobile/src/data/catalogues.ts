@@ -58,14 +58,27 @@ const DEPOT = 'https://raw.githubusercontent.com/alexnr10/roam';
 export const REFERENCE_PAR_DEFAUT = 'main';
 
 /**
- * La référence servie, lue dans la configuration Expo.
+ * La référence servie, dans l'ordre où elle peut être connue.
  *
- * Lue défensivement : `expo-constants` est un module natif, et ce fichier est
- * aussi chargé par les tests, qui tournent sous Node sans application autour.
- * Une référence absente vaut `main` — le comportement d'avant, qui est le bon
- * pour développer.
+ * 1. **`EXPO_PUBLIC_ROAM_CATALOGUES`**, inlinée dans le bundle à la
+ *    compilation. C'est la seule qui marche PARTOUT.
+ * 2. La configuration Expo, pour une application compilée.
+ * 3. `main`, pour développer.
+ *
+ * L'ordre a été payé. La configuration seule suffisait à l'APK — une
+ * application native embarque son manifeste — mais PAS à un site statique :
+ * l'`index.html` exporté ne porte aucune configuration, `expo-constants` n'y
+ * trouve rien, et la version publiée retombait silencieusement sur `main`.
+ * Elle aurait donc vu apparaître un deuxième pays le jour où on l'y pousse :
+ * exactement ce que tout ce mécanisme cherche à empêcher.
+ *
+ * Une variable `EXPO_PUBLIC_*` est remplacée par sa VALEUR au moment du
+ * bundling : elle est donc dans le fichier livré, vérifiable en le lisant, et
+ * ne dépend d'aucun manifeste à l'exécution.
  */
 export function referenceServie(): string {
+  const inlinee = process.env.EXPO_PUBLIC_ROAM_CATALOGUES;
+  if (typeof inlinee === 'string' && inlinee.trim()) return inlinee.trim();
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const Constants = require('expo-constants').default;

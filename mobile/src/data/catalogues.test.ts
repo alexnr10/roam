@@ -110,7 +110,32 @@ describe('la référence servie', () => {
     expect(gele).toContain('/v0.1-france/');
   });
 
-  it('lit vraiment ce que la configuration annonce', () => {
+  it('préfère la variable inlinée dans le bundle', () => {
+    // LA correction qui manquait. La configuration Expo suffit à une
+    // application NATIVE, qui embarque son manifeste — pas à un site statique,
+    // dont l'`index.html` n'en porte aucun. La version publiée retombait donc
+    // silencieusement sur `main`, et aurait vu apparaître un deuxième pays le
+    // jour où on l'y pousse : exactement ce que ce mécanisme empêche.
+    const avant = process.env.EXPO_PUBLIC_ROAM_CATALOGUES;
+    try {
+      process.env.EXPO_PUBLIC_ROAM_CATALOGUES = 'v9-publiee';
+      jest.isolateModules(() => {
+        jest.doMock(
+          'expo-constants',
+          () => ({ default: { expoConfig: { extra: { catalogues: 'autre-chose' } } } }),
+          { virtual: true },
+        );
+        // La variable inlinée l'emporte sur le manifeste : c'est elle qui vaut
+        // sur les deux plateformes.
+        expect(require('./catalogues').referenceServie()).toBe('v9-publiee');
+      });
+    } finally {
+      if (avant === undefined) delete process.env.EXPO_PUBLIC_ROAM_CATALOGUES;
+      else process.env.EXPO_PUBLIC_ROAM_CATALOGUES = avant;
+    }
+  });
+
+  it('retombe sur la configuration quand rien n’est inliné', () => {
     // LE point du mécanisme, et le seul qui ne se voie pas : si la lecture
     // échouait, tout retomberait sur `main` sans un mot, et les catalogues
     // d'une version publiée se remettraient à bouger.
