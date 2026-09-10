@@ -1,0 +1,32 @@
+decision,curator_note,theme_id,name,wikidata_id
+keep,,,"Basilique Saint-Pierre",Q12512
+keep,,megalithes,"Panthéon",Q99309
+keep,,,"Dôme de Milan",Q18068
+keep,,,"Cathédrale de Modène",Q753721
+keep,,,"Église Santa Maria delle Grazie de Milan",Q244952
+keep,,,"Chapelle Sixtine",Q2943
+keep,,,"Basilique Santa Maria Novella",Q51175
+keep,,,"Château Saint-Ange",Q486382
+drop,,,"Val d'Orcia",Q217449
+keep,,,"Île d'Elbe",Q45328
+keep,,,"Lac de Côme",Q15523
+keep,,,"Pompéi",Q43332
+drop,,,"Syracuse",Q13670
+drop,,,"Tarente",Q13498
+drop,,,"Messine",Q13666
+keep,,,"Tour de Pise",Q39054
+keep,,megalithes,"Colisée",Q10285
+keep,,megalithes,"Vallée des Temples",Q636774
+keep,,chateaux,"Castel del Monte",Q215897
+keep,,megalithes,"Villa d'Hadrien",Q272777
+keep,,jardins,"Villa d'Este",Q746063
+keep,,megalithes,"Villa romaine du Casale",Q505617
+keep,,megalithes,"Herculanum",Q178813
+keep,,megalithes,"Su Nuraxi",Q253241
+drop,,,"Musées du Vatican",Q182955
+keep,,,"Palais Pitti",Q29286
+keep,,,"Piazza dei Miracoli",Q750245
+drop,,,"Calabre",Q1458
+keep,,,"Ponte Vecchio",Q208633
+keep,,,"Vésuve",Q524
+keep,,,"Etna",Q16990
