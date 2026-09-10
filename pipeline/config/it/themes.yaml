@@ -113,3 +113,52 @@ themes:
   # thèmes. Un thème d'un seul lieu ne se garde pas.
   - id: cirques
     retire: true
+
+  # ── Les piazzas : le seul thème que la France n'a pas ──────────────────
+  #
+  # `place (Q174782)` n'est déclarée par AUCUN thème du dépôt, et c'est
+  # délibéré : en France une place est un carrefour. En Italie c'est une
+  # destination — on va Piazza del Campo comme on va au Louvre, et le
+  # recensement à six langues l'avait signalé dès le début, 112 lieux italiens
+  # que rien ne ramassait.
+  #
+  # `gaps --pays Q38 --class Q174782`, lieux italiens par plancher :
+  #
+  #     ≥0    ≥1   ≥2   ≥3   ≥4   ≥6   ≥8  ≥10  ≥12  ≥15  ≥20
+  #   1711  1241  561  297  193  115   74   53   42   35   20
+  #
+  # Aucune falaise au-dessus de deux langues : la seule vraie rupture est
+  # entre 1 et 2 (1 241 → 561), et c'est la bande des places de quartier qui
+  # n'ont qu'un article italien — le même piège que les 2 884 forêts
+  # françaises à une langue. Au-dessus, la pente est régulière, et le plancher
+  # est donc un choix, pas une lecture.
+  #
+  # Il est calé sur `monuments`, le thème le plus proche par nature — urbain,
+  # bâti, fourre-tout du remarquable — qui vaut 6 en affichage et 4 en
+  # collecte. Ici : 115 lieux passent l'affichage, 193 sont collectés, et les
+  # 78 d'écart laissent de quoi repêcher ou épingler. À 8 il n'en resterait
+  # que 74, et Piazza Grande d'Arezzo n'a pas huit versions linguistiques.
+  #
+  # Le plafond par commune fait le reste, et il est indispensable ici : sans
+  # lui, Rome, Florence et Venise prendraient tout le thème.
+  #
+  # Le thème arrive EN DERNIER dans l'ordre fusionné, et c'est bien ainsi :
+  # l'ordre de `themes.yaml` est la priorité éditoriale, et une piazza qui est
+  # aussi un site antique — le Forum, le Campidoglio — doit rester un site
+  # antique. Les places ne prennent que ce qu'aucun autre thème ne revendique.
+  - id: piazzas
+    name: Places monumentales
+    name_singular: Place
+    name_short: Places
+    name_hints: [place, piazza]
+    icon: piazza
+    kind: culture
+    # Ni portes ni horaires : une piazza est ouverte, toujours. Le bonus
+    # d'accueil du public ne mesurerait ici que la présence d'une balise.
+    gated: false
+    # La place elle-même, pas son quartier : on y est ou on n'y est pas.
+    radius_m: 150
+    min_sitelinks: 6
+    fetch_min_sitelinks: 4
+    cap: 50
+    wikidata_classes: [Q174782]                      # place

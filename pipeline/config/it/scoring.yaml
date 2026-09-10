@@ -66,21 +66,91 @@ geo:
       parent_key: prov_istat_code  # le même code que la couche du dessus
       url: https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_municipalities.geojson
 
-# ── Les dérogations communales : celles de Paris ne valent pas ici ───────
+# ── Les dérogations communales ──────────────────────────────────────────
 #
-# `commune_overrides` est un dictionnaire, et un dictionnaire FUSIONNE clé
-# par clé : sans ce `null`, l'Italie héritait de la dérogation parisienne.
-# Elle était inerte — aucun code ISTAT ne fait cinq chiffres — mais le
-# journal du build l'annonçait à chaque construction (« 75056 maisons 10,
-# monuments 16, musees 10 »), ce qui est une fausse piste écrite en toutes
-# lettres.
+# Le plafond général reste six par thème et par ville : c'est la règle, et
+# elle a retiré 1 118 lieux au premier build qui l'a vue mordre — Rome 572,
+# Venise 213, Milan 64, Florence 61, Naples 53. Elle a aussi emporté « Îles
+# de Venise » en entier : vingt-huit îles qui sont toutes dans la même
+# commune, dont il ne restait que six.
 #
-# Les siennes viendront, et la commande `derogations` les donne maintenant :
-# elle montre le vivier de chaque ville au pied du plafond, thème par thème,
-# avec la plus forte chute et le pas courant à côté. Le premier build
-# italien avec le plafond actif dit où regarder — il retire 572 lieux à
-# Rome, 213 à Venise, 64 à Milan, 61 à Florence, 53 à Naples, et il a emporté
-# « Îles de Venise » en entier : vingt-huit îles qui sont toutes dans la
-# même commune.
+# Une dérogation ne se pose donc pas sur une intuition mais sur un
+# DÉCROCHAGE, et `derogations` le montre : le vivier de chaque ville au pied
+# du plafond, thème par thème, avec la plus forte chute et le pas courant à
+# côté. Ce dernier fait le travail — une plus forte chute existe toujours,
+# même dans une liste régulière ; c'est leur rapport qui dit s'il faut la
+# croire.
+#
+# Huit lignes seulement en sortent, et pas une n'est un arbitrage de goût.
 collections:
-  commune_overrides: null
+  commune_overrides:
+    # Paris n'a rien à faire ici : un dictionnaire fusionne clé par clé, et
+    # sans ce `null` l'Italie héritait de sa dérogation. Inerte — aucun code
+    # ISTAT ne fait cinq chiffres — mais annoncée dans le journal de chaque
+    # construction, ce qui est une fausse piste écrite en toutes lettres.
+    "75056": null
+
+    # Chacune coupe à la plus forte chute mesurée, quand cette chute sort du
+    # pas courant. Là où elle n'en sort pas, il n'y a pas de ligne : deux
+    # thèmes de Rome, deux de Venise, tout Milan et tout Naples restent à six.
+
+    "058091":           # Rome — 629 candidats au pied du plafond, 572 retirés
+      # 203 candidats, et pas de falaise : les scores descendent du Panthéon
+      # (184) à Sant'Ivo alla Sapienza (91) sans rupture franche. La plus forte
+      # chute vaut 2,3 pour un pas courant de 0,5 — quatre fois et demie, le
+      # signal le plus FAIBLE des quatre lignes de cette ville. Elle tombe
+      # après Saint-Pierre-aux-Liens, ce qui donne les quatre basiliques
+      # papales, le Panthéon et les quatre grandes églises jésuites et
+      # nationales. C'est la ligne à revoir en premier si la revue la conteste.
+      cathedrales: 9
+      # 203 candidats, chute de 4,8 pour un pas de 0,4 — douze fois. Elle tombe
+      # après le Forum Boarium : Forum Romain, Circus Maximus, mur d'Aurélien,
+      # Ostie, muraille Servienne, mausolée d'Auguste, forum de Trajan, forum
+      # Boarium. Les temples du Capitole suivent cinq points plus bas.
+      megalithes: 8
+      # 140 candidats, chute de 5,4 pour un pas de 0,6 — neuf fois. Après l'arc
+      # de Septime Sévère : les trois colonnes, les trois arcs, les deux
+      # théâtres antiques, le Farnèse et le Quirinal. Les palais du dix-septième
+      # siècle commencent cinq points plus bas.
+      monuments: 10
+      # 29 candidats, chute de 9,8 pour un pas de 1,5. Le même chiffre qu'à
+      # Paris, et pour la même raison : une ville où dix institutions se
+      # suivent sans qu'aucune ne soit de second rang.
+      musees: 10
+
+    "027042":           # Venise — 260 candidats, 213 retirés
+      # 29 candidats, chute de 9,1 pour un pas de 0,9 — dix fois, la mesure la
+      # plus nette de toutes les villes. Elle rend « Îles de Venise », que le
+      # plafond à six avait fait disparaître en entier : San Lazzaro degli
+      # Armeni, Murano, Burano, Torcello, Poveglia, le Ghetto, le Lido, la
+      # Giudecca. San Giorgio Maggiore suit neuf points plus bas.
+      iles: 8
+      # 58 candidats, chute de 3,6 pour un pas de 0,6 — six fois. Après le
+      # Rédempteur : Saint-Marc, les Frari, San Zanipolo, la Salute, San
+      # Zaccaria, San Francesco della Vigna, San Giorgio Maggiore, la Madonna
+      # dell'Orto, Torcello et le Rédempteur.
+      cathedrales: 10
+      # 131 candidats, chute de 2,5 pour un pas de 0,4 — six fois.
+      #
+      # ⚠ Ce vivier demande un coup d'œil en revue : quatre de ses vingt-cinq
+      # premiers sont des THÉÂTRES DISPARUS — San Cassiano (démoli en 1812),
+      # San Benedetto, San Samuele, San Moisè. `fantomes` est fait pour ça.
+      monuments: 8
+
+    "048017":           # Florence — 99 candidats, 61 retirés
+      # 16 candidats, chute de 18,2 pour un pas de 1,6 — onze fois, et elle ne
+      # vient qu'au treizième : les Offices, Pitti, l'Accademia, le Bargello,
+      # le Palazzo Vecchio, la chapelle Brancacci, l'Opera del Duomo, Boboli,
+      # Medici-Riccardi, Galilée, le corridor de Vasari, les chapelles des
+      # Médicis et l'archéologique se suivent sans une rupture. C'est le cas
+      # des musées parisiens, mais MESURÉ celui-là, et non arbitré.
+      musees: 13
+
+    # Milan (015146) et Naples (063049) n'ont PAS de dérogation, et c'est le
+    # résultat de la mesure, pas un oubli. Leurs viviers sont des plateaux :
+    # à Milan, onze palais entre 67 et 70 points ; à Naples, dix-sept palais
+    # entre 55 et 65. Le plafond y coupe exactement ce qu'il doit couper.
+    #
+    # Deux villes confirment même le six en s'y arrêtant d'elles-mêmes : les
+    # maisons de Milan chutent de 6,6 juste après le sixième, et les monuments
+    # de Florence de 2,4 pour un pas de 0,4 — au sixième également.

@@ -8020,11 +8020,40 @@ class TestSurcoucheDePays(unittest.TestCase):
         # dérogation de Paris. Inerte — aucun code ISTAT ne fait cinq
         # chiffres — mais annoncée à chaque build, ce qui est une fausse piste.
         it = load_config(pays="it")
-        self.assertEqual(it.collections.commune_overrides, {})
-        # Le plafond lui-même, lui, reste : c'est la règle générale.
+        self.assertNotIn("75056", it.collections.commune_overrides)
+        self.assertIn("75056", CONFIG.collections.commune_overrides)
+        # Le plafond lui-même reste : c'est la règle générale.
         self.assertEqual(it.collections.max_per_commune,
                          CONFIG.collections.max_per_commune)
-        self.assertIn("75056", CONFIG.collections.commune_overrides)
+
+    def test_une_ville_a_null_est_retiree_et_non_gardee_vide(self):
+        # Une ville gardée avec un dictionnaire vide serait inerte, mais elle
+        # continuerait d'être annoncée dans le journal de chaque construction.
+        vide = fusionner(
+            {"collections": {"commune_overrides": {"75056": {"musees": 10}}}},
+            {"collections": {"commune_overrides": {"75056": None}}},
+        )
+        self.assertEqual(vide["collections"]["commune_overrides"]["75056"], None)
+
+    def test_les_derogations_italiennes_sont_celles_que_derogations_a_mesurees(self):
+        # Chaque ligne coupe à la plus forte chute rendue par `derogations`,
+        # quand cette chute sort du pas courant. Rome : églises 9 (2,3 pour un
+        # pas de 0,5), sites antiques 8 (4,8 / 0,4), monuments 10 (5,4 / 0,6),
+        # musées 10 (9,8 / 1,5). Venise : îles 8 (9,1 / 0,9), églises 10
+        # (3,6 / 0,6), monuments 8 (2,5 / 0,4). Florence : musées 13
+        # (18,2 / 1,6). Milan et Naples n'ont que des plateaux.
+        villes = load_config(pays="it").collections.commune_overrides
+        self.assertEqual(villes["058091"], {   # Rome
+            "cathedrales": 9, "megalithes": 8, "monuments": 10, "musees": 10})
+        self.assertEqual(villes["027042"], {   # Venise
+            "cathedrales": 10, "iles": 8, "monuments": 8})
+        self.assertEqual(villes["048017"], {"musees": 13})   # Florence
+        for sans in ("015146", "063049"):     # Milan, Naples
+            self.assertNotIn(sans, villes)
+        # Les huit îles de Venise sont la raison d'être de tout ceci : à six,
+        # la collection « Îles de Venise » disparaissait en entier.
+        self.assertGreater(villes["027042"]["iles"],
+                           load_config(pays="it").collections.max_per_commune)
 
     def test_l_italie_garde_l_unesco_et_perd_les_listes_francaises(self):
         # L'UNESCO est la seule des quinze qui ne soit pas nationale — et elle
@@ -8068,6 +8097,28 @@ class TestSurcoucheDePays(unittest.TestCase):
         self.assertEqual(villages.min_sitelinks, CONFIG.theme("villages").min_sitelinks)
         self.assertEqual(villages.cap, CONFIG.theme("villages").cap)
 
+    def test_l_italie_ajoute_le_seul_theme_que_la_france_n_a_pas(self):
+        # `place (Q174782)` n'est déclarée par aucun thème du dépôt : en France
+        # une place est un carrefour, en Italie c'est une destination. La
+        # surcouche doit donc pouvoir AJOUTER un thème, pas seulement en
+        # corriger un.
+        it = load_config(pays="it")
+        piazzas = it.theme("piazzas")
+        self.assertEqual(piazzas.wikidata_classes, ["Q174782"])
+        self.assertNotIn("piazzas", [t.id for t in CONFIG.themes])
+        # Calé sur `monuments`, le thème le plus proche par nature : 115 lieux
+        # passent l'affichage, 193 sont collectés (`gaps --pays Q38`).
+        self.assertEqual(piazzas.min_sitelinks, CONFIG.theme("monuments").min_sitelinks)
+        self.assertEqual(piazzas.fetch_min_sitelinks,
+                         CONFIG.theme("monuments").fetch_min_sitelinks)
+        # Une piazza est ouverte, toujours : le bonus d'accueil du public n'y
+        # mesurerait que la présence d'une balise.
+        self.assertFalse(piazzas.gated)
+        # EN DERNIER dans l'ordre : l'ordre est la priorité éditoriale, et une
+        # piazza qui est aussi un site antique — le Forum — reste un site
+        # antique.
+        self.assertEqual([t.id for t in it.themes][-1], "piazzas")
+
     def test_un_theme_que_la_mesure_ne_porte_pas_est_retire(self):
         # Mesuré par `gaps --pays Q38` : la classe « forêt » (Q4421) rend deux
         # lieux italiens au plancher d'affichage du thème (4 langues), et les
@@ -8100,6 +8151,34 @@ class TestSurcoucheDePays(unittest.TestCase):
     def test_un_pays_inconnu_le_dit(self):
         with self.assertRaises(SystemExit):
             load_config(pays="xx")
+
+
+class TestChaqueThemeAUnGlyphe(unittest.TestCase):
+    """Un thème sans tracé n'a ni symbole sur la carte ni pastille de filtre.
+
+    `ThemeIcon` rend `null` quand `TRACES` ne connaît pas l'identifiant, et la
+    carte native n'enregistre que les PNG qui existent : le thème disparaît
+    des deux côtés SANS UN MOT. C'est le mode de défaillance d'un pays qui
+    ajoute un thème — et l'Italie en ajoute un.
+    """
+
+    @staticmethod
+    def _traces() -> set[str]:
+        source = (Path(__file__).resolve().parents[2]
+                  / "mobile" / "src" / "ui" / "themeIcons.tsx").read_text(encoding="utf-8")
+        corps = source.split("export const TRACES", 1)[1].split("export const THEME_IDS", 1)[0]
+        return set(re.findall(r"^  ['\"]?([a-z-]+)['\"]?: \[", corps, re.M))
+
+    def test_tous_les_themes_de_tous_les_pays_ont_leur_trace(self):
+        traces = self._traces()
+        for pays in (None, "it"):
+            for theme in load_config(pays=pays).themes:
+                with self.subTest(pays=pays or "fr", theme=theme.id):
+                    self.assertIn(theme.id, traces)
+
+    def test_la_piazza_en_fait_partie(self):
+        # Le cas qui a motivé ce garde-fou.
+        self.assertIn("piazzas", self._traces())
 
 
 class TestPlusForteChute(unittest.TestCase):

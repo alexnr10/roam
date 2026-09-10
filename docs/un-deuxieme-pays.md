@@ -821,6 +821,67 @@ Les codes ISTAT des villes concernées, lus dans la couche communale et non de
 mémoire : Rome 058091, Venise 027042, Milan 015146, Florence 048017, Naples
 063049, Turin 001272, Palerme 082053, Bologne 037006.
 
+### Les huit dérogations italiennes — MESURÉES
+
+Sorties de `derogations`, chacune à la plus forte chute quand elle sort du pas
+courant. Là où elle n'en sort pas, il n'y a pas de ligne.
+
+| ville | thème | candidats | chute / pas | plafond |
+|---|---|---|---|---|
+| Rome `058091` | églises | 203 | 2,3 / 0,5 | **9** |
+| | sites antiques | 203 | 4,8 / 0,4 | **8** |
+| | monuments | 140 | 5,4 / 0,6 | **10** |
+| | musées | 29 | 9,8 / 1,5 | **10** |
+| Venise `027042` | îles | 29 | 9,1 / 0,9 | **8** |
+| | églises | 58 | 3,6 / 0,6 | **10** |
+| | monuments | 131 | 2,5 / 0,4 | **8** |
+| Florence `048017` | musées | 16 | 18,2 / 1,6 | **13** |
+
+**Milan et Naples n'en ont aucune, et c'est un résultat.** Leurs viviers sont
+des plateaux : onze palais milanais entre 67 et 70 points, dix-sept palais
+napolitains entre 55 et 65. Le plafond y coupe exactement ce qu'il doit couper.
+Deux mesures confirment même le six en s'y arrêtant d'elles-mêmes — les maisons
+de Milan chutent de 6,6 juste après le sixième, les monuments de Florence de
+2,4 pour un pas de 0,4, au sixième également.
+
+Les huit îles de Venise sont la raison d'être de tout ceci : à six, la
+collection « Îles de Venise » disparaissait en entier.
+
+**Deux observations à porter en revue**, lues dans ces mêmes viviers :
+
+- **Le Vatican n'est pas l'Italie, et Rome perd Saint-Pierre.** Les 203 églises
+  romaines du vivier ne contiennent ni Saint-Pierre, ni la chapelle Sixtine, ni
+  les musées du Vatican : `apply_geographic_scope` les situe en Q237. Le filtre
+  a raison, le guide a tort — un voyageur français qui va à Rome va au Vatican.
+  Saint-Marin pose la même question.
+- **Quatre des vingt-cinq premiers « monuments » de Venise sont des théâtres
+  DISPARUS** — San Cassiano (démoli en 1812), San Benedetto, San Samuele, San
+  Moisè. `fantomes` est fait pour ça.
+
+### Les piazzas : le seul thème que la France n'a pas — ÉCRIT
+
+`gaps --pays Q38 --class Q174782`, lieux italiens par plancher :
+
+     ≥0    ≥1   ≥2   ≥3   ≥4   ≥6   ≥8  ≥10  ≥12  ≥15  ≥20
+   1711  1241  561  297  193  115   74   53   42   35   20
+
+Aucune falaise au-dessus de deux langues : la seule vraie rupture est entre 1 et
+2 (1 241 → 561), la bande des places de quartier qui n'ont qu'un article
+italien — le même piège que les 2 884 forêts françaises à une langue. Le
+plancher est donc un choix, et il est calé sur `monuments`, le thème le plus
+proche par nature : 6 en affichage (115 lieux), 4 en collecte (193), les 78
+d'écart laissant de quoi repêcher.
+
+Le thème arrive **en dernier** dans l'ordre fusionné, et c'est voulu : l'ordre
+est la priorité éditoriale, et une piazza qui est aussi un site antique — le
+Forum, le Campidoglio — doit rester un site antique.
+
+**Le glyphe devait exister AVANT le thème.** `ThemeIcon` rend `null` quand
+`TRACES` ne connaît pas l'identifiant, et la carte native n'enregistre que les
+PNG présents : un thème sans tracé disparaît des deux côtés sans un mot. Un
+test du pipeline lit maintenant `themeIcons.tsx` et vérifie que chaque thème de
+chaque pays a le sien.
+
 ### Le plafond des églises : la question a changé de main
 
 Avant les communes, `cathedrales` portait 549 lieux au catalogue et la question

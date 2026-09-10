@@ -486,11 +486,16 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
         min_diameter_km=float(raw["collections"].get("min_diameter_km", 0.0)),
         min_theme_lift=float(raw["collections"].get("min_theme_lift", 0.0)),
         always_cross=[str(slug) for slug in (raw["collections"].get("always_cross") or [])],
+        # Une ville à `null` est RETIRÉE, pas gardée vide. Un dictionnaire
+        # fusionne clé par clé : sans cela, la surcouche d'un pays héritait de
+        # la dérogation parisienne et n'avait aucun moyen de s'en défaire —
+        # inerte, mais annoncée dans le journal de chaque construction.
         commune_overrides={
-            str(ville): {str(t): int(n) for t, n in (plafonds or {}).items()}
+            str(ville): {str(t): int(n) for t, n in plafonds.items()}
             for ville, plafonds in (
                 raw["collections"].get("commune_overrides") or {}
             ).items()
+            if plafonds
         },
     )
 
