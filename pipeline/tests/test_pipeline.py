@@ -8017,17 +8017,56 @@ class TestSurcoucheDePays(unittest.TestCase):
     def test_l_italie_garde_l_unesco_et_perd_les_listes_francaises(self):
         # L'UNESCO est la seule des quinze qui ne soit pas nationale — et elle
         # vaut d'autant plus ici : l'Italie porte le plus grand nombre de biens
-        # inscrits au monde.
+        # inscrits au monde. Les Borghi più belli sont la première liste
+        # NATIONALE italienne résolue.
         it = load_config(pays="it")
-        self.assertEqual([lbl.id for lbl in it.labels], ["unesco"])
+        self.assertEqual(
+            sorted(lbl.id for lbl in it.labels),
+            ["borghi-piu-belli", "unesco"],
+        )
 
-    def test_un_theme_qui_ne_peut_rien_collecter_est_retire(self):
-        # `villages` n'a AUCUNE classe Wikidata : il vit entièrement des Plus
-        # Beaux Villages de France. Un thème vide promet une catégorie et rend
-        # une liste blanche.
-        it = load_config(pays="it")
-        self.assertNotIn("villages", [t.id for t in it.themes])
-        self.assertIn("villages", [t.id for t in CONFIG.themes])
+    def test_les_borghi_sont_ecrits_comme_les_plus_beaux_villages(self):
+        # L'équivalent exact, et il doit l'être jusque dans la forme de la
+        # requête : c'est l'ASSOCIATION qui est interrogée (`member_of`), pas
+        # une page de liste régionale.
+        borghi = next(
+            lbl for lbl in load_config(pays="it").labels
+            if lbl.id == "borghi-piu-belli"
+        )
+        villages = next(
+            lbl for lbl in CONFIG.labels if lbl.id == "plus-beaux-villages"
+        )
+        self.assertEqual(borghi.query_kind, villages.query_kind)
+        self.assertEqual(borghi.qid, "Q127107")
+        self.assertEqual(borghi.score_bonus, villages.score_bonus)
+        self.assertTrue(borghi.makes_collection)
+        # Extrapolé de la revue française — 352 lieux de listes à jury relus,
+        # zéro écarté. Si la revue italienne écarte, c'est cette ligne qui
+        # saute.
+        self.assertTrue(borghi.garde_d_office)
+
+    def test_les_villages_italiens_vivent_de_la_liste_italienne(self):
+        # Le thème n'a AUCUNE classe Wikidata : il vit entièrement de ses
+        # listes. Les françaises sont retirées ; sans la liste italienne il
+        # promettrait une catégorie et rendrait une liste blanche.
+        villages = load_config(pays="it").theme("villages")
+        self.assertEqual(villages.from_labels, ["borghi-piu-belli"])
+        self.assertEqual(villages.wikidata_classes, [])
+        # Le reste du thème ne bouge pas.
+        self.assertEqual(villages.min_sitelinks, CONFIG.theme("villages").min_sitelinks)
+        self.assertEqual(villages.cap, CONFIG.theme("villages").cap)
+
+    def test_un_theme_que_la_mesure_ne_porte_pas_est_retire(self):
+        # Mesuré par `gaps --pays Q38` : la classe « forêt » (Q4421) rend deux
+        # lieux italiens au plancher d'affichage du thème (4 langues), et les
+        # trois classes de `cirques` un seul pour tout le pays. Ni la forêt
+        # DOMANIALE — un statut du droit français — ni le label Forêt
+        # d'Exception ne les repêchent.
+        italiens = [t.id for t in load_config(pays="it").themes]
+        francais = [t.id for t in CONFIG.themes]
+        for theme_id in ("forets", "cirques"):
+            self.assertNotIn(theme_id, italiens)
+            self.assertIn(theme_id, francais)
 
     def test_aucun_theme_italien_ne_depend_d_une_liste_retiree(self):
         # La validation le refuserait, et c'est bien ; encore faut-il que le

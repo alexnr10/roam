@@ -6,18 +6,24 @@
 # `docs/un-deuxieme-pays.md`.
 
 themes:
-  # ── Les villages : retirés, faute de liste ─────────────────────────────
+  # ── Les villages : la liste italienne à la place des françaises ────────
   #
-  # Le thème n'a AUCUNE classe Wikidata : il vit entièrement des Plus Beaux
-  # Villages de France et des Plus Beaux Détours. Sans elles il ne collecte
-  # rien, et un thème vide au catalogue est pire qu'un thème absent — il
-  # promet une catégorie et rend une liste blanche.
+  # Le thème n'a AUCUNE classe Wikidata : il vit entièrement de ses listes. En
+  # France, les Plus Beaux Villages et les Plus Beaux Détours ; en Italie, les
+  # Borghi più belli d'Italia, résolus dans `labels.yaml` (Q127107).
   #
-  # Il revient dès que « I Borghi più belli d'Italia » est résolu contre
-  # Wikidata avec `label-probe`. C'est l'équivalent exact, et il est la
-  # première chose à ajouter à ce fichier.
+  # Le reste du thème ne bouge pas, et le PLANCHER D'AFFICHAGE surtout pas :
+  # un lieu tenu par une liste officielle de son propre thème passe outre
+  # (`collections.py`, `apply_notoriety_floor`), exactement comme les Maisons des
+  # Illustres en France. Un bourg de trois cents habitants documenté dans la
+  # seule Wikipédia italienne reste au catalogue — c'est le jury qui l'y met,
+  # pas le décompte de langues.
+  #
+  # Le `cap` de 80 reste lui aussi : la liste italienne en compte un peu plus
+  # de trois cents, comme la française. S'il faut le relever, ce sera après un
+  # build, en lisant la coupe réelle — jamais avant.
   - id: villages
-    retire: true
+    from_labels: [borghi-piu-belli]
 
   # ── Les maisons : les classes seules ───────────────────────────────────
   #
@@ -63,3 +69,47 @@ themes:
     broad_classes:
       - qid: Q16970
         fetch_min_sitelinks: 8
+
+  # ── Les forêts : retirées, la mesure ne les porte pas ──────────────────
+  #
+  # `gaps --pays Q38 --class Q4421`, lieux italiens de la classe « forêt » par
+  # plancher :
+  #
+  #     ≥0   ≥1   ≥2   ≥3   ≥4   ≥6   ≥8  ≥10  ≥12  ≥15  ≥20
+  #     93   83   18    5    2    1    0    0    0    0    0
+  #
+  # À comparer aux 2 920 françaises, dont 156 tiennent à trois langues. Le
+  # plancher d'AFFICHAGE du thème est à 4 : deux forêts italiennes le passent.
+  #
+  # Et rien ne les repêche. La classe propre du thème, `Q3079027`, est la forêt
+  # DOMANIALE — un statut de propriété du droit français, qui ne désigne rien
+  # en Italie. Le label Forêt d'Exception, qui portait à lui seul sept des
+  # trente-deux forêts du catalogue français, est une liste de l'ONF : retiré
+  # dans `labels.yaml`. Il reste donc, littéralement, deux lieux.
+  #
+  # Un thème qui promet une catégorie et rend deux lignes est pire qu'un thème
+  # absent — c'est le motif qui avait retiré `villages`, avant que la liste
+  # italienne ne le rende. Retiré, donc, et c'est une décision de CURATION :
+  # abaisser le plancher à 2 langues rendrait 18 lieux, mais ce sont les bois
+  # communaux, la bande que la mesure française écarte à dessein. Le jour où
+  # une liste italienne des forêts remarquables se résout, ces deux lignes
+  # sautent et le thème revient tel quel.
+  - id: forets
+    retire: true
+
+  # ── Les cirques : retirés, il n'y en a qu'un ───────────────────────────
+  #
+  # `gaps --pays Q38 --class Q388227` (cirque glaciaire) :
+  #
+  #     ≥0   ≥1   ≥2   ≥3   ≥4   ≥6   ≥8  ≥10  ≥12  ≥15  ≥20
+  #      2    2    1    1    1    0    0    0    0    0    0
+  #
+  # Et la collecte confirme sur les TROIS classes du thème réunies — cirque
+  # glaciaire, cirque, reculée : un lieu candidat pour toute l'Italie.
+  #
+  # Ce n'est pas une lacune de Wikidata, c'est de la géographie. Gavarnie, la
+  # Fer-à-Cheval, Mourèze : le cirque est une forme pyrénéenne et jurassienne.
+  # L'Italie a ses lacs, ses volcans et ses Dolomites, qui sont d'autres
+  # thèmes. Un thème d'un seul lieu ne se garde pas.
+  - id: cirques
+    retire: true

@@ -597,8 +597,8 @@ constructions d'affilée rendent le même octet.
 | fichier | ce qu'il dit |
 |---|---|
 | `scoring.yaml` | Q38 / IT / Italie / d'Italie, et les contours des 110 provinces |
-| `themes.yaml` | `villages` retiré, `maisons` sans liste d'État, les églises entrent et leur plafond tombe |
-| `labels.yaml` | quatorze listes françaises retirées, l'UNESCO gardée |
+| `themes.yaml` | `villages` rendu par la liste italienne, `forets` et `cirques` retirés, `maisons` sans liste d'État, les églises entrent et leur plafond tombe |
+| `labels.yaml` | quatorze listes françaises retirées, l'UNESCO gardée, les Borghi più belli ajoutés |
 
 Les contours viennent d'`openpolis/geojson-italy`, découpage officiel de
 l'ISTAT, vérifié : 110 provinces, 5,4 Mo. Les noms de propriétés ne se
@@ -715,9 +715,60 @@ Paris a été posée. Elles viennent donc après la première collecte, pas avan
 été posés après un build, en lisant que le catalogue en portait 193 pour 61
 montrés. Le premier build italien donnera la même lecture.
 
-**« I Borghi più belli d'Italia »**, à résoudre avec `label-probe`. C'est
-l'équivalent exact des Plus Beaux Villages, et il rend au thème `villages` de
-quoi exister.
+**Les listes italiennes restantes.** Les monuments nationaux, les jardins
+historiques, les parcs nationaux et régionaux, les réserves naturelles : rien
+n'est écrit tant que `suggest-qids` puis `verify-qids` ne l'ont pas résolu. Les
+Borghi più belli, eux, sont faits — section suivante.
+
+### Les trois thèmes que la mesure italienne a tranchés — FAIT
+
+**Villages : rendus.** `suggest-qids` sur « I borghi più belli » rend six
+résultats ; c'est **Q127107** qui est l'association — « association culturelle
+italienne » —, comme Q1010307 l'est en France. Les Q110890335/6/7 sont des
+pages de listes régionales : `member_of` sur elles ne rendrait qu'une région.
+Le label est écrit dans `config/it/labels.yaml` sur le modèle exact du
+français : `member_of`, bonus 30, `makes_collection`, `garde_d_office`.
+
+Ce dernier est une **extrapolation assumée**, et c'est la seule ligne de tout
+`config/it/` qui n'est pas une mesure. La revue française a relu 352 lieux de
+listes à jury et n'en a écarté aucun (185 villages, 102 détours, 54 Grands
+Sites, 11 forêts d'exception) ; les Borghi sont du même genre — association,
+jury, liste finie — mais n'ont jamais été relus. Si la première revue italienne
+écarte des bourgs, c'est cette ligne qui saute, et elle seule.
+
+Le plancher d'affichage du thème (3 langues) ne bouge pas : un lieu porté par
+une liste officielle de son thème le franchit d'office
+(`collections.py`, `apply_notoriety_floor`), comme les Maisons des Illustres en
+France — 147 d'entre elles ne tenaient qu'à cette dispense.
+
+**Forêts : retirées.** `gaps --pays Q38 --class Q4421` :
+
+    forêt (Q4421)
+     ≥0   ≥1   ≥2   ≥3   ≥4   ≥6   ≥8  ≥10  ≥12  ≥15  ≥20
+     93   83   18    5    2    1    0    0    0    0    0
+
+Contre 2 920 françaises, dont 156 à trois langues. Le plancher d'affichage du
+thème est à 4 : **deux** forêts italiennes le passent. Et rien ne les repêche —
+la classe propre du thème, `Q3079027`, est la forêt *domaniale*, un statut du
+droit français ; le label Forêt d'Exception, qui portait sept des trente-deux
+forêts françaises du catalogue, est une liste de l'ONF. Abaisser le plancher à
+2 rendrait 18 lieux, mais c'est la bande des bois communaux, que la mesure
+française écarte à dessein.
+
+**Cirques : retirés.** `gaps --pays Q38 --class Q388227` :
+
+    cirque glaciaire (Q388227)
+     ≥0   ≥1   ≥2   ≥3   ≥4   ≥6   ≥8  ≥10  ≥12  ≥15  ≥20
+      2    2    1    1    1    0    0    0    0    0    0
+
+Et la collecte le confirme sur les trois classes du thème réunies : **un** lieu
+candidat pour toute l'Italie. Ce n'est pas une lacune de Wikidata, c'est de la
+géographie — le cirque est une forme pyrénéenne et jurassienne.
+
+Dans les deux cas, le motif est celui qui avait retiré `villages` avant que la
+liste italienne ne le rende : un thème qui promet une catégorie et rend deux
+lignes est pire qu'un thème absent. C'est une décision de curation, pas de
+configuration, et elle tient en une ligne à retirer.
 
 ### Ce qu'on sait déjà pour écrire `config/it/`
 

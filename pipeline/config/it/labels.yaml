@@ -6,13 +6,42 @@
 # qu'ajouter enverrait le pipeline interroger Wikidata pour quinze listes
 # étrangères, à chaque collecte, pour rien.
 #
-# `retire: true` les enlève. Ce qu'il faudra mettre à leur place — les
-# monuments nationaux, les Borghi più belli d'Italia, les jardins historiques —
-# se résout avec `label-probe`, une liste à la fois, comme les françaises l'ont
-# été. Aucun n'est écrit ici tant qu'il n'est pas résolu contre Wikidata : un
-# Q-id supposé est un label qui ne collecte rien et ne le dit pas.
+# `retire: true` les enlève. Ce qu'il faut mettre à leur place se résout avec
+# `suggest-qids` puis `verify-qids`, une liste à la fois, comme les françaises
+# l'ont été. Aucun n'est écrit ici tant qu'il n'est pas résolu contre
+# Wikidata : un Q-id supposé est un label qui ne collecte rien et ne le dit pas.
+#
+# Résolue à ce jour : les Borghi più belli d'Italia, ci-dessous. Restent à
+# résoudre, dans cet ordre d'utilité — les monuments nationaux, les jardins
+# historiques, les parcs nationaux et régionaux, les réserves naturelles.
 
 labels:
+  # ── I Borghi più belli d'Italia ────────────────────────────────────────
+  #
+  # L'équivalent italien exact des Plus Beaux Villages de France : une
+  # association privée, un jury, une liste finie, révisée. Elle rend au thème
+  # `villages` ce que les listes françaises lui donnaient — il n'a aucune
+  # classe Wikidata et ne vit que de ses listes.
+  #
+  # `suggest-qids` a rendu six résultats pour « I borghi più belli » ; c'est
+  # Q127107 qui est l'ASSOCIATION (« association culturelle italienne »),
+  # comme Q1010307 l'est en France. Les trois Q110890335/6/7 sont des pages de
+  # listes régionales, pas l'autorité : `member_of` sur elles ne rendrait que
+  # la région écrite. Rien n'est repris de mémoire : le Q-id vient de la sortie
+  # de `suggest-qids`, et `verify-qids` doit le confirmer avant la collecte.
+  - id: borghi-piu-belli
+    # Gardé sans revue — et c'est ici une EXTRAPOLATION, pas une mesure.
+    # En France, les quatre listes à jury ont été mesurées : 352 lieux relus,
+    # 0 écarté. Celle-ci est du même genre (association, jury, liste finie),
+    # jamais relue en italien. Si la première revue italienne écarte des
+    # bourgs, c'est cette ligne qui saute, et elle seule.
+    garde_d_office: true
+    name: Les Plus Beaux Bourgs d'Italie
+    authority: Association I Borghi più belli d'Italia
+    score_bonus: 30
+    makes_collection: true
+    wikidata_query: { kind: member_of, qid: Q127107 }
+
   # L'UNESCO reste : c'est la seule liste de ces quinze qui ne soit pas
   # nationale, et elle vaut d'autant plus ici — l'Italie porte le plus grand
   # nombre de biens inscrits au monde.
