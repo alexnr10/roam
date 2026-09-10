@@ -1,32 +1,155 @@
 decision,curator_note,theme_id,name,wikidata_id
+keep,,,"Abbaye Saint-Michel-de-la-Cluse",Q19881
+keep,,,"Abbaye du Mont-Cassin",Q334051
+keep,,cathedrales,"Basilique Saint-Apollinaire de Classe",Q744552
+keep,,,"Chartreuse de Pavie",Q654443
+keep,,cathedrales,"Église du Santo",Q810139
+keep,,,"Église et couvent de la Trinité-des-Monts de Rome",Q1229008
+keep,,,"Chartreuse de Padula",Q1051820
+keep,,,"Abbaye de Pomposa",Q514366
+keep,,musees,"Musée national San Marco",Q13453137
+keep,,cathedrales,"Église de Santo-Spirito",Q1519975
+keep,,,"Cascata delle Marmore",Q38580
 keep,,,"Basilique Saint-Pierre",Q12512
-keep,,megalithes,"Panthéon",Q99309
 keep,,,"Dôme de Milan",Q18068
 keep,,,"Cathédrale de Modène",Q753721
 keep,,,"Église Santa Maria delle Grazie de Milan",Q244952
 keep,,,"Chapelle Sixtine",Q2943
 keep,,,"Basilique Santa Maria Novella",Q51175
+keep,,,"Cathédrale Santa Maria del Fiore",Q191739
+keep,,,"Basilique Sainte-Marie-Majeure de Rome",Q186282
+keep,,,"Basilique Saint-Vital",Q721817
+keep,,,"Basilique Saint-Jean-de-Latran",Q84090
+keep,,,"Castel del Monte",Q215897
 keep,,,"Château Saint-Ange",Q486382
-drop,,,"Val d'Orcia",Q217449
+keep,,,"Château de Miramare",Q165069
+keep,,monuments,"Palais des Normands",Q1473825
+keep,,,"Château d'Este",Q1048836
+keep,,,"Château des Sforza",Q23354
+keep,,,"Palais royal de Venaria",Q19838
+keep,,,"Château de Torrechiara",Q13291063
+keep,,,"Fort de Bard",Q2255867
+keep,,,"Castel Nuovo",Q781219
+drop,,,"Plaine du Pô",Q202207
+drop,,,"Val Camonica",Q734317
+drop,,,"Valteline",Q685105
+drop,,,"Val Gardena",Q384885
+drop,,,"Val Pusteria",Q698451
+drop,,,"Carnie",Q369765
+drop,,,"Valle Latina",Q41700210
+drop,,,"Val Polcevera",Q657150
+drop,,,"Val di Chiana",Q1071597
+drop,,,"Val di Fiemme",Q256454
+keep,,,"Grottes de Castellana",Q1547653
+keep,,,"Grottes de Frasassi",Q1994964
+keep,,,"Grotte de Neptune",Q1501051
+drop,,,"Lupercal",Q1235116
+keep,,,"Oreille de Denys",Q282839
+demote,,,"Balzi Rossi",Q555143
+drop,,,"Grotte de l'Addaura",Q352845
+keep,,,"Grottes de Toirano",Q1332930
 keep,,,"Île d'Elbe",Q45328
+keep,,,"Stromboli",Q131148
+keep,,,"Capri",Q173292
+keep,,,"Lampedusa",Q107338
+keep,,,"Ischia",Q189387
+keep,,abbayes,"San Lazzaro degli Armeni",Q1791020
+drop,,,"Île de Montecristo",Q203169
+keep,,,"Murano",Q52437
+keep,,,"Vulcano",Q207323
+drop,,,"Sicile",Q4951156
+keep,,,"Villa d'Este",Q746063
+keep,,,"Jardin botanique de Padoue",Q598892
+keep,,,"Villa Borghèse",Q678313
+keep,,,"Jardins du Vatican",Q42003
+keep,,,"Jardin botanique Hanbury",Q894646
+keep,,,"Jardin botanique de Palerme",Q894656
+demote,,,"Jardin botanique de Brera",Q2882456
+keep,,maisons,"Villa Godi Malinverni",Q2084394
+keep,,,"Parco Sempione",Q133963
 keep,,,"Lac de Côme",Q15523
+keep,,,"Lac de Garde",Q6414
+keep,,,"Lac Majeur",Q14379
+keep,,dunes-marais,"Lagune de Venise",Q76925
+keep,,,"Lac de Lugano",Q14418
+keep,,,"Lac d'Iseo",Q15648
+keep,,,"Lac d'Orta",Q63141
+keep,,,"Lac de Bolsena",Q208180
+keep,,,"Lac Trasimène",Q188487
+keep,,,"Lac de Resia",Q1249840
+keep,,musees,"Palais royal de Naples",Q426339
+keep,,,"Villa Médicis",Q1362663
+keep,,musees,"Galerie Palatine",Q866498
+keep,,grottes,"Grotte Bleue",Q605185
+keep,,musees,"MAXXI - Musée national des arts du XXIe siècle",Q1881229
+keep,,,"Villa Balbianello",Q1759446
+keep,,,"Musée Poldi-Pezzoli",Q1190657
+keep,,,"Casa di Giulietta",Q3661293
+keep,,musees,"Musée Ferrari",Q2706867
+keep,,musees,"Galleria Estense",Q774128
+keep,,,"Colisée",Q10285
+keep,,,"Panthéon",Q99309
+keep,,,"Vallée des Temples",Q636774
+keep,,,"Villa d'Hadrien",Q272777
+keep,,,"Villa romaine du Casale",Q505617
 keep,,,"Pompéi",Q43332
-drop,,,"Syracuse",Q13670
-drop,,,"Tarente",Q13498
-drop,,,"Messine",Q13666
+keep,,,"Herculanum",Q178813
+keep,,,"Su Nuraxi",Q253241
+keep,,,"Forum Romain",Q180212
+keep,,,"Circus Maximus",Q207808
 keep,,,"Tour de Pise",Q39054
-keep,,megalithes,"Colisée",Q10285
-keep,,megalithes,"Vallée des Temples",Q636774
-keep,,chateaux,"Castel del Monte",Q215897
-keep,,megalithes,"Villa d'Hadrien",Q272777
-keep,,jardins,"Villa d'Este",Q746063
-keep,,megalithes,"Villa romaine du Casale",Q505617
-keep,,megalithes,"Herculanum",Q178813
-keep,,megalithes,"Su Nuraxi",Q253241
-drop,,,"Musées du Vatican",Q182955
+keep,,,"Colonne Trajane",Q192784
+keep,,,"Palais du Vatican",Q145093
+keep,,,"Palais Farnèse",Q848386
+keep,,,"La Scala",Q5471
+drop,,,"Théâtre de Pompée",Q944814
+keep,,,"Arc de Constantin",Q5786
+keep,,,"Palais du Quirinal",Q223079
+keep,,,"Campanile de Saint-Marc",Q754194
+demote,,musees,"Palazzo Doria-Tursi",Q162965
 keep,,,"Palais Pitti",Q29286
+keep,,,"Musées du Capitole",Q333906
+keep,,,"Arènes de Vérone",Q641556
+keep,,,"Galerie des Offices",Q51252
+keep,,,"Palais de Caserte",Q327983
+keep,,,"Palais des Doges",Q189883
+keep,,monuments,"Monument à Victor-Emmanuel II",Q506234
+keep,,megalithes,"Sélinonte",Q952173
+keep,,,"Galerie Borghèse",Q841506
+keep,,,"Musée archéologique national de Paestum",Q3329487
 keep,,,"Piazza dei Miracoli",Q750245
-drop,,,"Calabre",Q1458
+keep,,,"Place Saint-Pierre",Q83425
+keep,,,"Place Saint-Marc",Q217527
+keep,,,"Piazza Navona",Q463400
+keep,,,"Piazza del Popolo",Q824997
+keep,,,"Place du Capitole",Q34921
+keep,,,"Piazza di Spagna",Q15124814
+keep,,,"Piazza Venezia",Q874832
+keep,,,"Largo di Torre Argentina",Q1541068
+keep,,,"Piazza della Signoria",Q849846
+drop,,,"Salento",Q735628
+keep,,,"Gargano",Q763332
+keep,,,"Péninsule de Sorrente",Q59116
+keep,,,"Scala dei Turchi",Q3951389
 keep,,,"Ponte Vecchio",Q208633
+drop,,,"Pont Morandi",Q3907993
+keep,,,"Pont des Soupirs",Q52517
+keep,,,"Pont du Rialto",Q52505
+drop,,,"Aqueduc de l'Aqua Virgo",Q600139
+keep,,,"Pont de la Constitution",Q52501
+keep,,,"Pont de l'Académie",Q52509
+drop,,,"Pont de la Liberté",Q1134699
+keep,,,"Pont des Déchaussés",Q52508
+keep,,,"Pont Santa Trinita",Q545578
+keep,,volcans,"Champs Phlégréens",Q755123
+drop,,,"Massif du Mont-Blanc",Q671343
+drop,,,"Alpes cottiennes",Q1251
+drop,,,"Mont Cassin",Q154372
+drop,,,"Plateau du Karst",Q625139
+drop,,,"Cilento",Q842184
+keep,,,"Mont Titano",Q158526
+drop,,,"Alpes carniques",Q660390
+demote,,,"Mont Albain",Q1129380
+keep,,,"Monte Pellegrino",Q731916
 keep,,,"Vésuve",Q524
 keep,,,"Etna",Q16990
