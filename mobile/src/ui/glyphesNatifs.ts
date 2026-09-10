@@ -15,6 +15,7 @@ export const GLYPHES: Record<string, ImageRequireSource> = {
   'chateaux': require('../../assets/glyphes/chateaux.png'),
   'abbayes': require('../../assets/glyphes/abbayes.png'),
   'cathedrales': require('../../assets/glyphes/cathedrales.png'),
+  'piazzas': require('../../assets/glyphes/piazzas.png'),
   'villages': require('../../assets/glyphes/villages.png'),
   'sommets': require('../../assets/glyphes/sommets.png'),
   'cascades': require('../../assets/glyphes/cascades.png'),

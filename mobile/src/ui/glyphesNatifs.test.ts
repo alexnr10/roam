@@ -47,8 +47,8 @@ function dimensions(chemin: string): { largeur: number; hauteur: number } {
 }
 
 describe('les glyphes de la carte native', () => {
-  it('couvre les vingt-trois thèmes', () => {
-    expect(themes.length).toBe(23);
+  it('couvre les vingt-quatre thèmes', () => {
+    expect(themes.length).toBe(24);
   });
 
   for (const densite of [1, 2, 3]) {

@@ -44,6 +44,21 @@ export const TRACES: Record<string, string[]> = {
     'M7.5 7V4.5',
     'M16.5 7V4.5',
   ],
+  // La piazza : un thème que la France n'a pas. Ici une place est un
+  // carrefour ; en Italie c'est une destination.
+  //
+  // Ce qui la définit n'est pas un édifice mais une COMPOSITION : un vide
+  // encadré de façades basses, avec quelque chose au centre. Le glyphe la
+  // rend donc en trois masses sur une ligne de sol — l'obélisque seul serait
+  // « monuments ». Cinq variantes ont été rendues à 90, 22 et 14 pixels avant
+  // celle-ci : la fontaine devenait illisible sous 22, et l'arcade se
+  // confondait avec « abbayes ».
+  piazzas: [
+    'M2 20h20',
+    'M11 20V8.5l1-2.5 1 2.5V20',
+    'M2.5 20v-5.5h5.5V20',
+    'M16 20v-5.5h5.5V20',
+  ],
   villages: [
     'M2 20v-6l4.5-3.5L11 14v6',
     'M11 20v-8l5-4 5 4v8',
@@ -197,6 +212,7 @@ export const THEME_LABELS: Record<string, string> = {
   chateaux: "Châteaux",
   abbayes: "Abbayes",
   cathedrales: "Cathédrales",
+  piazzas: "Places",
   villages: "Villages",
   sommets: "Sommets",
   cascades: "Cascades",
