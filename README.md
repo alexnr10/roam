@@ -38,6 +38,21 @@ pipeline/   collecte Wikidata, scoring, construction des collections
 mobile/     application Expo — carte, validation GPS, collections, badges
 ```
 
+## Où en est ce clone ?
+
+```bash
+sh scripts/etat.sh
+```
+
+Branche, commit, retard sur l'amont, fichiers modifiés — et ce qu'il faut
+faire. À lancer **avant** toute série de commandes.
+
+Deux pannes au moins n'ont pas eu d'autre cause qu'un clone ailleurs qu'on ne
+le croyait : une branche restée en arrière, un `main` local qui n'avait jamais
+bougé depuis le premier commit. Aucune ne se signale — `git pull` répond
+« Already up to date » sur la branche courante, même quand il vient de
+télécharger cent commits pour une autre.
+
 ## Démarrage
 
 ```bash
