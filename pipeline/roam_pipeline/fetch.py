@@ -9,11 +9,12 @@ import re
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Sequence
 
 from . import wikidata as wd
 from .commons import _replier, file_title
 from .wikipedia import BATCH, EXTRACT_BATCH, WikipediaClient, title_from_url
-from .config import Config, Label, Theme
+from .config import Config, Enclave, Label, Theme
 from .geo import normalize_dept_code, region_of
 from . import localisation
 from .geocode import (
@@ -46,7 +47,8 @@ def fetch_theme(
     theme: Theme,
     label_members: dict[str, set[str]] | None = None,
     *,
-    country: str,
+    country: str | Sequence[str],
+    enclaves: dict[str, Enclave] | None = None,
 ) -> list[Place]:
     """Lieux candidats pour un thème.
 
@@ -74,7 +76,7 @@ def fetch_theme(
             LOG.warning("thème %s : aucun membre de label disponible", theme.id)
         for batch in wd.chunked(sorted(members), 150):
             for row in client.query(wd.items_query(batch)):
-                place = _row_to_place(row, theme)
+                place = _row_to_place(row, theme, enclaves)
                 if place is not None:
                     by_qid[place.wikidata_id] = place
 
@@ -92,7 +94,7 @@ def fetch_theme(
                 [q], f, limit=limit, offset=offset, country=country
             ),
         ):
-            place = _row_to_place(row, theme)
+            place = _row_to_place(row, theme, enclaves)
             if place is None:
                 continue
             place.via_broad_class = class_qid in broad
@@ -143,7 +145,9 @@ def _completeness(place: Place) -> int:
     )
 
 
-def _row_to_place(row: dict[str, str], theme: Theme) -> Place | None:
+def _row_to_place(
+    row: dict[str, str], theme: Theme, enclaves: dict[str, Enclave] | None = None
+) -> Place | None:
     qid = wd.qid_from_uri(row.get("item"))
     coords = wd.parse_point(row.get("coord"))
     name = row.get("itemLabel")
@@ -154,7 +158,7 @@ def _row_to_place(row: dict[str, str], theme: Theme) -> Place | None:
     if name == qid:
         return None
 
-    return Place(
+    place = Place(
         wikidata_id=qid,
         name=name,
         theme_id=theme.id,
@@ -169,6 +173,18 @@ def _row_to_place(row: dict[str, str], theme: Theme) -> Place | None:
         admin_qid=wd.qid_from_uri(row.get("admin")),
         validation_radius_m=theme.radius_m,
     )
+    # Un lieu d'enclave n'a pas de province italienne : il sortirait du
+    # catalogue avant d'être jugé, faute de département. On le rattache à celle
+    # qui l'entoure — et `country_code` reste VIDE, car la mention en ferait un
+    # catalogue à part (`pays_de`), alors qu'il est là pour être dans celui-ci.
+    enclave = (enclaves or {}).get(wd.qid_from_uri(row.get("pays")) or "")
+    if enclave is not None:
+        place.departement_code = enclave.departement
+        connue = region_of(enclave.departement)
+        if connue:
+            place.region_code = connue.code
+        place.commune_name = place.commune_name or enclave.name
+    return place
 
 
 def _as_int(value: str | None) -> int | None:
@@ -727,6 +743,12 @@ def resolve_admin(client: wd.SparqlClient, places: list[Place]) -> None:
             continue
         dept_raw, region_raw = codes.get(place.admin_qid, (None, None))
         dept = normalize_dept_code(dept_raw)
+        # Ne pas EFFACER un département que la collecte a déjà établi. Un lieu
+        # du Vatican porte bien un `P131` — la Cité elle-même — dont aucun code
+        # de province ne sort : sans cette garde, la remontée administrative
+        # reprenait d'une main le rattachement que l'enclave venait de poser.
+        if dept is None and place.departement_code:
+            continue
         place.departement_code = dept
         # Le code de région se déduit du département : plus fiable que la
         # remontée Wikidata, qui rate les communes mal rattachées.
@@ -1745,11 +1767,19 @@ def run_fetch(
         if unknown:
             raise KeyError(f"thème(s) inconnu(s) : {', '.join(sorted(unknown))}")
 
+    enclaves = {enclave.qid: enclave for enclave in config.country.enclaves}
+    if enclaves:
+        LOG.info(
+            "enclaves absorbées : %s",
+            ", ".join(f"{e.name} ({e.qid}) → département {e.departement}"
+                      for e in config.country.enclaves),
+        )
+
     label_members: dict[str, set[str]] = {}
     for label in config.labels:
         try:
             label_members[label.id] = fetch_label_members(
-                client, label, manual_dir, country=config.country.qid)
+                client, label, manual_dir, country=config.country.qids)
         except Exception as exc:  # un label en échec ne doit pas tuer la collecte
             LOG.error("label %s : collecte échouée (%s)", label.id, exc)
             label_members[label.id] = set()
@@ -1758,8 +1788,9 @@ def run_fetch(
     failed: list[str] = []
     for theme in themes:
         try:
-            places.extend(
-                fetch_theme(client, theme, label_members, country=config.country.qid))
+            places.extend(fetch_theme(
+                client, theme, label_members,
+                country=config.country.qids, enclaves=enclaves))
         except Exception as exc:
             LOG.error("thème %s : collecte échouée (%s)", theme.id, exc)
             failed.append(theme.id)

@@ -291,6 +291,26 @@ class Layer:
 
 
 @dataclass(frozen=True)
+class Enclave:
+    """Un micro-État enclavé, rattaché au catalogue qui l'entoure.
+
+    Le Vatican et Saint-Marin sont des pays chez Wikidata : `P17` y vaut Q237
+    et Q238, jamais Q38. La collecte italienne ne les voyait donc pas, et les
+    203 églises romaines du vivier n'avaient ni Saint-Pierre, ni la chapelle
+    Sixtine, ni les musées du Vatican. Le filtre avait raison ; le guide avait
+    tort — un voyageur français qui va à Rome va au Vatican.
+
+    `departement` dit à quelle province le rattacher, parce qu'un lieu sans
+    département sort du catalogue avant même d'être jugé. C'est un choix de
+    GUIDE et non de géopolitique : on va à Saint-Pierre depuis Rome.
+    """
+
+    qid: str
+    name: str
+    departement: str
+
+
+@dataclass(frozen=True)
 class Country:
     """Le pays que ce catalogue décrit.
 
@@ -306,6 +326,13 @@ class Country:
     code: str
     name: str
     de_form: str
+    #: Les micro-États enclavés que ce catalogue absorbe.
+    enclaves: tuple[Enclave, ...] = ()
+
+    @property
+    def qids(self) -> list[str]:
+        """Tous les pays à interroger : le principal, puis ses enclaves."""
+        return [self.qid, *(enclave.qid for enclave in self.enclaves)]
 
 
 @dataclass(frozen=True)
@@ -529,6 +556,13 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
     country = Country(
         qid=str(pays["qid"]), code=str(pays["code"]),
         name=str(pays["name"]), de_form=str(pays["de_form"]),
+        # `enclaves` est frère de `country` dans le fichier — il décrit ce que
+        # le catalogue absorbe, pas le pays lui-même.
+        enclaves=tuple(
+            Enclave(qid=str(e["qid"]), name=str(e["name"]),
+                    departement=str(e["departement"]))
+            for e in (raw["geo"].get("enclaves") or [])
+        ),
     )
 
     layers = {

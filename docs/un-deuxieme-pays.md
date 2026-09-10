@@ -914,6 +914,54 @@ dispense.
 Une seule ligne en Italie : `iles-departement-027`. Les quatre autres restent
 dehors, et c'est la règle qui a raison.
 
+### Le Vatican et Saint-Marin, absorbés — FAIT
+
+Ce sont des **pays** chez Wikidata : `P17` y vaut Q237 et Q238, jamais Q38. La
+collecte italienne ne les voyait donc pas, et les 203 églises romaines du vivier
+de `derogations` n'avaient ni Saint-Pierre, ni la chapelle Sixtine, ni les
+musées du Vatican. Le filtre avait raison ; le guide avait tort.
+
+`geo.enclaves` les déclare, avec la province à laquelle les rattacher — Rome
+(058) et Rimini (099), lues dans `data/reference/it/departements.csv`. Ce
+rattachement n'est pas de la géopolitique : un lieu sans département sort du
+catalogue avant d'être jugé, et surtout **on va à Saint-Pierre depuis Rome**.
+`country_code` reste vide sur ces lieux — la mention en ferait un catalogue à
+part (`pays_de`), alors qu'ils sont là pour être dans celui de l'Italie.
+
+Les Q-id ne viennent pas de mémoire. Wikidata est injoignable depuis le
+conteneur ; ils sont lus dans la table `datasets/country-codes`, qui **se
+vérifie sur ce dépôt** : elle donne IT → Q38 et FR → Q142, exactement ce que
+`config/` écrit déjà, puis VA → Q237 et SM → Q238.
+
+⚠ Q237 y est libellé « Saint-Siège ». Wikidata distingue parfois le Saint-Siège
+de l'État de la Cité du Vatican. La collecte tranchera sans ambiguïté : si le
+Vatican rend zéro lieu quand Saint-Marin en rend, c'est l'entité voisine qu'il
+faut. `fetch` journalise les enclaves absorbées pour que la question se voie.
+
+La requête française ne change pas d'un caractère : un seul pays reste écrit en
+dur, `?pays` n'entre dans le `SELECT` que lié. Catalogue français byte-identique.
+
+### La feuille de revue ne porte que ce qui se décide
+
+`garde_d_office` dit qu'une commission a déjà fait le travail — mesuré sur la
+revue française, 352 lieux de listes à jury relus, zéro écarté. Les laisser dans
+la feuille demandait au curateur de RATIFIER ce qu'aucune décision ne peut
+changer : 388 bourgs italiens sur 2 456 lignes, un sixième de la revue. Leur
+niveau ne se décide pas en revue de toute façon — il vient du rang dans la
+collection, donc de la notoriété, comme en France.
+
+Un lieu portant déjà un verdict reste dans la feuille : il a été jugé une fois,
+et le curateur doit pouvoir y revenir. C'est ce qui laisse la feuille française
+intacte — ses 2 080 lignes sont toutes tranchées.
+
+### `verdict` accepte un nom
+
+Écarter les quatre théâtres vénitiens démolis demandait d'aller chercher quatre
+Q-id un par un dans la feuille. Un geste qui coûte quatre allers-retours est un
+geste qu'on ne fait pas. Le nom suffit désormais ; l'identifiant reste accepté,
+et reste le seul moyen sûr quand deux lieux le partagent — auquel cas la
+commande refuse et liste les dix mieux notés.
+
 ### Le plafond des églises : la question a changé de main
 
 Avant les communes, `cathedrales` portait 549 lieux au catalogue et la question

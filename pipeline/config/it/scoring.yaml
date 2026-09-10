@@ -37,6 +37,37 @@ geo:
   # La province est l'échelon qui correspond au département : cent dix contre
   # cent une, pour un pays d'un tiers plus petit. La région italienne, elle,
   # compte vingt unités — presque les dix-huit françaises.
+  # ── Les enclaves : le Vatican et Saint-Marin ──────────────────────────
+  #
+  # Ce sont des PAYS chez Wikidata : `P17` y vaut Q237 et Q238, jamais Q38. La
+  # collecte italienne ne les voyait donc pas — et les 203 églises romaines du
+  # vivier de `derogations` n'avaient ni Saint-Pierre, ni la chapelle Sixtine,
+  # ni les musées du Vatican. Le filtre avait raison ; le guide avait tort.
+  #
+  # `departement` dit à quelle province les rattacher, et ce n'est pas de la
+  # géopolitique : un lieu sans département sort du catalogue avant d'être
+  # jugé (`apply_geographic_scope`), et surtout on va à Saint-Pierre DEPUIS
+  # Rome. Les deux codes sont lus dans `data/reference/it/departements.csv` :
+  # 058 Rome, 099 Rimini — la ville italienne la plus proche de Saint-Marin.
+  #
+  # Les Q-id ne viennent pas de mémoire : ils sont lus dans la table
+  # `datasets/country-codes`, qui donne IT → Q38 et FR → Q142 — soit exactement
+  # ce que ce dépôt écrit déjà — et VA → Q237, SM → Q238.
+  #
+  # ⚠ Q237 y est libellé « Saint-Siège ». Wikidata distingue parfois le
+  # Saint-Siège de l'État de la Cité du Vatican, et `P17` des lieux pointe
+  # peut-être l'autre. La collecte le dira sans ambiguïté : si le Vatican rend
+  # ZÉRO lieu alors que Saint-Marin en rend, c'est l'entité voisine qu'il faut,
+  # et `suggest-qids` la donnera. `fetch` journalise les enclaves absorbées
+  # pour que la question se voie.
+  enclaves:
+    - qid: Q237
+      name: Vatican
+      departement: "058"      # province de Rome
+    - qid: Q238
+      name: Saint-Marin
+      departement: "099"      # province de Rimini
+
   layers:
     departement:
       fichier: province.geojson

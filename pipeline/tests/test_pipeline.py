@@ -8194,6 +8194,111 @@ class TestSurcoucheDePays(unittest.TestCase):
             load_config(pays="xx")
 
 
+class TestEnclaves(unittest.TestCase):
+    """Le Vatican et Saint-Marin sont des pays chez Wikidata."""
+
+    def test_l_italie_interroge_ses_enclaves(self):
+        it = load_config(pays="it")
+        self.assertEqual(it.country.qids, ["Q38", "Q237", "Q238"])
+        self.assertEqual([(e.name, e.departement) for e in it.country.enclaves],
+                         [("Vatican", "058"), ("Saint-Marin", "099")])
+
+    def test_la_france_n_interroge_qu_elle_meme(self):
+        # Monaco et Andorre existent, mais rien ne les a demandés : une
+        # enclave se déclare, elle ne se devine pas.
+        self.assertEqual(CONFIG.country.qids, ["Q142"])
+        self.assertEqual(CONFIG.country.enclaves, ())
+
+    def test_la_requete_francaise_ne_change_pas(self):
+        # Un seul pays reste écrit en dur, et `?pays` n'entre pas dans le
+        # SELECT : une variable libre changerait la requête sans rien apprendre.
+        from roam_pipeline import wikidata as wd
+
+        requete = wd.theme_query(["Q1"], 3, country="Q142")
+        self.assertIn("?item wdt:P17 wd:Q142 .", requete)
+        self.assertNotIn("?pays", requete)
+
+    def test_plusieurs_pays_passent_par_un_VALUES(self):
+        from roam_pipeline import wikidata as wd
+
+        requete = wd.theme_query(["Q1"], 3, country=["Q38", "Q237", "Q238"])
+        self.assertIn("VALUES ?pays { wd:Q38 wd:Q237 wd:Q238 }", requete)
+        self.assertIn("?admin ?frwiki ?pays", requete)
+
+    def test_un_lieu_d_enclave_recoit_la_province_qui_l_entoure(self):
+        # Sans département, il sortirait du catalogue avant d'être jugé.
+        from roam_pipeline.fetch import _row_to_place
+
+        geo.utiliser_pays("IT")
+        try:
+            enclaves = {e.qid: e for e in load_config(pays="it").country.enclaves}
+            place = _row_to_place({
+                "item": "http://www.wikidata.org/entity/Q12345",
+                "itemLabel": "Basilique",
+                "coord": "Point(12.4534 41.9022)",
+                "sitelinks": "40",
+                "pays": "http://www.wikidata.org/entity/Q237",
+            }, CONFIG.themes[0], enclaves)
+            self.assertEqual(place.departement_code, "058")
+            self.assertEqual(place.region_code, geo.region_of("058").code)
+            self.assertEqual(place.commune_name, "Vatican")
+            # `country_code` reste VIDE : la mention en ferait un catalogue à
+            # part, alors qu'il est là pour être dans celui de l'Italie.
+            self.assertEqual(place.country_code, "")
+        finally:
+            geo.utiliser_pays("FR")
+
+    def test_un_lieu_ordinaire_n_est_pas_touche(self):
+        from roam_pipeline.fetch import _row_to_place
+
+        place = _row_to_place({
+            "item": "http://www.wikidata.org/entity/Q243",
+            "itemLabel": "Tour Eiffel",
+            "coord": "Point(2.2945 48.8584)",
+            "sitelinks": "100",
+        }, CONFIG.themes[0], {"Q237": load_config(pays="it").country.enclaves[0]})
+        self.assertIsNone(place.departement_code)
+
+
+class TestFeuilleDeRevue(unittest.TestCase):
+    """La feuille ne porte que ce qui se DÉCIDE."""
+
+    @staticmethod
+    def _config(garde: bool):
+        label = replace(CONFIG.labels[0], id="jury", garde_d_office=garde,
+                        makes_collection=True)
+        return replace(CONFIG, labels=[label])
+
+    def test_un_lieu_garde_d_office_sort_de_la_feuille(self):
+        # Trois cent quatre-vingt-huit bourgs italiens sur deux mille quatre
+        # cent cinquante-six lignes : un sixième de la revue pour un verdict
+        # connu d'avance. Leur niveau vient de leur rang, pas d'une décision.
+        from roam_pipeline.review import a_relire
+
+        bourg = make_place("Bourg", labels=["jury"])
+        autre = make_place("Autre chose")
+        with _capture():
+            reste = a_relire([bourg, autre], self._config(True), {})
+        self.assertEqual([p.name for p in reste], ["Autre chose"])
+
+    def test_sans_le_drapeau_la_feuille_ne_perd_rien(self):
+        from roam_pipeline.review import a_relire
+
+        bourg = make_place("Bourg", labels=["jury"])
+        self.assertEqual(len(a_relire([bourg], self._config(False), {})), 1)
+
+    def test_un_verdict_deja_pris_reste_relisible(self):
+        # Il a été jugé une fois : le curateur doit pouvoir revenir dessus.
+        # C'est ce qui laisse la feuille française intacte — ses 352 lieux de
+        # listes à jury portent tous un verdict.
+        from roam_pipeline.review import a_relire
+
+        bourg = make_place("Bourg", labels=["jury"])
+        reste = a_relire([bourg], self._config(True),
+                         {bourg.wikidata_id: ("keep", "")})
+        self.assertEqual(len(reste), 1)
+
+
 class TestChaqueThemeAUnGlyphe(unittest.TestCase):
     """Un thème sans tracé n'a ni symbole sur la carte ni pastille de filtre.
 

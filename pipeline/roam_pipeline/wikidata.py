@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import logging
 import time
-from typing import Any, Iterable, Iterator
+from typing import Any, Iterable, Iterator, Sequence
 
 import requests
 
@@ -223,13 +223,29 @@ def chunked(items: Iterable[Any], size: int) -> Iterator[list[Any]]:
 # Requêtes
 # ---------------------------------------------------------------------------
 
+def filtre_pays(country: str | Sequence[str], variable: str = "?pays") -> str:
+    """La clause qui borne une requête à un ou plusieurs pays.
+
+    Un seul pays reste écrit en dur — c'est le cas de la France, et changer sa
+    requête ne se justifie par rien. Plusieurs passent par un `VALUES` : le
+    catalogue italien absorbe le Vatican et Saint-Marin, qui sont des pays
+    chez Wikidata (`P17` y vaut Q237 et Q238, jamais Q38).
+    """
+    qids = [country] if isinstance(country, str) else list(country)
+    if len(qids) == 1:
+        return f"?item wdt:{P_COUNTRY} wd:{qids[0]} ."
+    valeurs = " ".join(f"wd:{qid}" for qid in qids)
+    return (f"VALUES {variable} {{ {valeurs} }}\n"
+            f"  ?item wdt:{P_COUNTRY} {variable} .")
+
+
 def theme_query(
     class_qids: list[str],
     min_sitelinks: int,
     limit: int | None = None,
     offset: int = 0,
     *,
-    country: str,
+    country: str | Sequence[str],
 ) -> str:
     """Lieux français d'un thème, avec notoriété et commune de rattachement.
 
@@ -244,12 +260,16 @@ def theme_query(
     """
     values = " ".join(f"wd:{q}" for q in class_qids)
     page = f"\nORDER BY ?item\nLIMIT {limit} OFFSET {offset}" if limit else ""
+    pays = filtre_pays(country)
+    # `?pays` n'entre dans le SELECT que s'il est lié : une variable libre y
+    # changerait la requête française sans rien lui apprendre.
+    colonne = " ?pays" if "VALUES ?pays" in pays else ""
     return f"""
-SELECT DISTINCT ?item ?itemLabel ?coord ?sitelinks ?image ?commons ?elevation ?admin ?frwiki
+SELECT DISTINCT ?item ?itemLabel ?coord ?sitelinks ?image ?commons ?elevation ?admin ?frwiki{colonne}
 WHERE {{
   VALUES ?class {{ {values} }}
   ?item wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* ?class .
-  ?item wdt:{P_COUNTRY} wd:{country} .
+  {pays}
   ?item wdt:{P_COORDINATE} ?coord .
   ?item wikibase:sitelinks ?sitelinks .
   FILTER(?sitelinks >= {min_sitelinks})
@@ -461,7 +481,7 @@ SELECT ?item ?visitors WHERE {{
 """
 
 
-def label_members_query(kind: str, qid: str, *, country: str) -> str:
+def label_members_query(kind: str, qid: str, *, country: str | Sequence[str]) -> str:
     """Membres d'un label. `kind` ∈ {heritage, member_of, instance, operator, owner}."""
     predicate = {
         "heritage": f"wdt:{P_HERITAGE}",
@@ -480,7 +500,7 @@ def label_members_query(kind: str, qid: str, *, country: str) -> str:
     return f"""
 SELECT DISTINCT ?item WHERE {{
   ?item {predicate[kind]} wd:{qid} .
-  ?item wdt:{P_COUNTRY} wd:{country} .
+  {filtre_pays(country)}
 }}
 """
 

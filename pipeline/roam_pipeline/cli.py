@@ -70,6 +70,7 @@ from . import localisation
 from .outlines import export as export_outlines
 from .review import (
     CLEAR, DECISIONS, apply_decisions, apply_names, apply_photos, apply_themes,
+    a_relire,
     gardes_d_office,
     diff_tiers, merge_decisions, photo_file, read_decisions, read_names,
     read_photos, read_themes,
@@ -412,7 +413,7 @@ def cmd_relabel(args: argparse.Namespace, config: Config) -> int:
     for label in config.labels:
         try:
             members[label.id] = fetch_label_members(
-                client, label, args.manual, country=config.country.qid)
+                client, label, args.manual, country=config.country.qids)
         except Exception as erreur:  # noqa: BLE001 — un label en échec n'est pas fatal
             LOG.error("label %s : collecte échouée (%s)", label.id, erreur)
             members[label.id] = set()
@@ -881,9 +882,12 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     gone = vanished(before, current)
 
     write_json(retained, collections, args.out)
-    write_review_csv(retained, collections, args.out / "review.csv", config, changes)
+    # La feuille ne porte QUE ce qui se décide. Un lieu gardé d'office par une
+    # liste à jury n'attend aucun verdict — son niveau vient de son rang.
+    a_lire = a_relire(retained, config, decisions)
+    write_review_csv(a_lire, collections, args.out / "review.csv", config, changes)
     write_review_html(
-        retained, collections, config, args.out / "review.html", changes,
+        a_lire, collections, config, args.out / "review.html", changes,
         decided={qid: verdict for qid, (verdict, _note) in decisions.items()},
         # Calculée sur le catalogue AVANT arbitrage : après le dédoublonnage,
         # le lieu n'a plus qu'un thème et la contestation ne se voit plus.
@@ -3069,11 +3073,6 @@ def cmd_verdict(args: argparse.Namespace, config: Config) -> int:
     trié et relisible, et la prochaine revue l'emporte toujours sur ce qu'on
     écrit ici — le verdict le plus récent gagne, comme partout ailleurs.
     """
-    qid = (args.wikidata_id or "").strip()
-    if not qid.startswith("Q") or not qid[1:].isdigit():
-        print(f"« {qid} » n'est pas un identifiant Wikidata.", file=sys.stderr)
-        return 1
-
     if not args.clear and args.decision not in DECISIONS:
         print(f"Verdict inconnu : {args.decision}. Verdicts valides : "
               + ", ".join(DECISIONS), file=sys.stderr)
@@ -3081,6 +3080,36 @@ def cmd_verdict(args: argparse.Namespace, config: Config) -> int:
 
     places = read_raw(args.raw)
     connus = {place.wikidata_id: place.name for place in places}
+
+    # Un NOM suffit. Écarter les quatre théâtres vénitiens démolis demandait
+    # sinon d'aller chercher quatre Q-id un par un dans la feuille de revue,
+    # et un geste qui coûte quatre allers-retours est un geste qu'on ne fait
+    # pas. L'identifiant reste accepté, et reste le seul moyen sûr quand deux
+    # lieux portent le même nom — auquel cas la commande refuse et les liste.
+    qid = (args.wikidata_id or "").strip()
+    if not (qid.startswith("Q") and qid[1:].isdigit()):
+        cherche = _fold(qid)
+        trouves = [p for p in places if _fold(p.name) == cherche]
+        if not trouves:
+            trouves = [p for p in places if cherche and cherche in _fold(p.name)]
+        if not trouves:
+            print(f"Aucun lieu collecté ne s'appelle « {qid} ».", file=sys.stderr)
+            return 1
+        # Un lieu peut être collecté sous plusieurs thèmes : c'est la MÊME
+        # entité, et un verdict la vise entière.
+        uniques = {p.wikidata_id: p for p in trouves}
+        if len(uniques) > 1:
+            print(f"« {qid} » désigne {len(uniques)} lieux — précise "
+                  "l'identifiant :", file=sys.stderr)
+            ordre = sorted(uniques.values(), key=lambda p: (-(p.score or 0), p.name))
+            for place in ordre[:10]:
+                print(f"  {place.wikidata_id:<11} {place.name}", file=sys.stderr)
+            if len(ordre) > 10:
+                print(f"  … et {len(ordre) - 10} autres", file=sys.stderr)
+            return 1
+        qid = next(iter(uniques))
+        print(f"« {args.wikidata_id} » → {qid} {connus[qid]}")
+
     if qid not in connus:
         # Écarter un lieu absent de la collecte ne casse rien, mais c'est
         # presque toujours une faute de frappe sur l'identifiant.
@@ -4146,7 +4175,8 @@ def build_parser() -> argparse.ArgumentParser:
         "verdict",
         help="écarte ou valide un lieu sans passer par la revue (keep, drop, "
              "promote, demote)")
-    verdict.add_argument("wikidata_id")
+    verdict.add_argument("wikidata_id", metavar="LIEU",
+                         help="l'identifiant Wikidata, ou le nom du lieu")
     verdict.add_argument("decision", nargs="?", default="",
                          help="keep, drop, promote, promote2 ou demote — `promote2` fait entrer un lieu dans sa collection nationale ET l'y monte d'un cran")
     verdict.add_argument("--note", help="pourquoi ce verdict")
