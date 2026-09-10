@@ -154,3 +154,27 @@ collections:
     # Deux villes confirment même le six en s'y arrêtant d'elles-mêmes : les
     # maisons de Milan chutent de 6,6 juste après le sixième, et les monuments
     # de Florence de 2,4 pour un pas de 0,4 — au sixième également.
+
+  # ── Un croisement gardé contre la règle du diamètre ────────────────────
+  #
+  # `min_diameter_km: 25` écarte les croisements « trop resserrés pour être un
+  # voyage », et sa justification est explicite : « on ne collectionne pas ce
+  # qui se fait à pied en une après-midi sans quitter sa ville ». Elle a été
+  # mesurée sur la France, et elle y a raison — trente et un ponts parisiens
+  # dans neuf kilomètres.
+  #
+  # Elle écarte cinq croisements italiens, et quatre le méritent : les musées
+  # de Florence (2 km), les monuments de Venise (1 km), les églises de Venise
+  # (11 km) sont bien la promenade d'une journée dans une seule ville.
+  #
+  # Le cinquième, non. Les huit îles de la lagune — San Lazzaro degli Armeni,
+  # Murano, Burano, Torcello, Poveglia, le Ghetto, le Lido, la Giudecca —
+  # tiennent dans quinze kilomètres, mais on n'y va qu'en vaporetto et il y
+  # faut la journée. SUR L'EAU, LE DIAMÈTRE NE MESURE PLUS L'EFFORT : c'est
+  # précisément le cas que la règle ne sait pas voir, et le cas pour lequel
+  # `always_cross` existe.
+  #
+  # Le rapport de thème, lui, n'a jamais été en cause : les îles de Venise
+  # valent très au-dessus de la moyenne nationale. C'est le diamètre seul.
+  always_cross:
+    - iles-departement-027    # Îles de Venise

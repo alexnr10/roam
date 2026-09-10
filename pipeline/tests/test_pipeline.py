@@ -7765,6 +7765,33 @@ class TestThemeLift(unittest.TestCase):
         # qu'on ne peut plus discuter.
         self.assertIn("gardés par décision", "\n".join(journal.output))
 
+    def test_a_named_crossing_survives_the_diameter_too(self):
+        # « Quoi qu'il arrive » ne valait que pour le rapport : la coupe au
+        # diamètre passait AVANT, et une décision de curateur ne pouvait pas
+        # rattraper un croisement jugé trop resserré.
+        #
+        # Les huit îles de la lagune de Venise tiennent dans quinze kilomètres,
+        # et le diamètre les traitait donc comme les trente et un ponts de
+        # Paris — alors qu'on n'y va qu'en vaporetto et qu'il y faut la
+        # journée. Sur l'eau, le diamètre ne mesure plus l'effort.
+        from roam_pipeline.collections import build_cross_collections
+
+        serre = TestCollectionDiameter._places(10, spread_km=2.0)
+        strict = replace(CONFIG, collections=replace(
+            CONFIG.collections, min_diameter_km=25.0, min_theme_lift=0.0,
+            cross_theme_levels=["departement"], always_cross=[],
+        ))
+        with self.assertLogs("roam_pipeline.collections", level="INFO") as journal:
+            self.assertEqual(build_cross_collections(serre, strict), [])
+        self.assertIn("trop resserrés", "\n".join(journal.output))
+
+        garde = replace(strict, collections=replace(
+            strict.collections, always_cross=["ponts-departement-75"]))
+        with self.assertLogs("roam_pipeline.collections", level="INFO") as journal:
+            built = build_cross_collections(serre, garde)
+        self.assertEqual(len(built), 1)
+        self.assertIn("gardés par décision", "\n".join(journal.output))
+
     def test_the_configured_threshold_spares_the_loire(self):
         # Les châteaux du Centre-Val de Loire valent ×3,0, les mégalithes du
         # Morbihan ×4,8 : le seuil doit passer sous les deux.
@@ -8096,6 +8123,20 @@ class TestSurcoucheDePays(unittest.TestCase):
         # Le reste du thème ne bouge pas.
         self.assertEqual(villages.min_sitelinks, CONFIG.theme("villages").min_sitelinks)
         self.assertEqual(villages.cap, CONFIG.theme("villages").cap)
+
+    def test_l_italie_garde_les_iles_de_venise_contre_le_diametre(self):
+        # `min_diameter_km` écarte cinq croisements italiens, et quatre le
+        # méritent — les musées de Florence tiennent dans deux kilomètres. Le
+        # cinquième, non : les huit îles de la lagune tiennent dans quinze
+        # kilomètres mais demandent la journée et le vaporetto.
+        it = load_config(pays="it")
+        self.assertEqual(it.collections.always_cross, ["iles-departement-027"])
+        # La règle elle-même ne bouge pas : c'est une exception, pas un
+        # abaissement du seuil pour tout le monde.
+        self.assertEqual(it.collections.min_diameter_km,
+                         CONFIG.collections.min_diameter_km)
+        # Et la France garde la sienne — une liste sans `id` REMPLACE.
+        self.assertEqual(CONFIG.collections.always_cross, ["plages-region-93"])
 
     def test_l_italie_ajoute_le_seul_theme_que_la_france_n_a_pas(self):
         # `place (Q174782)` n'est déclarée par aucun thème du dépôt : en France

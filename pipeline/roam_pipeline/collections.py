@@ -742,17 +742,27 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
             # écarte parfois les extrémités.
             retenus = [par_id[m.place_id] for m in built.places]
             etendue = diameter_km(retenus)
-            if etendue < config.collections.min_diameter_km:
-                serres.append((etendue, len(built.places), built.name))
-                continue
             rapport = theme_lift(
                 len(built.places), par_zone[code], par_theme[theme_id], len(places)
             )
+            # `always_cross` dit « quoi qu'il arrive », et cela vaut aussi pour
+            # l'étendue. Elle ne le faisait pas : la coupe au diamètre passait
+            # AVANT, et une décision de curateur ne pouvait pas rattraper un
+            # croisement jugé trop resserré.
+            #
+            # Ce n'est pas théorique. Les huit îles de la lagune de Venise
+            # tiennent dans quinze kilomètres, et le diamètre les traite donc
+            # comme les trente et un ponts de Paris — alors qu'aller à Murano,
+            # Burano et Torcello se fait en vaporetto et prend la journée. Sur
+            # l'eau, le diamètre ne mesure plus l'effort.
             if collection.slug in config.collections.always_cross:
                 # Le rapport est une heuristique, la décision est un jugement.
                 # Elle doit se voir : une exception qui agit en silence est une
                 # règle qu'on ne peut plus discuter.
                 gardes.append((rapport, built.name))
+            elif etendue < config.collections.min_diameter_km:
+                serres.append((etendue, len(built.places), built.name))
+                continue
             elif rapport < config.collections.min_theme_lift:
                 banals.append((rapport, len(built.places), built.name))
                 continue

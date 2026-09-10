@@ -882,6 +882,38 @@ PNG présents : un thème sans tracé disparaît des deux côtés sans un mot. U
 test du pipeline lit maintenant `themeIcons.tsx` et vérifie que chaque thème de
 chaque pays a le sien.
 
+### Ce que le premier build complet a montré — et la règle qu'il a cassée
+
+2 456 lieux, 211 collections, les huit dérogations actives, les piazzas dedans.
+Le thème des places rend **74 lieux** au catalogue (225 collectés, 123 au-dessus
+du plancher, 82 après le plafond communal) : plus que les ponts (32), les
+grottes (30) ou les jardins (56). Le plancher calé sur `monuments` tient.
+
+Mais les dérogations ont rendu les lieux **sans rendre les collections**.
+« Îles de Venise » est réapparue avec ses huit îles — et a été écartée aussitôt
+par une AUTRE règle, `min_diameter_km: 25`, qui la juge « trop resserrée pour
+être un voyage » : quinze kilomètres.
+
+Cinq croisements italiens tombent sur cette règle, et **quatre le méritent** :
+les musées de Florence (2 km), les monuments de Venise (1 km), les églises de
+Venise (11 km) sont bien la promenade d'une journée dans une seule ville, ce
+que la règle dit refuser en toutes lettres — « on ne collectionne pas ce qui se
+fait à pied en une après-midi sans quitter sa ville ».
+
+Le cinquième, non. On ne va à Murano, Burano et Torcello qu'en vaporetto, et il
+y faut la journée. **Sur l'eau, le diamètre ne mesure plus l'effort.**
+
+`always_cross` existe pour ce cas — « le rapport est une heuristique, la
+décision est un jugement » — mais il ne pouvait pas le traiter : la coupe au
+diamètre passait AVANT, et l'exception n'agissait que sur le rapport de thème.
+Elle agit maintenant sur les deux, ce qui est ce que « gardés QUOI QU'IL
+ARRIVE » a toujours prétendu dire. La France est byte-identique après le
+changement — `plages-region-93` fait 34 km et n'a jamais eu besoin de la
+dispense.
+
+Une seule ligne en Italie : `iles-departement-027`. Les quatre autres restent
+dehors, et c'est la règle qui a raison.
+
 ### Le plafond des églises : la question a changé de main
 
 Avant les communes, `cathedrales` portait 549 lieux au catalogue et la question
