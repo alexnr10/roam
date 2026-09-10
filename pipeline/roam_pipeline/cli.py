@@ -484,10 +484,12 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     # Les contours d'abord, quand ils sont là : gratuits, instantanés, et sans
     # dépendance à un service national. `geo-layers` les télécharge.
     couches = localisation.couches_du_pays(config, args.geo)
-    enrich_departements(places, localisateur=couches.get("departement"))
+    enrich_departements(places, localisateur=couches.get("departement"),
+                        pays=config.country.code)
     # Après le département : la commune fait autorité sur lui, et la corrige au
     # passage quand Wikidata l'avait mal rattaché.
-    enrich_communes(places, localisateur=couches.get("departement"))
+    enrich_communes(places, localisateur=couches.get("departement"),
+                    pays=config.country.code)
     if not args.skip_summaries:
         enrich_summaries(places)
     # Une requête par article : la passe la plus longue, et la seule dont le
@@ -528,6 +530,19 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     )
     from .geocode import departements_for
     from .overpass import PROBE_CELL, OverpassClient, cells
+
+    # `overpass.py` délimite la FRANCE, par un rectangle et par une zone
+    # `ISO3166-1="FR"`. Lancée sur un catalogue italien, la commande ne
+    # planterait pas : elle proposerait des lieux français à côté de lieux
+    # italiens, et les mêlerait au même fichier de candidats.
+    if config.country.code.upper() != "FR":
+        print(
+            f"`discover` ne connaît que la France : sa requête Overpass y est "
+            f"délimitée en dur, et rendrait des lieux français pour "
+            f"{config.country.name}. Rien n'a été collecté.",
+            file=sys.stderr,
+        )
+        return 1
 
     raw_path = args.out / "places_raw.json"
     if not raw_path.exists():

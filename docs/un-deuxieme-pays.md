@@ -670,6 +670,33 @@ Effet sur la France : **aucun**. Les 352 lieux concernés étaient tous déjà
 relus et gardés — le catalogue est identique à l'octet. La règle vaut pour ce
 qui ENTRE ensuite, et pour les listes équivalentes des autres pays.
 
+### Ce qui refuse poliment hors de France — audité avant la première collecte
+
+Trois dépendances françaises étaient sur le chemin de `fetch` → `enrich`, et
+aucune ne se serait signalée :
+
+**Les API de l'État français**, en secours du rattachement. Interrogées sur des
+coordonnées italiennes, elles ne répondent pas « hors de mon territoire » :
+elles rendent la commune française la plus proche, ou rien. La passe
+« communes » les aurait appelées pour CHAQUE lieu italien — les contours
+locaux, eux, ne donnent pas la commune. Elles sont maintenant gardées par le
+code du pays, et le disent dans le journal.
+
+Conséquence à connaître : hors de France, la commune vient de Wikidata seule.
+Les sondages italiens la donnaient sur tous les lieux testés — Turin, Rome,
+Florence, Velletri, Cesena — mais ce qui n'en a pas restera hors de la maille
+la plus fine de la carte de conquête.
+
+**`discover`** délimite la France en dur, par un rectangle et par une zone
+`ISO3166-1="FR"`. Il ne plantait pas : il aurait proposé des lieux français
+dans un catalogue italien, mêlés au même fichier de candidats. Il refuse
+désormais, en nommant la raison.
+
+**`normalize_dept_code`** complète à deux chiffres — un usage INSEE. Les codes
+ISTAT en font trois. Le rattachement par contours ne passe pas par là (il rend
+le code du polygone, déjà juste), donc ce n'est pas bloquant ; ça le
+deviendrait le jour où un code de province viendrait de Wikidata.
+
 ### Ce qu'il manque encore pour collecter l'Italie
 
 **Le référentiel des provinces et des régions.** `geo.py` lit

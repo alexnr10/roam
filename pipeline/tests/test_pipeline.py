@@ -54,7 +54,7 @@ from roam_pipeline.collections import (
     dedupe_across_themes,
     haversine_m,
 )
-from roam_pipeline import cli, geo
+from roam_pipeline import cli, fetch, geo
 from roam_pipeline.config import CONFIG_DIR, Config, Exclusions, Visitors, fusionner, load_config
 from roam_pipeline.export import (
     review_tiers,
@@ -8225,3 +8225,64 @@ class TestOptionsGlobales(unittest.TestCase):
         args = self._lire("stats")
         cli._ranger_par_pays(args, CONFIG)
         self.assertEqual(args.out, cli.DEFAULT_OUT)
+
+
+class TestApiNationales(unittest.TestCase):
+    """Les API de secours sont FRANÇAISES, et ne le disent pas.
+
+    `api-adresse.data.gouv.fr` et `geo.api.gouv.fr` sont gratuites, sans clé,
+    excellentes — et strictement françaises. Interrogées sur des coordonnées
+    italiennes, elles ne répondent pas « hors de mon territoire » : elles
+    répondent la commune française la plus proche, ou rien. Une collecte
+    italienne les appellerait des milliers de fois pour un résultat au mieux
+    vide, au pire faux.
+    """
+
+    class _Espion:
+        """Un client qui compte les appels au lieu d'en faire."""
+
+        def __init__(self):
+            self.appels = 0
+
+        def reverse_communes(self, *a, **k):
+            self.appels += 1
+            return {}
+
+        def locate_commune(self, *a, **k):
+            self.appels += 1
+            return None
+
+        def locate_departement(self, *a, **k):
+            self.appels += 1
+            return None
+
+    @staticmethod
+    def _lieu():
+        # Le Colisée : hors de France, et sans rattachement.
+        place = make_place("Colisée", wikidata_id="Q10285", lat=41.8902, lon=12.4922)
+        place.departement_code = None
+        place.commune_code = None
+        return place
+
+    def test_aucun_appel_hors_de_France_pour_le_departement(self):
+        espion = self._Espion()
+        fetch.enrich_departements(
+            [self._lieu()], address_client=espion, commune_client=espion, pays="IT",
+        )
+        self.assertEqual(espion.appels, 0)
+
+    def test_aucun_appel_hors_de_France_pour_la_commune(self):
+        espion = self._Espion()
+        fetch.enrich_communes(
+            [self._lieu()], address_client=espion, commune_client=espion, pays="IT",
+        )
+        self.assertEqual(espion.appels, 0)
+
+    def test_en_France_les_API_restent_appelees(self):
+        # La garde ne doit pas éteindre ce qui marche : c'est par ces deux
+        # passes que la France rattache ce que les contours n'ont pas su situer.
+        espion = self._Espion()
+        fetch.enrich_communes(
+            [self._lieu()], address_client=espion, commune_client=espion, pays="FR",
+        )
+        self.assertGreater(espion.appels, 0)

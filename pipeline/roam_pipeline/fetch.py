@@ -27,6 +27,19 @@ from .raw import EXTRA_SHARD, NO_THEME_SHARD, read_raw, shard_of, shards, write_
 
 LOG = logging.getLogger(__name__)
 
+#: Le pays dont les API nationales sont branchées.
+#
+# `api-adresse.data.gouv.fr` et `geo.api.gouv.fr` sont gratuites, sans clé,
+# excellentes — et strictement françaises. Interrogées sur des coordonnées
+# italiennes, elles ne répondent pas « hors de mon territoire » : elles
+# répondent la commune française la plus proche, ou rien. Une collecte
+# italienne les appellerait des milliers de fois pour un résultat au mieux
+# vide, au pire faux.
+#
+# Les contours locaux, eux, ne connaissent aucun pays : c'est par eux que passe
+# le rattachement partout ailleurs.
+PAYS_DES_API = "FR"
+
 
 def fetch_theme(
     client: wd.SparqlClient,
@@ -1197,6 +1210,7 @@ def enrich_communes(
     address_client: AddressClient | None = None,
     commune_client: CommuneClient | None = None,
     localisateur=None,
+    pays: str = PAYS_DES_API,
 ) -> int:
     """Rattache chaque lieu à sa commune, par ses coordonnées.
 
@@ -1213,6 +1227,19 @@ def enrich_communes(
     Seuls les lieux sans commune sont interrogés : relancer la passe ne coûte
     donc rien une fois qu'elle a abouti.
     """
+    if pays.upper() != PAYS_DES_API:
+        # Voir `PAYS_DES_API`. La commune vient alors de Wikidata seule — les
+        # sondages italiens la donnaient sur tous les lieux testés, de Turin à
+        # Cesena — et les lieux qu'elle ne renseigne pas restent sans commune,
+        # donc hors de la maille la plus fine de la carte de conquête.
+        sans = [p for p in places if not p.commune_code]
+        if sans:
+            LOG.info(
+                "communes : %s lieux sans commune — les API sont françaises, "
+                "aucun appel", len(sans),
+            )
+        return 0
+
     missing = [p for p in places if not p.commune_code]
     # Même garde que pour le département : ne rien demander au réseau sur un
     # point que les contours du pays ne peuvent pas contenir.
@@ -1358,6 +1385,7 @@ def enrich_departements(
     address_client: AddressClient | None = None,
     commune_client: CommuneClient | None = None,
     localisateur=None,
+    pays: str = PAYS_DES_API,
 ) -> int:
     """Rattache par coordonnées les lieux que Wikidata ne situe pas.
 
@@ -1373,6 +1401,18 @@ def enrich_departements(
     # Les contours d'abord : ce qu'ils situent n'a besoin d'aucune requête.
     if localisateur is not None:
         resolved += enrich_departements_localement(places, localisateur)
+
+    if pays.upper() != PAYS_DES_API:
+        # Voir `PAYS_DES_API` : la suite est une passe de secours par des
+        # services français. Hors de France, ce qui reste sans département
+        # restera sans, et le dira.
+        restants = [p for p in places if not p.departement_code]
+        if restants:
+            LOG.info(
+                "rattachement : %s lieux sans province — les API de secours "
+                "sont françaises, aucun appel", len(restants),
+            )
+        return resolved
 
     missing = [p for p in places if not p.departement_code]
     # Ce que les contours n'ont pas su situer se partage en deux, et une seule
