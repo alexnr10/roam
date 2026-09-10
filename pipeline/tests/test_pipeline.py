@@ -8194,6 +8194,30 @@ class TestSurcoucheDePays(unittest.TestCase):
             load_config(pays="xx")
 
 
+class TestFeuilleDeRevueDuBonPays(unittest.TestCase):
+    """La feuille lue doit être celle du pays qu'on relit.
+
+    `--review` se posait AVANT le rangement par pays : il pointait
+    `data/out/` — la France — pendant que les décisions s'écrivaient dans
+    `data/it/manual/`. Une revue italienne a ainsi versé 2 080 verdicts
+    français dans le fichier italien, sans en enregistrer un seul des siens.
+    Rien n'a planté : les identifiants ne se recoupent jamais.
+    """
+
+    def test_la_feuille_suit_le_pays(self):
+        from roam_pipeline.cli import build_parser, _defauts, _chemins_du_pays, AUTOSAVE
+
+        for pays, attendu in ((None, "out"), ("it", "it")):
+            argv = ["apply-review"] + (["--pays-config", pays] if pays else [])
+            args = build_parser().parse_args(argv)
+            _defauts(args)
+            _chemins_du_pays(args, load_config(pays=pays))
+            with self.subTest(pays=pays or "fr"):
+                self.assertIn(attendu, args.review.parts)
+                self.assertEqual(args.review.parent, args.out)
+                self.assertEqual(args.review.name, AUTOSAVE)
+
+
 class TestDepartementDuCodeCommunal(unittest.TestCase):
     """« C'est la commune qui gagne » — encore faut-il savoir lire son code.
 

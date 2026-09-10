@@ -1472,6 +1472,29 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
         print("Aucune décision renseignée dans la feuille de revue.", file=sys.stderr)
         return 1
 
+    # Le garde-fou qui aurait vu la panne tout de suite. Une feuille dont AUCUN
+    # identifiant n'est dans la collecte ne parle pas de ce catalogue-ci : soit
+    # elle vient d'un autre pays, soit d'un autre dépôt. L'écrire quand même ne
+    # plante pas — les identifiants ne se recoupent simplement jamais — et c'est
+    # exactement ce qui rend la panne coûteuse : deux mille quatre-vingts
+    # verdicts français sont entrés dans le fichier italien en silence.
+    collecte = {place.wikidata_id for place in read_raw(args.raw)}
+    etrangers = [qid for qid in (set(fresh) | set(fresh_themes) | effaces)
+                 if qid not in collecte]
+    if collecte and len(etrangers) == len(set(fresh) | set(fresh_themes) | effaces):
+        print(f"Aucun des {len(etrangers)} lieux de {args.review} n'est dans la "
+              f"collecte de {config.country.name} ({args.raw}).\n"
+              "Cette feuille parle d'un autre catalogue — rien n'a été écrit.",
+              file=sys.stderr)
+        return 1
+    if etrangers:
+        print(f"⚠ {len(etrangers)} décision(s) portent sur des lieux absents de "
+              f"la collecte, ignorées (ex. {', '.join(sorted(etrangers)[:3])}).",
+              file=sys.stderr)
+        fresh = {q: v for q, v in fresh.items() if q in collecte}
+        fresh_themes = {q: v for q, v in fresh_themes.items() if q in collecte}
+        effaces = {q for q in effaces if q in collecte}
+
     path = args.manual / "decisions.csv"
     decisions = read_decisions(path)
     before = len(decisions)
@@ -4285,6 +4308,26 @@ def _ranger_par_pays(args: argparse.Namespace, config: Config) -> None:
             setattr(args, nom, racine / defaut.name)
 
 
+def _chemins_du_pays(args: argparse.Namespace, config: Config) -> None:
+    """Tous les chemins d'un pays, rangés dans le BON ORDRE.
+
+    `--review` se posait avant `_ranger_par_pays` : il pointait `data/out/` —
+    la France — pendant que les décisions s'écrivaient dans
+    `data/it/manual/`. Une revue italienne a ainsi versé deux mille
+    quatre-vingts verdicts FRANÇAIS dans le fichier italien, sans en
+    enregistrer un seul des siens, et sans un mot : les identifiants de deux
+    pays ne se recoupent jamais, donc rien ne plantait.
+
+    Les deux gestes vivent ici ensemble pour qu'on ne puisse plus les séparer.
+    """
+    _ranger_par_pays(args, config)
+    # Le brouillon écrit par `review` au fil des clics. La grande feuille
+    # `review.csv` faisait un mauvais défaut : sa colonne `decision` est vide,
+    # elle n'apporte donc jamais rien.
+    if getattr(args, "review", None) is None and args.command == "apply-review":
+        args.review = args.out / AUTOSAVE
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     _defauts(args)
@@ -4292,14 +4335,8 @@ def main(argv: list[str] | None = None) -> int:
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(levelname)-7s %(message)s",
     )
-    if getattr(args, "review", None) is None and args.command == "apply-review":
-        # Le brouillon écrit par `review` au fil des clics. La grande feuille
-        # `review.csv` faisait un mauvais défaut : sa colonne `decision` est
-        # vide, elle n'apporte donc jamais rien.
-        args.review = args.out / AUTOSAVE
-
     config = load_config(args.config, pays=getattr(args, "pays_config", None))
-    _ranger_par_pays(args, config)
+    _chemins_du_pays(args, config)
     # Le référentiel — provinces et régions — avant qu'une table ne soit lue.
     geo.utiliser_pays(config.country.code)
     handlers = {
