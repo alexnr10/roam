@@ -15,7 +15,7 @@ from . import wikidata as wd
 from .commons import _replier, file_title
 from .wikipedia import BATCH, EXTRACT_BATCH, WikipediaClient, title_from_url
 from .config import Config, Enclave, Label, Theme
-from .geo import normalize_dept_code, region_of
+from .geo import departement_du_code_communal, normalize_dept_code, region_of
 from . import localisation
 from .geocode import (
     AddressClient,
@@ -683,7 +683,7 @@ def align_departements(places: list[Place]) -> int:
         # donnait un « département » que le filtre du périmètre laissait passer,
         # et Lifou, Nuku Hiva et le mont Ross entraient dans le catalogue — les
         # COM sont hors v1.
-        attendu = normalize_dept_code(departement_from_insee(place.commune_code))
+        attendu = departement_du_code_communal(place.commune_code)
         if not attendu or attendu == place.departement_code:
             continue
         LOG.debug(

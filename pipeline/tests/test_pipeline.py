@@ -8194,6 +8194,41 @@ class TestSurcoucheDePays(unittest.TestCase):
             load_config(pays="xx")
 
 
+class TestDepartementDuCodeCommunal(unittest.TestCase):
+    """« C'est la commune qui gagne » — encore faut-il savoir lire son code.
+
+    `departement_from_insee` connaît la France et elle seule. Hors de France,
+    `align_departements` ne gagnait donc rien : la péninsule italienne portait
+    la commune 066018, dans la province de L'Aquila, ET le département 099,
+    Rimini, sans que rien ne tranche.
+    """
+
+    def tearDown(self):
+        geo.utiliser_pays("FR")
+
+    def test_les_trois_cas_francais_se_retrouvent_seuls(self):
+        # Le plus LONG préfixe connu : 974 avant 97, et la Corse sur sa lettre.
+        geo.utiliser_pays("FR")
+        for code, attendu in (("75056", "75"), ("97411", "974"),
+                              ("2A004", "2A"), ("29019", "29")):
+            with self.subTest(code=code):
+                self.assertEqual(geo.departement_du_code_communal(code), attendu)
+
+    def test_les_codes_istat_se_lisent_sur_trois_chiffres(self):
+        geo.utiliser_pays("IT")
+        for code, attendu in (("066018", "066"), ("058091", "058"),
+                              ("015146", "015")):
+            with self.subTest(code=code):
+                self.assertEqual(geo.departement_du_code_communal(code), attendu)
+
+    def test_un_code_inconnu_ne_rend_rien(self):
+        # Mieux vaut ne rien corriger que corriger au hasard.
+        geo.utiliser_pays("FR")
+        for code in ("", None, "999999", "ZZ"):
+            with self.subTest(code=code):
+                self.assertIsNone(geo.departement_du_code_communal(code))
+
+
 class TestEnclaves(unittest.TestCase):
     """Le Vatican et Saint-Marin sont des pays chez Wikidata."""
 

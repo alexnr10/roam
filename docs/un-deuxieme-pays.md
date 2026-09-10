@@ -957,9 +957,29 @@ catalogue comme deuxième meilleure plage d'Italie**, N1#2 du « meilleur de
 Rimini ». L'Apennin du Nord est entré par la même porte.
 
 Le pays PRINCIPAL gagne désormais sur une enclave : un lieu que Wikidata situe
-en Italie est italien, même s'il déborde. Sans rattachement d'enclave, la
-péninsule n'a pas de département et le périmètre l'écarte — ce qu'il faisait
-très bien avant. L'enclave ne sert plus qu'à ce qu'elle SEULE contient.
+en Italie est italien, même s'il déborde. L'enclave ne sert plus qu'à ce
+qu'elle SEULE contient.
+
+⚠ **Mais cela ne suffit pas à écarter la péninsule, et l'affirmer était une
+erreur.** Elle a un point de coordonnées, ce point tombe dans une commune
+italienne réelle (066018, province de L'Aquila), et la couche communale lui
+donne donc un département de toute façon. Aucune règle ne l'écartera : c'est
+un lieu régulier à tous égards, qui n'est simplement pas un lieu. C'est la
+définition même de ce qu'une REVUE tranche, et pas une configuration.
+
+Elle a tout de même révélé un vrai défaut. `align_departements` dit « c'est la
+commune qui gagne » — encore faut-il savoir lire son code, et
+`departement_from_insee` connaît la France et elle seule : deux chiffres, trois
+pour l'outre-mer, une lettre pour la Corse. Les codes ISTAT en font trois pour
+la province et six pour la commune. Hors de France, la commune ne gagnait donc
+RIEN, et la péninsule portait à la fois la commune de L'Aquila et le
+département de Rimini sans que rien ne tranche — un lieu sur 2 466, mais rien
+n'empêchait qu'ils soient cent.
+
+`departement_du_code_communal` cherche le plus long préfixe qui soit un
+département connu, quel que soit le pays. La règle retrouve les trois cas
+français d'elle-même : 97411 → 974 avant 97, 2A004 → 2A, 75056 → 75. Catalogue
+français byte-identique.
 
 ### La feuille de revue ne porte que ce qui se décide
 
