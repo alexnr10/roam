@@ -1,0 +1,21 @@
+# Décisions éditoriales, cumulées au fil des revues.
+#
+# keep    : validé, et conservé même si un plancher venait à monter.
+# drop    : écarté du catalogue.
+# promote : remonté dans le classement. Sur un lieu hors de sa collection
+#           nationale, il l'y fait ENTRER, à son rang, et rien de plus.
+# promote2: le fait entrer ET le monte d'un cran. À n'employer que là où
+#           `promote` ne ferait qu'entrer — ailleurs il vaut `promote`.
+# demote  : descendu dans le classement.
+#
+# Ce fichier est la mémoire de la curation. Le supprimer perd tout le travail
+# de relecture ; en corriger une ligne suffit à revenir sur un verdict.
+#
+wikidata_id,decision,name,note
+Q1057412,drop,Teatro San Samuele,n'existe plus
+Q223427,drop,Amatrice,centre historique détruit par le séisme de 2016
+Q246429,drop,Teatro San Cassiano,démoli en 1812
+Q2575251,drop,Teatro San Moisè,n'existe plus
+Q4779852,drop,Apiolae,ville disparue  emplacement inconnu
+Q523565,drop,Teatro San Benedetto,n'existe plus
+Q528066,drop,Teatro comunale,fermé en 2014  remplacé par l'Opera di Firenze
