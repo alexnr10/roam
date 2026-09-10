@@ -17,6 +17,7 @@ from datetime import datetime
 from typing import Any
 from pathlib import Path
 
+from . import geo
 from . import wikidata as wd
 from .collections import DUPLICATE_DISTANCE_M, build_all, fantomes, haversine_m
 from .config import CONFIG_DIR, Config, load_config
@@ -69,6 +70,7 @@ from . import localisation
 from .outlines import export as export_outlines
 from .review import (
     CLEAR, DECISIONS, apply_decisions, apply_names, apply_photos, apply_themes,
+    gardes_d_office,
     diff_tiers, merge_decisions, photo_file, read_decisions, read_names,
     read_photos, read_themes,
     theme_claims, write_themes, read_snapshot, snapshot_is_safe, snapshot_losses,
@@ -837,7 +839,10 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
               "ignorée. Thèmes valides : "
               + ", ".join(t.id for t in config.themes), file=sys.stderr)
     decisions = read_decisions(args.manual / "decisions.csv")
-    kept, counts = apply_decisions(scored, decisions, strict=args.strict)
+    kept, counts = apply_decisions(
+        scored, decisions, strict=args.strict,
+        d_office=gardes_d_office(scored, config),
+    )
     # Rescoré après les décisions : `drop` retire des lieux, donc la
     # distribution change. Le déplacement de niveau, lui, ne touche pas au
     # score — il s'applique au classement, une fois celui-ci établi.
@@ -4004,6 +4009,8 @@ def main(argv: list[str] | None = None) -> int:
 
     config = load_config(args.config, pays=getattr(args, "pays_config", None))
     _ranger_par_pays(args, config)
+    # Le référentiel — provinces et régions — avant qu'une table ne soit lue.
+    geo.utiliser_pays(config.country.code)
     handlers = {
         "verify-qids": cmd_verify_qids,
         "suggest-qids": cmd_suggest_qids,

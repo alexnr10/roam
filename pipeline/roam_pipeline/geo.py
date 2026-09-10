@@ -1,9 +1,19 @@
-"""Référentiel géographique français (départements, régions).
+"""Référentiel géographique : le deuxième échelon et le premier, par pays.
 
 Le champ `de_form` porte la forme complète du complément de nom
 (« du Cantal », « de la Manche », « des Landes », « de l'Ain »). Le français ne
 permet pas de la dériver d'une règle simple, donc elle est stockée telle quelle :
-c'est ce qui donne « Châteaux du Cantal » et non « Châteaux de Cantal ».
+c'est ce qui donne « Châteaux du Cantal » et non « Châteaux de Cantal ». La même
+raison vaut d'un pays à l'autre — « des Pouilles » ne se dérive pas de
+« Puglia ».
+
+Les noms sont FRANÇAIS, y compris pour les provinces italiennes : le catalogue
+est écrit en français, et une collection s'appelle « Châteaux de Toscane ». Le
+jour où l'application proposera d'autres langues, ce sont ces tables qui auront
+leur équivalent, pas la mécanique qui les lit.
+
+Un pays par exécution : le pipeline charge une configuration, donc un pays, et
+`utiliser_pays()` dit lequel avant que quoi que ce soit ne lise une table.
 """
 
 from __future__ import annotations
@@ -14,6 +24,31 @@ from functools import lru_cache
 from pathlib import Path
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "reference"
+
+#: Le pays dont on lit le référentiel. La France est à la racine — elle est le
+#: pays d'origine du dépôt et ses fichiers y sont versionnés depuis le début ;
+#: les autres ont leur sous-dossier, comme les contours de `geo/<code>/`.
+_PAYS = "FR"
+
+
+def utiliser_pays(code: str) -> None:
+    """Choisit le référentiel à lire. Appelé une fois, au démarrage.
+
+    Les tables sont mises en cache : en changer en cours de route rendrait des
+    départements français et des provinces italiennes selon l'ordre des appels.
+    Le cache est donc vidé ici, et nulle part ailleurs.
+    """
+    global _PAYS
+    if code.upper() == _PAYS:
+        return
+    _PAYS = code.upper()
+    regions.cache_clear()
+    departements.cache_clear()
+
+
+def _dossier() -> Path:
+    """Le dossier du référentiel courant."""
+    return DATA_DIR if _PAYS == "FR" else DATA_DIR / _PAYS.lower()
 
 
 @dataclass(frozen=True)
@@ -29,10 +64,10 @@ class Area:
         return f"{self.level}:{self.code}"
 
 
-@lru_cache(maxsize=1)
+@lru_cache(maxsize=None)
 def regions() -> dict[str, Area]:
     out: dict[str, Area] = {}
-    with (DATA_DIR / "regions.csv").open(encoding="utf-8") as fh:
+    with (_dossier() / "regions.csv").open(encoding="utf-8") as fh:
         for row in csv.DictReader(fh):
             out[row["code"]] = Area(
                 code=row["code"], name=row["name"], de_form=row["de_form"], level="region"
@@ -40,10 +75,10 @@ def regions() -> dict[str, Area]:
     return out
 
 
-@lru_cache(maxsize=1)
+@lru_cache(maxsize=None)
 def departements() -> dict[str, Area]:
     out: dict[str, Area] = {}
-    with (DATA_DIR / "departements.csv").open(encoding="utf-8") as fh:
+    with (_dossier() / "departements.csv").open(encoding="utf-8") as fh:
         for row in csv.DictReader(fh):
             out[row["code"]] = Area(
                 code=row["code"],
@@ -73,7 +108,13 @@ FRANCE = Area(code="FR", name="France", de_form="de France", level="country")
 
 def area(level: str, code: str) -> Area | None:
     if level == "country":
-        return FRANCE
+        # Le nom et le complément du pays vivent dans la configuration, pas
+        # ici : `country_area(config)` est le seul chemin juste. Rendre la
+        # France par défaut a un sens tant qu'il n'y a qu'elle ; en Italie, ce
+        # serait intituler une collection « Le meilleur de France » sur des
+        # lieux italiens — une faute qui ne plante pas et qu'on lirait dans
+        # l'application.
+        return FRANCE if _PAYS == "FR" else None
     if level == "region":
         return regions().get(code)
     if level == "departement":

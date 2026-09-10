@@ -29,6 +29,9 @@ labels:
     wikidata_query: { kind: heritage, qid: Q9259 }   # patrimoine mondial ✓
 
   - id: plus-beaux-villages
+    # Gardé sans revue : une commission a déjà fait le travail.
+    # Mesuré sur la revue française — 185 relus, 0 écarté.
+    garde_d_office: true
     name: Les Plus Beaux Villages de France
     authority: Association Les Plus Beaux Villages de France
     score_bonus: 30
@@ -36,6 +39,9 @@ labels:
     wikidata_query: { kind: member_of, qid: Q1010307 }   # l'association ✓
 
   - id: grand-site-de-france
+    # Gardé sans revue : une commission a déjà fait le travail.
+    # Mesuré sur la revue française — 54 relus, 0 écarté.
+    garde_d_office: true
     name: Grand Site de France
     authority: Ministère de la Transition écologique
     # Ramené de 30 à 20 : à 30, les six Grands Sites du thème « Sommets »
@@ -136,6 +142,9 @@ labels:
   # CHÂTEAU de Fontainebleau et ignore sa forêt.
   # Voir data/manual/foret-exception-a-resoudre.txt.
   - id: foret-exception
+    # Gardé sans revue : une commission a déjà fait le travail.
+    # Mesuré sur la revue française — 11 relus, 0 écarté.
+    garde_d_office: true
     name: Forêt d'Exception
     authority: Office national des forêts
     score_bonus: 15
@@ -177,6 +186,9 @@ labels:
   # Pas de propriété Wikidata fiable : listes à saisir à la main dans
   # data/manual/<id>.csv (colonnes : name,wikidata_id,note).
   - id: plus-beaux-detours
+    # Gardé sans revue : une commission a déjà fait le travail.
+    # Mesuré sur la revue française — 102 relus, 0 écarté.
+    garde_d_office: true
     name: Les Plus Beaux Détours de France
     authority: Association Les Plus Beaux Détours de France
     score_bonus: 15

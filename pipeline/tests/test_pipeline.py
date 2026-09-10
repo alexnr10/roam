@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+from dataclasses import replace
 import io
 import json
 import logging
@@ -28,7 +29,7 @@ from roam_pipeline.raw import EXTRA_SHARD, read_raw, shards, write_raw
 from roam_pipeline.merge import merge_file, merge_text, split_conflict
 from roam_pipeline.wikipedia import WikipediaClient
 from roam_pipeline.review import (
-    CLEAR, DECISIONS, apply_decisions, apply_themes, merge_decisions, name_hints,
+    CLEAR, DECISIONS, apply_decisions, apply_themes, gardes_d_office, merge_decisions, name_hints,
     read_decisions,
     read_themes, theme_claims, theme_from_name, write_decisions, write_themes,
 )
@@ -53,6 +54,7 @@ from roam_pipeline.collections import (
     dedupe_across_themes,
     haversine_m,
 )
+from roam_pipeline import geo
 from roam_pipeline.config import CONFIG_DIR, Config, Exclusions, Visitors, fusionner, load_config
 from roam_pipeline.export import (
     review_tiers,
@@ -8047,3 +8049,122 @@ class TestSurcoucheDePays(unittest.TestCase):
     def test_un_pays_inconnu_le_dit(self):
         with self.assertRaises(SystemExit):
             load_config(pays="xx")
+
+
+class TestReferentielParPays(unittest.TestCase):
+    """Provinces italiennes et départements français, lus par la même mécanique."""
+
+    def tearDown(self):
+        geo.utiliser_pays("FR")
+
+    def test_la_france_reste_a_la_racine(self):
+        geo.utiliser_pays("FR")
+        self.assertEqual(len(geo.regions()), 18)
+        self.assertEqual(len(geo.departements()), 101)
+        self.assertEqual(geo.departements()["24"].name, "Dordogne")
+
+    def test_l_italie_a_ses_vingt_regions_et_cent_dix_provinces(self):
+        geo.utiliser_pays("IT")
+        self.assertEqual(len(geo.regions()), 20)
+        self.assertEqual(len(geo.departements()), 110)
+
+    def test_les_noms_sont_francais(self):
+        # Le catalogue est écrit en français : une collection s'appelle
+        # « Châteaux de Toscane », pas « Châteaux de Toscana ». Le jour où
+        # l'application proposera d'autres langues, c'est cette table qui aura
+        # son équivalent, pas la mécanique qui la lit.
+        geo.utiliser_pays("IT")
+        self.assertEqual(geo.regions()["09"].name, "Toscane")
+        self.assertEqual(geo.regions()["16"].de_form, "des Pouilles")
+        self.assertEqual(geo.departements()["048"].name, "Florence")
+
+    def test_chaque_province_a_une_region_connue(self):
+        # Un rattachement qui pointe vers une région absente rendrait des lieux
+        # sans collection régionale, en silence.
+        geo.utiliser_pays("IT")
+        connues = set(geo.regions())
+        for code, prov in geo.departements().items():
+            self.assertIn(prov.parent_code, connues, f"{code} {prov.name}")
+
+    def test_le_complement_de_nom_s_elide(self):
+        geo.utiliser_pays("IT")
+        formes = {a.name: a.de_form for a in geo.departements().values()}
+        self.assertEqual(formes["Ancône"], "d'Ancône")
+        self.assertEqual(formes["Turin"], "de Turin")
+        # « de L'Aquila » : l'article appartient au nom, on ne l'élide pas.
+        self.assertEqual(formes["L'Aquila"], "de L'Aquila")
+
+    def test_changer_de_pays_vide_le_cache(self):
+        # Les tables sont mises en cache : sans le vidage, on obtiendrait des
+        # départements français et des provinces italiennes selon l'ordre des
+        # appels.
+        geo.utiliser_pays("FR")
+        self.assertIn("24", geo.departements())
+        geo.utiliser_pays("IT")
+        self.assertNotIn("24", geo.departements())
+        geo.utiliser_pays("FR")
+        self.assertIn("24", geo.departements())
+
+    def test_le_pays_ne_se_devine_pas_hors_de_France(self):
+        # `area("country")` rendait la France par défaut. En Italie, ce serait
+        # intituler « Le meilleur de France » des lieux italiens — une faute
+        # qui ne plante pas, et qu'on lirait dans l'application.
+        geo.utiliser_pays("IT")
+        self.assertIsNone(geo.area("country", "IT"))
+        geo.utiliser_pays("FR")
+        self.assertIsNotNone(geo.area("country", "FR"))
+
+
+class TestGardeDOffice(unittest.TestCase):
+    """Ce qu'une liste de jury garde sans passer par la revue.
+
+    Mesuré sur la revue française : Plus Beaux Villages, Plus Beaux Détours,
+    Grands Sites et Forêts d'Exception comptent 352 lieux relus et ZÉRO écarté.
+    Les inventaires d'État écartent 22 à 31 % : ils disent « protégé », pas
+    « vaut le voyage ».
+    """
+
+    @staticmethod
+    def _lieu(qid, labels):
+        place = make_place(f"Lieu {qid}", wikidata_id=qid)
+        place.labels = labels
+        return place
+
+    def test_ne_retient_que_les_labels_declares(self):
+        villages = self._lieu("Q1", ["plus-beaux-villages"])
+        monument = self._lieu("Q2", ["monument-historique-classe"])
+        rien = self._lieu("Q3", [])
+        trouves = gardes_d_office([villages, monument, rien], CONFIG)
+        self.assertEqual(trouves, {"Q1"})
+
+    def test_garde_sans_verdict_enregistre(self):
+        place = self._lieu("Q1", ["grand-site-de-france"])
+        kept, _ = apply_decisions([place], {}, d_office={"Q1"})
+        self.assertEqual(len(kept), 1)
+        # `keep` épingle : le lieu ne doit pas retomber si un plancher monte.
+        self.assertTrue(kept[0].pinned)
+        self.assertTrue(kept[0].kept_in_review)
+
+    def test_un_verdict_enregistre_l_emporte(self):
+        # Une liste propose, le curateur dispose — y compris pour écarter.
+        place = self._lieu("Q1", ["plus-beaux-villages"])
+        kept, _ = apply_decisions([place], {"Q1": ("drop", "")}, d_office={"Q1"})
+        self.assertEqual(kept, [])
+
+    def test_un_deplacement_enregistre_reste_un_deplacement(self):
+        place = self._lieu("Q1", ["plus-beaux-detours"])
+        kept, _ = apply_decisions([place], {"Q1": ("demote", "")}, d_office={"Q1"})
+        self.assertEqual(kept[0].tier_shift, 1)
+        # Un déplacement n'épingle pas : c'est la règle en vigueur, et la
+        # garde d'office ne doit pas la contourner par la bande.
+        self.assertFalse(kept[0].pinned)
+
+    def test_sans_label_declare_rien_ne_change(self):
+        # Le drapeau n'existe sur aucun label : la garde d'office ne doit alors
+        # coûter aucun parcours et ne retenir personne.
+        muet = replace(
+            CONFIG,
+            labels=[replace(lbl, garde_d_office=False) for lbl in CONFIG.labels],
+        )
+        place = self._lieu("Q1", ["plus-beaux-villages"])
+        self.assertEqual(gardes_d_office([place], muet), set())

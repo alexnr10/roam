@@ -599,6 +599,71 @@ l'ISTAT, vérifié : 110 provinces, 5,4 Mo. Les noms de propriétés ne se
 devinent pas — `prov_istat_code`, `prov_name`, `reg_istat_code` — et c'est à
 peu près tout ce qui change d'un pays à l'autre.
 
+### Le référentiel italien — FAIT
+
+`data/reference/it/regions.csv` et `departements.csv` : vingt régions, cent dix
+provinces. Codes, rattachements et noms italiens viennent du GeoJSON de l'ISTAT
+— celui-là même que `geo-layers` télécharge. Ce qui est écrit à la main, et
+qu'aucune donnée ne porte, ce sont les noms FRANÇAIS et leur complément :
+« des Pouilles » ne se dérive pas de « Puglia ». Le générateur est versionné :
+`python scripts/referentiel-it.py`.
+
+**Les collections italiennes portent des noms français** — « Châteaux de
+Toscane », « Le meilleur du Latium ». C'est une décision du curateur : le
+catalogue est écrit en français. Le jour où l'application proposera d'autres
+langues, ce sont ces tables qui auront leur équivalent, pas la mécanique qui
+les lit — `geo.py` ne connaît ni langue ni pays, il lit un dossier.
+
+Les exonymes sont posés seulement là où le français en a un d'usage : on écrit
+Florence, Padoue, Plaisance et Côme, mais personne n'écrit « Bellune » pour
+Belluno. Sur-franciser est une faute aussi sûre que sous-franciser.
+
+⚠ **La source porte le découpage sarde d'avant 2016** : quatre provinces
+supprimées depuis y figurent encore, sous des noms de promotion touristique
+(« Gallura Nord-Est Sardegna »). Elles retrouvent ici leur nom administratif,
+que la source connaît par son sigle — OT, CI, VS. Les polygones, eux, pavent
+bien la Sardaigne : aucun lieu ne restera sans province.
+
+`geo.py` lit maintenant `data/reference/<code>/`, la France restant à la
+racine. `utiliser_pays()` est appelé une fois, au démarrage, et vide les
+caches — sans quoi on obtiendrait des départements français et des provinces
+italiennes selon l'ordre des appels.
+
+Et `area("country")` ne rend plus la France par défaut hors de France : c'était
+intituler « Le meilleur de France » des lieux italiens, une faute qui ne plante
+pas et qu'on lirait dans l'application.
+
+### Ce que la revue française apprend sur les labels
+
+Mesuré sur les 3 191 verdicts enregistrés, par label :
+
+| liste | gardés | écartés | |
+|---|---:|---:|---|
+| Plus Beaux Villages | 185 | **0** | jury |
+| Plus Beaux Détours | 102 | **0** | jury |
+| Grands Sites de France | 54 | **0** | jury |
+| Forêts d'Exception | 11 | **0** | jury |
+| Monuments historiques classés | 920 | 273 | inventaire — 22 % |
+| Monuments historiques inscrits | 373 | 187 | inventaire — 31 % |
+| Maisons des Illustres | 200 | 76 | inventaire — 26 % |
+
+Les listes de JURY ne se relisent pas : une commission a déjà fait le travail.
+Les inventaires d'État, si — ils disent « protégé », pas « vaut le voyage ».
+
+`garde_d_office: true` dans `labels.yaml` pose la règle, label par label et sur
+la mesure, jamais sur la catégorie « officiel ». Un verdict enregistré
+l'emporte toujours : une liste propose, le curateur dispose.
+
+L'UNESCO n'est pas déclaré, et c'est un cas intéressant : huit écartés, mais
+aucun pour sa qualité. Ce sont des inscriptions qui ne sont pas une visite —
+« Monuments romains et romans d'Arles », « Les Plages du Débarquement » — et
+des doublons entre thèmes. Le pipeline ne sait pas distinguer une inscription
+d'un lieu ; tant qu'il ne le sait pas, ces huit-là valent d'être relus.
+
+Effet sur la France : **aucun**. Les 352 lieux concernés étaient tous déjà
+relus et gardés — le catalogue est identique à l'octet. La règle vaut pour ce
+qui ENTRE ensuite, et pour les listes équivalentes des autres pays.
+
 ### Ce qu'il manque encore pour collecter l'Italie
 
 **Le référentiel des provinces et des régions.** `geo.py` lit

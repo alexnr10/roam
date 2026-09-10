@@ -113,9 +113,33 @@ def merge_decisions(
     return fusionnees
 
 
+def gardes_d_office(places: list[Place], config) -> set[str]:
+    """Les lieux qu'une liste de jury garde sans passer par la revue.
+
+    Certaines listes ne se relisent pas : sur la revue française, les Plus
+    Beaux Villages, les Plus Beaux Détours, les Grands Sites de France et les
+    Forêts d'Exception comptent 352 lieux relus et ZÉRO écarté. Une commission
+    a déjà fait le travail, et la refaire ne change rien.
+
+    Les inventaires d'État sont l'inverse — 22 % des monuments historiques
+    classés écartés, 31 % des inscrits — parce qu'ils disent « protégé » et non
+    « vaut le voyage ». Le drapeau est donc posé label par label dans
+    `labels.yaml`, sur une mesure ; il ne suit pas la catégorie « officiel ».
+    """
+    d_office = {lbl.id for lbl in config.labels if lbl.garde_d_office}
+    if not d_office:
+        return set()
+    return {
+        place.wikidata_id
+        for place in places
+        if d_office.intersection(place.labels or ())
+    }
+
+
 def apply_decisions(
     places: list[Place], decisions: dict[str, tuple[str, str]],
     strict: bool = False,
+    d_office: set[str] | frozenset[str] = frozenset(),
 ) -> tuple[list[Place], Counter[str]]:
     """Applique les verdicts. Renvoie les lieux conservés et le décompte.
 
@@ -124,6 +148,10 @@ def apply_decisions(
     classé n'a pas dit qu'il ne valait rien. `keep` épingle — un lieu
     explicitement validé ne doit pas disparaître parce qu'un plancher a bougé
     depuis.
+
+    `d_office` vient de `gardes_d_office` : ces lieux valent `keep` sans avoir
+    été relus. Un verdict ENREGISTRÉ l'emporte toujours — y compris un `drop`.
+    Une liste propose, le curateur dispose.
     """
     kept: list[Place] = []
     counts: Counter[str] = Counter()
@@ -134,6 +162,8 @@ def apply_decisions(
         # que de places.csv, et c'est la seule occasion de le savoir.
         place.pinned_by_hand = place.pinned
         decision, _note = decisions.get(place.wikidata_id, ("", ""))
+        if not decision and place.wikidata_id in d_office:
+            decision = "keep"
         # Compté une fois par LIEU, pas par ligne : un même lieu peut figurer
         # sous deux thèmes avant le dédoublonnage, et le décompte affiché
         # dépassait alors le nombre de décisions prises.

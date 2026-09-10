@@ -115,6 +115,25 @@ class Label:
     # curées : Wikidata rattache deux cent une entités françaises au patrimoine
     # mondial, dont vingt-quatre seulement tombaient dans un thème.
     collects: bool = False
+    #: Un lieu qui porte ce label est GARDÉ sans passer par la revue.
+    #
+    # Mesuré sur la revue française, sur les lieux effectivement relus :
+    #
+    #     Plus Beaux Villages      185 gardés, 0 écarté
+    #     Plus Beaux Détours       102 gardés, 0 écarté
+    #     Grands Sites de France    54 gardés, 0 écarté
+    #     Forêts d'Exception        11 gardés, 0 écarté
+    #
+    # Ces quatre-là sont des listes de JURY : une commission admet, et son
+    # travail est déjà une curation. Les inventaires d'État, eux, écartent
+    # beaucoup — 22 % des monuments historiques classés, 31 % des inscrits,
+    # 26 % des Maisons des Illustres — parce qu'ils disent « protégé », et non
+    # « vaut le voyage ». Le drapeau se pose donc label par label, sur une
+    # mesure, jamais sur la catégorie « officiel ».
+    #
+    # Un verdict explicite l'emporte toujours : le curateur garde le dernier
+    # mot sur ce qu'une liste lui propose.
+    garde_d_office: bool = False
 
     @property
     def is_manual(self) -> bool:
@@ -446,6 +465,7 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
                 qid=q.get("qid"),
                 search=q.get("search"),
                 collects=bool(lbl.get("collects", False)),
+                garde_d_office=bool(lbl.get("garde_d_office", False)),
             )
         )
 
