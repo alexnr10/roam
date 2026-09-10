@@ -3115,9 +3115,23 @@ def cmd_verdict(args: argparse.Namespace, config: Config) -> int:
         if len(uniques) > 1:
             print(f"« {qid} » désigne {len(uniques)} lieux — précise "
                   "l'identifiant :", file=sys.stderr)
-            ordre = sorted(uniques.values(), key=lambda p: (-(p.score or 0), p.name))
+            # Pas de score ici : `read_raw` rend la collecte, pas le
+            # catalogue construit, et un « 0.0 » affiché trente-quatre fois
+            # ferait croire à trente-quatre lieux sans intérêt.
+            ordre = sorted(uniques.values(), key=lambda p: (p.name, p.wikidata_id))
+            depts = geo.departements()
             for place in ordre[:10]:
-                print(f"  {place.wikidata_id:<11} {place.name}", file=sys.stderr)
+                # Le nom NE SUFFIT PAS à choisir, et c'est justement pourquoi
+                # cette liste s'affiche : trois théâtres italiens s'appellent
+                # « Teatro comunale », au caractère près. Ce qui les sépare est
+                # l'endroit et le thème — les nommer trois fois n'aide personne.
+                zone = depts.get(place.departement_code or "")
+                ou = " · ".join(x for x in (
+                    place.commune_name,
+                    zone.name if zone and zone.name != place.commune_name else None,
+                ) if x) or "sans commune"
+                print(f"  {place.wikidata_id:<11} {place.name[:34]:<34} "
+                      f"{place.theme_id:<12} {ou}", file=sys.stderr)
             if len(ordre) > 10:
                 print(f"  … et {len(ordre) - 10} autres", file=sys.stderr)
             return 1
