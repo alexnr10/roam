@@ -56,6 +56,9 @@ def fetch_theme(
     d'un coup dépasse régulièrement le timeout de WDQS.
     """
     by_qid: dict[str, Place] = {}
+    # Le rang de la variante retenue pour un même Q-id. Voir `_rang_du_pays`.
+    rangs: dict[str, tuple[int, int]] = {}
+    principal = country if isinstance(country, str) else list(country)[0]
 
     if not theme.collected_classes and not theme.from_labels:
         LOG.warning(
@@ -79,6 +82,9 @@ def fetch_theme(
                 place = _row_to_place(row, theme, enclaves)
                 if place is not None:
                     by_qid[place.wikidata_id] = place
+                    # Même barème que les classes, sans quoi n'importe quelle
+                    # ligne de classe évincerait ensuite le membre de liste.
+                    rangs[place.wikidata_id] = (0, -_completeness(place))
 
     # Une classe à la fois, et par pages : les classes volumineuses (châteaux,
     # abbayes, cathédrales) dépassaient le délai de WDQS en une seule requête.
@@ -98,11 +104,13 @@ def fetch_theme(
             if place is None:
                 continue
             place.via_broad_class = class_qid in broad
-            existing = by_qid.get(place.wikidata_id)
-            # Une même entité peut remonter via plusieurs classes : on garde la
-            # variante la mieux renseignée.
-            if existing is None or _completeness(place) > _completeness(existing):
+            # Une même entité peut remonter via plusieurs classes, ET via
+            # plusieurs pays : on garde la variante la mieux placée, puis la
+            # mieux renseignée.
+            rang = (_rang_du_pays(row, principal), -_completeness(place))
+            if rang < rangs.get(place.wikidata_id, (99, 0)):
                 by_qid[place.wikidata_id] = place
+                rangs[place.wikidata_id] = rang
 
     LOG.info("thème %s : %s lieux candidats", theme.id, len(by_qid))
     return list(by_qid.values())
@@ -143,6 +151,28 @@ def _completeness(place: Place) -> int:
         for value in (place.image_url, place.departement_code, place.elevation_m, place.wikipedia_url)
         if value
     )
+
+
+def _rang_du_pays(row: dict[str, str], principal: str) -> int:
+    """Le PAYS PRINCIPAL gagne sur une enclave, et ce n'est pas cosmétique.
+
+    Un lieu qui déborde sur une enclave remonte DEUX FOIS de Wikidata, une
+    ligne par `P17`, et les deux se valent en complétude : c'est l'ordre de la
+    réponse qui décidait, donc rien.
+
+    La péninsule italienne en a fait les frais. Elle est en Italie, à
+    Saint-Marin et au Vatican ; la ligne saint-marinaise l'a emporté une fois,
+    le rattachement d'enclave lui a donné la province de Rimini — et une
+    péninsule de mille kilomètres est entrée au catalogue comme DEUXIÈME
+    meilleure plage d'Italie. Sans ce rattachement elle n'a pas de département
+    et le périmètre l'écarte, ce qu'il faisait très bien jusque-là.
+
+    Un lieu que Wikidata situe dans le pays principal est donc du pays
+    principal, même s'il déborde. L'enclave ne sert qu'à ce qu'elle SEULE
+    contient — la basilique Saint-Pierre, le mont Titano.
+    """
+    pays = wd.qid_from_uri(row.get("pays"))
+    return 0 if not pays or pays == principal else 1
 
 
 def _row_to_place(

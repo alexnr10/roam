@@ -941,6 +941,26 @@ faut. `fetch` journalise les enclaves absorbées pour que la question se voie.
 La requête française ne change pas d'un caractère : un seul pays reste écrit en
 dur, `?pays` n'entre dans le `SELECT` que lié. Catalogue français byte-identique.
 
+**Ça marche** : 21 lieux d'enclave au catalogue, et la basilique Saint-Pierre y
+est l'église la mieux notée d'Italie (187,8, juste derrière le Colisée). Q237
+était la bonne entité. Suivent les musées du Vatican, la chapelle Sixtine, le
+palais, la place Saint-Pierre, les jardins ; côté Saint-Marin, le mont Titano,
+la basilique, les trois tours, le palais public.
+
+⚠ **Et le mécanisme avait un défaut, que seul le catalogue réel a montré.** Un
+lieu qui DÉBORDE sur une enclave remonte deux fois de Wikidata, une ligne par
+`P17`, et les deux se valent en complétude : c'est l'ordre de la réponse qui
+décidait, donc rien. La péninsule italienne — Italie, Saint-Marin ET Vatican —
+a vu sa ligne saint-marinaise l'emporter, le rattachement d'enclave lui a donné
+la province de Rimini, et **une péninsule de mille kilomètres est entrée au
+catalogue comme deuxième meilleure plage d'Italie**, N1#2 du « meilleur de
+Rimini ». L'Apennin du Nord est entré par la même porte.
+
+Le pays PRINCIPAL gagne désormais sur une enclave : un lieu que Wikidata situe
+en Italie est italien, même s'il déborde. Sans rattachement d'enclave, la
+péninsule n'a pas de département et le périmètre l'écarte — ce qu'il faisait
+très bien avant. L'enclave ne sert plus qu'à ce qu'elle SEULE contient.
+
 ### La feuille de revue ne porte que ce qui se décide
 
 `garde_d_office` dit qu'une commission a déjà fait le travail — mesuré sur la

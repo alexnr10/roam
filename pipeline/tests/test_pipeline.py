@@ -8248,6 +8248,26 @@ class TestEnclaves(unittest.TestCase):
         finally:
             geo.utiliser_pays("FR")
 
+    def test_le_pays_principal_gagne_sur_l_enclave(self):
+        # La péninsule italienne est en Italie, à Saint-Marin ET au Vatican :
+        # elle remonte trois fois, une ligne par `P17`, et les trois se valent
+        # en complétude. L'ordre de la réponse décidait, donc rien — et le jour
+        # où la ligne saint-marinaise a gagné, une péninsule de mille
+        # kilomètres est entrée comme DEUXIÈME meilleure plage d'Italie.
+        from roam_pipeline.fetch import _rang_du_pays
+
+        italienne = {"pays": "http://www.wikidata.org/entity/Q38"}
+        saint_marin = {"pays": "http://www.wikidata.org/entity/Q238"}
+        self.assertLess(_rang_du_pays(italienne, "Q38"),
+                        _rang_du_pays(saint_marin, "Q38"))
+
+    def test_sans_colonne_pays_rien_ne_change(self):
+        # La requête française ne rend pas `?pays` : toutes ses lignes doivent
+        # rester à égalité, sans quoi le classement changerait le catalogue.
+        from roam_pipeline.fetch import _rang_du_pays
+
+        self.assertEqual(_rang_du_pays({}, "Q142"), 0)
+
     def test_un_lieu_ordinaire_n_est_pas_touche(self):
         from roam_pipeline.fetch import _row_to_place
 
