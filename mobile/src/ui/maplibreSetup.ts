@@ -1,5 +1,7 @@
 import * as maplibregl from 'maplibre-gl';
 
+import { CHEMIN_DU_WORKER, voisinDuSite } from '../lib/site';
+
 /**
  * Où MapLibre va chercher son worker.
  *
@@ -26,7 +28,19 @@ declare global {
   }
 }
 
-const DEFAULT_WORKER = '/maplibre/maplibre-gl-worker.mjs';
+/** Les adresses des scripts chargés — vide hors d'un navigateur. */
+function scriptsCharges(): string[] {
+  if (typeof document === 'undefined') return [];
+  return Array.from(document.getElementsByTagName('script'))
+    .map((balise) => balise.src)
+    .filter(Boolean);
+}
+
+/** L'adresse du worker, relative à la racine du site. Voir `lib/site.ts`. */
+export function adresseDuWorker(): string {
+  const repli = typeof document !== 'undefined' ? document.baseURI : '/';
+  return voisinDuSite(CHEMIN_DU_WORKER, scriptsCharges(), repli);
+}
 
 let done = false;
 
@@ -34,6 +48,7 @@ export function prepareMapLibre(): void {
   if (done) return;
   done = true;
   maplibregl.setWorkerUrl(
-    (typeof window !== 'undefined' && window.__ROAM_MAPLIBRE_WORKER__) || DEFAULT_WORKER,
+    (typeof window !== 'undefined' && window.__ROAM_MAPLIBRE_WORKER__) ||
+      adresseDuWorker(),
   );
 }

@@ -51,6 +51,45 @@ La carte, elle, est la même des deux côtés : même moteur, mêmes couches, m�
 couleurs. C'est le web qui servait autrefois d'aperçu de ce que le natif ne savait
 pas faire ; il n'y a plus d'écart à montrer.
 
+## Publier le site sur GitHub Pages
+
+Pour faire tester à quelqu'un qui n'a pas Android — un iPhone, un ordinateur —
+sans compte Apple ni installation. La carte y est la même, et Safari donne la
+géolocalisation, donc la validation sur place fonctionne aussi.
+
+**Il faut du HTTPS.** Safari refuse la géolocalisation hors d'un contexte
+sécurisé : un fichier HTML ouvert depuis les Fichiers se regarde, mais ne
+valide rien. GitHub Pages sert en HTTPS, gratuitement.
+
+```bash
+cd mobile
+npm run export:pages     # export sous /roam, + un repli 404.html
+
+# publier le contenu de dist/ sur la branche gh-pages
+cd dist && git init -q && git add -A
+git commit -qm "site"
+git push -f https://github.com/alexnr10/roam HEAD:gh-pages
+cd .. && rm -rf dist/.git
+```
+
+Puis, une seule fois : **Settings → Pages → Source : branche `gh-pages`,
+dossier `/`**. Le site paraît sous quelques minutes à
+`https://alexnr10.github.io/roam/`.
+
+Deux détails qui ne se devinent pas, et qui ont chacun coûté un essai :
+
+- **le préfixe.** Un dépôt de projet est servi sous `/roam/`, pas à la racine
+  du domaine. `export:pages` pose `baseUrl` en conséquence — sans lui, chaque
+  fichier est cherché un cran trop haut et la page reste blanche ;
+- **le worker de MapLibre.** Il était demandé à `/maplibre/…`, donc à la racine
+  du DOMAINE. Il est maintenant résolu depuis l'adresse du bundle, la seule qui
+  reste juste même sur une route profonde. Sans quoi la carte se charge, ne
+  dessine rien, et ne dit pas pourquoi.
+
+`404.html` est une copie d'`index.html` : GitHub Pages le sert pour toute route
+inconnue, ce qui rend les liens profonds — `/roam/place/Q243` — au lieu d'une
+page d'erreur.
+
 ## Ce que fait le prototype
 
 - **Carte** avec filtre *Tous / À visiter / Visités*, et pastilles colorées selon l'état
