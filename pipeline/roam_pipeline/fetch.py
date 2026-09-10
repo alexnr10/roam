@@ -1205,11 +1205,39 @@ def enrich_summaries(places: list[Place], client: WikipediaClient | None = None)
     return found
 
 
+def _communes_par_contour(places: list[Place], zones) -> int:
+    """Rattache par point-dans-polygone les lieux qui n'ont pas de commune.
+
+    Le même mécanisme que le rattachement au département, à la maille en
+    dessous : un index par cases d'un degré, puis le point dans le polygone.
+    La commune fait autorité sur le département, ici comme dans la passe
+    française — elle vient du même contour et ne peut pas le contredire.
+    """
+    resolved = 0
+    for place in places:
+        if place.commune_code:
+            continue
+        zone = zones.contenant(place.lat, place.lon)
+        if zone is None:
+            continue
+        place.commune_code = zone.code
+        place.commune_name = zone.name or place.commune_name
+        dept = normalize_dept_code(zone.parent_code)
+        if dept:
+            place.departement_code = dept
+            known = region_of(dept)
+            if known:
+                place.region_code = known.code
+        resolved += 1
+    return resolved
+
+
 def enrich_communes(
     places: list[Place],
     address_client: AddressClient | None = None,
     commune_client: CommuneClient | None = None,
     localisateur=None,
+    communes=None,
     pays: str = PAYS_DES_API,
 ) -> int:
     """Rattache chaque lieu à sa commune, par ses coordonnées.
@@ -1226,19 +1254,33 @@ def enrich_communes(
 
     Seuls les lieux sans commune sont interrogés : relancer la passe ne coûte
     donc rien une fois qu'elle a abouti.
+
+    Une COUCHE de contours communaux, quand elle est là, passe avant tout
+    appel : elle est gratuite, instantanée, et elle ne connaît pas de
+    frontière. C'est le seul rattachement possible hors de France — les deux
+    API sont nationales, et `resolve_admin` ne remplit QUE le département,
+    jamais la commune. Le premier catalogue italien l'a payé comptant : zéro
+    commune sur deux mille cinq cent soixante-trois lieux, donc un plafond par
+    commune qui n'a pas mordu une fois, quatre-vingts églises gardées dans la
+    seule Rome, et la maille la plus fine de la carte de conquête vide.
     """
+    par_contour = _communes_par_contour(places, communes) if communes is not None else 0
+    if par_contour:
+        LOG.info("communes : %s lieux rattachés par les contours", par_contour)
+
     if pays.upper() != PAYS_DES_API:
-        # Voir `PAYS_DES_API`. La commune vient alors de Wikidata seule — les
-        # sondages italiens la donnaient sur tous les lieux testés, de Turin à
-        # Cesena — et les lieux qu'elle ne renseigne pas restent sans commune,
-        # donc hors de la maille la plus fine de la carte de conquête.
+        # Voir `PAYS_DES_API` : les deux API sont françaises. Sans couche
+        # communale, il ne reste rien — et les lieux sans commune sortent de la
+        # maille la plus fine de la carte de conquête.
         sans = [p for p in places if not p.commune_code]
         if sans:
             LOG.info(
                 "communes : %s lieux sans commune — les API sont françaises, "
-                "aucun appel", len(sans),
+                "aucun appel%s", len(sans),
+                "" if communes is not None else
+                " et aucune couche communale (`geo-layers` la télécharge)",
             )
-        return 0
+        return par_contour
 
     missing = [p for p in places if not p.commune_code]
     # Même garde que pour le département : ne rien demander au réseau sur un
@@ -1254,7 +1296,7 @@ def enrich_communes(
         return 0
 
     LOG.info("communes : %s lieux à rattacher", len(missing))
-    resolved = 0
+    resolved = par_contour
 
     def assign(place: Place, commune) -> bool:
         if commune is None:

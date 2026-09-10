@@ -682,10 +682,30 @@ elles rendent la commune française la plus proche, ou rien. La passe
 locaux, eux, ne donnent pas la commune. Elles sont maintenant gardées par le
 code du pays, et le disent dans le journal.
 
-Conséquence à connaître : hors de France, la commune vient de Wikidata seule.
-Les sondages italiens la donnaient sur tous les lieux testés — Turin, Rome,
-Florence, Velletri, Cesena — mais ce qui n'en a pas restera hors de la maille
-la plus fine de la carte de conquête.
+⚠ **La conséquence écrite ici était fausse, et le premier build l'a prouvée.**
+« Hors de France, la commune vient de Wikidata seule » : non. `resolve_admin`
+ne remplit QUE le département depuis Wikidata ; il n'écrit ni `commune_code` ni
+`commune_name`, et il n'existe que deux endroits dans tout le pipeline qui les
+écrivent — l'API française, et les contours. Le premier catalogue italien est
+donc sorti avec **zéro commune sur 2 563 lieux**. Trois conséquences, toutes
+visibles dans sa sortie :
+
+- `max_per_commune: 6` n'a pas mordu une seule fois — la colonne `commune` du
+  tableau en entonnoir est identique à `plancher` pour les vingt et un thèmes.
+  Rome garde ainsi quatre-vingts églises, là où le même plafond en retire cent
+  vingt à Paris.
+- la commune manque à chaque fiche de l'application, qui retombe sur la
+  province.
+- la maille la plus fine de la carte de conquête est vide.
+
+**Corrigé** : `enrich` rattache maintenant la commune par point-dans-polygone
+quand une couche communale existe, avant tout appel d'API. `config/it/`
+déclare celle de l'ISTAT — 7 896 communes, 35 Mo, `com_istat_code` /
+`name` / `prov_istat_code`. Mesuré ici : 2,8 s de chargement, 231 Mo en
+mémoire, 12 000 points rattachés en 0,7 s, et huit points de contrôle justes,
+y compris les pièges (Cinque Terre → Riomaggiore, les trulli → Alberobello).
+La France ne déclare pas de couche communale et garde ses deux API : rien n'y
+change.
 
 **`discover`** délimite la France en dur, par un rectangle et par une zone
 `ISO3166-1="FR"`. Il ne plantait pas : il aurait proposé des lieux français

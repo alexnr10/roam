@@ -489,6 +489,7 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     # Après le département : la commune fait autorité sur lui, et la corrige au
     # passage quand Wikidata l'avait mal rattaché.
     enrich_communes(places, localisateur=couches.get("departement"),
+                    communes=couches.get("commune"),
                     pays=config.country.code)
     if not args.skip_summaries:
         enrich_summaries(places)

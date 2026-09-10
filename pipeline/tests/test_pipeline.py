@@ -8090,6 +8090,106 @@ class TestSurcoucheDePays(unittest.TestCase):
             load_config(pays="xx")
 
 
+class TestCommuneParContour(unittest.TestCase):
+    """La commune hors de France : par les contours, ou pas du tout.
+
+    Les deux API que `enrich_communes` interroge sont nationales, et
+    `resolve_admin` ne remplit que le département. Le premier catalogue italien
+    est sorti avec ZÉRO commune sur 2 563 lieux : le plafond par commune n'a
+    pas mordu une fois (quatre-vingts églises gardées dans la seule Rome), la
+    commune manquait à chaque fiche, et la maille la plus fine de la carte de
+    conquête était vide.
+    """
+
+    @staticmethod
+    def _carre(x0, y0, cote=1.0):
+        return [(x0, y0), (x0 + cote, y0), (x0 + cote, y0 + cote), (x0, y0 + cote)]
+
+    def _couche(self, code, name, parent):
+        polygones = [[self._carre(12.0, 41.0)]]
+        return localisation.Localisateur([localisation.Zone(
+            code=code, name=name, level="commune", parent_code=parent,
+            bbox=localisation._bbox(polygones), polygones=polygones)])
+
+    def tearDown(self):
+        geo.utiliser_pays("FR")
+
+    def test_les_contours_rattachent_hors_de_france_sans_un_appel(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        geo.utiliser_pays("IT")
+        lieu = make_place("Colisée", lat=41.5, lon=12.5, departement_code=None)
+        appels = []
+
+        class Interdit:
+            def reverse_communes(self, points):
+                appels.append(points)
+                raise AssertionError("aucune API française hors de France")
+
+        self.assertEqual(
+            enrich_communes([lieu], Interdit(), None,
+                            communes=self._couche("058091", "Roma", "058"),
+                            pays="IT"),
+            1,
+        )
+        self.assertEqual(appels, [])
+        self.assertEqual(lieu.commune_code, "058091")
+        self.assertEqual(lieu.commune_name, "Roma")
+
+    def test_la_commune_fait_autorite_sur_le_departement_et_la_region(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        # Le contour communal porte le code de sa province ; la région s'en
+        # déduit par le référentiel, jamais par une seconde source.
+        geo.utiliser_pays("IT")
+        lieu = make_place("Colisée", lat=41.5, lon=12.5, departement_code=None)
+        enrich_communes([lieu], None, None,
+                        communes=self._couche("058091", "Roma", "058"), pays="IT")
+        self.assertEqual(lieu.departement_code, "058")
+        self.assertEqual(lieu.region_code, geo.region_of("058").code)
+
+    def test_sans_couche_communale_rien_ne_rattache_hors_de_france(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        # Le comportement qui a produit le catalogue italien sans communes. Il
+        # reste juste — il ne doit simplement plus être le seul possible.
+        geo.utiliser_pays("IT")
+        lieu = make_place("Colisée", lat=41.5, lon=12.5, departement_code=None)
+        self.assertEqual(enrich_communes([lieu], None, None, pays="IT"), 0)
+        self.assertIsNone(lieu.commune_code)
+
+    def test_un_lieu_deja_rattache_n_est_pas_repris(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        # Relancer la passe ne doit rien coûter ni rien écraser : c'est ce qui
+        # rend `enrich` rejouable.
+        geo.utiliser_pays("IT")
+        lieu = make_place("Colisée", lat=41.5, lon=12.5,
+                          commune_code="058091", commune_name="Roma")
+        self.assertEqual(
+            enrich_communes([lieu], None, None,
+                            communes=self._couche("999999", "Ailleurs", "099"),
+                            pays="IT"),
+            0,
+        )
+        self.assertEqual(lieu.commune_code, "058091")
+
+    def test_un_point_hors_de_toute_commune_reste_sans_commune(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        # Une plage au large, un phare en mer : le silence vaut mieux qu'un
+        # rangement arbitraire.
+        geo.utiliser_pays("IT")
+        large = make_place("Îlot", lat=39.0, lon=9.0, departement_code=None)
+        self.assertEqual(
+            enrich_communes([large], None, None,
+                            communes=self._couche("058091", "Roma", "058"),
+                            pays="IT"),
+            0,
+        )
+        self.assertIsNone(large.commune_code)
+
+
 class TestReferentielParPays(unittest.TestCase):
     """Provinces italiennes et départements français, lus par la même mécanique."""
 

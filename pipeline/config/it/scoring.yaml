@@ -45,6 +45,27 @@ geo:
       parent_key: reg_istat_code
       url: https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_provinces.geojson
 
+    # ── La commune, et c'est la seule façon de l'avoir hors de France ──────
+    #
+    # Les deux API que `enrich` interroge pour la commune sont NATIONALES
+    # (api-adresse et geo.api.gouv.fr), et `resolve_admin` ne remplit que le
+    # département depuis Wikidata, jamais la commune. Le premier catalogue
+    # italien l'a payé comptant : zéro commune sur 2 563 lieux — donc un
+    # `max_per_commune` qui n'a pas mordu une seule fois (80 églises gardées
+    # dans la seule Rome), la commune absente de chaque fiche de l'application,
+    # et la maille la plus fine de la carte de conquête vide.
+    #
+    # Les contours communaux la rendent, par le même point-dans-polygone que
+    # les provinces. Le fichier est gros — 35 Mo, 7 900 communes contre 110
+    # provinces — mais il ne se télécharge qu'une fois et ne sert qu'à
+    # `enrich`.
+    commune:
+      fichier: commune.geojson
+      code_key: com_istat_code     # six chiffres, ex. 058091 pour Rome
+      name_key: name
+      parent_key: prov_istat_code  # le même code que la couche du dessus
+      url: https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_municipalities.geojson
+
   # PAS DE DÉROGATION COMMUNALE ENCORE.
   #
   # Rome, Florence, Venise et Naples en demanderont chacune une — Paris pèse
