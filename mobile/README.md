@@ -84,7 +84,13 @@ Deux détails qui ne se devinent pas, et qui ont chacun coûté un essai :
 - **le worker de MapLibre.** Il était demandé à `/maplibre/…`, donc à la racine
   du DOMAINE. Il est maintenant résolu depuis l'adresse du bundle, la seule qui
   reste juste même sur une route profonde. Sans quoi la carte se charge, ne
-  dessine rien, et ne dit pas pourquoi.
+  dessine rien, et ne dit pas pourquoi ;
+- **la référence des catalogues.** Elle est INLINÉE dans le bundle par
+  `EXPO_PUBLIC_ROAM_CATALOGUES`, lue dans `app.json`. La configuration Expo
+  seule ne suffit pas : un export statique ne porte aucun manifeste, et le site
+  retombait sur `main`. L'export passe `--clear` parce que le cache de Metro
+  ignore la valeur de cette variable — sans quoi changer de branche réutilise
+  l'ancienne, en silence.
 
 Deux fichiers vides ou presque, que `export:pages` dépose et sans lesquels
 rien ne marche :

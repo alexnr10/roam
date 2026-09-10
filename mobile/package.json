@@ -11,7 +11,7 @@
     "glyphes": "node scripts/build-glyphes.mjs",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "export:web": "node scripts/sync-maplibre-worker.mjs && EXPO_PUBLIC_ROAM_CATALOGUES=$(node -p \"require('./app.json').expo.extra.catalogues\") EXPO_OFFLINE=1 expo export --platform web --output-dir dist",
+    "export:web": "node scripts/sync-maplibre-worker.mjs && EXPO_PUBLIC_ROAM_CATALOGUES=$(node -p \"require('./app.json').expo.extra.catalogues\") EXPO_OFFLINE=1 expo export --clear --platform web --output-dir dist",
     "export:pages": "ROAM_BASE_URL=/roam npm run export:web && cp dist/index.html dist/404.html && touch dist/.nojekyll",
     "preview:single": "npm run export:web && node scripts/inline-web-build.mjs",
     "postinstall": "node scripts/sync-maplibre-worker.mjs"
