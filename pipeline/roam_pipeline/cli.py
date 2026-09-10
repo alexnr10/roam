@@ -2508,6 +2508,160 @@ def _list_photos(args: argparse.Namespace, qid: str, photos: dict[str, str]) -> 
     return 0
 
 
+def _plus_forte_chute(scores: list[float], cap: int) -> tuple[int, float, float] | None:
+    """Où la liste des candidats chute le plus fort, à partir du plafond.
+
+    Rend (rang, chute, pas courant) : garder `rang` lieux coupe juste avant la
+    plus grande marche. La recherche ne commence QU'AU plafond — une dérogation
+    ne peut que l'élever, jamais l'abaisser — et s'arrête assez loin pour voir
+    le plateau qui suit sans lire toute la ville.
+
+    Le pas courant vient avec, et ce n'est pas décoratif : la plus forte chute
+    existe toujours, même dans une liste parfaitement régulière. C'est leur
+    RAPPORT qui dit s'il y a un décrochage.
+    """
+    fin = min(len(scores) - 1, max(cap * 4, cap + 12))
+    if fin < cap:
+        return None
+    marches = [scores[k - 1] - scores[k] for k in range(cap, fin + 1)]
+    rupture = cap + max(range(len(marches)), key=lambda i: marches[i])
+    courant = sorted(marches)[len(marches) // 2]
+    return rupture, scores[rupture - 1] - scores[rupture], courant
+
+
+def cmd_derogations(args: argparse.Namespace, config: Config) -> int:
+    """Le vivier de chaque ville au pied du plafond par commune.
+
+    Une dérogation communale se décide sur un DÉCROCHAGE mesuré, jamais sur une
+    intuition : c'est ainsi que celle de Paris a été posée — « monuments 20
+    candidats, décrochage après le 8e (131 puis 114) ». Cette mesure-là avait
+    été faite à la main, une ville et un thème à la fois ; elle n'était donc
+    pas refaisable pour un deuxième pays.
+
+    Elle l'est ici. Le premier catalogue italien a montré pourquoi il le
+    fallait : le plafond y retire 572 lieux à Rome et 213 à Venise, et il a
+    emporté « Îles de Venise » en entier — vingt-huit îles qui sont toutes dans
+    la même commune. Sans le vivier sous les yeux, on ne peut ni voir cela, ni
+    choisir un chiffre autrement qu'au doigt mouillé.
+
+    Ce qui s'affiche n'est PAS une recommandation : c'est la liste des scores au
+    pied du plafond, et l'endroit où elle décroche le plus fort. Le chiffre
+    reste une décision de curation — les musées parisiens n'ont aucun
+    décrochage, et leur dérogation est un arbitrage assumé.
+    """
+    from .collections import (
+        _ville, apply_access_filter, apply_alpine_filter, apply_class_exclusion,
+        apply_geographic_scope, apply_list_membership, apply_notoriety_floor,
+        dedupe_across_themes,
+    )
+
+    plafond = config.collections.max_per_commune
+    if not plafond:
+        print("Aucun plafond par commune n'est déclaré : rien à déroger.")
+        return 0
+
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
+        return 1
+
+    scored = score_all(_load_places(raw_path), config)
+    apply_names(scored, read_names(args.manual / "names.csv"))
+    scored, _inconnus = apply_themes(
+        scored, read_themes(args.manual / "themes.csv"),
+        {theme.id for theme in config.themes},
+    )
+    pipeline_log = logging.getLogger("roam_pipeline")
+    precedent = pipeline_log.level
+    pipeline_log.setLevel(logging.ERROR)
+    try:
+        kept, _counts = apply_decisions(
+            scored, read_decisions(args.manual / "decisions.csv"),
+            d_office=gardes_d_office(scored, config),
+        )
+        score_all(kept, config)
+        # Le même enchaînement que `build_all`, arrêté JUSTE avant le plafond
+        # par commune : c'est exactement la population qu'il voit.
+        etape = apply_geographic_scope(kept, config)
+        etape = dedupe_across_themes(etape, config)
+        etape = apply_class_exclusion(etape, config)
+        etape = apply_list_membership(etape, config)
+        etape = apply_access_filter(etape, config)
+        etape = apply_alpine_filter(etape, config)
+        au_pied = apply_notoriety_floor(etape, config)
+    finally:
+        pipeline_log.setLevel(precedent)
+
+    derogations = config.collections.commune_overrides
+    viviers: dict[str, dict[str, list[Place]]] = defaultdict(lambda: defaultdict(list))
+    noms: dict[str, str] = {}
+    for place in au_pied:
+        if not place.commune_code:
+            continue
+        ville = _ville(place.commune_code)
+        noms.setdefault(ville, place.commune_name or ville)
+        viviers[ville][place.theme_id].append(place)
+
+    def coupes(ville: str) -> int:
+        """Combien le plafond retire à cette ville, dérogations comprises."""
+        return sum(
+            max(0, len(lieux) - derogations.get(ville, {}).get(theme_id, plafond))
+            for theme_id, lieux in viviers[ville].items()
+        )
+
+    if args.ville:
+        if args.ville not in viviers:
+            print(f"Aucun lieu au pied du plafond dans la commune {args.ville}.",
+                  file=sys.stderr)
+            return 1
+        villes = [args.ville]
+    else:
+        villes = sorted(viviers, key=lambda v: -coupes(v))[: args.villes]
+
+    for ville in villes:
+        total = sum(len(lieux) for lieux in viviers[ville].values())
+        print(f"\n{noms[ville]} ({ville}) — {total} candidats au pied du "
+              f"plafond, {coupes(ville)} retirés")
+        propres = derogations.get(ville, {})
+        for theme_id, lieux in sorted(viviers[ville].items(), key=lambda kv: -len(kv[1])):
+            cap = propres.get(theme_id, plafond)
+            if len(lieux) <= cap and not args.tout:
+                continue
+            lieux.sort(key=lambda p: -p.score)
+            scores = [p.score for p in lieux]
+            # Le décrochage ne se cherche qu'À PARTIR du plafond : une
+            # dérogation ne peut que l'élever, jamais l'abaisser.
+            fin = min(len(scores) - 1, max(cap * 4, cap + 12))
+            # La plus forte chute EXISTE TOUJOURS : la nommer « décrochage »
+            # ferait dire à l'outil ce qu'il ne sait pas. Les quatre-vingts
+            # musées parisiens descendent du Louvre à Jacquemart-André sans une
+            # rupture, et le curateur l'a lu à la main. On donne donc la chute
+            # ET le pas courant, et la liste dessous tranche.
+            trouve = _plus_forte_chute(scores, cap)
+            if trouve is None:
+                rupture, verdict = None, "moins de candidats que le plafond"
+            else:
+                rupture, chute, courant = trouve
+                verdict = (
+                    f"plus forte chute après le {rupture}e "
+                    f"({scores[rupture - 1]:.0f} puis {scores[rupture]:.0f}, "
+                    f"soit {chute:.1f} ; pas courant {courant:.1f})"
+                )
+            marque = f"  [dérogation {cap}]" if theme_id in propres else ""
+            print(f"  {theme_id:<14} {len(lieux):>4} candidats · plafond {cap}"
+                  f" · {verdict}{marque}")
+            for rang, place in enumerate(lieux[: fin + 1], start=1):
+                if rang == cap:
+                    bord = "  ← plafond"
+                elif rupture is not None and rang == rupture:
+                    bord = "  ⟵ plus forte chute"
+                else:
+                    bord = ""
+                print(f"      {rang:>3}. {place.score:6.1f}  {place.name[:48]:<48}{bord}")
+    print()
+    return 0
+
+
 def cmd_pertes(args: argparse.Namespace, config: Config) -> int:
     """Quels redressements de thème ont fait DISPARAÎTRE un lieu ?
 
@@ -4006,6 +4160,15 @@ def build_parser() -> argparse.ArgumentParser:
     epingle.add_argument("--note", help="pourquoi cet épinglage")
     epingle.add_argument("--clear", action="store_true", help="retirer l'épinglage")
 
+    derog = sub.add_parser(
+        "derogations",
+        help="le vivier de chaque ville au pied du plafond par commune")
+    derog.add_argument("--ville", help="ne regarder que cette commune (son code)")
+    derog.add_argument("--villes", type=int, default=5,
+                       help="combien de villes montrer (défaut : 5)")
+    derog.add_argument("--tout", action="store_true",
+                       help="montrer aussi les thèmes que le plafond ne touche pas")
+
     sub.add_parser(
         "pertes", help="quels redressements de thème écartent un lieu du catalogue")
 
@@ -4101,6 +4264,7 @@ def main(argv: list[str] | None = None) -> int:
         "verdict": cmd_verdict,
         "pin": cmd_pin,
         "label-probe": cmd_label_probe,
+        "derogations": cmd_derogations,
         "pertes": cmd_pertes,
         "merge": cmd_merge,
         "weigh": cmd_weigh,

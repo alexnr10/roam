@@ -66,11 +66,21 @@ geo:
       parent_key: prov_istat_code  # le même code que la couche du dessus
       url: https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_municipalities.geojson
 
-  # PAS DE DÉROGATION COMMUNALE ENCORE.
-  #
-  # Rome, Florence, Venise et Naples en demanderont chacune une — Paris pèse
-  # cinquante-neuf lieux au catalogue français et a la sienne, écrite en toutes
-  # lettres. Mais une dérogation se pose sur un CODE de commune, et les codes
-  # ISTAT ne s'inventent pas : ils se liront dans la première collecte, avec le
-  # vivier de chaque ville au pied du plafond — c'est ainsi que celle de Paris
-  # a été décidée, sur un décrochage mesuré et non sur une intuition.
+# ── Les dérogations communales : celles de Paris ne valent pas ici ───────
+#
+# `commune_overrides` est un dictionnaire, et un dictionnaire FUSIONNE clé
+# par clé : sans ce `null`, l'Italie héritait de la dérogation parisienne.
+# Elle était inerte — aucun code ISTAT ne fait cinq chiffres — mais le
+# journal du build l'annonçait à chaque construction (« 75056 maisons 10,
+# monuments 16, musees 10 »), ce qui est une fausse piste écrite en toutes
+# lettres.
+#
+# Les siennes viendront, et la commande `derogations` les donne maintenant :
+# elle montre le vivier de chaque ville au pied du plafond, thème par thème,
+# avec la plus forte chute et le pas courant à côté. Le premier build
+# italien avec le plafond actif dit où regarder — il retire 572 lieux à
+# Rome, 213 à Venise, 64 à Milan, 61 à Florence, 53 à Naples, et il a emporté
+# « Îles de Venise » en entier : vingt-huit îles qui sont toutes dans la
+# même commune.
+collections:
+  commune_overrides: null

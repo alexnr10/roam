@@ -8014,6 +8014,18 @@ class TestSurcoucheDePays(unittest.TestCase):
         self.assertEqual(it.scoring.sitelinks_weight, CONFIG.scoring.sitelinks_weight)
         self.assertEqual(it.tiers.tier1_size, CONFIG.tiers.tier1_size)
 
+    def test_l_italie_n_herite_pas_de_la_derogation_parisienne(self):
+        # `commune_overrides` est un dictionnaire, et un dictionnaire fusionne
+        # clé par clé : sans un `null` explicite, l'Italie portait la
+        # dérogation de Paris. Inerte — aucun code ISTAT ne fait cinq
+        # chiffres — mais annoncée à chaque build, ce qui est une fausse piste.
+        it = load_config(pays="it")
+        self.assertEqual(it.collections.commune_overrides, {})
+        # Le plafond lui-même, lui, reste : c'est la règle générale.
+        self.assertEqual(it.collections.max_per_commune,
+                         CONFIG.collections.max_per_commune)
+        self.assertIn("75056", CONFIG.collections.commune_overrides)
+
     def test_l_italie_garde_l_unesco_et_perd_les_listes_francaises(self):
         # L'UNESCO est la seule des quinze qui ne soit pas nationale — et elle
         # vaut d'autant plus ici : l'Italie porte le plus grand nombre de biens
@@ -8088,6 +8100,38 @@ class TestSurcoucheDePays(unittest.TestCase):
     def test_un_pays_inconnu_le_dit(self):
         with self.assertRaises(SystemExit):
             load_config(pays="xx")
+
+
+class TestPlusForteChute(unittest.TestCase):
+    """Où couper le vivier d'une ville — la mesure, pas le verdict."""
+
+    def test_la_recherche_ne_commence_qu_au_plafond(self):
+        # Une dérogation ne peut qu'ÉLEVER le plafond. Une chute avant lui ne
+        # l'intéresse pas : la proposer reviendrait à conseiller de couper plus
+        # court que la règle générale.
+        scores = [200.0, 100.0, 99.0, 98.0, 97.0, 96.0, 95.0, 60.0, 59.0, 58.0]
+        rang, chute, _pas = cli._plus_forte_chute(scores, cap=6)
+        self.assertEqual(rang, 7)
+        self.assertAlmostEqual(chute, 35.0)
+
+    def test_le_pas_courant_accompagne_la_chute(self):
+        # La plus forte chute existe toujours, même dans une liste régulière.
+        # C'est leur rapport qui dit s'il y a un décrochage — sans le pas, un
+        # escalier parfait passerait pour une falaise.
+        scores = [100.0 - i for i in range(30)]
+        rang, chute, pas = cli._plus_forte_chute(scores, cap=6)
+        self.assertAlmostEqual(chute, 1.0)
+        self.assertAlmostEqual(pas, 1.0)
+
+    def test_une_falaise_se_distingue_du_pas_courant(self):
+        scores = [100.0, 99.0, 98.0, 97.0, 96.0, 95.0, 94.0, 93.0, 60.0, 59.0, 58.0]
+        rang, chute, pas = cli._plus_forte_chute(scores, cap=6)
+        self.assertEqual(rang, 8)
+        self.assertAlmostEqual(chute, 33.0)
+        self.assertAlmostEqual(pas, 1.0)
+
+    def test_moins_de_candidats_que_le_plafond_ne_dit_rien(self):
+        self.assertIsNone(cli._plus_forte_chute([100.0, 90.0], cap=6))
 
 
 class TestCommuneParContour(unittest.TestCase):

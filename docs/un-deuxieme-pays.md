@@ -790,6 +790,49 @@ liste italienne ne le rende : un thème qui promet une catégorie et rend deux
 lignes est pire qu'un thème absent. C'est une décision de curation, pas de
 configuration, et elle tient en une ligne à retirer.
 
+### Le plafond par commune, une fois les communes là — MESURÉ
+
+Le build suivant, avec les communes rattachées, a fait mordre `max_per_commune`
+pour la première fois : **1 118 lieux retirés** — Rome 572, Venise 213, Milan
+64, Florence 61, Naples 53. Le catalogue passe de 2 563 à **2 373 lieux**, et
+les lieux jetés faute de collection tombent de 702 à 44.
+
+Ce que le plafond a coûté, thème par thème, entre la colonne `plancher` et la
+colonne `commune` : églises 550 → 235, monuments 617 → 189, mégalithes 454 →
+235, îles 116 → 90, musées 184 → 134, ponts 45 → 32.
+
+Et il a emporté **dix collections entières**, dont « Îles de Venise » (28
+lieux), « Sommets du Piémont » (23) et « Littoral et plages de Sicile » (18).
+Les vingt-huit îles de Venise sont toutes dans la même commune : à six par
+thème, il en reste six. C'est exactement le cas qu'une dérogation existe pour
+traiter — Paris a la sienne pour la même raison.
+
+**`derogations` rend cette décision refaisable.** Celle de Paris avait été
+mesurée à la main, une ville et un thème à la fois ; la commande donne
+maintenant, pour les villes que le plafond coupe le plus, le vivier au pied du
+plafond thème par thème, la plus forte chute et le **pas courant** à côté. Ce
+dernier n'est pas décoratif : une plus forte chute existe toujours, même dans
+une liste régulière, et c'est leur rapport qui dit s'il y a un décrochage. Sur
+Paris, la commande retrouve ce que le curateur avait lu — jardins, chute de
+15,0 pour un pas courant de 1,3 (une falaise) ; musées, chute de 5,1 pour un pas
+de 0,9 (« trente-deux institutions se suivent sans rupture »).
+
+Les codes ISTAT des villes concernées, lus dans la couche communale et non de
+mémoire : Rome 058091, Venise 027042, Milan 015146, Florence 048017, Naples
+063049, Turin 001272, Palerme 082053, Bologne 037006.
+
+### Le plafond des églises : la question a changé de main
+
+Avant les communes, `cathedrales` portait 549 lieux au catalogue et la question
+était « quel `catalogue_cap` ? ». Le plafond par commune en a retiré 315 à lui
+seul, et le thème en compte **253**. Le travail que le `catalogue_cap` français
+faisait — empêcher une capitale d'occuper tout un thème — est fait ici par
+l'échelon en dessous, et mieux : il coupe Rome sans toucher à Assise, Orvieto
+ou Sienne. Un plafond de thème posé maintenant couperait précisément l'inverse.
+
+À revoir après la première revue italienne, pas avant : une revue qui écarte des
+églises change le chiffre sur lequel un plafond se poserait.
+
 ### Ce qu'on sait déjà pour écrire `config/it/`
 
 Trois planchers mesurés, à ne pas remesurer. Les tableaux sont ceux de
