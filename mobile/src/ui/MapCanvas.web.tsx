@@ -6,7 +6,7 @@ import type { GeoJSONSource, MapLayerMouseEvent, Map as MapLibreMap } from 'mapl
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { outlinesFor } from '../data/outlines';
+import { EMPTY_OUTLINES, outlinesFor } from '../data/outlines';
 import type { Emprise } from '../lib/regions';
 import {
   REGIONS,
@@ -20,6 +20,7 @@ import {
   voile,
 } from '../lib/regions';
 import { etoilesDe } from '../lib/etoiles';
+import { useCatalogue } from '../lib/useCatalogue';
 import { colors, spacing, type } from '../theme';
 import type { Place } from '../types';
 import type { MapCanvasProps } from './MapCanvas';
@@ -239,6 +240,14 @@ export function MapCanvas({
     [],
   );
 
+  /**
+   * La version du catalogue : elle change à chaque bascule de pays.
+   *
+   * `places`, `collections` et les contours sont des liens vivants — leur
+   * contenu suit tout seul. Ce qui ne suit pas, c'est React, et donc la carte.
+   */
+  const versionDuCatalogue = useCatalogue();
+
   const [ouverte, setOuverte] = useState<string | null>(null);
   const [degraded, setDegraded] = useState(false);
   // Le premier reproche de MapLibre, gardé pour l'afficher si la carte ne
@@ -326,18 +335,17 @@ export function MapCanvas({
       instance.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
       instance.on('load', () => {
-        const contours: Record<string, unknown> = {
-          [SOURCE_VOILE]: voile(),
-          [SOURCE_REGIONS]: outlinesFor('region'),
-          [SOURCE_DEPTS]: outlinesFor('departement'),
-          [SOURCE_LIEUX]: { type: 'FeatureCollection', features: [] },
-        };
-
-        for (const [id, data] of Object.entries(contours)) {
-          if (!data) continue;
+        // Les quatre sources sont posées VIDES, et remplies par l'effet qui
+        // suit le catalogue. Les créer avec leurs données figeait les contours
+        // sur le pays de départ : en passant la frontière, la carte gardait
+        // les aplats français par-dessus l'Italie. Pire, un pays sans découpage
+        // régional n'aurait jamais créé la source, et le pays suivant se serait
+        // retrouvé sans couche du tout — impossible à rattraper sans reprendre
+        // la carte entière.
+        for (const id of [SOURCE_VOILE, SOURCE_REGIONS, SOURCE_DEPTS, SOURCE_LIEUX]) {
           instance.addSource(id, {
             type: 'geojson',
-            data: data as never,
+            data: { type: 'FeatureCollection', features: [] },
             // Le survol passe par `feature-state`, qui a besoin d'un
             // identifiant : sans lui, MapLibre n'a rien à quoi accrocher
             // l'état. Les lieux, eux, portent le leur dans la donnée.
@@ -367,11 +375,14 @@ export function MapCanvas({
         // voir `couches.ts`. Elles étaient écrites deux fois, et les deux
         // copies avaient déjà divergé en silence — l'anneau du lieu qu'on
         // touche n'existait sur aucune des deux plateformes.
+        //
+        // Toutes posées, sans condition : une couche sur une source vide ne
+        // dessine rien, et c'est exactement ce qu'on veut le temps que le
+        // catalogue arrive.
         for (const couche of couchesDeLaCarte({
           natif: false,
           avecPolices: Boolean(instance.getStyle()?.glyphs),
         })) {
-          if (!contours[couche.source]) continue;
           instance.addLayer(couche as never);
         }
 
@@ -529,6 +540,49 @@ export function MapCanvas({
       setReady(false);
     };
   }, []);
+
+  /**
+   * Les contours, qui suivent le catalogue.
+   *
+   * Ils étaient lus UNE FOIS, à la création de la carte : les aplats, les
+   * coutures de départements et le voile restaient donc ceux du pays de
+   * départ. En passant la frontière, on aurait vu les régions françaises
+   * posées par-dessus l'Italie — et le voile hors-France aurait recouvert
+   * l'Italie entière.
+   *
+   * `voile()` en dépend aussi : c'est le monde PERCÉ des régions du pays, et
+   * ses trous changent quand le pays change.
+   */
+  useEffect(() => {
+    const instance = map.current;
+    if (!ready || !instance) return;
+    const donnees: Record<string, unknown> = {
+      [SOURCE_VOILE]: voile(),
+      [SOURCE_REGIONS]: outlinesFor('region') ?? EMPTY_OUTLINES,
+      [SOURCE_DEPTS]: outlinesFor('departement') ?? EMPTY_OUTLINES,
+    };
+    for (const [id, data] of Object.entries(donnees)) {
+      const source = instance.getSource(id) as GeoJSONSource | undefined;
+      source?.setData(data as never);
+    }
+  }, [ready, versionDuCatalogue]);
+
+  /**
+   * La région ouverte, quand le pays change sous elle.
+   *
+   * Le code d'une région française ne désigne rien en Italie : la garder
+   * ouverte laisserait un bandeau titré sur une région absente et une pastille
+   * de retour qui ne ramène nulle part. Le prochain mouvement de caméra la
+   * remplacerait, mais « le prochain mouvement » peut ne jamais venir — on
+   * traverse une frontière et on s'arrête.
+   */
+  useEffect(() => {
+    if (!ouverte || REGIONS.has(ouverte)) return;
+    ouverteRef.current = null;
+    zoomOuverture.current = null;
+    setOuverte(null);
+    onRegion.current?.(null);
+  }, [ouverte, versionDuCatalogue]);
 
   /**
    * Les lieux de la région ouverte, et la façon dont ils arrivent.

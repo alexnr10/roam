@@ -1,4 +1,4 @@
-import { chargerCatalogue, areas, collections, getPlace, nomDuPays, places, paysCourant } from './catalog';
+import { chargerCatalogue, areas, collections, getPlace, nomDuPays, places, paysCourant, surChangement, versionDuCatalogue } from './catalog';
 import { etoilesDe } from '../lib/etoiles';
 import { nomDeRegion, regionDuDepartement } from '../lib/regions';
 import contoursFrancais from './outlines.json';
@@ -118,5 +118,48 @@ describe('les contours suivent le pays', () => {
     chargerCatalogue(francais);
     expect(outlinesFor('region')).not.toBeNull();
     expect(nomDeRegion('84')).not.toBe('84');
+  });
+});
+
+describe('la version du catalogue', () => {
+  afterEach(() => chargerCatalogue(francais));
+
+  /**
+   * C'est le seul fil par lequel React apprend qu'un pays a changé.
+   *
+   * `places`, `collections` et les contours sont des liens vivants : leur
+   * contenu suit tout seul, et de son point de vue rien n'a changé. Les deux
+   * cartes accrochent leurs contours à ce compteur — les aplats de régions, les
+   * coutures de départements, le voile hors-pays, la carte de conquête. S'il
+   * cessait d'avancer, elles garderaient les contours français par-dessus
+   * l'Italie, sans que rien ne plante ni ne le dise.
+   */
+  it('avance à chaque catalogue chargé', () => {
+    const avant = versionDuCatalogue();
+    chargerCatalogue(italien);
+    expect(versionDuCatalogue()).toBeGreaterThan(avant);
+  });
+
+  it('avance aussi quand on revient au pays précédent', () => {
+    // Revenir en France est un changement comme un autre : les contours à
+    // redessiner sont ceux qu'on avait quittés, pas ceux qui sont posés.
+    chargerCatalogue(italien);
+    const enItalie = versionDuCatalogue();
+    chargerCatalogue(francais);
+    expect(versionDuCatalogue()).toBeGreaterThan(enItalie);
+  });
+
+  it('prévient qui la surveille', () => {
+    // `useSyncExternalStore` s'abonne par là : sans cet appel, le compteur
+    // avancerait sans que personne ne se redessine.
+    let appels = 0;
+    const arreter = surChangement(() => {
+      appels += 1;
+    });
+    chargerCatalogue(italien);
+    expect(appels).toBe(1);
+    arreter();
+    chargerCatalogue(francais);
+    expect(appels).toBe(1);
   });
 });

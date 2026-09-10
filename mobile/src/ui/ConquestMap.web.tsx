@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { attributionDesContours, outlinesFor } from '../data/outlines';
+import { useCatalogue } from '../lib/useCatalogue';
 import { colors, radius, spacing, type } from '../theme';
 import type { AreaLevel } from '../types';
 import type { ConquestMapProps } from './ConquestMap';
@@ -63,7 +64,11 @@ export function ConquestMap({ zones, level, selectedCode, onSelectZone }: Conque
   const [failed, setFailed] = useState(false);
   const [ready, setReady] = useState(false);
 
-  const outlines = useMemo(() => outlinesFor(level), [level]);
+  // Les contours changent avec le PAYS autant qu'avec l'échelle : sans la
+  // version du catalogue en dépendance, ils resteraient ceux du pays de
+  // départ, et la conquête colorierait des départements qui n'existent plus.
+  const version = useCatalogue();
+  const outlines = useMemo(() => outlinesFor(level), [level, version]);
   const shades = useMemo(() => aPeindre(zones), [zones]);
 
   useEffect(() => {
