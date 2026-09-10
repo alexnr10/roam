@@ -86,9 +86,16 @@ Deux détails qui ne se devinent pas, et qui ont chacun coûté un essai :
   reste juste même sur une route profonde. Sans quoi la carte se charge, ne
   dessine rien, et ne dit pas pourquoi.
 
-`404.html` est une copie d'`index.html` : GitHub Pages le sert pour toute route
-inconnue, ce qui rend les liens profonds — `/roam/place/Q243` — au lieu d'une
-page d'erreur.
+Deux fichiers vides ou presque, que `export:pages` dépose et sans lesquels
+rien ne marche :
+
+- **`.nojekyll`.** GitHub Pages fait tourner Jekyll par défaut, et Jekyll
+  ignore tout ce qui commence par `_` — donc `_expo/`, où vit l'intégralité du
+  JavaScript. Sans ce fichier, la page se charge, ne trouve aucun script, et
+  reste blanche. Rien dans les journaux de publication ne le dit.
+- **`404.html`**, copie d'`index.html`. GitHub Pages le sert pour toute route
+  inconnue, ce qui rend les liens profonds — `/roam/place/Q243` — au lieu d'une
+  page d'erreur.
 
 ## Ce que fait le prototype
 
