@@ -3608,28 +3608,81 @@ def _print_sitelink_distribution(places, floors: dict[str, int] | None = None) -
         print(f"      {theme_id:<16} {''.join(cells)}")
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        prog="roam_pipeline",
-        description="Pipeline de curation du catalogue Roam. Propose et classe ; ne publie pas.",
-    )
-    parser.add_argument("--config", type=Path, default=CONFIG_DIR, help="dossier de configuration")
+def _options_globales() -> argparse.ArgumentParser:
+    """Les options qui valent pour toutes les commandes.
+
+    Rendues à un parseur PARENT, et donné à chaque sous-commande : argparse ne
+    reconnaît sinon une option globale qu'AVANT le nom de la commande, et
+    refuse `geo-layers --pays-config it` par un « unrecognized arguments » qui
+    ne dit pas pourquoi. Personne ne devine cet ordre, et personne ne devrait
+    avoir à le retenir : les deux marchent.
+    """
+    commun = argparse.ArgumentParser(add_help=False)
+    # AUCUN défaut ici, et c'est le point délicat : le même parseur sert au
+    # sommet ET à chaque sous-commande. Avec des défauts, la sous-commande
+    # REPOSE le sien par-dessus la valeur donnée avant elle —
+    # `--pays-config it geo-layers` chargeait alors la France, en silence, et
+    # c'est exactement la panne qu'on essaie d'éviter partout ailleurs.
+    #
+    # `SUPPRESS` laisse l'attribut absent quand l'option n'est pas donnée, ce
+    # qui préserve ce que l'autre parseur a lu. Les vrais défauts sont posés
+    # après coup, par `_defauts`.
+    rien = argparse.SUPPRESS
+    commun.add_argument("--config", type=Path, default=rien, help="dossier de configuration")
     # `--pays-config` et non `--pays` : `--pays` existe déjà sur `gaps` et
     # `label-probe`, où il prend un Q-id et ne fait que MESURER un pays sans
     # rien engager. Celui-ci engage tout — il choisit la configuration avec
     # laquelle on collecte, note et exporte.
-    parser.add_argument(
-        "--pays-config", dest="pays_config", metavar="CODE",
+    commun.add_argument(
+        "--pays-config", dest="pays_config", metavar="CODE", default=rien,
         help="configuration d'un pays (ex. it), posée sur celle du dépôt",
     )
-    parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help="dossier de sortie")
-    parser.add_argument("--manual", type=Path, default=DEFAULT_MANUAL, help="listes manuelles")
-    parser.add_argument("--raw", type=Path, default=DEFAULT_RAW,
+    commun.add_argument("--out", type=Path, default=rien, help="dossier de sortie")
+    commun.add_argument("--manual", type=Path, default=rien, help="listes manuelles")
+    commun.add_argument("--raw", type=Path, default=rien,
                         help="collecte versionnée, un fichier par thème")
-    parser.add_argument("--geo", type=Path, default=DEFAULT_GEO,
+    commun.add_argument("--geo", type=Path, default=rien,
                         help="contours administratifs pour le rattachement")
-    parser.add_argument("-v", "--verbose", action="store_true")
+    commun.add_argument("-v", "--verbose", action="store_true", default=rien)
+    return commun
 
+
+#: Les valeurs des options globales quand personne ne les donne.
+DEFAUTS_GLOBAUX: dict[str, Any] = {
+    "config": CONFIG_DIR,
+    "pays_config": None,
+    "out": DEFAULT_OUT,
+    "manual": DEFAULT_MANUAL,
+    "raw": DEFAULT_RAW,
+    "geo": DEFAULT_GEO,
+    "verbose": False,
+}
+
+
+def _defauts(args: argparse.Namespace) -> None:
+    """Pose les défauts des options globales laissées absentes."""
+    for nom, valeur in DEFAUTS_GLOBAUX.items():
+        if not hasattr(args, nom):
+            setattr(args, nom, valeur)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    commun = _options_globales()
+    parser = argparse.ArgumentParser(
+        prog="roam_pipeline",
+        description="Pipeline de curation du catalogue Roam. Propose et classe ; ne publie pas.",
+        parents=[commun],
+    )
+
+    class _Sous(argparse._SubParsersAction):
+        """Chaque sous-commande hérite des options globales."""
+
+        def add_parser(self, name, **kwargs):
+            kwargs.setdefault("parents", [])
+            kwargs["parents"] = [*kwargs["parents"], commun]
+            return super().add_parser(name, **kwargs)
+
+    parser.register("action", "parsers", _Sous)
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("verify-qids", help="vérifie les Q-ids de la configuration (réseau requis)")
@@ -3997,6 +4050,7 @@ def _ranger_par_pays(args: argparse.Namespace, config: Config) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    _defauts(args)
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(levelname)-7s %(message)s",

@@ -568,7 +568,13 @@ Une SURCOUCHE, pas une copie. `config/it/*.yaml` ne dit que les écarts, et
 - tout le reste remplace, `null` explicite compris — c'est ainsi qu'on retire
   un plafond.
 
-    python -m roam_pipeline <commande> --pays-config it
+    python -m roam_pipeline --pays-config it <commande>
+
+L'option se place avant ou après le nom de la commande : argparse ne la
+reconnaît nativement qu'avant, et refuse le reste par un « unrecognized
+arguments » qui ne dit pas pourquoi. Elle est donc rendue à chaque
+sous-commande — sans défaut, sans quoi la sous-commande reposerait le sien
+par-dessus la valeur donnée avant elle, et chargerait la France en silence.
 
 `--pays-config` et non `--pays` : ce dernier existe déjà sur `gaps` et
 `label-probe`, où il prend un Q-id et ne fait que MESURER un pays sans rien

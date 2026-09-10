@@ -5,7 +5,9 @@
 # jugement éditorial qui ne connaît pas de frontière : ils restent dans
 # `config/scoring.yaml`, et une correction faite là vaut pour les deux pays.
 #
-#     python -m roam_pipeline <commande> --pays-config it
+#     python -m roam_pipeline --pays-config it <commande>
+#
+# L'option se place avant ou après le nom de la commande, indifféremment.
 #
 # ⚠ CE FICHIER NE SUFFIT PAS À COLLECTER L'ITALIE. Il manque encore le
 # référentiel des provinces et des régions — `data/reference/regions.csv` et

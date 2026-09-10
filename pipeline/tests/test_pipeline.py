@@ -54,7 +54,7 @@ from roam_pipeline.collections import (
     dedupe_across_themes,
     haversine_m,
 )
-from roam_pipeline import geo
+from roam_pipeline import cli, geo
 from roam_pipeline.config import CONFIG_DIR, Config, Exclusions, Visitors, fusionner, load_config
 from roam_pipeline.export import (
     review_tiers,
@@ -8168,3 +8168,60 @@ class TestGardeDOffice(unittest.TestCase):
         )
         place = self._lieu("Q1", ["plus-beaux-villages"])
         self.assertEqual(gardes_d_office([place], muet), set())
+
+
+class TestOptionsGlobales(unittest.TestCase):
+    """Les options globales, avant ou après le nom de la commande.
+
+    Argparse ne les reconnaît qu'AVANT, et refuse le reste par un
+    « unrecognized arguments » qui ne dit pas pourquoi. Personne ne devine cet
+    ordre. Rendues à chaque sous-commande par un parseur parent, elles marchent
+    des deux côtés — mais un parent qui porte des DÉFAUTS repose alors le sien
+    par-dessus la valeur donnée avant la commande, et
+    `--pays-config it geo-layers` chargeait la France en silence.
+    """
+
+    @staticmethod
+    def _lire(*argv):
+        args = cli.build_parser().parse_args(list(argv))
+        cli._defauts(args)
+        return args
+
+    def test_avant_la_commande(self):
+        self.assertEqual(self._lire("--pays-config", "it", "stats").pays_config, "it")
+
+    def test_apres_la_commande(self):
+        self.assertEqual(self._lire("stats", "--pays-config", "it").pays_config, "it")
+
+    def test_sans_rien_c_est_la_France(self):
+        args = self._lire("stats")
+        self.assertIsNone(args.pays_config)
+        self.assertEqual(args.out, cli.DEFAULT_OUT)
+        self.assertEqual(args.manual, cli.DEFAULT_MANUAL)
+        self.assertFalse(args.verbose)
+
+    def test_un_chemin_donne_avant_la_commande_survit(self):
+        # Le même piège que pour le pays, sur tous les chemins : c'est celui-là
+        # qui ferait écrire une collecte italienne dans les fichiers français.
+        args = self._lire("--out", "/tmp/ailleurs", "stats")
+        self.assertEqual(str(args.out), "/tmp/ailleurs")
+
+    def test_les_donnees_d_un_pays_ajoute_vont_chez_lui(self):
+        # Sans cela, `--pays-config it` collecterait l'Italie par-dessus la
+        # France : même `places_raw.json`, même `decisions.csv`.
+        args = self._lire("--pays-config", "it", "stats")
+        config = load_config(pays="it")
+        cli._ranger_par_pays(args, config)
+        self.assertIn("/data/it/", str(args.out))
+        self.assertIn("/data/it/", str(args.manual))
+        self.assertIn("/data/it/", str(args.raw))
+
+    def test_un_chemin_explicite_gagne_sur_le_rangement(self):
+        args = self._lire("--pays-config", "it", "--out", "/tmp/ici", "stats")
+        cli._ranger_par_pays(args, load_config(pays="it"))
+        self.assertEqual(str(args.out), "/tmp/ici")
+
+    def test_la_France_ne_se_range_nulle_part(self):
+        args = self._lire("stats")
+        cli._ranger_par_pays(args, CONFIG)
+        self.assertEqual(args.out, cli.DEFAULT_OUT)
