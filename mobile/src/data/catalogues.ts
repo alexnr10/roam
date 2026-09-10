@@ -32,12 +32,51 @@ export type PaysDisponible = PaysConnu & {
 /**
  * D'où viennent les catalogues servis.
  *
- * La branche est écrite ici plutôt que devinée : une application publiée doit
- * lire une branche stable, pas celle sur laquelle on travaille ce jour-là.
+ * Deux choses arrivent sur le téléphone, et une seule est figée par le paquet.
+ * L'application, oui ; les catalogues, non — ils sont relus À CHAQUE
+ * démarrage, et c'est tout l'intérêt : corriger le catalogue ne demande pas
+ * de recompiler.
+ *
+ * Mais une version DONNÉE à quelqu'un ne doit pas changer sous ses pieds. En
+ * lisant `main`, une application publiée verrait apparaître un pays le jour où
+ * on l'y pousse — sans mise à jour, sans rien demander. Quelqu'un à qui on a
+ * confié « la version France » ferait glisser la carte vers Menton et
+ * trouverait l'Italie.
+ *
+ * La référence est donc une donnée de compilation, dans `app.json` :
+ *
+ *     "extra": { "catalogues": "main" }        pour le développement
+ *     "extra": { "catalogues": "v0.1-france" } pour une version publiée
+ *
+ * `raw.githubusercontent.com` sert une ÉTIQUETTE exactement comme une
+ * branche : pointer une version publiée sur un tag fige ses catalogues pour de
+ * bon, et rend `main` à son rôle, qui est de bouger.
  */
 const DEPOT = 'https://raw.githubusercontent.com/alexnr10/roam';
-const BRANCHE = 'main';
-export const BASE = `${DEPOT}/${BRANCHE}/catalogues`;
+
+/** La référence par défaut, quand la configuration ne dit rien. */
+export const REFERENCE_PAR_DEFAUT = 'main';
+
+/**
+ * La référence servie, lue dans la configuration Expo.
+ *
+ * Lue défensivement : `expo-constants` est un module natif, et ce fichier est
+ * aussi chargé par les tests, qui tournent sous Node sans application autour.
+ * Une référence absente vaut `main` — le comportement d'avant, qui est le bon
+ * pour développer.
+ */
+export function referenceServie(): string {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const Constants = require('expo-constants').default;
+    const dite = Constants?.expoConfig?.extra?.catalogues;
+    return typeof dite === 'string' && dite.trim() ? dite.trim() : REFERENCE_PAR_DEFAUT;
+  } catch {
+    return REFERENCE_PAR_DEFAUT;
+  }
+}
+
+export const BASE = `${DEPOT}/${referenceServie()}/catalogues`;
 
 const catalogueEmbarque = embarque as unknown as Catalog;
 

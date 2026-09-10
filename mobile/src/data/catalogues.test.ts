@@ -1,4 +1,4 @@
-import { PAYS, PAYS_EMBARQUE, PaysInconnu, catalogueDe, dejaCharge, deposer, lireIndex, obtenir } from './catalogues';
+import { BASE, PAYS, PAYS_EMBARQUE, PaysInconnu, REFERENCE_PAR_DEFAUT, catalogueDe, dejaCharge, deposer, lireIndex, obtenir, referenceServie } from './catalogues';
 import type { Catalog } from '../types';
 
 const vide = { places: [], collections: [], themes: [], areas: {} } as unknown as Catalog;
@@ -77,5 +77,72 @@ describe("l'index du dépôt", () => {
     // peut-être pas, serait pire que le manque.
     const casse = async () => { throw new Error('hors ligne'); };
     await expect(lireIndex(casse as unknown as typeof fetch)).resolves.toBeDefined();
+  });
+});
+
+describe('la référence servie', () => {
+  /**
+   * Une version donnée à quelqu'un ne doit pas changer sous ses pieds.
+   *
+   * Les catalogues sont relus à chaque démarrage — c'est voulu, corriger le
+   * catalogue ne demande pas de recompiler. Mais en lisant `main`, une version
+   * publiée verrait apparaître un pays le jour où on l'y pousse : quelqu'un à
+   * qui on a confié « la version France » ferait glisser la carte vers Menton
+   * et trouverait l'Italie.
+   */
+
+  it('retombe sur `main` quand la configuration ne dit rien', () => {
+    // C'est le cas des tests, qui tournent sans application autour — et celui
+    // du développement, où lire la branche de travail est le bon défaut.
+    expect(referenceServie()).toBe(REFERENCE_PAR_DEFAUT);
+  });
+
+  it('construit une adresse brute du dépôt', () => {
+    expect(BASE).toBe(
+      `https://raw.githubusercontent.com/alexnr10/roam/${referenceServie()}/catalogues`,
+    );
+  });
+
+  it('accepte une étiquette aussi bien qu’une branche', () => {
+    // `raw.githubusercontent.com` sert un tag exactement comme une branche :
+    // c'est ce qui permet de figer les catalogues d'une version publiée.
+    const gele = `https://raw.githubusercontent.com/alexnr10/roam/v0.1-france/catalogues`;
+    expect(gele).toContain('/v0.1-france/');
+  });
+
+  it('lit vraiment ce que la configuration annonce', () => {
+    // LE point du mécanisme, et le seul qui ne se voie pas : si la lecture
+    // échouait, tout retomberait sur `main` sans un mot, et les catalogues
+    // d'une version publiée se remettraient à bouger.
+    jest.isolateModules(() => {
+      jest.doMock(
+        'expo-constants',
+        () => ({ default: { expoConfig: { extra: { catalogues: 'v0.1-france' } } } }),
+        { virtual: true },
+      );
+      const module = require('./catalogues');
+      expect(module.referenceServie()).toBe('v0.1-france');
+      expect(module.BASE).toContain('/v0.1-france/catalogues');
+      expect(module.BASE).not.toContain('/main/');
+    });
+  });
+
+  it('ignore une référence vide plutôt que de fabriquer une adresse fausse', () => {
+    jest.isolateModules(() => {
+      jest.doMock(
+        'expo-constants',
+        () => ({ default: { expoConfig: { extra: { catalogues: '   ' } } } }),
+        { virtual: true },
+      );
+      expect(require('./catalogues').referenceServie()).toBe(REFERENCE_PAR_DEFAUT);
+    });
+  });
+
+  it('est déclarée dans app.json', () => {
+    // Le lien est ténu — une clé de configuration lue par un `require` — et
+    // sans elle, une version publiée retomberait silencieusement sur `main`.
+    const app = require('../../app.json');
+    expect(typeof app.expo.extra.catalogues).toBe('string');
+    expect(app.expo.extra.catalogues.trim()).not.toBe('');
   });
 });

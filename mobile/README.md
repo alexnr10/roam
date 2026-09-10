@@ -81,6 +81,54 @@ npx eas-cli@latest build --platform android --profile preview
 Rend un APK installable directement. Aucune clé d'API : le fond de carte vient
 d'OpenFreeMap, qui sert des tuiles vectorielles sans compte.
 
+## Publier une version, et la figer
+
+Deux choses arrivent sur le téléphone de qui reçoit l'APK, et **une seule est
+figée par le paquet** :
+
+- l'application, oui ;
+- les catalogues, non. Ils sont relus à CHAQUE démarrage, depuis le dépôt.
+  C'est voulu — corriger le catalogue ne demande pas de recompiler.
+
+Une version confiée à quelqu'un ne doit donc pas lire `main`, sinon elle
+changera sous ses pieds : le jour où un deuxième pays y est poussé, la
+« version France » de son téléphone le verra apparaître, sans mise à jour.
+
+`app.json` porte la référence servie :
+
+```jsonc
+"extra": { "catalogues": "main" }          // développement
+"extra": { "catalogues": "v0.1-france" }   // version publiée
+```
+
+`raw.githubusercontent.com` sert une étiquette exactement comme une branche.
+Pour publier :
+
+```bash
+# 1. Pointer la version sur l'étiquette qu'elle portera
+#    (dans app.json : "catalogues": "v0.1-france", et "version": "0.1.0")
+git commit -am "version 0.1 — France"
+
+# 2. Étiqueter CE commit, et le pousser : c'est lui que les catalogues suivront
+git tag v0.1-france && git push origin main v0.1-france
+
+# 3. Compiler l'APK à donner
+npx eas-cli@latest build --platform android --profile preview
+```
+
+À partir de là, `main` redevient libre : les catalogues de cette version
+restent ceux de l'étiquette, quoi qu'on pousse ensuite.
+
+Pour corriger le catalogue d'une version publiée — un lieu fautif, une photo
+manquante — il suffit de déplacer l'étiquette :
+
+```bash
+git tag -f v0.1-france && git push -f origin v0.1-france
+```
+
+Les applications déjà installées le liront au démarrage suivant. Sans
+recompiler, et sans rien réinstaller.
+
 ## Organisation
 
 ```
