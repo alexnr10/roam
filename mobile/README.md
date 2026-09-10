@@ -168,8 +168,9 @@ assets/glyphes/         icônes de thèmes en images, engendrées
   d'une région y arrivent en un fondu, là où le web les fait apparaître en cascade
   depuis le centre. Animer image par image demanderait de traverser le pont soixante
   fois par seconde ; le SDK natif interpole lui-même, mais d'un seul tenant.
-- **Pas encore de carte de conquête sur natif** : elle attend d'être portée sur le
-  même moteur. La liste, elle, fonctionne partout — et elle dit ce qu'il RESTE à
-  faire, là où un aplat de couleur ne dit que ce qui est fait.
+- **Les collections italiennes porteront des noms français** — « Châteaux de
+  Toscane ». C'est un choix, pas une limite technique : le catalogue est écrit en
+  français. Le choix de la langue par l'utilisateur viendra, et ce sont les
+  référentiels qui auront leur équivalent, pas la mécanique.
 - **Pas de photo** pour l'instant : elle est prévue comme bonus optionnel, jamais
   comme condition de validation.
