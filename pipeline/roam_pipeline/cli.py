@@ -3008,6 +3008,11 @@ def cmd_merge(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+#: Thèmes dont les lieux sont des ruines par nature : le filet des fantômes y
+#: rabat pour la raison même qui met le lieu au catalogue.
+RUINES_PAR_NATURE = frozenset({"megalithes"})
+
+
 def cmd_fantomes(args: argparse.Namespace, config: Config) -> int:
     """Les lieux du catalogue dont le résumé dit que la chose n'est plus là.
 
@@ -3045,7 +3050,16 @@ def cmd_fantomes(args: argparse.Namespace, config: Config) -> int:
     for place, motifs in trouves:
         verdict = decisions.get(place.wikidata_id, ("—", ""))[0]
         print(f"  {place.score or 0:>6.1f}  {place.wikidata_id:<11} {place.name}")
-        print(f"          {', '.join(motifs)} · verdict actuel : {verdict}")
+        print(f"          {place.theme_id} · {', '.join(motifs)} "
+              f"· verdict actuel : {verdict}")
+        # Sur un thème dont la ruine EST le sujet, le filet se déclenche pour
+        # la raison même qui met le lieu au catalogue. Six candidats italiens,
+        # deux étaient Géla et Stabies — deux cités antiques détruites, donc
+        # deux parcs archéologiques qui se visitent. Le dire ici évite de le
+        # redécouvrir à chaque construction.
+        if place.theme_id in RUINES_PAR_NATURE:
+            print("          ⚠ thème où la destruction est le sujet : "
+                  "un site fouillé se visite, une ville disparue non")
         for ou in rangs.get(place.wikidata_id, []):
             print(f"          {ou}")
         extrait = " ".join((place.summary or "").split())[:160]
