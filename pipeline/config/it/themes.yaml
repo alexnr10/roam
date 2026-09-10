@@ -1,0 +1,65 @@
+# Les thèmes, en Italie : ce qui diffère.
+#
+# Les vingt-trois thèmes restent ceux du dépôt — un château est un château des
+# deux côtés des Alpes. Ne sont écrits ici que les écarts, et chacun s'appuie
+# sur un comptage réel de `gaps --pays Q38 --class <QID>`, reproduit dans
+# `docs/un-deuxieme-pays.md`.
+
+themes:
+  # ── Les villages : retirés, faute de liste ─────────────────────────────
+  #
+  # Le thème n'a AUCUNE classe Wikidata : il vit entièrement des Plus Beaux
+  # Villages de France et des Plus Beaux Détours. Sans elles il ne collecte
+  # rien, et un thème vide au catalogue est pire qu'un thème absent — il
+  # promet une catégorie et rend une liste blanche.
+  #
+  # Il revient dès que « I Borghi più belli d'Italia » est résolu contre
+  # Wikidata avec `label-probe`. C'est l'équivalent exact, et il est la
+  # première chose à ajouter à ce fichier.
+  - id: villages
+    retire: true
+
+  # ── Les maisons : les classes seules ───────────────────────────────────
+  #
+  # `maisons-des-illustres` est une liste du ministère français. Les six
+  # classes Wikidata et la porte générique « maison » restent : elles ne
+  # dépendent d'aucun État.
+  #
+  # ⚠ Les VILLAS ne sont pas déclarées ici, et c'est délibéré. `Q3950` en
+  # classe précise à trois langues donnerait 577 lieux collectés et 275
+  # au-dessus du plancher d'affichage — un gain d'environ 225 lieux. Mais 275
+  # villas dans un thème qui compte 143 maisons en France noieraient les
+  # maisons sous les villas. Les villas palladiennes de Vénétie et les villas
+  # médicéennes sont deux séries du patrimoine mondial : elles méritent
+  # probablement un thème à elles. C'est une décision de curation, pas de
+  # configuration.
+  - id: maisons
+    from_labels: []
+
+  # ── Les églises : la classe manquait, le plafond était un contresens ────
+  #
+  # `gaps --pays Q38 --class Q16970`, lieux italiens par plancher de collecte :
+  #
+  #     ≥0      ≥1     ≥2    ≥3    ≥4    ≥6   ≥8  ≥10  ≥12  ≥15  ≥20
+  #   56648   26882  13199  3699  2125  1007  637  372  264  156   78
+  #
+  # Huit langues comme porte GÉNÉRIQUE, à l'image de « maison » dans le thème
+  # précédent : une porte large cède devant n'importe quelle porte précise, et
+  # une église qui est aussi une cathédrale reste une cathédrale.
+  #
+  # Le PLAFOND est l'autre moitié, et l'une sans l'autre ne sert à rien. Quatre
+  # -vingts places pour l'Italie, c'est cathédrales + basiliques mineures +
+  # églises ramenées à quatre-vingts dans le pays dont les églises SONT le
+  # patrimoine principal : le recensement en donne déjà 460 à douze langues.
+  #
+  # Il est donc RETIRÉ, pas relevé. Choisir un chiffre maintenant serait une
+  # estimation déguisée en mesure — les quatre-vingts français, eux, ont été
+  # posés APRÈS un build, en lisant que le catalogue en portait 193 pour 61
+  # montrés. Le premier build italien donnera la même lecture, et c'est là
+  # qu'un plafond se décide. Le plancher d'affichage du thème (10 langues) et
+  # le plafond de collection (60) tiennent d'ici là.
+  - id: cathedrales
+    catalogue_cap: null
+    broad_classes:
+      - qid: Q16970
+        fetch_min_sitelinks: 8

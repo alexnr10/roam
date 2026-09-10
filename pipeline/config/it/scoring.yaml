@@ -1,0 +1,53 @@
+# L'Italie : ce qui diffère de la configuration du dépôt.
+#
+# Ce fichier ne dit QUE les écarts. Les quatre-vingts poids, les paliers de
+# niveaux, les plafonds de collection et les règles de répartition sont du
+# jugement éditorial qui ne connaît pas de frontière : ils restent dans
+# `config/scoring.yaml`, et une correction faite là vaut pour les deux pays.
+#
+#     python -m roam_pipeline <commande> --pays-config it
+#
+# ⚠ CE FICHIER NE SUFFIT PAS À COLLECTER L'ITALIE. Il manque encore le
+# référentiel des provinces et des régions — `data/reference/regions.csv` et
+# `departements.csv` sont français et lus en dur par `geo.py`. Voir
+# `docs/un-deuxieme-pays.md`.
+
+geo:
+  country:
+    qid: Q38
+    code: IT
+    name: Italie
+    # Le complément de nom que le français ne sait pas dériver.
+    de_form: d'Italie
+
+  # LES CONTOURS, pour rattacher un lieu à sa province sans réseau.
+  #
+  # Source : openpolis/geojson-italy, découpage officiel de l'ISTAT. Vérifié
+  # le 10 septembre 2026 : 110 provinces, 5,4 Mo.
+  #
+  # Les noms de propriétés ne se devinent pas — ce sont ceux du producteur, et
+  # c'est à peu près tout ce qui change d'un pays à l'autre :
+  #
+  #   prov_istat_code   "001"        code de la province, sur trois chiffres
+  #   prov_name         "Torino"     son nom
+  #   reg_istat_code    "01"         la région qui la contient
+  #
+  # La province est l'échelon qui correspond au département : cent dix contre
+  # cent une, pour un pays d'un tiers plus petit. La région italienne, elle,
+  # compte vingt unités — presque les dix-huit françaises.
+  layers:
+    departement:
+      fichier: province.geojson
+      code_key: prov_istat_code
+      name_key: prov_name
+      parent_key: reg_istat_code
+      url: https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_provinces.geojson
+
+  # PAS DE DÉROGATION COMMUNALE ENCORE.
+  #
+  # Rome, Florence, Venise et Naples en demanderont chacune une — Paris pèse
+  # cinquante-neuf lieux au catalogue français et a la sienne, écrite en toutes
+  # lettres. Mais une dérogation se pose sur un CODE de commune, et les codes
+  # ISTAT ne s'inventent pas : ils se liront dans la première collecte, avec le
+  # vivier de chaque ville au pied du plafond — c'est ainsi que celle de Paris
+  # a été décidée, sur un décrochage mesuré et non sur une intuition.

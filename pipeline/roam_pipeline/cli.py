@@ -3609,6 +3609,14 @@ def build_parser() -> argparse.ArgumentParser:
         description="Pipeline de curation du catalogue Roam. Propose et classe ; ne publie pas.",
     )
     parser.add_argument("--config", type=Path, default=CONFIG_DIR, help="dossier de configuration")
+    # `--pays-config` et non `--pays` : `--pays` existe déjà sur `gaps` et
+    # `label-probe`, où il prend un Q-id et ne fait que MESURER un pays sans
+    # rien engager. Celui-ci engage tout — il choisit la configuration avec
+    # laquelle on collecte, note et exporte.
+    parser.add_argument(
+        "--pays-config", dest="pays_config", metavar="CODE",
+        help="configuration d'un pays (ex. it), posée sur celle du dépôt",
+    )
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help="dossier de sortie")
     parser.add_argument("--manual", type=Path, default=DEFAULT_MANUAL, help="listes manuelles")
     parser.add_argument("--raw", type=Path, default=DEFAULT_RAW,
@@ -3952,6 +3960,36 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _ranger_par_pays(args: argparse.Namespace, config: Config) -> None:
+    """Range les données d'un pays ajouté dans son propre dossier.
+
+    Sans cela, `--pays-config it` collecterait l'Italie PAR-DESSUS la France :
+    même `places_raw.json`, même `decisions.csv`, même `tiers.csv`. Une revue
+    de deux mille lieux disparaîtrait sous une collecte étrangère, sans un
+    avertissement — c'est la pire panne qu'on puisse écrire, parce qu'elle ne
+    plante pas.
+
+    La France reste où elle est. Elle est le pays d'origine du dépôt, ses
+    fichiers sont versionnés à leur place depuis le début, et les déplacer
+    demanderait de reconstruire le catalogue pour vérifier qu'il n'a pas bougé
+    d'un octet. Le jour où un troisième pays arrivera, la symétrie vaudra ce
+    déplacement ; aujourd'hui elle coûterait plus qu'elle ne rapporte.
+
+    Un chemin donné à la main gagne toujours : `--out` explicite veut dire
+    « écris là », y compris pour l'Italie.
+    """
+    if not getattr(args, "pays_config", None):
+        return
+    racine = BASE_DIR / "data" / config.country.code.lower()
+    for nom, defaut in (
+        ("out", DEFAULT_OUT),
+        ("manual", DEFAULT_MANUAL),
+        ("raw", DEFAULT_RAW),
+    ):
+        if getattr(args, nom, None) == defaut:
+            setattr(args, nom, racine / defaut.name)
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     logging.basicConfig(
@@ -3964,7 +4002,8 @@ def main(argv: list[str] | None = None) -> int:
         # vide, elle n'apporte donc jamais rien.
         args.review = args.out / AUTOSAVE
 
-    config = load_config(args.config)
+    config = load_config(args.config, pays=getattr(args, "pays_config", None))
+    _ranger_par_pays(args, config)
     handlers = {
         "verify-qids": cmd_verify_qids,
         "suggest-qids": cmd_suggest_qids,

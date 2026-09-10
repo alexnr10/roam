@@ -321,8 +321,83 @@ def _read_yaml(path: Path) -> dict[str, Any]:
         return yaml.safe_load(fh)
 
 
-def load_config(config_dir: Path | None = None) -> Config:
+def fusionner(base: Any, surcouche: Any) -> Any:
+    """La configuration d'un pays, posée SUR celle du dépôt.
+
+    Un deuxième pays ne repart pas de zéro : vingt-trois thèmes, quatre-vingts
+    poids, les paliers de niveaux, les règles de collection — presque tout est
+    du jugement éditorial qui ne connaît pas de frontière. Recopier ces
+    fichiers pour l'Italie donnerait deux vérités qui divergeraient au premier
+    réglage, et c'est exactement ce qui s'est passé sur les couches de la
+    carte.
+
+    La surcouche ne dit donc QUE ce qui diffère. Trois règles :
+
+    - deux dictionnaires fusionnent clé par clé, en profondeur ;
+    - une liste d'objets PORTANT UN `id` fusionne par cet identifiant — un
+      thème déjà connu est corrigé, un thème inconnu s'ajoute. Sans cela,
+      changer le plancher des églises demanderait de recopier les vingt-trois
+      thèmes. `retire: true` en RETIRE un : les Plus Beaux Villages de France
+      n'ont pas d'équivalent italien, et une fusion qui ne sait qu'ajouter
+      laisserait le pipeline aller chercher quinze listes d'État étrangères ;
+    - tout le reste REMPLACE, y compris une liste sans `id` et un `null`
+      explicite. C'est ainsi qu'on RETIRE un plafond : `catalogue_cap: null`
+      dit quelque chose, et ce quelque chose est « pas de plafond ».
+    """
+    if isinstance(base, dict) and isinstance(surcouche, dict):
+        fusion = dict(base)
+        for cle, valeur in surcouche.items():
+            fusion[cle] = fusionner(base.get(cle), valeur) if cle in base else valeur
+        return fusion
+    if _liste_identifiee(base) and _liste_identifiee(surcouche):
+        par_id = {str(e["id"]): dict(e) for e in base}
+        ordre = [str(e["id"]) for e in base]
+        for entree in surcouche:
+            cle = str(entree["id"])
+            if entree.get("retire"):
+                par_id.pop(cle, None)
+                if cle in ordre:
+                    ordre.remove(cle)
+            elif cle in par_id:
+                par_id[cle] = fusionner(par_id[cle], entree)
+            else:
+                par_id[cle] = dict(entree)
+                ordre.append(cle)
+        return [par_id[cle] for cle in ordre]
+    return surcouche
+
+
+def _liste_identifiee(valeur: Any) -> bool:
+    """Une liste d'objets portant tous un `id` — thèmes, labels."""
+    return (
+        isinstance(valeur, list)
+        and len(valeur) > 0
+        and all(isinstance(e, dict) and "id" in e for e in valeur)
+    )
+
+
+def load_config(config_dir: Path | None = None, pays: str | None = None) -> Config:
+    """La configuration du dépôt, éventuellement recouverte par celle d'un pays.
+
+    `pays` est un code — `it` — et nomme un sous-dossier de `config/`. Absent,
+    on lit la configuration du dépôt telle quelle : c'est la France, et elle ne
+    bouge pas d'un octet quand un autre pays s'ajoute.
+    """
     d = config_dir or CONFIG_DIR
+    surcouche = (d / pays) if pays else None
+    if surcouche is not None and not surcouche.is_dir():
+        raise SystemExit(
+            f"pas de configuration pour « {pays} » : {surcouche} n'existe pas."
+        )
+
+    def lire(nom: str) -> dict[str, Any]:
+        """Un fichier de configuration, recouvert par celui du pays s'il existe."""
+        base = _read_yaml(d / nom)
+        if surcouche is None:
+            return base
+        par_dessus = surcouche / nom
+        return fusionner(base, _read_yaml(par_dessus)) if par_dessus.exists() else base
+
 
     themes = [
         Theme(
@@ -354,11 +429,11 @@ def load_config(config_dir: Path | None = None) -> Config:
                 for b in (t.get("broad_classes") or [])
             ],
         )
-        for t in _read_yaml(d / "themes.yaml")["themes"]
+        for t in lire("themes.yaml")["themes"]
     ]
 
     labels = []
-    for lbl in _read_yaml(d / "labels.yaml")["labels"]:
+    for lbl in lire("labels.yaml")["labels"]:
         q = lbl.get("wikidata_query") or {"kind": "manual"}
         labels.append(
             Label(
@@ -374,7 +449,7 @@ def load_config(config_dir: Path | None = None) -> Config:
             )
         )
 
-    raw = _read_yaml(d / "scoring.yaml")
+    raw = lire("scoring.yaml")
     scoring = Scoring(**raw["scoring"])
     tiers = Tiers(**raw["tiers"])
     rules = CollectionRules(
@@ -409,7 +484,7 @@ def load_config(config_dir: Path | None = None) -> Config:
         scale=int(seen_visitors.get("scale", 10_000)),
     )
 
-    raw_themes = _read_yaml(d / "themes.yaml")
+    raw_themes = lire("themes.yaml")
     excluded = raw_themes.get("exclude_classes") or {}
     exclusions = Exclusions(
         qids=[str(q) for q in (excluded.get("qids") or [])],

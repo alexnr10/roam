@@ -1,0 +1,46 @@
+# Les listes d'État, en Italie.
+#
+# Quatorze des quinze labels du dépôt sont français : les Plus Beaux Villages
+# de France, les Grands Sites, les Monuments historiques, les Jardins
+# remarquables. Ils ne désignent rien en Italie — et une fusion qui ne saurait
+# qu'ajouter enverrait le pipeline interroger Wikidata pour quinze listes
+# étrangères, à chaque collecte, pour rien.
+#
+# `retire: true` les enlève. Ce qu'il faudra mettre à leur place — les
+# monuments nationaux, les Borghi più belli d'Italia, les jardins historiques —
+# se résout avec `label-probe`, une liste à la fois, comme les françaises l'ont
+# été. Aucun n'est écrit ici tant qu'il n'est pas résolu contre Wikidata : un
+# Q-id supposé est un label qui ne collecte rien et ne le dit pas.
+
+labels:
+  # L'UNESCO reste : c'est la seule liste de ces quinze qui ne soit pas
+  # nationale, et elle vaut d'autant plus ici — l'Italie porte le plus grand
+  # nombre de biens inscrits au monde.
+  - id: plus-beaux-villages
+    retire: true
+  - id: grand-site-de-france
+    retire: true
+  - id: monument-historique-classe
+    retire: true
+  - id: monument-historique-inscrit
+    retire: true
+  - id: jardin-remarquable
+    retire: true
+  - id: maisons-des-illustres
+    retire: true
+  - id: site-classe
+    retire: true
+  - id: site-inscrit
+    retire: true
+  - id: foret-exception
+    retire: true
+  - id: reserve-naturelle
+    retire: true
+  - id: parc-naturel-regional
+    retire: true
+  - id: parc-national
+    retire: true
+  - id: plus-beaux-detours
+    retire: true
+  - id: pavillon-bleu
+    retire: true

@@ -53,7 +53,7 @@ from roam_pipeline.collections import (
     dedupe_across_themes,
     haversine_m,
 )
-from roam_pipeline.config import CONFIG_DIR, Config, Exclusions, Visitors, load_config
+from roam_pipeline.config import CONFIG_DIR, Config, Exclusions, Visitors, fusionner, load_config
 from roam_pipeline.export import (
     review_tiers,
     _sql_str, read_review_csv, read_review_themes, write_review_csv, write_review_html, write_seed_sql,
@@ -7949,3 +7949,101 @@ class TestResolveOrder(unittest.TestCase):
         _texte, ecrit = self._run(None)
         self.assertIn("Q9999", ecrit)
         self.assertNotIn("Q1111", ecrit)
+
+
+class TestSurcoucheDePays(unittest.TestCase):
+    """La configuration d'un pays, posée SUR celle du dépôt.
+
+    Un deuxième pays ne repart pas de zéro : vingt-trois thèmes, quatre-vingts
+    poids, les paliers de niveaux. Recopier ces fichiers pour l'Italie donnerait
+    deux vérités qui divergeraient au premier réglage — c'est exactement ce qui
+    est arrivé aux couches de la carte, où l'anneau du lieu touché n'existait
+    sur aucune des deux plateformes.
+    """
+
+    def test_deux_dictionnaires_fusionnent_en_profondeur(self):
+        base = {"geo": {"country": {"qid": "Q142", "code": "FR"}, "levels": ["a"]}}
+        sur = {"geo": {"country": {"qid": "Q38"}}}
+        self.assertEqual(
+            fusionner(base, sur),
+            {"geo": {"country": {"qid": "Q38", "code": "FR"}, "levels": ["a"]}},
+        )
+
+    def test_une_liste_identifiee_fusionne_par_identifiant(self):
+        # Sans cela, changer le plancher des églises demanderait de recopier
+        # les vingt-trois thèmes.
+        base = [{"id": "a", "cap": 1}, {"id": "b", "cap": 2}]
+        sur = [{"id": "b", "cap": 9}, {"id": "c", "cap": 3}]
+        self.assertEqual(
+            fusionner(base, sur),
+            [{"id": "a", "cap": 1}, {"id": "b", "cap": 9}, {"id": "c", "cap": 3}],
+        )
+
+    def test_retire_enleve_une_entree(self):
+        # Les Plus Beaux Villages de France n'ont pas d'équivalent italien, et
+        # une fusion qui ne saurait qu'ajouter enverrait le pipeline chercher
+        # quinze listes d'État étrangères à chaque collecte.
+        base = [{"id": "a"}, {"id": "b"}]
+        self.assertEqual(fusionner(base, [{"id": "a", "retire": True}]), [{"id": "b"}])
+
+    def test_un_null_explicite_retire_une_valeur(self):
+        # C'est ainsi qu'on enlève un plafond : `catalogue_cap: null` dit
+        # quelque chose, et ce quelque chose est « pas de plafond ».
+        self.assertEqual(fusionner({"cap": 80}, {"cap": None}), {"cap": None})
+
+    def test_une_liste_sans_identifiant_remplace(self):
+        self.assertEqual(fusionner({"x": [1, 2, 3]}, {"x": [9]}), {"x": [9]})
+
+    def test_la_france_ne_bouge_pas(self):
+        # La configuration du dépôt EST la France. Ajouter un pays ne doit pas
+        # lui coûter un octet — c'est la règle qui tient depuis le début.
+        fr = load_config()
+        self.assertEqual(fr.country.qid, "Q142")
+        self.assertEqual(fr.country.code, "FR")
+        self.assertEqual(len(fr.themes), 23)
+        self.assertEqual(len(fr.labels), 15)
+        self.assertEqual(fr.theme("cathedrales").catalogue_cap, 80)
+
+    def test_l_italie_ne_dit_que_ses_ecarts(self):
+        it = load_config(pays="it")
+        self.assertEqual(it.country.qid, "Q38")
+        self.assertEqual(it.country.de_form, "d'Italie")
+        # Les poids éditoriaux ne connaissent pas de frontière.
+        self.assertEqual(it.scoring.sitelinks_weight, CONFIG.scoring.sitelinks_weight)
+        self.assertEqual(it.tiers.tier1_size, CONFIG.tiers.tier1_size)
+
+    def test_l_italie_garde_l_unesco_et_perd_les_listes_francaises(self):
+        # L'UNESCO est la seule des quinze qui ne soit pas nationale — et elle
+        # vaut d'autant plus ici : l'Italie porte le plus grand nombre de biens
+        # inscrits au monde.
+        it = load_config(pays="it")
+        self.assertEqual([lbl.id for lbl in it.labels], ["unesco"])
+
+    def test_un_theme_qui_ne_peut_rien_collecter_est_retire(self):
+        # `villages` n'a AUCUNE classe Wikidata : il vit entièrement des Plus
+        # Beaux Villages de France. Un thème vide promet une catégorie et rend
+        # une liste blanche.
+        it = load_config(pays="it")
+        self.assertNotIn("villages", [t.id for t in it.themes])
+        self.assertIn("villages", [t.id for t in CONFIG.themes])
+
+    def test_aucun_theme_italien_ne_depend_d_une_liste_retiree(self):
+        # La validation le refuserait, et c'est bien ; encore faut-il que le
+        # fichier livré passe.
+        it = load_config(pays="it")
+        connus = {lbl.id for lbl in it.labels}
+        for theme in it.themes:
+            for label_id in theme.from_labels:
+                self.assertIn(label_id, connus, f"{theme.id} → {label_id}")
+
+    def test_les_eglises_entrent_et_le_plafond_tombe(self):
+        # Les deux ensemble, ou rien : quatre-vingts places pour cathédrales,
+        # basiliques ET églises dans le pays dont les églises sont le patrimoine
+        # principal serait un contresens.
+        eglises = load_config(pays="it").theme("cathedrales")
+        self.assertIsNone(eglises.catalogue_cap)
+        self.assertIn("Q16970", [b.qid for b in eglises.broad_classes])
+
+    def test_un_pays_inconnu_le_dit(self):
+        with self.assertRaises(SystemExit):
+            load_config(pays="xx")

@@ -557,6 +557,70 @@ le recensement perd donc en priorité ce pour quoi on le lance.
 `gaps` réessaie désormais classe par classe après un lot perdu — une seule
 reste alors hors de portée, pas ses trois voisines.
 
+## `config/it/` est écrit — ce qu'il contient, ce qu'il attend
+
+Une SURCOUCHE, pas une copie. `config/it/*.yaml` ne dit que les écarts, et
+`fusionner()` les pose sur la configuration du dépôt :
+
+- deux dictionnaires fusionnent en profondeur ;
+- une liste d'objets portant un `id` fusionne par cet identifiant, et
+  `retire: true` en enlève un ;
+- tout le reste remplace, `null` explicite compris — c'est ainsi qu'on retire
+  un plafond.
+
+    python -m roam_pipeline <commande> --pays-config it
+
+`--pays-config` et non `--pays` : ce dernier existe déjà sur `gaps` et
+`label-probe`, où il prend un Q-id et ne fait que MESURER un pays sans rien
+engager. Celui-ci engage tout.
+
+**Les données d'un pays ajouté vont dans `data/<code>/`.** Sans cela,
+`--pays-config it` collecterait l'Italie par-dessus la France : même
+`places_raw.json`, même `decisions.csv`. Une revue de deux mille lieux
+disparaîtrait sous une collecte étrangère, sans un avertissement. La France
+reste où elle est — ses fichiers sont versionnés à leur place depuis le début,
+et les déplacer demanderait de reconstruire le catalogue pour vérifier qu'il
+n'a pas bougé d'un octet. Le jour où un troisième pays arrivera, la symétrie
+vaudra ce déplacement.
+
+Vérifié : la France est inchangée, et le build est déterministe — deux
+constructions d'affilée rendent le même octet.
+
+### Ce que `config/it/` contient
+
+| fichier | ce qu'il dit |
+|---|---|
+| `scoring.yaml` | Q38 / IT / Italie / d'Italie, et les contours des 110 provinces |
+| `themes.yaml` | `villages` retiré, `maisons` sans liste d'État, les églises entrent et leur plafond tombe |
+| `labels.yaml` | quatorze listes françaises retirées, l'UNESCO gardée |
+
+Les contours viennent d'`openpolis/geojson-italy`, découpage officiel de
+l'ISTAT, vérifié : 110 provinces, 5,4 Mo. Les noms de propriétés ne se
+devinent pas — `prov_istat_code`, `prov_name`, `reg_istat_code` — et c'est à
+peu près tout ce qui change d'un pays à l'autre.
+
+### Ce qu'il manque encore pour collecter l'Italie
+
+**Le référentiel des provinces et des régions.** `geo.py` lit
+`data/reference/regions.csv` et `departements.csv` en dur : ils sont français.
+Il faut leur équivalent italien — 110 provinces, 20 régions — et rendre leur
+lecture dépendante du pays. Les codes et les noms se tirent du GeoJSON déjà
+vérifié ; le `de_form` français d'un nom italien (« de Toscane », « des
+Pouilles ») est du travail éditorial, pas de la dérivation.
+
+**Les dérogations communales.** Rome, Florence, Venise et Naples en demanderont
+chacune une. Elles se posent sur un code ISTAT de commune, et se décident sur
+un décrochage MESURÉ dans le vivier de chaque ville — c'est ainsi que celle de
+Paris a été posée. Elles viennent donc après la première collecte, pas avant.
+
+**Le plafond des églises.** Retiré, pas relevé : les quatre-vingts français ont
+été posés après un build, en lisant que le catalogue en portait 193 pour 61
+montrés. Le premier build italien donnera la même lecture.
+
+**« I Borghi più belli d'Italia »**, à résoudre avec `label-probe`. C'est
+l'équivalent exact des Plus Beaux Villages, et il rend au thème `villages` de
+quoi exister.
+
 ### Ce qu'on sait déjà pour écrire `config/it/`
 
 Trois planchers mesurés, à ne pas remesurer. Les tableaux sont ceux de
