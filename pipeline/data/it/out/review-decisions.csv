@@ -10,6 +10,15 @@ keep,,,"Abbaye de Pomposa",Q514366
 keep,,musees,"Musée national San Marco",Q13453137
 keep,,cathedrales,"Église de Santo-Spirito",Q1519975
 keep,,,"Cascata delle Marmore",Q38580
+keep,,,"Cascate del Serio",Q3661556
+keep,,,"Cascade du Toce",Q37329
+demote,,,"Fiumelatte",Q3746246
+keep,,,"Cascades de Riva",Q60847935
+keep,,,"Cascades de Barbiano",Q3661559
+keep,,,"Cascades de Nardis",Q3661552
+keep,,,"Cascade Piscina Irgas",Q48315714
+keep,,,"Cascade de Parcines",Q3661539
+drop,,,"Cascade de Sardagna",Q24941161
 keep,,,"Basilique Saint-Pierre",Q12512
 keep,,,"Dôme de Milan",Q18068
 keep,,,"Cathédrale de Modène",Q753721
@@ -48,6 +57,8 @@ keep,,,"Oreille de Denys",Q282839
 demote,,,"Balzi Rossi",Q555143
 drop,,,"Grotte de l'Addaura",Q352845
 keep,,,"Grottes de Toirano",Q1332930
+drop,,,"Grottes de Coreca",Q29886508
+keep,,,"Arene Candide",Q642002
 keep,,,"Île d'Elbe",Q45328
 keep,,,"Stromboli",Q131148
 keep,,,"Capri",Q173292
@@ -67,6 +78,7 @@ keep,,,"Jardin botanique de Palerme",Q894656
 demote,,,"Jardin botanique de Brera",Q2882456
 keep,,maisons,"Villa Godi Malinverni",Q2084394
 keep,,,"Parco Sempione",Q133963
+keep,,,"Parc du Valentino",Q1061804
 keep,,,"Lac de Côme",Q15523
 keep,,,"Lac de Garde",Q6414
 keep,,,"Lac Majeur",Q14379
@@ -117,6 +129,16 @@ keep,,monuments,"Monument à Victor-Emmanuel II",Q506234
 keep,,megalithes,"Sélinonte",Q952173
 keep,,,"Galerie Borghèse",Q841506
 keep,,,"Musée archéologique national de Paestum",Q3329487
+keep,,,"Phare de Punta Carena",Q372769
+keep,,,"Phare de la Victoire",Q752327
+demote,,,"Phare de Livourne",Q3739193
+drop,,,"Phare de Cap de Caça",Q3739761
+keep,,,"Phare de San Venerio",Q431403
+keep,,,"Phare de Santa Maria di Leuca",Q28375947
+keep,,,"Phare de Portoferraio",Q16555281
+keep,,,"Phare du Janicule",Q28375369
+drop,,,"Phare du cap Colonna",Q23308931
+keep,,,"Phare de Bari",Q3378175
 keep,,,"Piazza dei Miracoli",Q750245
 keep,,,"Place Saint-Pierre",Q83425
 keep,,,"Place Saint-Marc",Q217527
@@ -131,6 +153,12 @@ drop,,,"Salento",Q735628
 keep,,,"Gargano",Q763332
 keep,,,"Péninsule de Sorrente",Q59116
 keep,,,"Scala dei Turchi",Q3951389
+keep,,,"Capo Vaticano",Q1034760
+keep,,,"Capo Testa",Q1034748
+keep,,,"Cap Caccia",Q2256770
+demote,,,"Capocotta",Q3657228
+keep,,,"Poetto",Q3393181
+keep,,,"Promontoire de l'Argentario",Q1239373
 keep,,,"Ponte Vecchio",Q208633
 drop,,,"Pont Morandi",Q3907993
 keep,,,"Pont des Soupirs",Q52517
@@ -153,3 +181,11 @@ demote,,,"Mont Albain",Q1129380
 keep,,,"Monte Pellegrino",Q731916
 keep,,,"Vésuve",Q524
 keep,,,"Etna",Q16990
+keep,,,"Monte Nuovo",Q1084616
+keep,,sommets,"Mont Algide",Q989650
+keep,,sommets,"Mont Somma",Q729873
+keep,,sommets,"Mont Époméo",Q729764
+keep,,,"Vulcanello",Q1321161
+drop,,,"Mont Barbaro",Q3321680
+keep,,,"Volcan Albain",Q4016622
+drop,,,"Colline de Camaldoli",Q3683240

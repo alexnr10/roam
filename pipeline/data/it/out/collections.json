@@ -3416,10 +3416,10 @@
     "label_id": null,
     "geo_level": null,
     "geo_code": null,
-    "place_count": 30,
+    "place_count": 29,
     "tier_counts": [
       10,
-      20,
+      19,
       0
     ],
     "places": [
@@ -3466,28 +3466,28 @@
         "natural_tier": 1
       },
       {
-        "place_id": "Q29886508",
+        "place_id": "Q642002",
         "tier": 1,
         "rank": 7,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q642002",
+        "place_id": "Q1431132",
         "tier": 1,
         "rank": 8,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q1431132",
+        "place_id": "Q924853",
         "tier": 1,
         "rank": 9,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q924853",
+        "place_id": "Q3936338",
         "tier": 1,
         "rank": 10,
         "forced": false,
@@ -3501,135 +3501,128 @@
         "natural_tier": 1
       },
       {
-        "place_id": "Q3936338",
+        "place_id": "Q3777010",
         "tier": 2,
         "rank": 12,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3777010",
+        "place_id": "Q1547628",
         "tier": 2,
         "rank": 13,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1547628",
+        "place_id": "Q3661554",
         "tier": 2,
         "rank": 14,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3661554",
+        "place_id": "Q1225474",
         "tier": 2,
         "rank": 15,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1225474",
+        "place_id": "Q13099380",
         "tier": 2,
         "rank": 16,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q13099380",
+        "place_id": "Q1547618",
         "tier": 2,
         "rank": 17,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1547618",
+        "place_id": "Q3392526",
         "tier": 2,
         "rank": 18,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3392526",
+        "place_id": "Q17632175",
         "tier": 2,
         "rank": 19,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q17632175",
+        "place_id": "Q2059749",
         "tier": 2,
         "rank": 20,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q2059749",
+        "place_id": "Q3117235",
         "tier": 2,
         "rank": 21,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3117235",
+        "place_id": "Q3777058",
         "tier": 2,
         "rank": 22,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3777058",
+        "place_id": "Q3777074",
         "tier": 2,
         "rank": 23,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3777074",
+        "place_id": "Q3777082",
         "tier": 2,
         "rank": 24,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3777082",
+        "place_id": "Q617591",
         "tier": 2,
         "rank": 25,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q617591",
+        "place_id": "Q3777013",
         "tier": 2,
         "rank": 26,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3777013",
+        "place_id": "Q3777043",
         "tier": 2,
         "rank": 27,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3777043",
+        "place_id": "Q3925508",
         "tier": 2,
         "rank": 28,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3925508",
-        "tier": 2,
-        "rank": 29,
-        "forced": false,
-        "natural_tier": 2
-      },
-      {
         "place_id": "Q3966943",
         "tier": 2,
-        "rank": 30,
+        "rank": 29,
         "forced": false,
         "natural_tier": 2
       }
@@ -4377,10 +4370,10 @@
     "label_id": null,
     "geo_level": null,
     "geo_code": null,
-    "place_count": 17,
+    "place_count": 15,
     "tier_counts": [
       10,
-      7,
+      5,
       0
     ],
     "places": [
@@ -4399,107 +4392,93 @@
         "natural_tier": 1
       },
       {
-        "place_id": "Q3739193",
+        "place_id": "Q431403",
         "tier": 1,
         "rank": 3,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3739761",
+        "place_id": "Q28375947",
         "tier": 1,
         "rank": 4,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q431403",
+        "place_id": "Q16555281",
         "tier": 1,
         "rank": 5,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q28375947",
+        "place_id": "Q28375369",
         "tier": 1,
         "rank": 6,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q16555281",
+        "place_id": "Q3378175",
         "tier": 1,
         "rank": 7,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q28375369",
+        "place_id": "Q3739765",
         "tier": 1,
         "rank": 8,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q23308931",
+        "place_id": "Q259658",
         "tier": 1,
         "rank": 9,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3378175",
+        "place_id": "Q55606613",
         "tier": 1,
         "rank": 10,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3739765",
+        "place_id": "Q3739193",
         "tier": 2,
         "rank": 11,
         "forced": false,
-        "natural_tier": 2
+        "natural_tier": 1
       },
       {
-        "place_id": "Q259658",
+        "place_id": "Q16555250",
         "tier": 2,
         "rank": 12,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q55606613",
+        "place_id": "Q28376417",
         "tier": 2,
         "rank": 13,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q16555250",
+        "place_id": "Q973243",
         "tier": 2,
         "rank": 14,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q28376417",
-        "tier": 2,
-        "rank": 15,
-        "forced": false,
-        "natural_tier": 2
-      },
-      {
-        "place_id": "Q973243",
-        "tier": 2,
-        "rank": 16,
-        "forced": false,
-        "natural_tier": 2
-      },
-      {
         "place_id": "Q28375375",
         "tier": 2,
-        "rank": 17,
+        "rank": 15,
         "forced": false,
         "natural_tier": 2
       }
@@ -4754,11 +4733,11 @@
     "label_id": null,
     "geo_level": null,
     "geo_code": null,
-    "place_count": 46,
+    "place_count": 45,
     "tier_counts": [
       10,
       25,
-      11
+      10
     ],
     "places": [
       {
@@ -4783,303 +4762,296 @@
         "natural_tier": 1
       },
       {
-        "place_id": "Q3746246",
+        "place_id": "Q60847935",
         "tier": 1,
         "rank": 4,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q60847935",
+        "place_id": "Q3661559",
         "tier": 1,
         "rank": 5,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3661559",
+        "place_id": "Q3661552",
         "tier": 1,
         "rank": 6,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3661552",
+        "place_id": "Q48315714",
         "tier": 1,
         "rank": 7,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q48315714",
+        "place_id": "Q3661539",
         "tier": 1,
         "rank": 8,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3661539",
+        "place_id": "Q36989690",
         "tier": 1,
         "rank": 9,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q24941161",
+        "place_id": "Q68663076",
         "tier": 1,
         "rank": 10,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q36989690",
+        "place_id": "Q3746246",
         "tier": 2,
         "rank": 11,
         "forced": false,
-        "natural_tier": 2
+        "natural_tier": 1
       },
       {
-        "place_id": "Q68663076",
+        "place_id": "Q24230614",
         "tier": 2,
         "rank": 12,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q24230614",
+        "place_id": "Q3661562",
         "tier": 2,
         "rank": 13,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3661562",
+        "place_id": "Q107265381",
         "tier": 2,
         "rank": 14,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q107265381",
+        "place_id": "Q56011954",
         "tier": 2,
         "rank": 15,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q56011954",
+        "place_id": "Q3944154",
         "tier": 2,
         "rank": 16,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3944154",
+        "place_id": "Q3936798",
         "tier": 2,
         "rank": 17,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3936798",
+        "place_id": "Q23409550",
         "tier": 2,
         "rank": 18,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q23409550",
+        "place_id": "Q56692899",
         "tier": 2,
         "rank": 19,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q56692899",
+        "place_id": "Q113625590",
         "tier": 2,
         "rank": 20,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q113625590",
+        "place_id": "Q3886164",
         "tier": 2,
         "rank": 21,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3886164",
+        "place_id": "Q114892456",
         "tier": 2,
         "rank": 22,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q114892456",
+        "place_id": "Q140523147",
         "tier": 2,
         "rank": 23,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q140523147",
+        "place_id": "Q116774401",
         "tier": 2,
         "rank": 24,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q116774401",
+        "place_id": "Q30260477",
         "tier": 2,
         "rank": 25,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q30260477",
+        "place_id": "Q25409611",
         "tier": 2,
         "rank": 26,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q25409611",
+        "place_id": "Q113015071",
         "tier": 2,
         "rank": 27,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q113015071",
+        "place_id": "Q56323298",
         "tier": 2,
         "rank": 28,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q56323298",
+        "place_id": "Q3661533",
         "tier": 2,
         "rank": 29,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3661533",
+        "place_id": "Q106540844",
         "tier": 2,
         "rank": 30,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q106540844",
+        "place_id": "Q121889310",
         "tier": 2,
         "rank": 31,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q121889310",
+        "place_id": "Q109378078",
         "tier": 2,
         "rank": 32,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q109378078",
+        "place_id": "Q56750046",
         "tier": 2,
         "rank": 33,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q56750046",
+        "place_id": "Q3661538",
         "tier": 2,
         "rank": 34,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3661538",
+        "place_id": "Q139980983",
         "tier": 2,
         "rank": 35,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q139980983",
+        "place_id": "Q3661534",
         "tier": 3,
         "rank": 36,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3661534",
+        "place_id": "Q97369764",
         "tier": 3,
         "rank": 37,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q97369764",
+        "place_id": "Q1046900",
         "tier": 3,
         "rank": 38,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1046900",
+        "place_id": "Q140378242",
         "tier": 3,
         "rank": 39,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q140378242",
+        "place_id": "Q139600970",
         "tier": 3,
         "rank": 40,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q139600970",
+        "place_id": "Q60841901",
         "tier": 3,
         "rank": 41,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q60841901",
+        "place_id": "Q3661557",
         "tier": 3,
         "rank": 42,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3661557",
+        "place_id": "Q56543513",
         "tier": 3,
         "rank": 43,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q56543513",
+        "place_id": "Q17623957",
         "tier": 3,
         "rank": 44,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q17623957",
-        "tier": 3,
-        "rank": 45,
-        "forced": false,
-        "natural_tier": 3
-      },
-      {
         "place_id": "Q3661565",
         "tier": 3,
-        "rank": 46,
+        "rank": 45,
         "forced": false,
         "natural_tier": 3
       }
@@ -6054,10 +6026,10 @@
     "label_id": null,
     "geo_level": null,
     "geo_code": null,
-    "place_count": 14,
+    "place_count": 9,
     "tier_counts": [
-      10,
-      4,
+      7,
+      2,
       0
     ],
     "places": [
@@ -6090,72 +6062,37 @@
         "natural_tier": 1
       },
       {
-        "place_id": "Q989650",
+        "place_id": "Q1321161",
         "tier": 1,
         "rank": 5,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q729873",
+        "place_id": "Q4016622",
         "tier": 1,
         "rank": 6,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q729764",
+        "place_id": "Q1648022",
         "tier": 1,
         "rank": 7,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q1321161",
-        "tier": 1,
-        "rank": 8,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q3321680",
-        "tier": 1,
-        "rank": 9,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q4016622",
-        "tier": 1,
-        "rank": 10,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q3683240",
-        "tier": 2,
-        "rank": 11,
-        "forced": false,
-        "natural_tier": 2
-      },
-      {
-        "place_id": "Q1648022",
-        "tier": 2,
-        "rank": 12,
-        "forced": false,
-        "natural_tier": 2
-      },
-      {
         "place_id": "Q1037278",
         "tier": 2,
-        "rank": 13,
+        "rank": 8,
         "forced": false,
         "natural_tier": 2
       },
       {
         "place_id": "Q31445600",
         "tier": 2,
-        "rank": 14,
+        "rank": 9,
         "forced": false,
         "natural_tier": 2
       }
@@ -6506,91 +6443,91 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q501212",
+        "place_id": "Q989650",
         "tier": 3,
         "rank": 48,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q905515",
+        "place_id": "Q501212",
         "tier": 3,
         "rank": 49,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q384115",
+        "place_id": "Q905515",
         "tier": 3,
         "rank": 50,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1516713",
+        "place_id": "Q384115",
         "tier": 3,
         "rank": 51,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q783445",
+        "place_id": "Q1516713",
         "tier": 3,
         "rank": 52,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q525113",
+        "place_id": "Q783445",
         "tier": 3,
         "rank": 53,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1494024",
+        "place_id": "Q525113",
         "tier": 3,
         "rank": 54,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3861947",
+        "place_id": "Q1494024",
         "tier": 3,
         "rank": 55,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1060445",
+        "place_id": "Q729873",
         "tier": 3,
         "rank": 56,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1515769",
+        "place_id": "Q3861947",
         "tier": 3,
         "rank": 57,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1082965",
+        "place_id": "Q1060445",
         "tier": 3,
         "rank": 58,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3493796",
+        "place_id": "Q1515769",
         "tier": 3,
         "rank": 59,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q937540",
+        "place_id": "Q1082965",
         "tier": 3,
         "rank": 60,
         "forced": false,
@@ -6656,378 +6593,378 @@
         "natural_tier": 1
       },
       {
-        "place_id": "Q3657228",
+        "place_id": "Q3393181",
         "tier": 1,
         "rank": 7,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3393181",
+        "place_id": "Q1239373",
         "tier": 1,
         "rank": 8,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q1239373",
+        "place_id": "Q1815153",
         "tier": 1,
         "rank": 9,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q1815153",
+        "place_id": "Q2933429",
         "tier": 1,
         "rank": 10,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q2933429",
+        "place_id": "Q2257429",
         "tier": 2,
         "rank": 11,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q2257429",
+        "place_id": "Q1664412",
         "tier": 2,
         "rank": 12,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1664412",
+        "place_id": "Q921014",
         "tier": 2,
         "rank": 13,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q921014",
+        "place_id": "Q929659",
         "tier": 2,
         "rank": 14,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q929659",
+        "place_id": "Q3998557",
         "tier": 2,
         "rank": 15,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3998557",
+        "place_id": "Q1131545",
         "tier": 2,
         "rank": 16,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1131545",
+        "place_id": "Q3966656",
         "tier": 2,
         "rank": 17,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3966656",
+        "place_id": "Q3705947",
         "tier": 2,
         "rank": 18,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3705947",
+        "place_id": "Q1034750",
         "tier": 2,
         "rank": 19,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1034750",
+        "place_id": "Q367993",
         "tier": 2,
         "rank": 20,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q367993",
+        "place_id": "Q3925727",
         "tier": 2,
         "rank": 21,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3925727",
+        "place_id": "Q3947467",
         "tier": 2,
         "rank": 22,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3947467",
+        "place_id": "Q34834195",
         "tier": 2,
         "rank": 23,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q34834195",
+        "place_id": "Q33325782",
         "tier": 2,
         "rank": 24,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q33325782",
+        "place_id": "Q3657143",
         "tier": 2,
         "rank": 25,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3657143",
+        "place_id": "Q2937113",
         "tier": 2,
         "rank": 26,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q2937113",
+        "place_id": "Q2136958",
         "tier": 2,
         "rank": 27,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q2136958",
+        "place_id": "Q3649992",
         "tier": 2,
         "rank": 28,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3649992",
+        "place_id": "Q3649988",
         "tier": 2,
         "rank": 29,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3649988",
+        "place_id": "Q2937020",
         "tier": 2,
         "rank": 30,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q2937020",
+        "place_id": "Q538419",
         "tier": 2,
         "rank": 31,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q538419",
+        "place_id": "Q3657127",
         "tier": 2,
         "rank": 32,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3657127",
+        "place_id": "Q33333130",
         "tier": 2,
         "rank": 33,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q33333130",
+        "place_id": "Q2487667",
         "tier": 2,
         "rank": 34,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q2487667",
+        "place_id": "Q3657864",
         "tier": 2,
         "rank": 35,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3657864",
+        "place_id": "Q3966664",
         "tier": 3,
         "rank": 36,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3966664",
+        "place_id": "Q3966668",
         "tier": 3,
         "rank": 37,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3966668",
+        "place_id": "Q4272956",
         "tier": 3,
         "rank": 38,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q4272956",
+        "place_id": "Q3649993",
         "tier": 3,
         "rank": 39,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3649993",
+        "place_id": "Q16608028",
         "tier": 3,
         "rank": 40,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q16608028",
+        "place_id": "Q18470459",
         "tier": 3,
         "rank": 41,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q18470459",
+        "place_id": "Q3802949",
         "tier": 3,
         "rank": 42,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3802949",
+        "place_id": "Q608369",
         "tier": 3,
         "rank": 43,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q608369",
+        "place_id": "Q1034749",
         "tier": 3,
         "rank": 44,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1034749",
+        "place_id": "Q1902951",
         "tier": 3,
         "rank": 45,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1902951",
+        "place_id": "Q1121290",
         "tier": 3,
         "rank": 46,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1121290",
+        "place_id": "Q1302378",
         "tier": 3,
         "rank": 47,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1302378",
+        "place_id": "Q18510219",
         "tier": 3,
         "rank": 48,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q18510219",
+        "place_id": "Q3966672",
         "tier": 3,
         "rank": 49,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3966672",
+        "place_id": "Q33325339",
         "tier": 3,
         "rank": 50,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q33325339",
+        "place_id": "Q24887975",
         "tier": 3,
         "rank": 51,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q24887975",
+        "place_id": "Q3657181",
         "tier": 3,
         "rank": 52,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3657181",
+        "place_id": "Q3657146",
         "tier": 3,
         "rank": 53,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3657146",
+        "place_id": "Q1034741",
         "tier": 3,
         "rank": 54,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1034741",
+        "place_id": "Q1256373",
         "tier": 3,
         "rank": 55,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1256373",
+        "place_id": "Q33325734",
         "tier": 3,
         "rank": 56,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q33325734",
+        "place_id": "Q16536487",
         "tier": 3,
         "rank": 57,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q16536487",
+        "place_id": "Q3657111",
         "tier": 3,
         "rank": 58,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3657111",
+        "place_id": "Q34834868",
         "tier": 3,
         "rank": 59,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q34834868",
+        "place_id": "Q3657150",
         "tier": 3,
         "rank": 60,
         "forced": false,
@@ -10448,35 +10385,35 @@
         "natural_tier": 2
       },
       {
-        "place_id": "Q989650",
+        "place_id": "Q4016622",
         "tier": 2,
         "rank": 15,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3657228",
+        "place_id": "Q13099380",
         "tier": 2,
         "rank": 16,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q13099380",
+        "place_id": "Q28375369",
         "tier": 2,
         "rank": 17,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q28375369",
+        "place_id": "Q1046900",
         "tier": 2,
         "rank": 18,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1046900",
+        "place_id": "Q33339413",
         "tier": 2,
         "rank": 19,
         "forced": false,
@@ -10588,7 +10525,7 @@
         "natural_tier": 2
       },
       {
-        "place_id": "Q1012797",
+        "place_id": "Q1334215",
         "tier": 2,
         "rank": 35,
         "forced": false,
@@ -10609,28 +10546,28 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q84090",
+        "place_id": "Q1012797",
         "tier": 3,
         "rank": 38,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q848386",
+        "place_id": "Q84090",
         "tier": 3,
         "rank": 39,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1971299",
+        "place_id": "Q848386",
         "tier": 3,
         "rank": 40,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1334215",
+        "place_id": "Q1971299",
         "tier": 3,
         "rank": 41,
         "forced": false,
@@ -10763,42 +10700,42 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q16010710",
+        "place_id": "Q523409",
         "tier": 3,
         "rank": 60,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q569253",
+        "place_id": "Q16010710",
         "tier": 3,
         "rank": 61,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q2037271",
+        "place_id": "Q569253",
         "tier": 3,
         "rank": 62,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q723887",
+        "place_id": "Q2037271",
         "tier": 3,
         "rank": 63,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q774654",
+        "place_id": "Q723887",
         "tier": 3,
         "rank": 64,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q523409",
+        "place_id": "Q774654",
         "tier": 3,
         "rank": 65,
         "forced": false,
@@ -12048,56 +11985,56 @@
         "natural_tier": 2
       },
       {
-        "place_id": "Q755123",
+        "place_id": "Q1347586",
         "tier": 2,
         "rank": 25,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1347586",
+        "place_id": "Q290549",
         "tier": 2,
         "rank": 26,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q290549",
+        "place_id": "Q1041792",
         "tier": 2,
         "rank": 27,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1041792",
+        "place_id": "Q926401",
         "tier": 2,
         "rank": 28,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q926401",
+        "place_id": "Q189387",
         "tier": 2,
         "rank": 29,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q189387",
+        "place_id": "Q1241298",
         "tier": 2,
         "rank": 30,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1241298",
+        "place_id": "Q1048809",
         "tier": 2,
         "rank": 31,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1048809",
+        "place_id": "Q729873",
         "tier": 2,
         "rank": 32,
         "forced": false,
@@ -12146,14 +12083,14 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q1084616",
+        "place_id": "Q547910",
         "tier": 3,
         "rank": 39,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q547910",
+        "place_id": "Q755123",
         "tier": 3,
         "rank": 40,
         "forced": false,
@@ -12181,63 +12118,63 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q929453",
+        "place_id": "Q1415098",
         "tier": 3,
         "rank": 44,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1415098",
+        "place_id": "Q1235318",
         "tier": 3,
         "rank": 45,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1235318",
+        "place_id": "Q929659",
         "tier": 3,
         "rank": 46,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q929659",
+        "place_id": "Q1590855",
         "tier": 3,
         "rank": 47,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1590855",
+        "place_id": "Q289414",
         "tier": 3,
         "rank": 48,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q289414",
+        "place_id": "Q645041",
         "tier": 3,
         "rank": 49,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q645041",
+        "place_id": "Q2699249",
         "tier": 3,
         "rank": 50,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q2699249",
+        "place_id": "Q1192720",
         "tier": 3,
         "rank": 51,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1192720",
+        "place_id": "Q729764",
         "tier": 3,
         "rank": 52,
         "forced": false,
@@ -12251,154 +12188,154 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q729873",
+        "place_id": "Q1547308",
         "tier": 3,
         "rank": 54,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1547308",
+        "place_id": "Q1631971",
         "tier": 3,
         "rank": 55,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1631971",
+        "place_id": "Q542944",
         "tier": 3,
         "rank": 56,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q542944",
+        "place_id": "Q897839",
         "tier": 3,
         "rank": 57,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q897839",
+        "place_id": "Q810104",
         "tier": 3,
         "rank": 58,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q810104",
+        "place_id": "Q897603",
         "tier": 3,
         "rank": 59,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q897603",
+        "place_id": "Q432545",
         "tier": 3,
         "rank": 60,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q432545",
+        "place_id": "Q662766",
         "tier": 3,
         "rank": 61,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q662766",
+        "place_id": "Q958145",
         "tier": 3,
         "rank": 62,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q958145",
+        "place_id": "Q2059749",
         "tier": 3,
         "rank": 63,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q2059749",
+        "place_id": "Q5915068",
         "tier": 3,
         "rank": 64,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q5915068",
+        "place_id": "Q718315",
         "tier": 3,
         "rank": 65,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q718315",
+        "place_id": "Q977606",
         "tier": 3,
         "rank": 66,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q977606",
+        "place_id": "Q221640",
         "tier": 3,
         "rank": 67,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q729764",
+        "place_id": "Q1048627",
         "tier": 3,
         "rank": 68,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q221640",
+        "place_id": "Q1073353",
         "tier": 3,
         "rank": 69,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1048627",
+        "place_id": "Q898417",
         "tier": 3,
         "rank": 70,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1073353",
+        "place_id": "Q929453",
         "tier": 3,
         "rank": 71,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q898417",
+        "place_id": "Q718774",
         "tier": 3,
         "rank": 72,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q718774",
+        "place_id": "Q3663202",
         "tier": 3,
         "rank": 73,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3663202",
+        "place_id": "Q2165460",
         "tier": 3,
         "rank": 74,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q2165460",
+        "place_id": "Q1084616",
         "tier": 3,
         "rank": 75,
         "forced": false,
@@ -12412,28 +12349,28 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q3322117",
+        "place_id": "Q384957",
         "tier": 3,
         "rank": 77,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q384957",
+        "place_id": "Q1230048",
         "tier": 3,
         "rank": 78,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1230048",
+        "place_id": "Q3867690",
         "tier": 3,
         "rank": 79,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3867690",
+        "place_id": "Q581560",
         "tier": 3,
         "rank": 80,
         "forced": false,
@@ -14544,10 +14481,10 @@
     "label_id": null,
     "geo_level": "departement",
     "geo_code": "102",
-    "place_count": 9,
+    "place_count": 10,
     "tier_counts": [
       9,
-      0,
+      1,
       0
     ],
     "places": [
@@ -14613,6 +14550,13 @@
         "rank": 9,
         "forced": false,
         "natural_tier": 1
+      },
+      {
+        "place_id": "Q33341794",
+        "tier": 2,
+        "rank": 10,
+        "forced": false,
+        "natural_tier": 2
       }
     ]
   },
@@ -15205,63 +15149,63 @@
         "natural_tier": 1
       },
       {
-        "place_id": "Q3739193",
+        "place_id": "Q3966656",
         "tier": 1,
         "rank": 5,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3966656",
+        "place_id": "Q3886286",
         "tier": 1,
         "rank": 6,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3886286",
+        "place_id": "Q4012768",
         "tier": 1,
         "rank": 7,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q4012768",
+        "place_id": "Q208114",
         "tier": 1,
         "rank": 8,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q208114",
+        "place_id": "Q3593349",
         "tier": 1,
         "rank": 9,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3593349",
+        "place_id": "Q157686",
         "tier": 1,
         "rank": 10,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3966668",
+        "place_id": "Q3739193",
         "tier": 2,
         "rank": 11,
         "forced": false,
-        "natural_tier": 2
+        "natural_tier": 1
       },
       {
-        "place_id": "Q3649993",
+        "place_id": "Q3966668",
         "tier": 2,
         "rank": 12,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q157686",
+        "place_id": "Q3649993",
         "tier": 2,
         "rank": 13,
         "forced": false,
@@ -17808,10 +17752,10 @@
     "label_id": null,
     "geo_level": "departement",
     "geo_code": "112",
-    "place_count": 28,
+    "place_count": 27,
     "tier_counts": [
       10,
-      18,
+      17,
       0
     ],
     "places": [
@@ -17865,21 +17809,21 @@
         "natural_tier": 1
       },
       {
-        "place_id": "Q3739761",
+        "place_id": "Q946242",
         "tier": 1,
         "rank": 8,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q946242",
+        "place_id": "Q17334557",
         "tier": 1,
         "rank": 9,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q17334557",
+        "place_id": "Q1543539",
         "tier": 1,
         "rank": 10,
         "forced": false,
@@ -17900,114 +17844,107 @@
         "natural_tier": 2
       },
       {
-        "place_id": "Q1543539",
+        "place_id": "Q3909149",
         "tier": 2,
         "rank": 13,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3909149",
+        "place_id": "Q3828296",
         "tier": 2,
         "rank": 14,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3828296",
+        "place_id": "Q1091068",
         "tier": 2,
         "rank": 15,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1091068",
+        "place_id": "Q2273465",
         "tier": 2,
         "rank": 16,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q2273465",
+        "place_id": "Q3905173",
         "tier": 2,
         "rank": 17,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3905173",
+        "place_id": "Q30285659",
         "tier": 2,
         "rank": 18,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q30285659",
+        "place_id": "Q728211",
         "tier": 2,
         "rank": 19,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q728211",
+        "place_id": "Q107064078",
         "tier": 2,
         "rank": 20,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q107064078",
+        "place_id": "Q3874164",
         "tier": 2,
         "rank": 21,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3874164",
+        "place_id": "Q473277",
         "tier": 2,
         "rank": 22,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q473277",
+        "place_id": "Q732021",
         "tier": 2,
         "rank": 23,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q732021",
+        "place_id": "Q2595439",
         "tier": 2,
         "rank": 24,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q2595439",
+        "place_id": "Q3777082",
         "tier": 2,
         "rank": 25,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3777082",
+        "place_id": "Q3968023",
         "tier": 2,
         "rank": 26,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3968023",
-        "tier": 2,
-        "rank": 27,
-        "forced": false,
-        "natural_tier": 2
-      },
-      {
         "place_id": "Q33335398",
         "tier": 2,
-        "rank": 28,
+        "rank": 27,
         "forced": false,
         "natural_tier": 2
       }
@@ -19626,11 +19563,11 @@
     "label_id": null,
     "geo_level": "departement",
     "geo_code": "022",
-    "place_count": 73,
+    "place_count": 72,
     "tier_counts": [
       10,
       25,
-      38
+      37
     ],
     "places": [
       {
@@ -19788,28 +19725,28 @@
         "natural_tier": 2
       },
       {
-        "place_id": "Q24941161",
+        "place_id": "Q699575",
         "tier": 2,
         "rank": 23,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q699575",
+        "place_id": "Q1052694",
         "tier": 2,
         "rank": 24,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1052694",
+        "place_id": "Q327930",
         "tier": 2,
         "rank": 25,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q327930",
+        "place_id": "Q24230614",
         "tier": 2,
         "rank": 26,
         "forced": false,
@@ -19872,56 +19809,56 @@
         "natural_tier": 2
       },
       {
-        "place_id": "Q24230614",
+        "place_id": "Q326968",
         "tier": 2,
         "rank": 35,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q326968",
+        "place_id": "Q1545440",
         "tier": 3,
         "rank": 36,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1545440",
+        "place_id": "Q1475787",
         "tier": 3,
         "rank": 37,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1475787",
+        "place_id": "Q297133",
         "tier": 3,
         "rank": 38,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q297133",
+        "place_id": "Q31229",
         "tier": 3,
         "rank": 39,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q31229",
+        "place_id": "Q2222728",
         "tier": 3,
         "rank": 40,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q2222728",
+        "place_id": "Q3676757",
         "tier": 3,
         "rank": 41,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3676757",
+        "place_id": "Q113015071",
         "tier": 3,
         "rank": 42,
         "forced": false,
@@ -19956,63 +19893,63 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q113015071",
+        "place_id": "Q781019",
         "tier": 3,
         "rank": 47,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q781019",
+        "place_id": "Q1945934",
         "tier": 3,
         "rank": 48,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1945934",
+        "place_id": "Q244220",
         "tier": 3,
         "rank": 49,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q244220",
+        "place_id": "Q35722561",
         "tier": 3,
         "rank": 50,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q35722561",
+        "place_id": "Q1683655",
         "tier": 3,
         "rank": 51,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1683655",
+        "place_id": "Q3862087",
         "tier": 3,
         "rank": 52,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3862087",
+        "place_id": "Q3825920",
         "tier": 3,
         "rank": 53,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3825920",
+        "place_id": "Q44834809",
         "tier": 3,
         "rank": 54,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q44834809",
+        "place_id": "Q106540844",
         "tier": 3,
         "rank": 55,
         "forced": false,
@@ -20040,107 +19977,100 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q106540844",
+        "place_id": "Q18601851",
         "tier": 3,
         "rank": 59,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q18601851",
+        "place_id": "Q3825965",
         "tier": 3,
         "rank": 60,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3825965",
+        "place_id": "Q1057382",
         "tier": 3,
         "rank": 61,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1057382",
+        "place_id": "Q3825962",
         "tier": 3,
         "rank": 62,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3825962",
+        "place_id": "Q301774",
         "tier": 3,
         "rank": 63,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q301774",
+        "place_id": "Q17623660",
         "tier": 3,
         "rank": 64,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q17623660",
+        "place_id": "Q2448521",
         "tier": 3,
         "rank": 65,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q2448521",
+        "place_id": "Q3825822",
         "tier": 3,
         "rank": 66,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3825822",
+        "place_id": "Q224779",
         "tier": 3,
         "rank": 67,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q224779",
+        "place_id": "Q3930074",
         "tier": 3,
         "rank": 68,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3930074",
+        "place_id": "Q18022857",
         "tier": 3,
         "rank": 69,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q18022857",
+        "place_id": "Q1332805",
         "tier": 3,
         "rank": 70,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1332805",
+        "place_id": "Q16536381",
         "tier": 3,
         "rank": 71,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q16536381",
-        "tier": 3,
-        "rank": 72,
-        "forced": false,
-        "natural_tier": 3
-      },
-      {
         "place_id": "Q121889310",
         "tier": 3,
-        "rank": 73,
+        "rank": 72,
         "forced": false,
         "natural_tier": 3
       }
@@ -24178,9 +24108,9 @@
     "label_id": null,
     "geo_level": "departement",
     "geo_code": "101",
-    "place_count": 9,
+    "place_count": 8,
     "tier_counts": [
-      9,
+      8,
       0,
       0
     ],
@@ -24221,30 +24151,23 @@
         "natural_tier": 1
       },
       {
-        "place_id": "Q23308931",
+        "place_id": "Q3662534",
         "tier": 1,
         "rank": 6,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3662534",
+        "place_id": "Q54496",
         "tier": 1,
         "rank": 7,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q54496",
-        "tier": 1,
-        "rank": 8,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
         "place_id": "Q110694487",
         "tier": 1,
-        "rank": 9,
+        "rank": 8,
         "forced": false,
         "natural_tier": 1
       }
@@ -25201,10 +25124,10 @@
     "label_id": null,
     "geo_level": "departement",
     "geo_code": "078",
-    "place_count": 20,
+    "place_count": 19,
     "tier_counts": [
       10,
-      10,
+      9,
       0
     ],
     "places": [
@@ -25237,114 +25160,107 @@
         "natural_tier": 1
       },
       {
-        "place_id": "Q29886508",
+        "place_id": "Q3952486",
         "tier": 1,
         "rank": 5,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3952486",
+        "place_id": "Q15228912",
         "tier": 1,
         "rank": 6,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q15228912",
+        "place_id": "Q3825664",
         "tier": 1,
         "rank": 7,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3825664",
+        "place_id": "Q53821",
         "tier": 1,
         "rank": 8,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q53821",
+        "place_id": "Q53867",
         "tier": 1,
         "rank": 9,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q53867",
+        "place_id": "Q53919",
         "tier": 1,
         "rank": 10,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q53919",
+        "place_id": "Q1805723",
         "tier": 2,
         "rank": 11,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1805723",
+        "place_id": "Q53947",
         "tier": 2,
         "rank": 12,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q53947",
+        "place_id": "Q18429979",
         "tier": 2,
         "rank": 13,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q18429979",
+        "place_id": "Q53881",
         "tier": 2,
         "rank": 14,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q53881",
+        "place_id": "Q53845",
         "tier": 2,
         "rank": 15,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q53845",
+        "place_id": "Q3957956",
         "tier": 2,
         "rank": 16,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3957956",
+        "place_id": "Q532450",
         "tier": 2,
         "rank": 17,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q532450",
+        "place_id": "Q3825626",
         "tier": 2,
         "rank": 18,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3825626",
-        "tier": 2,
-        "rank": 19,
-        "forced": false,
-        "natural_tier": 2
-      },
-      {
         "place_id": "Q3655702",
         "tier": 2,
-        "rank": 20,
+        "rank": 19,
         "forced": false,
         "natural_tier": 2
       }
@@ -25880,8 +25796,8 @@
     "geo_code": "097",
     "place_count": 17,
     "tier_counts": [
-      9,
       8,
+      9,
       0
     ],
     "places": [
@@ -25928,22 +25844,22 @@
         "natural_tier": 1
       },
       {
-        "place_id": "Q3746246",
+        "place_id": "Q1231343",
         "tier": 1,
         "rank": 7,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q1231343",
+        "place_id": "Q63161",
         "tier": 1,
         "rank": 8,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q63161",
-        "tier": 1,
+        "place_id": "Q3746246",
+        "tier": 2,
         "rank": 9,
         "forced": false,
         "natural_tier": 1
@@ -28511,35 +28427,35 @@
         "natural_tier": 2
       },
       {
-        "place_id": "Q989650",
+        "place_id": "Q4016622",
         "tier": 2,
         "rank": 16,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3657228",
+        "place_id": "Q13099380",
         "tier": 2,
         "rank": 17,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q13099380",
+        "place_id": "Q28375369",
         "tier": 2,
         "rank": 18,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q28375369",
+        "place_id": "Q1046900",
         "tier": 2,
         "rank": 19,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1046900",
+        "place_id": "Q33339413",
         "tier": 2,
         "rank": 20,
         "forced": false,
@@ -28595,14 +28511,14 @@
         "natural_tier": 2
       },
       {
-        "place_id": "Q207808",
+        "place_id": "Q2530284",
         "tier": 2,
         "rank": 28,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q2530284",
+        "place_id": "Q207808",
         "tier": 2,
         "rank": 29,
         "forced": false,
@@ -28700,14 +28616,14 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q770847",
+        "place_id": "Q1334215",
         "tier": 3,
         "rank": 43,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1334215",
+        "place_id": "Q770847",
         "tier": 3,
         "rank": 44,
         "forced": false,
@@ -28784,35 +28700,35 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q16010710",
+        "place_id": "Q523409",
         "tier": 3,
         "rank": 55,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q159498",
+        "place_id": "Q16010710",
         "tier": 3,
         "rank": 56,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q833129",
+        "place_id": "Q159498",
         "tier": 3,
         "rank": 57,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1971299",
+        "place_id": "Q833129",
         "tier": 3,
         "rank": 58,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q523409",
+        "place_id": "Q1971299",
         "tier": 3,
         "rank": 59,
         "forced": false,
@@ -28889,21 +28805,21 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q1352586",
+        "place_id": "Q661926",
         "tier": 3,
         "rank": 70,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q223079",
+        "place_id": "Q1352586",
         "tier": 3,
         "rank": 71,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q661926",
+        "place_id": "Q223079",
         "tier": 3,
         "rank": 72,
         "forced": false,
@@ -30242,151 +30158,151 @@
         "natural_tier": 2
       },
       {
-        "place_id": "Q3739193",
+        "place_id": "Q3105331",
         "tier": 2,
         "rank": 16,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3105331",
+        "place_id": "Q191739",
         "tier": 2,
         "rank": 17,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q191739",
+        "place_id": "Q157824",
         "tier": 2,
         "rank": 18,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q157824",
+        "place_id": "Q51252",
         "tier": 2,
         "rank": 19,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q51252",
+        "place_id": "Q1754247",
         "tier": 2,
         "rank": 20,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1754247",
+        "place_id": "Q216479",
         "tier": 2,
         "rank": 21,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q216479",
+        "place_id": "Q521619",
         "tier": 2,
         "rank": 22,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q521619",
+        "place_id": "Q1376633",
         "tier": 2,
         "rank": 23,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1376633",
+        "place_id": "Q282554",
         "tier": 2,
         "rank": 24,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q282554",
+        "place_id": "Q10855544",
         "tier": 2,
         "rank": 25,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q10855544",
+        "place_id": "Q82707",
         "tier": 2,
         "rank": 26,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q82707",
+        "place_id": "Q849846",
         "tier": 2,
         "rank": 27,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q849846",
+        "place_id": "Q3966656",
         "tier": 2,
         "rank": 28,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3966656",
+        "place_id": "Q622309",
         "tier": 2,
         "rank": 29,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q622309",
+        "place_id": "Q573881",
         "tier": 2,
         "rank": 30,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q573881",
+        "place_id": "Q214929",
         "tier": 2,
         "rank": 31,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q214929",
+        "place_id": "Q208114",
         "tier": 2,
         "rank": 32,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q208114",
+        "place_id": "Q1140023",
         "tier": 2,
         "rank": 33,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1140023",
+        "place_id": "Q799026",
         "tier": 2,
         "rank": 34,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q799026",
+        "place_id": "Q3748715",
         "tier": 2,
         "rank": 35,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3748715",
+        "place_id": "Q3739193",
         "tier": 3,
         "rank": 36,
         "forced": false,
-        "natural_tier": 3
+        "natural_tier": 2
       },
       {
         "place_id": "Q388448",
@@ -30882,14 +30798,14 @@
         "natural_tier": 2
       },
       {
-        "place_id": "Q980745",
+        "place_id": "Q729873",
         "tier": 2,
         "rank": 25,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q929453",
+        "place_id": "Q980745",
         "tier": 2,
         "rank": 26,
         "forced": false,
@@ -30952,7 +30868,7 @@
         "natural_tier": 2
       },
       {
-        "place_id": "Q755123",
+        "place_id": "Q729764",
         "tier": 2,
         "rank": 35,
         "forced": false,
@@ -30973,63 +30889,63 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q3322117",
+        "place_id": "Q926401",
         "tier": 3,
         "rank": 38,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q926401",
+        "place_id": "Q924853",
         "tier": 3,
         "rank": 39,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q924853",
+        "place_id": "Q72356",
         "tier": 3,
         "rank": 40,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q72356",
+        "place_id": "Q1257335",
         "tier": 3,
         "rank": 41,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1257335",
+        "place_id": "Q81814",
         "tier": 3,
         "rank": 42,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q81814",
+        "place_id": "Q189387",
         "tier": 3,
         "rank": 43,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q189387",
+        "place_id": "Q1041792",
         "tier": 3,
         "rank": 44,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1041792",
+        "place_id": "Q934070",
         "tier": 3,
         "rank": 45,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q934070",
+        "place_id": "Q929453",
         "tier": 3,
         "rank": 46,
         "forced": false,
@@ -31064,49 +30980,49 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q1139820",
+        "place_id": "Q1590855",
         "tier": 3,
         "rank": 51,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1590855",
+        "place_id": "Q637248",
         "tier": 3,
         "rank": 52,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q637248",
+        "place_id": "Q859732",
         "tier": 3,
         "rank": 53,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q859732",
+        "place_id": "Q1415098",
         "tier": 3,
         "rank": 54,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1415098",
+        "place_id": "Q2699249",
         "tier": 3,
         "rank": 55,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q2699249",
+        "place_id": "Q368820",
         "tier": 3,
         "rank": 56,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q368820",
+        "place_id": "Q3322117",
         "tier": 3,
         "rank": 57,
         "forced": false,
@@ -31127,70 +31043,70 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q1084616",
+        "place_id": "Q80785",
         "tier": 3,
         "rank": 60,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q80785",
+        "place_id": "Q718790",
         "tier": 3,
         "rank": 61,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q718790",
+        "place_id": "Q1547308",
         "tier": 3,
         "rank": 62,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1547308",
+        "place_id": "Q542944",
         "tier": 3,
         "rank": 63,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q266587",
+        "place_id": "Q755123",
         "tier": 3,
         "rank": 64,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q542944",
+        "place_id": "Q1048627",
         "tier": 3,
         "rank": 65,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1048627",
+        "place_id": "Q3931701",
         "tier": 3,
         "rank": 66,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3931701",
+        "place_id": "Q1235318",
         "tier": 3,
         "rank": 67,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1235318",
+        "place_id": "Q1547618",
         "tier": 3,
         "rank": 68,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1547618",
+        "place_id": "Q1139820",
         "tier": 3,
         "rank": 69,
         "forced": false,
@@ -31225,49 +31141,49 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q1635935",
+        "place_id": "Q380497",
         "tier": 3,
         "rank": 74,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q380497",
+        "place_id": "Q55037",
         "tier": 3,
         "rank": 75,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q55037",
+        "place_id": "Q1192720",
         "tier": 3,
         "rank": 76,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1192720",
+        "place_id": "Q3982267",
         "tier": 3,
         "rank": 77,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3982267",
+        "place_id": "Q1631971",
         "tier": 3,
         "rank": 78,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1631971",
+        "place_id": "Q1131545",
         "tier": 3,
         "rank": 79,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1131545",
+        "place_id": "Q266587",
         "tier": 3,
         "rank": 80,
         "forced": false,
@@ -31354,21 +31270,21 @@
         "natural_tier": 1
       },
       {
-        "place_id": "Q3739761",
+        "place_id": "Q1534505",
         "tier": 1,
         "rank": 10,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q1534505",
+        "place_id": "Q2005261",
         "tier": 2,
         "rank": 11,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q2005261",
+        "place_id": "Q3739765",
         "tier": 2,
         "rank": 12,
         "forced": false,
@@ -33521,11 +33437,11 @@
     "label_id": null,
     "geo_level": "region",
     "geo_code": "18",
-    "place_count": 70,
+    "place_count": 69,
     "tier_counts": [
       10,
       25,
-      35
+      34
     ],
     "places": [
       {
@@ -33564,457 +33480,450 @@
         "natural_tier": 1
       },
       {
-        "place_id": "Q29886508",
+        "place_id": "Q3952486",
         "tier": 1,
         "rank": 6,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q3952486",
+        "place_id": "Q1034760",
         "tier": 1,
         "rank": 7,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q1034760",
+        "place_id": "Q2356853",
         "tier": 1,
         "rank": 8,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q2356853",
+        "place_id": "Q2942743",
         "tier": 1,
         "rank": 9,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q2942743",
+        "place_id": "Q7459703",
         "tier": 1,
         "rank": 10,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q7459703",
+        "place_id": "Q769551",
         "tier": 2,
         "rank": 11,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q769551",
+        "place_id": "Q1775991",
         "tier": 2,
         "rank": 12,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1775991",
+        "place_id": "Q3661534",
         "tier": 2,
         "rank": 13,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q23308931",
+        "place_id": "Q54612",
         "tier": 2,
         "rank": 14,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3661534",
+        "place_id": "Q602564",
         "tier": 2,
         "rank": 15,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q54612",
+        "place_id": "Q54680",
         "tier": 2,
         "rank": 16,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q602564",
+        "place_id": "Q3836325",
         "tier": 2,
         "rank": 17,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q54680",
+        "place_id": "Q3925727",
         "tier": 2,
         "rank": 18,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3836325",
+        "place_id": "Q1088296",
         "tier": 2,
         "rank": 19,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1088296",
+        "place_id": "Q28001091",
         "tier": 2,
         "rank": 20,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q28001091",
+        "place_id": "Q54570",
         "tier": 2,
         "rank": 21,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3925727",
+        "place_id": "Q1084264",
         "tier": 2,
         "rank": 22,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q54570",
+        "place_id": "Q1736209",
         "tier": 2,
         "rank": 23,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1084264",
+        "place_id": "Q54519",
         "tier": 2,
         "rank": 24,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1736209",
+        "place_id": "Q611318",
         "tier": 2,
         "rank": 25,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q54519",
+        "place_id": "Q2885882",
         "tier": 2,
         "rank": 26,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q611318",
+        "place_id": "Q2136958",
         "tier": 2,
         "rank": 27,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q2885882",
+        "place_id": "Q53495",
         "tier": 2,
         "rank": 28,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q53495",
+        "place_id": "Q117670",
         "tier": 2,
         "rank": 29,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q117670",
+        "place_id": "Q3662534",
         "tier": 2,
         "rank": 30,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q3662534",
+        "place_id": "Q1805723",
         "tier": 2,
         "rank": 31,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q2136958",
+        "place_id": "Q53826",
         "tier": 2,
         "rank": 32,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1805723",
+        "place_id": "Q53821",
         "tier": 2,
         "rank": 33,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q53826",
+        "place_id": "Q747888",
         "tier": 2,
         "rank": 34,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q53821",
+        "place_id": "Q11936633",
         "tier": 2,
         "rank": 35,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q747888",
+        "place_id": "Q2942624",
         "tier": 3,
         "rank": 36,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q11936633",
+        "place_id": "Q1641527",
         "tier": 3,
         "rank": 37,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q2942624",
+        "place_id": "Q608369",
         "tier": 3,
         "rank": 38,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1641527",
+        "place_id": "Q53867",
         "tier": 3,
         "rank": 39,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q53867",
+        "place_id": "Q1239561",
         "tier": 3,
         "rank": 40,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1239561",
+        "place_id": "Q3957956",
         "tier": 3,
         "rank": 41,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3957956",
+        "place_id": "Q110694487",
         "tier": 3,
         "rank": 42,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q110694487",
+        "place_id": "Q53919",
         "tier": 3,
         "rank": 43,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q608369",
+        "place_id": "Q3621968",
         "tier": 3,
         "rank": 44,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q53919",
+        "place_id": "Q3825664",
         "tier": 3,
         "rank": 45,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3621968",
+        "place_id": "Q3832077",
         "tier": 3,
         "rank": 46,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3825664",
+        "place_id": "Q53947",
         "tier": 3,
         "rank": 47,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q53947",
+        "place_id": "Q16328376",
         "tier": 3,
         "rank": 48,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q16328376",
+        "place_id": "Q1736224",
         "tier": 3,
         "rank": 49,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1736224",
+        "place_id": "Q18429979",
         "tier": 3,
         "rank": 50,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q18429979",
+        "place_id": "Q1048868",
         "tier": 3,
         "rank": 51,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1048868",
+        "place_id": "Q765929",
         "tier": 3,
         "rank": 52,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q765929",
+        "place_id": "Q2518014",
         "tier": 3,
         "rank": 53,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3832077",
+        "place_id": "Q34834162",
         "tier": 3,
         "rank": 54,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q2518014",
+        "place_id": "Q53881",
         "tier": 3,
         "rank": 55,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q53881",
+        "place_id": "Q3655702",
         "tier": 3,
         "rank": 56,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3655702",
+        "place_id": "Q53845",
         "tier": 3,
         "rank": 57,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q53845",
+        "place_id": "Q54496",
         "tier": 3,
         "rank": 58,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q54496",
+        "place_id": "Q1292498",
         "tier": 3,
         "rank": 59,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1292498",
+        "place_id": "Q15228912",
         "tier": 3,
         "rank": 60,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q15228912",
+        "place_id": "Q532450",
         "tier": 3,
         "rank": 61,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q532450",
+        "place_id": "Q2942652",
         "tier": 3,
         "rank": 62,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q2942652",
+        "place_id": "Q3636122",
         "tier": 3,
         "rank": 63,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3636122",
+        "place_id": "Q110205775",
         "tier": 3,
         "rank": 64,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q110205775",
+        "place_id": "Q3662364",
         "tier": 3,
         "rank": 65,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3662364",
+        "place_id": "Q3825626",
         "tier": 3,
         "rank": 66,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3825626",
+        "place_id": "Q724206",
         "tier": 3,
         "rank": 67,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q724206",
+        "place_id": "Q3983093",
         "tier": 3,
         "rank": 68,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3983093",
+        "place_id": "Q33341794",
         "tier": 3,
         "rank": 69,
-        "forced": false,
-        "natural_tier": 3
-      },
-      {
-        "place_id": "Q34834162",
-        "tier": 3,
-        "rank": 70,
         "forced": false,
         "natural_tier": 3
       }
@@ -37697,35 +37606,35 @@
         "natural_tier": 2
       },
       {
-        "place_id": "Q3661559",
+        "place_id": "Q377319",
         "tier": 2,
         "rank": 23,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q377319",
+        "place_id": "Q2252934",
         "tier": 2,
         "rank": 24,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q2252934",
+        "place_id": "Q1407745",
         "tier": 2,
         "rank": 25,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q1407745",
+        "place_id": "Q699575",
         "tier": 2,
         "rank": 26,
         "forced": false,
         "natural_tier": 2
       },
       {
-        "place_id": "Q699575",
+        "place_id": "Q3661559",
         "tier": 2,
         "rank": 27,
         "forced": false,
@@ -37795,35 +37704,35 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q3661552",
+        "place_id": "Q380287",
         "tier": 3,
         "rank": 37,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q380287",
+        "place_id": "Q472776",
         "tier": 3,
         "rank": 38,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q472776",
+        "place_id": "Q2438157",
         "tier": 3,
         "rank": 39,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q2438157",
+        "place_id": "Q2576260",
         "tier": 3,
         "rank": 40,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q2576260",
+        "place_id": "Q3661552",
         "tier": 3,
         "rank": 41,
         "forced": false,
@@ -37879,42 +37788,42 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q3661539",
+        "place_id": "Q3825824",
         "tier": 3,
         "rank": 49,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q3825824",
+        "place_id": "Q419357",
         "tier": 3,
         "rank": 50,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q419357",
+        "place_id": "Q179398",
         "tier": 3,
         "rank": 51,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q179398",
+        "place_id": "Q572562",
         "tier": 3,
         "rank": 52,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q572562",
+        "place_id": "Q913928",
         "tier": 3,
         "rank": 53,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q913928",
+        "place_id": "Q3661539",
         "tier": 3,
         "rank": 54,
         "forced": false,
@@ -37963,63 +37872,63 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q24941161",
+        "place_id": "Q31229",
         "tier": 3,
         "rank": 61,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q31229",
+        "place_id": "Q2155315",
         "tier": 3,
         "rank": 62,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q2155315",
+        "place_id": "Q2222728",
         "tier": 3,
         "rank": 63,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q2222728",
+        "place_id": "Q327930",
         "tier": 3,
         "rank": 64,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q327930",
+        "place_id": "Q385925",
         "tier": 3,
         "rank": 65,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q385925",
+        "place_id": "Q4007393",
         "tier": 3,
         "rank": 66,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q4007393",
+        "place_id": "Q691103",
         "tier": 3,
         "rank": 67,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q691103",
+        "place_id": "Q456137",
         "tier": 3,
         "rank": 68,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q456137",
+        "place_id": "Q24230614",
         "tier": 3,
         "rank": 69,
         "forced": false,
@@ -38054,49 +37963,49 @@
         "natural_tier": 3
       },
       {
-        "place_id": "Q24230614",
+        "place_id": "Q1654531",
         "tier": 3,
         "rank": 74,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1654531",
+        "place_id": "Q363425",
         "tier": 3,
         "rank": 75,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q363425",
+        "place_id": "Q1545440",
         "tier": 3,
         "rank": 76,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q1545440",
+        "place_id": "Q326968",
         "tier": 3,
         "rank": 77,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q326968",
+        "place_id": "Q781019",
         "tier": 3,
         "rank": 78,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q781019",
+        "place_id": "Q224779",
         "tier": 3,
         "rank": 79,
         "forced": false,
         "natural_tier": 3
       },
       {
-        "place_id": "Q224779",
+        "place_id": "Q1534537",
         "tier": 3,
         "rank": 80,
         "forced": false,
@@ -38902,79 +38811,6 @@
         "place_id": "Q682404",
         "tier": 2,
         "rank": 26,
-        "forced": false,
-        "natural_tier": 2
-      }
-    ]
-  },
-  {
-    "slug": "volcans-departement-063",
-    "name": "Volcans et sites volcaniques de Naples",
-    "kind": "geo",
-    "theme_id": "volcans",
-    "label_id": null,
-    "geo_level": "departement",
-    "geo_code": "063",
-    "place_count": 8,
-    "tier_counts": [
-      7,
-      1,
-      0
-    ],
-    "places": [
-      {
-        "place_id": "Q524",
-        "tier": 1,
-        "rank": 1,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q755123",
-        "tier": 1,
-        "rank": 2,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q1084616",
-        "tier": 1,
-        "rank": 3,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q729873",
-        "tier": 1,
-        "rank": 4,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q729764",
-        "tier": 1,
-        "rank": 5,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q3321680",
-        "tier": 1,
-        "rank": 6,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q3683240",
-        "tier": 1,
-        "rank": 7,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q1037278",
-        "tier": 2,
-        "rank": 8,
         "forced": false,
         "natural_tier": 2
       }
@@ -41961,93 +41797,6 @@
     ]
   },
   {
-    "slug": "sommets-departement-021",
-    "name": "Sommets de Bolzano",
-    "kind": "geo",
-    "theme_id": "sommets",
-    "label_id": null,
-    "geo_level": "departement",
-    "geo_code": "021",
-    "place_count": 10,
-    "tier_counts": [
-      8,
-      2,
-      0
-    ],
-    "places": [
-      {
-        "place_id": "Q501212",
-        "tier": 1,
-        "rank": 1,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q63521967",
-        "tier": 1,
-        "rank": 2,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q605818",
-        "tier": 1,
-        "rank": 3,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q913928",
-        "tier": 1,
-        "rank": 4,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q595212",
-        "tier": 1,
-        "rank": 5,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q2155315",
-        "tier": 1,
-        "rank": 6,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q456137",
-        "tier": 1,
-        "rank": 7,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q913922",
-        "tier": 1,
-        "rank": 8,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q499264",
-        "tier": 2,
-        "rank": 9,
-        "forced": false,
-        "natural_tier": 2
-      },
-      {
-        "place_id": "Q1598119",
-        "tier": 2,
-        "rank": 10,
-        "forced": false,
-        "natural_tier": 2
-      }
-    ]
-  },
-  {
     "slug": "chateaux-departement-001",
     "name": "Châteaux de Turin",
     "kind": "geo",
@@ -43653,79 +43402,6 @@
         "rank": 47,
         "forced": false,
         "natural_tier": 3
-      }
-    ]
-  },
-  {
-    "slug": "volcans-region-15",
-    "name": "Volcans et sites volcaniques de Campanie",
-    "kind": "geo",
-    "theme_id": "volcans",
-    "label_id": null,
-    "geo_level": "region",
-    "geo_code": "15",
-    "place_count": 8,
-    "tier_counts": [
-      7,
-      1,
-      0
-    ],
-    "places": [
-      {
-        "place_id": "Q524",
-        "tier": 1,
-        "rank": 1,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q755123",
-        "tier": 1,
-        "rank": 2,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q1084616",
-        "tier": 1,
-        "rank": 3,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q729873",
-        "tier": 1,
-        "rank": 4,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q729764",
-        "tier": 1,
-        "rank": 5,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q3321680",
-        "tier": 1,
-        "rank": 6,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q3683240",
-        "tier": 1,
-        "rank": 7,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
-        "place_id": "Q1037278",
-        "tier": 2,
-        "rank": 8,
-        "forced": false,
-        "natural_tier": 2
       }
     ]
   },
@@ -47031,9 +46707,9 @@
     "label_id": null,
     "geo_level": "region",
     "geo_code": "04",
-    "place_count": 10,
+    "place_count": 9,
     "tier_counts": [
-      6,
+      5,
       4,
       0
     ],
@@ -47067,44 +46743,37 @@
         "natural_tier": 1
       },
       {
-        "place_id": "Q24941161",
+        "place_id": "Q24230614",
         "tier": 1,
         "rank": 5,
         "forced": false,
         "natural_tier": 1
       },
       {
-        "place_id": "Q24230614",
-        "tier": 1,
-        "rank": 6,
-        "forced": false,
-        "natural_tier": 1
-      },
-      {
         "place_id": "Q113015071",
         "tier": 2,
-        "rank": 7,
+        "rank": 6,
         "forced": false,
         "natural_tier": 2
       },
       {
         "place_id": "Q106540844",
         "tier": 2,
-        "rank": 8,
+        "rank": 7,
         "forced": false,
         "natural_tier": 2
       },
       {
         "place_id": "Q121889310",
         "tier": 2,
-        "rank": 9,
+        "rank": 8,
         "forced": false,
         "natural_tier": 2
       },
       {
         "place_id": "Q17623957",
         "tier": 2,
-        "rank": 10,
+        "rank": 9,
         "forced": false,
         "natural_tier": 2
       }
