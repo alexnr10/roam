@@ -1,24 +1,24 @@
 decision,curator_note,theme_id,name,wikidata_id
 keep,,,"Abbaye Saint-Michel-de-la-Cluse",Q19881
 keep,,,"Abbaye du Mont-Cassin",Q334051
-keep,,cathedrales,"Basilique Saint-Apollinaire de Classe",Q744552
+keep,,,"San Lazzaro degli Armeni",Q1791020
 keep,,,"Chartreuse de Pavie",Q654443
-keep,,cathedrales,"Église du Santo",Q810139
 keep,,,"Église et couvent de la Trinité-des-Monts de Rome",Q1229008
 keep,,,"Chartreuse de Padula",Q1051820
 keep,,,"Abbaye de Pomposa",Q514366
-keep,,musees,"Musée national San Marco",Q13453137
-keep,,cathedrales,"Église de Santo-Spirito",Q1519975
+keep,,,"Chartreuse Saint-Martin",Q859732
+keep,,,"Basilique Sainte-Claire de Naples",Q810104
+keep,,,"Abbaye de Casamari",Q833129
 keep,,,"Cascata delle Marmore",Q38580
 keep,,,"Cascate del Serio",Q3661556
 keep,,,"Cascade du Toce",Q37329
-demote,,,"Fiumelatte",Q3746246
 keep,,,"Cascades de Riva",Q60847935
 keep,,,"Cascades de Barbiano",Q3661559
 keep,,,"Cascades de Nardis",Q3661552
 keep,,,"Cascade Piscina Irgas",Q48315714
 keep,,,"Cascade de Parcines",Q3661539
-drop,,,"Cascade de Sardagna",Q24941161
+keep,,,"Cascade de Lillaz",Q36989690
+keep,,,"Chute d'Isollaz",Q68663076
 keep,,,"Basilique Saint-Pierre",Q12512
 keep,,,"Dôme de Milan",Q18068
 keep,,,"Cathédrale de Modène",Q753721
@@ -32,73 +32,73 @@ keep,,,"Basilique Saint-Jean-de-Latran",Q84090
 keep,,,"Castel del Monte",Q215897
 keep,,,"Château Saint-Ange",Q486382
 keep,,,"Château de Miramare",Q165069
-keep,,monuments,"Palais des Normands",Q1473825
 keep,,,"Château d'Este",Q1048836
 keep,,,"Château des Sforza",Q23354
 keep,,,"Palais royal de Venaria",Q19838
 keep,,,"Château de Torrechiara",Q13291063
 keep,,,"Fort de Bard",Q2255867
 keep,,,"Castel Nuovo",Q781219
-drop,,,"Plaine du Pô",Q202207
-drop,,,"Val Camonica",Q734317
-drop,,,"Valteline",Q685105
-drop,,,"Val Gardena",Q384885
-drop,,,"Val Pusteria",Q698451
-drop,,,"Carnie",Q369765
-drop,,,"Valle Latina",Q41700210
-drop,,,"Val Polcevera",Q657150
-drop,,,"Val di Chiana",Q1071597
-drop,,,"Val di Fiemme",Q256454
+keep,,,"Château aragonais",Q1048809
+drop,,,"Val Venosta",Q1468834
+drop,,,"Val di Fassa",Q1397570
+drop,,,"Vallée du Gesso",Q1634984
+drop,,,"Cadore",Q1025312
+drop,,,"Val Badia",Q644159
+drop,,,"Val d'Ossola",Q690168
+drop,,,"Mugello",Q283034
+drop,,,"Primiero",Q2252934
+drop,,,"Val Müstair",Q257965
+drop,,,"Val Vigezzo",Q975319
+keep,,,"Grotte Bleue",Q605185
 keep,,,"Grottes de Castellana",Q1547653
 keep,,,"Grottes de Frasassi",Q1994964
 keep,,,"Grotte de Neptune",Q1501051
-drop,,,"Lupercal",Q1235116
 keep,,,"Oreille de Denys",Q282839
-demote,,,"Balzi Rossi",Q555143
-drop,,,"Grotte de l'Addaura",Q352845
 keep,,,"Grottes de Toirano",Q1332930
-drop,,,"Grottes de Coreca",Q29886508
 keep,,,"Arene Candide",Q642002
+drop,,,"Grotte du Cheval",Q1431132
+drop,,,"Grotte du Chien",Q924853
+demote,,,"Grotte de Fumane",Q3936338
 keep,,,"Île d'Elbe",Q45328
 keep,,,"Stromboli",Q131148
 keep,,,"Capri",Q173292
 keep,,,"Lampedusa",Q107338
 keep,,,"Ischia",Q189387
-keep,,abbayes,"San Lazzaro degli Armeni",Q1791020
-drop,,,"Île de Montecristo",Q203169
 keep,,,"Murano",Q52437
 keep,,,"Vulcano",Q207323
-drop,,,"Sicile",Q4951156
+keep,,,"Burano",Q52439
+keep,,,"Torcello",Q52441
+drop,,,"Poveglia",Q1145492
 keep,,,"Villa d'Este",Q746063
 keep,,,"Jardin botanique de Padoue",Q598892
 keep,,,"Villa Borghèse",Q678313
 keep,,,"Jardins du Vatican",Q42003
 keep,,,"Jardin botanique Hanbury",Q894646
 keep,,,"Jardin botanique de Palerme",Q894656
-demote,,,"Jardin botanique de Brera",Q2882456
-keep,,maisons,"Villa Godi Malinverni",Q2084394
 keep,,,"Parco Sempione",Q133963
 keep,,,"Parc du Valentino",Q1061804
+demote,,,"Jardin Botanique de l'Université de Pavie",Q1765144
+keep,,,"Jardin botanique de Naples",Q848422
 keep,,,"Lac de Côme",Q15523
 keep,,,"Lac de Garde",Q6414
 keep,,,"Lac Majeur",Q14379
-keep,,dunes-marais,"Lagune de Venise",Q76925
 keep,,,"Lac de Lugano",Q14418
 keep,,,"Lac d'Iseo",Q15648
 keep,,,"Lac d'Orta",Q63141
 keep,,,"Lac de Bolsena",Q208180
 keep,,,"Lac Trasimène",Q188487
 keep,,,"Lac de Resia",Q1249840
-keep,,musees,"Palais royal de Naples",Q426339
+keep,,,"Lac de Bracciano",Q896551
 keep,,,"Villa Médicis",Q1362663
-keep,,musees,"Galerie Palatine",Q866498
-keep,,grottes,"Grotte Bleue",Q605185
-keep,,musees,"MAXXI - Musée national des arts du XXIe siècle",Q1881229
 keep,,,"Villa Balbianello",Q1759446
 keep,,,"Musée Poldi-Pezzoli",Q1190657
 keep,,,"Casa di Giulietta",Q3661293
-keep,,musees,"Musée Ferrari",Q2706867
-keep,,musees,"Galleria Estense",Q774128
+keep,,,"Vittoriale degli italiani",Q1547160
+keep,,,"Musée Bagatti Valsecchi",Q838986
+keep,,,"Villa San Michele",Q1041718
+drop,,,"Villa Malaparte",Q2165447
+keep,,musees,"Musée de Castelvecchio",Q2518724
+keep,,musees,"Palais Grimani di Santa Maria Formosa",Q2898082
 keep,,,"Colisée",Q10285
 keep,,,"Panthéon",Q99309
 keep,,,"Vallée des Temples",Q636774
@@ -107,38 +107,38 @@ keep,,,"Villa romaine du Casale",Q505617
 keep,,,"Pompéi",Q43332
 keep,,,"Herculanum",Q178813
 keep,,,"Su Nuraxi",Q253241
+keep,,,"Sélinonte",Q952173
 keep,,,"Forum Romain",Q180212
-keep,,,"Circus Maximus",Q207808
 keep,,,"Tour de Pise",Q39054
+keep,,,"Monument à Victor-Emmanuel II",Q506234
 keep,,,"Colonne Trajane",Q192784
 keep,,,"Palais du Vatican",Q145093
 keep,,,"Palais Farnèse",Q848386
 keep,,,"La Scala",Q5471
-drop,,,"Théâtre de Pompée",Q944814
 keep,,,"Arc de Constantin",Q5786
 keep,,,"Palais du Quirinal",Q223079
+keep,,,"Palais des Normands",Q1473825
 keep,,,"Campanile de Saint-Marc",Q754194
-demote,,musees,"Palazzo Doria-Tursi",Q162965
 keep,,,"Palais Pitti",Q29286
 keep,,,"Musées du Capitole",Q333906
 keep,,,"Arènes de Vérone",Q641556
 keep,,,"Galerie des Offices",Q51252
 keep,,,"Palais de Caserte",Q327983
 keep,,,"Palais des Doges",Q189883
-keep,,monuments,"Monument à Victor-Emmanuel II",Q506234
-keep,,megalithes,"Sélinonte",Q952173
 keep,,,"Galerie Borghèse",Q841506
 keep,,,"Musée archéologique national de Paestum",Q3329487
+keep,,,"Galleria dell'Accademia de Florence",Q10855544
+keep,,megalithes,"Thermes de Caracalla",Q502098
 keep,,,"Phare de Punta Carena",Q372769
 keep,,,"Phare de la Victoire",Q752327
-demote,,,"Phare de Livourne",Q3739193
-drop,,,"Phare de Cap de Caça",Q3739761
 keep,,,"Phare de San Venerio",Q431403
 keep,,,"Phare de Santa Maria di Leuca",Q28375947
 keep,,,"Phare de Portoferraio",Q16555281
 keep,,,"Phare du Janicule",Q28375369
-drop,,,"Phare du cap Colonna",Q23308931
 keep,,,"Phare de Bari",Q3378175
+keep,,,"Phare de Capo Testa",Q3739765
+demote,,,"Phare du Mont Circé",Q259658
+drop,,,"Phare de Capo di Vado",Q55606613
 keep,,,"Piazza dei Miracoli",Q750245
 keep,,,"Place Saint-Pierre",Q83425
 keep,,,"Place Saint-Marc",Q217527
@@ -149,43 +149,55 @@ keep,,,"Piazza di Spagna",Q15124814
 keep,,,"Piazza Venezia",Q874832
 keep,,,"Largo di Torre Argentina",Q1541068
 keep,,,"Piazza della Signoria",Q849846
-drop,,,"Salento",Q735628
 keep,,,"Gargano",Q763332
 keep,,,"Péninsule de Sorrente",Q59116
 keep,,,"Scala dei Turchi",Q3951389
 keep,,,"Capo Vaticano",Q1034760
 keep,,,"Capo Testa",Q1034748
 keep,,,"Cap Caccia",Q2256770
-demote,,,"Capocotta",Q3657228
 keep,,,"Poetto",Q3393181
 keep,,,"Promontoire de l'Argentario",Q1239373
+demote,,monuments,"Tour Mileto",Q1815153
+keep,,,"Cala Goloritzé",Q2933429
 keep,,,"Ponte Vecchio",Q208633
-drop,,,"Pont Morandi",Q3907993
 keep,,,"Pont des Soupirs",Q52517
 keep,,,"Pont du Rialto",Q52505
-drop,,,"Aqueduc de l'Aqua Virgo",Q600139
 keep,,,"Pont de la Constitution",Q52501
 keep,,,"Pont de l'Académie",Q52509
-drop,,,"Pont de la Liberté",Q1134699
+demote,,,"Viaduc Gênes-Saint-Georges",Q84709324
 keep,,,"Pont des Déchaussés",Q52508
 keep,,,"Pont Santa Trinita",Q545578
-keep,,volcans,"Champs Phlégréens",Q755123
-drop,,,"Massif du Mont-Blanc",Q671343
-drop,,,"Alpes cottiennes",Q1251
-drop,,,"Mont Cassin",Q154372
-drop,,,"Plateau du Karst",Q625139
-drop,,,"Cilento",Q842184
+keep,,,"Pont Scaliger",Q1809027
+demote,,,"Pont des Tétons",Q2717392
+drop,,volcans,"Solfatare",Q943209
 keep,,,"Mont Titano",Q158526
-drop,,,"Alpes carniques",Q660390
-demote,,,"Mont Albain",Q1129380
 keep,,,"Monte Pellegrino",Q731916
+keep,,,"Mont Amiata",Q470777
+keep,,,"Monte Baldo",Q1945737
+keep,,,"Monte Grappa",Q701820
+keep,,,"Monte Zoncolan",Q1468844
+drop,,,"Alpes apuanes",Q622309
+demote,,,"Aspromonte",Q303853
+drop,,,"Sila",Q1088296
 keep,,,"Vésuve",Q524
 keep,,,"Etna",Q16990
+keep,,,"Champs Phlégréens",Q755123
 keep,,,"Monte Nuovo",Q1084616
-keep,,sommets,"Mont Algide",Q989650
-keep,,sommets,"Mont Somma",Q729873
-keep,,sommets,"Mont Époméo",Q729764
 keep,,,"Vulcanello",Q1321161
-drop,,,"Mont Barbaro",Q3321680
 keep,,,"Volcan Albain",Q4016622
-drop,,,"Colline de Camaldoli",Q3683240
+keep,,,"Vulcano",Q1648022
+demote,,,"Fiumelatte",Q3746246
+keep,,,"Basilique Saint-Apollinaire de Classe",Q744552
+keep,,,"Église du Santo",Q810139
+demote,,,"Balzi Rossi",Q555143
+keep,,,"Villa Godi Malinverni",Q2084394
+keep,,,"Circus Maximus",Q207808
+keep,,,"Palais royal de Naples",Q426339
+demote,,,"Phare de Livourne",Q3739193
+demote,,,"Mont Albain",Q1129380
+keep,,,"Musée Ferrari",Q2706867
+keep,,,"Galleria Estense",Q774128
+keep,,,"Mont Algide",Q989650
+keep,,,"Mont Somma",Q729873
+keep,,,"Lagune de Venise",Q76925
+keep,,,"Mont Époméo",Q729764
