@@ -188,6 +188,10 @@ keep,,,"Vulcano",Q1648022
 demote,,,"Fiumelatte",Q3746246
 promote,,,"Dôme de Pise",Q1754247
 promote,,,"Basilique Saint-Marc",Q172988
+keep,,,"Cathédrale Notre-Dame-de-l'Assomption de Sienne",Q282554
+keep,,,"Sanctuaire Madonna di San Luca",Q2004104
+keep,,,"Basilique Saint-Apollinaire-le-Neuf",Q832278
+keep,,,"Basilique Saint-Paul-hors-les-Murs",Q231699
 keep,,,"Basilique Saint-Apollinaire de Classe",Q744552
 keep,,,"Église du Santo",Q810139
 demote,,,"Balzi Rossi",Q555143
@@ -198,6 +202,7 @@ keep,,,"Forum Romain",Q180212
 keep,,,"Circus Maximus",Q207808
 keep,,,"Mur d'Aurélien",Q625149
 keep,,,"Ostie",Q1012797
+drop,,,"Géla",Q39971
 keep,,,"Palazzo Rosso",Q2034331
 promote,,,"Musée archéologique national de Naples",Q637248
 promote,,,"Musée Égyptologique de Turin",Q19877
@@ -206,7 +211,12 @@ keep,,megalithes,"Ségeste",Q692847
 keep,,,"Musée national du Bargello",Q388448
 keep,,,"Galeries de l'Académie",Q338330
 keep,,,"Pinacothèque de Brera",Q150066
-,,megalithes,"Autel de la paix d'Auguste",Q623612
+keep,,,"Autel de la paix d'Auguste",Q623612
+drop,,,"Mont Palatin",Q200642
+keep,,,"Musée national romain",Q1135392
+keep,,cathedrales,"Basilique de Superga",Q1145261
+keep,,,"Mole Antonelliana",Q201902
+keep,,,"Palais de la Seigneurie",Q271928
 keep,,,"Palais royal de Naples",Q426339
 demote,,,"Phare de Livourne",Q3739193
 demote,,,"Phare du Mont Circé",Q259658

@@ -31,7 +31,7 @@ Q10285,1,megalithes,Colisée
 Q102997,3,villages,Vernasca
 Q103040,3,villages,Casale Marittimo
 Q103136,3,villages,Montescudaio
-Q1031614,2,musees,Campo Santo
+Q1031614,1,monuments,Campo Santo
 Q10326,2,villages,Usseaux
 Q1033649,3,chateaux,Château de Canossa
 Q1034741,3,plages,Capo Marargiu
@@ -65,7 +65,7 @@ Q1049884,3,megalithes,Castro (Lazio)
 Q1051478,3,megalithes,Caudium
 Q1051808,3,lacs,Lac de Cavazzo
 Q1051820,1,abbayes,Chartreuse de Padula
-Q1052171,3,musees,Ca' Rezzonico
+Q1052171,2,musees,Ca' Rezzonico
 Q105239,3,villages,Monte Isola
 Q1052521,3,lacs,Lac de Mezzano
 Q1052694,2,lacs,Lac de Cei
@@ -82,8 +82,7 @@ Q1056344,2,abbayes,Chartreuse de Galluzzo
 Q1056360,2,piazzas,Piazza Bra
 Q1056442,3,cathedrales,Église Sainte-Anastasie de Vérone
 Q1057382,3,sommets,Gruppo della Carega
-Q1058770,2,megalithes,Métaponte
-Q1058967,3,megalithes,Théâtre grec de Syracuse
+Q1058967,2,megalithes,Théâtre grec de Syracuse
 Q1059016,3,lacs,Lac de Pilate
 Q105946329,3,monuments,Palais Botta Adorno
 Q1059942,3,sommets,Mont Lauro
@@ -129,7 +128,6 @@ Q1084616,1,volcans,Monte Nuovo
 Q10855544,1,musees,Galleria dell'Accademia de Florence
 Q1085906,2,iles,Ventotene
 Q10862,3,villages,Monteleone d'Orvieto
-Q1088273,3,monuments,Torre dei Gualandi
 Q1088931,3,sommets,Taburnus
 Q1088991,3,lacs,Lago di Ancipa
 Q1089148,3,iles,Île de San Nicola
@@ -152,7 +150,7 @@ Q1101730,3,cathedrales,Cathédrale Notre-Dame-de-l'Assomption de Côme
 Q110205775,3,abbayes,Abbaye bénédictine Sant'Eufemia
 Q1102867,3,piazzas,Piazza del Popolo
 Q1103550,3,musees,Pinacothèque nationale de Bologne
-Q110589478,2,gorges,Gorges du Furlo
+Q110589478,1,gorges,Gorges du Furlo
 Q1106893,3,sommets,Mont Lesima
 Q110694487,3,chateaux,Forteresse de Le Castella
 Q1107168,3,monuments,Palazzo dell'Arengario
@@ -167,7 +165,7 @@ Q1113843,3,musees,Bibliothèque Malatestiana
 Q1115328,3,monuments,Loggia del Capitanio
 Q1115358,3,cathedrales,Basilique de Notre-Dame de l'humilité
 Q1115846,3,musees,Hôpital du Ceppo
-Q1117509,2,gorges,Val Pô
+Q1117509,1,gorges,Val Pô
 Q1118135,3,cathedrales,Cathédrale Notre-Dame-de-l'Assomption de Novare
 Q111833,3,villages,Montefiore Conca
 Q11184602,3,villages,Pietramontecorvino
@@ -178,7 +176,8 @@ Q111972,3,villages,Verucchio
 Q1120660,3,abbayes,Abbaye de Vezzolano
 Q112127,3,villages,Tremosine
 Q1121290,3,plages,Lido di Pomposa
-Q112336078,3,gorges,Bletterbach gorge
+Q112336078,2,gorges,Bletterbach gorge
+Q1123712,2,monuments,Palais Paolo et Niccolò Interiano
 Q112482,3,monuments,Torre Civica
 Q112485,3,chateaux,Château Savoie
 Q1126234,2,iles,Tavolara
@@ -219,6 +218,7 @@ Q1152669,3,sommets,Palanzone
 Q1153879,3,monuments,Arco dei Gavi
 Q1156274,3,monuments,Tour Velasca
 Q1160855,3,megalithes,Trebula Balliensis
+Q1164944,3,musees,Villa Medicea La Magia
 Q116531,3,villages,Atina
 Q116552,3,villages,Boville Ernica
 Q1166100,3,chateaux,Château de Rocca Calascio
@@ -239,6 +239,7 @@ Q1192720,3,iles,Nisida
 Q11936633,3,megalithes,Metauria
 Q1200696,2,musees,Museo dell'Opera del Duomo
 Q120272,3,villages,Luserna
+Q1203458,2,musees,Galerie Doria-Pamphilj
 Q120399,2,villages,Carloforte
 Q1218738,3,iles,Île de San Domino
 Q121889310,2,cascades,Cascata del salton
@@ -258,7 +259,6 @@ Q1231948,3,villages,Populonia
 Q1231982,3,sommets,Monte Rite
 Q1232330,3,sommets,Pizzo di Gino
 Q1233234,2,iles,Île d'Ortygie
-Q1233293,2,musees,Naxos
 Q1235318,3,piazzas,Place Bellini
 Q123540,3,villages,Arcevia
 Q1236114,3,lacs,Lac Massaciuccoli
@@ -271,7 +271,7 @@ Q123965,2,villages,Corinaldo
 Q1240126,3,megalithes,Via Aemilia Scaura
 Q1241262,2,maisons,Villa Palagonia
 Q1241298,2,megalithes,Villa des Mystères
-Q1241849,2,maisons,Villa Mondragone
+Q1241849,3,maisons,Villa Mondragone
 Q124436,3,villages,Morro d'Alba
 Q124512,3,villages,Offagna
 Q1246006,2,lacs,Lac de Vico
@@ -282,16 +282,15 @@ Q12512,1,cathedrales,Basilique Saint-Pierre
 Q1256373,3,plages,Capo di Santa Maria di Leuca
 Q1256487,3,cathedrales,Baptistère des Orthodoxes
 Q1256546,3,abbayes,Sant'Angelo
-Q1257335,2,megalithes,Oplontis
 Q1258865,3,musees,Villa Emo
-Q1261544,2,monuments,Palais du Te
+Q1261544,1,maisons,Palais du Te
 Q126182,2,maisons,Villa Mosconi Bertani
 Q1262976,2,ponts,Pont de l'Amiral
 Q126327,2,iles,Île de San Giorgio Maggiore
 Q1265593,2,monuments,Ca' Vendramin Calergi
 Q1267415,3,lacs,Lago di Valdurna
 Q1267485,2,maisons,Villa Madame
-Q1267721,2,monuments,Palais ducal d'Urbin
+Q1267721,3,monuments,Palais ducal d'Urbin
 Q1268593,3,cathedrales,Temple Malatesta
 Q1268698,1,ponts,Pont des Flèches
 Q1270723,3,musees,Scuola Grande de San Rocco
@@ -299,7 +298,7 @@ Q1273362,2,abbayes,Scuola Grande di San Marco
 Q1273374,3,monuments,Palais Labia
 Q1273657,3,cathedrales,Église de la Sainte-Trinité-et-Saint-Spiridion de Trieste
 Q1276962,3,musees,Palais Schifanoia
-Q1278477,2,musees,Baptistère de Pise
+Q1278477,1,monuments,Baptistère de Pise
 Q1279458,3,musees,Complexe muséal Santa Maria della Scala
 Q12798246,3,monuments,Palazzo Modello
 Q128089,2,villages,Gaète
@@ -331,12 +330,11 @@ Q1334215,2,sommets,Mont Soracte
 Q1339290,3,megalithes,Pont Saint-Martin
 Q133963,1,jardins,Parco Sempione
 Q13409862,3,iles,Île de Giglio
-Q1347586,2,megalithes,Villa des Papyrus
 Q1348158,2,piazzas,Piazzale Michelangelo
 Q1349926,3,megalithes,Sinuessa
 Q1351222,3,chateaux,Pont Nomentano
 Q1352586,3,megalithes,Lavinium
-Q1354756,3,cathedrales,Cathédrale de Cefalù
+Q1354756,2,cathedrales,Cathédrale de Cefalù
 Q1357573,3,musees,Chapelles des Médicis
 Q1362663,1,maisons,Villa Médicis
 Q13635068,3,megalithes,Hybla Heraea
@@ -400,9 +398,8 @@ Q1467712,3,lacs,Lac de Mergozzo
 Q1467793,3,iles,Gavi
 Q1468844,1,sommets,Monte Zoncolan
 Q146988,3,iles,Zannone
-Q1470912,2,musees,Musée Correr
 Q1471556,3,megalithes,Telesia
-Q1473825,1,monuments,Palais des Normands
+Q1473825,2,monuments,Palais des Normands
 Q1474759,3,megalithes,Puits sacré de Funtana Coberta
 Q1475787,3,lacs,Lac de Levico
 Q1477572,3,monuments,Théâtre romain de Vérone
@@ -434,8 +431,7 @@ Q15228912,2,ponts,Viadotto Italia
 Q1523719,3,villages,Giglio Castello
 Q15271,1,sommets,Monte Generoso
 Q1533416,3,musees,Museo Civico di Storia Naturale de Milan
-Q1534505,2,gorges,Gorge de Su Gorroppu
-Q1534537,1,gorges,Schnalstal
+Q1534505,1,gorges,Gorge de Su Gorroppu
 Q1536232,1,gorges,Gorges de l'Alcantara
 Q1538594,3,abbayes,Église San Silvestro al Quirinale
 Q15410555,3,lacs,Lac Sorapiss
@@ -468,16 +464,17 @@ Q1579896,3,megalithes,Labicum
 Q1581507,2,maisons,Villa Medicea del Poggio Imperiale
 Q1581882,3,cathedrales,Basilique Saint-André
 Q158526,1,sommets,Mont Titano
-Q1590855,3,megalithes,Maison des Vettii
+Q1590855,2,megalithes,Maison des Vettii
 Q1594614,3,chateaux,Rocca Maggiore
 Q159474,3,villages,Acquapendente
 Q159498,3,villages,Bagnoregio
 Q159529,3,villages,Bassano in Teverina
 Q1595905,3,piazzas,Piazza Marina
 Q1598119,3,sommets,Weißhorn
-Q16010710,3,megalithes,Antium
+Q16010710,2,megalithes,Antium
 Q1617215,3,monuments,Théâtre romain de Bénévent
 Q1619759,3,cathedrales,Cathédrale Saint-Jean-Baptiste de Cesena
+Q162353,2,monuments,Arc de Septime Sévère
 Q16268344,3,dunes-marais,Dune fossili di Massenzatica
 Q1627320,2,abbayes,Église de Sant'Onofrio au Janicule
 Q1631971,3,maisons,Villa Rosebery
@@ -496,7 +493,7 @@ Q1645600,2,piazzas,Piazza dell'Unità d'Italia
 Q1648022,1,volcans,Vulcano
 Q165069,1,chateaux,Château de Miramare
 Q16511590,3,monuments,Tour Asinelli
-Q16536381,3,gorges,Limarò Canyon
+Q16536381,2,gorges,Limarò Canyon
 Q16536487,3,plages,Capo Bianco
 Q1654198,2,chateaux,Château Tyrol
 Q1654531,3,lacs,Lac de Vernago
@@ -521,16 +518,16 @@ Q1674467,3,iles,Île Saint-Jules
 Q167669,3,sommets,Mont Labbro
 Q16773577,3,monuments,Palais Gottifredo
 Q1677980,3,cathedrales,Basilique San Francesco
-Q1683655,1,gorges,Valsugana
 Q168820,2,iles,Lampione
 Q169090,3,jardins,Giardini Pubblici Indro Montanelli
 Q16990,1,volcans,Etna
 Q1705125,3,musees,Palais public de Saint-Marin
+Q1717939,2,megalithes,Nécropole papale de la basilique Saint-Pierre
 Q1723626,2,gorges,Val Canale
 Q1724661,3,megalithes,Pyrgi
 Q17266053,3,monuments,Palais Natoli
 Q1727103,2,lacs,Lac de Tenno
-Q1728834,3,musees,Catacombes capucines de Palerme
+Q1728834,2,musees,Catacombes capucines de Palerme
 Q172988,1,cathedrales,Basilique Saint-Marc
 Q173292,1,iles,Capri
 Q17334557,3,sommets,Mont Santu
@@ -611,7 +608,6 @@ Q1811289,3,lacs,Lech dl Dragon
 Q1815153,3,monuments,Tour Mileto
 Q18155,3,villages,Rosazza
 Q1816328,2,abbayes,Ospedale della Pietà
-Q1817134,2,megalithes,Géants de mont Prama
 Q1819804,3,musees,Tour des Lamberti
 Q18202665,3,megalithes,Site archéologique de Polizzello
 Q18209,3,villages,Pontechianale
@@ -622,7 +618,6 @@ Q18429979,3,villages,Oriolo
 Q18449160,3,villages,Lollove
 Q18449189,3,villages,Toppo
 Q18454111,3,villages,Foglia
-Q1846533,1,gorges,Val Ferret
 Q18467441,3,villages,Cornello
 Q18470459,3,plages,Arenella
 Q18485926,3,villages,Raggiolo
@@ -642,7 +637,7 @@ Q1862652,3,maisons,Villa Medicea del Trebbio
 Q186282,1,cathedrales,Basilique Sainte-Marie-Majeure de Rome
 Q187599,3,monuments,Palazzo mediceo di Seravezza
 Q1877295,3,megalithes,Tombe Regolini-Galassi
-Q1881229,3,musees,MAXXI - Musée national des arts du XXIe siècle
+Q1881229,2,musees,MAXXI - Musée national des arts du XXIe siècle
 Q1883435,3,cathedrales,Sanctuaire Notre-Dame-de-la-Couronne
 Q1883452,3,cathedrales,Église San Biagio
 Q188487,1,lacs,Lac Trasimène
@@ -708,6 +703,7 @@ Q20008722,3,megalithes,Veleia
 Q2004104,2,cathedrales,Sanctuaire Madonna di San Luca
 Q2004573,3,monuments,Palazzo dei Priori
 Q2005261,3,monuments,Nuraghe Ardasai
+Q2005274,3,musees,Nuraghe Su Mulinu
 Q2006730,3,monuments,Palais du Podestat
 Q20089199,3,monuments,Palazzo Contrari
 Q20090,3,villages,Garessio
@@ -729,7 +725,7 @@ Q2034628,3,musees,Observatoire d'Asiago
 Q2034923,3,cathedrales,Basilique Sainte-Marie de Collemaggio
 Q2035053,3,jardins,Giardino Botanico Fondazione André Heller
 Q2036332,2,abbayes,Basilique San Pietro in Ciel d'Oro
-Q2037271,3,megalithes,Portus
+Q2037271,2,megalithes,Portus
 Q20390,3,villages,Castiglione del Lago
 Q20403,3,villages,Citerna
 Q204152,1,villages,Isola del Giglio
@@ -738,6 +734,8 @@ Q20427,3,villages,Deruta
 Q2046117,2,sommets,Paganella
 Q20472,3,villages,Massa Martana
 Q2047529,3,monuments,Palazzo Chiaramonte Steri
+Q2047548,2,monuments,Palais Chigi
+Q2047566,3,monuments,Palazzo Ducale
 Q20476,3,villages,Monte Castello di Vibio
 Q2047639,3,monuments,Palazzo dei Diamanti
 Q20478,3,villages,Montefalco
@@ -756,9 +754,9 @@ Q20559,2,villages,Spello
 Q20590,3,villages,Torgiano
 Q2059749,2,grottes,Grotta delle Felci
 Q20604,3,villages,Trevi
-Q2060988,1,maisons,Villa Pisani
+Q2060988,2,maisons,Villa Pisani
 Q2063557,3,megalithes,Pont de Tibère
-Q206365,2,maisons,Villa Medicea di Fiesole
+Q206365,3,maisons,Villa Medicea di Fiesole
 Q2065939,3,megalithes,Spina
 Q2066497,3,musees,Église Saint-Catalde de Palerme
 Q206927,3,villages,Frontino
@@ -773,7 +771,7 @@ Q207231,3,villages,Monte Grimano
 Q207323,1,iles,Vulcano
 Q20744415,3,maisons,Musée national du judaïsme italien et de la Shoah
 Q207463,3,villages,Pergola
-Q207486,2,cathedrales,Basilique Saint-François
+Q207486,1,cathedrales,Basilique Saint-François
 Q2077168,3,jardins,Jardin botanique alpin du château Savoie
 Q207808,2,megalithes,Circus Maximus
 Q208114,2,iles,Île de Pianosa
@@ -814,7 +812,6 @@ Q215164,3,villages,Sorano
 Q21552374,3,megalithes,Sanctuaire italique de Pietrabbondante
 Q21552379,3,cathedrales,Sanctuaire Notre-Dame-de-la-Splendeur
 Q2155315,3,sommets,Rittner Horn
-Q2158200,2,megalithes,Tombe de saint Pierre
 Q215897,1,chateaux,Castel del Monte
 Q216479,2,villages,Barga
 Q2165460,3,musees,Villa Jovis
@@ -879,7 +876,7 @@ Q2271810,3,maisons,Villa Zeno
 Q2273465,3,cathedrales,Cathédrale d'Alghero
 Q2274063,3,monuments,Nuraghe Seruci
 Q2274328,3,megalithes,Suessula
-Q2275554,2,gorges,Sextental
+Q2275554,1,gorges,Sextental
 Q2275983,3,megalithes,Éryx
 Q227641,3,villages,Zuccarello
 Q2276731,2,chateaux,Château de Duino
@@ -902,7 +899,7 @@ Q231699,2,cathedrales,Basilique Saint-Paul-hors-les-Murs
 Q23354,1,chateaux,Château des Sforza
 Q233797,2,villages,Castelsardo
 Q23409550,2,cascades,Cascata del Serpente
-Q2350404,3,megalithes,Sassi de Matera
+Q2350404,2,megalithes,Sassi de Matera
 Q235163,1,villages,Cefalù
 Q2356853,3,monuments,Pylônes de Messine
 Q2358398,3,musees,Musée municipal d'archéologie Bologna
@@ -927,7 +924,7 @@ Q24230614,2,cascades,Cascade du loup
 Q2425141,3,abbayes,Abbaye Saint-Vincent du Volturne
 Q2428630,3,megalithes,Corfinium
 Q243148,3,villages,Percile
-Q243456,2,megalithes,Cumes
+Q243456,3,megalithes,Cumes
 Q243467,3,villages,Subiaco
 Q2438157,2,lacs,Lac de Dobbiaco
 Q2440615,3,megalithes,Tombe du Triclinium
@@ -943,7 +940,7 @@ Q246478,3,villages,Bondone
 Q246524,3,villages,Borgo Valsugana
 Q2472396,3,musees,Torre del Mangia
 Q247451,2,chateaux,Château du Bon-Conseil
-Q2478068,2,gorges,Valchiavenna
+Q2478068,1,gorges,Valchiavenna
 Q2487667,2,plages,Capo Berta
 Q24887975,3,plages,Cala Fuili
 Q24935534,3,dunes-marais,Saline di Carloforte
@@ -990,7 +987,7 @@ Q2624890,3,monuments,Porta Garibaldi
 Q2631149,3,sommets,Mont Velino
 Q263305,3,villages,Vipiteno
 Q2634480,2,abbayes,Abbaye de Farfa
-Q2636862,2,piazzas,Prato della Valle
+Q2636862,1,piazzas,Prato della Valle
 Q2637309,2,gorges,Vallo di Diano
 Q2639843,3,cathedrales,Basilique San Gaudenzio de Novare
 Q2641550,3,sommets,Mont Cusna
@@ -1021,7 +1018,7 @@ Q270189,3,villages,Lerici
 Q270320,3,villages,Varese Ligure
 Q270328,2,villages,Vernazza
 Q270548,3,villages,Borgio Verezzi
-Q2705493,3,musees,Triennale de Milan
+Q2705493,2,musees,Triennale de Milan
 Q2705507,3,maisons,Villa Pisani
 Q2705822,3,megalithes,Siris
 Q270593,3,villages,Castelbianco
@@ -1044,7 +1041,7 @@ Q2721458,3,maisons,Villa Valmarana
 Q2722026,3,maisons,Villa Chiericati
 Q2722506,3,maisons,Villa Valmarana Bressan
 Q272777,1,megalithes,Villa d'Hadrien
-Q272968,2,megalithes,Élée
+Q272968,3,megalithes,Élée
 Q2738834,3,cathedrales,Cathédrale de Salerne
 Q2754576,3,cathedrales,Cathédrale d'Urbino
 Q2755827,2,abbayes,Abbaye de la Novalaise
@@ -1059,7 +1056,6 @@ Q279196,3,villages,Frosolone
 Q27989402,3,monuments,Palais Mezzabarba
 Q28001091,3,chateaux,Château de Pizzo
 Q28017373,3,plages,Capo Santa Panagia
-Q281330,2,megalithes,Muraille Servienne
 Q281532,3,monuments,Palais Spini-Feroni
 Q2817359,3,sommets,Gazzirola
 Q2820721,3,cathedrales,Abbaye de Santa Maria del Monte
@@ -1088,7 +1084,6 @@ Q2887140,3,cathedrales,Basilique Santissima Annunziata del Vastato
 Q2887169,3,cathedrales,Basilique du Saint-Sépulcre
 Q289414,3,cathedrales,Église des Girolamini
 Q289427,3,musees,Mausolée de Théodoric
-Q290097,2,megalithes,Baïes
 Q290549,1,musees,Musée de Capodimonte
 Q2910855,3,villages,Borghetto
 Q2914373,3,megalithes,Chisra
@@ -1138,6 +1133,7 @@ Q2942697,3,cathedrales,Cathédrale de Lanciano
 Q2942710,3,cathedrales,Cathédrale de Matera
 Q2942718,3,cathedrales,Cathédrale de Monopoli
 Q2942726,3,cathedrales,Église paroissiale de Montepulciano
+Q2942741,3,cathedrales,Cathédrale de Nola
 Q2942743,3,cathedrales,Cathédrale de Palmi
 Q2942756,3,cathedrales,Cathédrale de Pitigliano
 Q2942760,3,cathedrales,Cathédrale de Pontremoli
@@ -1150,6 +1146,7 @@ Q2943,1,cathedrales,Chapelle Sixtine
 Q294687,3,villages,Atzara
 Q295486,3,villages,Mezzano
 Q2967836,3,chateaux,Château Baradello
+Q2968007,3,chateaux,Château Tramontano
 Q2968035,3,chateaux,Château d'Aci
 Q2968346,3,chateaux,Château d'Ussel
 Q2968443,3,chateaux,Château de Barletta
@@ -1198,7 +1195,7 @@ Q327930,3,villages,Vigo di Fassa
 Q327983,1,musees,Palais de Caserte
 Q3280232,3,maisons,Maison natale de Giuseppe Verdi
 Q3290960,3,lacs,Lago di Barrea
-Q329967,2,megalithes,Paestum
+Q329967,1,megalithes,Paestum
 Q33014801,3,maisons,Museo Ebraico - Fausto Levi - di Soragna
 Q3309,3,sommets,Mont Forno
 Q331635,3,sommets,Appennino Abruzzese
@@ -1209,7 +1206,7 @@ Q3322117,3,sommets,Mont Solaro
 Q3322219,3,sommets,Mont de la Gragliasca
 Q3322556,3,sommets,Monte Morello
 Q3322572,3,sommets,Monte Sagro
-Q3329137,1,maisons,Musée Enzo-Ferrari
+Q3329137,2,maisons,Musée Enzo-Ferrari
 Q3329238,3,musees,Musée Lamborghini
 Q3329363,2,maisons,Musée Stibbert
 Q3329487,1,musees,Musée archéologique national de Paestum
@@ -1258,13 +1255,11 @@ Q334267,3,cathedrales,Abbaye San Salvatore de Brescia
 Q334276,3,abbayes,Abbaye de Sant'Antimo
 Q334328,3,abbayes,Abbaye de Thélème
 Q334414,2,abbayes,Abbaye de Saint-Clément de Casauria
-Q335070,2,megalithes,Albe la Longue
 Q3360829,3,monuments,Palais Bo
 Q3361073,3,monuments,Palais des Consuls
-Q3361280,2,monuments,Palazzo Angelo Giovanni Spinola
 Q3361303,3,monuments,Palazzo Ducale
+Q3361305,2,monuments,Palazzo Gio Carlo Brignole
 Q3361310,3,monuments,Palazzo Massari
-Q3361333,2,monuments,Palazzo Spinola di Pellicceria
 Q3361347,3,maisons,Palazzo Viti
 Q3361360,3,monuments,Palazzo dello Spagnolo
 Q3364207,2,jardins,Parc de la Favara
@@ -1286,7 +1281,6 @@ Q340757,2,villages,La Maddalena
 Q34107,3,villages,Monterosso Almo
 Q3437424,3,chateaux,Rocca Paolina
 Q34605,3,villages,Montagnana
-Q34615,2,megalithes,Adria
 Q34638,3,villages,Arquà Petrarca
 Q3469627,3,megalithes,Salapia
 Q34805,3,villages,Bard
@@ -1334,12 +1328,11 @@ Q3621786,3,megalithes,Arc de Riccardo
 Q3621793,3,monuments,Arc de Trajan
 Q3621968,3,megalithes,Sanctuary of Hera Lacinia
 Q3622428,3,megalithes,Argimusco
-Q3623078,3,musees,Armurerie Royale de Turin
+Q3623078,2,musees,Armurerie Royale de Turin
 Q3626844,3,megalithes,Marruvium
 Q3627904,3,megalithes,Aternum
 Q3629554,3,megalithes,Augusta Bagiennorum
 Q3632776,3,abbayes,Abbaye des chanoines réguliers de Fiesole
-Q363425,1,gorges,Val d'Ultimo
 Q3635652,3,cathedrales,Basilica Minore dei Santi Filippo e Giacomo
 Q3635671,3,cathedrales,Basilique Notre-Dame-des-Sept-Douleurs
 Q3636122,3,monuments,Bastion de Malte
@@ -1407,6 +1400,7 @@ Q3663020,3,villages,Castelponzone
 Q3663202,3,megalithes,Catacombes San Gaudioso
 Q3663438,3,sommets,Kanin
 Q3663959,3,megalithes,Cave di Cusa
+Q3664742,3,maisons,Centre de Production Rai de Naples
 Q3669510,3,cathedrales,Église Saint-Barthélémy de Marne
 Q3669965,3,cathedrales,Église de San Fermo Maggiore
 Q3670098,3,cathedrales,Église San Francesco de Terni
@@ -1433,7 +1427,7 @@ Q368820,3,monuments,Conservatoire San Pietro a Majella de Naples
 Q3698738,3,sommets,Croz dell'Altissimo
 Q36989690,1,cascades,Cascade de Lillaz
 Q3705947,2,plages,Dunes de Piscinas
-Q370873,2,gorges,Vallée de Muggio
+Q370873,1,gorges,Vallée de Muggio
 Q3716262,3,dunes-marais,Dunes of Campomarino
 Q3716338,3,cathedrales,Dôme de Carrare
 Q3716417,3,cathedrales,Cathédrale Sainte-Marie-Majeure de Spilimbergo
@@ -1446,7 +1440,7 @@ Q374149,3,megalithes,Via Flaminia
 Q3746246,2,cascades,Fiumelatte
 Q3747192,3,maisons,Fondation Magnani-Rocca
 Q3747209,3,maisons,Fondazione Querini Stampalia
-Q3748454,3,gorges,Forre laviche del Simeto
+Q3748454,2,gorges,Forre laviche del Simeto
 Q3748713,3,chateaux,Forteresse Santa Barbara
 Q3748715,3,chateaux,Vieille Forteresse
 Q3763804,2,jardins,Jardin Margherita
@@ -1459,7 +1453,7 @@ Q376571,3,chateaux,Runkelstein
 Q3768553,3,maisons,Gipsoteca canoviana
 Q377264,3,sommets,Apennin ligure
 Q377267,3,sommets,Sass de Stria
-Q3772860,3,gorges,Rastenbach Gorge
+Q3772860,2,gorges,Rastenbach Gorge
 Q377319,3,villages,Castelrotto
 Q3774095,3,villages,Gradella
 Q3777013,2,grottes,Grotta Verde
@@ -1536,6 +1530,7 @@ Q384957,3,piazzas,Piazza San Domenico Maggiore
 Q385538,2,villages,Bosa
 Q385753,2,sommets,Punta La Marmora
 Q38580,1,cascades,Cascata delle Marmore
+Q385910,2,cathedrales,Basilique Saint-Clément-du-Latran
 Q385925,3,abbayes,Abbaye de Novacella
 Q3860195,3,iles,Molarotto
 Q3860567,3,abbayes,Torba Abbey
@@ -1569,6 +1564,7 @@ Q3862288,3,villages,Montemarcello
 Q386523,3,villages,Geraci Siculo
 Q3867690,3,maisons,Musée archéologique de Pithecusae
 Q3867697,3,maisons,Musée archéologique national de Cividale del Friuli
+Q3867700,3,musees,Musée archéologique national de Metaponte
 Q3867701,3,maisons,Musée archéologique national Jatta
 Q3867749,3,maisons,Capitolar Museum of Atri
 Q3867751,3,maisons,Birthplace of Gabriele D'Annunzio Museum
@@ -1577,6 +1573,7 @@ Q3867990,3,maisons,Grazia Deledda's Museum
 Q3868042,3,maisons,Musée Mille Miglia
 Q3868061,3,maisons,Musée du papier d'Amalfi
 Q3868075,2,maisons,Musée de Rimini
+Q3868095,3,musees,Musée maritime de Cesenatico
 Q3868123,3,maisons,Musée des Grigne
 Q3868468,3,maisons,Museo storico Giuseppe Garibaldi
 Q3874164,3,megalithes,Nécropole de Su Crucifissu Mannu
@@ -1584,15 +1581,12 @@ Q387517,3,maisons,Villa Saraceno
 Q3878801,3,megalithes,Noto Antica
 Q388448,2,musees,Musée national du Bargello
 Q3886164,2,cascades,Orrido di Bellano
-Q3886286,2,jardins,Orto dei Semplici Elbano
+Q3886286,3,jardins,Orto dei Semplici Elbano
 Q3889420,3,monuments,Palazzetto dei Nobili
 Q3889504,3,monuments,Palais Agostini
-Q3889530,2,monuments,Palais Ambrogio Di Negro
 Q3889546,3,monuments,Palazzo Antinori
-Q3889577,2,monuments,Palais Baldassarre Lomellini
 Q3889607,3,maisons,Palazzo Barolo
-Q3889631,2,monuments,Palais Belimbau
-Q3889811,3,musees,Palais Tobia-Pallavicino
+Q3889811,2,musees,Palais Tobia-Pallavicino
 Q3889843,3,monuments,Palazzo Chiablese
 Q3889909,3,monuments,Palazzo comunale
 Q3889913,3,monuments,Palais communal
@@ -1603,11 +1597,12 @@ Q3890044,3,monuments,Palais ducal de Parme
 Q3890183,3,musees,Palais Gerolamo Grimaldi
 Q3890187,3,monuments,Palazzo Ghilini
 Q3890206,3,maisons,Palazzo Centurione Gio. Battista
-Q3890337,2,monuments,Palais Lercari-Parodi
+Q3890351,2,monuments,Palais Lomellini-Doria Lamba
 Q3890381,3,monuments,Palais Maffei
-Q3890451,2,musees,Palais Massimo des Thermes
 Q3890510,3,monuments,Palais Montalto
 Q3890540,3,monuments,Palais municipal
+Q3890545,2,monuments,Palazzo Ayrolo Negrone
+Q3890590,2,monuments,Palais Pallavicini-Cambiaso
 Q3890626,3,monuments,Palais patriarcal
 Q3890712,3,monuments,Palazzo Pretorio
 Q3890738,3,monuments,Palazzo Regio
@@ -1642,7 +1637,7 @@ Q3902381,3,piazzas,"Piazza dei Signori, Vicenza"
 Q3902382,3,piazzas,"Piazza dei Signori, Padoue"
 Q3902402,3,piazzas,Piazza del Duomo
 Q3902450,3,piazzas,Piazza della Scala
-Q3902457,3,piazzas,Piazza della Transalpina
+Q3902457,2,piazzas,Piazza della Transalpina
 Q3902458,3,piazzas,Place de la Victoire
 Q3902463,3,piazzas,Piazza delle Erbe
 Q3902464,3,piazzas,Place aux Herbes
@@ -1677,6 +1672,7 @@ Q3947467,2,plages,San Leone
 Q3948975,3,megalithes,Santa Croce
 Q3950012,3,cathedrales,Sanctuaire Saint Gabriel dell'Addolorata
 Q3950073,3,cathedrales,Sanctuaire Sainte-Marie-de-la-Croix
+Q3950859,3,megalithes,Parc archéologique de Saturo
 Q3951389,1,plages,Scala dei Turchi
 Q3952486,3,iles,Récifs de Coreca
 Q3957956,3,sommets,Serra Dolcedorme
@@ -1719,6 +1715,7 @@ Q3995322,3,monuments,Civic Tower (Castel Goffredo)
 Q3995474,3,monuments,Tour de l'Horloge de Padoue
 Q3995488,3,monuments,Torre della Gabbia
 Q3995542,3,monuments,Tour Calamosca
+Q3995584,3,musees,Tour de Nao
 Q3995587,3,villages,Torre di Palme
 Q3998557,2,plages,Triangolo Lariano
 Q4000489,3,megalithes,Galleria Borbonica
@@ -1769,7 +1766,7 @@ Q450922,2,ponts,Pont Aldo Moro
 Q45328,1,iles,Île d'Elbe
 Q453634,3,megalithes,Temple de Poséidon à Paestum
 Q4540172,2,abbayes,Monastère Mater Ecclesiae
-Q454201,2,gorges,Vallée Antigorio
+Q454201,1,gorges,Vallée Antigorio
 Q456137,3,sommets,Rieserferner Group
 Q46129,3,villages,Portobuffolé
 Q463400,1,piazzas,Piazza Navona
@@ -1795,7 +1792,6 @@ Q48155,3,villages,Follina
 Q481879,3,villages,Salemi
 Q48315714,1,cascades,Cascade Piscina Irgas
 Q486382,1,chateaux,Château Saint-Ange
-Q487929,2,megalithes,Milazzo
 Q48810344,2,jardins,Parco Biblioteca degli Alberi
 Q488863,3,abbayes,Monastère de Saint Nicolas l'Arène
 Q489260,3,villages,Palazzolo Acréide
@@ -1832,7 +1828,7 @@ Q502098,1,megalithes,Thermes de Caracalla
 Q502433,3,villages,Gangi
 Q503808,3,villages,Ferla
 Q504194,3,sommets,Monte Guglielmo
-Q505574,3,musees,Villa Almerico Capra
+Q505574,2,musees,Villa Almerico Capra
 Q505617,1,megalithes,Villa romaine du Casale
 Q505847,2,iles,Île de Salina
 Q506234,1,monuments,Monument à Victor-Emmanuel II
@@ -1885,7 +1881,6 @@ Q52083,3,villages,Loro Ciuffenna
 Q52084,3,villages,Lucignano
 Q52091,3,villages,Ortignano Raggiolo
 Q52095,3,villages,Poppi
-Q521619,2,monuments,Palais Strozzi
 Q52174,1,villages,Otrante
 Q52198,3,villages,Specchia
 Q52297,3,villages,Irsina
@@ -1904,7 +1899,7 @@ Q52511,3,villages,Acerenza
 Q525113,3,sommets,Mont Subasio
 Q52517,1,ponts,Pont des Soupirs
 Q525297,2,piazzas,Piazzale Loreto
-Q52531,3,cathedrales,Basilique Santa Maria della Salute de Venise
+Q52531,2,cathedrales,Basilique Santa Maria della Salute de Venise
 Q52554,3,villages,Castelmezzano
 Q525626,2,gorges,Passeier Valley
 Q52577,3,villages,Guardia Perticara
@@ -1941,7 +1936,6 @@ Q538419,2,plages,Cala Sisine
 Q53845,3,villages,Buonvicino
 Q53867,3,villages,Civita
 Q53881,3,villages,Fiumefreddo Bruzio
-Q538820,1,gorges,Valdarno
 Q53919,3,villages,Morano Calabro
 Q53947,3,villages,Rocca Imperiale
 Q540546,3,megalithes,Pont de pierre
@@ -1955,13 +1949,12 @@ Q545404,2,iles,Île Tibérine
 Q545578,1,ponts,Pont Santa Trinita
 Q54570,3,villages,Bova
 Q54612,3,villages,Gerace
-Q54614,2,megalithes,Gioia Tauro
 Q546547,3,megalithes,Cosa
 Q54680,3,villages,Stilo
 Q5471,1,monuments,La Scala
 Q5473073,3,megalithes,Forum Novum
 Q54747,1,villages,Tropea
-Q547910,3,megalithes,Stabies
+Q547910,2,megalithes,Stabies
 Q548867,3,megalithes,Eretum
 Q55037,3,villages,Gesualdo
 Q550514,2,cathedrales,Basilique San Nicola de Bari
@@ -1982,7 +1975,7 @@ Q555272,3,megalithes,Poggio Civitate
 Q55570250,3,chateaux,Casino del Principe
 Q5558578,3,jardins,Jardin botanique de l'Isola Madre
 Q5558600,2,jardins,Giardino Botanico Alpino Viote
-Q55739617,3,megalithes,Sassi et parc des églises rupestres de Matera
+Q55739617,2,megalithes,Sassi et parc des églises rupestres de Matera
 Q55925,3,villages,Montesarchio
 Q5600028,3,lacs,Lac du Grand-Saint-Bernard
 Q56011954,2,cascades,Cascade de Troggia
@@ -2000,14 +1993,14 @@ Q56323298,2,cascades,Bucamante Waterfall
 Q56543513,3,cascades,Pesegh waterfall
 Q56692899,2,cascades,Cascate di Stroppia
 Q56750046,2,cascades,Cascata della Donnaiola
-Q568611,3,megalithes,Canne
+Q568611,2,megalithes,Canne
 Q569253,2,cathedrales,Basilique Santa Maria degli Angeli e dei Martiri
 Q569767,2,monuments,Torre Ghirlandina
 Q572009,3,chateaux,Château du Carmine
 Q572562,3,lacs,Lac d'Anterselva
 Q573650,3,chateaux,Forteresse de Lucera
 Q573881,2,cathedrales,Basilique San Lorenzo
-Q574740,2,musees,Jardins de Bomarzo
+Q574740,2,jardins,Jardins de Bomarzo
 Q576004,3,iles,Molara
 Q5786,1,monuments,Arc de Constantin
 Q579763,3,megalithes,Luna
@@ -2029,14 +2022,14 @@ Q59300,3,villages,Servigliano
 Q595212,3,sommets,Groupe de Fanes
 Q595477,3,sommets,Monti Ausoni
 Q597347,3,megalithes,Ferento
-Q597957,2,musees,Villa Farnèse
+Q597957,1,maisons,Villa Farnèse
 Q598892,1,jardins,Jardin botanique de Padoue
 Q599804,2,sommets,Monts Péloritains
 Q600062,3,cathedrales,Chapelle archiépiscopale
 Q600264,3,piazzas,Piazza Dante
 Q600863,3,jardins,Gardens of Augustus
 Q602102,3,cathedrales,Cathédrale Saint-Étienne-et-Notre-Dame-de-l'Assomption de Pavie
-Q602564,3,megalithes,Thourioï
+Q602564,2,megalithes,Thourioï
 Q60287354,3,villages,Barberino Tavarnelle
 Q6029,3,villages,Acquasparta
 Q604770,3,monuments,Palazzo Re Enzo
@@ -2078,10 +2071,7 @@ Q636774,1,megalithes,Vallée des Temples
 Q637157,3,musees,Musée archéologique national de Tarente
 Q637189,3,maisons,Musée archéologique national de Ferrare
 Q637248,1,musees,Musée archéologique national de Naples
-Q63793,1,gorges,Val Germanasca
-Q638283,2,cathedrales,Église Saint-Louis-des-Français
 Q63851952,3,villages,Presicce-Acquarica
-Q64103,2,monuments,Palais des Conservateurs
 Q6414,1,lacs,Lac de Garde
 Q641556,1,musees,Arènes de Vérone
 Q642002,1,grottes,Arene Candide
@@ -2109,7 +2099,6 @@ Q657102,3,megalithes,Atella
 Q657629,2,maisons,Palazzo Davanzati
 Q657635,3,cathedrales,Église Saint-Laurent
 Q657847,3,monuments,Porta Nuova
-Q659138,2,monuments,Théâtre de Marcellus
 Q660633,3,sommets,Mont Arci
 Q660758,3,iles,Tino
 Q661926,3,sommets,Monts Aurunces
@@ -2117,13 +2106,13 @@ Q662766,3,monuments,Amphithéâtre de Pouzzoles
 Q66467261,3,plages,Punta Molentis
 Q6657726,3,megalithes,Catacombes juives de Venosa
 Q670416,3,sommets,Campanile di Val Montanaia
-Q671481,3,megalithes,Tyndaris
+Q671481,2,megalithes,Tyndaris
 Q671850,3,musees,Puits de Saint Patrick
 Q671933,3,cathedrales,Cathédrale Saint-Georges de Ferrare
 Q672082,2,abbayes,Basilique Sant'Eustorgio
 Q672495,3,lacs,Lago di Livigno
 Q6741375,3,chateaux,Forteresse Malaspina
-Q676074,3,megalithes,Cirque de Caligula et de Néron
+Q676074,2,megalithes,Cirque de Caligula et de Néron
 Q677175,3,musees,Nora
 Q677220,3,sommets,Lugano Prealps
 Q678313,1,jardins,Villa Borghèse
@@ -2135,7 +2124,6 @@ Q686306,3,cathedrales,Dôme d'Amalfi
 Q686611,3,sommets,Monts Lépins
 Q68663076,1,cascades,Chute d'Isollaz
 Q689104,3,megalithes,Temple d'Antas
-Q690199,1,gorges,Val Divedro
 Q6904863,3,megalithes,Monte Polizzo
 Q691073,1,sommets,Monts Sibyllins
 Q691103,3,lacs,Lac de Landro
@@ -2156,10 +2144,7 @@ Q7200016,3,sommets,Pizzo Campanile
 Q7200046,3,sommets,Pizzo di Porcaresc
 Q721817,1,cathedrales,Basilique Saint-Vital
 Q7227633,3,sommets,Poncione d'Arzo
-Q722964,1,gorges,Valle d'Itria
 Q723327,3,sommets,Monti Picentini
-Q72356,2,megalithes,Poggiomarino
-Q723887,2,monuments,Arc de Titus
 Q724170,3,jardins,Giardini della Biennale
 Q724206,3,sommets,Monte Stella
 Q724869,3,lacs,Lac d'Occhito
@@ -2175,7 +2160,7 @@ Q730500,2,iles,Asinara
 Q731479,3,abbayes,San Carlo al Corso
 Q731916,1,sommets,Monte Pellegrino
 Q732021,3,sommets,Monte Rasu
-Q732511,2,cathedrales,Baptistère Saint-Jean
+Q732511,2,monuments,Baptistère Saint-Jean
 Q732732,3,megalithes,Egnazia
 Q733217,3,cathedrales,Cathédrale de Messine
 Q733389,3,musees,Villa médicéenne de Poggio a Caiano
@@ -2195,7 +2180,7 @@ Q744776,2,piazzas,Campo San Polo
 Q745359,3,cathedrales,Église Saint-Jean-des-Ermites de Palerme
 Q7459703,2,ponts,Viaduc Sfalassà
 Q746063,1,jardins,Villa d'Este
-Q747484,2,musees,Théâtre de Taormine
+Q747484,2,megalithes,Théâtre de Taormine
 Q747586,3,cathedrales,Basilique Saint-Saturnin de Cagliari
 Q747888,3,musees,Cathédrale de Stilo
 Q749536,3,cathedrales,Cathédrale de Brindisi
@@ -2209,7 +2194,7 @@ Q752501,3,cathedrales,Dôme Saint-Georges
 Q752505,3,iles,Tinetto
 Q753363,3,cathedrales,Cathédrale de Bitonto
 Q753721,1,cathedrales,Cathédrale de Modène
-Q754194,1,monuments,Campanile de Saint-Marc
+Q754194,2,monuments,Campanile de Saint-Marc
 Q754314,2,megalithes,Tusculum
 Q755123,1,volcans,Champs Phlégréens
 Q757114,2,iles,Palmaria
@@ -2219,6 +2204,7 @@ Q765929,3,sommets,Monte Consolino
 Q768130,3,cathedrales,Cathédrale de Gorizia
 Q76925,3,dunes-marais,Lagune de Venise
 Q769551,3,lacs,Lac Angitola
+Q770847,2,megalithes,Mausolée d'Auguste
 Q770949,2,ponts,Pont Vittorio Emanuele II
 Q772890,3,musees,Galerie nationale de Parme
 Q774128,3,musees,Galleria Estense
@@ -2232,7 +2218,7 @@ Q781219,1,chateaux,Castel Nuovo
 Q782685,3,lacs,Lago Santa Rosalia
 Q782896,2,lacs,Lac Averne
 Q783445,3,sommets,Monts Cimins
-Q786664,2,gorges,Valle Sabbia
+Q786664,1,gorges,Valle Sabbia
 Q7882645,3,cathedrales,Cathédrale d'Ivrée
 Q790430,3,musees,Château normand-souabe de Bari
 Q793909,3,cathedrales,San Damiano
@@ -2255,6 +2241,7 @@ Q810107,3,cathedrales,Basilique Santo Stefano
 Q810128,2,cathedrales,Basilique patriarcale d'Aquilée
 Q810139,2,cathedrales,Église du Santo
 Q81814,3,villages,Vietri sul Mare
+Q820872,3,musees,Ca' d'Oro
 Q822085,3,musees,Palazzo della Pilotta
 Q824997,1,piazzas,Piazza del Popolo
 Q82707,3,villages,Greve in Chianti
@@ -2283,15 +2270,17 @@ Q845310,2,iles,Caprera
 Q845510,3,monuments,Teatro Petruzzelli
 Q84709324,2,ponts,Viaduc Gênes-Saint-Georges
 Q848386,1,monuments,Palais Farnèse
+Q848394,2,monuments,Palais de Latran
 Q848422,1,jardins,Jardin botanique de Naples
 Q849448,2,lacs,Lac d'Albano
 Q849846,2,piazzas,Piazza della Signoria
 Q851796,3,sommets,Bulgheria
-Q854843,3,megalithes,Camarina
+Q854843,2,megalithes,Camarina
 Q856400,3,maisons,Maison de Carlo Goldoni
 Q858940,3,chateaux,Castel Capuano
 Q859732,1,abbayes,Chartreuse Saint-Martin
 Q860569,2,abbayes,Abbaye de Chiaravalle
+Q860816,3,cathedrales,Église d'Orsanmichele
 Q861436,3,cathedrales,Église de la Madonna dell'Orto
 Q862602,2,abbayes,Basilique San Domenico
 Q866192,3,piazzas,Piazza della Santissima Annunziata
@@ -2312,7 +2301,7 @@ Q894670,3,musees,Jardin botanique de Pise
 Q89591373,3,megalithes,Ponte Vecchio
 Q896551,1,lacs,Lac de Bracciano
 Q897603,3,cathedrales,Église San Domenico Maggiore
-Q897839,2,musees,Chapelle Sansevero
+Q897839,2,monuments,Chapelle Sansevero
 Q898150,3,sommets,Matese
 Q898155,3,sommets,Roccamonfina
 Q898417,3,megalithes,Linterne
@@ -2345,7 +2334,7 @@ Q92953255,3,maisons,Villa Ravera
 Q929598,3,monuments,Palais dul Séminaire
 Q929659,2,plages,Cap Misène
 Q929968,2,piazzas,Piazza Mercanti
-Q931172,3,megalithes,Vulci
+Q931172,2,megalithes,Vulci
 Q931434,2,megalithes,Nécropole de Pantalica
 Q933666,2,sommets,Cinque Torri
 Q934070,2,maisons,Villa Lysis
@@ -2366,13 +2355,12 @@ Q949581,3,lacs,Lac Salso
 Q949654,3,megalithes,Tombe des Taureaux
 Q94966,3,villages,Sarnano
 Q94980,3,villages,Treia
-Q949846,3,musees,Jardin des Tarots
+Q949846,2,musees,Jardin des Tarots
 Q94984797,3,cathedrales,Santa Maria della Concezione
 Q94986,3,villages,Visso
 Q950002,3,cathedrales,Cathédrale de Capoue
 Q951442,3,megalithes,Calatia
 Q952173,1,megalithes,Sélinonte
-Q952653,1,gorges,Vallée Anzasca
 Q952753,3,megalithes,Casilinum
 Q953113,3,lacs,Stubensee
 Q953994,3,sommets,Mont Terminillo
@@ -2382,9 +2370,8 @@ Q957378,3,sommets,Mont Bignone
 Q957551,2,monuments,Ca' Foscari
 Q957717,3,sommets,Monts Herniques
 Q958145,3,piazzas,Piazza dei Martiri
-Q958490,2,gorges,Vallée de Ledro
+Q958490,1,gorges,Vallée de Ledro
 Q958699,3,cathedrales,Cathédrale Saint-Jean-Baptiste de Turin
-Q962184,2,megalithes,Motyé
 Q962235,3,lacs,Lac de Candia
 Q963954,1,musees,Chapelle des Scrovegni
 Q964499,2,maisons,Villa Giulia
