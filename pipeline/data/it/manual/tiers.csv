@@ -1044,7 +1044,6 @@ Q28375947,1,phares,Phare de Santa Maria di Leuca
 Q28376417,2,phares,Phare de San Benedetto del Tronto
 Q284719,3,musees,Basilique palladienne
 Q284789,3,villages,Sadali
-Q2859274,2,megalithes,Aquilée romaine
 Q2860643,3,rochers,Arco naturale
 Q28668608,3,maisons,Villa Arrigona
 Q28727449,3,musees,Museo del violino
@@ -1558,7 +1557,6 @@ Q3889420,3,monuments,Palazzetto dei Nobili
 Q3889504,3,monuments,Palais Agostini
 Q3889546,3,monuments,Palazzo Antinori
 Q3889607,3,maisons,Palazzo Barolo
-Q3889823,2,monuments,Palazzo Cattaneo Adorno
 Q3889843,3,monuments,Palazzo Chiablese
 Q3889909,3,monuments,Palazzo comunale
 Q3889913,3,monuments,Palais communal
@@ -1568,11 +1566,12 @@ Q3889992,3,maisons,Palazzo Croce De Marini
 Q3890044,3,monuments,Palais ducal de Parme
 Q3890183,2,monuments,Palais Gerolamo Grimaldi
 Q3890187,3,monuments,Palazzo Ghilini
-Q3890188,3,monuments,Palazzo Giacomo Lomellini
+Q3890188,2,monuments,Palazzo Giacomo Lomellini
 Q3890206,3,maisons,Palazzo Centurione Gio. Battista
 Q3890381,3,monuments,Palais Maffei
 Q3890510,3,monuments,Palais Montalto
 Q3890540,3,monuments,Palais municipal
+Q3890608,3,monuments,Palazzo Pantaleo Spinola
 Q3890626,3,monuments,Palais patriarcal
 Q3890712,3,monuments,Palazzo Pretorio
 Q3890738,3,monuments,Palazzo Regio
@@ -1874,7 +1873,6 @@ Q52693,3,villages,Viggianello
 Q52861,3,cathedrales,Cathédrale Saint-Cyriaque d'Ancône
 Q52959,3,villages,Bagnara di Romagna
 Q52962,2,villages,Brisighella
-Q529806,2,monuments,Domus Flavia
 Q530591,3,megalithes,Trebula Mutuesca
 Q53129,3,villages,Gradisca d'Isonzo
 Q53166,3,villages,Cordovado
@@ -1975,7 +1973,7 @@ Q588036,3,monuments,Palais Pretorio
 Q589462,3,cathedrales,Église Santa Maria presso San Satiro
 Q589711,3,sommets,Monte Argentella
 Q59116,1,plages,Péninsule de Sorrente
-Q5915068,3,megalithes,Maison de Julia Felix
+Q5915068,2,megalithes,Maison de Julia Felix
 Q59271,3,villages,Moresco
 Q59300,3,villages,Servigliano
 Q595212,3,sommets,Groupe de Fanes
@@ -2040,6 +2038,7 @@ Q642924,3,iles,Île Belle
 Q644288,2,megalithes,Mausolée de Galla Placidia
 Q644828,3,cathedrales,Basilique San Domenico
 Q645041,2,chateaux,Castello dell’ovo
+Q645181,2,monuments,Obélisque du Latran
 Q646047,3,sommets,Monti Sicani
 Q648679,2,lacs,Lac de Nemi
 Q649030,1,piazzas,Ghetto de Venise
