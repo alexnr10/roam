@@ -71,6 +71,7 @@ keep,,,"Burano",Q52439
 keep,,,"Torcello",Q52441
 keep,,,"Linosa",Q497321
 promote,,,"Île d'Ortygie",Q1233234
+promote,,,"Île de Favignana",Q996782
 keep,,,"Villa d'Este",Q746063
 keep,,,"Jardin botanique de Padoue",Q598892
 keep,,,"Villa Borghèse",Q678313
@@ -92,6 +93,7 @@ keep,,,"Lac Trasimène",Q188487
 keep,,,"Lac de Resia",Q1249840
 keep,,,"Lac de Bracciano",Q896551
 promote,,,"Lac de Braies",Q445369
+promote,,,"Lac de Misurina",Q1177961
 keep,,,"Villa Médicis",Q1362663
 keep,,,"Villa Farnèse",Q597957
 keep,,,"Villa Almerico Capra",Q505574
@@ -156,6 +158,7 @@ keep,,,"Piazza di Spagna",Q15124814
 keep,,,"Piazza Venezia",Q874832
 keep,,,"Largo di Torre Argentina",Q1541068
 promote,,,"Prato della Valle",Q2636862
+promote,,,"Piazza del Plebiscito",Q1047594
 keep,,,"Gargano",Q763332
 keep,,,"Péninsule de Sorrente",Q59116
 keep,,,"Scala dei Turchi",Q3951389
@@ -171,11 +174,11 @@ keep,,,"Pont des Soupirs",Q52517
 keep,,,"Pont du Rialto",Q52505
 keep,,,"Pont de la Constitution",Q52501
 keep,,,"Pont de l'Académie",Q52509
+keep,,,"Pont de pierre",Q540546
 keep,,,"Pont des Déchaussés",Q52508
 keep,,,"Pont Santa Trinita",Q545578
 keep,,,"Pont Scaliger",Q1809027
 keep,,,"Pont des Flèches",Q1268698
-keep,,,"Ponte Coperto",Q1053846
 keep,,,"Mont Titano",Q158526
 keep,,,"Monte Pellegrino",Q731916
 keep,,,"Mont Amiata",Q470777
@@ -198,13 +201,14 @@ keep,,,"Basilique Sainte-Justine",Q219502
 keep,,,"Abbaye de Bobbio",Q333844
 keep,,,"Abbaye de Tre Fontane",Q114436
 keep,,,"Abbaye de Farfa",Q2634480
-drop,,,"Ospedale della Pietà",Q1816328
-drop,,,"Sacro Convento",Q495217
-drop,,,"Monastère Mater Ecclesiae",Q4540172
 keep,,,"Abbaye de Saint-Clément de Casauria",Q334414
-keep,,cathedrales,"Basilique Sant'Andrea delle Fratte",Q1809794
-drop,,,"Église de Sant'Onofrio au Janicule",Q1627320
-demote,,musees,"Musée national San Matteo",Q1081881
+keep,,,"Abbaye de Chiaravalle",Q860569
+demote,,,"Badia de Florence",Q799026
+keep,,,"Sanctuaire de l'Averne",Q14552418
+keep,,,"Abbaye Saint-Jean-l'Évangéliste",Q3603222
+keep,,,"Chartreuse de Galluzzo",Q1056344
+demote,,cathedrales,"Basilique Sant'Eustorgio",Q672082
+drop,,,"Chartreuse Saint-Ambroise de Garegnano",Q581827
 demote,,,"Fiumelatte",Q3746246
 keep,,,"Cathédrale Notre-Dame-de-l'Assomption de Sienne",Q282554
 keep,,,"Sanctuaire Madonna di San Luca",Q2004104
@@ -239,11 +243,23 @@ keep,,,"Château San Giusto",Q1048860
 keep,,,"Château Visconti",Q3183228
 keep,,,"Château de Melfi",Q3662690
 keep,,,"Château du Bon-Conseil",Q247451
-keep,,musees,"Château de Rivoli",Q19844
 keep,,,"Château d'Issogne",Q1147746
 keep,,,"Château royal de Racconigi",Q19851
 keep,,,"Château souabe de Trani",Q3662987
 keep,,,"Château de Moncalieri",Q19850
+keep,,,"Château de Duino",Q2276731
+keep,,,"Forteresse de San Leo",Q1753598
+keep,,,"Château du Valentino",Q19830
+keep,,,"Château Sant'Elmo",Q1048627
+keep,,,"Trois tours de Saint-Marin",Q2287080
+keep,,,"Château Scaliger de Malcesine",Q3662369
+keep,,,"Château de Verrès",Q937190
+keep,,,"Château Tyrol",Q1654198
+drop,,,"Castelvecchio",Q1049016
+demote,,,"Forteresse de Fortezza",Q212164
+keep,,ponts,"Pont Nomentano",Q1351222
+keep,,,"Château d'Arco",Q224779
+keep,,,"Château d'Aci",Q2968035
 demote,,,"Balzi Rossi",Q555143
 demote,,,"Grotte de Fumane",Q3936338
 keep,,,"Île de Pianosa",Q208114
@@ -266,27 +282,35 @@ keep,,,"Filicudi",Q743908
 keep,,,"Île de Ponza",Q1133295
 keep,,,"Île de Levanzo",Q497357
 keep,,,"Budelli",Q1892625
-promote,,,"Île de Favignana",Q996782
-drop,,,"Tinetto",Q752505
 keep,,,"Santo Stefano",Q909048
-drop,,,"Sant'Erasmo",Q1072076
-drop,,,"Nisida",Q1192720
+keep,,,"Isola dei Pescatori",Q304108
+keep,,,"Île Saint-Jules",Q1674467
+demote,,,"Île Comacina",Q1674456
+demote,,,"San Servolo",Q618075
 demote,,,"Jardins de Bomarzo",Q574740
 demote,,,"Jardin Botanique de l'Université de Pavie",Q1765144
 keep,,,"Lac de Nemi",Q648679
 keep,,,"Lac d'Albano",Q849448
 keep,,,"Lac Averne",Q782896
-promote,,,"Lac de Misurina",Q1177961
 keep,,,"Lac de Carezza",Q1416530
+drop,,,"Lac de Varèse",Q542913
+drop,,,"Fucin",Q914789
+demote,,,"Lac de Viverone",Q1800441
 keep,,,"Palais Colonna",Q1971299
 keep,,,"Villa Pisani",Q2060988
 keep,,,"Musée Enzo-Ferrari",Q3329137
 keep,,,"Villa di Pratolino",Q1376633
-drop,,,"Villa Madame",Q1267485
 keep,,,"Villa Barbaro",Q1071495
 keep,,,"Palais royal de Gênes",Q1514006
 keep,,,"Villa Doria Pamphilj",Q774654
+keep,,,"Casa Buonarroti",Q2418618
+keep,,,"Villa Medicea di Castello",Q2094778
 keep,,,"Villa Godi Malinverni",Q2084394
+keep,,,"Villa Torlonia",Q474857
+keep,,,"Musée Stibbert",Q3329363
+drop,,,"Villa Cornaro",Q2698156
+demote,,musees,"Musée de Rimini",Q3868075
+keep,,,"Villa Necchi Campiglio",Q2525507
 keep,,,"Forum Romain",Q180212
 keep,,,"Circus Maximus",Q207808
 keep,,,"Mur d'Aurélien",Q625149
@@ -303,13 +327,15 @@ keep,,,"Maison des Vettii",Q1590855
 keep,,,"Sassi de Matera",Q2350404
 keep,,,"Amphithéâtre de Pompéi",Q2015116
 keep,,,"Théâtre grec de Syracuse",Q1058967
-drop,,,"Lavinium",Q1352586
-drop,,,"Via Flaminia",Q374149
-drop,,,"Bovillae",Q743694
-drop,,,"Locres Épizéfirienne",Q3836325
-keep,,ponts,"Pont de pierre",Q540546
-drop,,,"Monte Bolca",Q1413204
 keep,,,"Temple d'Apollon",Q2699249
+demote,,,"Alba Fucens",Q944515
+drop,,,"Héracléa Minoa",Q1502156
+keep,,,"Temple de Poséidon à Paestum",Q453634
+drop,,,"Luna",Q579763
+drop,,,"Cosa",Q546547
+drop,,,"Falerii Novi",Q1436362
+demote,,,"Maison du Faune",Q1547308
+keep,,,"Olympéion d'Agrigente",Q2000309
 keep,,,"Palais des Normands",Q1473825
 keep,,,"Campanile de Saint-Marc",Q754194
 keep,,,"Baptistère Saint-Jean",Q732511
@@ -324,15 +350,17 @@ keep,,,"Palais Barberini",Q1136614
 keep,,,"Campanile de Santa Maria del Fiore",Q1140023
 keep,,,"Ca' Foscari",Q957551
 keep,,,"Teatro Massimo Vittorio Emanuele",Q261439
-demote,,,"Palais sénatorial",Q927092
 keep,,,"Palazzo Pubblico",Q1190961
-drop,,,"Palais Rucellai",Q923702
+drop,,,"Palais Montecitorio",Q781417
 keep,,,"Palais Madame",Q19826
 keep,,,"Ca' Vendramin Calergi",Q1265593
 keep,,,"Torre Ghirlandina",Q569767
 keep,,,"Palais ducal d'Urbin",Q1267721
 keep,,,"Palazzo Ducale",Q2047566
-demote,,musees,"Palais royal de Portici",Q1041792
+keep,,,"Teatro comunale",Q2306368
+keep,,maisons,"Palais Chiericati",Q729773
+drop,,,"Teatro Malibran",Q3982047
+drop,,,"Teatro Regio",Q183202
 keep,,,"Palazzo Rosso",Q2034331
 keep,,,"Musée national du Bargello",Q388448
 keep,,,"Galeries de l'Académie",Q338330
@@ -366,11 +394,25 @@ keep,,,"Piazza del Campo",Q1061229
 keep,,,"Piazza Bra",Q1056360
 keep,,,"Piazza del Duomo",Q51108
 keep,,,"Piazza dell'Unità d'Italia",Q1645600
-drop,,,"Cour du Belvédère",Q2547111
-promote,,,"Piazza del Plebiscito",Q1047594
+keep,,,"Quattro Canti",Q1665695
+keep,,,"Piazza Maggiore",Q634917
+keep,,,"Piazzale Michelangelo",Q1348158
 demote,,,"Viaduc Gênes-Saint-Georges",Q84709324
+keep,,,"Ponte Coperto",Q1053846
 demote,,,"Mont Albain",Q1129380
 demote,,,"Aspromonte",Q303853
+promote,,,"Cinque Torri",Q933666
+drop,,,"Gennargentu",Q955286
+keep,,,"Punta La Marmora",Q385753
+keep,,,"Monte Limbara",Q1945873
+drop,,,"Madonies",Q1858387
+drop,,,"Monts Hybléens",Q181115
+keep,,,"Mont Musinè",Q3861770
+demote,,,"Mont Soracte",Q1334215
+keep,,,"Monte Piana",Q872637
+keep,,,"Mottarone",Q926621
+demote,,,"Mont Vultur",Q509433
+keep,,,"Paganella",Q2046117
 demote,,,"Île de Gorgone",Q19347
 demote,,,"Ventotene",Q1085906
 demote,,,"Cumes",Q243456
@@ -388,4 +430,5 @@ keep,,,"Basilique San Pietro in Ciel d'Oro",Q2036332
 keep,,,"Basilique San Domenico",Q862602
 keep,,,"Lagune de Venise",Q76925
 demote,,,"Tour Mileto",Q1815153
+keep,,,"Château de Rivoli",Q19844
 keep,,,"Mont Époméo",Q729764
