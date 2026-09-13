@@ -1089,8 +1089,30 @@ Trinité-des-Monts, qui sont deux visites.
 
 Résultat : les paires voisines d'un même niveau 1 tombent de **96 à 18**, et
 celles qui restent sont dans des collections trop maigres pour faire autrement.
-La France ne déclare pas encore la règle — elle lui vaudrait aussi, mais son
-catalogue est livré et le changement se mesure avant de se prendre.
+
+**La France l'a prise ensuite, après mesure sur son catalogue livré.** Elle y
+avait 37 paires voisines en niveau 1, et pas des cas limites : le site
+d'Étretat avec la Porte d'Aval (88 m, qui EST le site d'Étretat), Bruniquel
+avec les châteaux de Bruniquel (54 m), l'abbaye de Fontevraud avec le village
+qui porte son nom (174 m), l'Aude trois fois sur le même carrefour de Narbonne.
+
+    catalogue      2 080 → 2 080 lieux, les MÊMES
+    collections      203 →   203, les mêmes
+    niveaux            91 changements, 30 descentes depuis un niveau 1
+    paires voisines    37 → 2
+
+Rien n'entre ni ne sort : la règle ne touche que l'ordre. Et elle garde le bon
+des deux — sur 32 descentes, 31 laissent en place le mieux noté (Étretat 76,9
+contre Porte d'Aval 50,2 ; Vézelay 172,9 contre sa basilique 148,0). La seule
+exception sépare Lugdunum du théâtre antique de Lyon par quatre points, sur le
+même parc archéologique.
+
+⚠ Le prix est réel. Sur les 30 lieux descendus, **trois seulement** sont
+niveau 1 dans la collection nationale de leur thème : onze y sont niveau 3, six
+niveau 2, et **dix n'y figurent pas du tout** — la cathédrale de Toul, les
+châteaux de Bruniquel, le musée de Narbonne. Pour ceux-là, la descente retire
+leur seule apparition en niveau 1. Ils restent au catalogue et au niveau 2 de
+leur département.
 
 ### Bergame en villages : le même cas qu'en France
 

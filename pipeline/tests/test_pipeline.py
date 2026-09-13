@@ -8241,9 +8241,13 @@ class TestVoisinsDansUneCollection(unittest.TestCase):
         # Quatre places, quatre lieux : le rayon a cédé pour remplir.
         self.assertEqual(len(retenus), 4)
 
-    def test_l_italie_le_declare_et_la_france_pas_encore(self):
-        self.assertEqual(load_config(pays="it").collections.min_distance_m, 200.0)
-        self.assertEqual(CONFIG.collections.min_distance_m, 0.0)
+    def test_les_deux_pays_declarent_le_meme_rayon(self):
+        # Deux cents mètres, mesuré sur les paires italiennes puis vérifié sur
+        # le catalogue français livré : 37 paires voisines en niveau 1 → 2,
+        # sans qu'un seul lieu entre ni sorte du catalogue.
+        self.assertEqual(CONFIG.collections.min_distance_m, 200.0)
+        self.assertEqual(load_config(pays="it").collections.min_distance_m,
+                         CONFIG.collections.min_distance_m)
 
 
 class TestFeuilleDeRevueDuBonPays(unittest.TestCase):

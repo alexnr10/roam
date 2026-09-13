@@ -307,6 +307,53 @@ collections:
   # trente et un et la collection reste pleine. Aucune des 256 collections ne
   # rétrécit.
   max_theme_share: 0.25
+
+  # Distance en deçà de laquelle deux lieux d'une collection MIXTE comptent
+  # pour le même site.
+  #
+  # « Le meilleur de la Seine-Maritime » ouvrait sur le site d'Étretat ET la
+  # Porte d'Aval, qui est le site d'Étretat, à quatre-vingt-huit mètres. Le
+  # Tarn-et-Garonne sur Bruniquel et les châteaux de Bruniquel (54 m), le
+  # Maine-et-Loire sur l'abbaye de Fontevraud et le village qui porte son nom
+  # (174 m), l'Aude trois fois sur le même carrefour de Narbonne — la
+  # cathédrale, son palais devenu musée, le pont des Marchands.
+  #
+  # `dedupe` ne peut rien y faire : elle ne compare QUE des lieux du même
+  # thème, et la Porte d'Aval est un rocher quand Étretat est une plage. Ce ne
+  # sont d'ailleurs pas des doublons — on les visite séparément — donc le
+  # voisin n'est jamais retiré du catalogue : il cède sa place là où la
+  # collection peut se remplir sans lui, il revient après les autres là où
+  # elle ne le peut pas.
+  #
+  # DEUX CENTS MÈTRES, lu dans les paires mesurées en Italie : sous 150 m on
+  # ne trouve que des évidences (dôme de Milan et Piazza del Duomo, 50 m) ;
+  # entre 150 et 200 m les quatre paires ajoutées sont toutes du même site ;
+  # la première discutable n'arrive qu'à 241 m — villa Médicis et
+  # Trinité-des-Monts, qui sont deux visites.
+  #
+  # Ce que la règle coûte à la France, mesuré sur son catalogue livré :
+  #
+  #   catalogue      2 080 → 2 080 lieux, les MÊMES
+  #   collections      203 →   203, les mêmes
+  #   niveaux            91 changements, 30 descentes depuis un niveau 1
+  #   paires voisines    37 → 2 dans un même niveau 1
+  #
+  # Rien n'entre ni ne sort : la règle ne touche que l'ordre.
+  #
+  # Et elle garde le bon des deux. Sur les trente-deux descentes, TRENTE ET UNE
+  # laissent en place le lieu le mieux noté — Étretat devant la Porte d'Aval
+  # (76,9 contre 50,2), Vézelay devant sa basilique (172,9 contre 148,0), le
+  # château d'Annecy devant le palais de l'Isle (101,7 contre 87,1). La seule
+  # exception sépare Lugdunum du théâtre antique de Lyon par quatre points,
+  # sur le même parc archéologique.
+  #
+  # ⚠ Le prix, lui, est réel et il faut le connaître : sur les trente lieux
+  # descendus, TROIS seulement sont niveau 1 dans la collection nationale de
+  # leur thème. Onze y sont niveau 3, six niveau 2, et dix n'y figurent pas du
+  # tout — la cathédrale de Toul, les châteaux de Bruniquel, le musée de
+  # Narbonne. Pour ceux-là, la descente retire leur seule apparition en
+  # niveau 1. Ils restent au catalogue, et au niveau 2 de leur département.
+  min_distance_m: 200
   # Étendue minimale d'un croisement thème × territoire.
   #
   # Un croisement existe parce que la machine croise tout, pas parce que
