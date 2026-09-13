@@ -25,17 +25,35 @@
 #   « à vérifier » le nom du parc apparaît dans le résumé sans que rien ne dise
 #                  que le lieu est dedans. C'est un indice, et il t'appartient.
 #
-# SIX PARCS N'ONT AUCUNE LIGNE, faute d'un lieu que le texte rattache à eux :
+# QUATRE PARCS N'ONT TOUJOURS PAS DE LIGNE, et pour une raison précise : le
+# lieu que le curateur a choisi n'est pas dans la collecte. Le label TAMPONNE
+# un lieu, il n'en crée aucun.
 #
-#     Alta Murgia · Dolomites bellunoises · Sila · Stelvio · Val Grande
-#     Apennin lucanien-Val d'Agri
+#     Sila            Giganti della Sila   absents de la collecte
+#     Stelvio         Solda                absente
+#     Val Grande      Cicogna              absente
+#     Apennin lucanien Lago Laudemio       absent
 #
-# Ce n'est PAS qu'ils ne contiennent aucun lieu du catalogue — c'est qu'aucun
-# résumé ne les nomme. Le Stelvio et les Dolomites bellunoises tiennent
-# sûrement des sommets déjà collectés ; Wikipédia ne le dit pas dans le texte,
-# voilà tout. Trois faux positifs écartés au passage : le Conservatoire San
-# Pietro a Majella est à Naples, et Herculanum et Pompéi ne sont pas DANS le
-# parc du Vésuve — elles sont sous ses cendres, ce qui n'est pas pareil.
+# Pour les faire exister, c'est `data/it/manual/places.csv` qu'il faut servir
+# d'abord — une ligne `wikidata_id,theme_id,note`, puis un `fetch` complet, et
+# seulement ensuite une ligne ici.
+#
+# ⚠ « Sila », le massif, EST dans la collecte (Q1088296, 24 langues) mais porte
+# un verdict `drop` de la revue : le curateur l'a déjà écarté. L'inscrire ici
+# le ferait rentrer par la fenêtre.
+#
+# ⚠ MONTE SCHIARA ATTEND UN ÉPINGLAGE. Il est collecté (Q3861991, 8 langues),
+# mais culmine à 2 565 m et le filtre alpin l'écarte faute d'un signal d'accès
+# prouvé. Le label dispense du plancher de notoriété, PAS du filtre alpin —
+# seul `pin` le fait, et c'est voulu : la règle dit qu'un sommet réellement
+# accessible malgré son altitude revient par un jugement humain, jamais par une
+# supposition du pipeline. La ligne ci-dessous est donc INERTE tant que
+# `pin Q3861991` n'a pas été lancé.
+#
+# Trois faux positifs écartés au passage, pour qu'on ne les repropose pas : le
+# Conservatoire San Pietro a Majella est à Naples, et Herculanum et Pompéi ne
+# sont pas DANS le parc du Vésuve — elles sont sous ses cendres, ce qui n'est
+# pas pareil.
 #
 # POUR AJOUTER OU CORRIGER UNE LIGNE, le Q-id se lit dans la collecte plutôt
 # qu'il ne s'invente :
@@ -51,6 +69,7 @@
 # est dans le parc des Cinque Terre », et ce fichier pourrait se relire seul.
 wikidata_id,name,note
 Q524,Vésuve,parc national Vésuve (attesté)
+Q215897,Castel del Monte,parc national Alta Murgia (choix du curateur)
 Q204152,Isola del Giglio,parc national Archipel toscan (à vérifier)
 Q51935,Monte Sant'Angelo,parc national Gargano (à vérifier)
 Q340757,La Maddalena,parc national Archipel de La Maddalena (attesté)
@@ -70,3 +89,4 @@ Q510076,Pietra di Bismantova,parc national Apennin tosco-émilien (à vérifier)
 Q1131545,Cap Palinuro,parc national Cilento et Val de Diano (à vérifier)
 Q3392526,Grotte de Cavallone,parc national Majella (attesté)
 Q898150,Matese,parc national Matese (attesté)
+Q3861991,Monte Schiara,parc national Dolomites bellunoises (choix du curateur — INERTE tant que `pin Q3861991` n'est pas lancé)
