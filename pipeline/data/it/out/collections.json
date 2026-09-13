@@ -37030,6 +37030,583 @@
     ]
   },
   {
+    "slug": "geo-country-it",
+    "name": "Le meilleur d'Italie",
+    "kind": "geo",
+    "theme_id": null,
+    "label_id": null,
+    "geo_level": "country",
+    "geo_code": "IT",
+    "place_count": 80,
+    "tier_counts": [
+      10,
+      25,
+      45
+    ],
+    "places": [
+      {
+        "place_id": "Q10285",
+        "tier": 1,
+        "rank": 1,
+        "forced": false,
+        "natural_tier": 1
+      },
+      {
+        "place_id": "Q12512",
+        "tier": 1,
+        "rank": 2,
+        "forced": false,
+        "natural_tier": 1
+      },
+      {
+        "place_id": "Q215897",
+        "tier": 1,
+        "rank": 3,
+        "forced": false,
+        "natural_tier": 1
+      },
+      {
+        "place_id": "Q628",
+        "tier": 1,
+        "rank": 4,
+        "forced": false,
+        "natural_tier": 1
+      },
+      {
+        "place_id": "Q746063",
+        "tier": 1,
+        "rank": 5,
+        "forced": false,
+        "natural_tier": 1
+      },
+      {
+        "place_id": "Q39054",
+        "tier": 1,
+        "rank": 6,
+        "forced": false,
+        "natural_tier": 1
+      },
+      {
+        "place_id": "Q750245",
+        "tier": 1,
+        "rank": 7,
+        "forced": false,
+        "natural_tier": 1
+      },
+      {
+        "place_id": "Q524",
+        "tier": 1,
+        "rank": 8,
+        "forced": false,
+        "natural_tier": 1
+      },
+      {
+        "place_id": "Q208633",
+        "tier": 1,
+        "rank": 9,
+        "forced": false,
+        "natural_tier": 1
+      },
+      {
+        "place_id": "Q29286",
+        "tier": 1,
+        "rank": 10,
+        "forced": false,
+        "natural_tier": 1
+      },
+      {
+        "place_id": "Q15523",
+        "tier": 2,
+        "rank": 11,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q45328",
+        "tier": 2,
+        "rank": 12,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q19881",
+        "tier": 2,
+        "rank": 13,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q76925",
+        "tier": 2,
+        "rank": 14,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q1362663",
+        "tier": 2,
+        "rank": 15,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q605185",
+        "tier": 2,
+        "rank": 16,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q763332",
+        "tier": 2,
+        "rank": 17,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q158526",
+        "tier": 2,
+        "rank": 18,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q38580",
+        "tier": 2,
+        "rank": 19,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q1536232",
+        "tier": 2,
+        "rank": 20,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q372769",
+        "tier": 2,
+        "rank": 21,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q2860643",
+        "tier": 2,
+        "rank": 22,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q13139",
+        "tier": 2,
+        "rank": 23,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q18068",
+        "tier": 2,
+        "rank": 24,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q99309",
+        "tier": 2,
+        "rank": 25,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q51812",
+        "tier": 2,
+        "rank": 26,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q506234",
+        "tier": 2,
+        "rank": 27,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q333906",
+        "tier": 2,
+        "rank": 28,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q6414",
+        "tier": 2,
+        "rank": 29,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q753721",
+        "tier": 2,
+        "rank": 30,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q52174",
+        "tier": 2,
+        "rank": 31,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q59116",
+        "tier": 2,
+        "rank": 32,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q597957",
+        "tier": 2,
+        "rank": 33,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q731916",
+        "tier": 2,
+        "rank": 34,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q636774",
+        "tier": 2,
+        "rank": 35,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q1129380",
+        "tier": 3,
+        "rank": 36,
+        "forced": false,
+        "natural_tier": 2
+      },
+      {
+        "place_id": "Q486382",
+        "tier": 3,
+        "rank": 37,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q204152",
+        "tier": 3,
+        "rank": 38,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q244952",
+        "tier": 3,
+        "rank": 39,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q192784",
+        "tier": 3,
+        "rank": 40,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q131148",
+        "tier": 3,
+        "rank": 41,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q242105",
+        "tier": 3,
+        "rank": 42,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q641556",
+        "tier": 3,
+        "rank": 43,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q83425",
+        "tier": 3,
+        "rank": 44,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q470777",
+        "tier": 3,
+        "rank": 45,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q14379",
+        "tier": 3,
+        "rank": 46,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q2943",
+        "tier": 3,
+        "rank": 47,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q272777",
+        "tier": 3,
+        "rank": 48,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q192917",
+        "tier": 3,
+        "rank": 49,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q145093",
+        "tier": 3,
+        "rank": 50,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q3951389",
+        "tier": 3,
+        "rank": 51,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q505574",
+        "tier": 3,
+        "rank": 52,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q334051",
+        "tier": 3,
+        "rank": 53,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q51175",
+        "tier": 3,
+        "rank": 54,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q235163",
+        "tier": 3,
+        "rank": 55,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q1945737",
+        "tier": 3,
+        "rank": 56,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q598892",
+        "tier": 3,
+        "rank": 57,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q505617",
+        "tier": 3,
+        "rank": 58,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q165069",
+        "tier": 3,
+        "rank": 59,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q51252",
+        "tier": 3,
+        "rank": 60,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q51935",
+        "tier": 3,
+        "rank": 61,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q14418",
+        "tier": 3,
+        "rank": 62,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q191739",
+        "tier": 3,
+        "rank": 63,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q848386",
+        "tier": 3,
+        "rank": 64,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q3661556",
+        "tier": 3,
+        "rank": 65,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q701820",
+        "tier": 3,
+        "rank": 66,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q54747",
+        "tier": 3,
+        "rank": 67,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q173292",
+        "tier": 3,
+        "rank": 68,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q43332",
+        "tier": 3,
+        "rank": 69,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q186282",
+        "tier": 3,
+        "rank": 70,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q1034760",
+        "tier": 3,
+        "rank": 71,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q1759446",
+        "tier": 3,
+        "rank": 72,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q128089",
+        "tier": 3,
+        "rank": 73,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q5471",
+        "tier": 3,
+        "rank": 74,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q327983",
+        "tier": 3,
+        "rank": 75,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q217527",
+        "tier": 3,
+        "rank": 76,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q1468844",
+        "tier": 3,
+        "rank": 77,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q15648",
+        "tier": 3,
+        "rank": 78,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q721817",
+        "tier": 3,
+        "rank": 79,
+        "forced": false,
+        "natural_tier": 3
+      },
+      {
+        "place_id": "Q13649",
+        "tier": 3,
+        "rank": 80,
+        "forced": false,
+        "natural_tier": 3
+      }
+    ]
+  },
+  {
     "slug": "megalithes-departement-058",
     "name": "Mégalithes et sites antiques de Rome",
     "kind": "geo",

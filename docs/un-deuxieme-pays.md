@@ -1002,6 +1002,64 @@ geste qu'on ne fait pas. Le nom suffit désormais ; l'identifiant reste accepté
 et reste le seul moyen sûr quand deux lieux le partagent — auquel cas la
 commande refuse et liste les dix mieux notés.
 
+### « Le meilleur d'Italie » n'existait pas
+
+`geo.area("country")` ne rend la France QUE quand le dépôt parle de la France,
+et `None` sinon. La garde était juste — intituler « Le meilleur de France » une
+collection de lieux italiens est une faute qui ne plante pas et qu'on lirait
+dans l'application — mais elle a **supprimé la collection au lieu de la
+renommer**. L'Italie n'avait donc pas sa liste nationale : la plus importante
+d'un guide, et la seule qui manquait.
+
+Le nom du pays vit dans la configuration : c'est elle qu'il faut lire, pas une
+constante de module. Son niveau 1, une fois la collection rendue, dit à lui
+seul que le brassage par thème fonctionne :
+
+    #1 Colisée · #2 Saint-Pierre · #3 Castel del Monte · #4 Bergame
+    #5 Villa d'Este · #6 tour de Pise · #7 Piazza dei Miracoli
+    #8 Vésuve · #9 Ponte Vecchio · #10 Palais Pitti
+
+Dix lieux, dix thèmes, huit régions. Catalogue français byte-identique.
+
+### La part des églises, mesurée après onze revues
+
+Le curateur a trouvé les niveaux 1 et 2 chargés en églises et en sites
+antiques. La mesure lui donne à moitié raison, et pas là où il croyait.
+
+**Rome n'a pas trente églises** : la commune en porte NEUF — exactement sa
+dérogation — et onze avec les deux du Vatican. Le plafond communal fait son
+travail, et `max_theme_share` fait le sien : « Le meilleur de Rome » compte 11
+églises sur 80, soit 14 %.
+
+Mais au niveau du CATALOGUE, l'écart est réel :
+
+| thème | Italie | France |
+|---|---|---|
+| églises | 263 — **11,5 %** | 80 — 3,8 % |
+| sites antiques | 210 — 9,2 % | 104 — 5,0 % |
+| villages | 387 — 16,9 % | 290 — 13,9 % |
+
+La cause est une décision prise sciemment et remise à plus tard :
+`cathedrales.catalogue_cap: null` en Italie, quand la France plafonne à 80.
+
+**Aucune falaise où couper.** Les 263 églises descendent par marches de 0,1
+point ; la plus forte chute ne vient qu'au 259e rang. C'est donc un arbitrage,
+comme les musées parisiens — mais un arbitrage dont le coût se mesure :
+
+| plafond | catalogue | églises | part | collections |
+|---|---|---|---|---|
+| aucun | 2 285 | 263 | 11,5 % | 203 |
+| 200 | 2 205 | 186 | 8,4 % | 200 |
+| 150 | 2 168 | 146 | 6,7 % | 201 |
+| 100 | 2 125 | 97 | 4,6 % | 199 |
+
+Le catalogue perd peu de collections dans tous les cas : la question est
+éditoriale, pas technique.
+
+**L'équilibre RÉGIONAL, lui, est meilleur qu'en France** : 20 régions
+italiennes, médiane 96 lieux, de 226 (Lombardie) à 13 (Molise) — un rapport de
+17. La France va de 273 à 8, soit 34.
+
 ### Le plafond des églises : la question a changé de main
 
 Avant les communes, `cathedrales` portait 549 lieux au catalogue et la question

@@ -16,7 +16,7 @@ from collections import Counter, defaultdict
 from dataclasses import replace
 
 from .config import Config
-from .geo import area, departements, region_of, regions
+from .geo import area, country_area, departements, region_of, regions
 from .models import Collection, CollectionPlace, Place
 from .score import assign_tiers, rescued
 
@@ -643,7 +643,7 @@ def build_geo_collections(places: list[Place], config: Config) -> list[Collectio
                 buckets[code].append(place)
 
         for code, members in buckets.items():
-            zone = area(level, code)
+            zone = _zone(level, code, config)
             if zone is None:
                 continue
             collection = Collection(
@@ -699,6 +699,24 @@ def theme_lift(members: int, dans_la_zone: int, dans_le_pays: int, total: int) -
     return (members / dans_la_zone) / (dans_le_pays / total)
 
 
+def _zone(level: str, code: str, config: Config):
+    """Le territoire d'une collection, pays compris.
+
+    `area("country")` ne rend la France QUE quand le dépôt parle de la France,
+    et `None` sinon — la garde était juste : intituler « Le meilleur de
+    France » une collection de lieux italiens est une faute qui ne plante pas
+    et qu'on lirait dans l'application.
+
+    Mais elle a supprimé la collection au lieu de la renommer. L'Italie n'avait
+    donc PAS de « Le meilleur d'Italie » — la liste qui compte le plus dans un
+    guide, et la seule qui manquait. Le nom du pays vit dans la configuration :
+    c'est elle qu'il faut lire, pas une constante de module.
+    """
+    if level == "country":
+        return country_area(config)
+    return area(level, code)
+
+
 def build_cross_collections(places: list[Place], config: Config) -> list[Collection]:
     """Croisements thème × géographie (« Châteaux du Cantal »).
 
@@ -722,7 +740,7 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
                 par_zone[code] += 1
 
         for (theme_id, code), members in buckets.items():
-            zone = area(level, code)
+            zone = _zone(level, code, config)
             if zone is None:
                 continue
             theme = config.theme(theme_id)
