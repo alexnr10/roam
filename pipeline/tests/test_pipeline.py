@@ -8408,6 +8408,104 @@ class TestLabelDansUneAire(unittest.TestCase):
         self.assertTrue(any("propriété de situation" in m for m in journal.output))
 
 
+class TestListeSansEnTete(unittest.TestCase):
+    """Un CSV sans en-tête se lit en silence et ne rend rien.
+
+    `places.csv` italien portait trois sommets des Dolomites épinglés à la
+    main. La collecte annonçait « ajouts manuels : 0 lieux épinglés » à chaque
+    fois, sans qu'une ligne dise pourquoi : `DictReader` prenait la première
+    donnée pour les noms de colonnes, et « wikidata_id » n'existait plus.
+
+    C'est `pin` qui créait le fichier ainsi — il ajoute sa ligne en mode
+    ajout, et sur un fichier absent la première ligne écrite est une donnée.
+    En France le fichier avait été écrit à la main, avec son en-tête : le
+    défaut n'a pu se voir qu'au deuxième pays.
+    """
+
+    def test_le_fichier_sans_en_tete_est_refuse_bruyamment(self):
+        from roam_pipeline.fetch import read_csv_rows
+
+        with tempfile.TemporaryDirectory() as tmp:
+            chemin = Path(tmp) / "places.csv"
+            chemin.write_text("Q1257207,sommets,épinglé\nQ203241,sommets,\n",
+                              encoding="utf-8")
+            with self.assertLogs("roam_pipeline.fetch", level="ERROR") as journal:
+                self.assertEqual(read_csv_rows(chemin), [])
+            self.assertTrue(any("première ligne est une DONNÉE" in m
+                                for m in journal.output))
+
+    def test_le_fichier_avec_en_tete_se_lit(self):
+        from roam_pipeline.fetch import read_csv_rows
+
+        with tempfile.TemporaryDirectory() as tmp:
+            chemin = Path(tmp) / "places.csv"
+            chemin.write_text("wikidata_id,theme_id,note\nQ1257207,sommets,x\n",
+                              encoding="utf-8")
+            lignes = read_csv_rows(chemin)
+        self.assertEqual(lignes, [{"wikidata_id": "Q1257207",
+                                   "theme_id": "sommets", "note": "x"}])
+
+    def test_les_commentaires_restent_ignores(self):
+        from roam_pipeline.fetch import read_csv_rows
+
+        with tempfile.TemporaryDirectory() as tmp:
+            chemin = Path(tmp) / "places.csv"
+            chemin.write_text("# une explication\n\nwikidata_id,theme_id\nQ1,sommets\n",
+                              encoding="utf-8")
+            self.assertEqual(read_csv_rows(chemin),
+                             [{"wikidata_id": "Q1", "theme_id": "sommets"}])
+
+    def test_la_liste_italienne_porte_son_en_tete(self):
+        from roam_pipeline.cli import BASE_DIR
+        from roam_pipeline.fetch import read_place_list
+
+        chemin = BASE_DIR / "data" / "it" / "manual" / "places.csv"
+        if not chemin.exists():
+            self.skipTest("liste italienne absente")
+        epingles = read_place_list(load_config(pays="it"), chemin)
+        # Les trois sommets des Dolomites : Tre Cime, Marmolada, Lagazuoi.
+        self.assertEqual(len(epingles), 3, epingles)
+        self.assertEqual(set(epingles.values()), {"sommets"})
+
+
+class TestLangueDesLibelles(unittest.TestCase):
+    """Wikidata rend le Q-id lui-même quand il n'a pas la langue demandée.
+
+    Avec « fr,en », 128 entités italiennes sont revenues nommées
+    « Q100293619 » et la collecte les a jetées comme « sans libellé
+    exploitable » — l'Aquarium de Naples, l'Antiquarium d'Herculanum, le jardin
+    botanique alpin Bruno-Peyronel. Elles ont un nom : il est en italien.
+    """
+
+    def tearDown(self):
+        from roam_pipeline import wikidata as wd
+        wd.utiliser_langues("fr,en")
+
+    def test_la_france_demande_le_francais_et_l_anglais(self):
+        self.assertEqual(load_config().country.langues, "fr,en")
+
+    def test_l_italie_glisse_l_italien_entre_les_deux(self):
+        # Le français DEVANT — le catalogue est français — et l'anglais
+        # DERRIÈRE l'italien : « Acquario di Napoli » vaut mieux que
+        # « Aquarium of Naples » pour un lieu qu'on visite à Naples.
+        self.assertEqual(load_config(pays="it").country.langues, "fr,it,en")
+
+    def test_toutes_les_requetes_suivent(self):
+        from roam_pipeline import wikidata as wd
+
+        wd.utiliser_langues("fr,it,en")
+        requetes = [
+            wd.items_query(["Q1"]),
+            wd.theme_query(["Q1"], 4, country="Q38"),
+            wd.entity_flags_query(["Q1"]),
+        ]
+        for sparql in requetes:
+            if "wikibase:label" in sparql:
+                self.assertIn('wikibase:language "fr,it,en"', sparql)
+        # Au moins une en porte, sans quoi le test ne prouverait rien.
+        self.assertTrue(any("wikibase:label" in q for q in requetes))
+
+
 class TestUnLieuParParc(unittest.TestCase):
     """« Un lieu par parc, et le lieu phare. »
 

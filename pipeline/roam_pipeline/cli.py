@@ -3396,6 +3396,14 @@ def cmd_pin(args: argparse.Namespace, config: Config) -> int:
     if not args.clear:
         liste = args.manual / "places.csv"
         contenu = liste.read_bytes() if liste.exists() else b""
+        if not contenu.strip():
+            # Sans en-tête, `DictReader` prend la première ligne pour les noms
+            # de colonnes et le fichier entier devient illisible — en silence.
+            # C'est arrivé : trois sommets des Dolomites épinglés, « ajouts
+            # manuels : 0 lieux épinglés » à chaque collecte.
+            contenu = b"wikidata_id,theme_id,note\n"
+            liste.parent.mkdir(parents=True, exist_ok=True)
+            liste.write_bytes(contenu)
         if qid.encode() not in contenu:
             fin = b"" if contenu.endswith((b"\n", b"")) else b"\n"
             note = (args.note or "epingle a la main").replace(",", " ")
@@ -4481,6 +4489,8 @@ def main(argv: list[str] | None = None) -> int:
     _chemins_du_pays(args, config)
     # Le référentiel — provinces et régions — avant qu'une table ne soit lue.
     geo.utiliser_pays(config.country.code)
+    # Et la langue des libellés avant qu'une requête ne parte.
+    wd.utiliser_langues(config.country.langues)
     handlers = {
         "verify-qids": cmd_verify_qids,
         "suggest-qids": cmd_suggest_qids,

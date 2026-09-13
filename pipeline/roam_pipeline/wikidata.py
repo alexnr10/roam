@@ -66,6 +66,31 @@ P_DISSOLVED = "P576"
 P_OPERATOR = "P137"
 P_OWNED_BY = "P127"
 
+#: Langues demandées au service de libellés de Wikidata, dans l'ordre.
+#
+# « fr,en » a suffi tant que le catalogue était français. Sur l'Italie il a
+# coûté cher : le service rend le Q-ID LUI-MÊME quand aucune des langues
+# demandées n'existe, et la collecte jette alors le lieu comme « sans libellé
+# exploitable » — 128 entités italiennes perdues d'un coup, dont l'Aquarium de
+# Naples et l'Antiquarium d'Herculanum. Elles ont un nom : il est en italien.
+#
+# L'ordre compte, et le français reste en tête : ce catalogue est français, et
+# on veut « Cathédrale de Milan » quand Wikidata la connaît sous ce nom. Vient
+# ensuite la langue DU PAYS — « Acquario di Napoli » vaut mieux que « Aquarium
+# of Naples » pour un lieu italien — et l'anglais en dernier recours.
+_LANGUES = "fr,en"
+
+
+def utiliser_langues(langues: str) -> None:
+    """Choisit les langues du service de libellés. Appelée au démarrage."""
+    global _LANGUES
+    _LANGUES = langues
+
+
+def service_label() -> str:
+    """La clause de libellé, dans les langues du pays courant."""
+    return f'SERVICE wikibase:label {{ bd:serviceParam wikibase:language "{_LANGUES}". }}'
+
 
 class SparqlError(RuntimeError):
     pass
@@ -278,7 +303,7 @@ WHERE {{
   OPTIONAL {{ ?item wdt:{P_ELEVATION} ?elevation. }}
   OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY} ?admin. }}
   OPTIONAL {{ ?frwiki schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> . }}
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+  {service_label()}
 }}{page}
 """
 
@@ -317,7 +342,7 @@ WHERE {{
   OPTIONAL {{ ?item wdt:{P_ELEVATION} ?elevation. }}
   OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY} ?admin. }}
   OPTIONAL {{ ?frwiki schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> . }}
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+  {service_label()}
 }}
 """
 
@@ -360,7 +385,7 @@ SELECT DISTINCT ?item ?class ?classLabel WHERE {{
   VALUES ?item {{ {items} }}
   VALUES ?class {{ {classes} }}
   ?item wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* ?class .
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+  {service_label()}
 }}
 """
 
@@ -408,7 +433,7 @@ SELECT ?class ?item ?itemLabel WHERE {{
   VALUES ?class {{ {values} }}
   ?item wdt:{P_INSTANCE_OF} ?class .
 {_notable_body(min_sitelinks, country)}
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+  {service_label()}
 }}
 """
 
@@ -457,7 +482,7 @@ WHERE {{
   OPTIONAL {{ ?item wdt:{P_INSTANCE_OF} ?class. }}
   OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY} ?admin. }}
   OPTIONAL {{ ?frwiki schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> . }}
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+  {service_label()}
 }}
 """
 
@@ -589,7 +614,7 @@ SELECT DISTINCT ?nom ?item ?itemLabel WHERE {{
   ?item rdfs:label ?nom .
   ?item wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* wd:{class_qid} .
   ?item wdt:{P_COUNTRY} wd:{country} .
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+  {service_label()}
 }}
 """
 
@@ -619,6 +644,6 @@ def entity_labels_query(qids: list[str]) -> str:
     return f"""
 SELECT ?item ?itemLabel ?itemDescription WHERE {{
   VALUES ?item {{ {values} }}
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+  {service_label()}
 }}
 """

@@ -346,6 +346,12 @@ class Country:
     code: str
     name: str
     de_form: str
+    #: Langues du service de libellés de Wikidata, dans l'ordre de préférence.
+    #
+    # Le français d'abord — le catalogue est français — puis la langue du pays,
+    # puis l'anglais. Sans la langue du pays, Wikidata rend le Q-id lui-même
+    # quand il ne connaît que le nom local, et la collecte jette le lieu.
+    langues: str = "fr,en"
     #: Les micro-États enclavés que ce catalogue absorbe.
     enclaves: tuple[Enclave, ...] = ()
 
@@ -579,6 +585,7 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
     country = Country(
         qid=str(pays["qid"]), code=str(pays["code"]),
         name=str(pays["name"]), de_form=str(pays["de_form"]),
+        langues=str(pays.get("langues") or "fr,en"),
         # `enclaves` est frère de `country` dans le fichier — il décrit ce que
         # le catalogue absorbe, pas le pays lui-même.
         enclaves=tuple(

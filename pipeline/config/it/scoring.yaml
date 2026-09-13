@@ -21,6 +21,20 @@ geo:
     name: Italie
     # Le complément de nom que le français ne sait pas dériver.
     de_form: d'Italie
+    # L'ITALIEN AU MILIEU, et ce n'est pas un détail de confort.
+    #
+    # Le service de libellés de Wikidata rend le Q-ID LUI-MÊME quand aucune des
+    # langues demandées n'existe. Avec « fr,en », 128 entités italiennes sont
+    # revenues nommées « Q100293619 » et la collecte les a jetées comme « sans
+    # libellé exploitable » — l'Aquarium de Naples, l'Antiquarium d'Herculanum,
+    # le jardin botanique alpin Bruno-Peyronel. Elles ont un nom : il est en
+    # italien, et personne ne le demandait.
+    #
+    # Le français reste en tête : on veut « Cathédrale de Milan » là où
+    # Wikidata la connaît sous ce nom. L'anglais passe DERRIÈRE l'italien —
+    # « Acquario di Napoli » vaut mieux que « Aquarium of Naples » pour un lieu
+    # que l'on va visiter à Naples.
+    langues: fr,it,en
 
   # LES CONTOURS, pour rattacher un lieu à sa province sans réseau.
   #

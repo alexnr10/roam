@@ -131,6 +131,25 @@ def read_csv_rows(path: Path) -> list[dict[str, str]]:
         for line in path.read_text(encoding="utf-8").splitlines()
         if line.strip() and not line.lstrip().startswith("#")
     ]
+    if not lines:
+        return []
+    # Un fichier SANS EN-TÊTE se lit en silence et ne rend rien : `DictReader`
+    # prend sa première ligne pour les noms de colonnes, et chaque valeur
+    # devient une clef. `places.csv` italien contenait trois sommets des
+    # Dolomites épinglés à la main ; la collecte annonçait « ajouts manuels :
+    # 0 lieux épinglés » sans qu'une ligne ne dise pourquoi.
+    #
+    # La colonne des identifiants est la seule qui compte : si le nom de la
+    # première colonne ressemble à un Q-id, c'est une donnée, pas un en-tête.
+    premiere = lines[0].split(",")[0].strip()
+    if premiere[:1] == "Q" and premiere[1:].isdigit():
+        LOG.error(
+            "%s : la première ligne est une DONNÉE (« %s ») et sert d'en-tête — "
+            "le fichier entier est illisible. Ajoute « wikidata_id,theme_id,note » "
+            "en première ligne.",
+            path.name, lines[0][:60],
+        )
+        return []
     return list(csv.DictReader(lines))
 
 
