@@ -25,30 +25,40 @@
 #   « à vérifier » le nom du parc apparaît dans le résumé sans que rien ne dise
 #                  que le lieu est dedans. C'est un indice, et il t'appartient.
 #
-# QUATRE PARCS N'ONT TOUJOURS PAS DE LIGNE, et pour une raison précise : le
-# lieu que le curateur a choisi n'est pas dans la collecte. Le label TAMPONNE
-# un lieu, il n'en crée aucun.
+# TROIS LIGNES SONT UN CHOIX PAR DÉFAUT, faute de mieux — marquées « province
+# du parc ». Le lieu demandé n'était pas dans la collecte, et celui retenu est
+# le meilleur que le catalogue tienne dans le territoire du parc, identifié par
+# sa COMMUNE et non par un texte :
 #
-#     Sila            Giganti della Sila   absents de la collecte
-#     Stelvio         Solda                absente
-#     Val Grande      Cicogna              absente
-#     Apennin lucanien Lago Laudemio       absent
+#     Stelvio           massif de l'Ortles, commune Stelvio/Stilfs
+#     Apennin lucanien  Grumentum, commune Grumento Nova, en Val d'Agri
+#     Sila              lac Arvo, commune San Giovanni in Fiore
 #
-# Pour les faire exister, c'est `data/it/manual/places.csv` qu'il faut servir
-# d'abord — une ligne `wikidata_id,theme_id,note`, puis un `fetch` complet, et
-# seulement ensuite une ligne ici.
+# DEUX PARCS RESTENT SANS LIGNE, et chacun pour une raison nette :
+#
+#   DOLOMITES BELLUNOISES. Le Monte Schiara est le sommet emblématique, il est
+#   collecté (Q3861991), et il NE SE MONTE PAS — le filtre alpin l'écarte à
+#   2 565 m faute d'accès prouvé, et le curateur confirme. Le label dispense du
+#   plancher de notoriété, PAS du filtre alpin ; seul `pin` le ferait, et
+#   épingler un sommet inaccessible serait précisément l'erreur que la règle
+#   existe pour empêcher. Aucun autre lieu du catalogue n'est attesté dans ce
+#   parc : la province de Belluno tient la Marmolada, les Tre Cime, Misurina,
+#   qui sont dans d'AUTRES parcs.
+#
+#   VAL GRANDE. Cicogna, le hameau d'accès, n'est pas dans la collecte, et les
+#   vingt et un lieux de la province sont ceux du lac Majeur — Stresa, les îles
+#   Borromées, Cannobio — qui sont hors du parc.
+#
+# Pour leur donner une ligne il faut d'abord FAIRE EXISTER le lieu : une ligne
+# dans `data/it/manual/places.csv` (`wikidata_id,theme_id,note`), un `fetch`
+# complet, et seulement ensuite une ligne ici.
 #
 # ⚠ « Sila », le massif, EST dans la collecte (Q1088296, 24 langues) mais porte
 # un verdict `drop` de la revue : le curateur l'a déjà écarté. L'inscrire ici
-# le ferait rentrer par la fenêtre.
-#
-# ⚠ MONTE SCHIARA ATTEND UN ÉPINGLAGE. Il est collecté (Q3861991, 8 langues),
-# mais culmine à 2 565 m et le filtre alpin l'écarte faute d'un signal d'accès
-# prouvé. Le label dispense du plancher de notoriété, PAS du filtre alpin —
-# seul `pin` le fait, et c'est voulu : la règle dit qu'un sommet réellement
-# accessible malgré son altitude revient par un jugement humain, jamais par une
-# supposition du pipeline. La ligne ci-dessous est donc INERTE tant que
-# `pin Q3861991` n'a pas été lancé.
+# le ferait rentrer par la fenêtre, et ce n'est pas au label de défaire un
+# jugement. La réserve « I Giganti della Sila » (Q3936596) existe chez Wikidata
+# mais c'est une AIRE PROTÉGÉE — la classe même qu'on vient de purger du thème
+# « plages », et qu'aucun thème de Roam ne revendique.
 #
 # Trois faux positifs écartés au passage, pour qu'on ne les repropose pas : le
 # Conservatoire San Pietro a Majella est à Naples, et Herculanum et Pompéi ne
@@ -89,4 +99,6 @@ Q510076,Pietra di Bismantova,parc national Apennin tosco-émilien (à vérifier)
 Q1131545,Cap Palinuro,parc national Cilento et Val de Diano (à vérifier)
 Q3392526,Grotte de Cavallone,parc national Majella (attesté)
 Q898150,Matese,parc national Matese (attesté)
-Q3861991,Monte Schiara,parc national Dolomites bellunoises (choix du curateur — INERTE tant que `pin Q3861991` n'est pas lancé)
+Q63521967,Massif de l'Ortles,parc national Stelvio (province du parc)
+Q1550380,Grumentum,parc national Apennin lucanien-Val d'Agri (province du parc)
+Q3825626,Lac Arvo,parc national Sila (province du parc)
