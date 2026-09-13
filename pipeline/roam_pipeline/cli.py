@@ -520,6 +520,80 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def _emprise_du_pays(args: argparse.Namespace, config: Config, raw_path):
+    """Le rectangle de découpe, la cellule témoin et le localisateur d'un pays.
+
+    Trois choses seulement séparaient `discover` d'un deuxième pays, et aucune
+    n'était dans la requête Overpass :
+
+    - **le rectangle**, qui découpe le travail en cellules. Celui de la France
+      est écrit en dur, et volontairement MÉTROPOLITAIN : le calculer sur les
+      contours engloberait la Réunion et la Polynésie, soit un rectangle de
+      vingt mille cellules pour cent une utiles. Ailleurs, il se calcule sur la
+      couche des départements, déjà téléchargée par `geo-layers`.
+    - **la cellule témoin**, qui prouve que la zone du pays s'est résolue.
+      Celle de Paris ne vaut que pour la France ; ailleurs on prend le lieu le
+      mieux noté du catalogue — le Colisée, Saint-Pierre — que l'on sait
+      présent chez OpenStreetMap.
+    - **le localisateur**, qui écarte les candidats hors du pays. La France a
+      ses deux API ; les autres ont leurs contours communaux, qui font le même
+      travail sans réseau et sans frontière nationale câblée.
+    """
+    from .geocode import departements_for
+    from .overpass import FRANCE_BBOX, PROBE_CELL, temoin_autour
+
+    if config.country.code.upper() == "FR":
+        return FRANCE_BBOX, PROBE_CELL, departements_for
+
+    couches = localisation.couches_du_pays(config, args.geo)
+    zones = couches.get("commune") or couches.get("departement")
+    if zones is None:
+        print(f"Aucun contour pour {config.country.name} : `geo-layers` les "
+              "télécharge. Sans eux, impossible de découper le pays ni "
+              "d'écarter les candidats étrangers.", file=sys.stderr)
+        return None, None, None
+
+    boites = [z.bbox for z in zones.zones if z.bbox[2] >= z.bbox[0]]
+    emprise = (min(b[1] for b in boites), min(b[0] for b in boites),
+               max(b[3] for b in boites), max(b[2] for b in boites))
+
+    # Le témoin doit être un lieu qu'OpenStreetMap connaît À COUP SÛR, et deux
+    # candidats évidents ne le sont pas :
+    #
+    # - le mieux DOCUMENTÉ de la collecte est « Alpes », 213 langues, dont le
+    #   point est au mont Blanc — en France ;
+    # - le mieux documenté PARMI les points italiens est « Calabre », dont la
+    #   coordonnée est le centroïde rond d'une région, 39,0000 / 16,5000, où
+    #   OSM n'a évidemment rien de nommé.
+    #
+    # Le CATALOGUE, lui, ne contient que des lieux qui ont passé la revue et
+    # tous les filtres : son mieux noté est le Colisée. On y va d'abord, et on
+    # retombe sur la collecte pour un pays qui n'a pas encore été construit.
+    catalogue = args.out / "places.json"
+    source = catalogue if catalogue.exists() else raw_path
+    dedans = [p for p in _load_places(source) if zones.contenant(p.lat, p.lon)]
+    meilleur = max(dedans, key=lambda p: (p.score, p.sitelinks), default=None)
+    if meilleur is None:
+        print(f"Aucun lieu de {source} ne tombe dans les contours de "
+              f"{config.country.name} — lance d'abord `fetch` puis `build`.",
+              file=sys.stderr)
+        return None, None, None
+    LOG.info("emprise %s : %s · témoin « %s »", config.country.code,
+             ", ".join(f"{v:.1f}" for v in emprise), meilleur.name)
+
+    def situer(points):
+        trouves = {}
+        for identifiant, lat, lon in points:
+            zone = zones.contenant(lat, lon)
+            if zone is not None:
+                code = geo.departement_du_code_communal(zone.code) or zone.parent_code
+                if code:
+                    trouves[identifiant] = code
+        return trouves
+
+    return emprise, temoin_autour(meilleur.lat, meilleur.lon), situer
+
+
 def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     """Confronte le catalogue aux sites de visite d'OpenStreetMap.
 
@@ -531,33 +605,26 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
         keep_in_france, tag_filters_for,
     )
     from .geocode import departements_for
-    from .overpass import PROBE_CELL, OverpassClient, cells
-
-    # `overpass.py` délimite la FRANCE, par un rectangle et par une zone
-    # `ISO3166-1="FR"`. Lancée sur un catalogue italien, la commande ne
-    # planterait pas : elle proposerait des lieux français à côté de lieux
-    # italiens, et les mêlerait au même fichier de candidats.
-    if config.country.code.upper() != "FR":
-        print(
-            f"`discover` ne connaît que la France : sa requête Overpass y est "
-            f"délimitée en dur, et rendrait des lieux français pour "
-            f"{config.country.name}. Rien n'a été collecté.",
-            file=sys.stderr,
-        )
-        return 1
+    from .overpass import FRANCE_BBOX, PROBE_CELL, OverpassClient, cells, temoin_autour
 
     raw_path = args.out / "places_raw.json"
     if not raw_path.exists():
         print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
         return 1
 
-    client = OverpassClient()
+    pays = config.country.code.upper()
+    emprise, temoin, situer = _emprise_du_pays(args, config, raw_path)
+    if emprise is None:
+        return 1
+
+    client = OverpassClient(pays=pays)
     # Un aller-retour de contrôle avant d'en lancer quarante : la requête
-    # délimite la France par une zone, et une zone qui ne se résout pas ne
+    # délimite le pays par une zone, et une zone qui ne se résout pas ne
     # provoque aucune erreur — elle renvoie simplement zéro objet, partout.
-    if not client.fetch_cell(PROBE_CELL):
-        print("Le contrôle sur le centre de Paris ne renvoie rien : la zone France "
-              "n'a pas été résolue par Overpass. Collecte interrompue.", file=sys.stderr)
+    if not client.fetch_cell(temoin):
+        print(f"Le contrôle sur un lieu certain ne renvoie rien : la zone "
+              f"{pays} n'a pas été résolue par Overpass. Collecte interrompue.",
+              file=sys.stderr)
         return 1
 
     vises = {t.strip() for t in (args.only or "").split(",") if t.strip()}
@@ -581,7 +648,7 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
               file=sys.stderr)
         return 1
 
-    grid = list(cells())
+    grid = list(cells(emprise))
     if args.cells:
         grid = grid[: args.cells]
     print(f"Interrogation d'OpenStreetMap : {len(grid)} cellules, compte ~{max(1, len(grid) // 4)} min."
@@ -612,7 +679,7 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     # Deuxième garde-fou, indépendant de la requête Overpass : le rectangle de
     # collecte déborde sur les pays voisins, et une zone mal résolue par un
     # miroir Overpass repeuplerait la feuille de musées bâlois ou milanais.
-    candidates = keep_in_france(candidates, departements_for)
+    candidates = keep_in_france(candidates, situer)
     if vises:
         candidates = [s for s in candidates if guess_theme(s.tags) in vises]
     confident = [site for site in candidates if is_confident(site, sans_portes)]
@@ -659,10 +726,10 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     # ne rien annoncer : sur un thème sans portes, une fiche Wikidata suffit.
     preuve = ("une fiche Wikidata" if vises and vises <= sans_portes
               else "un signe d'accueil du public ET un lien encyclopédique")
-    print(f"{len(candidates)} en France et absents du catalogue, "
+    print(f"{len(candidates)} {config.country.de_form} et absents du catalogue, "
           f"dont {len(confident)} avec {preuve}.")
     print(f"{min(len(retained), args.limit)} écrits dans {out_path}, "
-          f"dont {ready} directement recopiables dans data/manual/places.csv.")
+          f"dont {ready} directement recopiables dans {args.manual / 'places.csv'}.")
     if not args.all and len(candidates) > len(confident):
         print(f"Ajoute --all pour voir les {len(candidates) - len(confident)} autres.")
     if vises:

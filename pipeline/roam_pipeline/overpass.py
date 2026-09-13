@@ -44,17 +44,39 @@ USER_AGENT = "RoamCatalogBot/0.1 (https://github.com/alexnr10/roam) python-reque
 FRANCE_BBOX = (41.3, -5.2, 51.2, 9.6)
 CELL_DEGREES = 2.0
 
-# Frontière de la France telle qu'OpenStreetMap la trace, départements
-# d'outre-mer compris. Overpass la résout en zone et l'applique à chaque
-# clause : aucun objet situé hors du territoire ne peut plus remonter.
-FRANCE_AREA = 'area["ISO3166-1"="FR"][admin_level=2]->.fr;'
+# Frontière du pays telle qu'OpenStreetMap la trace. Overpass la résout en zone
+# et l'applique à chaque clause : aucun objet situé hors du territoire ne peut
+# plus remonter.
+#
+# Le code ISO vient de la configuration — c'est la SEULE chose qui change d'un
+# pays à l'autre dans cette requête, avec le rectangle de découpe. Tant qu'il
+# vivait en dur ici, `discover` refusait de tourner ailleurs qu'en France, et
+# le catalogue italien est resté sans une seule donnée d'accueil du public.
+def pays_area(code: str = "FR") -> str:
+    return f'area["ISO3166-1"="{code.upper()}"][admin_level=2]->.pays;'
+
+
+FRANCE_AREA = pays_area("FR")
 
 # Emprise minuscule au centre de Paris — le Louvre, l'Orangerie, les Tuileries.
 # Toute requête correcte y trouve quelque chose. Une réponse vide ne peut donc
-# vouloir dire qu'une chose : la zone France n'a pas été résolue. Sans ce
+# vouloir dire qu'une chose : la zone du pays n'a pas été résolue. Sans ce
 # contrôle, la collecte entière reviendrait vide au bout de vingt minutes sans
 # qu'aucune erreur ne soit levée.
+#
+# Hors de France, le témoin se dérive du catalogue : voir `temoin_autour`.
 PROBE_CELL = (48.855, 2.32, 48.87, 2.35)
+
+
+def temoin_autour(lat: float, lon: float, cote: float = 0.015):
+    """Une cellule témoin autour d'un lieu que l'on sait présent chez OSM.
+
+    Le témoin parisien ne vaut que pour la France. Ailleurs, le meilleur lieu
+    du catalogue fait l'affaire — le Colisée, la basilique Saint-Pierre : s'ils
+    ne remontent pas, c'est la zone du pays qui n'a pas été résolue, et non la
+    région qui serait vide.
+    """
+    return (lat - cote, lon - cote, lat + cote, lon + cote)
 
 # Catégories susceptibles de porter un lieu de visite.
 #
@@ -131,6 +153,7 @@ def cell_query(
     cell: tuple[float, float, float, float],
     timeout_s: int = 180,
     tags: list[str] | None = None,
+    pays: str = "FR",
 ) -> str:
     """Requête Overpass pour une cellule.
 
@@ -144,10 +167,10 @@ def cell_query(
     """
     box = f"{cell[0]},{cell[1]},{cell[2]},{cell[3]}"
     clauses = "\n  ".join(
-        f'nwr[{tag}]["name"](area.fr)({box});' for tag in (tags or TAG_FILTERS)
+        f'nwr[{tag}]["name"](area.pays)({box});' for tag in (tags or TAG_FILTERS)
     )
     return f"""[out:json][timeout:{timeout_s}];
-{FRANCE_AREA}
+{pays_area(pays)}
 (
   {clauses}
 );
@@ -157,10 +180,11 @@ out center tags;
 
 class OverpassClient:
     def __init__(self, min_interval_s: float = 3.0, timeout_s: int = 240,
-                 max_retries: int = 3) -> None:
+                 max_retries: int = 3, pays: str = "FR") -> None:
         self.min_interval_s = min_interval_s
         self.timeout_s = timeout_s
         self.max_retries = max_retries
+        self.pays = pays
         self._last_call = 0.0
         self._endpoint = 0
         # Une cellule abandonnée rend une liste vide, exactement comme une
@@ -185,7 +209,8 @@ class OverpassClient:
             endpoint = ENDPOINTS[self._endpoint % len(ENDPOINTS)]
             try:
                 response = self._session.post(
-                    endpoint, data={"data": cell_query(cell, tags=tags)},
+                    endpoint,
+                    data={"data": cell_query(cell, tags=tags, pays=self.pays)},
                     timeout=self.timeout_s
                 )
             except requests.RequestException as exc:

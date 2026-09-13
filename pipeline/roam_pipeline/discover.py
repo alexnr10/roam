@@ -303,7 +303,11 @@ def find_candidates(
 def keep_in_france(
     sites: list[OsmPlace], locate: Callable[[list[tuple[str, float, float]]], dict[str, str]]
 ) -> list[OsmPlace]:
-    """Écarte les candidats situés hors de France, et situe les autres.
+    """Écarte les candidats situés hors du pays, et situe les autres.
+
+    `locate` porte la frontière, et c'est pour cela que la fonction n'a jamais
+    eu à connaître la France : les deux API de l'État pour elle, les contours
+    communaux pour tout autre pays.
 
     La collecte OpenStreetMap part d'un rectangle, et un rectangle autour de la
     France déborde sur six pays. Rien en aval ne le rattrapait : les lieux du
@@ -334,8 +338,8 @@ def keep_in_france(
         # une réserve de baie, un phare sur son rocher — n'appartient à aucun
         # polygone communal sans être pour autant à l'étranger.
         LOG.info(
-            "périmètre : %s candidats sans commune française écartés (hors de "
-            "France, ou en mer) : %s",
+            "périmètre : %s candidats sans commune écartés (hors du pays, ou "
+            "en mer) : %s",
             rejected,
             ", ".join(s.name for s in sites if s.departement is None)[:120],
         )

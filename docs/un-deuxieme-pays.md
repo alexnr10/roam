@@ -1164,6 +1164,44 @@ trois sommets sont restés écartés au filtre alpin, drapeau posé, et il a fal
 `explain` pour s'en apercevoir. Le message de la commande disait « relance
 `build` » : il dit maintenant `sync` PUIS `build`.
 
+### `discover` sort de France — FAIT
+
+Le chantier que l'analyse de la revue avait désigné : le curateur promeut des
+lieux sous-documentés sur Wikipédia parce que le pipeline ne sait pas encore
+qu'ils ouvrent leurs portes. En France, `discover` donne à 607 lieux un accueil
+attesté et à 293 leurs horaires ; en Italie, zéro — le bonus de 10 points et le
+malus de 20 y étaient morts.
+
+Trois choses seulement séparaient la commande d'un deuxième pays, et aucune
+n'était dans la requête Overpass elle-même :
+
+- **le code ISO**, écrit en dur dans `FRANCE_AREA`. Il vient de la
+  configuration ; c'est la zone qui délimite le pays, le rectangle ne fait que
+  découper le travail.
+- **le rectangle**. Celui de la France reste écrit en dur et volontairement
+  MÉTROPOLITAIN : le calculer sur ses contours engloberait la Réunion et la
+  Polynésie — vingt mille cellules pour cent une utiles. Ailleurs il se calcule
+  sur la couche des départements. L'Italie donne 36 cellules, contre 40 pour la
+  France.
+- **le localisateur**, qui écarte les candidats hors du pays — un rectangle
+  autour de l'Italie couvre la Suisse, l'Autriche, la Slovénie et la Croatie.
+  La France garde ses deux API ; les autres pays utilisent leurs contours
+  communaux, qui font le même travail sans réseau. Vérifié : Rome et Milan
+  passent, Bâle, Nice et un point en pleine mer sont écartés.
+
+⚠ **La cellule témoin a demandé deux essais**, et c'est le genre d'erreur qui
+ne se serait vue qu'après vingt minutes de collecte. Elle doit tomber sur un
+lieu qu'OpenStreetMap connaît à coup sûr, et les deux candidats évidents ne le
+sont pas : le mieux documenté de la collecte italienne est « Alpes », 213
+langues, dont le point est au mont Blanc — en France ; le mieux documenté des
+points réellement italiens est « Calabre », dont la coordonnée est le centroïde
+rond d'une région, 39,0000 / 16,5000, où OSM n'a évidemment rien de nommé. C'est
+le CATALOGUE qu'il faut interroger : il ne contient que des lieux passés par la
+revue et tous les filtres, et son mieux noté est le Colisée.
+
+La France est vérifiée identique — même rectangle, même témoin parisien, mêmes
+deux API.
+
 ### Le plafond des églises : la question a changé de main
 
 Avant les communes, `cathedrales` portait 549 lieux au catalogue et la question

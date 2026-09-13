@@ -1666,15 +1666,37 @@ class TestOpenStreetMap(unittest.TestCase):
         )
         self.assertEqual([s.name for s in find_candidates([], [maigre, riche])], ["Riche", "Maigre"])
 
-    def test_the_overpass_query_is_bounded_by_the_french_border(self):
+    def test_the_overpass_query_is_bounded_by_the_country_border(self):
         from roam_pipeline.overpass import cell_query
 
+        # L'emprise découpe le travail ; c'est la ZONE qui dit où est le pays,
+        # et elle s'applique à chaque clause — sans quoi le rectangle français
+        # rendrait le zoo de Bâle et la Pinacothèque de Brera.
         query = cell_query((48.0, 2.0, 50.0, 4.0))
-        # L'emprise découpe le travail ; c'est la zone qui dit où est la France.
         self.assertIn('area["ISO3166-1"="FR"]', query)
         for line in query.splitlines():
             if line.strip().startswith("nwr"):
-                self.assertIn("(area.fr)", line)
+                self.assertIn("(area.pays)", line)
+
+    def test_the_border_follows_the_configured_country(self):
+        # Le code ISO vivait en dur : `discover` refusait donc de tourner
+        # ailleurs, et le catalogue italien est resté sans une seule donnée
+        # d'accueil du public.
+        from roam_pipeline.overpass import cell_query
+
+        query = cell_query((44.0, 8.0, 46.0, 10.0), pays="it")
+        self.assertIn('area["ISO3166-1"="IT"]', query)
+        self.assertNotIn("FR", query)
+
+    def test_le_temoin_entoure_le_point_donne(self):
+        # Hors de France, le témoin se dérive du meilleur lieu du catalogue.
+        from roam_pipeline.overpass import temoin_autour
+
+        sud, ouest, nord, est = temoin_autour(41.8902, 12.4922)
+        self.assertLess(sud, 41.8902)
+        self.assertLess(41.8902, nord)
+        self.assertLess(ouest, 12.4922)
+        self.assertLess(12.4922, est)
 
     def test_candidates_outside_france_are_dropped(self):
         from roam_pipeline.discover import keep_in_france
@@ -8194,6 +8216,62 @@ class TestSurcoucheDePays(unittest.TestCase):
     def test_un_pays_inconnu_le_dit(self):
         with self.assertRaises(SystemExit):
             load_config(pays="xx")
+
+
+class TestEmpriseDuPays(unittest.TestCase):
+    """`discover` hors de France : le rectangle, le témoin et le localisateur."""
+
+    def tearDown(self):
+        geo.utiliser_pays("FR")
+
+    @staticmethod
+    def _args(pays):
+        import argparse
+        from roam_pipeline.cli import BASE_DIR
+        racine = BASE_DIR / "data" / (pays.lower() if pays != "FR" else "")
+        return argparse.Namespace(
+            geo=BASE_DIR / "data" / "reference" / "geo",
+            out=(racine / "out") if pays != "FR" else BASE_DIR / "data" / "out")
+
+    def test_la_france_garde_ses_constantes(self):
+        # Son rectangle est MÉTROPOLITAIN à dessein : le calculer sur les
+        # contours engloberait la Réunion et la Polynésie.
+        from roam_pipeline.cli import _emprise_du_pays, BASE_DIR
+        from roam_pipeline.overpass import FRANCE_BBOX, PROBE_CELL
+        from roam_pipeline.geocode import departements_for
+
+        geo.utiliser_pays("FR")
+        args = self._args("FR")
+        emprise, temoin, situer = _emprise_du_pays(
+            args, CONFIG, BASE_DIR / "data" / "out" / "places_raw.json")
+        self.assertEqual(emprise, FRANCE_BBOX)
+        self.assertEqual(temoin, PROBE_CELL)
+        self.assertIs(situer, departements_for)
+
+    def test_l_italie_calcule_la_sienne_sur_ses_contours(self):
+        from roam_pipeline.cli import _emprise_du_pays, BASE_DIR
+
+        config = load_config(pays="it")
+        geo.utiliser_pays("IT")
+        args = self._args("IT")
+        if not (args.geo / "it" / "commune.geojson").exists():
+            self.skipTest("contours italiens absents — `geo-layers` les télécharge")
+        emprise, temoin, situer = _emprise_du_pays(
+            args, config, BASE_DIR / "data" / "it" / "out" / "places_raw.json")
+        sud, ouest, nord, est = emprise
+        self.assertTrue(sud < 40 < nord and ouest < 12 < est, emprise)
+        # Le témoin doit entourer un lieu du CATALOGUE : le mieux documenté de
+        # la collecte est « Alpes », dont le point est au mont Blanc, et le
+        # mieux documenté des points italiens est « Calabre », centroïde rond
+        # d'une région où OSM n'a rien de nommé.
+        ts, to, tn, te = temoin
+        self.assertTrue(41 < ts < 42 and 12 < to < 13, temoin)
+        # Et le localisateur garde l'Italie, écarte les voisins.
+        trouve = situer([("rome", 41.8902, 12.4922), ("bale", 47.54, 7.57),
+                         ("mer", 40.0, 5.0)])
+        self.assertIn("rome", trouve)
+        self.assertNotIn("bale", trouve)
+        self.assertNotIn("mer", trouve)
 
 
 class TestOrdreDeLaRevue(unittest.TestCase):
