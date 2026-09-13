@@ -8128,8 +8128,7 @@ class TestSurcoucheDePays(unittest.TestCase):
         # ne sont pas résolues, le label ne collecte rien — et le dit.
         parcs = next(lbl for lbl in it.labels if lbl.id == "parchi-nazionali")
         self.assertEqual(parcs.query_kind, "dans_une_aire")
-        self.assertIsNone(parcs.qid)
-        self.assertTrue(parcs.attend_une_propriete)
+        self.assertEqual((parcs.qid, parcs.via_property), ("Q46169", "P3018"))
         self.assertFalse(parcs.collects)   # il tamponne, il ne crée pas de lieu
 
     def test_les_borghi_sont_ecrits_comme_les_plus_beaux_villages(self):
@@ -8329,42 +8328,71 @@ class TestLabelDansUneAire(unittest.TestCase):
         self.assertIn("wdt:P1435 wd:Q9259",
                       label_members_query("heritage", "Q9259", country="Q142"))
 
-    def test_les_deux_identifiants_manquants_sont_reclames(self):
+    def test_la_france_reclame_encore_ses_deux_identifiants(self):
         """`suggest-qids` doit demander la classe ET la propriété."""
         from roam_pipeline.cli import _pending_terms
 
-        for pays, attendu in ((None, "parc-national"), ("it", "parchi-nazionali")):
-            config = load_config(pays=pays) if pays else load_config()
-            termes = {(owner, kind) for owner, _t, kind in _pending_terms(config)}
-            self.assertIn((f"label {attendu}", "item"), termes)
-            self.assertIn((f"label {attendu} (propriété)", "property"), termes)
+        termes = {(owner, kind) for owner, _t, kind in _pending_terms(load_config())}
+        self.assertIn(("label parc-national", "item"), termes)
+        self.assertIn(("label parc-national (propriété)", "property"), termes)
+
+    def test_l_italie_ne_reclame_plus_rien(self):
+        # Résolus l'un et l'autre sur des sorties réelles : P3018 par
+        # `suggest-qids --property`, Q46169 par `probe` sur trois parcs de la
+        # collecte — Vésuve, Abruzzes, Val Grande déclarent tous les deux la
+        # même classe.
+        from roam_pipeline.cli import _pending_terms
+
+        config = load_config(pays="it")
+        parcs = next(l for l in config.labels if l.id == "parchi-nazionali")
+        self.assertEqual(parcs.qid, "Q46169")
+        self.assertEqual(parcs.via_property, "P3018")
+        self.assertFalse(parcs.attend_une_propriete)
+        self.assertFalse([o for o, _t, _k in _pending_terms(config)
+                          if "parchi" in o])
+
+    def test_la_requete_italienne_est_celle_qu_on_croit(self):
+        from roam_pipeline.wikidata import label_members_query
+
+        parcs = next(l for l in load_config(pays="it").labels
+                     if l.id == "parchi-nazionali")
+        sparql = label_members_query(parcs.query_kind, parcs.qid, country="Q38",
+                                     via_property=parcs.via_property)
+        self.assertIn("wdt:P3018/wdt:P31/wdt:P279* wd:Q46169", sparql)
+        # La classe interrogée est le PARC, pas l'aire protégée : Q473972
+        # ramènerait les réserves régionales et les oasis — les cinq cents
+        # aires qu'on vient d'écarter du thème « plages ».
+        self.assertNotIn("Q473972", sparql)
 
     def test_un_label_en_attente_ne_collecte_rien_et_le_dit(self):
         from roam_pipeline.fetch import fetch_label_members
         from pathlib import Path
 
+        import dataclasses
+
         config = load_config(pays="it")
         label = next(l for l in config.labels if l.id == "parchi-nazionali")
-        self.assertTrue(label.attend_une_propriete)
         # Un client qui explose : la garde doit sortir AVANT toute requête.
         class _Jamais:
             def query(self, _sparql):
                 raise AssertionError("aucune requête ne doit partir")
 
+        # Sans la classe : la première garde.
+        sans_classe = dataclasses.replace(label, qid=None, search="parc")
         with self.assertLogs("roam_pipeline.fetch", level="WARNING") as journal:
             membres = fetch_label_members(
-                _Jamais(), label, Path("data/it/manual"), country="Q38")
+                _Jamais(), sans_classe, Path("data/it/manual"), country="Q38")
         self.assertEqual(membres, set())
-        # La classe manque aussi : c'est cette garde-là qui sort en premier.
         self.assertTrue(any("identifiant non résolu" in m for m in journal.output))
 
-        # La classe résolue, la propriété seule manquante : la seconde garde.
-        import dataclasses
-        resolu = dataclasses.replace(label, qid="Q999")
-        self.assertTrue(resolu.attend_une_propriete)
+        # La classe résolue, la propriété seule manquante : la seconde. C'est
+        # la garde qui compte — une propriété vide ne lève rien dans SPARQL,
+        # elle rend zéro membre en silence.
+        sans_propriete = dataclasses.replace(label, via_property=None)
+        self.assertTrue(sans_propriete.attend_une_propriete)
         with self.assertLogs("roam_pipeline.fetch", level="WARNING") as journal:
             membres = fetch_label_members(
-                _Jamais(), resolu, Path("data/it/manual"), country="Q38")
+                _Jamais(), sans_propriete, Path("data/it/manual"), country="Q38")
         self.assertEqual(membres, set())
         self.assertTrue(any("propriété de situation" in m for m in journal.output))
 

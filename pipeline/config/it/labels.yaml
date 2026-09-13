@@ -55,21 +55,33 @@ labels:
   # Cinque Terre, les criques du Cilento — les lieux que les thèmes tiennent
   # déjà et qui se trouvent dans un parc.
   #
-  # ⚠️ EN ATTENTE DE DEUX RÉSOLUTIONS, et il ne collectera rien d'ici là — en
-  # le disant, à chaque `fetch`. C'est le même obstacle que la charte française
-  # avait rencontré et noté sans le lever (voir `parc-national` dans le fichier
-  # du dépôt) : « la requête prévue ramènerait les parcs eux-mêmes, pas les
-  # lieux qui s'y trouvent ». Le type de requête `dans_une_aire` est ce qui
-  # manquait — il fait les deux sauts, la propriété de situation puis la classe
-  # de ce qu'elle atteint — mais ses deux identifiants se résolvent contre
-  # Wikidata, jamais de mémoire :
+  # C'est le même obstacle que la charte française avait rencontré et noté sans
+  # le lever (voir `parc-national` dans le fichier du dépôt) : « la requête
+  # prévue ramènerait les parcs eux-mêmes, pas les lieux qui s'y trouvent ».
+  # Le type de requête `dans_une_aire` est ce qui manquait — il fait les deux
+  # sauts, la propriété de situation puis la classe de ce qu'elle atteint.
   #
-  #     python -m roam_pipeline probe --pays-config it Q635414 Q1438999 Q358729
-  #         les trois parcs que la collecte contient déjà : leurs classes
-  #         déclarées disent laquelle interroger.
-  #     python -m roam_pipeline suggest-qids --property "aire protégée"
-  #         la propriété de situation. Elle est MONDIALE : la même servira au
-  #         label français le jour où il se réveillera.
+  # LES DEUX IDENTIFIANTS VIENNENT DE SORTIES RÉELLES, aucun de mémoire.
+  #
+  # `probe Q635414 Q1438999 Q358729` — les parcs du Vésuve, des Abruzzes et du
+  # Val Grande, pris dans la collecte elle-même — déclare les mêmes deux
+  # classes sur les trois : parc national (Q46169) et aire protégée (Q473972).
+  # C'est la PREMIÈRE qu'on interroge : la seconde ramènerait les réserves
+  # régionales, les oasis et les zones humides, c'est-à-dire les cinq cents
+  # aires qui viennent d'être écartées du thème « plages ».
+  #
+  # Aucune classe propre à l'Italie n'apparaît — le libellé « parc national
+  # d'Italie » est une DESCRIPTION, pas une classe. Q46169 est donc mondiale, et
+  # c'est le filtre de pays de la requête qui borne le résultat : les lieux
+  # italiens situés dans un parc national.
+  #
+  # `suggest-qids --property "aire protégée"` rend un seul résultat, P3018,
+  # « se trouve dans l'aire protégée ». La propriété est mondiale elle aussi :
+  # la même servira au label français le jour où sa classe sera vérifiée.
+  #
+  # ⚠️ Le compte reste à faire, et il se lit sur la prochaine collecte :
+  # `label parchi-nazionali : N membres`. Wikidata peut très bien ne porter
+  # P3018 que sur une poignée de lieux italiens — une collection en exige huit.
   - id: parchi-nazionali
     name: Parcs nationaux d'Italie
     authority: Ministero dell'Ambiente e della Sicurezza Energetica
@@ -81,8 +93,8 @@ labels:
     collects: false
     wikidata_query:
       kind: dans_une_aire
-      search: parc national italien
-      property_search: aire protégée
+      qid: Q46169            # parc national ✓ (probe sur trois parcs réels)
+      property: P3018        # se trouve dans l'aire protégée ✓
 
   # L'UNESCO reste : c'est la seule liste de ces quinze qui ne soit pas
   # nationale, et elle vaut d'autant plus ici — l'Italie porte le plus grand
