@@ -79,17 +79,54 @@ labels:
   # « se trouve dans l'aire protégée ». La propriété est mondiale elle aussi :
   # la même servira au label français le jour où sa classe sera vérifiée.
   #
-  # ⚠️ Le compte reste à faire, et il se lit sur la prochaine collecte :
-  # `label parchi-nazionali : N membres`. Wikidata peut très bien ne porter
-  # P3018 que sur une poignée de lieux italiens — une collection en exige huit.
+  # ⚠️⚠️ MESURÉ, ET MIS EN SOMMEIL. La mécanique marche ; la DONNÉE n'est pas là.
+  #
+  # La requête rend 158 membres dans 21 parcs, ce qui promettait bien. Sur le
+  # catalogue, 44 lieux portent le label — et ils tombent dans DOUZE parcs, de
+  # façon grotesquement inégale :
+  #
+  #     Q1425191  17 lieux   (Monts Sibyllins, dont 11 sommets)
+  #     Q1111568   8 lieux   (Archipel toscan, TOUS des phares)
+  #     Q1072838   5 · Q1027914 3 · les huit autres parcs : 1 ou 2
+  #
+  # Vingt-cinq des quarante-quatre viennent de deux parcs. Douze des
+  # quarante-quatre sont des phares — soit douze des treize phares du
+  # catalogue, parce qu'un import administratif a posé P3018 sur les phares.
+  #
+  # Et ce qui manque dit tout. Ces lieux sont AU CATALOGUE, ils sont DANS un
+  # parc national, et aucun ne porte la propriété :
+  #
+  #     Vernazza (Cinque Terre) · Paestum (Cilento) · Tre Cime di Lavaredo
+  #     Marmolada · Asinara · Vallée des Temples
+  #
+  # P3018 sur l'Italie n'est pas un jeu de données, c'est le travail de deux ou
+  # trois contributeurs sur leurs parcs de prédilection. La collection qui en
+  # sort s'appelle « Parcs nationaux d'Italie » et contient quatre phares, un
+  # petit lac à 57 points et une cascade à 28. « Ne garder que le top du top »
+  # interdit de publier ça.
+  #
+  # DEUX FAÇONS DE LA RÉVEILLER, et la mécanique est prête pour les deux :
+  #
+  #   1. Par la GÉOMÉTRIE — une couche de contours des parcs dans `geo.layers`,
+  #      et le point-dans-polygone qui sert déjà aux 7 896 communes. Vernazza,
+  #      Paestum, les Tre Cime et la Marmolada entrent alors tout seuls. Il y
+  #      faut un GeoJSON des limites : openpolis n'en publie pas (vérifié,
+  #      404), il viendrait de l'EUAP du ministère ou de Protected Planet.
+  #
+  #   2. À LA MAIN — `wikidata_query: { kind: manual }` et un fichier
+  #      `data/it/manual/parchi-nazionali.csv` d'une vingtaine de lignes, un
+  #      lieu phare par parc, choisi par le curateur. C'est exactement ce que
+  #      demandait la consigne — « dans l'idéal le lieu phare » — et c'est ce
+  #      que font déjà les Plus Beaux Détours.
+  #
+  # D'ici là : ni collection, ni bonus. Le bonus surtout — vingt points à douze
+  # phares sur treize, c'était récompenser un accident d'étiquetage.
   - id: parchi-nazionali
     name: Parcs nationaux d'Italie
     authority: Ministero dell'Ambiente e della Sicurezza Energetica
-    # Vingt, comme les Grands Sites de France, et pour la même raison : le
-    # label doit peser sans décider seul. À revoir sur mesure quand la
-    # collection existera — c'est un chiffre posé, pas un chiffre mesuré.
-    score_bonus: 20
-    makes_collection: true
+    # 20 le jour où l'appartenance sera vraie, comme les Grands Sites de France.
+    score_bonus: 0
+    makes_collection: false
     collects: false
     wikidata_query:
       kind: dans_une_aire

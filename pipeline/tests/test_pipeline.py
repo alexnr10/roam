@@ -8130,6 +8130,13 @@ class TestSurcoucheDePays(unittest.TestCase):
         self.assertEqual(parcs.query_kind, "dans_une_aire")
         self.assertEqual((parcs.qid, parcs.via_property), ("Q46169", "P3018"))
         self.assertFalse(parcs.collects)   # il tamponne, il ne crée pas de lieu
+        # EN SOMMEIL, et c'est une mesure. Sur 44 lieux marqués, 25 viennent de
+        # deux parcs et 12 sont des phares — douze des treize phares du
+        # catalogue, parce qu'un import a posé P3018 sur les phares. Vernazza,
+        # Paestum, les Tre Cime et la Marmolada, eux, ne le portent pas.
+        # Ni collection, ni bonus, tant que l'appartenance n'est pas vraie.
+        self.assertFalse(parcs.makes_collection)
+        self.assertEqual(parcs.score_bonus, 0)
 
     def test_les_borghi_sont_ecrits_comme_les_plus_beaux_villages(self):
         # L'équivalent exact, et il doit l'être jusque dans la forme de la
