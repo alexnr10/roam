@@ -4849,7 +4849,7 @@ class TestRelabelCannotCreatePlaces(unittest.TestCase):
             with _capture() as sortie:
                 with unittest.mock.patch("roam_pipeline.cli.wd.SparqlClient"), \
                      unittest.mock.patch("roam_pipeline.cli.fetch_label_members",
-                                         side_effect=lambda _c, l, _m, country: membres.get(l.id, set())):
+                                         side_effect=lambda _c, l, _m, country, groupes=None: membres.get(l.id, set())):
                     cmd_relabel(args, CONFIG)
             return sortie.getvalue()
 
@@ -8309,7 +8309,17 @@ class TestLabelDansUneAire(unittest.TestCase):
 
         sparql = label_members_query(
             "dans_une_aire", "Q999", country="Q38", via_property="P888")
-        self.assertIn("wdt:P888/wdt:P31/wdt:P279* wd:Q999", sparql)
+        self.assertIn("?item wdt:P888 ?aire", sparql)
+        self.assertIn("?aire wdt:P31/wdt:P279* wd:Q999", sparql)
+
+    def test_la_requete_rend_l_aire_avec_le_lieu(self):
+        # Sans elle, la collection ne saurait pas de quel parc vient un lieu,
+        # et prendrait les mieux notés tous parcs confondus.
+        from roam_pipeline.wikidata import label_members_query
+
+        sparql = label_members_query(
+            "dans_une_aire", "Q999", country="Q38", via_property="P888")
+        self.assertIn("SELECT DISTINCT ?item ?aire", sparql)
 
     def test_sans_propriete_la_requete_refuse_de_partir(self):
         # Le piège qu'il fallait fermer : une propriété vide ne lève rien dans
@@ -8358,7 +8368,8 @@ class TestLabelDansUneAire(unittest.TestCase):
                      if l.id == "parchi-nazionali")
         sparql = label_members_query(parcs.query_kind, parcs.qid, country="Q38",
                                      via_property=parcs.via_property)
-        self.assertIn("wdt:P3018/wdt:P31/wdt:P279* wd:Q46169", sparql)
+        self.assertIn("?item wdt:P3018 ?aire", sparql)
+        self.assertIn("?aire wdt:P31/wdt:P279* wd:Q46169", sparql)
         # La classe interrogée est le PARC, pas l'aire protégée : Q473972
         # ramènerait les réserves régionales et les oasis — les cinq cents
         # aires qu'on vient d'écarter du thème « plages ».
@@ -8395,6 +8406,98 @@ class TestLabelDansUneAire(unittest.TestCase):
                 _Jamais(), sans_propriete, Path("data/it/manual"), country="Q38")
         self.assertEqual(membres, set())
         self.assertTrue(any("propriété de situation" in m for m in journal.output))
+
+
+class TestUnLieuParParc(unittest.TestCase):
+    """« Un lieu par parc, et le lieu phare. »
+
+    Les autres labels sont des listes de LIEUX : les Plus Beaux Villages
+    désignent Rocamadour, et la collection les prend tous. « Parcs nationaux
+    d'Italie » désigne des PARCS, et ce qu'on en veut est le meilleur lieu de
+    chacun. Sans cette règle, la collection prendrait les mieux notés tous
+    parcs confondus — huit lieux des Cinque Terre et rien du Grand-Paradis.
+    """
+
+    @staticmethod
+    def _lot(triplets):
+        lieux = []
+        for nom, parc, score in triplets:
+            p = make_place(nom, theme="sommets", wikidata_id=f"Q{len(lieux)}",
+                           score=score)
+            p.labels = ["parchi-nazionali"]
+            if parc:
+                p.label_groupes = {"parchi-nazionali": parc}
+            lieux.append(p)
+        return lieux
+
+    def test_le_meilleur_de_chaque_parc_et_lui_seul(self):
+        from roam_pipeline.collections import _un_par_aire
+
+        membres = self._lot([
+            ("Vernazza", "Q_cinque", 95), ("Riomaggiore", "Q_cinque", 92),
+            ("Monterosso", "Q_cinque", 88), ("Manarola", "Q_cinque", 84),
+            ("Grand-Paradis", "Q_paradis", 70), ("Cogne", "Q_paradis", 61),
+            ("Vésuve", "Q_vesuve", 80),
+        ])
+        retenus, cap = _un_par_aire("parchi-nazionali", membres, len(membres))
+        self.assertEqual([p.name for p in retenus],
+                         ["Vernazza", "Vésuve", "Grand-Paradis"])
+        self.assertEqual(cap, 3)
+
+    def test_un_membre_sans_aire_garde_sa_place(self):
+        # Rattaché à la main, ou porté par une liste sans géométrie : il forme
+        # son propre groupe plutôt que de disparaître.
+        from roam_pipeline.collections import _un_par_aire
+
+        membres = self._lot([("Vernazza", "Q_cinque", 95),
+                             ("Riomaggiore", "Q_cinque", 92),
+                             ("Orphelin", None, 50)])
+        retenus, _cap = _un_par_aire("parchi-nazionali", membres, len(membres))
+        self.assertEqual(sorted(p.name for p in retenus), ["Orphelin", "Vernazza"])
+
+    def test_la_regle_ne_tue_pas_la_collection(self):
+        # Deux parcs seulement, un plancher à huit : plutôt qu'une collection
+        # de deux qui n'existerait pas, on complète avec les meilleurs écartés.
+        from roam_pipeline.collections import _un_par_aire
+
+        membres = self._lot([(f"L{i}", "Q_a" if i % 2 else "Q_b", 100 - i)
+                             for i in range(12)])
+        retenus, cap = _un_par_aire("parchi-nazionali", membres, 12, plancher=8)
+        self.assertEqual(len(retenus), 8)
+        self.assertEqual(cap, 8)
+        # Les deux premiers restent les mieux notés de chaque parc.
+        self.assertEqual([p.name for p in retenus[:2]], ["L0", "L1"])
+
+    def test_un_label_sans_aire_n_est_pas_touche(self):
+        # Les Plus Beaux Villages restent une liste de lieux : on les prend
+        # tous, et la règle ne doit pas s'y appliquer par mégarde.
+        from roam_pipeline.collections import _un_par_aire
+
+        membres = self._lot([("Gordes", None, 90), ("Eze", None, 85),
+                             ("Camon", None, 70)])
+        retenus, cap = _un_par_aire("plus-beaux-villages", membres, 3)
+        self.assertEqual(len(retenus), 3)
+        self.assertEqual(cap, 3)
+
+    def test_le_rattachement_survit_a_l_ecriture(self):
+        from roam_pipeline.models import Place
+
+        p = make_place("Vésuve", theme="volcans", wikidata_id="Q1")
+        p.labels = ["parchi-nazionali"]
+        p.label_groupes = {"parchi-nazionali": "Q635414"}
+        relu = Place.from_dict(p.to_dict())
+        self.assertEqual(relu.label_groupes, {"parchi-nazionali": "Q635414"})
+
+    def test_apply_labels_reporte_l_aire(self):
+        from roam_pipeline.fetch import apply_labels
+
+        p = make_place("Vésuve", theme="volcans", wikidata_id="Q1")
+        autre = make_place("Ailleurs", theme="volcans", wikidata_id="Q2")
+        apply_labels([p, autre], {"parchi-nazionali": {"Q1"}},
+                     {"parchi-nazionali": {"Q1": "Q635414", "Q2": "Q999"}})
+        self.assertEqual(p.label_groupes, {"parchi-nazionali": "Q635414"})
+        # Q2 n'a pas le label : il n'hérite pas de l'aire non plus.
+        self.assertEqual(autre.label_groupes, {})
 
 
 class TestCommuneAuLarge(unittest.TestCase):

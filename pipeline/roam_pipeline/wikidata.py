@@ -524,6 +524,18 @@ def label_members_query(
     # Seul l'identifiant est exploité : demander les libellés et les coordonnées
     # multipliait le volume par dix, jusqu'à tronquer la réponse sur les gros
     # labels (30 000 monuments historiques inscrits).
+    if kind == "dans_une_aire":
+        # L'aire est rendue avec le lieu : c'est elle qui permettra de prendre
+        # LE MEILLEUR LIEU DE CHAQUE PARC plutôt que les mieux notés tous parcs
+        # confondus. Une variable de plus ne coûte rien ici — la requête ne
+        # rend que des identifiants, jamais de libellés ni de coordonnées.
+        return f"""
+SELECT DISTINCT ?item ?aire WHERE {{
+  ?item wdt:{via_property} ?aire .
+  ?aire wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* wd:{qid} .
+  {filtre_pays(country)}
+}}
+"""
     return f"""
 SELECT DISTINCT ?item WHERE {{
   ?item {predicate[kind]} wd:{qid} .

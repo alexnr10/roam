@@ -13,6 +13,7 @@ import math
 import re
 import unicodedata
 from collections import Counter, defaultdict
+from collections.abc import Callable
 from dataclasses import replace
 
 from .config import Config
@@ -273,8 +274,14 @@ def diameter_km(places: list[Place]) -> float:
     )
 
 
-def _spread(ordered: list[Place], limit: int, max_per_dept: int) -> list[Place]:
-    """Choisit `limit` lieux sans laisser un département occuper la collection.
+def _spread(
+    ordered: list[Place], limit: int, max_per_dept: int,
+    clef: Callable[[Place], str | None] | None = None,
+) -> list[Place]:
+    """Choisit `limit` lieux sans laisser un territoire occuper la collection.
+
+    `clef` dit ce qu'est un territoire. Par défaut le département ; les labels
+    d'aires y passent le parc, pour n'en garder qu'un lieu chacun.
 
     Le score mesure la documentation d'un lieu, et Paris est documenté comme
     nulle part ailleurs : la collection nationale des ponts comptait vingt-cinq
@@ -291,9 +298,10 @@ def _spread(ordered: list[Place], limit: int, max_per_dept: int) -> list[Place]:
     retenus: list[Place] = []
     reportes: list[Place] = []
     par_dept: Counter[str] = Counter()
+    clef = clef or (lambda p: p.departement_code)
 
     for place in ordered:
-        dept = place.departement_code or "?"
+        dept = clef(place) or "?"
         if len(retenus) >= limit:
             break
         if par_dept[dept] >= max_per_dept:
@@ -638,6 +646,48 @@ def build_theme_collections(places: list[Place], config: Config) -> list[Collect
     return out
 
 
+def _un_par_aire(
+    label_id: str, members: list[Place], cap: int, plancher: int = 0
+) -> tuple[list[Place], int]:
+    """Un seul lieu par aire, et c'est le meilleur — pour les labels d'aires.
+
+    Les autres labels sont des listes de LIEUX : les Plus Beaux Villages
+    désignent Rocamadour, et la collection les prend tous. « Parcs nationaux
+    d'Italie » désigne des PARCS, et ce qu'on en veut est le meilleur lieu de
+    chacun. Prendre les mieux notés tous parcs confondus donnerait huit lieux
+    des Cinque Terre et rien du Grand-Paradis — une collection qui porte le nom
+    des parcs sans les représenter.
+
+    Le plafond devient donc le nombre d'aires DISTINCTES, et le quota un lieu
+    par aire. `_spread` fait le reste : il parcourt dans l'ordre du score, donc
+    le lieu retenu pour un parc est son mieux noté.
+
+    Un membre sans aire — rattaché à la main, par exemple — n'est pas perdu :
+    il forme son propre groupe et garde sa place.
+
+    Et la règle ne doit pas TUER la collection : si les parcs représentés sont
+    moins nombreux que le plancher, `_spread` complète avec les meilleurs
+    écartés. Un deuxième lieu des Cinque Terre vaut mieux qu'une collection
+    trop courte pour exister — c'est déjà l'arbitrage du quota par département.
+    """
+    groupes = {p.wikidata_id: p.label_groupes.get(label_id) for p in members}
+    if not any(groupes.values()):
+        return members, cap
+
+    ordonnes = sorted(members, key=lambda p: (-p.score, p.name))
+    aires = {groupes[p.wikidata_id] or p.wikidata_id for p in ordonnes}
+    vise = min(len(members), max(len(aires), plancher))
+    retenus = _spread(ordonnes, vise, 1,
+                      clef=lambda p: groupes[p.wikidata_id] or p.wikidata_id)
+    LOG.info(
+        "label %s : %s lieux dans %s aires → %s retenus, le mieux noté de "
+        "chaque aire%s",
+        label_id, len(members), len(aires), len(retenus),
+        f" (complété jusqu'au plancher de {plancher})" if vise > len(aires) else "",
+    )
+    return retenus, len(retenus) or 1
+
+
 def build_label_collections(places: list[Place], config: Config) -> list[Collection]:
     out = []
     muets: list[str] = []
@@ -656,7 +706,10 @@ def build_label_collections(places: list[Place], config: Config) -> list[Collect
         )
         # Un label est une liste officielle et finie : on ne la tronque pas,
         # sinon la collection ne correspond plus au label qu'elle affiche.
-        built = _finalize(collection, members, config, cap=len(members) or 1)
+        cap = len(members) or 1
+        members, cap = _un_par_aire(
+            label.id, members, cap, config.collections.min_places)
+        built = _finalize(collection, members, config, cap=cap)
         if built:
             out.append(built)
 

@@ -77,6 +77,14 @@ class Place:
     admin_qid: str | None = None
 
     labels: list[str] = field(default_factory=list)
+    #: Pour les labels qui rattachent à une AIRE et non à une liste plate :
+    #: identifiant du label → Q-id de l'aire qui contient le lieu.
+    #
+    # « Parcs nationaux d'Italie » n'est pas une liste de lieux, c'est une liste
+    # de PARCS dont on veut le meilleur lieu chacun. Sans ce rattachement, la
+    # collection prend les mieux notés sans regarder d'où ils viennent : huit
+    # lieux des Cinque Terre et rien du Grand-Paradis.
+    label_groupes: dict[str, str] = field(default_factory=dict)
     validation_radius_m: int = 150
     score: float = 0.0
     # Correction manuelle issue de la revue : −1 pour un `promote`, +1 pour un

@@ -1716,6 +1716,7 @@ def enrich_visitors(
 
 def fetch_label_members(
     client: wd.SparqlClient, label: Label, manual_dir: Path, *, country: str,
+    groupes: dict[str, str] | None = None,
 ) -> set[str]:
     """Q-ids des lieux portant un label.
 
@@ -1758,7 +1759,18 @@ def fetch_label_members(
     rows = client.query(wd.label_members_query(
         label.query_kind, label.qid or "", country=country,
         via_property=label.via_property))
-    qids = {qid for qid in (wd.qid_from_uri(r.get("item")) for r in rows) if qid}
+    qids: set[str] = set()
+    for row in rows:
+        qid = wd.qid_from_uri(row.get("item"))
+        if not qid:
+            continue
+        qids.add(qid)
+        # L'aire qui contient le lieu, quand la requête la rend. Un lieu peut
+        # tomber dans deux parcs — la première l'emporte, et la collection n'en
+        # souffre pas : elle cherche un représentant par parc, pas le contraire.
+        aire = wd.qid_from_uri(row.get("aire"))
+        if groupes is not None and aire:
+            groupes.setdefault(qid, aire)
     ajoutes = complement - qids
     if ajoutes:
         LOG.info(
@@ -1795,12 +1807,27 @@ def _read_manual_label(
     return qids
 
 
-def apply_labels(places: list[Place], label_members: dict[str, set[str]]) -> None:
-    """Reporte les labels sur les lieux déjà collectés."""
+def apply_labels(
+    places: list[Place],
+    label_members: dict[str, set[str]],
+    groupes_par_label: dict[str, dict[str, str]] | None = None,
+) -> None:
+    """Reporte les labels sur les lieux déjà collectés.
+
+    Et, pour les labels qui rattachent à une AIRE, l'aire elle-même : c'est
+    elle qui permettra de prendre le meilleur lieu de chaque parc plutôt que
+    les mieux notés tous parcs confondus.
+    """
+    groupes_par_label = groupes_par_label or {}
     for place in places:
         place.labels = sorted(
             label_id for label_id, qids in label_members.items() if place.wikidata_id in qids
         )
+        place.label_groupes = {
+            label_id: groupes[place.wikidata_id]
+            for label_id, groupes in groupes_par_label.items()
+            if label_id in place.labels and place.wikidata_id in groupes
+        }
 
 
 def run_fetch(
@@ -1842,13 +1869,20 @@ def run_fetch(
         )
 
     label_members: dict[str, set[str]] = {}
+    groupes_par_label: dict[str, dict[str, str]] = {}
     for label in config.labels:
+        groupes: dict[str, str] = {}
         try:
             label_members[label.id] = fetch_label_members(
-                client, label, manual_dir, country=config.country.qids)
+                client, label, manual_dir, country=config.country.qids,
+                groupes=groupes)
         except Exception as exc:  # un label en échec ne doit pas tuer la collecte
             LOG.error("label %s : collecte échouée (%s)", label.id, exc)
             label_members[label.id] = set()
+        if groupes:
+            groupes_par_label[label.id] = groupes
+            LOG.info("label %s : %s aires distinctes", label.id,
+                     len(set(groupes.values())))
 
     places: list[Place] = []
     failed: list[str] = []
@@ -1904,7 +1938,7 @@ def run_fetch(
         LOG.error("labels collecteurs : collecte échouée (%s)", exc)
 
     resolve_admin(client, places)
-    apply_labels(places, label_members)
+    apply_labels(places, label_members, groupes_par_label)
 
     # L'ouverture au public ne vient que d'OpenStreetMap, donc de `discover`,
     # qui coûte vingt minutes : une nouvelle collecte l'écraserait sans trace.

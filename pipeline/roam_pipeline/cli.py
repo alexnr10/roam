@@ -413,14 +413,19 @@ def cmd_relabel(args: argparse.Namespace, config: Config) -> int:
 
     client = wd.SparqlClient()
     members: dict[str, set[str]] = {}
+    groupes_par_label: dict[str, dict[str, str]] = {}
     for label in config.labels:
+        groupes: dict[str, str] = {}
         try:
             members[label.id] = fetch_label_members(
-                client, label, args.manual, country=config.country.qids)
+                client, label, args.manual, country=config.country.qids,
+                groupes=groupes)
         except Exception as erreur:  # noqa: BLE001 — un label en échec n'est pas fatal
             LOG.error("label %s : collecte échouée (%s)", label.id, erreur)
             members[label.id] = set()
-    apply_labels(places, members)
+        if groupes:
+            groupes_par_label[label.id] = groupes
+    apply_labels(places, members, groupes_par_label)
 
     # Un membre que la collecte ne contient pas ne peut pas être étiqueté :
     # `relabel` appose des labels, il ne crée pas de lieux. Cent une communes
