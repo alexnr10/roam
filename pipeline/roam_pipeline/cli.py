@@ -857,9 +857,16 @@ def cmd_adopt(args: argparse.Namespace, config: Config) -> int:
     # catalogue sans que rien ne l'ait regardé.
     enrich_exclusions(client, adopted, config.exclusions.qids)
     enrich_flags(client, adopted)
-    enrich_departements(
-        adopted,
-        localisateur=localisation.couches_du_pays(config, args.geo).get("departement"))
+    # `pays` n'était pas transmis : les candidats italiens partaient donc vers
+    # l'API Adresse française, qui ne connaît pas l'Italie et rend la commune
+    # française la plus proche — ou rien. Et la commune, elle, n'était pas
+    # demandée du tout, si bien qu'un candidat adopté n'avait ni commune ni
+    # plafond communal.
+    couches = localisation.couches_du_pays(config, args.geo)
+    enrich_departements(adopted, localisateur=couches.get("departement"),
+                        pays=config.country.code)
+    enrich_communes(adopted, localisateur=couches.get("departement"),
+                    communes=couches.get("commune"), pays=config.country.code)
     enrich_article_sizes(adopted)
     if not args.skip_summaries:
         enrich_summaries(adopted)
@@ -4088,7 +4095,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="fait entrer les candidats d'OpenStreetMap dans le catalogue (réseau requis)",
     )
     adopt.add_argument(
-        "--candidates", type=Path, help="feuille de candidats (défaut : data/out/candidates.csv)"
+        "--candidates", type=Path,
+        help="feuille de candidats (défaut : candidates.csv du dossier de sortie)"
     )
     adopt.add_argument(
         "--skip-summaries",
