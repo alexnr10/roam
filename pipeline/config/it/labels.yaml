@@ -79,7 +79,9 @@ labels:
   # « se trouve dans l'aire protégée ». La propriété est mondiale elle aussi :
   # la même servira au label français le jour où sa classe sera vérifiée.
   #
-  # ⚠️⚠️ MESURÉ, ET MIS EN SOMMEIL. La mécanique marche ; la DONNÉE n'est pas là.
+  # ⚠️ MESURÉ : la mécanique Wikidata marche, la DONNÉE n'est pas là. La liste
+  # se saisit donc à la main, dans `data/it/manual/parchi-nazionali.csv` —
+  # comme les Plus Beaux Détours, et pour la même raison.
   #
   # La requête rend 158 membres dans 21 parcs, ce qui promettait bien. Sur le
   # catalogue, 44 lieux portent le label — et ils tombent dans DOUZE parcs, de
@@ -105,33 +107,29 @@ labels:
   # petit lac à 57 points et une cascade à 28. « Ne garder que le top du top »
   # interdit de publier ça.
   #
-  # DEUX FAÇONS DE LA RÉVEILLER, et la mécanique est prête pour les deux :
+  # LA SUITE, ET ELLE EST ÉCRITE POUR : la GÉOMÉTRIE. Une couche de contours
+  # des parcs dans `geo.layers`, et le point-dans-polygone qui fait déjà
+  # tourner 7 896 communes — Vernazza, Paestum, les Tre Cime et la Marmolada
+  # entreraient toutes seules, et le fichier à la main deviendrait un simple
+  # complément. Il y faut un GeoJSON des limites : openpolis n'en publie pas
+  # (vérifié, 404), il viendrait de l'EUAP du ministère ou de Protected Planet.
   #
-  #   1. Par la GÉOMÉTRIE — une couche de contours des parcs dans `geo.layers`,
-  #      et le point-dans-polygone qui sert déjà aux 7 896 communes. Vernazza,
-  #      Paestum, les Tre Cime et la Marmolada entrent alors tout seuls. Il y
-  #      faut un GeoJSON des limites : openpolis n'en publie pas (vérifié,
-  #      404), il viendrait de l'EUAP du ministère ou de Protected Planet.
-  #
-  #   2. À LA MAIN — `wikidata_query: { kind: manual }` et un fichier
-  #      `data/it/manual/parchi-nazionali.csv` d'une vingtaine de lignes, un
-  #      lieu phare par parc, choisi par le curateur. C'est exactement ce que
-  #      demandait la consigne — « dans l'idéal le lieu phare » — et c'est ce
-  #      que font déjà les Plus Beaux Détours.
-  #
-  # D'ici là : ni collection, ni bonus. Le bonus surtout — vingt points à douze
-  # phares sur treize, c'était récompenser un accident d'étiquetage.
+  # Le type de requête `dans_une_aire`, le rattachement du lieu à son aire et
+  # la règle « un lieu par parc » restent en place et sous test. Deux lignes
+  # rebranchent Wikidata le jour où la propriété sera remplie ; mais la liste
+  # à la main restera meilleure tant qu'un curateur choisira mieux qu'elle.
   - id: parchi-nazionali
     name: Parcs nationaux d'Italie
     authority: Ministero dell'Ambiente e della Sicurezza Energetica
-    # 20 le jour où l'appartenance sera vraie, comme les Grands Sites de France.
-    score_bonus: 0
-    makes_collection: false
+    # Vingt, comme les Grands Sites de France, et pour la même raison : le
+    # label doit peser sans décider seul. À REMESURER sur la prochaine
+    # construction — c'est un chiffre posé par analogie, pas par mesure, et le
+    # précédent français invite à la prudence : à 30, les Grands Sites
+    # occupaient six des dix places du niveau 1 en « Sommets ».
+    score_bonus: 20
+    makes_collection: true
     collects: false
-    wikidata_query:
-      kind: dans_une_aire
-      qid: Q46169            # parc national ✓ (probe sur trois parcs réels)
-      property: P3018        # se trouve dans l'aire protégée ✓
+    wikidata_query: { kind: manual }
 
   # L'UNESCO reste : c'est la seule liste de ces quinze qui ne soit pas
   # nationale, et elle vaut d'autant plus ici — l'Italie porte le plus grand

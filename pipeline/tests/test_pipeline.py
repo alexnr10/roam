@@ -8127,16 +8127,14 @@ class TestSurcoucheDePays(unittest.TestCase):
         # Déclarée ne veut pas dire active : tant que la classe et la propriété
         # ne sont pas résolues, le label ne collecte rien — et le dit.
         parcs = next(lbl for lbl in it.labels if lbl.id == "parchi-nazionali")
-        self.assertEqual(parcs.query_kind, "dans_une_aire")
-        self.assertEqual((parcs.qid, parcs.via_property), ("Q46169", "P3018"))
         self.assertFalse(parcs.collects)   # il tamponne, il ne crée pas de lieu
-        # EN SOMMEIL, et c'est une mesure. Sur 44 lieux marqués, 25 viennent de
-        # deux parcs et 12 sont des phares — douze des treize phares du
-        # catalogue, parce qu'un import a posé P3018 sur les phares. Vernazza,
-        # Paestum, les Tre Cime et la Marmolada, eux, ne le portent pas.
-        # Ni collection, ni bonus, tant que l'appartenance n'est pas vraie.
-        self.assertFalse(parcs.makes_collection)
-        self.assertEqual(parcs.score_bonus, 0)
+        # À LA MAIN, et c'est une mesure qui l'a décidé. Interrogée chez
+        # Wikidata, la propriété marquait 44 lieux du catalogue — 25 dans deux
+        # parcs, 12 sur des phares — quand Vernazza, Paestum, les Tre Cime et
+        # la Marmolada, qui sont dans des parcs nationaux, ne la portaient pas.
+        self.assertTrue(parcs.is_manual)
+        self.assertTrue(parcs.makes_collection)
+        self.assertEqual(parcs.score_bonus, 20)
 
     def test_les_borghi_sont_ecrits_comme_les_plus_beaux_villages(self):
         # L'équivalent exact, et il doit l'être jusque dans la forme de la
@@ -8353,33 +8351,39 @@ class TestLabelDansUneAire(unittest.TestCase):
         self.assertIn(("label parc-national", "item"), termes)
         self.assertIn(("label parc-national (propriété)", "property"), termes)
 
-    def test_l_italie_ne_reclame_plus_rien(self):
-        # Résolus l'un et l'autre sur des sorties réelles : P3018 par
-        # `suggest-qids --property`, Q46169 par `probe` sur trois parcs de la
-        # collecte — Vésuve, Abruzzes, Val Grande déclarent tous les deux la
-        # même classe.
+    def test_l_italie_ne_reclame_rien(self):
+        # Un label manuel n'attend aucun identifiant : sa liste est le fichier.
         from roam_pipeline.cli import _pending_terms
 
         config = load_config(pays="it")
-        parcs = next(l for l in config.labels if l.id == "parchi-nazionali")
-        self.assertEqual(parcs.qid, "Q46169")
-        self.assertEqual(parcs.via_property, "P3018")
-        self.assertFalse(parcs.attend_une_propriete)
         self.assertFalse([o for o, _t, _k in _pending_terms(config)
                           if "parchi" in o])
 
-    def test_la_requete_italienne_est_celle_qu_on_croit(self):
+    def test_la_liste_des_parcs_est_lisible_et_fournie(self):
+        from roam_pipeline.cli import BASE_DIR
+        from roam_pipeline.fetch import _read_manual_label
+
+        config = load_config(pays="it")
+        parcs = next(l for l in config.labels if l.id == "parchi-nazionali")
+        dossier = BASE_DIR / "data" / "it" / "manual"
+        if not (dossier / "parchi-nazionali.csv").exists():
+            self.skipTest("liste des parcs absente")
+        membres = _read_manual_label(parcs, dossier)
+        # Une collection en exige huit ; l'amorce en compte seize.
+        self.assertGreaterEqual(len(membres), 8, membres)
+        self.assertTrue(all(q.startswith("Q") and q[1:].isdigit() for q in membres),
+                        membres)
+
+    def test_un_lieu_par_parc_reste_disponible_pour_la_geometrie(self):
+        """La mécanique Wikidata n'est pas jetée, seulement débranchée."""
         from roam_pipeline.wikidata import label_members_query
 
-        parcs = next(l for l in load_config(pays="it").labels
-                     if l.id == "parchi-nazionali")
-        sparql = label_members_query(parcs.query_kind, parcs.qid, country="Q38",
-                                     via_property=parcs.via_property)
+        sparql = label_members_query("dans_une_aire", "Q46169", country="Q38",
+                                     via_property="P3018")
         self.assertIn("?item wdt:P3018 ?aire", sparql)
         self.assertIn("?aire wdt:P31/wdt:P279* wd:Q46169", sparql)
-        # La classe interrogée est le PARC, pas l'aire protégée : Q473972
-        # ramènerait les réserves régionales et les oasis — les cinq cents
-        # aires qu'on vient d'écarter du thème « plages ».
+        # La classe est le PARC, pas l'aire protégée : Q473972 ramènerait les
+        # réserves régionales et les oasis.
         self.assertNotIn("Q473972", sparql)
 
     def test_un_label_en_attente_ne_collecte_rien_et_le_dit(self):
@@ -8387,9 +8391,13 @@ class TestLabelDansUneAire(unittest.TestCase):
         from pathlib import Path
 
         import dataclasses
+        from roam_pipeline.config import Label
 
-        config = load_config(pays="it")
-        label = next(l for l in config.labels if l.id == "parchi-nazionali")
+        label = Label(
+            id="parchi-nazionali", name="Parcs", authority="", score_bonus=20,
+            makes_collection=True, query_kind="dans_une_aire",
+            qid="Q46169", via_property="P3018",
+        )
         # Un client qui explose : la garde doit sortir AVANT toute requête.
         class _Jamais:
             def query(self, _sparql):

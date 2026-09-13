@@ -1,0 +1,63 @@
+# Les parcs nationaux d'Italie, UN LIEU PHARE PAR PARC.
+#
+# Ce fichier est une liste de LIEUX, pas de parcs : le label tamponne un lieu
+# que le catalogue tient déjà, et la collection rassemble ces lieux-là. Le
+# parc lui-même n'entre pas au catalogue — on ne veut pas le Vésuve ET le parc
+# national du Vésuve.
+#
+# POURQUOI À LA MAIN. Wikidata porte bien une propriété d'appartenance
+# (P3018, « se trouve dans l'aire protégée ») et le pipeline sait l'interroger
+# — c'est le type de requête `dans_une_aire`, toujours en place. Mais sur
+# l'Italie elle est vide aux trois quarts : 44 lieux du catalogue la portent,
+# dont 25 dans deux parcs seulement et 12 sur des phares, tandis que Vernazza,
+# Paestum, les Tre Cime, la Marmolada et la Vallée des Temples ne la portent
+# pas. Ce n'est pas un jeu de données, c'est le travail de quelques
+# contributeurs sur leurs parcs de prédilection.
+#
+# LES SEIZE PREMIÈRES LIGNES SONT UNE AMORCE, pas une liste arrêtée. Chacune
+# est le lieu le mieux noté que l'on sache rattacher à son parc, et la colonne
+# `note` dit d'où vient le rattachement :
+#
+#     « résumé »   le résumé Wikipédia du lieu nomme son parc
+#     « P3018 »    Wikidata le rattache par la propriété d'appartenance
+#     « les deux » les deux sources concordent
+#
+# Quatre sont faibles et demandent un meilleur candidat — le Lago Nero (57),
+# la grotte de Cavallone (59), le phare de Capo Palinuro (68), le phare du
+# Mont Circé (74). Un parc n'est pas obligé d'être représenté par son plus
+# haut score : il doit l'être par ce qu'on va y voir.
+#
+# ET IL MANQUE DES PARCS. Les Cinque Terre, les Dolomites bellunoises, le
+# Stelvio, le Val Grande, l'Alta Murgia, la Sila, le Matese, l'Appennino
+# Lucano n'ont pas de ligne. Le catalogue contient Vernazza, les Tre Cime et
+# la Marmolada : il n'y a qu'à les inscrire.
+#
+# POUR AJOUTER UNE LIGNE, le Q-id se lit dans la collecte plutôt qu'il ne
+# s'invente :
+#
+#     python -m roam_pipeline verdict --pays-config it Vernazza
+#     python -m roam_pipeline suggest-qids "Tre Cime di Lavaredo"
+#
+# Puis `fetch` (ou `relabel`) et `build`. Une ligne retirée le reste.
+#
+# ⚠ Le parc en commentaire n'est là que pour la lecture humaine : c'est le
+# Q-id qui fait foi, et rien ne vérifie que le lieu est vraiment dans le parc
+# annoncé. La couche de contours le fera un jour, et c'est ce jour-là que ce
+# fichier pourra se relire tout seul.
+wikidata_id,name,note
+Q524,Vésuve,parc national Vésuve
+Q340757,La Maddalena,parc national Archipel de La Maddalena
+Q54612,Gerace,parc national Aspromonte
+Q51966,Vico del Gargano,parc national Gargano
+Q50148,Scanno,parc national Abruzzes, Latium et Molise
+Q51433,Castelli,parc national Gran Sasso e Monti della Laga
+Q691073,Monts Sibyllins,parc national Monts Sibyllins
+Q750837,Grotte-refuge du Romito,parc national Pollino
+Q730500,Asinara,parc national Asinara
+Q14552418,Sanctuaire de l'Averne,parc national Forêts casentinoises
+Q1638880,Jardin botanique alpin Paradisia,parc national Grand-Paradis
+Q16555281,Phare de Portoferraio,parc national Archipel toscan
+Q259658,Phare du Mont Circé,parc national Circeo
+Q55606606,Phare de Capo Palinuro,parc national Cilento et Val de Diano
+Q3392526,Grotte de Cavallone,parc national Majella
+Q3825744,Lago Nero,parc national Apennin tosco-émilien
