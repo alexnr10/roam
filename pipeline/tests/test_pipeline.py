@@ -8277,8 +8277,12 @@ class TestEmpriseDuPays(unittest.TestCase):
         args = self._args("IT")
         if not (args.geo / "it" / "commune.geojson").exists():
             self.skipTest("contours italiens absents — `geo-layers` les télécharge")
-        emprise, temoin, situer = _emprise_du_pays(
-            args, config, BASE_DIR / "data" / "it" / "out" / "places_raw.json")
+        # La copie de travail n'est pas versionnée : sur un dépôt fraîchement
+        # cloné, c'est `sync` qui la reconstitue.
+        collecte = BASE_DIR / "data" / "it" / "out" / "places_raw.json"
+        if not collecte.exists():
+            self.skipTest("collecte italienne absente — `sync` la reconstitue")
+        emprise, temoin, situer = _emprise_du_pays(args, config, collecte)
         sud, ouest, nord, est = emprise
         self.assertTrue(sud < 40 < nord and ouest < 12 < est, emprise)
         # Le témoin doit entourer un lieu du CATALOGUE : le mieux documenté de
