@@ -24,7 +24,8 @@ from .geocode import (
     plausibly_french,
 )
 from .models import Place
-from .raw import EXTRA_SHARD, NO_THEME_SHARD, read_raw, shard_of, shards, write_raw
+from .raw import (EXTRA_SHARD, NO_THEME_SHARD, read_raw, read_shard, shard_of, shards,
+                  write_raw)
 
 LOG = logging.getLogger(__name__)
 
@@ -1976,7 +1977,38 @@ def run_fetch(
     # leur fichier ; ceux qui ont échoué aussi — leur dernière collecte réussie
     # vaut mieux que rien, et l'échec est déjà signalé par ailleurs.
     collected = {t.id for t in themes} - set(failed)
-    written = write_raw(raw_dir, places, replacing=collected | {EXTRA_SHARD})
+
+    # MAIS LES LABELS, EUX, VALENT POUR TOUT LE CATALOGUE. `apply_labels` ne
+    # vient de toucher que les lieux de cette collecte ; sur une reprise
+    # partielle, les autres fichiers gardaient les labels du jour d'avant.
+    #
+    # Mesuré, et c'est ainsi qu'on l'a vu : après un `fetch --only villages`,
+    # la liste des parcs nationaux comptait vingt-six lignes et le catalogue
+    # vingt et un porteurs — six labels périmés que le fichier ne demandait
+    # plus, onze jamais posés parce que leur thème n'avait pas été recollecté.
+    # Rien ne le disait, et la collection affichait un mélange des deux
+    # versions de la liste.
+    #
+    # Seuls les fichiers dont un lieu CHANGE sont réécrits : une reprise
+    # partielle qui ne bouge aucun label ne touche toujours rien.
+    relabelles: list[Place] = []
+    retouches: set[str] = set()
+    for shard in shards(raw_dir):
+        if shard in collected or shard == EXTRA_SHARD:
+            continue
+        lot = read_shard(raw_dir, shard)
+        avant = [sorted(place.labels or ()) for place in lot]
+        apply_labels(lot, label_members, groupes_par_label)
+        if any(sorted(place.labels or ()) != vieux
+               for place, vieux in zip(lot, avant)):
+            retouches.add(shard)
+        relabelles.extend(lot)
+    if retouches:
+        LOG.info("labels reposés sur %s thème(s) non recollecté(s) : %s",
+                 len(retouches), ", ".join(sorted(retouches)))
+
+    written = write_raw(raw_dir, places + relabelles,
+                        replacing=collected | {EXTRA_SHARD} | retouches)
     LOG.info(
         "collecte écrite dans %s : %s",
         raw_dir,
