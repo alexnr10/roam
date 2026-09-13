@@ -8274,6 +8274,74 @@ class TestEmpriseDuPays(unittest.TestCase):
         self.assertNotIn("mer", trouve)
 
 
+class TestPorteDesReservesNaturelles(unittest.TestCase):
+    """Un parc national n'est pas une plage.
+
+    `leisure=nature_reserve` était rangé dans « Littoral et plages ». Mesuré
+    sur les deux catalogues : la porte rapporte 3 candidats en France pour ZÉRO
+    lieu retenu, et 630 en Italie — 42 % de la feuille — dont 89 entrés au
+    catalogue, tous des aires protégées. Le parc national du Vésuve entrait en
+    plage quand le volcan a déjà son thème.
+    """
+
+    def test_une_reserve_naturelle_n_est_plus_une_plage(self):
+        from roam_pipeline.discover import guess_theme
+
+        self.assertIsNone(guess_theme({"leisure": "nature_reserve"}))
+
+    def test_les_autres_portes_tiennent(self):
+        from roam_pipeline.discover import guess_theme
+
+        self.assertEqual(guess_theme({"leisure": "garden"}), "jardins")
+        self.assertEqual(guess_theme({"tourism": "museum"}), "musees")
+        self.assertEqual(guess_theme({"historic": "castle"}), "chateaux")
+
+    def test_overpass_ne_demande_plus_les_reserves(self):
+        # Fermer la porte doit aussi cesser de RAPPORTER les objets qu'elle
+        # laissait entrer, sans quoi on paierait six cents réponses pour les
+        # jeter juste après.
+        from roam_pipeline.discover import tag_filters_for
+        from roam_pipeline.overpass import TAG_FILTERS
+
+        self.assertEqual(tag_filters_for({"plages"}), [])
+        self.assertFalse([f for f in TAG_FILTERS if "nature_reserve" in f])
+
+    def test_les_deux_tables_ne_divergent_pas(self):
+        """Ce qu'on demande à Overpass et ce qu'on sait nommer, à l'identique.
+
+        Les deux listes sont écrites à la main dans deux fichiers. Une porte
+        fermée d'un seul côté coûte soit des réponses payées pour rien —
+        `find_candidates` les jetterait à l'étape « thème reconnu » —, soit un
+        thème qui ne reçoit plus rien sans que personne ne le dise.
+        """
+        import re
+        from roam_pipeline.discover import THEME_BY_TAG
+        from roam_pipeline.overpass import TAG_FILTERS
+
+        demande: dict[str, set[str]] = {}
+        for motif in TAG_FILTERS:
+            cle, valeurs = re.fullmatch(r'(\w+)~"\^\((.+)\)\$"', motif).groups()
+            demande.setdefault(cle, set()).update(valeurs.split("|"))
+
+        nomme: dict[str, set[str]] = {}
+        for cle, valeur, _theme in THEME_BY_TAG:
+            nomme.setdefault(cle, set()).add(valeur)
+
+        self.assertEqual(demande, nomme)
+
+    def test_la_liste_adoptee_italienne_ne_porte_plus_de_plage(self):
+        import csv
+        from roam_pipeline.cli import BASE_DIR
+
+        chemin = BASE_DIR / "data" / "it" / "manual" / "candidates.csv"
+        if not chemin.exists():
+            self.skipTest("liste italienne absente")
+        lignes = [l.rstrip() for l in chemin.read_text(encoding="utf-8").splitlines()
+                  if l.strip() and not l.lstrip().startswith("#")]
+        themes = {row["theme_id"] for row in csv.DictReader(lignes)}
+        self.assertNotIn("plages", themes)
+
+
 class TestCellulesTombees(unittest.TestCase):
     """Une cellule perdue laisse un trou que rien ne vient combler.
 

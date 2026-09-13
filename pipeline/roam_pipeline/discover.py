@@ -70,7 +70,25 @@ THEME_BY_TAG: list[tuple[str, str, str]] = [
     ("tourism", "theme_park", "musees"),
     ("tourism", "attraction", "monuments"),
     ("leisure", "garden", "jardins"),
-    ("leisure", "nature_reserve", "plages"),
+    # `leisure=nature_reserve` a été rangé dans « Littoral et plages » parce que
+    # le thème couvre le littoral, et qu'une réserve naturelle française se
+    # rencontre souvent en bord de mer. La porte a été mesurée sur deux pays et
+    # elle ne tient dans aucun des deux.
+    #
+    #   France   3 candidats sur 941, adoptés, ZÉRO au catalogue construit —
+    #            parc du Vinaigrier, réserve du Scamandre, réserve de Lunaret.
+    #            Aucune n'est une plage ; aucune n'a passé le plancher.
+    #   Italie   630 candidats sur 1500 — 42 % de la feuille — 577 adoptés,
+    #            89 entrés au catalogue. Les quatre-vingt-neuf sont des aires
+    #            protégées, pas une plage parmi elles : parc national des
+    #            Abruzzes, du Val Grande, du Vésuve, Rieserferner-Ahrn.
+    #
+    # Le Vésuve est le cas qui tranche : le parc entrait en PLAGE quand le
+    # volcan tient déjà son thème. Et ces 630 candidats sont ce qui a fait
+    # buter la feuille italienne sur son plafond de 1500 — sans eux, 918.
+    #
+    # Roam n'a pas de thème pour les aires protégées. Tant qu'il n'en a pas, la
+    # porte reste fermée : un parc national n'est pas une plage.
     ("natural", "cave_entrance", "grottes"),
     # Une chute d'eau se pose sur le COURS D'EAU chez OpenStreetMap, pas sur le
     # relief : `waterway=waterfall`. `natural=waterfall` existe et se rencontre,
@@ -273,9 +291,12 @@ def find_candidates(
     known_qids = {p.wikidata_id for p in places}
     index = _Index(places, lambda p: (p.lat, p.lon))
     candidates: list[OsmPlace] = []
-    # « thème reconnu » ne figure pas dans l'entonnoir : toutes les catégories
-    # demandées à Overpass ont une correspondance, l'étape ne retire jamais
-    # rien. Compter un filtre qui ne filtre pas donne l'illusion d'un contrôle.
+    # « thème reconnu » ne figure pas dans l'entonnoir : les deux tables sont
+    # tenues ensemble — ce qu'Overpass rapporte, `guess_theme` sait le nommer —
+    # et l'étape ne retire donc jamais rien. Compter un filtre qui ne filtre
+    # pas donne l'illusion d'un contrôle. Le jour où elle se mettrait à retirer
+    # quelque chose, c'est que les tables auraient divergé : le test
+    # `test_les_deux_tables_ne_divergent_pas` est là pour ça.
     funnel = {"lus": len(osm), "gérés": 0, "absents": 0, "documentés": 0}
 
     for site in osm:

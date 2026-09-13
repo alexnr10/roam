@@ -91,7 +91,10 @@ def temoin_autour(lat: float, lon: float, cote: float = 0.015):
 TAG_FILTERS = [
     'tourism~"^(museum|gallery|zoo|aquarium|theme_park|attraction)$"',
     'historic~"^(castle|fort|manor|monument|ruins|archaeological_site|city_gate|aqueduct)$"',
-    'leisure~"^(garden|nature_reserve)$"',
+    # `nature_reserve` est parti avec sa porte : rangé dans « Littoral et
+    # plages », il rapportait 630 aires protégées en Italie — 42 % de la
+    # feuille — et zéro lieu retenu en France. Voir `discover.THEME_BY_TAG`.
+    'leisure~"^(garden)$"',
     'natural~"^(cave_entrance|waterfall)$"',
     # `waterway=waterfall` est l'étiquette réelle des chutes d'eau : demander
     # `natural=waterfall` seul rendait cinq objets pour toute la France.
