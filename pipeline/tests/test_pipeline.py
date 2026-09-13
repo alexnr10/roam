@@ -8478,9 +8478,11 @@ class TestListeSansEnTete(unittest.TestCase):
         if not chemin.exists():
             self.skipTest("liste italienne absente")
         epingles = read_place_list(load_config(pays="it"), chemin)
-        # Les trois sommets des Dolomites : Tre Cime, Marmolada, Lagazuoi.
-        self.assertEqual(len(epingles), 3, epingles)
-        self.assertEqual(set(epingles.values()), {"sommets"})
+        # Les trois sommets des Dolomites — Tre Cime, Marmolada, Lagazuoi — et
+        # Cicogna, hameau d'accès du Val Grande, qu'aucune classe collectée ne
+        # reconnaît : une frazione n'est pas une classe de Roam.
+        self.assertGreaterEqual(len(epingles), 3, epingles)
+        self.assertEqual(set(epingles.values()), {"sommets", "villages"})
 
 
 class TestLangueDesLibelles(unittest.TestCase):

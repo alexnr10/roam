@@ -34,24 +34,26 @@
 #     Apennin lucanien  Grumentum, commune Grumento Nova, en Val d'Agri
 #     Sila              lac Arvo, commune San Giovanni in Fiore
 #
-# DEUX PARCS RESTENT SANS LIGNE, et chacun pour une raison nette :
+# LES VINGT-SIX PARCS ONT LEUR LIGNE. Les deux derniers ont demandé chacun un
+# détour, et tous deux illustrent une règle du pipeline :
 #
-#   DOLOMITES BELLUNOISES. Le Monte Schiara est le sommet emblématique, il est
-#   collecté (Q3861991), et il NE SE MONTE PAS — le filtre alpin l'écarte à
-#   2 565 m faute d'accès prouvé, et le curateur confirme. Le label dispense du
-#   plancher de notoriété, PAS du filtre alpin ; seul `pin` le ferait, et
-#   épingler un sommet inaccessible serait précisément l'erreur que la règle
-#   existe pour empêcher. Aucun autre lieu du catalogue n'est attesté dans ce
-#   parc : la province de Belluno tient la Marmolada, les Tre Cime, Misurina,
-#   qui sont dans d'AUTRES parcs.
+#   DOLOMITES BELLUNOISES — lago della Stua. Deux entités portent ce nom chez
+#   Wikidata : Q953113, commune de Brennero (province 021, au col du Brenner),
+#   et Q3825880, commune de Cesiomaggiore (province 025, Belluno). C'est la
+#   SECONDE. Elle ne porte que trois versions linguistiques pour un plancher
+#   des lacs à six : elle n'entre que par la dispense qu'accorde cette liste.
 #
-#   VAL GRANDE. Cicogna, le hameau d'accès, n'est pas dans la collecte, et les
-#   vingt et un lieux de la province sont ceux du lac Majeur — Stresa, les îles
-#   Borromées, Cannobio — qui sont hors du parc.
+#   Le Monte Schiara, sommet emblématique du parc, reste dehors et c'est
+#   voulu : il ne se monte pas, le filtre alpin l'écarte à 2 565 m, et seul
+#   `pin` passerait outre — épingler un sommet inaccessible serait exactement
+#   l'erreur que cette règle existe pour empêcher.
 #
-# Pour leur donner une ligne il faut d'abord FAIRE EXISTER le lieu : une ligne
-# dans `data/it/manual/places.csv` (`wikidata_id,theme_id,note`), un `fetch`
-# complet, et seulement ensuite une ligne ici.
+#   VAL GRANDE — Cicogna. Deux frazioni de ce nom ; les CONTOURS COMMUNAUX ont
+#   tranché, pas le libellé : Q18445963 tombe dans Cossogno (province 103,
+#   Verbano-Cusio-Ossola), Q18484870 dans Terranuova Bracciolini (province 051,
+#   Arezzo). Aucune classe collectée ne la reconnaît — une frazione n'est pas
+#   une classe de Roam — elle est donc inscrite dans `places.csv`, qui impose
+#   son thème, et n'entrera qu'au prochain `fetch`.
 #
 # ⚠ « Sila », le massif, EST dans la collecte (Q1088296, 24 langues) mais porte
 # un verdict `drop` de la revue : le curateur l'a déjà écarté. L'inscrire ici
@@ -102,3 +104,5 @@ Q898150,Matese,parc national Matese (attesté)
 Q63521967,Massif de l'Ortles,parc national Stelvio (province du parc)
 Q1550380,Grumentum,parc national Apennin lucanien-Val d'Agri (province du parc)
 Q3825626,Lac Arvo,parc national Sila (province du parc)
+Q3825880,Lago della Stua,parc national Dolomites bellunoises (choix du curateur)
+Q18445963,Cicogna,parc national Val Grande (choix du curateur — entre au prochain fetch)
