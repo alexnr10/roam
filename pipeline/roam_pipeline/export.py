@@ -204,6 +204,51 @@ def review_tiers(collections: list[Collection]) -> dict[str, int]:
     return _membership(collections)[1]
 
 
+#: Longueur d'une tranche de revue, en lignes. Vingt-cinq tient dans un écran
+#: de téléphone en deux ou trois défilements, et c'est la taille des blocs de
+#: niveau 2 que le curateur a lus sans rien signaler.
+TRANCHE = 25
+
+
+def _par_tranches(places: list[Place], best_tier: dict[str, int]) -> list[Place]:
+    """L'ordre de lecture de la revue : par niveau, puis par tranches de thème.
+
+    Grouper par thème est juste — comparer des châteaux entre eux va plus vite
+    que de sauter de l'un à l'autre — mais grouper TOUT un thème d'un bloc ne
+    l'est pas. Mesuré sur la revue italienne : les niveaux 1 et 2 tournent
+    joliment, onze à vingt-cinq lignes par thème, six pour cent du niveau
+    chacun. Le niveau 3, lui, fait les deux tiers de la feuille et s'y lit par
+    blocs de cent à cent quatre-vingts lignes — 178 sommets d'affilée, puis 176
+    sites antiques, puis 149 monuments.
+
+    Le catalogue est équilibré ; c'est l'ORDRE DE LECTURE qui ne l'est pas, et
+    le curateur l'a senti avant qu'on le mesure : « j'ai l'impression de ne voir
+    que des cathédrales, des abbayes, des musées et des sites antiques », en
+    Italie comme en France.
+
+    On coupe donc chaque thème en tranches et on les alterne. Un château reste
+    à côté d'un château sur vingt-cinq lignes, et la séance garde sa variété.
+    """
+    par_theme: dict[tuple[int, str], list[Place]] = defaultdict(list)
+    for place in places:
+        par_theme[(best_tier.get(place.wikidata_id, 9), place.theme_id)].append(place)
+    for lot in par_theme.values():
+        lot.sort(key=lambda p: (-p.score, p.name))
+
+    ordered: list[Place] = []
+    for niveau in sorted({cle[0] for cle in par_theme}):
+        themes = sorted(t for lv, t in par_theme if lv == niveau)
+        tour = 0
+        while themes:
+            for theme in themes:
+                lot = par_theme[(niveau, theme)]
+                ordered.extend(lot[tour * TRANCHE:(tour + 1) * TRANCHE])
+            tour += 1
+            themes = [t for t in themes
+                      if len(par_theme[(niveau, t)]) > tour * TRANCHE]
+    return ordered
+
+
 def write_review_csv(
     places: list[Place],
     collections: list[Collection],
@@ -226,10 +271,7 @@ def write_review_csv(
     # est décourageant ; relire d'abord les 200 incontournables donne déjà un
     # catalogue jouable, et comparer des châteaux entre eux va plus vite que
     # de sauter d'un thème à l'autre.
-    ordered = sorted(
-        places,
-        key=lambda p: (best_tier.get(p.wikidata_id, 9), p.theme_id, -p.score, p.name),
-    )
+    ordered = _par_tranches(places, best_tier)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8", newline="") as fh:
@@ -589,11 +631,13 @@ def write_review_html(
     # et la refaire par lieu coûterait deux mille parcours.
     doubles = remplacants(places)
     rows = []
-    for place in sorted(
-        places,
-        key=lambda p: (p.wikidata_id not in nationale,
-                       best_tier.get(p.wikidata_id, 9), p.theme_id, -p.score, p.name),
-    ):
+    # Même ordre de lecture que la feuille CSV — par tranches de thème, et non
+    # par thème entier — mais la page garde sa coupe principale : ce qui est
+    # dans la collection nationale du thème d'abord. C'est la page que le
+    # curateur lit vraiment ; le défaut qu'il a signalé est ici.
+    dedans = [p for p in places if p.wikidata_id in nationale]
+    dehors = [p for p in places if p.wikidata_id not in nationale]
+    for place in _par_tranches(dedans, best_tier) + _par_tranches(dehors, best_tier):
         dept = depts.get(place.departement_code or "")
         parts = score_breakdown(place, config)
         # Deux raisons de douter du rattachement, et une seule d'entre elles

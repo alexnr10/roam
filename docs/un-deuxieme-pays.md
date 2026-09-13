@@ -1127,6 +1127,43 @@ Montsoreau (158 langues), Sarlat (82), Le Puy-en-Velay (80), Bar-le-Duc (76),
 Provins (75). Le thème s'appelle « Villages de caractère » et c'est ce nom,
 plus que son contenu, qui fait sursauter.
 
+### « Je ne vois que des cathédrales » — le catalogue ou l'ordre de lecture ?
+
+Le curateur a eu cette impression en Italie, et se souvenait de l'avoir eue en
+France. Mesuré sur la feuille italienne, il avait raison, mais pas sur le
+catalogue :
+
+    NIVEAU 1 — 200 lignes, 19 blocs · chaque thème 6 % du niveau, 11 à 13 lignes
+    NIVEAU 2 — 391 lignes, 19 blocs · chaque thème 6 % du niveau, 25 lignes
+    NIVEAU 3 — 1 195 lignes (67 % de la feuille) — et là :
+        sommets 178 lignes d'affilée · megalithes 176 · monuments 149
+        lacs 109 · cathedrales 105 · musees 99
+
+Les deux tiers du travail sont au niveau 3, et l'ordre y était le thème ENTIER,
+par ordre alphabétique. Après abbayes et cascades vient le bloc de 105
+cathédrales, puis 65 châteaux — c'est exactement ce qu'il lisait au moment où il
+l'a signalé.
+
+Grouper par thème reste juste : comparer des châteaux entre eux va plus vite
+que de sauter de l'un à l'autre. Grouper TOUT un thème d'un bloc ne l'est pas.
+La feuille se lit donc par tranches de vingt-cinq, alternées entre thèmes — un
+château reste à côté d'un château, et la séance garde sa variété. Le plus long
+bloc d'un seul thème passe de **178 lignes à 25**.
+
+### Trois sommets des Dolomites épinglés — et le piège de `pin`
+
+Le filtre alpin écarte 796 sommets italiens au-dessus de 2 500 m, faute d'un
+signal d'accès. C'est la règle française, et elle a raison par défaut ; comme en
+France, ce qui se rejoint sans alpinisme revient par un épinglage. Trois l'ont
+été : Tre Cime di Lavaredo (route du refuge Auronzo), la Marmolada
+(téléphérique de Punta Rocca), le Lagazuoi (téléphérique du col de Falzarego).
+
+⚠ **`pin` écrit dans la collecte VERSIONNÉE ; `build` lit la copie de travail.**
+Sans `sync` entre les deux, l'épinglage ne fait rien et ne le dit pas — les
+trois sommets sont restés écartés au filtre alpin, drapeau posé, et il a fallu
+`explain` pour s'en apercevoir. Le message de la commande disait « relance
+`build` » : il dit maintenant `sync` PUIS `build`.
+
 ### Le plafond des églises : la question a changé de main
 
 Avant les communes, `cathedrales` portait 549 lieux au catalogue et la question

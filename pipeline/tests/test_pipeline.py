@@ -8196,6 +8196,68 @@ class TestSurcoucheDePays(unittest.TestCase):
             load_config(pays="xx")
 
 
+class TestOrdreDeLaRevue(unittest.TestCase):
+    """La feuille se lit par tranches de thème, pas par thème entier.
+
+    Mesuré sur la revue italienne : les niveaux 1 et 2 tournent joliment, mais
+    le niveau 3 fait les deux tiers de la feuille et s'y lisait par blocs de
+    cent à cent quatre-vingts lignes — 178 sommets d'affilée, puis 176 sites
+    antiques, puis 149 monuments. Le catalogue est équilibré ; c'est l'ORDRE DE
+    LECTURE qui ne l'était pas.
+    """
+
+    @staticmethod
+    def _lot(tailles):
+        places, tiers = [], {}
+        for theme, n in tailles:
+            for i in range(n):
+                qid = f"Q{theme}{i}"
+                places.append(make_place(qid, theme=theme, score=n - i))
+                places[-1].wikidata_id = qid
+                tiers[qid] = 3
+        return places, tiers
+
+    def test_les_gros_themes_sont_coupes_en_tranches(self):
+        from roam_pipeline.export import _par_tranches, TRANCHE
+
+        places, tiers = self._lot([("a", 100), ("b", 30)])
+        ordre = _par_tranches(places, tiers)
+        # Le premier bloc d'un seul thème ne dépasse pas la tranche.
+        premier = 0
+        for p in ordre:
+            if p.theme_id != ordre[0].theme_id:
+                break
+            premier += 1
+        self.assertLessEqual(premier, TRANCHE)
+
+    def test_rien_ne_se_perd_ni_ne_se_duplique(self):
+        from roam_pipeline.export import _par_tranches
+
+        places, tiers = self._lot([("a", 100), ("b", 30), ("c", 10)])
+        ordre = _par_tranches(places, tiers)
+        self.assertEqual(len(ordre), len(places))
+        self.assertEqual({p.wikidata_id for p in ordre},
+                         {p.wikidata_id for p in places})
+
+    def test_les_niveaux_restent_dans_l_ordre(self):
+        # Relire d'abord les incontournables donne déjà un catalogue jouable :
+        # le niveau prime sur tout le reste.
+        from roam_pipeline.export import _par_tranches
+
+        places, tiers = self._lot([("a", 5)])
+        for i, p in enumerate(places):
+            tiers[p.wikidata_id] = 1 if i < 2 else 3
+        ordre = _par_tranches(places, tiers)
+        self.assertEqual([tiers[p.wikidata_id] for p in ordre], [1, 1, 3, 3, 3])
+
+    def test_dans_une_tranche_le_meilleur_score_est_en_tete(self):
+        from roam_pipeline.export import _par_tranches
+
+        places, tiers = self._lot([("a", 5)])
+        ordre = _par_tranches(places, tiers)
+        self.assertEqual([p.score for p in ordre], sorted((p.score for p in places), reverse=True))
+
+
 class TestVoisinsDansUneCollection(unittest.TestCase):
     """Deux lieux du même site ne commencent pas deux fois un palmarès."""
 

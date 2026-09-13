@@ -3269,7 +3269,13 @@ def cmd_pin(args: argparse.Namespace, config: Config) -> int:
                 fh.write(fin + ligne)
             print(f"Inscrit dans {liste} — sans quoi la prochaine collecte "
                   "complète effacerait le drapeau.")
-    print("Relance `build` pour en tenir compte.")
+    # `pin` écrit dans la COLLECTE VERSIONNÉE ; `build`, lui, lit la copie de
+    # travail. Sans `sync` entre les deux, l'épinglage ne fait rien et ne le
+    # dit pas : trois sommets des Dolomites sont restés écartés au « filtre
+    # alpin » alors que leur drapeau était posé, et il a fallu `explain` pour
+    # s'en apercevoir.
+    print("Enchaîne avec `sync` PUIS `build` : l'épinglage vit dans la collecte "
+          "versionnée, et `build` lit la copie de travail.")
     return 0
 
 
