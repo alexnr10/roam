@@ -8423,6 +8423,75 @@ class TestLabelDansUneAire(unittest.TestCase):
         self.assertTrue(any("propriété de situation" in m for m in journal.output))
 
 
+class TestLabelsApresCollectePartielle(unittest.TestCase):
+    """`fetch --only X` laissait les autres thèmes avec les labels de la veille.
+
+    `apply_labels` ne touche que les lieux de la collecte du jour, et une
+    reprise partielle ne réécrit que les fichiers des thèmes demandés. Les
+    autres gardaient donc leurs labels périmés, sans un mot.
+
+    Mesuré sur l'Italie après un `fetch --only villages` : la liste des parcs
+    nationaux comptait vingt-six lignes, le catalogue vingt et un porteurs —
+    six labels que le fichier ne demandait plus, onze jamais posés. La
+    collection affichait un mélange des deux versions de la liste.
+    """
+
+    def _collecte(self, tmp, labels_par_lieu):
+        from roam_pipeline.raw import write_raw
+
+        racine = Path(tmp)
+        (racine / "raw").mkdir(parents=True, exist_ok=True)
+        lieux = []
+        for qid, theme, labels in labels_par_lieu:
+            p = make_place(qid, theme=theme, wikidata_id=qid, sitelinks=30)
+            p.labels = list(labels)
+            lieux.append(p)
+        write_raw(racine / "raw", lieux, {p.theme_id for p in lieux})
+        return racine
+
+    def test_un_theme_non_recollecte_perd_ses_labels_perimes(self):
+        from roam_pipeline.fetch import apply_labels
+        from roam_pipeline.raw import read_shard, write_raw
+
+        with tempfile.TemporaryDirectory() as tmp:
+            racine = self._collecte(tmp, [
+                ("Q1", "chateaux", ["parcs"]),      # label devenu faux
+                ("Q2", "sommets", []),              # label à poser
+            ])
+            membres = {"parcs": {"Q2"}}
+            # Ce que fait désormais la fin de `run_fetch` sur les thèmes
+            # qu'elle n'a pas recollectés.
+            retouches, relabelles = set(), []
+            for shard in ("chateaux", "sommets"):
+                lot = read_shard(racine / "raw", shard)
+                avant = [sorted(p.labels or ()) for p in lot]
+                apply_labels(lot, membres, {})
+                if any(sorted(p.labels or ()) != v for p, v in zip(lot, avant)):
+                    retouches.add(shard)
+                relabelles.extend(lot)
+            self.assertEqual(retouches, {"chateaux", "sommets"})
+            write_raw(racine / "raw", relabelles, retouches)
+
+            apres = {p.wikidata_id: p.labels
+                     for s in ("chateaux", "sommets")
+                     for p in read_shard(racine / "raw", s)}
+        self.assertEqual(apres["Q1"], [])            # le périmé est parti
+        self.assertEqual(apres["Q2"], ["parcs"])     # le manquant est posé
+
+    def test_un_theme_dont_rien_ne_change_n_est_pas_reecrit(self):
+        # La protection de `write_raw` tient : une reprise partielle qui ne
+        # bouge aucun label ne doit toucher aucun fichier de plus.
+        from roam_pipeline.fetch import apply_labels
+        from roam_pipeline.raw import read_shard
+
+        with tempfile.TemporaryDirectory() as tmp:
+            racine = self._collecte(tmp, [("Q1", "chateaux", ["parcs"])])
+            lot = read_shard(racine / "raw", "chateaux")
+            avant = [sorted(p.labels or ()) for p in lot]
+            apply_labels(lot, {"parcs": {"Q1"}}, {})
+            self.assertEqual([sorted(p.labels or ()) for p in lot], avant)
+
+
 class TestListeSansEnTete(unittest.TestCase):
     """Un CSV sans en-tête se lit en silence et ne rend rien.
 

@@ -145351,9 +145351,7 @@
     "commune_code": "078092",
     "commune_name": "Papasidero",
     "admin_qid": "Q53929",
-    "labels": [
-      "parchi-nazionali"
-    ],
+    "labels": [],
     "label_groupes": {},
     "validation_radius_m": 200,
     "score": 0.0,
@@ -146917,7 +146915,9 @@
     "commune_code": "081014",
     "commune_name": "Pantelleria",
     "admin_qid": "Q481758",
-    "labels": [],
+    "labels": [
+      "parchi-nazionali"
+    ],
     "label_groupes": {},
     "validation_radius_m": 2000,
     "score": 0.0,
@@ -174433,7 +174433,9 @@
     "commune_code": "078119",
     "commune_name": "San Giovanni in Fiore",
     "admin_qid": "Q16162",
-    "labels": [],
+    "labels": [
+      "parchi-nazionali"
+    ],
     "label_groupes": {},
     "validation_radius_m": 1500,
     "score": 0.0,
@@ -176319,9 +176321,7 @@
     "commune_code": "033020",
     "commune_name": "Ferriere",
     "admin_qid": "Q1263",
-    "labels": [
-      "parchi-nazionali"
-    ],
+    "labels": [],
     "label_groupes": {},
     "validation_radius_m": 1500,
     "score": 0.0,
@@ -178391,7 +178391,9 @@
     "commune_code": "025011",
     "commune_name": "Cesiomaggiore",
     "admin_qid": "Q40033",
-    "labels": [],
+    "labels": [
+      "parchi-nazionali"
+    ],
     "label_groupes": {},
     "validation_radius_m": 1500,
     "score": 0.0,
@@ -225417,7 +225419,9 @@
     "commune_code": "076037",
     "commune_name": "Grumento Nova",
     "admin_qid": "Q52576",
-    "labels": [],
+    "labels": [
+      "parchi-nazionali"
+    ],
     "label_groupes": {},
     "validation_radius_m": 200,
     "score": 0.0,
@@ -275889,9 +275893,7 @@
     "commune_code": "078092",
     "commune_name": "Papasidero",
     "admin_qid": "Q53929",
-    "labels": [
-      "parchi-nazionali"
-    ],
+    "labels": [],
     "label_groupes": {},
     "validation_radius_m": 200,
     "score": 0.0,
@@ -352167,7 +352169,9 @@
     "commune_code": "076037",
     "commune_name": "Grumento Nova",
     "admin_qid": "Q52576",
-    "labels": [],
+    "labels": [
+      "parchi-nazionali"
+    ],
     "label_groupes": {},
     "validation_radius_m": 120,
     "score": 0.0,
@@ -361050,6 +361054,7 @@
     "commune_name": "Andria",
     "admin_qid": "Q13486",
     "labels": [
+      "parchi-nazionali",
       "unesco"
     ],
     "label_groupes": {},
@@ -392855,9 +392860,7 @@
     "commune_code": "078092",
     "commune_name": "Papasidero",
     "admin_qid": "Q53929",
-    "labels": [
-      "parchi-nazionali"
-    ],
+    "labels": [],
     "label_groupes": {},
     "validation_radius_m": 120,
     "score": 0.0,
@@ -397043,9 +397046,7 @@
     "commune_code": "049014",
     "commune_name": "Portoferraio",
     "admin_qid": "Q157856",
-    "labels": [
-      "parchi-nazionali"
-    ],
+    "labels": [],
     "label_groupes": {},
     "validation_radius_m": 200,
     "score": 0.0,
@@ -397597,9 +397598,7 @@
     "commune_code": "059025",
     "commune_name": "San Felice Circeo",
     "admin_qid": "Q128170",
-    "labels": [
-      "parchi-nazionali"
-    ],
+    "labels": [],
     "label_groupes": {},
     "validation_radius_m": 200,
     "score": 0.0,
@@ -402061,9 +402060,7 @@
     "commune_code": "065039",
     "commune_name": "Centola",
     "admin_qid": "Q80867",
-    "labels": [
-      "parchi-nazionali"
-    ],
+    "labels": [],
     "label_groupes": {},
     "validation_radius_m": 200,
     "score": 0.0,
@@ -413933,7 +413930,9 @@
     "commune_code": "065039",
     "commune_name": "Centola",
     "admin_qid": "Q80867",
-    "labels": [],
+    "labels": [
+      "parchi-nazionali"
+    ],
     "label_groupes": {},
     "validation_radius_m": 500,
     "score": 0.0,
@@ -474379,7 +474378,9 @@
     "commune_code": "081014",
     "commune_name": "Pantelleria",
     "admin_qid": "Q481758",
-    "labels": [],
+    "labels": [
+      "parchi-nazionali"
+    ],
     "label_groupes": {},
     "validation_radius_m": 1000,
     "score": 0.0,
@@ -508189,7 +508190,9 @@
     "commune_code": "116001",
     "commune_name": "Arzana",
     "admin_qid": "Q16220",
-    "labels": [],
+    "labels": [
+      "parchi-nazionali"
+    ],
     "label_groupes": {},
     "validation_radius_m": 1000,
     "score": 0.0,
@@ -517021,7 +517024,9 @@
     "commune_code": "078033",
     "commune_name": "Castrovillari",
     "admin_qid": "Q16249",
-    "labels": [],
+    "labels": [
+      "parchi-nazionali"
+    ],
     "label_groupes": {},
     "validation_radius_m": 1000,
     "score": 0.0,
@@ -530177,7 +530182,9 @@
     "commune_code": "035016",
     "commune_name": "Castelnovo ne' Monti",
     "admin_qid": "Q111165",
-    "labels": [],
+    "labels": [
+      "parchi-nazionali"
+    ],
     "label_groupes": {},
     "validation_radius_m": 1000,
     "score": 0.0,
@@ -533031,7 +533038,9 @@
     "commune_code": "021095",
     "commune_name": "Stelvio/Stilfs",
     "admin_qid": null,
-    "labels": [],
+    "labels": [
+      "parchi-nazionali"
+    ],
     "label_groupes": {},
     "validation_radius_m": 1000,
     "score": 0.0,
@@ -536619,9 +536628,7 @@
     "commune_code": "044044",
     "commune_name": "Montemonaco",
     "admin_qid": "Q16117",
-    "labels": [
-      "parchi-nazionali"
-    ],
+    "labels": [],
     "label_groupes": {},
     "validation_radius_m": 1000,
     "score": 0.0,
@@ -542233,7 +542240,9 @@
     "commune_code": "094040",
     "commune_name": "Roccamandolfi",
     "admin_qid": "Q1443",
-    "labels": [],
+    "labels": [
+      "parchi-nazionali"
+    ],
     "label_groupes": {},
     "validation_radius_m": 1000,
     "score": 0.0,
@@ -563490,7 +563499,9 @@
     "commune_code": "081014",
     "commune_name": "Pantelleria",
     "admin_qid": "Q481758",
-    "labels": [],
+    "labels": [
+      "parchi-nazionali"
+    ],
     "label_groupes": {},
     "validation_radius_m": 400,
     "score": 0.0,

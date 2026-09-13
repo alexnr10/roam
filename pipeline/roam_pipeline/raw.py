@@ -120,6 +120,16 @@ def _load(path: Path) -> list[Place]:
     return places
 
 
+def read_shard(raw_dir: Path, shard: str) -> list[Place]:
+    """Les lieux d'UN fichier, tels qu'ils y sont écrits.
+
+    À la différence de `read_raw`, aucun arbitrage entre thèmes : c'est le
+    contenu brut du fichier, qu'on veut pouvoir corriger puis réécrire à sa
+    place.
+    """
+    return _load(_path(raw_dir, shard))
+
+
 def read_raw(raw_dir: Path) -> list[Place]:
     """Recompose le catalogue brut depuis les fichiers du dépôt.
 
