@@ -1264,12 +1264,35 @@ def _communes_par_contour(places: list[Place], zones) -> int:
     dessous : un index par cases d'un degré, puis le point dans le polygone.
     La commune fait autorité sur le département, ici comme dans la passe
     française — elle vient du même contour et ne peut pas le contredire.
+
+    Et la MÊME recherche aux alentours que le département, pour la même raison :
+    un contour communal s'arrête au trait de côte. Cherché par le seul polygone,
+    le rattachement laissait 68 lieux italiens sans commune contre 4 en France,
+    et la liste disait tout — le Bigo de Gênes, le Castel dell'Ovo sur son îlot,
+    Miramare et Duino en falaise, le château aragonais d'Ischia, les pylônes du
+    détroit de Messine. Des points tombés de quelques centaines de mètres au
+    large de leur propre ville.
+
+    Mesuré sur les soixante-huit : tous rattachés, 59 au premier palier de cinq
+    cents mètres, 4 à 1 500, 4 à 3 000, un seul à 6 000. Et les réponses sont
+    les bonnes — Castel dell'Ovo à Naples, le Bigo à Gênes, Miramare à Trieste.
+
+    Deux cas se discutent, et ils se discutent dans le sens du produit. Les cinq
+    lieux du Vatican rendent « Roma », et le mont Titano « Rimini » : ce ne sont
+    pas les bonnes communes en droit, ce sont celles que l'enclave a déjà
+    choisies comme département. Sans commune, visiter Saint-Pierre ne colorerait
+    rien à la maille la plus fine de la carte de conquête ; avec, il colore Rome,
+    ce qu'un visiteur attend. Et ils entrent enfin dans le plafond par commune,
+    au lieu d'y échapper.
+
+    Les sommets frontaliers rendent toujours leur versant italien, jamais le
+    suisse ni le slovène : la couche ne porte que les communes du pays.
     """
     resolved = 0
     for place in places:
         if place.commune_code:
             continue
-        zone = zones.contenant(place.lat, place.lon)
+        zone = zones.autour(place.lat, place.lon, localisation.RAYONS)
         if zone is None:
             continue
         place.commune_code = zone.code

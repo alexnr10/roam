@@ -8091,9 +8091,18 @@ class TestSurcoucheDePays(unittest.TestCase):
         # musées 10 (9,8 / 1,5). Venise : îles 8 (9,1 / 0,9), églises 10
         # (3,6 / 0,6), monuments 8 (2,5 / 0,4). Florence : musées 13
         # (18,2 / 1,6). Milan et Naples n'ont que des plateaux.
+        #
+        # Rome a gagné une septième place monumentale le jour où la place
+        # Saint-Pierre a reçu une commune : le groupe de tête compte un membre
+        # de plus, la chute reste la même (6,2 pour un pas de 2, entre le Largo
+        # di Torre Argentina et le Campo de' Fiori) et passe du sixième rang au
+        # septième. Les églises, elles, ne bougent pas — la mesure refaite avec
+        # la basilique Saint-Pierre et la chapelle Sixtine dans le vivier coupe
+        # toujours après le neuvième.
         villes = load_config(pays="it").collections.commune_overrides
         self.assertEqual(villes["058091"], {   # Rome
-            "cathedrales": 9, "megalithes": 8, "monuments": 10, "musees": 10})
+            "cathedrales": 9, "megalithes": 8, "monuments": 10, "musees": 10,
+            "piazzas": 7})
         self.assertEqual(villes["027042"], {   # Venise
             "cathedrales": 10, "iles": 8, "monuments": 8})
         self.assertEqual(villes["048017"], {"musees": 13})   # Florence
@@ -8272,6 +8281,74 @@ class TestEmpriseDuPays(unittest.TestCase):
         self.assertIn("rome", trouve)
         self.assertNotIn("bale", trouve)
         self.assertNotIn("mer", trouve)
+
+
+class TestCommuneAuLarge(unittest.TestCase):
+    """Un contour communal s'arrête au trait de côte.
+
+    Cherchée par le seul point-dans-polygone, la passe communale laissait 68
+    lieux italiens sans commune contre 4 en France — et la liste disait tout :
+    le Bigo de Gênes, le Castel dell'Ovo sur son îlot, Miramare et Duino en
+    falaise, les pylônes du détroit de Messine. Des points tombés de quelques
+    centaines de mètres au large de leur propre ville, qui échappaient donc au
+    plafond par commune et à la maille la plus fine de la carte de conquête.
+
+    Mesuré sur les soixante-huit, avec la couche communale italienne : tous
+    rattachés, 59 au premier palier de cinq cents mètres, et les réponses sont
+    les bonnes — Castel dell'Ovo à Naples, le Bigo à Gênes, Miramare à Trieste.
+    Les 29 lieux de la collecte brute qui restent sans commune sont ceux qui
+    n'en ont pas : volcans sous-marins, épaves, et massifs dont le centroïde
+    tombe en Autriche ou en Slovénie.
+    """
+
+    def setUp(self):
+        # Les codes de département se normalisent selon le pays courant : « 012 »
+        # lu comme français rend « 15 ».
+        geo.utiliser_pays("IT")
+
+    def tearDown(self):
+        geo.utiliser_pays("FR")
+
+    @staticmethod
+    def _couche():
+        from roam_pipeline.localisation import Localisateur, Zone
+
+        # Un carré d'un centième de degré — environ 1,1 km de côté.
+        carre = [[(12.00, 45.00), (12.01, 45.00), (12.01, 45.01),
+                  (12.00, 45.01), (12.00, 45.00)]]
+        return Localisateur([Zone(code="012345", name="Portoville", level="commune",
+                                  parent_code="012", bbox=(12.00, 45.00, 12.01, 45.01),
+                                  polygones=[carre])])
+
+    def test_un_lieu_au_large_recoit_sa_commune(self):
+        from roam_pipeline.fetch import _communes_par_contour
+
+        # 300 m à l'est du contour : un château sur son rocher.
+        lieu = make_place("Q1", theme="chateaux")
+        lieu.lat, lieu.lon, lieu.commune_code = 45.005, 12.014, None
+        self.assertEqual(_communes_par_contour([lieu], self._couche()), 1)
+        self.assertEqual(lieu.commune_code, "012345")
+        self.assertEqual(lieu.commune_name, "Portoville")
+        self.assertEqual(lieu.departement_code, "012")
+
+    def test_le_large_lointain_ne_recoit_rien(self):
+        # Un volcan sous-marin à cinquante kilomètres n'a pas de commune, et
+        # lui en inventer une serait pire que de le laisser sans.
+        from roam_pipeline.fetch import _communes_par_contour
+
+        lieu = make_place("Q2", theme="volcans")
+        lieu.lat, lieu.lon, lieu.commune_code = 45.005, 12.60, None
+        self.assertEqual(_communes_par_contour([lieu], self._couche()), 0)
+        self.assertIsNone(lieu.commune_code)
+
+    def test_une_commune_deja_connue_n_est_pas_touchee(self):
+        from roam_pipeline.fetch import _communes_par_contour
+
+        lieu = make_place("Q3", theme="musees")
+        lieu.lat, lieu.lon = 45.005, 12.014
+        lieu.commune_code, lieu.commune_name = "099999", "Ailleurs"
+        self.assertEqual(_communes_par_contour([lieu], self._couche()), 0)
+        self.assertEqual(lieu.commune_code, "099999")
 
 
 class TestPorteDesReservesNaturelles(unittest.TestCase):

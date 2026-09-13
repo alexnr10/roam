@@ -148,6 +148,24 @@ collections:
       # Paris, et pour la même raison : une ville où dix institutions se
       # suivent sans qu'aucune ne soit de second rang.
       musees: 10
+      # Sept, et c'est le Vatican qui l'a rendu nécessaire. Rattacher la place
+      # Saint-Pierre à la commune de Rome — elle n'avait aucune commune avant,
+      # et échappait donc au plafond — ajoute une place au groupe de tête sans
+      # rien changer à sa forme : la chute la plus forte valait déjà 6,2 pour un
+      # pas de 2, et elle tombe toujours entre le Largo di Torre Argentina (96)
+      # et le Campo de' Fiori (90). Elle est simplement passée du sixième rang
+      # au septième.
+      #
+      # À six, la place Saint-Pierre entrait et le Largo sortait. `derogations`
+      # relancé sur la collecte rattachée coupe après le SEPTIÈME : Saint-Pierre,
+      # Navone, del Popolo, le Capitole, d'Espagne, Venezia, Torre Argentina.
+      #
+      # Les cathédrales, elles, ne bougent pas : la mesure refaite avec la
+      # basilique Saint-Pierre et la chapelle Sixtine dans le vivier coupe
+      # toujours après le neuvième (3,2 pour un pas de 0,7). Saint-Clément et
+      # Sainte-Praxède sortent du catalogue romain, et c'est la méthode qui le
+      # dit — pas un effet de bord du rattachement.
+      piazzas: 7
 
     "027042":           # Venise — 260 candidats, 213 retirés
       # 29 candidats, chute de 9,1 pour un pas de 0,9 — dix fois, la mesure la
