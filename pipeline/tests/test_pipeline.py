@@ -6782,7 +6782,7 @@ class TestThemeShareInGeoCollections(unittest.TestCase):
         # court », vérifiée par le test suivant.
         lot = self._lot({"musees": 60, "jardins": 30, "ponts": 30,
                          "cathedrales": 30})
-        retenus = _mix_themes(lot, 80, 0.25)
+        retenus, _voisins = _mix_themes(lot, 80, 0.25)
         self.assertEqual(len(retenus), 80)
         self.assertEqual(Counter(p.theme_id for p in retenus)["musees"], 20)
 
@@ -6790,7 +6790,7 @@ class TestThemeShareInGeoCollections(unittest.TestCase):
         # Le Centre-Val de Loire n'a pas soixante lieux hors châteaux : son
         # plafond monte jusqu'à ce que la collection soit pleine.
         lot = self._lot({"chateaux": 70, "abbayes": 10, "musees": 8})
-        retenus = _mix_themes(lot, 80, 0.25)
+        retenus, _voisins = _mix_themes(lot, 80, 0.25)
         self.assertEqual(len(retenus), 80)
         self.assertGreater(Counter(p.theme_id for p in retenus)["chateaux"], 20)
 
@@ -6798,7 +6798,7 @@ class TestThemeShareInGeoCollections(unittest.TestCase):
         # La Creuse a douze lieux : elle n'a rien à sélectionner. Une part
         # calculée sur les lieux PRÉSENTS la ramenait à huit.
         lot = self._lot({"chateaux": 5, "megalithes": 5, "ponts": 1, "forets": 1})
-        retenus = _mix_themes(lot, 80, 0.25)
+        retenus, _voisins = _mix_themes(lot, 80, 0.25)
         self.assertEqual(len(retenus), 12)
 
     def test_a_mixed_collection_ranks_by_rank_not_by_score(self):
@@ -8181,17 +8181,69 @@ class TestSurcoucheDePays(unittest.TestCase):
             for label_id in theme.from_labels:
                 self.assertIn(label_id, connus, f"{theme.id} → {label_id}")
 
-    def test_les_eglises_entrent_et_le_plafond_tombe(self):
-        # Les deux ensemble, ou rien : quatre-vingts places pour cathédrales,
-        # basiliques ET églises dans le pays dont les églises sont le patrimoine
-        # principal serait un contresens.
+    def test_les_eglises_entrent_et_le_plafond_est_pose_apres_mesure(self):
+        # Les quatre-vingts français auraient été un contresens ici. Le plafond
+        # a donc d'abord été RETIRÉ, puis posé après onze revues, sur une
+        # mesure : sans lui, 263 églises pour 11,5 % du catalogue contre 3,8 %
+        # en France ; à 150, 146 pour 6,7 % — deux collections perdues.
         eglises = load_config(pays="it").theme("cathedrales")
-        self.assertIsNone(eglises.catalogue_cap)
+        self.assertEqual(eglises.catalogue_cap, 150)
+        self.assertGreater(eglises.catalogue_cap, CONFIG.theme("cathedrales").catalogue_cap)
         self.assertIn("Q16970", [b.qid for b in eglises.broad_classes])
 
     def test_un_pays_inconnu_le_dit(self):
         with self.assertRaises(SystemExit):
             load_config(pays="xx")
+
+
+class TestVoisinsDansUneCollection(unittest.TestCase):
+    """Deux lieux du même site ne commencent pas deux fois un palmarès."""
+
+    @staticmethod
+    def _lieu(nom, theme, lat, lon, score):
+        return make_place(nom, theme=theme, lat=lat, lon=lon, score=score)
+
+    def test_le_voisin_est_repousse_pas_ecarte(self):
+        # La tour de Pise et la Piazza dei Miracoli sont à 155 m : on les visite
+        # séparément, chacune mérite le catalogue. Mais un palmarès qui commence
+        # deux fois au même endroit ne dit rien du territoire.
+        from roam_pipeline.collections import _mix_themes
+
+        tour = self._lieu("Tour", "monuments", 43.72301, 10.39662, 166.0)
+        place = self._lieu("Piazza", "piazzas", 43.72343, 10.39478, 163.0)
+        loin = self._lieu("Ailleurs", "lacs", 45.0, 9.0, 100.0)
+        ordre = [tour, place, loin]
+
+        serre = _mix_themes(list(ordre), limit=3, part=1.0, rayon=200.0)[0]
+        self.assertEqual([p.name for p in serre], ["Tour", "Ailleurs", "Piazza"])
+        # Rien n'est perdu : les trois sont là, le voisin est simplement dernier.
+        self.assertEqual(len(serre), 3)
+
+    def test_sans_rayon_l_ordre_reste_celui_du_score(self):
+        from roam_pipeline.collections import _mix_themes
+
+        ordre = [
+            self._lieu("Tour", "monuments", 43.72301, 10.39662, 166.0),
+            self._lieu("Piazza", "piazzas", 43.72343, 10.39478, 163.0),
+            self._lieu("Ailleurs", "lacs", 45.0, 9.0, 100.0),
+        ]
+        self.assertEqual([p.name for p in _mix_themes(list(ordre), 3, 1.0)[0]],
+                         ["Tour", "Piazza", "Ailleurs"])
+
+    def test_le_voisinage_cede_avant_le_quota_de_theme(self):
+        # Une collection courte vaut mieux qu'une collection resserrée sur un
+        # thème : c'est le défaut que `part` existe pour empêcher.
+        from roam_pipeline.collections import _mix_themes
+
+        proches = [self._lieu(f"P{i}", "cathedrales", 43.7230 + i * 1e-5, 10.3966, 100 - i)
+                   for i in range(4)]
+        retenus = _mix_themes(list(proches), limit=4, part=0.5, rayon=200.0)[0]
+        # Quatre places, quatre lieux : le rayon a cédé pour remplir.
+        self.assertEqual(len(retenus), 4)
+
+    def test_l_italie_le_declare_et_la_france_pas_encore(self):
+        self.assertEqual(load_config(pays="it").collections.min_distance_m, 200.0)
+        self.assertEqual(CONFIG.collections.min_distance_m, 0.0)
 
 
 class TestFeuilleDeRevueDuBonPays(unittest.TestCase):

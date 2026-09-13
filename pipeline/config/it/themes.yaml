@@ -58,14 +58,35 @@ themes:
   # églises ramenées à quatre-vingts dans le pays dont les églises SONT le
   # patrimoine principal : le recensement en donne déjà 460 à douze langues.
   #
-  # Il est donc RETIRÉ, pas relevé. Choisir un chiffre maintenant serait une
-  # estimation déguisée en mesure — les quatre-vingts français, eux, ont été
-  # posés APRÈS un build, en lisant que le catalogue en portait 193 pour 61
-  # montrés. Le premier build italien donnera la même lecture, et c'est là
-  # qu'un plafond se décide. Le plancher d'affichage du thème (10 langues) et
-  # le plafond de collection (60) tiennent d'ici là.
+  # Il a été RETIRÉ d'abord, pas relevé : choisir un chiffre avant un build
+  # aurait été une estimation déguisée en mesure. Le voici, posé après onze
+  # revues italiennes, sur la même lecture que les quatre-vingts français.
+  #
+  # Sans plafond, le catalogue portait 263 églises — 11,5 % de ses lieux,
+  # contre 3,8 % en France. Un lieu sur cinq au niveau 1 des collections
+  # géographiques était une église ou un site antique.
+  #
+  # AUCUNE FALAISE où couper : les 263 descendent par marches de 0,1 point et
+  # la plus forte chute ne vient qu'au 259e rang. C'est donc un arbitrage,
+  # comme les musées parisiens — mais un arbitrage dont le coût a été mesuré,
+  # une construction par valeur :
+  #
+  #   plafond   catalogue   églises   part    collections
+  #   aucun        2 285      263     11,5 %      203
+  #   200          2 205      186      8,4 %      200
+  #   150          2 168      146      6,7 %      201
+  #   100          2 125       97      4,6 %      199
+  #
+  # Cent cinquante. Il divise l'excès par deux et coûte deux collections. Il
+  # laisse les églises italiennes nettement plus présentes qu'en France —
+  # 6,7 % contre 3,8 % — ce qui est juste pour le pays dont elles SONT le
+  # patrimoine principal, sans qu'elles occupent un lieu sur neuf.
+  #
+  # Les sites antiques posent la même question (210 contre 104 en France) et
+  # elle se mesurera APRÈS : ce plafond leur libère des places, et le chiffre
+  # qu'on lirait aujourd'hui ne serait plus le bon demain.
   - id: cathedrales
-    catalogue_cap: null
+    catalogue_cap: 150
     broad_classes:
       - qid: Q16970
         fetch_min_sitelinks: 8

@@ -209,3 +209,28 @@ collections:
   # valent très au-dessus de la moyenne nationale. C'est le diamètre seul.
   always_cross:
     - iles-departement-027    # Îles de Venise
+
+  # ── Deux lieux du même site ne commencent pas deux fois un palmarès ─────
+  #
+  # « Le meilleur de Pise » ouvrait sur CINQ lieux de la seule Piazza dei
+  # Miracoli — la tour, la place, le dôme, le baptistère, le Campo Santo — et
+  # « Le meilleur d'Italie » en prenait deux de ses dix premiers.
+  #
+  # Ce ne sont pas des doublons : on les visite séparément, chacun a son
+  # billet, chacun mérite le catalogue. Le second n'est donc pas écarté, il est
+  # REPOUSSÉ après les autres — il descend d'un niveau, ce qui est exactement
+  # le reproche.
+  #
+  # Deux cents mètres, et le chiffre est lu dans les paires mesurées. En
+  # dessous de 150 m on ne trouve que des évidences : dôme de Milan ↔ Piazza
+  # del Duomo (50 m), cathédrale de Modène ↔ Torre Ghirlandina (51 m). Entre
+  # 150 et 200 m, les quatre paires ajoutées sont TOUTES du même site — tour de
+  # Pise ↔ Piazza dei Miracoli (155 m), Vallée des Temples ↔ temple de la
+  # Concorde (195 m, le temple est dans la vallée), Olympéion ↔ temple
+  # d'Héraclès (185 m), musées du Capitole ↔ Vittoriano (187 m). La première
+  # paire discutable n'arrive qu'à 241 m : villa Médicis ↔ Trinité-des-Monts,
+  # qui sont deux visites.
+  #
+  # La France ne le déclare pas encore : la règle lui vaudrait aussi, mais son
+  # catalogue est livré et le changement se mesure avant de se prendre.
+  min_distance_m: 200

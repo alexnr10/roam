@@ -1060,6 +1060,51 @@ Le catalogue perd peu de collections dans tous les cas : la question est
 italiennes, médiane 96 lieux, de 226 (Lombardie) à 13 (Molise) — un rapport de
 17. La France va de 273 à 8, soit 34.
 
+### Deux lieux du même site ne commencent pas deux fois un palmarès
+
+« Le meilleur de Pise » ouvrait sur CINQ lieux de la seule Piazza dei
+Miracoli — la tour, la place, le dôme, le baptistère, le Campo Santo — et « Le
+meilleur d'Italie » en prenait deux de ses dix premiers.
+
+Ce ne sont pas des doublons : on les visite séparément, chacun a son billet, et
+`dedupe` ne les voit pas — elle ne compare QUE des lieux du même thème, et la
+tour est un monument quand la place est une piazza. Le voisin n'est donc jamais
+retiré du catalogue ; ce qui lui arrive dépend de ce que la collection a sous la
+main. Là où elle peut se remplir sans lui, il cède la place ; là où elle ne le
+peut pas, il revient à la passe suivante et se range APRÈS les autres.
+
+⚠ Ce second rang a demandé une correction que la première écriture n'avait pas
+vue : `assign_tiers` RETRIE par la clé `ordre`, si bien que le voisin repris à
+la passe relâchée retrouvait sa place au score. « Le meilleur de Pise » rouvrait
+sur trois lieux de la même place, et seule la version large — celle où le voisin
+est simplement écarté — semblait marcher.
+
+**Deux cents mètres**, lu dans les paires mesurées. Sous 150 m on ne trouve que
+des évidences (dôme de Milan ↔ Piazza del Duomo, 50 m). Entre 150 et 200 m, les
+quatre paires ajoutées sont toutes du même site : tour de Pise ↔ Piazza dei
+Miracoli (155 m), Vallée des Temples ↔ temple de la Concorde (195 m), Olympéion
+↔ temple d'Héraclès (185 m), musées du Capitole ↔ Vittoriano (187 m). La
+première paire discutable n'arrive qu'à 241 m — villa Médicis ↔
+Trinité-des-Monts, qui sont deux visites.
+
+Résultat : les paires voisines d'un même niveau 1 tombent de **96 à 18**, et
+celles qui restent sont dans des collections trop maigres pour faire autrement.
+La France ne déclare pas encore la règle — elle lui vaudrait aussi, mais son
+catalogue est livré et le changement se mesure avant de se prendre.
+
+### Bergame en villages : le même cas qu'en France
+
+Bergame — 120 000 habitants, 132 versions linguistiques — est quatrième du
+« meilleur d'Italie », dans le thème `villages`. Elle y entre par le label
+`borghi-piu-belli`, et sa notoriété de VILLE lui donne un score qu'aucun bourg
+ne peut approcher.
+
+Ce n'est pas un travers italien. Le thème est alimenté par des listes de jury,
+et ces listes contiennent des villes des deux côtés des Alpes : la France y a
+Montsoreau (158 langues), Sarlat (82), Le Puy-en-Velay (80), Bar-le-Duc (76),
+Provins (75). Le thème s'appelle « Villages de caractère » et c'est ce nom,
+plus que son contenu, qui fait sursauter.
+
 ### Le plafond des églises : la question a changé de main
 
 Avant les communes, `cathedrales` portait 549 lieux au catalogue et la question

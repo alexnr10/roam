@@ -270,6 +270,10 @@ class CollectionRules:
     # (« plages-region-93 »). Le rapport de caractérisation est une heuristique ;
     # une ligne ici est un jugement, et il l'emporte.
     always_cross: list[str] = field(default_factory=list)
+    # Distance en deçà de laquelle deux lieux d'une collection MIXTE comptent
+    # pour le même site. Le second n'est pas écarté : il est repoussé après les
+    # autres, donc d'un niveau. Zéro n'applique rien.
+    min_distance_m: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -503,6 +507,7 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
         min_places=int(raw["collections"]["min_places"]),
         max_places=int(raw["collections"]["max_places"]),
         max_per_commune=int(raw["collections"].get("max_per_commune", 0)),
+        min_distance_m=float(raw["collections"].get("min_distance_m", 0.0)),
         min_per_region=int(raw["collections"].get("min_per_region", 0)),
         geo_levels=list(raw["geo"]["levels"]),
         cross_theme_levels=list(raw["geo"]["cross_theme_levels"]),

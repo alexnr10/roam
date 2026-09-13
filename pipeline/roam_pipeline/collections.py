@@ -366,7 +366,8 @@ def _rank_within_theme(members: list[Place]) -> dict[str, float]:
     return rangs
 
 
-def _mix_themes(ordered: list[Place], limit: int, part: float) -> list[Place]:
+def _mix_themes(ordered: list[Place], limit: int, part: float,
+                rayon: float = 0.0) -> list[Place]:
     """Empêche un seul thème d'occuper tout un « Le meilleur de… ».
 
     « Le meilleur de Paris » comptait quarante et un musées sur quatre-vingts.
@@ -384,26 +385,61 @@ def _mix_themes(ordered: list[Place], limit: int, part: float) -> list[Place]:
     repêchage : le Centre-Val de Loire n'a pas soixante lieux hors châteaux à
     offrir, alors son plafond s'établit à trente et un. Mieux vaut une région
     un peu châtelaine qu'une collection trop courte.
+
+    `rayon` ajoute la diversité GÉOGRAPHIQUE de la même façon. « Le meilleur de
+    Pise » ouvrait sur cinq lieux de la seule Piazza dei Miracoli — la tour, la
+    place, le dôme, le baptistère, le Campo Santo — et « Le meilleur d'Italie »
+    y prenait deux de ses dix premiers. Ce ne sont pas des doublons : on les
+    visite séparément, et chacun mérite le catalogue. Mais un palmarès qui
+    commence deux fois au même endroit ne dit rien du territoire.
+
+    Ce ne sont pas des doublons — on les visite séparément, chacun a son billet
+    — et le voisin n'est donc jamais retiré du CATALOGUE. Ce qui lui arrive
+    dépend de ce que la collection a sous la main : là où elle peut se remplir
+    sans lui, il lui cède la place (« Le meilleur d'Italie » prend le lac de
+    Côme plutôt qu'une deuxième entrée pisane) ; là où elle ne le peut pas, il
+    revient à la passe suivante et le second rendu dit de le ranger APRÈS les
+    autres, donc un niveau plus bas.
+
+    L'ordre de relâchement compte. Le voisinage cède AVANT le quota de thème :
+    une collection courte vaut mieux qu'une collection resserrée sur un thème,
+    et c'est le défaut que `part` existe pour empêcher.
     """
     plafond = max(3, int(limit * part))
     limite = max(plafond, limit)
     retenus: list[Place] = []
     par_theme: Counter[str] = Counter()
     vus: set[str] = set()
+    serre = rayon > 0
+    voisins: set[str] = set()
 
-    while len(retenus) < limit and plafond <= limite:
+    while len(retenus) < limit and (serre or plafond <= limite):
         avant = len(retenus)
         for place in ordered:
             if len(retenus) >= limit:
                 break
             if place.wikidata_id in vus or par_theme[place.theme_id] >= plafond:
                 continue
+            if serre and any(
+                haversine_m(place.lat, place.lon, autre.lat, autre.lon) < rayon
+                for autre in retenus
+            ):
+                continue
             retenus.append(place)
             vus.add(place.wikidata_id)
             par_theme[place.theme_id] += 1
+            if not serre and rayon > 0 and any(
+                autre is not place
+                and haversine_m(place.lat, place.lon, autre.lat, autre.lon) < rayon
+                for autre in retenus
+            ):
+                voisins.add(place.wikidata_id)
         if len(retenus) == avant:
-            plafond += 1
-    return retenus
+            if serre:
+                serre = False
+            else:
+                plafond += 1
+    return retenus, voisins
 
 
 def _finalize(
@@ -430,7 +466,14 @@ def _finalize(
         # comparer leurs documentations, pas leur intérêt.
         rangs = _rank_within_theme(ordered)
         ordre = lambda p: (rangs[p.wikidata_id], -p.score, p.name)  # noqa: E731
-        ordered = _mix_themes(sorted(ordered, key=ordre), limit, theme_share)
+        ordered, voisins = _mix_themes(
+            sorted(ordered, key=ordre), limit, theme_share, rules.min_distance_m)
+        if voisins:
+            # `assign_tiers` RETRIE par `ordre` : sans ce rang, le voisin repris
+            # à la passe relâchée retrouvait sa place au score et « Le meilleur
+            # de Pise » rouvrait sur trois lieux de la Piazza dei Miracoli.
+            ordre = lambda p: (  # noqa: E731
+                p.wikidata_id in voisins, rangs[p.wikidata_id], -p.score, p.name)
     else:
         ordered = ordered[:limit]
     # Seules les collections THÉMATIQUES : c'est d'elles que parle la revue
