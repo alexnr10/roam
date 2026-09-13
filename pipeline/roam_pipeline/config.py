@@ -134,10 +134,26 @@ class Label:
     # Un verdict explicite l'emporte toujours : le curateur garde le dernier
     # mot sur ce qu'une liste lui propose.
     garde_d_office: bool = False
+    #: La PROPRIÉTÉ par laquelle un lieu se rattache à l'objet du label.
+    #
+    # Les cinq premiers types de requête pointent l'objet directement : le lieu
+    # EST membre de, EST protégé au titre de. « Le Vésuve est dans le parc
+    # national du Vésuve » ne se dit pas comme ça — il faut une propriété de
+    # situation, et l'objet n'est plus une liste mais une CLASSE d'aires.
+    #
+    # Déclarée en configuration et jamais en dur : une propriété écrite de
+    # mémoire ne lève rien, elle rend zéro résultat en silence.
+    via_property: str | None = None
+    via_property_search: str | None = None
 
     @property
     def is_manual(self) -> bool:
         return self.query_kind == "manual"
+
+    @property
+    def attend_une_propriete(self) -> bool:
+        """Ce label a besoin d'une propriété qui n'est pas encore résolue."""
+        return self.query_kind == "dans_une_aire" and not self.via_property
 
 
 @dataclass(frozen=True)
@@ -497,6 +513,8 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
                 search=q.get("search"),
                 collects=bool(lbl.get("collects", False)),
                 garde_d_office=bool(lbl.get("garde_d_office", False)),
+                via_property=q.get("property"),
+                via_property_search=q.get("property_search"),
             )
         )
 

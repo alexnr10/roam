@@ -271,6 +271,9 @@ def _pending_terms(config: Config) -> list[tuple[str, str, str]]:
     for label in config.labels:
         if not label.is_manual and not label.qid and label.search:
             pending.append((f"label {label.id}", label.search, "item"))
+        if label.attend_une_propriete and label.via_property_search:
+            pending.append(
+                (f"label {label.id} (propriété)", label.via_property_search, "property"))
     for term in config.exclusions.search:
         pending.append(("exclusion", term, "item"))
     if config.visitors.search and not config.visitors.property_id:

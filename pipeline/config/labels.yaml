@@ -9,6 +9,14 @@
 #   - kind: member_of → ?place wdt:P463  wd:<qid>   (membre d'une organisation)
 #   - kind: instance  → ?place wdt:P31/wdt:P279* wd:<qid>
 #   - kind: manual    → pas de source Wikidata fiable, liste saisie à la main
+#   - kind: dans_une_aire → ?place wdt:<property>/wdt:P31/wdt:P279* wd:<qid>
+#
+# Ce dernier ne dit pas la même chose que les autres. Les quatre premiers
+# pointent l'objet DIRECTEMENT — le lieu est membre de, est protégé au titre
+# de — et l'objet est une entité unique. `dans_une_aire` dit que le lieu est
+# SITUÉ DANS quelque chose qui appartient à une classe : le Vésuve est dans le
+# parc national du Vésuve, qui est un parc national. Deux sauts, donc deux
+# identifiants — `property` pour la situation, `qid` pour la classe.
 #
 # Un `search` sans `qid` signale un label EN ATTENTE DE RÉSOLUTION : la collecte
 # l'ignore avec un avertissement. `suggest-qids` propose des candidats, `verify-qids`
@@ -176,12 +184,26 @@ labels:
   # propriété de contenance, pas une classe. Plutôt que d'expédier une requête
   # qui ne fait pas ce qu'elle annonce, le label est neutralisé jusqu'à ce que
   # la bonne propriété soit vérifiée.
+  #
+  # La propriété de contenance existe désormais dans le pipeline : c'est le type
+  # de requête `dans_une_aire`, écrit pour les parcs nationaux d'Italie, qui
+  # fait les deux sauts — la propriété de situation, puis la classe de ce
+  # qu'elle atteint. Le label attend donc deux résolutions au lieu d'un fichier
+  # à saisir, et `suggest-qids` les réclame maintenant de lui-même. La propriété
+  # est MONDIALE : celle que l'Italie résoudra est celle d'ici.
+  #
+  # Le comportement ne change pas tant qu'elles manquent — le label ne collecte
+  # rien, et le dit. Il le disait déjà : « pas de source Wikidata et
+  # data/manual/parc-national.csv absent — label ignoré ».
   - id: parc-national
     name: Parc national
     authority: Office français de la biodiversité
     score_bonus: 10
     makes_collection: false
-    wikidata_query: { kind: manual }
+    wikidata_query:
+      kind: dans_une_aire
+      search: parc national de France
+      property_search: aire protégée
 
   # Pas de propriété Wikidata fiable : listes à saisir à la main dans
   # data/manual/<id>.csv (colonnes : name,wikidata_id,note).

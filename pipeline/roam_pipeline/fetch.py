@@ -1743,8 +1743,21 @@ def fetch_label_members(
         )
         return set()
 
-    rows = client.query(
-        wd.label_members_query(label.query_kind, label.qid or "", country=country))
+    if label.attend_une_propriete:
+        # Une propriété manquante est plus sournoise qu'un Q-id manquant : la
+        # requête partirait quand même si on la laissait vide, et rendrait zéro
+        # membre sans rien dire.
+        LOG.warning(
+            "label %s : propriété de situation non résolue (terme « %s ») — "
+            "ignoré. Lance `suggest-qids --property` pour la résoudre.",
+            label.id,
+            label.via_property_search,
+        )
+        return set()
+
+    rows = client.query(wd.label_members_query(
+        label.query_kind, label.qid or "", country=country,
+        via_property=label.via_property))
     qids = {qid for qid in (wd.qid_from_uri(r.get("item")) for r in rows) if qid}
     ajoutes = complement - qids
     if ajoutes:

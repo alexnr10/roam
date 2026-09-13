@@ -42,6 +42,48 @@ labels:
     makes_collection: true
     wikidata_query: { kind: member_of, qid: Q127107 }
 
+  # ── Les parcs nationaux d'Italie ───────────────────────────────────────
+  #
+  # Une collection, et pas un thème : c'est la décision d'Alexis, et elle est
+  # la bonne. Un thème aurait fait du parc un LIEU, et le catalogue aurait tenu
+  # deux fois la même chose — mesuré sur les dix parcs qu'OpenStreetMap avait
+  # fait entrer : six doublaient un lieu déjà présent, le parc national du
+  # Vésuve et le Vésuve, celui de l'Aspromonte et l'Aspromonte, celui du Matese
+  # et le Matese. « Garder uniquement le lieu mais l'ajouter à la collection. »
+  #
+  # Le label ne collecte donc rien : il tamponne le Vésuve, les villages des
+  # Cinque Terre, les criques du Cilento — les lieux que les thèmes tiennent
+  # déjà et qui se trouvent dans un parc.
+  #
+  # ⚠️ EN ATTENTE DE DEUX RÉSOLUTIONS, et il ne collectera rien d'ici là — en
+  # le disant, à chaque `fetch`. C'est le même obstacle que la charte française
+  # avait rencontré et noté sans le lever (voir `parc-national` dans le fichier
+  # du dépôt) : « la requête prévue ramènerait les parcs eux-mêmes, pas les
+  # lieux qui s'y trouvent ». Le type de requête `dans_une_aire` est ce qui
+  # manquait — il fait les deux sauts, la propriété de situation puis la classe
+  # de ce qu'elle atteint — mais ses deux identifiants se résolvent contre
+  # Wikidata, jamais de mémoire :
+  #
+  #     python -m roam_pipeline probe --pays-config it Q635414 Q1438999 Q358729
+  #         les trois parcs que la collecte contient déjà : leurs classes
+  #         déclarées disent laquelle interroger.
+  #     python -m roam_pipeline suggest-qids --property "aire protégée"
+  #         la propriété de situation. Elle est MONDIALE : la même servira au
+  #         label français le jour où il se réveillera.
+  - id: parchi-nazionali
+    name: Parcs nationaux d'Italie
+    authority: Ministero dell'Ambiente e della Sicurezza Energetica
+    # Vingt, comme les Grands Sites de France, et pour la même raison : le
+    # label doit peser sans décider seul. À revoir sur mesure quand la
+    # collection existera — c'est un chiffre posé, pas un chiffre mesuré.
+    score_bonus: 20
+    makes_collection: true
+    collects: false
+    wikidata_query:
+      kind: dans_une_aire
+      search: parc national italien
+      property_search: aire protégée
+
   # L'UNESCO reste : c'est la seule liste de ces quinze qui ne soit pas
   # nationale, et elle vaut d'autant plus ici — l'Italie porte le plus grand
   # nombre de biens inscrits au monde.

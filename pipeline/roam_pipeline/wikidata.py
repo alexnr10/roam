@@ -481,8 +481,25 @@ SELECT ?item ?visitors WHERE {{
 """
 
 
-def label_members_query(kind: str, qid: str, *, country: str | Sequence[str]) -> str:
-    """Membres d'un label. `kind` ∈ {heritage, member_of, instance, operator, owner}."""
+def label_members_query(
+    kind: str, qid: str, *, country: str | Sequence[str],
+    via_property: str | None = None,
+) -> str:
+    """Membres d'un label.
+
+    `kind` ∈ {heritage, member_of, instance, operator, owner, dans_une_aire}.
+
+    Les cinq premiers pointent l'objet DIRECTEMENT : le lieu est membre de
+    l'association, protégé au titre du label, exploité par l'organisme. L'objet
+    est alors une entité unique — une liste, une désignation.
+
+    Le sixième dit autre chose : le lieu est SITUÉ DANS quelque chose qui
+    appartient à une classe. « Le Vésuve est dans le parc national du Vésuve »
+    ne se dit pas comme « le Vésuve est membre du parc du Vésuve », et l'objet
+    n'est pas un parc mais la classe de tous les parcs nationaux italiens. Il
+    faut donc deux sauts : la propriété de situation, puis la classe de ce
+    qu'elle atteint. `via_property` porte la première, `qid` la seconde.
+    """
     predicate = {
         "heritage": f"wdt:{P_HERITAGE}",
         "member_of": f"wdt:{P_MEMBER_OF}",
@@ -492,6 +509,16 @@ def label_members_query(kind: str, qid: str, *, country: str | Sequence[str]) ->
         "operator": f"wdt:{P_OPERATOR}",
         "owner": f"wdt:{P_OWNED_BY}",
     }
+    if kind == "dans_une_aire":
+        if not via_property:
+            raise ValueError(
+                "dans_une_aire exige une propriété de situation : déclare "
+                "`property` dans le `wikidata_query` du label, et résous-la "
+                "avec `suggest-qids --property`."
+            )
+        predicate[kind] = (
+            f"wdt:{via_property}/wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}*"
+        )
     if kind not in predicate:
         raise ValueError(f"type de requête de label non géré : {kind}")
     # Seul l'identifiant est exploité : demander les libellés et les coordonnées
