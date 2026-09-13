@@ -8274,6 +8274,85 @@ class TestEmpriseDuPays(unittest.TestCase):
         self.assertNotIn("mer", trouve)
 
 
+class TestCellulesTombees(unittest.TestCase):
+    """Une cellule perdue laisse un trou que rien ne vient combler.
+
+    Mesuré sur la collecte italienne : « 2 cellule(s) sur 36 abandonnées ». Le
+    client avait déjà insisté trois fois en changeant de miroir, mais sur
+    trente-cinq secondes ; la grille entière en prend vingt minutes, et rien ne
+    permettait de redemander CES deux cellules — `--cells` prend les N
+    premières, pas les manquantes.
+    """
+
+    class _Client:
+        """Overpass qui sature, puis se remet."""
+
+        def __init__(self, tombent, retombent=()):
+            self.tombent = set(tombent)
+            self.retombent = set(retombent)
+            self.abandonnees = []
+            self.appels = []
+
+        def fetch_cell(self, cell, tags=None):
+            self.appels.append(cell)
+            premier = self.appels.count(cell) == 1
+            if cell in self.tombent and (premier or cell in self.retombent):
+                self.abandonnees.append(cell)
+                return []
+            return [f"site-{cell}"]
+
+    @staticmethod
+    def _grille(n):
+        return [(float(i), 0.0, float(i) + 1, 1.0) for i in range(n)]
+
+    def test_la_cellule_tombee_est_redemandee(self):
+        from roam_pipeline.cli import _collecter_cellules
+
+        grille = self._grille(4)
+        client = self._Client(tombent={grille[1], grille[2]})
+        with contextlib.redirect_stdout(io.StringIO()):
+            osm = _collecter_cellules(client, grille, None)
+
+        # Quatre cellules, deux tombées, deux reprises : rien ne manque.
+        self.assertEqual(len(osm), 4)
+        self.assertEqual(client.appels[:4], grille)
+        self.assertEqual(sorted(client.appels[4:]), sorted([grille[1], grille[2]]))
+        self.assertEqual(client.abandonnees, [])
+
+    def test_une_collecte_entiere_ne_declenche_aucune_reprise(self):
+        from roam_pipeline.cli import _collecter_cellules
+
+        grille = self._grille(3)
+        client = self._Client(tombent=())
+        with contextlib.redirect_stdout(io.StringIO()) as sortie:
+            osm = _collecter_cellules(client, grille, None)
+
+        self.assertEqual(len(osm), 3)
+        self.assertEqual(client.appels, grille)
+        self.assertNotIn("Seconde tentative", sortie.getvalue())
+
+    def test_ce_qui_tombe_deux_fois_reste_compte(self):
+        # L'avertissement final doit annoncer les cellules tombées DEUX fois,
+        # et non celles du premier passage : sinon la reprise, en réussissant,
+        # laisserait croire à un trou qui n'existe plus.
+        from roam_pipeline.cli import _collecter_cellules
+
+        grille = self._grille(3)
+        client = self._Client(tombent={grille[0], grille[1]},
+                              retombent={grille[1]})
+        with contextlib.redirect_stdout(io.StringIO()):
+            osm = _collecter_cellules(client, grille, None)
+
+        self.assertEqual(len(osm), 2)
+        self.assertEqual(client.abandonnees, [grille[1]])
+
+    def test_la_cellule_se_lit_en_coordonnees(self):
+        from roam_pipeline.cli import _cellule
+
+        self.assertEqual(_cellule((41.5, 12.0, 42.0, 12.5)),
+                         "41.50,12.00 \u2192 42.00,12.50")
+
+
 class TestOrdreDeLaRevue(unittest.TestCase):
     """La feuille se lit par tranches de thème, pas par thème entier.
 

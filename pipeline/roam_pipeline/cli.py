@@ -594,6 +594,45 @@ def _emprise_du_pays(args: argparse.Namespace, config: Config, raw_path):
     return emprise, temoin_autour(meilleur.lat, meilleur.lon), situer
 
 
+def _cellule(cell: tuple[float, float, float, float]) -> str:
+    """Une cellule en coordonnées lisibles, pour dire OÙ est le trou."""
+    return f"{cell[0]:.2f},{cell[1]:.2f} → {cell[2]:.2f},{cell[3]:.2f}"
+
+
+def _collecter_cellules(client, grid, tags) -> list:
+    """Interroge toute la grille, puis REPREND les cellules tombées.
+
+    Une cellule tombe parce qu'Overpass sature à cet instant. Le client a déjà
+    insisté trois fois en changeant de miroir — mais sur trente-cinq secondes.
+    Le reste de la grille en prend plusieurs minutes, et quand elle s'achève la
+    saturation est le plus souvent passée.
+
+    Sans cette reprise, le trou est définitif pour la journée : `--cells` prend
+    les N PREMIÈRES cellules, jamais les manquantes, et relancer la commande
+    redemande les trente-six. Une seconde tournée sur les seules cellules
+    perdues coûte quelques secondes.
+    """
+    osm = []
+    for index, cell in enumerate(grid, start=1):
+        found = client.fetch_cell(cell, tags)
+        osm.extend(found)
+        LOG.info("cellule %s/%s : %s sites (%s au total)",
+                 index, len(grid), len(found), len(osm))
+
+    if client.abandonnees:
+        # Vidée AVANT la reprise : ce qui reste dedans après est ce qui est
+        # tombé deux fois, et c'est ce compte-là que l'avertissement final doit
+        # annoncer — pas celui du premier passage.
+        perdues, client.abandonnees = client.abandonnees, []
+        print(f"Seconde tentative sur {len(perdues)} cellule(s) tombée(s).")
+        for cell in perdues:
+            found = client.fetch_cell(cell, tags)
+            osm.extend(found)
+            LOG.info("reprise %s : %s sites (%s au total)",
+                     _cellule(cell), len(found), len(osm))
+    return osm
+
+
 def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     """Confronte le catalogue aux sites de visite d'OpenStreetMap.
 
@@ -653,11 +692,7 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
         grid = grid[: args.cells]
     print(f"Interrogation d'OpenStreetMap : {len(grid)} cellules, compte ~{max(1, len(grid) // 4)} min."
           + (f"\nRestreinte à {', '.join(sorted(vises))}." if vises else ""))
-    osm = []
-    for index, cell in enumerate(grid, start=1):
-        found = client.fetch_cell(cell, tags)
-        osm.extend(found)
-        LOG.info("cellule %s/%s : %s sites (%s au total)", index, len(grid), len(found), len(osm))
+    osm = _collecter_cellules(client, grid, tags)
 
     if not osm:
         print("Aucun site récupéré — service indisponible ?", file=sys.stderr)
@@ -720,8 +755,18 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     if client.abandonnees:
         # Une cellule abandonnée rend zéro site, comme une cellule vide : sans
         # ce compte, une collecte à moitié tombée passe pour un résultat.
+        #
+        # Dire OÙ est le trou, et ce qu'il coûte. L'ouverture au public est un
+        # état à trois valeurs : les lieux d'une cellule perdue restent
+        # INCONNUS, ils n'encaissent donc pas le malus de non-visitable — ils
+        # perdent seulement le bonus qu'ils auraient pu gagner.
         print(f"⚠ {len(client.abandonnees)} cellule(s) sur {len(grid)} abandonnées "
               "faute de réponse d'Overpass — le compte ci-dessous est PARTIEL.")
+        for cell in client.abandonnees:
+            dedans = sum(1 for p in places
+                         if cell[0] <= p.lat < cell[2] and cell[1] <= p.lon < cell[3])
+            print(f"   {_cellule(cell)} — {dedans} lieu(x) du catalogue sans "
+                  "information d'accueil")
     # Le critère n'est pas le même partout, et l'annoncer faux vaut moins que
     # ne rien annoncer : sur un thème sans portes, une fiche Wikidata suffit.
     preuve = ("une fiche Wikidata" if vises and vises <= sans_portes
@@ -730,6 +775,14 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
           f"dont {len(confident)} avec {preuve}.")
     print(f"{min(len(retained), args.limit)} écrits dans {out_path}, "
           f"dont {ready} directement recopiables dans {args.manual / 'places.csv'}.")
+    if len(retained) > args.limit:
+        # Le plafond coupe DANS les candidats sûrs, et la ligne « ajoute --all »
+        # juste en dessous parle des AUTRES — des moins sûrs. Sans ce mot, la
+        # collecte italienne annonçait « 1548 avec une attestation » puis « 1500
+        # écrits » et on lisait 1500 comme le total.
+        print(f"⚠ {len(retained) - args.limit} candidat(s) de même qualité n'ont "
+              f"PAS été écrits : la feuille est plafonnée par --limit "
+              f"(actuellement {args.limit}).")
     if not args.all and len(candidates) > len(confident):
         print(f"Ajoute --all pour voir les {len(candidates) - len(confident)} autres.")
     if vises:
