@@ -40,6 +40,7 @@ from .fetch import (
     apply_labels,
     carry_enrichment,
     fetch_label_members,
+    membres_inscrits,
     read_fetch_state,
     stale_themes,
     _paged,
@@ -943,6 +944,38 @@ def cmd_adopt(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def _alerter_listes_amputees(
+    config: Config, manual_dir: Path, retained: list[Place]
+) -> None:
+    """Une liste manuelle réclame des lieux que le catalogue n'a plus.
+
+    Un membre absent ne peut pas être tamponné, et la collection le perd SANS
+    RIEN DIRE. C'est surtout vrai des listes où chaque ligne représente autre
+    chose qu'elle-même : sur « Parcs nationaux d'Italie », une ligne est LE
+    lieu phare d'un parc, et l'écarter en revue emporte le parc entier.
+
+    Ni `relabel` ni `build` ne le signalaient : l'avertissement de `relabel` ne
+    couvre que les listes qui ALIMENTENT un thème, et une liste qui se contente
+    de tamponner n'en alimente aucun.
+    """
+    presents = {place.wikidata_id for place in retained}
+    for label in config.labels:
+        if not (label.is_manual and label.makes_collection):
+            continue
+        inscrits = membres_inscrits(label, manual_dir)
+        perdus = sorted(inscrits - presents)
+        if not perdus:
+            continue
+        LOG.warning(
+            "%s : %s membre(s) inscrits mais ABSENTS du catalogue — la liste "
+            "les réclame, la collection ne les aura pas : %s%s. "
+            "Écartés en revue, sous un plafond, ou jamais collectés — "
+            "`explain` le dit pour chacun.",
+            label.id, len(perdus), ", ".join(perdus[:8]),
+            f" (+{len(perdus) - 8})" if len(perdus) > 8 else "",
+        )
+
+
 def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     """Score, applique les décisions du curateur, construit et exporte.
 
@@ -1005,6 +1038,7 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     # photo sans crédit dans la collecte ne regarde personne, la même photo au
     # catalogue est une licence non respectée.
     warn_missing_credits(retained)
+    _alerter_listes_amputees(config, args.manual, retained)
 
     # Ce qui a bougé depuis la dernière revue. Le niveau d'un lieu n'est pas une
     # propriété du lieu : c'est son rang dans sa collection. Ajouter un signal

@@ -1802,6 +1802,15 @@ def fetch_label_members(
     return qids | complement
 
 
+def membres_inscrits(label: Label, manual_dir: Path) -> set[str]:
+    """Les identifiants qu'une liste manuelle RÉCLAME, sans rien interroger.
+
+    Ce que la liste demande, par opposition à ce que le catalogue porte : c'est
+    l'écart entre les deux qui dit qu'une collection a perdu un membre.
+    """
+    return _read_manual_label(label, manual_dir, quiet=True)
+
+
 def _read_manual_label(
     label: Label, manual_dir: Path, quiet: bool = False
 ) -> set[str]:

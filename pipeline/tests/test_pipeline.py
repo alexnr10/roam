@@ -8423,6 +8423,67 @@ class TestLabelDansUneAire(unittest.TestCase):
         self.assertTrue(any("propriété de situation" in m for m in journal.output))
 
 
+class TestListeAmputee(unittest.TestCase):
+    """Une liste manuelle qui réclame un lieu que le catalogue n'a plus.
+
+    Sur « Parcs nationaux d'Italie », chaque ligne est LE lieu phare d'un parc :
+    l'écarter en revue emporte le parc entier hors de la collection, et rien ne
+    le disait. L'avertissement de `relabel` ne couvre que les listes qui
+    ALIMENTENT un thème ; une liste qui se contente de tamponner n'en alimente
+    aucun, et passait donc entre les mailles.
+    """
+
+    @staticmethod
+    def _liste(tmp, qids):
+        dossier = Path(tmp)
+        (dossier / "parchi-nazionali.csv").write_text(
+            "wikidata_id,name\n" + "".join(f"{q},lieu {q}\n" for q in qids),
+            encoding="utf-8")
+        return dossier
+
+    def test_un_membre_ecarte_est_annonce(self):
+        from roam_pipeline.cli import _alerter_listes_amputees
+
+        config = load_config(pays="it")
+        garde = make_place("Vésuve", theme="volcans", wikidata_id="Q524")
+        with tempfile.TemporaryDirectory() as tmp:
+            dossier = self._liste(tmp, ["Q524", "Q999", "Q1000"])
+            with self.assertLogs("roam", level="WARNING") as journal:
+                _alerter_listes_amputees(config, dossier, [garde])
+        texte = "\n".join(journal.output)
+        self.assertIn("parchi-nazionali", texte)
+        self.assertIn("2 membre(s)", texte)
+        self.assertIn("Q999", texte)
+        self.assertNotIn("Q524", texte)     # celui-là est bien là
+
+    def test_une_liste_entiere_ne_dit_rien(self):
+        from roam_pipeline.cli import _alerter_listes_amputees
+
+        config = load_config(pays="it")
+        lieux = [make_place("Vésuve", theme="volcans", wikidata_id="Q524")]
+        with tempfile.TemporaryDirectory() as tmp:
+            dossier = self._liste(tmp, ["Q524"])
+            with self.assertNoLogs("roam", level="WARNING"):
+                _alerter_listes_amputees(config, dossier, lieux)
+
+    def test_la_liste_italienne_reelle_est_entiere(self):
+        """Le contrôle sur les vraies données : 26 parcs, 26 représentants."""
+        import csv, json
+        from roam_pipeline.cli import BASE_DIR
+
+        liste = BASE_DIR / "data" / "it" / "manual" / "parchi-nazionali.csv"
+        bati = BASE_DIR / "data" / "it" / "out" / "places.json"
+        if not (liste.exists() and bati.exists()):
+            self.skipTest("catalogue italien absent")
+        inscrits = {r["wikidata_id"] for r in csv.DictReader(
+            [l.rstrip() for l in liste.read_text(encoding="utf-8").splitlines()
+             if l.strip() and not l.lstrip().startswith("#")])}
+        charge = json.loads(bati.read_text(encoding="utf-8"))
+        presents = {x["wikidata_id"] for x in
+                    (charge["places"] if isinstance(charge, dict) else charge)}
+        self.assertEqual(inscrits - presents, set())
+
+
 class TestLabelsApresCollectePartielle(unittest.TestCase):
     """`fetch --only X` laissait les autres thèmes avec les labels de la veille.
 
