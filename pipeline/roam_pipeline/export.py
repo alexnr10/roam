@@ -1107,6 +1107,7 @@ function card(p) {
   const d = decisions[p.id] || "";
   const theme = themeNow(p);
   el.className = "card" + (d ? " " + d : "") + (theme !== p.themeId ? " rethemed" : "");
+  el.dataset.id = p.id;
 
   const img = p.image
     ? `<img class="thumb" loading="lazy" src="${p.image}" alt=""
@@ -1210,7 +1211,7 @@ function card(p) {
     if (picker.value === p.themeId) delete themeOf[p.id];
     else themeOf[p.id] = picker.value;
     save();
-    render();
+    rafraichir(p);
   };
 
   el.querySelectorAll("[data-act]").forEach(btn => {
@@ -1219,15 +1220,50 @@ function card(p) {
       decisions[p.id] = decisions[p.id] === act ? "" : act;
       if (!decisions[p.id] && !(p.id in DECIDED)) delete decisions[p.id];
       save();
-      render();
+      rafraichir(p);
     };
   });
   return el;
 }
 
-function render() {
+// Décider ne doit pas renvoyer en haut de page. `render()` reconstruit toute la
+// grille — c'est juste quand un filtre change, et c'est un saut au début de la
+// liste à chaque clic quand on relit deux cents sosies : on décide, on remonte,
+// on redescend chercher où l'on en était.
+//
+// Deux cas, et deux traitements. Si le lieu RESTE affiché après sa décision —
+// c'est le cas du filtre « Sosies », qui ne regarde pas les verdicts — seule sa
+// carte est remplacée, à sa place exacte, et rien ne bouge. S'il doit
+// DISPARAÎTRE — filtre « À décider » — la grille est bien reconstruite, mais la
+// position de défilement est rendue ensuite.
+function rafraichir(p) {
+  const encore = visible().some(q => q.id === p.id);
+  const ancienne = grid.querySelector(`[data-id="${CSS.escape(p.id)}"]`);
+  if (encore && ancienne) {
+    ancienne.replaceWith(card(p));
+    compteurs(visible());
+    return;
+  }
+  render(true);
+}
+
+// `garderPosition` distingue les deux appelants. Une DÉCISION doit laisser
+// l'écran où il est ; un CHANGEMENT DE FILTRE affiche une autre liste, et
+// revenir en haut est alors ce qu'on attend.
+function render(garderPosition) {
+  const y = window.scrollY;
   const list = visible();
   grid.replaceChildren(...list.map(card));
+  // Rendue APRÈS le remplacement, et bornée à la hauteur qui reste : sur une
+  // liste qui vient de raccourcir, insister laisserait l'écran sous son contenu.
+  window.scrollTo({
+    top: garderPosition ? Math.min(y, document.body.scrollHeight) : 0,
+    behavior: "instant",
+  });
+  compteurs(list);
+}
+
+function compteurs(list) {
   // Compté sur les lieux de la page, jamais sur les clés du stockage : c'est
   // la seconde barrière contre « plus de décidés que de lieux ».
   const done = DATA.filter(p => decisions[p.id]).length;
@@ -1257,7 +1293,7 @@ function render() {
 }
 
 for (const id of ["theme", "region", "tier", "state"]) {
-  document.getElementById(id).onchange = render;
+  document.getElementById(id).onchange = () => render(false);
 }
 
 function feuille() {

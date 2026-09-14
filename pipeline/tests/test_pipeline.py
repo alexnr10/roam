@@ -8427,6 +8427,50 @@ class TestLabelDansUneAire(unittest.TestCase):
         self.assertTrue(any("propriété de situation" in m for m in journal.output))
 
 
+class TestRevueNeRemontePas(unittest.TestCase):
+    """Décider ne doit pas renvoyer en haut de la page de revue.
+
+    `render()` reconstruisait toute la grille à chaque clic. C'est juste quand
+    un filtre change ; c'est un saut au début de la liste à chaque décision
+    quand on relit trois cents sosies — on décide, on remonte, on redescend
+    chercher où l'on en était.
+
+    Vérifié dans un navigateur sur la vraie page italienne : filtre « Sosies »
+    et filtre « À décider », 0 pixel d'écart ; changement de filtre, retour en
+    haut comme attendu.
+    """
+
+    def _page(self):
+        from roam_pipeline.cli import BASE_DIR
+        chemin = BASE_DIR / "data" / "it" / "out" / "review.html"
+        if not chemin.exists():
+            chemin = BASE_DIR / "data" / "out" / "review.html"
+        if not chemin.exists():
+            self.skipTest("page de revue absente — `build` la produit")
+        return chemin.read_text(encoding="utf-8")
+
+    def test_la_carte_porte_son_identifiant(self):
+        """Sans lui, on ne saurait pas laquelle remplacer."""
+        self.assertIn("el.dataset.id = p.id", self._page())
+
+    def test_une_decision_ne_rappelle_pas_render(self):
+        page = self._page()
+        # Les deux points de décision — les boutons et le sélecteur de thème —
+        # passent par le rafraîchissement ciblé.
+        self.assertIn("rafraichir(p)", page)
+        self.assertIn("ancienne.replaceWith(card(p))", page)
+
+    def test_le_defilement_est_rendu_apres_reconstruction(self):
+        page = self._page()
+        self.assertIn("const y = window.scrollY", page)
+        self.assertIn("garderPosition ? Math.min(y, document.body.scrollHeight) : 0",
+                      page)
+
+    def test_un_changement_de_filtre_remonte_bien(self):
+        # L'inverse compte autant : une autre liste s'affiche, on veut son début.
+        self.assertIn("onchange = () => render(false)", self._page())
+
+
 class TestPorteeDesSosiesParTheme(unittest.TestCase):
     """« Le cap qui donne sur une plage également collectée. »
 
