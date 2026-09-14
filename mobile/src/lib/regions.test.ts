@@ -2,6 +2,7 @@ import { places } from '../data/catalog';
 import {
   REGIONS,
   anneauDuMonde,
+  bornesDuPays,
   centreDe,
   cheminSvg,
   cheminSvgDans,
@@ -108,6 +109,32 @@ describe('voile', () => {
     // C'est ce percement qui fait apparaître Mayotte quand on dérive vers
     // l'océan Indien, sans qu'aucun encart n'ait à l'annoncer.
     expect(percé.geometry.coordinates.length).toBeGreaterThan(REGIONS.size);
+  });
+});
+
+describe('bornesDuPays', () => {
+  it('cadre la métropole, pas le globe', () => {
+    // L'union BRUTE des contours français va de la Guadeloupe (-61,8) à La
+    // Réunion (55,8) : une vue de départ montrant un hémisphère pour quelques
+    // lieux à l'autre bout du monde n'est pas une vue de départ. Le premier
+    // jet faisait exactement ça — mesuré, pas supposé.
+    const bornes = bornesDuPays();
+    expect(bornes).not.toBeNull();
+    const [[ouest, sud], [est, nord]] = bornes!;
+    expect(ouest).toBeGreaterThan(-10);
+    expect(est).toBeLessThan(12);
+    expect(sud).toBeGreaterThan(40);
+    expect(nord).toBeLessThan(52);
+  });
+
+  it("contient Brest, Menton et la pointe corse", () => {
+    const [[ouest, sud], [est, nord]] = bornesDuPays()!;
+    for (const [lon, lat] of [[-4.486, 48.39], [7.503, 43.775], [9.36, 41.39]]) {
+      expect(lon).toBeGreaterThanOrEqual(ouest);
+      expect(lon).toBeLessThanOrEqual(est);
+      expect(lat).toBeGreaterThanOrEqual(sud);
+      expect(lat).toBeLessThanOrEqual(nord);
+    }
   });
 });
 

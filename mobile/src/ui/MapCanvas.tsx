@@ -12,6 +12,7 @@ import { useCatalogue } from '../lib/useCatalogue';
 import type { Emprise } from '../lib/regions';
 import {
   REGIONS,
+  bornesDuPays,
   emprise,
   prochaineOuverture,
   regionDuCadre,
@@ -149,13 +150,17 @@ export type MapCanvasProps = {
  */
 const TOLERANCE_PX = 18;
 
-/** L'emprise de départ, dans l'ordre plat que veut le SDK natif. */
-const DEPART: [number, number, number, number] = [
-  FRANCE_BOUNDS[0][0],
-  FRANCE_BOUNDS[0][1],
-  FRANCE_BOUNDS[1][0],
-  FRANCE_BOUNDS[1][1],
-];
+/**
+ * L'emprise de départ, dans l'ordre plat que veut le SDK natif.
+ *
+ * Elle SUIT le pays : une constante française cadrait l'Italie de travers,
+ * contre le bord de l'écran. Calculée à l'appel, pas une fois pour toutes —
+ * le catalogue change sous la carte.
+ */
+const bornesDeDepart = (): [number, number, number, number] => {
+  const [[ouest, sud], [est, nord]] = bornesDuPays() ?? FRANCE_BOUNDS;
+  return [ouest, sud, est, nord];
+};
 
 /** Le cadrage de la vue de départ : la France entière, à douze points du bord. */
 const CADRAGE_DEPART = { top: 12, right: 12, bottom: 12, left: 12 };
@@ -511,7 +516,7 @@ function CarteNative({
     setOuverte(null);
     surRegion.current?.(null);
     const depart = setTimeout(() => {
-      camera.current?.fitBounds(DEPART, {
+      camera.current?.fitBounds(bornesDeDepart(), {
         padding: CADRAGE_DEPART,
         duration: TRANSITION.retour.zoom,
         easing: 'ease',
@@ -621,7 +626,7 @@ function CarteNative({
       >
         <Camera
           ref={camera}
-          initialViewState={{ bounds: DEPART, padding: CADRAGE_DEPART }}
+          initialViewState={{ bounds: bornesDeDepart(), padding: CADRAGE_DEPART }}
         />
 
         <Images images={imagesDesGlyphes} />

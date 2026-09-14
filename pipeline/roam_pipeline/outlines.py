@@ -323,8 +323,17 @@ def build_outlines(
     tolerance_km2: float,
     grid: float = GRID,
     min_polygon_km2: float = MIN_POLYGON_KM2,
+    code_key: str = "code",
+    name_key: str = "nom",
 ) -> list[dict]:
-    """Simplifie une collection de territoires en préservant leurs frontières."""
+    """Simplifie une collection de territoires en préservant leurs frontières.
+
+    `code_key` et `name_key` nomment les propriétés du GeoJSON d'entrée : elles
+    varient d'un producteur à l'autre — `code`/`nom` chez france-geojson,
+    `prov_istat_code`/`prov_name` chez openpolis — et c'est à peu près tout ce
+    qui change d'un pays à l'autre. La SORTIE, elle, dit toujours `code` et
+    `nom` : c'est ce que lit l'application, et elle n'a pas à connaître de pays.
+    """
     shapes = [_shape_of(feature["geometry"], grid) for feature in features]
     bounds = junctions(shapes)
 
@@ -365,7 +374,7 @@ def build_outlines(
             areas.append(_ring_area_km2(polygon[0], grid))
 
         if not polygons:
-            LOG.warning("contour vide : %s", feature["properties"].get("nom"))
+            LOG.warning("contour vide : %s", feature["properties"].get(name_key))
             continue
 
         # Les îlots sous le seuil s'effacent, jamais le territoire lui-même.
@@ -376,12 +385,12 @@ def build_outlines(
             if area >= min_polygon_km2 or area == biggest
         ]
 
-        code = str(feature["properties"]["code"])
+        code = str(feature["properties"][code_key])
         out.append(
             {
                 "type": "Feature",
                 "id": code,
-                "properties": {"code": code, "nom": feature["properties"]["nom"]},
+                "properties": {"code": code, "nom": feature["properties"][name_key]},
                 "geometry": (
                     {"type": "Polygon", "coordinates": kept[0]}
                     if len(kept) == 1
@@ -392,12 +401,26 @@ def build_outlines(
     return out
 
 
-def fetch(level: str, timeout_s: int = 120) -> list[dict]:
-    url = SOURCES[level]
+def fetch(level: str, timeout_s: int = 120, url: str | None = None) -> list[dict]:
+    url = url or SOURCES[level]
     LOG.info("contours %s : %s", level, url)
     response = requests.get(url, timeout=timeout_s)
     response.raise_for_status()
     return response.json()["features"]
+
+
+#: Ce qu'il faut savoir d'une échelle pour en tirer des contours : où la
+#: prendre, et sous quels noms de propriétés le producteur range le code et le
+#: nom. Le pays de départ n'en fournit pas — `SOURCES` le décrit déjà.
+class Source:
+    __slots__ = ("url", "fichier", "code_key", "name_key")
+
+    def __init__(self, url: str | None = None, fichier: str | None = None,
+                 code_key: str = "code", name_key: str = "nom") -> None:
+        self.url = url
+        self.fichier = fichier
+        self.code_key = code_key
+        self.name_key = name_key
 
 
 def export(
@@ -406,21 +429,58 @@ def export(
     grid: float = GRID,
     source_dir: Path | None = None,
     min_polygon_km2: float = MIN_POLYGON_KM2,
+    sources: dict[str, Source] | None = None,
+    attribution: str | None = None,
+    depot: Path | None = None,
+    noms: dict[str, dict[str, str]] | None = None,
 ) -> dict[str, int]:
-    """Écrit `outlines.json` : une collection GeoJSON par échelle."""
+    """Écrit `outlines.json` : une collection GeoJSON par échelle.
+
+    Sans `sources`, ce sont les tracés français qui sont produits — c'est le
+    défaut historique, et il ne bouge pas. Un autre pays passe les siennes :
+    leurs adresses et leurs noms de propriétés, qui ne se devinent pas.
+
+    Trois façons d'obtenir les polygones, dans cet ordre :
+
+    - `source_dir`, demandé à la main : on prend ce qui s'y trouve, et son
+      absence est une erreur — c'est tout l'intérêt de l'avoir demandé.
+    - `depot`, le dossier où `geo-layers` a déjà téléchargé les couches de
+      rattachement. S'il porte le fichier, on le PRÉFÈRE au réseau : c'est
+      celui sur lequel le catalogue a été rattaché, et deux millésimes
+      différents donneraient des codes de territoires qui ne se rejoignent
+      plus. Le découpage sarde de janvier 2026 a renuméroté huit provinces.
+    - le réseau, sinon.
+    """
     tolerances = tolerances or DEFAULT_TOLERANCE_KM2
-    payload: dict[str, object] = {"attribution": ATTRIBUTION}
+    sources = sources or {level: Source(url=url) for level, url in SOURCES.items()}
+    payload: dict[str, object] = {"attribution": attribution or ATTRIBUTION}
     counts: dict[str, int] = {}
 
-    for level in SOURCES:
+    for level, source in sources.items():
+        nom_fichier = source.fichier or f"{level}.geojson"
+        depose = depot / nom_fichier if depot is not None else None
         if source_dir is not None:
-            raw = json.loads((source_dir / f"{level}.geojson").read_text(encoding="utf-8"))
-            features = raw["features"]
+            features = json.loads(
+                (source_dir / nom_fichier).read_text(encoding="utf-8"))["features"]
+        elif depose is not None and depose.exists():
+            LOG.info("contours %s : %s (déjà sur le disque)", level, depose)
+            features = json.loads(depose.read_text(encoding="utf-8"))["features"]
         else:
-            features = fetch(level)
+            features = fetch(level, url=source.url)
         simplified = build_outlines(
-            features, tolerances[level], grid, min_polygon_km2=min_polygon_km2
+            features, tolerances[level], grid, min_polygon_km2=min_polygon_km2,
+            code_key=source.code_key, name_key=source.name_key,
         )
+        # Le nom affiché vient du RÉFÉRENTIEL, pas du producteur de polygones.
+        # Le découpage italien dit « Torino » et « Roma » ; le guide est en
+        # français et son catalogue dit Turin et Rome. Deux sources pour un même
+        # territoire finiraient par se contredire à l'écran — le bandeau tenant
+        # l'une, l'étiquette sur la carte l'autre.
+        table = (noms or {}).get(level) or {}
+        for feature in simplified:
+            attendu = table.get(feature["properties"]["code"])
+            if attendu:
+                feature["properties"]["nom"] = attendu
         payload[level] = {"type": "FeatureCollection", "features": simplified}
         counts[level] = len(simplified)
         LOG.info(

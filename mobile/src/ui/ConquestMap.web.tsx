@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { attributionDesContours, outlinesFor } from '../data/outlines';
+import { bornesDuPays } from '../lib/regions';
 import { useCatalogue } from '../lib/useCatalogue';
 import { colors, radius, spacing, type } from '../theme';
 import type { AreaLevel } from '../types';
@@ -91,7 +92,7 @@ export function ConquestMap({ zones, level, selectedCode, onSelectZone }: Conque
         instance = new maplibregl.Map({
           container: container.current,
           style: style as maplibregl.StyleSpecification,
-          bounds: FRANCE_BOUNDS,
+          bounds: bornesDuPays() ?? FRANCE_BOUNDS,
           fitBoundsOptions: { padding: 8 },
           attributionControl: { compact: true },
         });

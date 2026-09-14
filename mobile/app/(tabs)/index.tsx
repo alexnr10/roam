@@ -8,6 +8,7 @@ import { useCatalogue } from '../../src/lib/useCatalogue';
 import { usePays } from '../../src/store/pays';
 import { bandeau } from '../../src/lib/carte';
 import { etoilesDe } from '../../src/lib/etoiles';
+import { attributionDesContours } from '../../src/data/outlines';
 import { nomDeRegion } from '../../src/lib/regions';
 import { evaluateCheckIn, suggestCheckIn } from '../../src/lib/checkin';
 import { distanceToPlace, formatDistance } from '../../src/lib/geo';
@@ -398,10 +399,14 @@ export default function MapScreen() {
           ) : null}
 
           {/* La Licence ouverte exige la mention des contours, et les licences
-              de Commons celle des photos. Ce n'est pas une politesse. */}
+              de Commons celle des photos. Ce n'est pas une politesse — et
+              c'est pour cela qu'elle suit le PAYS : la ligne était écrite en
+              dur, elle créditait donc l'IGN sous des contours italiens, qui
+              viennent de l'ISTAT et demandent leur propre mention. */}
           <Text style={styles.credit} numberOfLines={2}>
-            Contours IGN Admin Express — Licence ouverte (Etalab) · Photos Wikimedia
-            Commons
+            {[attributionDesContours(), 'Photos Wikimedia Commons']
+              .filter(Boolean)
+              .join(' · ')}
           </Text>
           </View>
         </View>

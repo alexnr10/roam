@@ -82,6 +82,33 @@ geo:
       name: Saint-Marin
       departement: "099"      # province de Rimini
 
+  # ── LES CONTOURS À DESSINER ───────────────────────────────────────────
+  #
+  # Sans eux, la carte italienne est un rectangle vide. Ce n'est pas une
+  # coquetterie : la carte d'exploration n'affiche AUCUN lieu à l'échelle du
+  # pays — on ouvre une région, et les lieux de cette région apparaissent. Sans
+  # contours, il n'y a pas de région à ouvrir, donc pas un seul lieu à l'écran,
+  # alors même que le catalogue est chargé et que les vignettes du bas le
+  # montrent. La carte de conquête, elle, retombe proprement sur la liste.
+  #
+  # Même découpage ISTAT que le rattachement — c'est la condition pour que les
+  # codes dessinés soient ceux du catalogue. Le fichier des provinces est déjà
+  # sur le disque, on ne le retélécharge pas : le découpage sarde du 1er
+  # janvier 2026 a renuméroté huit provinces, et deux millésimes différents
+  # donneraient des aplats qui ne se rattachent à rien.
+  contours:
+    attribution: Contours ISTAT via openpolis/geojson-italy — CC BY
+    niveaux:
+      region:
+        code_key: reg_istat_code
+        name_key: reg_name
+        url: https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_regions.geojson
+      departement:
+        fichier: province.geojson
+        code_key: prov_istat_code
+        name_key: prov_name
+        url: https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_provinces.geojson
+
   layers:
     departement:
       fichier: province.geojson

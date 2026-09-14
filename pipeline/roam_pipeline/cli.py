@@ -68,6 +68,7 @@ from .fetch import (
 from .models import Collection, CollectionPlace, Place
 from .outlines import ATTRIBUTION as OUTLINE_ATTRIBUTION, DEFAULT_TOLERANCE_KM2
 from . import localisation
+from .outlines import Source as OutlineSource
 from .outlines import export as export_outlines
 from .review import (
     CLEAR, DECISIONS, apply_decisions, apply_names, apply_photos, apply_themes,
@@ -3680,12 +3681,44 @@ def cmd_export_outlines(args: argparse.Namespace, config: Config) -> int:
     if args.tolerance is not None:
         tolerances = {level: args.tolerance for level in tolerances}
 
-    counts = export_outlines(args.to, tolerances, source_dir=args.from_dir)
-    size = args.to.stat().st_size / 1024
-    print(f"Contours écrits dans {args.to} ({size:.0f} Ko)")
+    sources = {
+        level: OutlineSource(url=c.url, fichier=c.fichier,
+                             code_key=c.code_key, name_key=c.name_key)
+        for level, c in config.contours.items()
+    } or None
+    attribution = config.contours_attribution or OUTLINE_ATTRIBUTION
+
+    # LE FICHIER EMBARQUÉ N'APPARTIENT QU'AU PAYS DE DÉPART, comme le catalogue
+    # embarqué : ce sont les contours que l'application porte en elle et
+    # dessine sans réseau. Les écraser avec ceux d'un autre pays lui ferait
+    # colorier des provinces italiennes au premier lancement. Même garde-fou
+    # que `export-app`, pour la même raison, après la même mésaventure.
+    embarque = _pays_embarque(APP_CATALOG)
+    ecrit = args.to
+    if embarque and embarque != config.country.code:
+        ecrit = args.catalogues / f"{config.country.code.lower()}-contours.json"
+        print(f"Contours embarqués laissés tels quels : ils portent {embarque}, "
+              f"et cette collecte est {config.country.code}. Seule la copie "
+              f"servie est écrite.")
+
+    ecrit.parent.mkdir(parents=True, exist_ok=True)
+    from . import geo as referentiel
+    referentiel.utiliser_pays(config.country.code)
+    noms = {
+        "region": {code: a.name for code, a in referentiel.regions().items()},
+        "departement": {code: a.name for code, a in referentiel.departements().items()},
+    }
+
+    counts = export_outlines(
+        ecrit, tolerances, source_dir=args.from_dir, sources=sources,
+        attribution=attribution, depot=DEFAULT_GEO / config.country.code.lower(),
+        noms=noms,
+    )
+    size = ecrit.stat().st_size / 1024
+    print(f"Contours écrits dans {ecrit} ({size:.0f} Ko)")
     for level, count in counts.items():
         print(f"  {level:<12} {count:>3} territoires")
-    print(OUTLINE_ATTRIBUTION)
+    print(attribution)
 
     # Et la copie SERVIE, pour les pays que l'application ne porte pas en elle.
     # Elle passe par le même fichier : deux tracés d'un même pays finiraient
@@ -3693,7 +3726,8 @@ def cmd_export_outlines(args: argparse.Namespace, config: Config) -> int:
     # se voit à l'écran — c'est tout le sujet de la jointivité.
     servi = args.catalogues / f"{config.country.code.lower()}-contours.json"
     servi.parent.mkdir(parents=True, exist_ok=True)
-    servi.write_bytes(args.to.read_bytes())
+    if servi != ecrit:
+        servi.write_bytes(ecrit.read_bytes())
     print(f"Copie servie : {servi} ({servi.stat().st_size / 1024:.0f} Ko)")
     print("Relance `export-app` pour que l'index les annonce.")
     return 0

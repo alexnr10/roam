@@ -318,6 +318,28 @@ class Layer:
 
 
 @dataclass(frozen=True)
+class Contour:
+    """Une couche de contours à DESSINER, pour la carte de conquête.
+
+    À ne pas confondre avec `Layer`, qui sert au RATTACHEMENT : les deux
+    peuvent venir du même fichier, ou non. La France dessine les régions et
+    départements avec outre-mer de france-geojson, alors qu'elle ne rattache
+    que par les départements ; l'Italie dessine et rattache par le même
+    découpage ISTAT.
+
+    `fichier` nomme, quand il existe, le fichier que `geo-layers` a déjà
+    téléchargé : on le préfère alors au réseau, pour que les codes dessinés
+    soient EXACTEMENT ceux sur lesquels le catalogue a été rattaché.
+    """
+
+    level: str
+    url: str | None = None
+    fichier: str | None = None
+    code_key: str = "code"
+    name_key: str = "nom"
+
+
+@dataclass(frozen=True)
 class Enclave:
     """Un micro-État enclavé, rattaché au catalogue qui l'entoure.
 
@@ -378,6 +400,12 @@ class Config:
     tiers: Tiers
     collections: CollectionRules
     alerts: Alerts
+    #: Les contours à dessiner, par échelle. Vide = ceux de `outlines.SOURCES`,
+    #: qui sont ceux de la France.
+    contours: dict[str, Contour] = field(default_factory=dict)
+    #: La mention de source des contours. La Licence ouverte l'exige pour la
+    #: France, CC-BY pour l'ISTAT : la carte la porte à l'écran.
+    contours_attribution: str = ""
     exclusions: Exclusions = field(default_factory=Exclusions)
     visitors: Visitors = field(default_factory=Visitors)
     pageviews: Pageviews = field(default_factory=Pageviews)
@@ -614,9 +642,26 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
         for level, bloc in (raw["geo"].get("layers") or {}).items()
     }
 
+    # Les contours à DESSINER. Bloc séparé des `layers` parce que les deux ne
+    # coïncident pas : la France rattache par les seuls départements mais
+    # dessine aussi les régions, outre-mer compris.
+    dessins = raw["geo"].get("contours") or {}
+    contours = {
+        level: Contour(
+            level=level,
+            url=(str(bloc["url"]) if bloc.get("url") else None),
+            fichier=(str(bloc["fichier"]) if bloc.get("fichier") else None),
+            code_key=str(bloc.get("code_key", "code")),
+            name_key=str(bloc.get("name_key", "nom")),
+        )
+        for level, bloc in (dessins.get("niveaux") or {}).items()
+    }
+
     return Config(
         country=country,
         layers=layers,
+        contours=contours,
+        contours_attribution=str(dessins.get("attribution") or ""),
         themes=themes,
         labels=labels,
         scoring=scoring,

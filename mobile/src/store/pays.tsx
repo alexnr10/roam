@@ -42,6 +42,13 @@ type PaysContextValue = {
    */
   version: number;
   disponibles: typeof PAYS;
+  /**
+   * Change quand le pays a été choisi EXPLICITEMENT, jamais quand la carte a
+   * basculé toute seule. La caméra s'en sert pour se recadrer : recadrer sur
+   * une bascule automatique ferait bondir la vue au premier pas au-delà de
+   * Menton, alors qu'on venait justement de s'y promener.
+   */
+  recadrage: number;
   chargement: boolean;
   erreur: string | null;
   /** Choix explicite, depuis un réglage. */
@@ -55,6 +62,7 @@ const PaysContext = createContext<PaysContextValue | null>(null);
 export function PaysProvider({ children }: { children: React.ReactNode }) {
   const [pays, setPays] = useState(() => paysCourant() || PAYS_EMBARQUE);
   const [version, setVersion] = useState(0);
+  const [recadrage, setRecadrage] = useState(0);
   const [chargement, setChargement] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [connus, setConnus] = useState(() => [...PAYS]);
@@ -62,7 +70,7 @@ export function PaysProvider({ children }: { children: React.ReactNode }) {
   // téléchargements concurrents du même pays se marcheraient dessus.
   const enCours = useRef<string | null>(null);
 
-  const appliquer = useCallback(async (code: string) => {
+  const appliquer = useCallback(async (code: string, explicite = false) => {
     if (code === paysCourant() || enCours.current === code) return;
     enCours.current = code;
     setErreur(null);
@@ -80,6 +88,11 @@ export function PaysProvider({ children }: { children: React.ReactNode }) {
       chargerCatalogue(catalogue);
       setPays(code);
       setVersion((n) => n + 1);
+      // APRÈS le catalogue, jamais avant. Signalé au clic, le recadrage partait
+      // pendant que l'Italie se téléchargeait : la caméra se recadrait donc sur
+      // la France, son vol déclenchait `moveend`, et la bascule automatique
+      // rebasculait vers la France — le pays choisi tenait une demi-seconde.
+      if (explicite) setRecadrage((n) => n + 1);
       AsyncStorage.setItem(STORAGE_KEY, code).catch(() => {});
     } catch (souci) {
       setErreur(souci instanceof Error ? souci.message : String(souci));
@@ -108,6 +121,10 @@ export function PaysProvider({ children }: { children: React.ReactNode }) {
     };
   }, [appliquer]);
 
+  // Choisir un pays depuis un réglage n'est pas le franchir en se promenant :
+  // le premier demande un recadrage, le second l'interdit.
+  const choisir = useCallback((code: string) => { appliquer(code, true); }, [appliquer]);
+
   const regarder = useCallback(
     (lon: number, lat: number) => {
       const cible = paysAAdopter(lon, lat, paysCourant() || PAYS_EMBARQUE, connus);
@@ -117,8 +134,8 @@ export function PaysProvider({ children }: { children: React.ReactNode }) {
   );
 
   const value = useMemo<PaysContextValue>(
-    () => ({ pays, version, disponibles: connus, chargement, erreur, choisir: appliquer, regarder }),
-    [pays, version, connus, chargement, erreur, appliquer, regarder],
+    () => ({ pays, version, recadrage, disponibles: connus, chargement, erreur, choisir, regarder }),
+    [pays, version, recadrage, connus, chargement, erreur, choisir, regarder],
   );
 
   return <PaysContext.Provider value={value}>{children}</PaysContext.Provider>;
