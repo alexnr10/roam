@@ -36,6 +36,15 @@ STOPWORDS = {
     "de", "du", "des", "la", "le", "les", "l", "d", "au", "aux", "et", "en",
     "sur", "sous", "parc", "site", "ancien", "ancienne", "saint", "sainte",
     "notre", "dame",
+    # Les mêmes, en italien. « santa » et « maria » rapprochaient à eux seuls
+    # cent cinquante-sept paires de lieux distincts ; « della » quarante. Ce
+    # sont les « saint » et « de la » du deuxième pays, et rien d'autre.
+    "santa", "santo", "della", "delle", "dello", "degli", "alla", "alle",
+    "nella", "vecchio", "vecchia", "nuovo", "nuova",
+    # Les DÉDICACES se comportent comme « saint » : elles nomment le patron,
+    # pas le lieu. Deux églises mariales voisines ne sont pas la même église.
+    "maria", "marco", "sant", "giovanni", "pietro", "giuseppe", "giorgio",
+    "jupiter", "apollon", "minerve",
 }
 
 # Le mot qui dit la NATURE du lieu. Il ne sert pas à rapprocher — « Roche » se
@@ -45,11 +54,39 @@ STOPWORDS = {
 #
 # « mont » en est volontairement absent : l'abbaye du Mont-Saint-Michel et le
 # Mont-Saint-Michel sont bien le même lieu.
+# Mesuré sur les deux catalogues : à 350 mètres l'un de l'autre, `names_match`
+# confondait 525 paires de lieux DISTINCTS en France et 3 799 en Italie. Le mot
+# partagé n'était presque jamais un toponyme — c'était le mot qui dit la nature
+# du lieu, et il manquait à cette liste : `palazzo` à lui seul faisait
+# 1 288 paires, `palais` 845, `temple` 330, `casa` 222.
+#
+# Trois familles ont été ajoutées : les types français qui manquaient (palais,
+# couvent, square, galerie, hôtel), leurs équivalents italiens, et le
+# vocabulaire du LITTORAL — sans lui, « calanque de Sugiton » et « calanque de
+# Morgiou » se ressemblaient, alors que ce sont deux calanques voisines et
+# distinctes.
 TYPES = {
     "chateau", "moulin", "eglise", "cathedrale", "basilique", "abbaye",
     "prieure", "chapelle", "musee", "jardin", "grotte", "gouffre", "cascade",
     "pont", "viaduc", "aqueduc", "phare", "fort", "manoir", "tour", "ferme",
     "dolmen", "menhir", "villa", "maison",
+    # Français : ce que la liste d'origine avait laissé passer.
+    "palais", "couvent", "commanderie", "square", "galerie", "hotel",
+    "theatre", "amphitheatre", "arenes", "temple", "sanctuaire", "ermitage",
+    "monastere", "collegiale", "beffroi", "citadelle", "donjon", "place",
+    # Italien : les mêmes mots, dans la langue du pays.
+    "palazzo", "palazzi", "casa", "chiesa", "duomo", "basilica", "castello",
+    "torre", "ponte", "giardino", "faro", "grotta", "cascata", "museo",
+    "galleria", "piazza", "campo", "convento", "abbazia", "santuario",
+    "tempio", "teatro", "anfiteatro", "necropoli", "nuraghe", "tomba",
+    # Latin : le vocabulaire des sites antiques, qui revient sur chaque forum.
+    "forum", "domus", "thermes", "terme", "aqueduc", "acquedotto", "arco",
+    # Littoral, dans les deux langues. Deux calanques voisines ne sont pas la
+    # même calanque, et une plage n'est pas le cap qui lui donne son nom.
+    "plage", "plages", "calanque", "crique", "anse", "baie", "cap", "pointe",
+    "presquile", "peninsule", "falaise", "dune", "lido",
+    "spiaggia", "spiagge", "cala", "punta", "capo", "baia", "penisola",
+    "promontorio", "scoglio", "scogli", "scogliera",
 }
 
 # Catégories OpenStreetMap → thèmes Roam. Une proposition, pas un verdict :
@@ -70,7 +107,25 @@ THEME_BY_TAG: list[tuple[str, str, str]] = [
     ("tourism", "theme_park", "musees"),
     ("tourism", "attraction", "monuments"),
     ("leisure", "garden", "jardins"),
-    ("leisure", "nature_reserve", "plages"),
+    # `leisure=nature_reserve` a été rangé dans « Littoral et plages » parce que
+    # le thème couvre le littoral, et qu'une réserve naturelle française se
+    # rencontre souvent en bord de mer. La porte a été mesurée sur deux pays et
+    # elle ne tient dans aucun des deux.
+    #
+    #   France   3 candidats sur 941, adoptés, ZÉRO au catalogue construit —
+    #            parc du Vinaigrier, réserve du Scamandre, réserve de Lunaret.
+    #            Aucune n'est une plage ; aucune n'a passé le plancher.
+    #   Italie   630 candidats sur 1500 — 42 % de la feuille — 577 adoptés,
+    #            89 entrés au catalogue. Les quatre-vingt-neuf sont des aires
+    #            protégées, pas une plage parmi elles : parc national des
+    #            Abruzzes, du Val Grande, du Vésuve, Rieserferner-Ahrn.
+    #
+    # Le Vésuve est le cas qui tranche : le parc entrait en PLAGE quand le
+    # volcan tient déjà son thème. Et ces 630 candidats sont ce qui a fait
+    # buter la feuille italienne sur son plafond de 1500 — sans eux, 918.
+    #
+    # Roam n'a pas de thème pour les aires protégées. Tant qu'il n'en a pas, la
+    # porte reste fermée : un parc national n'est pas une plage.
     ("natural", "cave_entrance", "grottes"),
     # Une chute d'eau se pose sur le COURS D'EAU chez OpenStreetMap, pas sur le
     # relief : `waterway=waterfall`. `natural=waterfall` existe et se rencontre,
@@ -91,6 +146,22 @@ def _tokens(name: str) -> set[str]:
     }
 
 
+#: Les pluriels d'un mot de type, ramenés au singulier.
+#
+# Le test des types répond « deux natures différentes, donc deux lieux » dès
+# que les deux noms portent un type et que les types diffèrent. « Plages du
+# Prado » et « Plage du Prado » y tombaient : le même mot, au pluriel d'un côté.
+_PLURIELS = {"spiagge": "spiaggia", "palazzi": "palazzo", "scogli": "scoglio",
+             "gallerie": "galleria", "chiese": "chiesa", "torri": "torre"}
+
+
+def _type_canonique(mot: str) -> str:
+    """Le type, au singulier — le français par son « s », l'italien par la table."""
+    if mot in _PLURIELS:
+        return _PLURIELS[mot]
+    return mot[:-1] if mot.endswith("s") and mot[:-1] in TYPES else mot
+
+
 def names_match(left: str, right: str) -> bool:
     """Deux noms désignent-ils vraisemblablement le même lieu ?
 
@@ -101,7 +172,8 @@ def names_match(left: str, right: str) -> bool:
     rapprocher.
     """
     a, b = _tokens(left), _tokens(right)
-    left_type, right_type = a & TYPES, b & TYPES
+    left_type = {_type_canonique(mot) for mot in a & TYPES}
+    right_type = {_type_canonique(mot) for mot in b & TYPES}
     if left_type and right_type and not (left_type & right_type):
         return False
 
@@ -273,9 +345,12 @@ def find_candidates(
     known_qids = {p.wikidata_id for p in places}
     index = _Index(places, lambda p: (p.lat, p.lon))
     candidates: list[OsmPlace] = []
-    # « thème reconnu » ne figure pas dans l'entonnoir : toutes les catégories
-    # demandées à Overpass ont une correspondance, l'étape ne retire jamais
-    # rien. Compter un filtre qui ne filtre pas donne l'illusion d'un contrôle.
+    # « thème reconnu » ne figure pas dans l'entonnoir : les deux tables sont
+    # tenues ensemble — ce qu'Overpass rapporte, `guess_theme` sait le nommer —
+    # et l'étape ne retire donc jamais rien. Compter un filtre qui ne filtre
+    # pas donne l'illusion d'un contrôle. Le jour où elle se mettrait à retirer
+    # quelque chose, c'est que les tables auraient divergé : le test
+    # `test_les_deux_tables_ne_divergent_pas` est là pour ça.
     funnel = {"lus": len(osm), "gérés": 0, "absents": 0, "documentés": 0}
 
     for site in osm:
@@ -303,7 +378,11 @@ def find_candidates(
 def keep_in_france(
     sites: list[OsmPlace], locate: Callable[[list[tuple[str, float, float]]], dict[str, str]]
 ) -> list[OsmPlace]:
-    """Écarte les candidats situés hors de France, et situe les autres.
+    """Écarte les candidats situés hors du pays, et situe les autres.
+
+    `locate` porte la frontière, et c'est pour cela que la fonction n'a jamais
+    eu à connaître la France : les deux API de l'État pour elle, les contours
+    communaux pour tout autre pays.
 
     La collecte OpenStreetMap part d'un rectangle, et un rectangle autour de la
     France déborde sur six pays. Rien en aval ne le rattrapait : les lieux du
@@ -334,8 +413,8 @@ def keep_in_france(
         # une réserve de baie, un phare sur son rocher — n'appartient à aucun
         # polygone communal sans être pour autant à l'étranger.
         LOG.info(
-            "périmètre : %s candidats sans commune française écartés (hors de "
-            "France, ou en mer) : %s",
+            "périmètre : %s candidats sans commune écartés (hors du pays, ou "
+            "en mer) : %s",
             rejected,
             ", ".join(s.name for s in sites if s.departement is None)[:120],
         )

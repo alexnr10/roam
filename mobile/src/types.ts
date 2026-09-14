@@ -51,6 +51,16 @@ export type CollectionMember = {
   placeId: string;
   tier: Tier;
   rank: number;
+  /**
+   * Le nom que le lieu porte DANS cette collection, quand ce n'est pas le sien.
+   *
+   * « Parcs nationaux d'Italie » est une liste de parcs représentés chacun par
+   * un lieu phare : la collection annonce le Grand-Paradis, pas le « Jardin
+   * botanique alpin Paradisia », qui ne dit rien de ce qu'on va voir. Absent
+   * partout ailleurs — sur sa fiche et dans ses autres collections, le lieu
+   * garde son nom, qui est celui qu'on cherche sur place.
+   */
+  name?: string;
 };
 
 export type Collection = {

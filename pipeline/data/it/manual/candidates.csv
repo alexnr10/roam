@@ -1,0 +1,849 @@
+# Candidats adoptés depuis OpenStreetMap.
+#
+# Trouvés parce qu'un lieu porte des horaires ou un tarif — un fait de terrain
+# — là où Wikidata ne le classait dans aucune des classes interrogées. Ils
+# n'ont aucun privilège : ils sont scorés, soumis au plancher de notoriété et
+# dédoublonnés comme les autres. Ce fichier existe pour que `fetch` les
+# retrouve, et pour qu'une ligne retirée à la main le reste.
+#
+wikidata_id,theme_id,note
+Q100293619,musees,
+Q104528637,musees,Saints James and Christopher church
+Q105085144,musees,Museum Ladin Ursus ladinicus
+Q1053483,monuments,Colonne di San Lorenzo
+Q105393046,musees,"Museo del soldatino ""Mario Massacesi"""
+Q106074992,chateaux,Torre del Marino
+Q106092362,grottes,Grotta delle meraviglie
+Q106201688,grottes,Grotta di Capelvenere
+Q106246806,grottes,Grotta del Moro
+Q106302923,grottes,Grotta Gattulla
+Q106873311,musees,TtrAM
+Q107149279,musees,Lanserhaus
+Q107362224,musees,Museum house in Moggio
+Q107369545,musees,MAPP Museo d'Arte Paolo Pini
+Q107564173,cascades,Cascata della Brentana
+Q107711972,cascades,Cascata Fermona
+Q108177396,musees,Varallo fishing museum
+Q108321468,cascades,Brusia waterfall
+Q108443358,cascades,Cascata della Presia
+Q108489564,cascades,Tret waterfall
+Q110461130,musees,
+Q1106485,musees,Italia in miniatura
+Q110945147,chateaux,Castello di Monticello d'Alba
+Q110951816,chateaux,Castle of Borgo Adorno
+Q111332041,cascades,Cascata del Rio Negro
+Q111359532,jardins,
+Q1114366,musees,Musée du patrimoine industriel
+Q1115335,musees,Archaeological Museum of Sabbia Valley
+Q111551238,monuments,Porta di Ponte
+Q1116623,megalithes,Visentium
+Q111666244,cascades,Rio Vioz waterfall
+Q111697168,musees,Ecomuseum Land of Castelmagno
+Q112015455,musees,Museo Beniamino Gigli
+Q112054994,megalithes,Théâtre romain de Cividate Camuno
+Q112140976,chateaux,Villa Gina
+Q112142129,musees,
+Q112174149,musees,
+Q112174202,musees,
+Q112284669,monuments,
+Q112661376,megalithes,Catacombe del Mulinello
+Q112673815,monuments,Sanctuary of our Lady of the snow
+Q112705915,musees,Centro museale di documentazione e ricerca scientifica di paleontologia
+Q112944217,musees,
+Q112944230,musees,
+Q112944235,musees,Galleria Campari
+Q112944253,musees,Civico Museo Insubrico di Storia Naturale
+Q112960674,musees,Quadreria Crivelli
+Q113014551,musees,
+Q113014564,chateaux,Torre civica del Belvedere
+Q113014632,musees,
+Q113030301,musees,MuDA - Centro Esposizioni
+Q113140788,chateaux,Forte di Valledrane
+Q113199697,chateaux,Villa Rezzola
+Q113290248,monuments,
+Q113400210,musees,Batteria Pisani
+Q113512603,musees,Museo della Scuola Romana
+Q113535929,musees,Biblioteca della Fondazione Leonardo Sinisgalli
+Q113551690,chateaux,Castello Ducale
+Q113556629,chateaux,Forte Schiaffino
+Q113557328,monuments,Fortino dei Castriciani
+Q113562890,chateaux,
+Q113870106,grottes,Arma Pollera
+Q113969271,grottes,Grotta del Ciabattino
+Q114098236,cascades,Cam's waterfall
+Q115695,musees,Observatoire astrophysique de Turin
+Q116706430,musees,
+Q116944991,monuments,Torre dell&#39;Orologio (Cisternino)
+Q117213558,cascades,Cascata della Civetta
+Q118352924,monuments,
+Q120002808,megalithes,Roman villa of Orpheus
+Q121163057,cascades,Middle Vallesinella waterfalls
+Q121163289,cascades,Upper Vallesinella waterfalls
+Q121301270,musees,
+Q122152492,monuments,Sant'Eurosia
+Q122324480,megalithes,
+Q122327382,megalithes,
+Q123348232,musees,Checco Costa Museum
+Q123570918,monuments,Santa Maria Ausiliatrice
+Q123888801,musees,Archivio Museo Cesare Mattei
+Q123910297,musees,
+Q123916498,monuments,
+Q124032534,cascades,Vilpian Waterfall
+Q124247972,megalithes,Catacomb of San Marco
+Q125127062,musees,Museo Andrich
+Q1251366,musees,South Tyrol Museum of Nature
+Q125149146,cascades,Aschlbach Waterfall
+Q125393345,musees,
+Q125508642,jardins,Giardino Roccioso
+Q125511085,musees,Don Giovanni Guiso museum
+Q125636325,musees,Casa museo Antonio Ligabue
+Q1256448,monuments,Santi Niccolò e Cataldo church
+Q125703946,musees,MUSA - Museo del sale
+Q127276450,musees,Pinball and Arcade Museum
+Q1280995,musees,Musée minéralogique de Tiso
+Q129676505,megalithes,
+Q129676582,megalithes,
+Q130217792,megalithes,
+Q130232925,musees,Grand Tour Italia
+Q130497917,cascades,Folgorida waterfall
+Q130910654,monuments,
+Q131277854,musees,
+Q131310134,musees,
+Q131369619,monuments,
+Q131720676,cascades,Cascata del Ponale
+Q131766201,musees,Fondazione Massimo e Sonia Cirulli
+Q132086263,grottes,Grotta Azzurra
+Q132101436,cascades,Cascata dello Sprizzottolo
+Q132166234,musees,
+Q13217225,musees,Église Saint-François d'Udine
+Q1326241,megalithes,
+Q133454471,monuments,Fonte Fegatella
+Q134028574,monuments,Saletta Reale
+Q135103595,musees,Museo Byron
+Q135103601,musees,
+Q135882660,cascades,Sega waterfall
+Q135884108,cascades,Screaming cave
+Q135889689,cascades,Lavane waterfall
+Q136463612,cascades,Waterfall of Begna
+Q138912239,cascades,
+Q140044166,cascades,Pis del Pesio
+Q140044578,cascades,
+Q140381580,megalithes,
+Q140693020,musees,Museo mediceo
+Q140798497,musees,
+Q15052993,musees,Scuola di San Rocco
+Q15545668,musees,Museo Archeologico di Monasterace
+Q15639809,megalithes,Colonna Pizzuta
+Q15812268,megalithes,Tomba dei giganti di Moru
+Q15939615,musees,Giovanni Rambotti Civic Archaeological Museum
+Q16268566,musees,Musée de l'histoire de la psychiatrie
+Q16335817,musees,Museo civico archeologico di Villa Mirabello
+Q16336127,musees,Cala Gonone aquarium
+Q16336128,musees,Museo dello sbarco e Salerno Capitale
+Q16336132,musees,Musée archéologique virtuel d'Herculanum
+Q16336147,musees,"Museo delle arti (Catanzaro, Italy)"
+Q16336149,musees,Villa Fogazzaro Roi
+Q16336161,musees,Musei riuniti
+Q16336758,musees,Mongiana Firearms Factory Museum
+Q16336782,musees,"Territorial Archaeological Museum of Penisola Sorrentina ""Georges Vallet"""
+Q16337090,musees,Museo delle arti in ghisa nella Maremma
+Q16337205,musees,Musée archéologique de Portus Scabris
+Q16337292,musees,Museo della miniera
+Q16337402,musees,Museo officina Rancilio 1926
+Q16337988,musees,
+Q16337990,musees,Museo d'arte urbana
+Q16531852,musees,Belvedere di San Leucio
+Q16538051,chateaux,Castello di Burgos
+Q16538086,chateaux,Castello
+Q16560379,musees,
+Q16580532,musees,
+Q16580536,musees,Archaeological Museum of Savona
+Q16580588,musees,Museo della battaglia di Magenta
+Q16580620,musees,Museum of Contemporary Art of Crotone
+Q16586138,musees,Palazzo Doria-Pamphilj
+Q16609924,musees,Spoleto Città
+Q16621620,chateaux,Villa del Colle del Cardinale
+Q1668890,monuments,Saint Proculus church
+Q16975779,musees,Safari Ravenna
+Q17494412,musees,Museo etnografico dell'Alta Brianza
+Q17592733,musees,Schreibmaschinenmuseum Partschins
+Q17622679,musees,Institut culturel mocheno
+Q17623900,musees,
+Q17636844,musees,Ethnographic Museum of Premana
+Q18288173,monuments,Jewish cemetery of Conegliano
+Q18288681,musees,
+Q18288934,monuments,Quercia delle Checche
+Q18670440,musees,Musée de Bassano
+Q18676874,musees,Museo della Madonna del Parto
+Q18796164,musees,"Pinacoteca Civica ""il Guercino"""
+Q18881530,musees,Musei Civici di Feltre
+Q19621608,cascades,
+Q19721692,musees,
+Q19904258,musees,Ospedale di Busto Arsizio picture gallery
+Q20008341,musees,MuFant
+Q20008551,musees,Archaeological Museum of Venafro
+Q20009206,grottes,
+Q20009250,musees,Archaeological Civic Museum
+Q20009774,chateaux,Castel Pradaglia
+Q2002401,musees,
+Q20770633,musees,Musée du banditisme d'Aggius
+Q2098818,musees,Plattner in Wolfsgruben
+Q21008951,musees,Museo archeologico oliveriano
+Q21035617,musees,Museo dell'arte della tornitura del legno
+Q21076223,musees,Agorà della Scherma
+Q21153574,musees,Musée national atestin
+Q21188687,musees,Musée diocésain de Caserte
+Q21192539,megalithes,Grotta della vipera
+Q21196203,musees,Musée de la Céramique de Bassano del Grappa
+Q21196218,musees,Musée Remondini
+Q21235335,megalithes,
+Q21551899,musees,Casa-Studio Fernando Melani
+Q21552047,musees,Museo Archivio/Laboratorio per le Arti Contemporanee Hermann Nitsch
+Q21552052,musees,Civic Museum of Taverna
+Q21552066,musees,Augusto Vernarecci Civic Museum and Pinacotheca
+Q21552078,musees,Museo Civico 'I luoghi del lavoro contadino'
+Q21552091,musees,Museo Civico della Fisarmonica Mariano Dallapè
+Q21552175,musees,City Museum of Monte Porzio Catone
+Q21552276,musees,Museo geopaleontologico 'Ardito Desio'
+Q21552292,musees,Museo Navale Internazionale del Ponente Ligure
+Q21552312,musees,Museo Tuscolano Scuderie Aldobrandini
+Q21552328,musees,Pinacoteca 'Michele De Napoli'
+Q2223812,musees,Sant’Agostino
+Q22691332,musees,Mine Villanders
+Q23926876,musees,Concordiese national archeological museum
+Q24523065,musees,Civic Archaeological Museum of Verucchio
+Q24934566,musees,Agorà Orsi Coppini Museum
+Q24938027,musees,Museo del Risorgimento e sacrario di Oberdan
+Q24938029,musees,Museo storico dell'arma di cavalleria
+Q24941109,musees,Musée archéologique national de Civitavecchia
+Q24941869,musees,National museum of sea archaeology
+Q24941924,jardins,Mausoleum of the Conocchia
+Q24942825,megalithes,Roman Theatre of Bovianum Vetus
+Q2525859,monuments,Villa Valmarana ai Nani
+Q25387400,musees,
+Q25400346,musees,Fornace Coccapani
+Q25409272,monuments,San Bartolomeo degli Umiliati
+Q2592412,musees,Wolfsoniana
+Q26258041,monuments,Istituto dei Ciechi di Milano
+Q26678364,musees,
+Q27031421,musees,Gallerie Piedicastello
+Q2739545,monuments,Caffè Pedrocchi
+Q27435051,musees,Museo delle Terre Nuove
+Q27825053,musees,MUSME
+Q27992733,musees,"Museo del bonsai ""Crespi"""
+Q27992744,musees,Museo civico Craveri di storia naturale
+Q27992746,musees,
+Q27992761,musees,"Museo archeologico ""Villa Sulcis"""
+Q27992824,musees,Museo del Bijou
+Q27992861,musees,
+Q27992884,musees,Rivalta sul Mincio
+Q27992890,musees,
+Q27992921,musees,Museums in Bra
+Q27992927,musees,
+Q27992934,musees,Museo D'Annunzio Eroe
+Q27992938,musees,Museo etnografico
+Q27992939,musees,Museo Archeologico Genna Maria
+Q27992941,musees,Museo Naturalistico del Territorio “Giovanni Puscheddu”
+Q27993875,monuments,Torre Civica
+Q28003409,monuments,Ponte dell'Acqua
+Q28003411,monuments,Ponte Muto
+Q28003503,chateaux,Stronghold of Castrocaro
+Q28047517,musees,Museo di Storia della Fisica
+Q28670140,monuments,Torre del Gombito
+Q2944202,musees,Cenacolo di Fuligno
+Q29640281,musees,Delta Antico museum
+Q29904728,musees,Museo Civico Navale
+Q29917950,musees,Museo Renato Brozzi
+Q30064559,musees,Limonaia del Castel
+Q30066260,musees,Casa Masaccio
+Q30090778,musees,Museo di Salò
+Q30159213,musees,Opera Bosco
+Q30281536,grottes,Grotta di Filiestru
+Q30880427,musees,Falseum - Museo del falso e dell'inganno
+Q30888186,musees,Polo museale della cantieristica navale di Monfalcone
+Q30888469,musees,Zecca di Lucca
+Q30888845,musees,Museo civico Floriano Bodini
+Q30889387,musees,Musée du trésor de la cathédrale de Vercelli
+Q30890701,musees,Museo della Centuriazione Romana
+Q30894932,musees,Museo della Latteria
+Q30899161,musees,Museo del Setificio Piemontese
+Q3133893,musees,Herbier et musée botanique de l'université de Bologne
+Q3209505,musees,South Tyrolean Folklore Museum
+Q32814481,musees,Pinacoteca Antonio Atza
+Q32814927,musees,Museo casa Deriu
+Q32815631,musees,Museo delle Conce
+Q33041024,musees,
+Q33155159,cascades,Pos de l'acqua
+Q3328414,musees,Musée des navires romains de Fiumicino
+Q3328416,musees,Museo delle sinopie
+Q3328417,musees,Museo per la Memoria di Ustica di Bologna
+Q3329417,musees,Musée archéologique Isidoro-Falchi
+Q3329420,musees,Musée archéologique civique
+Q3329475,musees,Musée national étrusque de Viterbe
+Q3329479,musees,Musée archéologique national de Tuscania
+Q3329481,musees,Musée archéologique national d'Arezzo
+Q3329493,musees,Musée archéologique régional de la Vallée d'Aoste
+Q3329813,musees,Musée de l'artisanat valdôtain de tradition
+Q34501127,musees,Torre del Barbarossa
+Q3531044,megalithes,Tomba della Montagnola
+Q3531083,megalithes,Tombe de la Mule
+Q35505954,musees,Ecomuseo dell'acqua
+Q3585409,monuments,Église Sainte-Claire de Murano
+Q3603991,musees,Accademia dei Concordi di Rovigo
+Q3604679,musees,Aquarium of Cattolica
+Q3618772,musees,Antiquarium arborense
+Q3618785,musees,Antiquarium Statale di Numana
+Q3621152,musees,Ar/ge kunst Galleria Museo
+Q3621669,musees,Archive musée historique de Fiume
+Q3626705,musees,
+Q3639876,monuments,Bigo
+Q3647494,monuments,Bus de la Lum
+Q3657320,monuments,Chapelle Baglioni
+Q3661256,musees,Casa della cultura Leonida Repaci
+Q3661302,musees,Maison de Pirandello
+Q3661536,cascades,
+Q3661537,cascades,Farfarà waterfall
+Q3661799,musees,Casino Nobile di Villa Torlonia
+Q3662327,chateaux,Castello Grumello
+Q3662701,chateaux,Castle of Modica
+Q3662705,chateaux,Castello di Mongialino
+Q3662710,chateaux,Château de Monaselice
+Q3662994,chateaux,Castelluccio di Gela
+Q3663193,megalithes,Ad Decimum catacombs
+Q3664804,musees,Centre d'art moderne et contemporain
+Q3669073,musees,
+Q3671516,monuments,Chiesa di San Nicolò l'Arena
+Q3671783,musees,Battistero di San Pietro (Asti)
+Q3673324,monuments,Église de l'Assomption de Sainte Marie
+Q3674049,monuments,Chiesa di Santa Maria di Idris
+Q3676889,monuments,Cimetière monumental de Busto Arsizio
+Q3677153,musees,CineCittà World
+Q3678766,musees,Civiche raccolte d'arte di palazzo Marliani-Cicogna
+Q3678768,musees,Aquarium marin civique de Trieste
+Q3685236,musees,Monumental Complex of San Francesco
+Q3713404,musees,Domus Romana
+Q3718650,musees,
+Q3718652,musees,Écomusée du paysage de Parabiago
+Q3719016,musees,Edenlandia
+Q37282696,musees,Museo di Arte Sacra San Giacomo
+Q3734809,musees,Europark Idroscalo Milano
+Q3747149,musees,Fondation Burri
+Q3747250,musees,
+Q3757715,musees,"Galleria civica d'arte contemporanea ""Osvaldo Licini"" (Ascoli Piceno, Italy)"
+Q3757718,musees,Galleria d'Arte Moderna
+Q3761649,musees,Ghetto
+Q3763882,jardins,
+Q3763933,musees,Zoo di Pistoia
+Q3768551,musees,Gypsothèque Davide-Calandra
+Q3770979,musees,Museo della Ceramica Giuseppe Mazzotti
+Q3777028,grottes,
+Q3777030,monuments,Grotta del Vento
+Q3777037,grottes,Grotta dell'Inferno
+Q3777063,grottes,
+Q3777075,grottes,Grotta di Monte Majore
+Q3777125,grottes,Montevicoli Caves
+Q3777130,grottes,
+Q3784231,musees,Maison des anciens remèdes
+Q3786839,monuments,Hortus Conclusus
+Q37870367,musees,Arte Vetraria Museum
+Q37872481,monuments,Petrarca's house
+Q3821241,musees,The Tower of the Sun
+Q3840616,musees,Luneur Park
+Q3841681,musees,Museo della Scultura Contemporanea
+Q3846801,musees,Marengo Museum
+Q3852977,monuments,Mausoleum of Bela Rosin
+Q3854838,monuments,Marché Albinelli
+Q3854852,monuments,Mercato delle Erbe
+Q3858696,musees,Mirabilia Urbis Mazara del Vallo
+Q3859477,megalithes,Mithraeum de Marino
+Q3860224,monuments,Molinetto della Croda
+Q3862719,monuments,
+Q3862720,monuments,
+Q3867240,megalithes,Walls of Timoleon
+Q3867541,musees,Musei della Canonica del Duomo di Novara
+Q3867565,musees,Museo-laboratorio della Civiltà Contadina
+Q3867569,musees,Museum Adriano Bernareggi
+Q3867575,musees,Museo Baroffio e del Sacro Monte
+Q3867586,musees,Museo Carandente
+Q3867588,musees,CARLO ZAULI MUSEUM
+Q3867590,musees,Casina delle Civette
+Q3867591,musees,Casa d'arte futurista Depero
+Q3867613,musees,Museo Kere
+Q3867621,musees,Musée Morandi
+Q3867629,musees,Museo Tattile Statale Omero
+Q3867631,musees,Museo Civico Pietro Micca e dell'assedio di Torino
+Q3867632,musees,Museo Pio IX
+Q3867655,musees,Museo africano
+Q3867656,musees,Musée en plein air Bilotti
+Q3867662,musees,Musée archéologique civique Iulium Carnicum
+Q3867665,musees,Musée archéologique La Civitella
+Q3867667,musees,Museo archeologico comunale Ferruccio Barreca
+Q3867669,musees,Musée archéologique des Champs Phlégréens
+Q3867671,musees,Museo archeologico del Canavese
+Q3867676,musees,Museo Archeologico dell'alto Mantovano
+Q3867680,musees,Museo Archeologico della Media Valle del Sele
+Q3867688,musees,Musée archéologique de Lecco
+Q3867694,musees,Archaeological Museum of Lamezia Terme
+Q3867696,musees,Museo Archeologico Nazionale G. Carettoni di Cassino
+Q3867698,musees,Museo Archeologico Ibleo
+Q3867699,musees,Musée national de Matera
+Q3867704,musees,National Archaeological Museum of Sannio Caudino
+Q3867705,musees,National Archaeological Museum of Sibaritide
+Q3867707,musees,Museo nazionale della Siritide (Policoro)
+Q3867708,musees,Museo archeologico nazionale della Valle del Sarno
+Q3867710,musees,Museo archeologico nazionale di Adria
+Q3867712,musees,Museo Nazionale di Gnazia
+Q3867730,musees,Musée archéologique national de Volcei
+Q3867737,musees,National Archaeological Museum of Arcevia
+Q3867739,musees,Museo archeologico statale Vincenzo Laviola
+Q3867756,musees,
+Q3867759,musees,Casale Monferrato
+Q3867760,musees,Museo civico di Chiusa
+Q3867769,musees,Museo civico di Rovereto
+Q3867774,musees,Museo civico Duilio Cambellotti
+Q3867780,musees,Museo civico Umberto Mastroianni
+Q3867795,musees,Museo civico archeologico della città romana di Suasa
+Q3867796,musees,
+Q3867797,musees,Musée archéologique municipal de Cologna Veneta
+Q3867808,musees,Museo civico della Laguna Sud
+Q3867820,musees,Museo civico di Treviglio
+Q3867827,musees,Carmagnola civic historical natural museum
+Q3867845,musees,Musée d'Art Costantino- Barbella
+Q3867849,musees,Musée d'art contemporain de Lissone
+Q3867864,musees,Vittoria Colonna Modern Art Museum
+Q3867867,musees,
+Q3867882,musees,Musée des fresques Giovanni Battista Cavalcaselle
+Q3867886,musees,Museo degli Orologi da Torre
+Q3867893,musees,Museo etnografico trentino San Michele
+Q3867894,musees,Museum of Brettii and Enotri
+Q3867898,musees,Museo dei campionissimi
+Q3867903,musees,Museo Paleontologico Roncà
+Q3867904,musees,Musée des gladiateurs de Santa Maria Capua Vetere
+Q3867905,musees,Museum of Tarot
+Q3867938,musees,Serbariu coal mine museum
+Q3867957,musees,Palazzo Appiani
+Q3867963,musees,Museo del Paesaggio
+Q3867968,musees,Museo del prosciutto di Parma
+Q3867971,musees,Museo del salame di Felino
+Q3867978,musees,Museum of Vimercate and its territory
+Q3867981,musees,Museo Sant'Eulalia
+Q3867987,musees,Museum of Textiles and Industry of Busto Arsizio
+Q3867994,musees,Musée de l'Académie étrusque de Cortone
+Q3868006,musees,Musée de l'eau et du gaz
+Q3868031,musees,Museo della Brigata Sassari
+Q3868045,musees,Musée de la République romaine et la mémoire de Garibaldi
+Q3868052,musees,Museo della Sindone
+Q3868055,musees,Museo della Basilica di Santa Maria delle Grazie
+Q3868056,musees,Museo Della Bonifica
+Q3868057,musees,
+Q3868063,musees,"Museo della Cartolina ""Salvatore Nuvoli"""
+Q3868066,musees,Museo dell'arte ceramica
+Q3868076,musees,Musée de la ville du palazzo San Sebastiano
+Q3868083,musees,City and Territory Museum
+Q3868087,musees,Museo della civiltà solandra
+Q3868094,musees,Giorgio Amarelli Museum of Liquorice
+Q3868115,musees,Museum of Electrical Technique
+Q3868117,musees,Museo della vetrata
+Q3868122,musees,Museo Ferroviario Sardo
+Q3868143,musees,Museo delle Genti d'Abruzzo
+Q3868152,musees,Museo delle palafitte di Fiavé
+Q3868157,musees,Lake Ledro Stilt house Museum
+Q3868162,musees,Museo dello Strumento Musicale
+Q3868163,musees,"Museo Demologico dell'Economia, del Lavoro e del"
+Q3868167,musees,Casal de' Pazzi Museum
+Q3868181,musees,Museo di San Francesco
+Q3868187,musees,"Zoological Museum, Catania"
+Q3868200,musees,Musée d'art sacré de Massa Marittima
+Q3868203,musees,Museum of religious art
+Q3868211,musees,Musée de Physique de Naples
+Q3868214,musees,"Geophysical Museum, Rocca di Papa"
+Q3868229,musees,Museo di scienze naturali
+Q3868232,musees,Museo di scienze naturali del Collegio Mellerio Rosmini
+Q3868236,musees,"Museum of Biomedical Sciences, Chieti"
+Q3868241,musees,Natural History Civic Museum of Ferrara
+Q3868245,musees,Musée d'histoire naturelle de Jesolo
+Q3868248,musees,Museo della seta di Como
+Q3868251,musees,"Museo diffuso della resistenza, della deportazione, della guerra, dei diritti e della libertà"
+Q3868273,musees,"Musée diocésain ""Vito Ballatore"" de Mazara del Vallo"
+Q3868305,musees,Musée diocésain de San Sebastiano
+Q3868311,musees,Musée diocésain d'art sacré de Giaglione
+Q3868319,musees,Museo diocesano d'arte sacra (Susa)
+Q3868336,musees,"Musée diocésain d'art moderne ""Dedalo Montali"""
+Q3868341,musees,Musée diocésain de Sorrento-Stabia
+Q3868350,musees,Museo ebraico Yeshivà Marini
+Q3868353,musees,Ethnographic museum of Bomba
+Q3868361,musees,Musée Gambarina
+Q3868375,musees,Museo Ferroviario Piemontese
+Q3868388,musees,Museo internazionale della calzatura
+Q3868396,musees,Museo Lapidario
+Q3868416,musees,National Museum of Medieval and Modern Art of Basilicata
+Q3868421,musees,Museo Nazionale dell'Alta Val D'Agri
+Q3868430,musees,"National Museum, Locri"
+Q3868431,musees,Museo nazionale di Santa Maria delle Monache
+Q3868432,musees,Musée italien de la monnaie
+Q3868444,musees,Musée permanent de la Nativité de Dalmine
+Q3868457,musees,Museo Regionale della Bonifica di Ca' Vendramin
+Q3868464,musees,Musée d'art médiéval et moderne
+Q3868467,musees,Museo Storico Etnografico
+Q3868475,musees,Musée historique de l'Arme des Carabiniers
+Q3868479,musees,Museo storico di Bergamo
+Q3868488,musees,
+Q3880414,musees,Oasi di Sant'Alessio
+Q3884705,monuments,Oratorio di San Michele
+Q3890253,chateaux,Palazzo della Provincia
+Q3890790,musees,Palazzo Roverella
+Q3890846,musees,Sarcinelli palace
+Q3890895,chateaux,Palazzo Sforza-Cesarini
+Q3893449,megalithes,
+Q3895374,musees,PAV - Parco d'Arte Vivente
+Q3895574,musees,Parc de Pinocchio
+Q3895614,monuments,Parco Giardino Sigurtà
+Q3895699,megalithes,Parco nazionale delle incisioni rupestri di Naquane
+Q3905105,musees,Pinacoteca civica Francesco Podesti
+Q39058617,musees,Osteria Ai Pioppi
+Q3944143,grottes,
+Q3945629,megalithes,Sallianense
+Q3957971,monuments,
+Q3963841,musees,Society for Fine Arts and Permanent Exhibition
+Q3966478,musees,Speleovivarium
+Q3968798,musees,
+Q3995593,monuments,Tower of Portixedda
+Q4011896,chateaux,Villa Cicogna Mozzoni
+Q4012260,chateaux,Villa Manzoni
+Q4012772,megalithes,Villa di Tigellio
+Q4012807,megalithes,Roman villa of Desenzano del Garda
+Q48803518,musees,Musée archéologique national de Castiglioncello
+Q48804666,musees,
+Q48804678,musees,Museo archeologico dell'Agro atellano
+Q49539063,jardins,Parco Trapezio
+Q49963329,grottes,Buso della rana
+Q49963917,monuments,Grotta di Rio Martino
+Q51166,musees,Museo civico Luigi Bailo
+Q527433,musees,Museo nazionale storico degli Alpini
+Q52905823,musees,Toy Museum
+Q5311241,musees,Ducati Museum
+Q53673070,musees,Museo di Triora
+Q53709929,musees,Museo diocesano
+Q53709935,musees,Museum of the mask
+Q54087644,musees,Civico museo archeologico di Arona
+Q54803836,grottes,Grotte de Canova
+Q54854695,musees,
+Q54854704,musees,Museo Civico Archeologico
+Q54854724,musees,Museo - Biblioteca Francesco Antonio Marcucci
+Q54854928,musees,Leopardi's House
+Q54855038,musees,
+Q54855050,musees,Quadreria Cesarini
+Q54855128,musees,Civica Raccolta d'Arte
+Q54855178,musees,
+Q54855312,musees,
+Q54855369,musees,Museo del Fiume Bacchiglione
+Q54869375,musees,Museo della città
+Q54873836,chateaux,Castle of San Martino della Vaneza
+Q54874254,megalithes,Domus and Bishop's Palace
+Q54882667,musees,Ecomuseo di Leuzerie e Scherpelit
+Q54887072,musees,Museo del Parco Nazionale della Val Grande
+Q55179755,musees,Casa del Senato
+Q55182712,chateaux,Palazzo dei marchesi di Clavesana
+Q55183137,musees,Casa del Conte Verde
+Q55340434,musees,Museo Carsico Geologico e Paleontologico
+Q55340551,musees,"Museo d'arte moderna ""Ugo Carà"""
+Q55340719,musees,
+Q55348684,musees,Galleria Rizzi
+Q55350141,musees,
+Q55351863,musees,South Tyrolean Wine Museum
+Q55351927,musees,Zeitreise Mensch
+Q55351973,musees,
+Q55351985,musees,Heimatmuseum Laatsch - Museo locale di Laudes
+Q55352608,musees,Dolomythos
+Q55352675,musees,Messner Mountain Museum Ortles
+Q55352727,musees,Mining Museum Steinhaus
+Q55354230,musees,
+Q55354259,musees,Maison Gérard-Dayné
+Q55359058,musees,Museo Civico della Navigazione Fluviale
+Q55359110,musees,Museo civico di Montagnana
+Q55359431,musees,
+Q55359461,musees,Museo Geopaleontologico di Camposilvano
+Q55359472,musees,Museo archeologico nazionale di Verona
+Q55359562,musees,Museo dello Sbarco in Sicilia
+Q55359587,musees,
+Q55359630,musees,
+Q55359649,musees,
+Q55359882,musees,
+Q55360046,musees,
+Q55360153,musees,Physics Museum of the Sapienza University of Rome
+Q55360161,musees,
+Q55360210,musees,Museo civico etrusco romano Prof. G. Bianchini di Trevignano Romano
+Q55360428,musees,
+Q55360537,musees,"Museo delle cere anatomiche ""L. Cattaneo"""
+Q55360576,musees,Musée de physique de l'Université de Bologne
+Q55360618,musees,Casa Museo Giorgio Morandi
+Q55360648,musees,Collezione di anatomia patologica e teratologia veterinaria Alessandrini - Ercolani
+Q55360658,musees,Archaeological Environmental Museum (San Giovanni in Persiceto)
+Q55360722,musees,Pinacoteca Civica di Arte Moderna (Modigliana)
+Q55360886,musees,Museo dell'aceto balsamico tradizionale
+Q55360912,musees,Museo Luigi Illica
+Q55368647,musees,"Casa Museo ""Raffaele Bendandi"""
+Q55368995,musees,
+Q55369030,musees,Museo delle conchiglie
+Q55369104,musees,
+Q55369197,musees,Museo Storico
+Q55369904,musees,Museo Civico Messapico
+Q55370155,musees,
+Q55370174,musees,Museo del Ferro
+Q55370188,musees,Sale d'Arte
+Q55370194,musees,"Museo del cappello ""Giuseppe Borsalino"""
+Q55370238,musees,Gipsoteca Monteverde
+Q55370383,musees,"Museo paleontologico ""Giulio Maini"""
+Q55370591,musees,Castello e Museo di Arti e Mestieri di un Tempo
+Q55370893,musees,Casa museo Alta Valle del Cervo
+Q55370907,musees,Museo della Passione
+Q55370968,musees,
+Q55371323,musees,Museo civico della stampa
+Q55371370,musees,Ecomuseo della Pastorizia
+Q55371421,musees,Museo storico etnografico
+Q55371527,musees,Museo - Fondazione Calderara
+Q55371590,musees,Museo manzoniano
+Q55371672,musees,
+Q55371715,musees,
+Q55371749,musees,"Ecomuseo delle Guide Alpine ""Antonio Castagneri"""
+Q55371846,musees,Ecomuseo della Canapa
+Q55371855,musees,Museo delle Genti e delle Valli di Lanzo
+Q55371875,musees,Martini & Rossi
+Q55372009,musees,Mulino superiore
+Q55372056,musees,"Centro studi e museo d'arte preistorica (Pinerolo, Italy)"
+Q55372063,musees,Collezione civica d'arte di Pinerolo
+Q55372095,musees,
+Q55372175,musees,Museo Valdese
+Q55372218,musees,
+Q55372284,musees,Ecomuseo del Freidano
+Q55372352,musees,Museo Francesco Faà di Bruno
+Q55372550,musees,
+Q55372579,musees,
+Q55372596,musees,Ecomuseo Feltrificio Crumiere
+Q55372682,musees,Museo dell'Arte del Cappello
+Q55372708,musees,Museo etnografico di Gurro e della Valle Cannobina
+Q55372756,musees,
+Q55372828,musees,Walser museum
+Q55372921,musees,"Museo civico ""Gian Andrea Irico"""
+Q55372940,musees,Palace of museums of Varallo
+Q55373215,musees,Museo
+Q55373531,musees,
+Q55373629,musees,
+Q55373635,musees,Casa della Civiltà Contadina di Gaville
+Q55374434,musees,
+Q55374589,musees,
+Q55374687,musees,Museo delle Miniere
+Q55375082,musees,Museo del Vetro
+Q55375209,monuments,Area Archeologica Sant'Eulalia
+Q55375345,musees,Museo Etnografico
+Q55375378,musees,Museo etnografico Su Magasinu de Su Binu
+Q55375383,musees,
+Q55375602,musees,
+Q55375606,musees,
+Q55375743,musees,Museo ornitologico della Sardegna
+Q55375803,musees,
+Q55375842,musees,
+Q55375855,musees,Musée civique des sciences naturelles
+Q55375982,musees,Museo Etnografico e Naturalistico Val Sanagra
+Q55375985,musees,Museo dei Fossili
+Q55375987,musees,
+Q55376051,musees,Civico museo archeologico Platina
+Q55376066,musees,Museo della stampa
+Q55376114,musees,Garlate Silk Museum
+Q55376156,musees,Museo Storico di Lecco
+Q55376169,musees,Museo di storia naturale Ambrosioni
+Q55376350,musees,Cuggiono Historic Civic Museum
+Q55376526,musees,Galleria d'Arte Sacra dei Contemporanei
+Q55376600,musees,Museo Interattivo del Cinema
+Q55376741,musees,Museo Tazio Nuvolari
+Q55376765,musees,Suzzara Prize Museum
+Q55376872,musees,Musée municipal de Bormio
+Q55376900,musees,
+Q55376927,musees,Museo Salvini
+Q55376949,musees,Museo internazionale design ceramico - Civica raccolta di Terraglia
+Q55376962,musees,Pellini Bozzolo plaster cast gallery
+Q55377008,musees,Musée Cerlogne
+Q55377098,chateaux,Alfieri Castle in Magliano
+Q55377717,musees,Museo Etnografico del Ponente Ligure
+Q55377956,musees,Explora
+Q55378065,musees,Museo della Contrada della Chiocciola
+Q55378069,musees,Museo della Contrada del Leocorno
+Q55378820,musees,Cantina della Sfida
+Q55378988,musees,Museo di Mineralogia
+Q55379139,musees,Carlo Conti Archaeological and Pale-ontological Museum
+Q55379152,musees,Museo della Via Spluga e della Val San Giacomo
+Q55379187,musees,Museo del bottone
+Q55379256,musees,Palazzo Grosso
+Q55385389,musees,Museo Arcos
+Q55385457,musees,Museo archeologico della Fondazione De Palo-Ungaro
+Q55385915,musees,
+Q55385931,musees,Museo Civico Archeologico della Valtenesi
+Q55385949,musees,
+Q55386100,musees,Antiquarium di Telesia
+Q55386428,musees,
+Q55386628,musees,Museo tipografico Rondani
+Q55390554,musees,Museo della ceramica di Mondovì
+Q55390576,musees,Museo Etnografico degli Attrezzi Agricoli
+Q55390587,musees,
+Q55390698,musees,
+Q55390779,musees,Ecomuseo dei terrazzamenti e della vite
+Q55390839,musees,Ecomuseo della Pietra da Cantoni
+Q55391144,musees,Centro visita Alevé
+Q55391741,musees,
+Q55391898,musees,National Archaeological Museum of Lomellina
+Q55391942,megalithes,Necropoli della Cultura di Golasecca
+Q55391992,musees,Tipoteca
+Q55392057,musees,
+Q55671504,musees,"Archaeological Museum ""San Lorenzo"""
+Q55671640,musees,Diocesan Museum of Aversa
+Q55672092,musees,
+Q55672206,musees,
+Q55673102,musees,Museo del merletto
+Q55673263,megalithes,Val Camonica - Arte Rupestre - Parco Archeologico Nazionale dei Massi di Cemmo
+Q55673386,musees,Museo del presente
+Q55673402,musees,Museo della Certosa
+Q55673701,musees,
+Q55673706,musees,
+Q55674300,musees,
+Q55674364,megalithes,
+Q55674391,musees,Museo della civiltà contadina di Montefoscoli
+Q55674447,musees,Museo dell’identità dell’alta Garfagnana Olinto Cammelli
+Q55674602,musees,
+Q55675072,musees,Musée de la fontine
+Q55676410,chateaux,Civitacampomarano Castle
+Q55677314,musees,
+Q55677368,musees,K.u.K. Museum Bad Egart
+Q55677397,musees,
+Q55677776,musees,
+Q55677783,musees,
+Q55677851,musees,National Museum of Prehistory of Valle Camonica
+Q55677890,musees,
+Q55678311,musees,Museo Mineralogico
+Q55678700,musees,
+Q55678739,musees,Medma - Rosarno Archaeological Museum and Park Complex
+Q55678857,megalithes,
+Q55685680,musees,Museo nazionale Collezione Salce
+Q55685694,musees,Casa Zegna
+Q55685721,musees,"Palazzo Comunale, Saluzzo"
+Q55685742,megalithes,Demetra a Macchia delle Valli
+Q55685766,musees,Musée et parc archéologique national de Capo Colonna
+Q55686005,musees,
+Q55686092,musees,Museo Archeologico di Calatia
+Q55686163,megalithes,House of Titus Macer
+Q55686194,megalithes,Roman theatre and thermal complex of Montegrotto
+Q55686253,grottes,Grotte des Manie
+Q55802135,musees,
+Q55829263,musees,"Herbarium Museum, Sapienza University of Rome"
+Q5610788,grottes,Grotta Bianca
+Q56258452,musees,
+Q56258522,musees,Boat Pavilion
+Q56261148,musees,
+Q56295564,cascades,
+Q56421730,musees,
+Q56871293,musees,Chiesa di San Bartolomeo
+Q57315753,musees,
+Q59633221,musees,Classis Ravenna - Museo della Città e del Territorio
+Q60533061,musees,Messner Mountain Museum Corones
+Q60839886,musees,Casa della Resistenza
+Q60840190,musees,Museo Lavazza
+Q608405,monuments,Cimetière monumental de Milan
+Q60848223,monuments,Palazzo Di Lorenzo del Castelluccio
+Q61450471,musees,Museo d'arte sacre della Collegiata
+Q61502385,monuments,San Giorgio
+Q61723551,musees,
+Q63248212,megalithes,Grotta dei Briganti
+Q638761,monuments,Massacre des Fosses ardéatines
+Q64143684,musees,Musée M9
+Q64363409,cascades,
+Q64896957,musees,
+Q65128208,jardins,
+Q65966482,cascades,Cascate del Mulino
+Q65966527,musees,Museo di Arte e Storia Ebraica
+Q66054535,musees,Museo Archeologico Don Cesare Queirolo
+Q66057258,monuments,Cavallo mine
+Q66057978,musees,Museo della Civiltà Contadina
+Q66058158,chateaux,Palazzo Eccheli-Baisi
+Q66436113,musees,
+Q66713950,musees,Palazzo Pretorio
+Q67145784,musees,
+Q67149892,musees,
+Q67183022,musees,
+Q67382363,musees,Museo del Ferro
+Q67638436,musees,Reptiland - Galleria di Scienze Naturali e Centro Erpetologico
+Q67643798,musees,
+Q67644601,musees,Museo delle guide
+Q68297596,musees,Museo del Lago
+Q68298731,musees,Museo del Baco da Seta
+Q68315448,musees,Museo del paracarro
+Q68320363,musees,Museo della Tortura
+Q68323716,musees,Museo Didattico Memorie del Tempo
+Q68660455,musees,Museo del territorio
+Q68662313,musees,
+Q68662399,musees,Laboratorio dell'Insetto
+Q68663765,musees,
+Q68664787,musees,Museo del Caffè
+Q69319959,musees,Plessi Museum
+Q69325819,musees,Museo delle Antiche Vie
+Q69328386,musees,Museo Archeologico Faggiano
+Q69330603,monuments,Grotta Concone delle Rose
+Q69547768,musees,Galleria Civica
+Q69556137,musees,Museo del Giocattolo e del Bambino
+Q70330403,monuments,Napoleonic Monument
+Q70331703,musees,Museo Talamoni
+Q70342020,musees,Camera - Centro Italiano per la Fotografia
+Q70342217,musees,Mineralienmuseum
+Q70351963,monuments,Museo del San Michele
+Q70357801,musees,Museo Ettore Fico
+Q712943,musees,Museo Nazionale dell'Artiglieria
+Q71825568,monuments,Cavallo mine
+Q71827401,musees,Paul-Flora-Museum
+Q72162741,megalithes,Grotta della Signora
+Q72175279,musees,Gallerie ex voto
+Q72177603,musees,Museo Macchina da Scrivere
+Q72680633,musees,
+Q72684616,musees,Museo dei Colli Euganei
+Q72684876,musees,MUVIS - Museo del Vino
+Q72684933,musees,Museo Villaggio Grotte Zungri
+Q72685957,musees,Museo della Cultura Rurale Prealpina
+Q72709277,musees,Museo Archeologico Etnografico Palazzo Atzori
+Q73005746,musees,SMO
+Q73006053,musees,Museo del Turismo
+Q73016733,chateaux,Castello Bonoris
+Q73484864,monuments,
+Q73485927,monuments,Eremo di Poggio Conte
+Q73487299,musees,Museo Minerario
+Q73487410,cascades,Revegler Waterfall
+Q73488757,musees,
+Q73488929,musees,Leonardo da Vinci and Archimedes museum
+Q73774682,musees,
+Q768259,musees,Museo Civico San Domenico
+Q77048411,musees,Parco Zoo Punta Verde
+Q77844120,musees,MAXXI L'Aquila
+Q799944,monuments,Bagni di Craveggia
+Q84030844,musees,Museum Fabrizio De André
+Q84035459,megalithes,Area Archeologica del Turriglio
+Q841554,monuments,Aqueduc Carolino
+Q845460,musees,CavallinoMatto
+Q864639,musees,Bioparco
+Q87411300,monuments,Palco della Rimembranza
+Q88541099,musees,Museo del risparmio di Torino
+Q89400114,musees,Museo Fratelli Cozzi
+Q89403319,musees,Museo Lechi
+Q89867410,chateaux,
+Q90878168,musees,Museo San Paolo
+Q91088334,megalithes,
+Q91088336,megalithes,
+Q91336647,monuments,Florentine cemetery
+Q92063704,musees,Parco ittico Paradiso
+Q93317327,musees,Museo italiano dell’immaginario folklorico
+Q93450160,musees,
+Q938464,grottes,
+Q93895596,musees,
+Q93895626,musees,
+Q96406909,cascades,Gorg d'abiss
+Q96756172,musees,OrMA Archeological Museum
+Q97161243,musees,Casa delle Farfalle
+Q97940454,monuments,
+Q98086645,musees,Cinè Museum
+Q98280594,cascades,Carpinone waterfall
+Q98951041,musees,Suno Railway Museum

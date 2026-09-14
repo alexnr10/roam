@@ -105,10 +105,18 @@ const bootstrap = `
   // l'adresse, puis rendre l'adresse d'origine une fois l'application montée —
   // faute de quoi un rafraîchissement partirait sur « / » ou sur « /conquete »,
   // que l'hébergeur ne connaît pas.
+  //
+  // Le CHEMIN seul est ramené à la racine. La question et le fragment sont
+  // recopiés, et ce n'est pas un détail : \`?catalogues=\` choisit la référence
+  // servie, elle est lue à l'évaluation du module — donc APRÈS ce geste et
+  // AVANT que l'adresse d'origine ne soit rendue. Les effacer ici revenait à
+  // n'avoir jamais écrit la question.
   var initial = location.href;
   var replace = history.replaceState.bind(history);
   try {
-    if (location.pathname !== '/') replace(null, '', '/');
+    if (location.pathname !== '/') {
+      replace(null, '', '/' + location.search + location.hash);
+    }
   } catch (error) {
     console.warn('Roam : chemin non réinitialisable', error);
   }

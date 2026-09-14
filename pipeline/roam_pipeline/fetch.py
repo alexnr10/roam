@@ -9,12 +9,13 @@ import re
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Sequence
 
 from . import wikidata as wd
 from .commons import _replier, file_title
 from .wikipedia import BATCH, EXTRACT_BATCH, WikipediaClient, title_from_url
-from .config import Config, Label, Theme
-from .geo import normalize_dept_code, region_of
+from .config import Config, Enclave, Label, Theme
+from .geo import departement_du_code_communal, normalize_dept_code, region_of
 from . import localisation
 from .geocode import (
     AddressClient,
@@ -23,7 +24,8 @@ from .geocode import (
     plausibly_french,
 )
 from .models import Place
-from .raw import EXTRA_SHARD, NO_THEME_SHARD, read_raw, shard_of, shards, write_raw
+from .raw import (EXTRA_SHARD, NO_THEME_SHARD, read_raw, read_shard, shard_of, shards,
+                  write_raw)
 
 LOG = logging.getLogger(__name__)
 
@@ -46,7 +48,8 @@ def fetch_theme(
     theme: Theme,
     label_members: dict[str, set[str]] | None = None,
     *,
-    country: str,
+    country: str | Sequence[str],
+    enclaves: dict[str, Enclave] | None = None,
 ) -> list[Place]:
     """Lieux candidats pour un thème.
 
@@ -54,6 +57,9 @@ def fetch_theme(
     d'un coup dépasse régulièrement le timeout de WDQS.
     """
     by_qid: dict[str, Place] = {}
+    # Le rang de la variante retenue pour un même Q-id. Voir `_rang_du_pays`.
+    rangs: dict[str, tuple[int, int]] = {}
+    principal = country if isinstance(country, str) else list(country)[0]
 
     if not theme.collected_classes and not theme.from_labels:
         LOG.warning(
@@ -74,9 +80,12 @@ def fetch_theme(
             LOG.warning("thème %s : aucun membre de label disponible", theme.id)
         for batch in wd.chunked(sorted(members), 150):
             for row in client.query(wd.items_query(batch)):
-                place = _row_to_place(row, theme)
+                place = _row_to_place(row, theme, enclaves)
                 if place is not None:
                     by_qid[place.wikidata_id] = place
+                    # Même barème que les classes, sans quoi n'importe quelle
+                    # ligne de classe évincerait ensuite le membre de liste.
+                    rangs[place.wikidata_id] = (0, -_completeness(place))
 
     # Une classe à la fois, et par pages : les classes volumineuses (châteaux,
     # abbayes, cathédrales) dépassaient le délai de WDQS en une seule requête.
@@ -92,15 +101,17 @@ def fetch_theme(
                 [q], f, limit=limit, offset=offset, country=country
             ),
         ):
-            place = _row_to_place(row, theme)
+            place = _row_to_place(row, theme, enclaves)
             if place is None:
                 continue
             place.via_broad_class = class_qid in broad
-            existing = by_qid.get(place.wikidata_id)
-            # Une même entité peut remonter via plusieurs classes : on garde la
-            # variante la mieux renseignée.
-            if existing is None or _completeness(place) > _completeness(existing):
+            # Une même entité peut remonter via plusieurs classes, ET via
+            # plusieurs pays : on garde la variante la mieux placée, puis la
+            # mieux renseignée.
+            rang = (_rang_du_pays(row, principal), -_completeness(place))
+            if rang < rangs.get(place.wikidata_id, (99, 0)):
                 by_qid[place.wikidata_id] = place
+                rangs[place.wikidata_id] = rang
 
     LOG.info("thème %s : %s lieux candidats", theme.id, len(by_qid))
     return list(by_qid.values())
@@ -121,6 +132,25 @@ def read_csv_rows(path: Path) -> list[dict[str, str]]:
         for line in path.read_text(encoding="utf-8").splitlines()
         if line.strip() and not line.lstrip().startswith("#")
     ]
+    if not lines:
+        return []
+    # Un fichier SANS EN-TÊTE se lit en silence et ne rend rien : `DictReader`
+    # prend sa première ligne pour les noms de colonnes, et chaque valeur
+    # devient une clef. `places.csv` italien contenait trois sommets des
+    # Dolomites épinglés à la main ; la collecte annonçait « ajouts manuels :
+    # 0 lieux épinglés » sans qu'une ligne ne dise pourquoi.
+    #
+    # La colonne des identifiants est la seule qui compte : si le nom de la
+    # première colonne ressemble à un Q-id, c'est une donnée, pas un en-tête.
+    premiere = lines[0].split(",")[0].strip()
+    if premiere[:1] == "Q" and premiere[1:].isdigit():
+        LOG.error(
+            "%s : la première ligne est une DONNÉE (« %s ») et sert d'en-tête — "
+            "le fichier entier est illisible. Ajoute « wikidata_id,theme_id,note » "
+            "en première ligne.",
+            path.name, lines[0][:60],
+        )
+        return []
     return list(csv.DictReader(lines))
 
 
@@ -143,7 +173,31 @@ def _completeness(place: Place) -> int:
     )
 
 
-def _row_to_place(row: dict[str, str], theme: Theme) -> Place | None:
+def _rang_du_pays(row: dict[str, str], principal: str) -> int:
+    """Le PAYS PRINCIPAL gagne sur une enclave, et ce n'est pas cosmétique.
+
+    Un lieu qui déborde sur une enclave remonte DEUX FOIS de Wikidata, une
+    ligne par `P17`, et les deux se valent en complétude : c'est l'ordre de la
+    réponse qui décidait, donc rien.
+
+    La péninsule italienne en a fait les frais. Elle est en Italie, à
+    Saint-Marin et au Vatican ; la ligne saint-marinaise l'a emporté une fois,
+    le rattachement d'enclave lui a donné la province de Rimini — et une
+    péninsule de mille kilomètres est entrée au catalogue comme DEUXIÈME
+    meilleure plage d'Italie. Sans ce rattachement elle n'a pas de département
+    et le périmètre l'écarte, ce qu'il faisait très bien jusque-là.
+
+    Un lieu que Wikidata situe dans le pays principal est donc du pays
+    principal, même s'il déborde. L'enclave ne sert qu'à ce qu'elle SEULE
+    contient — la basilique Saint-Pierre, le mont Titano.
+    """
+    pays = wd.qid_from_uri(row.get("pays"))
+    return 0 if not pays or pays == principal else 1
+
+
+def _row_to_place(
+    row: dict[str, str], theme: Theme, enclaves: dict[str, Enclave] | None = None
+) -> Place | None:
     qid = wd.qid_from_uri(row.get("item"))
     coords = wd.parse_point(row.get("coord"))
     name = row.get("itemLabel")
@@ -154,7 +208,7 @@ def _row_to_place(row: dict[str, str], theme: Theme) -> Place | None:
     if name == qid:
         return None
 
-    return Place(
+    place = Place(
         wikidata_id=qid,
         name=name,
         theme_id=theme.id,
@@ -169,6 +223,18 @@ def _row_to_place(row: dict[str, str], theme: Theme) -> Place | None:
         admin_qid=wd.qid_from_uri(row.get("admin")),
         validation_radius_m=theme.radius_m,
     )
+    # Un lieu d'enclave n'a pas de province italienne : il sortirait du
+    # catalogue avant d'être jugé, faute de département. On le rattache à celle
+    # qui l'entoure — et `country_code` reste VIDE, car la mention en ferait un
+    # catalogue à part (`pays_de`), alors qu'il est là pour être dans celui-ci.
+    enclave = (enclaves or {}).get(wd.qid_from_uri(row.get("pays")) or "")
+    if enclave is not None:
+        place.departement_code = enclave.departement
+        connue = region_of(enclave.departement)
+        if connue:
+            place.region_code = connue.code
+        place.commune_name = place.commune_name or enclave.name
+    return place
 
 
 def _as_int(value: str | None) -> int | None:
@@ -637,7 +703,7 @@ def align_departements(places: list[Place]) -> int:
         # donnait un « département » que le filtre du périmètre laissait passer,
         # et Lifou, Nuku Hiva et le mont Ross entraient dans le catalogue — les
         # COM sont hors v1.
-        attendu = normalize_dept_code(departement_from_insee(place.commune_code))
+        attendu = departement_du_code_communal(place.commune_code)
         if not attendu or attendu == place.departement_code:
             continue
         LOG.debug(
@@ -727,6 +793,12 @@ def resolve_admin(client: wd.SparqlClient, places: list[Place]) -> None:
             continue
         dept_raw, region_raw = codes.get(place.admin_qid, (None, None))
         dept = normalize_dept_code(dept_raw)
+        # Ne pas EFFACER un département que la collecte a déjà établi. Un lieu
+        # du Vatican porte bien un `P131` — la Cité elle-même — dont aucun code
+        # de province ne sort : sans cette garde, la remontée administrative
+        # reprenait d'une main le rattachement que l'enclave venait de poser.
+        if dept is None and place.departement_code:
+            continue
         place.departement_code = dept
         # Le code de région se déduit du département : plus fiable que la
         # remontée Wikidata, qui rate les communes mal rattachées.
@@ -1205,11 +1277,62 @@ def enrich_summaries(places: list[Place], client: WikipediaClient | None = None)
     return found
 
 
+def _communes_par_contour(places: list[Place], zones) -> int:
+    """Rattache par point-dans-polygone les lieux qui n'ont pas de commune.
+
+    Le même mécanisme que le rattachement au département, à la maille en
+    dessous : un index par cases d'un degré, puis le point dans le polygone.
+    La commune fait autorité sur le département, ici comme dans la passe
+    française — elle vient du même contour et ne peut pas le contredire.
+
+    Et la MÊME recherche aux alentours que le département, pour la même raison :
+    un contour communal s'arrête au trait de côte. Cherché par le seul polygone,
+    le rattachement laissait 68 lieux italiens sans commune contre 4 en France,
+    et la liste disait tout — le Bigo de Gênes, le Castel dell'Ovo sur son îlot,
+    Miramare et Duino en falaise, le château aragonais d'Ischia, les pylônes du
+    détroit de Messine. Des points tombés de quelques centaines de mètres au
+    large de leur propre ville.
+
+    Mesuré sur les soixante-huit : tous rattachés, 59 au premier palier de cinq
+    cents mètres, 4 à 1 500, 4 à 3 000, un seul à 6 000. Et les réponses sont
+    les bonnes — Castel dell'Ovo à Naples, le Bigo à Gênes, Miramare à Trieste.
+
+    Deux cas se discutent, et ils se discutent dans le sens du produit. Les cinq
+    lieux du Vatican rendent « Roma », et le mont Titano « Rimini » : ce ne sont
+    pas les bonnes communes en droit, ce sont celles que l'enclave a déjà
+    choisies comme département. Sans commune, visiter Saint-Pierre ne colorerait
+    rien à la maille la plus fine de la carte de conquête ; avec, il colore Rome,
+    ce qu'un visiteur attend. Et ils entrent enfin dans le plafond par commune,
+    au lieu d'y échapper.
+
+    Les sommets frontaliers rendent toujours leur versant italien, jamais le
+    suisse ni le slovène : la couche ne porte que les communes du pays.
+    """
+    resolved = 0
+    for place in places:
+        if place.commune_code:
+            continue
+        zone = zones.autour(place.lat, place.lon, localisation.RAYONS)
+        if zone is None:
+            continue
+        place.commune_code = zone.code
+        place.commune_name = zone.name or place.commune_name
+        dept = normalize_dept_code(zone.parent_code)
+        if dept:
+            place.departement_code = dept
+            known = region_of(dept)
+            if known:
+                place.region_code = known.code
+        resolved += 1
+    return resolved
+
+
 def enrich_communes(
     places: list[Place],
     address_client: AddressClient | None = None,
     commune_client: CommuneClient | None = None,
     localisateur=None,
+    communes=None,
     pays: str = PAYS_DES_API,
 ) -> int:
     """Rattache chaque lieu à sa commune, par ses coordonnées.
@@ -1226,19 +1349,33 @@ def enrich_communes(
 
     Seuls les lieux sans commune sont interrogés : relancer la passe ne coûte
     donc rien une fois qu'elle a abouti.
+
+    Une COUCHE de contours communaux, quand elle est là, passe avant tout
+    appel : elle est gratuite, instantanée, et elle ne connaît pas de
+    frontière. C'est le seul rattachement possible hors de France — les deux
+    API sont nationales, et `resolve_admin` ne remplit QUE le département,
+    jamais la commune. Le premier catalogue italien l'a payé comptant : zéro
+    commune sur deux mille cinq cent soixante-trois lieux, donc un plafond par
+    commune qui n'a pas mordu une fois, quatre-vingts églises gardées dans la
+    seule Rome, et la maille la plus fine de la carte de conquête vide.
     """
+    par_contour = _communes_par_contour(places, communes) if communes is not None else 0
+    if par_contour:
+        LOG.info("communes : %s lieux rattachés par les contours", par_contour)
+
     if pays.upper() != PAYS_DES_API:
-        # Voir `PAYS_DES_API`. La commune vient alors de Wikidata seule — les
-        # sondages italiens la donnaient sur tous les lieux testés, de Turin à
-        # Cesena — et les lieux qu'elle ne renseigne pas restent sans commune,
-        # donc hors de la maille la plus fine de la carte de conquête.
+        # Voir `PAYS_DES_API` : les deux API sont françaises. Sans couche
+        # communale, il ne reste rien — et les lieux sans commune sortent de la
+        # maille la plus fine de la carte de conquête.
         sans = [p for p in places if not p.commune_code]
         if sans:
             LOG.info(
                 "communes : %s lieux sans commune — les API sont françaises, "
-                "aucun appel", len(sans),
+                "aucun appel%s", len(sans),
+                "" if communes is not None else
+                " et aucune couche communale (`geo-layers` la télécharge)",
             )
-        return 0
+        return par_contour
 
     missing = [p for p in places if not p.commune_code]
     # Même garde que pour le département : ne rien demander au réseau sur un
@@ -1254,7 +1391,7 @@ def enrich_communes(
         return 0
 
     LOG.info("communes : %s lieux à rattacher", len(missing))
-    resolved = 0
+    resolved = par_contour
 
     def assign(place: Place, commune) -> bool:
         if commune is None:
@@ -1599,6 +1736,8 @@ def enrich_visitors(
 
 def fetch_label_members(
     client: wd.SparqlClient, label: Label, manual_dir: Path, *, country: str,
+    groupes: dict[str, str] | None = None,
+    noms: dict[str, str] | None = None,
 ) -> set[str]:
     """Q-ids des lieux portant un label.
 
@@ -1611,9 +1750,9 @@ def fetch_label_members(
     perd rien.
     """
     if label.is_manual:
-        return _read_manual_label(label, manual_dir)
+        return _read_manual_label(label, manual_dir, noms=noms)
 
-    complement = _read_manual_label(label, manual_dir, quiet=True)
+    complement = _read_manual_label(label, manual_dir, quiet=True, noms=noms)
 
     if not label.qid:
         # Label en attente de résolution : mieux vaut l'ignorer bruyamment que
@@ -1626,9 +1765,33 @@ def fetch_label_members(
         )
         return set()
 
-    rows = client.query(
-        wd.label_members_query(label.query_kind, label.qid or "", country=country))
-    qids = {qid for qid in (wd.qid_from_uri(r.get("item")) for r in rows) if qid}
+    if label.attend_une_propriete:
+        # Une propriété manquante est plus sournoise qu'un Q-id manquant : la
+        # requête partirait quand même si on la laissait vide, et rendrait zéro
+        # membre sans rien dire.
+        LOG.warning(
+            "label %s : propriété de situation non résolue (terme « %s ») — "
+            "ignoré. Lance `suggest-qids --property` pour la résoudre.",
+            label.id,
+            label.via_property_search,
+        )
+        return set()
+
+    rows = client.query(wd.label_members_query(
+        label.query_kind, label.qid or "", country=country,
+        via_property=label.via_property))
+    qids: set[str] = set()
+    for row in rows:
+        qid = wd.qid_from_uri(row.get("item"))
+        if not qid:
+            continue
+        qids.add(qid)
+        # L'aire qui contient le lieu, quand la requête la rend. Un lieu peut
+        # tomber dans deux parcs — la première l'emporte, et la collection n'en
+        # souffre pas : elle cherche un représentant par parc, pas le contraire.
+        aire = wd.qid_from_uri(row.get("aire"))
+        if groupes is not None and aire:
+            groupes.setdefault(qid, aire)
     ajoutes = complement - qids
     if ajoutes:
         LOG.info(
@@ -1640,8 +1803,22 @@ def fetch_label_members(
     return qids | complement
 
 
+def membres_inscrits(label: Label, manual_dir: Path) -> set[str]:
+    """Les identifiants qu'une liste manuelle RÉCLAME, sans rien interroger.
+
+    Ce que la liste demande, par opposition à ce que le catalogue porte : c'est
+    l'écart entre les deux qui dit qu'une collection a perdu un membre.
+    """
+    return _read_manual_label(label, manual_dir, quiet=True)
+
+
+#: La colonne, facultative, qui renomme un lieu DANS la collection du label.
+COLONNE_NOM_DE_COLLECTION = "nom_dans_la_collection"
+
+
 def _read_manual_label(
-    label: Label, manual_dir: Path, quiet: bool = False
+    label: Label, manual_dir: Path, quiet: bool = False,
+    noms: dict[str, str] | None = None,
 ) -> set[str]:
     path = manual_dir / f"{label.id}.csv"
     if not path.exists():
@@ -1655,22 +1832,52 @@ def _read_manual_label(
             path,
         )
         return set()
-    qids = {
-        row["wikidata_id"].strip()
-        for row in read_csv_rows(path)
-        if row.get("wikidata_id")
-    }
+    qids: set[str] = set()
+    for row in read_csv_rows(path):
+        qid = (row.get("wikidata_id") or "").strip()
+        if not qid:
+            continue
+        qids.add(qid)
+        # Le nom de collection est FACULTATIF, colonne comprise : une liste qui
+        # ne la porte pas laisse chaque lieu sous son propre nom.
+        renomme = (row.get(COLONNE_NOM_DE_COLLECTION) or "").strip()
+        if renomme and noms is not None:
+            noms[qid] = renomme
     if not quiet:
         LOG.info("label %s : %s membres (liste manuelle)", label.id, len(qids))
+        if noms:
+            LOG.info("label %s : %s membres renommés dans la collection",
+                     label.id, len(noms))
     return qids
 
 
-def apply_labels(places: list[Place], label_members: dict[str, set[str]]) -> None:
-    """Reporte les labels sur les lieux déjà collectés."""
+def apply_labels(
+    places: list[Place],
+    label_members: dict[str, set[str]],
+    groupes_par_label: dict[str, dict[str, str]] | None = None,
+    noms_par_label: dict[str, dict[str, str]] | None = None,
+) -> None:
+    """Reporte les labels sur les lieux déjà collectés.
+
+    Et, pour les labels qui rattachent à une AIRE, l'aire elle-même : c'est
+    elle qui permettra de prendre le meilleur lieu de chaque parc plutôt que
+    les mieux notés tous parcs confondus.
+    """
+    groupes_par_label = groupes_par_label or {}
     for place in places:
         place.labels = sorted(
             label_id for label_id, qids in label_members.items() if place.wikidata_id in qids
         )
+        place.label_groupes = {
+            label_id: groupes[place.wikidata_id]
+            for label_id, groupes in groupes_par_label.items()
+            if label_id in place.labels and place.wikidata_id in groupes
+        }
+        place.label_noms = {
+            label_id: noms[place.wikidata_id]
+            for label_id, noms in (noms_par_label or {}).items()
+            if label_id in place.labels and place.wikidata_id in noms
+        }
 
 
 def run_fetch(
@@ -1703,21 +1910,41 @@ def run_fetch(
         if unknown:
             raise KeyError(f"thème(s) inconnu(s) : {', '.join(sorted(unknown))}")
 
+    enclaves = {enclave.qid: enclave for enclave in config.country.enclaves}
+    if enclaves:
+        LOG.info(
+            "enclaves absorbées : %s",
+            ", ".join(f"{e.name} ({e.qid}) → département {e.departement}"
+                      for e in config.country.enclaves),
+        )
+
     label_members: dict[str, set[str]] = {}
+    groupes_par_label: dict[str, dict[str, str]] = {}
+    noms_par_label: dict[str, dict[str, str]] = {}
     for label in config.labels:
+        groupes: dict[str, str] = {}
+        noms: dict[str, str] = {}
         try:
             label_members[label.id] = fetch_label_members(
-                client, label, manual_dir, country=config.country.qid)
+                client, label, manual_dir, country=config.country.qids,
+                groupes=groupes, noms=noms)
         except Exception as exc:  # un label en échec ne doit pas tuer la collecte
             LOG.error("label %s : collecte échouée (%s)", label.id, exc)
             label_members[label.id] = set()
+        if noms:
+            noms_par_label[label.id] = noms
+        if groupes:
+            groupes_par_label[label.id] = groupes
+            LOG.info("label %s : %s aires distinctes", label.id,
+                     len(set(groupes.values())))
 
     places: list[Place] = []
     failed: list[str] = []
     for theme in themes:
         try:
-            places.extend(
-                fetch_theme(client, theme, label_members, country=config.country.qid))
+            places.extend(fetch_theme(
+                client, theme, label_members,
+                country=config.country.qids, enclaves=enclaves))
         except Exception as exc:
             LOG.error("thème %s : collecte échouée (%s)", theme.id, exc)
             failed.append(theme.id)
@@ -1765,7 +1992,7 @@ def run_fetch(
         LOG.error("labels collecteurs : collecte échouée (%s)", exc)
 
     resolve_admin(client, places)
-    apply_labels(places, label_members)
+    apply_labels(places, label_members, groupes_par_label, noms_par_label)
 
     # L'ouverture au public ne vient que d'OpenStreetMap, donc de `discover`,
     # qui coûte vingt minutes : une nouvelle collecte l'écraserait sans trace.
@@ -1784,7 +2011,38 @@ def run_fetch(
     # leur fichier ; ceux qui ont échoué aussi — leur dernière collecte réussie
     # vaut mieux que rien, et l'échec est déjà signalé par ailleurs.
     collected = {t.id for t in themes} - set(failed)
-    written = write_raw(raw_dir, places, replacing=collected | {EXTRA_SHARD})
+
+    # MAIS LES LABELS, EUX, VALENT POUR TOUT LE CATALOGUE. `apply_labels` ne
+    # vient de toucher que les lieux de cette collecte ; sur une reprise
+    # partielle, les autres fichiers gardaient les labels du jour d'avant.
+    #
+    # Mesuré, et c'est ainsi qu'on l'a vu : après un `fetch --only villages`,
+    # la liste des parcs nationaux comptait vingt-six lignes et le catalogue
+    # vingt et un porteurs — six labels périmés que le fichier ne demandait
+    # plus, onze jamais posés parce que leur thème n'avait pas été recollecté.
+    # Rien ne le disait, et la collection affichait un mélange des deux
+    # versions de la liste.
+    #
+    # Seuls les fichiers dont un lieu CHANGE sont réécrits : une reprise
+    # partielle qui ne bouge aucun label ne touche toujours rien.
+    relabelles: list[Place] = []
+    retouches: set[str] = set()
+    for shard in shards(raw_dir):
+        if shard in collected or shard == EXTRA_SHARD:
+            continue
+        lot = read_shard(raw_dir, shard)
+        avant = [sorted(place.labels or ()) for place in lot]
+        apply_labels(lot, label_members, groupes_par_label, noms_par_label)
+        if any(sorted(place.labels or ()) != vieux
+               for place, vieux in zip(lot, avant)):
+            retouches.add(shard)
+        relabelles.extend(lot)
+    if retouches:
+        LOG.info("labels reposés sur %s thème(s) non recollecté(s) : %s",
+                 len(retouches), ", ".join(sorted(retouches)))
+
+    written = write_raw(raw_dir, places + relabelles,
+                        replacing=collected | {EXTRA_SHARD} | retouches)
     LOG.info(
         "collecte écrite dans %s : %s",
         raw_dir,

@@ -21,6 +21,20 @@ geo:
     name: Italie
     # Le complément de nom que le français ne sait pas dériver.
     de_form: d'Italie
+    # L'ITALIEN AU MILIEU, et ce n'est pas un détail de confort.
+    #
+    # Le service de libellés de Wikidata rend le Q-ID LUI-MÊME quand aucune des
+    # langues demandées n'existe. Avec « fr,en », 128 entités italiennes sont
+    # revenues nommées « Q100293619 » et la collecte les a jetées comme « sans
+    # libellé exploitable » — l'Aquarium de Naples, l'Antiquarium d'Herculanum,
+    # le jardin botanique alpin Bruno-Peyronel. Elles ont un nom : il est en
+    # italien, et personne ne le demandait.
+    #
+    # Le français reste en tête : on veut « Cathédrale de Milan » là où
+    # Wikidata la connaît sous ce nom. L'anglais passe DERRIÈRE l'italien —
+    # « Acquario di Napoli » vaut mieux que « Aquarium of Naples » pour un lieu
+    # que l'on va visiter à Naples.
+    langues: fr,it,en
 
   # LES CONTOURS, pour rattacher un lieu à sa province sans réseau.
   #
@@ -37,6 +51,64 @@ geo:
   # La province est l'échelon qui correspond au département : cent dix contre
   # cent une, pour un pays d'un tiers plus petit. La région italienne, elle,
   # compte vingt unités — presque les dix-huit françaises.
+  # ── Les enclaves : le Vatican et Saint-Marin ──────────────────────────
+  #
+  # Ce sont des PAYS chez Wikidata : `P17` y vaut Q237 et Q238, jamais Q38. La
+  # collecte italienne ne les voyait donc pas — et les 203 églises romaines du
+  # vivier de `derogations` n'avaient ni Saint-Pierre, ni la chapelle Sixtine,
+  # ni les musées du Vatican. Le filtre avait raison ; le guide avait tort.
+  #
+  # `departement` dit à quelle province les rattacher, et ce n'est pas de la
+  # géopolitique : un lieu sans département sort du catalogue avant d'être
+  # jugé (`apply_geographic_scope`), et surtout on va à Saint-Pierre DEPUIS
+  # Rome. Les deux codes sont lus dans `data/reference/it/departements.csv` :
+  # 058 Rome, 099 Rimini — la ville italienne la plus proche de Saint-Marin.
+  #
+  # Les Q-id ne viennent pas de mémoire : ils sont lus dans la table
+  # `datasets/country-codes`, qui donne IT → Q38 et FR → Q142 — soit exactement
+  # ce que ce dépôt écrit déjà — et VA → Q237, SM → Q238.
+  #
+  # ⚠ Q237 y est libellé « Saint-Siège ». Wikidata distingue parfois le
+  # Saint-Siège de l'État de la Cité du Vatican, et `P17` des lieux pointe
+  # peut-être l'autre. La collecte le dira sans ambiguïté : si le Vatican rend
+  # ZÉRO lieu alors que Saint-Marin en rend, c'est l'entité voisine qu'il faut,
+  # et `suggest-qids` la donnera. `fetch` journalise les enclaves absorbées
+  # pour que la question se voie.
+  enclaves:
+    - qid: Q237
+      name: Vatican
+      departement: "058"      # province de Rome
+    - qid: Q238
+      name: Saint-Marin
+      departement: "099"      # province de Rimini
+
+  # ── LES CONTOURS À DESSINER ───────────────────────────────────────────
+  #
+  # Sans eux, la carte italienne est un rectangle vide. Ce n'est pas une
+  # coquetterie : la carte d'exploration n'affiche AUCUN lieu à l'échelle du
+  # pays — on ouvre une région, et les lieux de cette région apparaissent. Sans
+  # contours, il n'y a pas de région à ouvrir, donc pas un seul lieu à l'écran,
+  # alors même que le catalogue est chargé et que les vignettes du bas le
+  # montrent. La carte de conquête, elle, retombe proprement sur la liste.
+  #
+  # Même découpage ISTAT que le rattachement — c'est la condition pour que les
+  # codes dessinés soient ceux du catalogue. Le fichier des provinces est déjà
+  # sur le disque, on ne le retélécharge pas : le découpage sarde du 1er
+  # janvier 2026 a renuméroté huit provinces, et deux millésimes différents
+  # donneraient des aplats qui ne se rattachent à rien.
+  contours:
+    attribution: Contours ISTAT via openpolis/geojson-italy — CC BY
+    niveaux:
+      region:
+        code_key: reg_istat_code
+        name_key: reg_name
+        url: https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_regions.geojson
+      departement:
+        fichier: province.geojson
+        code_key: prov_istat_code
+        name_key: prov_name
+        url: https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_provinces.geojson
+
   layers:
     departement:
       fichier: province.geojson
@@ -45,11 +117,179 @@ geo:
       parent_key: reg_istat_code
       url: https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_provinces.geojson
 
-  # PAS DE DÉROGATION COMMUNALE ENCORE.
+    # ── La commune, et c'est la seule façon de l'avoir hors de France ──────
+    #
+    # Les deux API que `enrich` interroge pour la commune sont NATIONALES
+    # (api-adresse et geo.api.gouv.fr), et `resolve_admin` ne remplit que le
+    # département depuis Wikidata, jamais la commune. Le premier catalogue
+    # italien l'a payé comptant : zéro commune sur 2 563 lieux — donc un
+    # `max_per_commune` qui n'a pas mordu une seule fois (80 églises gardées
+    # dans la seule Rome), la commune absente de chaque fiche de l'application,
+    # et la maille la plus fine de la carte de conquête vide.
+    #
+    # Les contours communaux la rendent, par le même point-dans-polygone que
+    # les provinces. Le fichier est gros — 35 Mo, 7 900 communes contre 110
+    # provinces — mais il ne se télécharge qu'une fois et ne sert qu'à
+    # `enrich`.
+    commune:
+      fichier: commune.geojson
+      code_key: com_istat_code     # six chiffres, ex. 058091 pour Rome
+      name_key: name
+      parent_key: prov_istat_code  # le même code que la couche du dessus
+      url: https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_municipalities.geojson
+
+# ── Les dérogations communales ──────────────────────────────────────────
+#
+# Le plafond général reste six par thème et par ville : c'est la règle, et
+# elle a retiré 1 118 lieux au premier build qui l'a vue mordre — Rome 572,
+# Venise 213, Milan 64, Florence 61, Naples 53. Elle a aussi emporté « Îles
+# de Venise » en entier : vingt-huit îles qui sont toutes dans la même
+# commune, dont il ne restait que six.
+#
+# Une dérogation ne se pose donc pas sur une intuition mais sur un
+# DÉCROCHAGE, et `derogations` le montre : le vivier de chaque ville au pied
+# du plafond, thème par thème, avec la plus forte chute et le pas courant à
+# côté. Ce dernier fait le travail — une plus forte chute existe toujours,
+# même dans une liste régulière ; c'est leur rapport qui dit s'il faut la
+# croire.
+#
+# Huit lignes seulement en sortent, et pas une n'est un arbitrage de goût.
+collections:
+  commune_overrides:
+    # Paris n'a rien à faire ici : un dictionnaire fusionne clé par clé, et
+    # sans ce `null` l'Italie héritait de sa dérogation. Inerte — aucun code
+    # ISTAT ne fait cinq chiffres — mais annoncée dans le journal de chaque
+    # construction, ce qui est une fausse piste écrite en toutes lettres.
+    "75056": null
+
+    # Chacune coupe à la plus forte chute mesurée, quand cette chute sort du
+    # pas courant. Là où elle n'en sort pas, il n'y a pas de ligne : deux
+    # thèmes de Rome, deux de Venise, tout Milan et tout Naples restent à six.
+
+    "058091":           # Rome — 629 candidats au pied du plafond, 572 retirés
+      # 203 candidats, et pas de falaise : les scores descendent du Panthéon
+      # (184) à Sant'Ivo alla Sapienza (91) sans rupture franche. La plus forte
+      # chute vaut 2,3 pour un pas courant de 0,5 — quatre fois et demie, le
+      # signal le plus FAIBLE des quatre lignes de cette ville. Elle tombe
+      # après Saint-Pierre-aux-Liens, ce qui donne les quatre basiliques
+      # papales, le Panthéon et les quatre grandes églises jésuites et
+      # nationales. C'est la ligne à revoir en premier si la revue la conteste.
+      cathedrales: 9
+      # 203 candidats, chute de 4,8 pour un pas de 0,4 — douze fois. Elle tombe
+      # après le Forum Boarium : Forum Romain, Circus Maximus, mur d'Aurélien,
+      # Ostie, muraille Servienne, mausolée d'Auguste, forum de Trajan, forum
+      # Boarium. Les temples du Capitole suivent cinq points plus bas.
+      megalithes: 8
+      # 140 candidats, chute de 5,4 pour un pas de 0,6 — neuf fois. Après l'arc
+      # de Septime Sévère : les trois colonnes, les trois arcs, les deux
+      # théâtres antiques, le Farnèse et le Quirinal. Les palais du dix-septième
+      # siècle commencent cinq points plus bas.
+      monuments: 10
+      # 29 candidats, chute de 9,8 pour un pas de 1,5. Le même chiffre qu'à
+      # Paris, et pour la même raison : une ville où dix institutions se
+      # suivent sans qu'aucune ne soit de second rang.
+      musees: 10
+      # Sept, et c'est le Vatican qui l'a rendu nécessaire. Rattacher la place
+      # Saint-Pierre à la commune de Rome — elle n'avait aucune commune avant,
+      # et échappait donc au plafond — ajoute une place au groupe de tête sans
+      # rien changer à sa forme : la chute la plus forte valait déjà 6,2 pour un
+      # pas de 2, et elle tombe toujours entre le Largo di Torre Argentina (96)
+      # et le Campo de' Fiori (90). Elle est simplement passée du sixième rang
+      # au septième.
+      #
+      # À six, la place Saint-Pierre entrait et le Largo sortait. `derogations`
+      # relancé sur la collecte rattachée coupe après le SEPTIÈME : Saint-Pierre,
+      # Navone, del Popolo, le Capitole, d'Espagne, Venezia, Torre Argentina.
+      #
+      # Les cathédrales, elles, ne bougent pas : la mesure refaite avec la
+      # basilique Saint-Pierre et la chapelle Sixtine dans le vivier coupe
+      # toujours après le neuvième (3,2 pour un pas de 0,7). Saint-Clément et
+      # Sainte-Praxède sortent du catalogue romain, et c'est la méthode qui le
+      # dit — pas un effet de bord du rattachement.
+      piazzas: 7
+
+    "027042":           # Venise — 260 candidats, 213 retirés
+      # 29 candidats, chute de 9,1 pour un pas de 0,9 — dix fois, la mesure la
+      # plus nette de toutes les villes. Elle rend « Îles de Venise », que le
+      # plafond à six avait fait disparaître en entier : San Lazzaro degli
+      # Armeni, Murano, Burano, Torcello, Poveglia, le Ghetto, le Lido, la
+      # Giudecca. San Giorgio Maggiore suit neuf points plus bas.
+      iles: 8
+      # 58 candidats, chute de 3,6 pour un pas de 0,6 — six fois. Après le
+      # Rédempteur : Saint-Marc, les Frari, San Zanipolo, la Salute, San
+      # Zaccaria, San Francesco della Vigna, San Giorgio Maggiore, la Madonna
+      # dell'Orto, Torcello et le Rédempteur.
+      cathedrales: 10
+      # 131 candidats, chute de 2,5 pour un pas de 0,4 — six fois.
+      #
+      # ⚠ Ce vivier demande un coup d'œil en revue : quatre de ses vingt-cinq
+      # premiers sont des THÉÂTRES DISPARUS — San Cassiano (démoli en 1812),
+      # San Benedetto, San Samuele, San Moisè. `fantomes` est fait pour ça.
+      monuments: 8
+
+    "048017":           # Florence — 99 candidats, 61 retirés
+      # 16 candidats, chute de 18,2 pour un pas de 1,6 — onze fois, et elle ne
+      # vient qu'au treizième : les Offices, Pitti, l'Accademia, le Bargello,
+      # le Palazzo Vecchio, la chapelle Brancacci, l'Opera del Duomo, Boboli,
+      # Medici-Riccardi, Galilée, le corridor de Vasari, les chapelles des
+      # Médicis et l'archéologique se suivent sans une rupture. C'est le cas
+      # des musées parisiens, mais MESURÉ celui-là, et non arbitré.
+      musees: 13
+
+    # Milan (015146) et Naples (063049) n'ont PAS de dérogation, et c'est le
+    # résultat de la mesure, pas un oubli. Leurs viviers sont des plateaux :
+    # à Milan, onze palais entre 67 et 70 points ; à Naples, dix-sept palais
+    # entre 55 et 65. Le plafond y coupe exactement ce qu'il doit couper.
+    #
+    # Deux villes confirment même le six en s'y arrêtant d'elles-mêmes : les
+    # maisons de Milan chutent de 6,6 juste après le sixième, et les monuments
+    # de Florence de 2,4 pour un pas de 0,4 — au sixième également.
+
+  # ── Un croisement gardé contre la règle du diamètre ────────────────────
   #
-  # Rome, Florence, Venise et Naples en demanderont chacune une — Paris pèse
-  # cinquante-neuf lieux au catalogue français et a la sienne, écrite en toutes
-  # lettres. Mais une dérogation se pose sur un CODE de commune, et les codes
-  # ISTAT ne s'inventent pas : ils se liront dans la première collecte, avec le
-  # vivier de chaque ville au pied du plafond — c'est ainsi que celle de Paris
-  # a été décidée, sur un décrochage mesuré et non sur une intuition.
+  # `min_diameter_km: 25` écarte les croisements « trop resserrés pour être un
+  # voyage », et sa justification est explicite : « on ne collectionne pas ce
+  # qui se fait à pied en une après-midi sans quitter sa ville ». Elle a été
+  # mesurée sur la France, et elle y a raison — trente et un ponts parisiens
+  # dans neuf kilomètres.
+  #
+  # Elle écarte cinq croisements italiens, et quatre le méritent : les musées
+  # de Florence (2 km), les monuments de Venise (1 km), les églises de Venise
+  # (11 km) sont bien la promenade d'une journée dans une seule ville.
+  #
+  # Le cinquième, non. Les huit îles de la lagune — San Lazzaro degli Armeni,
+  # Murano, Burano, Torcello, Poveglia, le Ghetto, le Lido, la Giudecca —
+  # tiennent dans quinze kilomètres, mais on n'y va qu'en vaporetto et il y
+  # faut la journée. SUR L'EAU, LE DIAMÈTRE NE MESURE PLUS L'EFFORT : c'est
+  # précisément le cas que la règle ne sait pas voir, et le cas pour lequel
+  # `always_cross` existe.
+  #
+  # Le rapport de thème, lui, n'a jamais été en cause : les îles de Venise
+  # valent très au-dessus de la moyenne nationale. C'est le diamètre seul.
+  always_cross:
+    - iles-departement-027    # Îles de Venise
+
+  # ── Deux lieux du même site ne commencent pas deux fois un palmarès ─────
+  #
+  # « Le meilleur de Pise » ouvrait sur CINQ lieux de la seule Piazza dei
+  # Miracoli — la tour, la place, le dôme, le baptistère, le Campo Santo — et
+  # « Le meilleur d'Italie » en prenait deux de ses dix premiers.
+  #
+  # Ce ne sont pas des doublons : on les visite séparément, chacun a son
+  # billet, chacun mérite le catalogue. Le second n'est donc pas écarté, il est
+  # REPOUSSÉ après les autres — il descend d'un niveau, ce qui est exactement
+  # le reproche.
+  #
+  # Deux cents mètres, et le chiffre est lu dans les paires mesurées. En
+  # dessous de 150 m on ne trouve que des évidences : dôme de Milan ↔ Piazza
+  # del Duomo (50 m), cathédrale de Modène ↔ Torre Ghirlandina (51 m). Entre
+  # 150 et 200 m, les quatre paires ajoutées sont TOUTES du même site — tour de
+  # Pise ↔ Piazza dei Miracoli (155 m), Vallée des Temples ↔ temple de la
+  # Concorde (195 m, le temple est dans la vallée), Olympéion ↔ temple
+  # d'Héraclès (185 m), musées du Capitole ↔ Vittoriano (187 m). La première
+  # paire discutable n'arrive qu'à 241 m : villa Médicis ↔ Trinité-des-Monts,
+  # qui sont deux visites.
+  #
+  # La France ne le déclare pas encore : la règle lui vaudrait aussi, mais son
+  # catalogue est livré et le changement se mesure avant de se prendre.
+  min_distance_m: 200

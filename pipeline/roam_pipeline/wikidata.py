@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import logging
 import time
-from typing import Any, Iterable, Iterator
+from typing import Any, Iterable, Iterator, Sequence
 
 import requests
 
@@ -65,6 +65,31 @@ P_DISSOLVED = "P576"
 # laquelle porte les membres.
 P_OPERATOR = "P137"
 P_OWNED_BY = "P127"
+
+#: Langues demandées au service de libellés de Wikidata, dans l'ordre.
+#
+# « fr,en » a suffi tant que le catalogue était français. Sur l'Italie il a
+# coûté cher : le service rend le Q-ID LUI-MÊME quand aucune des langues
+# demandées n'existe, et la collecte jette alors le lieu comme « sans libellé
+# exploitable » — 128 entités italiennes perdues d'un coup, dont l'Aquarium de
+# Naples et l'Antiquarium d'Herculanum. Elles ont un nom : il est en italien.
+#
+# L'ordre compte, et le français reste en tête : ce catalogue est français, et
+# on veut « Cathédrale de Milan » quand Wikidata la connaît sous ce nom. Vient
+# ensuite la langue DU PAYS — « Acquario di Napoli » vaut mieux que « Aquarium
+# of Naples » pour un lieu italien — et l'anglais en dernier recours.
+_LANGUES = "fr,en"
+
+
+def utiliser_langues(langues: str) -> None:
+    """Choisit les langues du service de libellés. Appelée au démarrage."""
+    global _LANGUES
+    _LANGUES = langues
+
+
+def service_label() -> str:
+    """La clause de libellé, dans les langues du pays courant."""
+    return f'SERVICE wikibase:label {{ bd:serviceParam wikibase:language "{_LANGUES}". }}'
 
 
 class SparqlError(RuntimeError):
@@ -223,13 +248,29 @@ def chunked(items: Iterable[Any], size: int) -> Iterator[list[Any]]:
 # Requêtes
 # ---------------------------------------------------------------------------
 
+def filtre_pays(country: str | Sequence[str], variable: str = "?pays") -> str:
+    """La clause qui borne une requête à un ou plusieurs pays.
+
+    Un seul pays reste écrit en dur — c'est le cas de la France, et changer sa
+    requête ne se justifie par rien. Plusieurs passent par un `VALUES` : le
+    catalogue italien absorbe le Vatican et Saint-Marin, qui sont des pays
+    chez Wikidata (`P17` y vaut Q237 et Q238, jamais Q38).
+    """
+    qids = [country] if isinstance(country, str) else list(country)
+    if len(qids) == 1:
+        return f"?item wdt:{P_COUNTRY} wd:{qids[0]} ."
+    valeurs = " ".join(f"wd:{qid}" for qid in qids)
+    return (f"VALUES {variable} {{ {valeurs} }}\n"
+            f"  ?item wdt:{P_COUNTRY} {variable} .")
+
+
 def theme_query(
     class_qids: list[str],
     min_sitelinks: int,
     limit: int | None = None,
     offset: int = 0,
     *,
-    country: str,
+    country: str | Sequence[str],
 ) -> str:
     """Lieux français d'un thème, avec notoriété et commune de rattachement.
 
@@ -244,12 +285,16 @@ def theme_query(
     """
     values = " ".join(f"wd:{q}" for q in class_qids)
     page = f"\nORDER BY ?item\nLIMIT {limit} OFFSET {offset}" if limit else ""
+    pays = filtre_pays(country)
+    # `?pays` n'entre dans le SELECT que s'il est lié : une variable libre y
+    # changerait la requête française sans rien lui apprendre.
+    colonne = " ?pays" if "VALUES ?pays" in pays else ""
     return f"""
-SELECT DISTINCT ?item ?itemLabel ?coord ?sitelinks ?image ?commons ?elevation ?admin ?frwiki
+SELECT DISTINCT ?item ?itemLabel ?coord ?sitelinks ?image ?commons ?elevation ?admin ?frwiki{colonne}
 WHERE {{
   VALUES ?class {{ {values} }}
   ?item wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* ?class .
-  ?item wdt:{P_COUNTRY} wd:{country} .
+  {pays}
   ?item wdt:{P_COORDINATE} ?coord .
   ?item wikibase:sitelinks ?sitelinks .
   FILTER(?sitelinks >= {min_sitelinks})
@@ -258,7 +303,7 @@ WHERE {{
   OPTIONAL {{ ?item wdt:{P_ELEVATION} ?elevation. }}
   OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY} ?admin. }}
   OPTIONAL {{ ?frwiki schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> . }}
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+  {service_label()}
 }}{page}
 """
 
@@ -297,7 +342,7 @@ WHERE {{
   OPTIONAL {{ ?item wdt:{P_ELEVATION} ?elevation. }}
   OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY} ?admin. }}
   OPTIONAL {{ ?frwiki schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> . }}
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+  {service_label()}
 }}
 """
 
@@ -340,7 +385,7 @@ SELECT DISTINCT ?item ?class ?classLabel WHERE {{
   VALUES ?item {{ {items} }}
   VALUES ?class {{ {classes} }}
   ?item wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* ?class .
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+  {service_label()}
 }}
 """
 
@@ -388,7 +433,7 @@ SELECT ?class ?item ?itemLabel WHERE {{
   VALUES ?class {{ {values} }}
   ?item wdt:{P_INSTANCE_OF} ?class .
 {_notable_body(min_sitelinks, country)}
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+  {service_label()}
 }}
 """
 
@@ -437,7 +482,7 @@ WHERE {{
   OPTIONAL {{ ?item wdt:{P_INSTANCE_OF} ?class. }}
   OPTIONAL {{ ?item wdt:{P_ADMIN_ENTITY} ?admin. }}
   OPTIONAL {{ ?frwiki schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> . }}
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+  {service_label()}
 }}
 """
 
@@ -461,8 +506,25 @@ SELECT ?item ?visitors WHERE {{
 """
 
 
-def label_members_query(kind: str, qid: str, *, country: str) -> str:
-    """Membres d'un label. `kind` ∈ {heritage, member_of, instance, operator, owner}."""
+def label_members_query(
+    kind: str, qid: str, *, country: str | Sequence[str],
+    via_property: str | None = None,
+) -> str:
+    """Membres d'un label.
+
+    `kind` ∈ {heritage, member_of, instance, operator, owner, dans_une_aire}.
+
+    Les cinq premiers pointent l'objet DIRECTEMENT : le lieu est membre de
+    l'association, protégé au titre du label, exploité par l'organisme. L'objet
+    est alors une entité unique — une liste, une désignation.
+
+    Le sixième dit autre chose : le lieu est SITUÉ DANS quelque chose qui
+    appartient à une classe. « Le Vésuve est dans le parc national du Vésuve »
+    ne se dit pas comme « le Vésuve est membre du parc du Vésuve », et l'objet
+    n'est pas un parc mais la classe de tous les parcs nationaux italiens. Il
+    faut donc deux sauts : la propriété de situation, puis la classe de ce
+    qu'elle atteint. `via_property` porte la première, `qid` la seconde.
+    """
     predicate = {
         "heritage": f"wdt:{P_HERITAGE}",
         "member_of": f"wdt:{P_MEMBER_OF}",
@@ -472,15 +534,37 @@ def label_members_query(kind: str, qid: str, *, country: str) -> str:
         "operator": f"wdt:{P_OPERATOR}",
         "owner": f"wdt:{P_OWNED_BY}",
     }
+    if kind == "dans_une_aire":
+        if not via_property:
+            raise ValueError(
+                "dans_une_aire exige une propriété de situation : déclare "
+                "`property` dans le `wikidata_query` du label, et résous-la "
+                "avec `suggest-qids --property`."
+            )
+        predicate[kind] = (
+            f"wdt:{via_property}/wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}*"
+        )
     if kind not in predicate:
         raise ValueError(f"type de requête de label non géré : {kind}")
     # Seul l'identifiant est exploité : demander les libellés et les coordonnées
     # multipliait le volume par dix, jusqu'à tronquer la réponse sur les gros
     # labels (30 000 monuments historiques inscrits).
+    if kind == "dans_une_aire":
+        # L'aire est rendue avec le lieu : c'est elle qui permettra de prendre
+        # LE MEILLEUR LIEU DE CHAQUE PARC plutôt que les mieux notés tous parcs
+        # confondus. Une variable de plus ne coûte rien ici — la requête ne
+        # rend que des identifiants, jamais de libellés ni de coordonnées.
+        return f"""
+SELECT DISTINCT ?item ?aire WHERE {{
+  ?item wdt:{via_property} ?aire .
+  ?aire wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* wd:{qid} .
+  {filtre_pays(country)}
+}}
+"""
     return f"""
 SELECT DISTINCT ?item WHERE {{
   ?item {predicate[kind]} wd:{qid} .
-  ?item wdt:{P_COUNTRY} wd:{country} .
+  {filtre_pays(country)}
 }}
 """
 
@@ -530,7 +614,7 @@ SELECT DISTINCT ?nom ?item ?itemLabel WHERE {{
   ?item rdfs:label ?nom .
   ?item wdt:{P_INSTANCE_OF}/wdt:{P_SUBCLASS_OF}* wd:{class_qid} .
   ?item wdt:{P_COUNTRY} wd:{country} .
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+  {service_label()}
 }}
 """
 
@@ -560,6 +644,6 @@ def entity_labels_query(qids: list[str]) -> str:
     return f"""
 SELECT ?item ?itemLabel ?itemDescription WHERE {{
   VALUES ?item {{ {values} }}
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
+  {service_label()}
 }}
 """

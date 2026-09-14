@@ -6,13 +6,131 @@
 # qu'ajouter enverrait le pipeline interroger Wikidata pour quinze listes
 # étrangères, à chaque collecte, pour rien.
 #
-# `retire: true` les enlève. Ce qu'il faudra mettre à leur place — les
-# monuments nationaux, les Borghi più belli d'Italia, les jardins historiques —
-# se résout avec `label-probe`, une liste à la fois, comme les françaises l'ont
-# été. Aucun n'est écrit ici tant qu'il n'est pas résolu contre Wikidata : un
-# Q-id supposé est un label qui ne collecte rien et ne le dit pas.
+# `retire: true` les enlève. Ce qu'il faut mettre à leur place se résout avec
+# `suggest-qids` puis `verify-qids`, une liste à la fois, comme les françaises
+# l'ont été. Aucun n'est écrit ici tant qu'il n'est pas résolu contre
+# Wikidata : un Q-id supposé est un label qui ne collecte rien et ne le dit pas.
+#
+# Résolue à ce jour : les Borghi più belli d'Italia, ci-dessous. Restent à
+# résoudre, dans cet ordre d'utilité — les monuments nationaux, les jardins
+# historiques, les parcs nationaux et régionaux, les réserves naturelles.
 
 labels:
+  # ── I Borghi più belli d'Italia ────────────────────────────────────────
+  #
+  # L'équivalent italien exact des Plus Beaux Villages de France : une
+  # association privée, un jury, une liste finie, révisée. Elle rend au thème
+  # `villages` ce que les listes françaises lui donnaient — il n'a aucune
+  # classe Wikidata et ne vit que de ses listes.
+  #
+  # `suggest-qids` a rendu six résultats pour « I borghi più belli » ; c'est
+  # Q127107 qui est l'ASSOCIATION (« association culturelle italienne »),
+  # comme Q1010307 l'est en France. Les trois Q110890335/6/7 sont des pages de
+  # listes régionales, pas l'autorité : `member_of` sur elles ne rendrait que
+  # la région écrite. Rien n'est repris de mémoire : le Q-id vient de la sortie
+  # de `suggest-qids`, et `verify-qids` doit le confirmer avant la collecte.
+  - id: borghi-piu-belli
+    # Gardé sans revue — et c'est ici une EXTRAPOLATION, pas une mesure.
+    # En France, les quatre listes à jury ont été mesurées : 352 lieux relus,
+    # 0 écarté. Celle-ci est du même genre (association, jury, liste finie),
+    # jamais relue en italien. Si la première revue italienne écarte des
+    # bourgs, c'est cette ligne qui saute, et elle seule.
+    garde_d_office: true
+    name: Les Plus Beaux Bourgs d'Italie
+    authority: Association I Borghi più belli d'Italia
+    score_bonus: 30
+    makes_collection: true
+    wikidata_query: { kind: member_of, qid: Q127107 }
+
+  # ── Les parcs nationaux d'Italie ───────────────────────────────────────
+  #
+  # Une collection, et pas un thème : c'est la décision d'Alexis, et elle est
+  # la bonne. Un thème aurait fait du parc un LIEU, et le catalogue aurait tenu
+  # deux fois la même chose — mesuré sur les dix parcs qu'OpenStreetMap avait
+  # fait entrer : six doublaient un lieu déjà présent, le parc national du
+  # Vésuve et le Vésuve, celui de l'Aspromonte et l'Aspromonte, celui du Matese
+  # et le Matese. « Garder uniquement le lieu mais l'ajouter à la collection. »
+  #
+  # Le label ne collecte donc rien : il tamponne le Vésuve, les villages des
+  # Cinque Terre, les criques du Cilento — les lieux que les thèmes tiennent
+  # déjà et qui se trouvent dans un parc.
+  #
+  # C'est le même obstacle que la charte française avait rencontré et noté sans
+  # le lever (voir `parc-national` dans le fichier du dépôt) : « la requête
+  # prévue ramènerait les parcs eux-mêmes, pas les lieux qui s'y trouvent ».
+  # Le type de requête `dans_une_aire` est ce qui manquait — il fait les deux
+  # sauts, la propriété de situation puis la classe de ce qu'elle atteint.
+  #
+  # LES DEUX IDENTIFIANTS VIENNENT DE SORTIES RÉELLES, aucun de mémoire.
+  #
+  # `probe Q635414 Q1438999 Q358729` — les parcs du Vésuve, des Abruzzes et du
+  # Val Grande, pris dans la collecte elle-même — déclare les mêmes deux
+  # classes sur les trois : parc national (Q46169) et aire protégée (Q473972).
+  # C'est la PREMIÈRE qu'on interroge : la seconde ramènerait les réserves
+  # régionales, les oasis et les zones humides, c'est-à-dire les cinq cents
+  # aires qui viennent d'être écartées du thème « plages ».
+  #
+  # Aucune classe propre à l'Italie n'apparaît — le libellé « parc national
+  # d'Italie » est une DESCRIPTION, pas une classe. Q46169 est donc mondiale, et
+  # c'est le filtre de pays de la requête qui borne le résultat : les lieux
+  # italiens situés dans un parc national.
+  #
+  # `suggest-qids --property "aire protégée"` rend un seul résultat, P3018,
+  # « se trouve dans l'aire protégée ». La propriété est mondiale elle aussi :
+  # la même servira au label français le jour où sa classe sera vérifiée.
+  #
+  # ⚠️ MESURÉ : la mécanique Wikidata marche, la DONNÉE n'est pas là. La liste
+  # se saisit donc à la main, dans `data/it/manual/parchi-nazionali.csv` —
+  # comme les Plus Beaux Détours, et pour la même raison.
+  #
+  # La requête rend 158 membres dans 21 parcs, ce qui promettait bien. Sur le
+  # catalogue, 44 lieux portent le label — et ils tombent dans DOUZE parcs, de
+  # façon grotesquement inégale :
+  #
+  #     Q1425191  17 lieux   (Monts Sibyllins, dont 11 sommets)
+  #     Q1111568   8 lieux   (Archipel toscan, TOUS des phares)
+  #     Q1072838   5 · Q1027914 3 · les huit autres parcs : 1 ou 2
+  #
+  # Vingt-cinq des quarante-quatre viennent de deux parcs. Douze des
+  # quarante-quatre sont des phares — soit douze des treize phares du
+  # catalogue, parce qu'un import administratif a posé P3018 sur les phares.
+  #
+  # Et ce qui manque dit tout. Ces lieux sont AU CATALOGUE, ils sont DANS un
+  # parc national, et aucun ne porte la propriété :
+  #
+  #     Vernazza (Cinque Terre) · Paestum (Cilento) · Tre Cime di Lavaredo
+  #     Marmolada · Asinara · Vallée des Temples
+  #
+  # P3018 sur l'Italie n'est pas un jeu de données, c'est le travail de deux ou
+  # trois contributeurs sur leurs parcs de prédilection. La collection qui en
+  # sort s'appelle « Parcs nationaux d'Italie » et contient quatre phares, un
+  # petit lac à 57 points et une cascade à 28. « Ne garder que le top du top »
+  # interdit de publier ça.
+  #
+  # LA SUITE, ET ELLE EST ÉCRITE POUR : la GÉOMÉTRIE. Une couche de contours
+  # des parcs dans `geo.layers`, et le point-dans-polygone qui fait déjà
+  # tourner 7 896 communes — Vernazza, Paestum, les Tre Cime et la Marmolada
+  # entreraient toutes seules, et le fichier à la main deviendrait un simple
+  # complément. Il y faut un GeoJSON des limites : openpolis n'en publie pas
+  # (vérifié, 404), il viendrait de l'EUAP du ministère ou de Protected Planet.
+  #
+  # Le type de requête `dans_une_aire`, le rattachement du lieu à son aire et
+  # la règle « un lieu par parc » restent en place et sous test. Deux lignes
+  # rebranchent Wikidata le jour où la propriété sera remplie ; mais la liste
+  # à la main restera meilleure tant qu'un curateur choisira mieux qu'elle.
+  - id: parchi-nazionali
+    name: Parcs nationaux d'Italie
+    authority: Ministero dell'Ambiente e della Sicurezza Energetica
+    # Vingt, comme les Grands Sites de France, et pour la même raison : le
+    # label doit peser sans décider seul. À REMESURER sur la prochaine
+    # construction — c'est un chiffre posé par analogie, pas par mesure, et le
+    # précédent français invite à la prudence : à 30, les Grands Sites
+    # occupaient six des dix places du niveau 1 en « Sommets ».
+    score_bonus: 20
+    makes_collection: true
+    collects: false
+    wikidata_query: { kind: manual }
+
   # L'UNESCO reste : c'est la seule liste de ces quinze qui ne soit pas
   # nationale, et elle vaut d'autant plus ici — l'Italie porte le plus grand
   # nombre de biens inscrits au monde.

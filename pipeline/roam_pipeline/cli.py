@@ -40,6 +40,7 @@ from .fetch import (
     apply_labels,
     carry_enrichment,
     fetch_label_members,
+    membres_inscrits,
     read_fetch_state,
     stale_themes,
     _paged,
@@ -67,9 +68,11 @@ from .fetch import (
 from .models import Collection, CollectionPlace, Place
 from .outlines import ATTRIBUTION as OUTLINE_ATTRIBUTION, DEFAULT_TOLERANCE_KM2
 from . import localisation
+from .outlines import Source as OutlineSource
 from .outlines import export as export_outlines
 from .review import (
     CLEAR, DECISIONS, apply_decisions, apply_names, apply_photos, apply_themes,
+    a_relire,
     gardes_d_office,
     diff_tiers, merge_decisions, photo_file, read_decisions, read_names,
     read_photos, read_themes,
@@ -270,6 +273,9 @@ def _pending_terms(config: Config) -> list[tuple[str, str, str]]:
     for label in config.labels:
         if not label.is_manual and not label.qid and label.search:
             pending.append((f"label {label.id}", label.search, "item"))
+        if label.attend_une_propriete and label.via_property_search:
+            pending.append(
+                (f"label {label.id} (propriété)", label.via_property_search, "property"))
     for term in config.exclusions.search:
         pending.append(("exclusion", term, "item"))
     if config.visitors.search and not config.visitors.property_id:
@@ -409,14 +415,23 @@ def cmd_relabel(args: argparse.Namespace, config: Config) -> int:
 
     client = wd.SparqlClient()
     members: dict[str, set[str]] = {}
+    groupes_par_label: dict[str, dict[str, str]] = {}
+    noms_par_label: dict[str, dict[str, str]] = {}
     for label in config.labels:
+        groupes: dict[str, str] = {}
+        noms: dict[str, str] = {}
         try:
             members[label.id] = fetch_label_members(
-                client, label, args.manual, country=config.country.qid)
+                client, label, args.manual, country=config.country.qids,
+                groupes=groupes, noms=noms)
         except Exception as erreur:  # noqa: BLE001 — un label en échec n'est pas fatal
             LOG.error("label %s : collecte échouée (%s)", label.id, erreur)
             members[label.id] = set()
-    apply_labels(places, members)
+        if groupes:
+            groupes_par_label[label.id] = groupes
+        if noms:
+            noms_par_label[label.id] = noms
+    apply_labels(places, members, groupes_par_label, noms_par_label)
 
     # Un membre que la collecte ne contient pas ne peut pas être étiqueté :
     # `relabel` appose des labels, il ne crée pas de lieux. Cent une communes
@@ -489,6 +504,7 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     # Après le département : la commune fait autorité sur lui, et la corrige au
     # passage quand Wikidata l'avait mal rattaché.
     enrich_communes(places, localisateur=couches.get("departement"),
+                    communes=couches.get("commune"),
                     pays=config.country.code)
     if not args.skip_summaries:
         enrich_summaries(places)
@@ -518,6 +534,119 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def _emprise_du_pays(args: argparse.Namespace, config: Config, raw_path):
+    """Le rectangle de découpe, la cellule témoin et le localisateur d'un pays.
+
+    Trois choses seulement séparaient `discover` d'un deuxième pays, et aucune
+    n'était dans la requête Overpass :
+
+    - **le rectangle**, qui découpe le travail en cellules. Celui de la France
+      est écrit en dur, et volontairement MÉTROPOLITAIN : le calculer sur les
+      contours engloberait la Réunion et la Polynésie, soit un rectangle de
+      vingt mille cellules pour cent une utiles. Ailleurs, il se calcule sur la
+      couche des départements, déjà téléchargée par `geo-layers`.
+    - **la cellule témoin**, qui prouve que la zone du pays s'est résolue.
+      Celle de Paris ne vaut que pour la France ; ailleurs on prend le lieu le
+      mieux noté du catalogue — le Colisée, Saint-Pierre — que l'on sait
+      présent chez OpenStreetMap.
+    - **le localisateur**, qui écarte les candidats hors du pays. La France a
+      ses deux API ; les autres ont leurs contours communaux, qui font le même
+      travail sans réseau et sans frontière nationale câblée.
+    """
+    from .geocode import departements_for
+    from .overpass import FRANCE_BBOX, PROBE_CELL, temoin_autour
+
+    if config.country.code.upper() == "FR":
+        return FRANCE_BBOX, PROBE_CELL, departements_for
+
+    couches = localisation.couches_du_pays(config, args.geo)
+    zones = couches.get("commune") or couches.get("departement")
+    if zones is None:
+        print(f"Aucun contour pour {config.country.name} : `geo-layers` les "
+              "télécharge. Sans eux, impossible de découper le pays ni "
+              "d'écarter les candidats étrangers.", file=sys.stderr)
+        return None, None, None
+
+    boites = [z.bbox for z in zones.zones if z.bbox[2] >= z.bbox[0]]
+    emprise = (min(b[1] for b in boites), min(b[0] for b in boites),
+               max(b[3] for b in boites), max(b[2] for b in boites))
+
+    # Le témoin doit être un lieu qu'OpenStreetMap connaît À COUP SÛR, et deux
+    # candidats évidents ne le sont pas :
+    #
+    # - le mieux DOCUMENTÉ de la collecte est « Alpes », 213 langues, dont le
+    #   point est au mont Blanc — en France ;
+    # - le mieux documenté PARMI les points italiens est « Calabre », dont la
+    #   coordonnée est le centroïde rond d'une région, 39,0000 / 16,5000, où
+    #   OSM n'a évidemment rien de nommé.
+    #
+    # Le CATALOGUE, lui, ne contient que des lieux qui ont passé la revue et
+    # tous les filtres : son mieux noté est le Colisée. On y va d'abord, et on
+    # retombe sur la collecte pour un pays qui n'a pas encore été construit.
+    catalogue = args.out / "places.json"
+    source = catalogue if catalogue.exists() else raw_path
+    dedans = [p for p in _load_places(source) if zones.contenant(p.lat, p.lon)]
+    meilleur = max(dedans, key=lambda p: (p.score, p.sitelinks), default=None)
+    if meilleur is None:
+        print(f"Aucun lieu de {source} ne tombe dans les contours de "
+              f"{config.country.name} — lance d'abord `fetch` puis `build`.",
+              file=sys.stderr)
+        return None, None, None
+    LOG.info("emprise %s : %s · témoin « %s »", config.country.code,
+             ", ".join(f"{v:.1f}" for v in emprise), meilleur.name)
+
+    def situer(points):
+        trouves = {}
+        for identifiant, lat, lon in points:
+            zone = zones.contenant(lat, lon)
+            if zone is not None:
+                code = geo.departement_du_code_communal(zone.code) or zone.parent_code
+                if code:
+                    trouves[identifiant] = code
+        return trouves
+
+    return emprise, temoin_autour(meilleur.lat, meilleur.lon), situer
+
+
+def _cellule(cell: tuple[float, float, float, float]) -> str:
+    """Une cellule en coordonnées lisibles, pour dire OÙ est le trou."""
+    return f"{cell[0]:.2f},{cell[1]:.2f} → {cell[2]:.2f},{cell[3]:.2f}"
+
+
+def _collecter_cellules(client, grid, tags) -> list:
+    """Interroge toute la grille, puis REPREND les cellules tombées.
+
+    Une cellule tombe parce qu'Overpass sature à cet instant. Le client a déjà
+    insisté trois fois en changeant de miroir — mais sur trente-cinq secondes.
+    Le reste de la grille en prend plusieurs minutes, et quand elle s'achève la
+    saturation est le plus souvent passée.
+
+    Sans cette reprise, le trou est définitif pour la journée : `--cells` prend
+    les N PREMIÈRES cellules, jamais les manquantes, et relancer la commande
+    redemande les trente-six. Une seconde tournée sur les seules cellules
+    perdues coûte quelques secondes.
+    """
+    osm = []
+    for index, cell in enumerate(grid, start=1):
+        found = client.fetch_cell(cell, tags)
+        osm.extend(found)
+        LOG.info("cellule %s/%s : %s sites (%s au total)",
+                 index, len(grid), len(found), len(osm))
+
+    if client.abandonnees:
+        # Vidée AVANT la reprise : ce qui reste dedans après est ce qui est
+        # tombé deux fois, et c'est ce compte-là que l'avertissement final doit
+        # annoncer — pas celui du premier passage.
+        perdues, client.abandonnees = client.abandonnees, []
+        print(f"Seconde tentative sur {len(perdues)} cellule(s) tombée(s).")
+        for cell in perdues:
+            found = client.fetch_cell(cell, tags)
+            osm.extend(found)
+            LOG.info("reprise %s : %s sites (%s au total)",
+                     _cellule(cell), len(found), len(osm))
+    return osm
+
+
 def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     """Confronte le catalogue aux sites de visite d'OpenStreetMap.
 
@@ -529,33 +658,26 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
         keep_in_france, tag_filters_for,
     )
     from .geocode import departements_for
-    from .overpass import PROBE_CELL, OverpassClient, cells
-
-    # `overpass.py` délimite la FRANCE, par un rectangle et par une zone
-    # `ISO3166-1="FR"`. Lancée sur un catalogue italien, la commande ne
-    # planterait pas : elle proposerait des lieux français à côté de lieux
-    # italiens, et les mêlerait au même fichier de candidats.
-    if config.country.code.upper() != "FR":
-        print(
-            f"`discover` ne connaît que la France : sa requête Overpass y est "
-            f"délimitée en dur, et rendrait des lieux français pour "
-            f"{config.country.name}. Rien n'a été collecté.",
-            file=sys.stderr,
-        )
-        return 1
+    from .overpass import FRANCE_BBOX, PROBE_CELL, OverpassClient, cells, temoin_autour
 
     raw_path = args.out / "places_raw.json"
     if not raw_path.exists():
         print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
         return 1
 
-    client = OverpassClient()
+    pays = config.country.code.upper()
+    emprise, temoin, situer = _emprise_du_pays(args, config, raw_path)
+    if emprise is None:
+        return 1
+
+    client = OverpassClient(pays=pays)
     # Un aller-retour de contrôle avant d'en lancer quarante : la requête
-    # délimite la France par une zone, et une zone qui ne se résout pas ne
+    # délimite le pays par une zone, et une zone qui ne se résout pas ne
     # provoque aucune erreur — elle renvoie simplement zéro objet, partout.
-    if not client.fetch_cell(PROBE_CELL):
-        print("Le contrôle sur le centre de Paris ne renvoie rien : la zone France "
-              "n'a pas été résolue par Overpass. Collecte interrompue.", file=sys.stderr)
+    if not client.fetch_cell(temoin):
+        print(f"Le contrôle sur un lieu certain ne renvoie rien : la zone "
+              f"{pays} n'a pas été résolue par Overpass. Collecte interrompue.",
+              file=sys.stderr)
         return 1
 
     vises = {t.strip() for t in (args.only or "").split(",") if t.strip()}
@@ -579,16 +701,12 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
               file=sys.stderr)
         return 1
 
-    grid = list(cells())
+    grid = list(cells(emprise))
     if args.cells:
         grid = grid[: args.cells]
     print(f"Interrogation d'OpenStreetMap : {len(grid)} cellules, compte ~{max(1, len(grid) // 4)} min."
           + (f"\nRestreinte à {', '.join(sorted(vises))}." if vises else ""))
-    osm = []
-    for index, cell in enumerate(grid, start=1):
-        found = client.fetch_cell(cell, tags)
-        osm.extend(found)
-        LOG.info("cellule %s/%s : %s sites (%s au total)", index, len(grid), len(found), len(osm))
+    osm = _collecter_cellules(client, grid, tags)
 
     if not osm:
         print("Aucun site récupéré — service indisponible ?", file=sys.stderr)
@@ -610,7 +728,7 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     # Deuxième garde-fou, indépendant de la requête Overpass : le rectangle de
     # collecte déborde sur les pays voisins, et une zone mal résolue par un
     # miroir Overpass repeuplerait la feuille de musées bâlois ou milanais.
-    candidates = keep_in_france(candidates, departements_for)
+    candidates = keep_in_france(candidates, situer)
     if vises:
         candidates = [s for s in candidates if guess_theme(s.tags) in vises]
     confident = [site for site in candidates if is_confident(site, sans_portes)]
@@ -651,16 +769,34 @@ def cmd_discover(args: argparse.Namespace, config: Config) -> int:
     if client.abandonnees:
         # Une cellule abandonnée rend zéro site, comme une cellule vide : sans
         # ce compte, une collecte à moitié tombée passe pour un résultat.
+        #
+        # Dire OÙ est le trou, et ce qu'il coûte. L'ouverture au public est un
+        # état à trois valeurs : les lieux d'une cellule perdue restent
+        # INCONNUS, ils n'encaissent donc pas le malus de non-visitable — ils
+        # perdent seulement le bonus qu'ils auraient pu gagner.
         print(f"⚠ {len(client.abandonnees)} cellule(s) sur {len(grid)} abandonnées "
               "faute de réponse d'Overpass — le compte ci-dessous est PARTIEL.")
+        for cell in client.abandonnees:
+            dedans = sum(1 for p in places
+                         if cell[0] <= p.lat < cell[2] and cell[1] <= p.lon < cell[3])
+            print(f"   {_cellule(cell)} — {dedans} lieu(x) du catalogue sans "
+                  "information d'accueil")
     # Le critère n'est pas le même partout, et l'annoncer faux vaut moins que
     # ne rien annoncer : sur un thème sans portes, une fiche Wikidata suffit.
     preuve = ("une fiche Wikidata" if vises and vises <= sans_portes
               else "un signe d'accueil du public ET un lien encyclopédique")
-    print(f"{len(candidates)} en France et absents du catalogue, "
+    print(f"{len(candidates)} {config.country.de_form} et absents du catalogue, "
           f"dont {len(confident)} avec {preuve}.")
     print(f"{min(len(retained), args.limit)} écrits dans {out_path}, "
-          f"dont {ready} directement recopiables dans data/manual/places.csv.")
+          f"dont {ready} directement recopiables dans {args.manual / 'places.csv'}.")
+    if len(retained) > args.limit:
+        # Le plafond coupe DANS les candidats sûrs, et la ligne « ajoute --all »
+        # juste en dessous parle des AUTRES — des moins sûrs. Sans ce mot, la
+        # collecte italienne annonçait « 1548 avec une attestation » puis « 1500
+        # écrits » et on lisait 1500 comme le total.
+        print(f"⚠ {len(retained) - args.limit} candidat(s) de même qualité n'ont "
+              f"PAS été écrits : la feuille est plafonnée par --limit "
+              f"(actuellement {args.limit}).")
     if not args.all and len(candidates) > len(confident):
         print(f"Ajoute --all pour voir les {len(candidates) - len(confident)} autres.")
     if vises:
@@ -788,9 +924,16 @@ def cmd_adopt(args: argparse.Namespace, config: Config) -> int:
     # catalogue sans que rien ne l'ait regardé.
     enrich_exclusions(client, adopted, config.exclusions.qids)
     enrich_flags(client, adopted)
-    enrich_departements(
-        adopted,
-        localisateur=localisation.couches_du_pays(config, args.geo).get("departement"))
+    # `pays` n'était pas transmis : les candidats italiens partaient donc vers
+    # l'API Adresse française, qui ne connaît pas l'Italie et rend la commune
+    # française la plus proche — ou rien. Et la commune, elle, n'était pas
+    # demandée du tout, si bien qu'un candidat adopté n'avait ni commune ni
+    # plafond communal.
+    couches = localisation.couches_du_pays(config, args.geo)
+    enrich_departements(adopted, localisateur=couches.get("departement"),
+                        pays=config.country.code)
+    enrich_communes(adopted, localisateur=couches.get("departement"),
+                    communes=couches.get("commune"), pays=config.country.code)
     enrich_article_sizes(adopted)
     if not args.skip_summaries:
         enrich_summaries(adopted)
@@ -804,6 +947,38 @@ def cmd_adopt(args: argparse.Namespace, config: Config) -> int:
     print("Ils ne sont pas épinglés : le plancher de notoriété s'y applique.")
     print("Lance `build` puis `review` — ils y porteront la mention « OpenStreetMap ».")
     return 0
+
+
+def _alerter_listes_amputees(
+    config: Config, manual_dir: Path, retained: list[Place]
+) -> None:
+    """Une liste manuelle réclame des lieux que le catalogue n'a plus.
+
+    Un membre absent ne peut pas être tamponné, et la collection le perd SANS
+    RIEN DIRE. C'est surtout vrai des listes où chaque ligne représente autre
+    chose qu'elle-même : sur « Parcs nationaux d'Italie », une ligne est LE
+    lieu phare d'un parc, et l'écarter en revue emporte le parc entier.
+
+    Ni `relabel` ni `build` ne le signalaient : l'avertissement de `relabel` ne
+    couvre que les listes qui ALIMENTENT un thème, et une liste qui se contente
+    de tamponner n'en alimente aucun.
+    """
+    presents = {place.wikidata_id for place in retained}
+    for label in config.labels:
+        if not (label.is_manual and label.makes_collection):
+            continue
+        inscrits = membres_inscrits(label, manual_dir)
+        perdus = sorted(inscrits - presents)
+        if not perdus:
+            continue
+        LOG.warning(
+            "%s : %s membre(s) inscrits mais ABSENTS du catalogue — la liste "
+            "les réclame, la collection ne les aura pas : %s%s. "
+            "Écartés en revue, sous un plafond, ou jamais collectés — "
+            "`explain` le dit pour chacun.",
+            label.id, len(perdus), ", ".join(perdus[:8]),
+            f" (+{len(perdus) - 8})" if len(perdus) > 8 else "",
+        )
 
 
 def _build_and_write(args: argparse.Namespace, config: Config) -> int:
@@ -868,6 +1043,7 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     # photo sans crédit dans la collecte ne regarde personne, la même photo au
     # catalogue est une licence non respectée.
     warn_missing_credits(retained)
+    _alerter_listes_amputees(config, args.manual, retained)
 
     # Ce qui a bougé depuis la dernière revue. Le niveau d'un lieu n'est pas une
     # propriété du lieu : c'est son rang dans sa collection. Ajouter un signal
@@ -880,9 +1056,12 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     gone = vanished(before, current)
 
     write_json(retained, collections, args.out)
-    write_review_csv(retained, collections, args.out / "review.csv", config, changes)
+    # La feuille ne porte QUE ce qui se décide. Un lieu gardé d'office par une
+    # liste à jury n'attend aucun verdict — son niveau vient de son rang.
+    a_lire = a_relire(retained, config, decisions)
+    write_review_csv(a_lire, collections, args.out / "review.csv", config, changes)
     write_review_html(
-        retained, collections, config, args.out / "review.html", changes,
+        a_lire, collections, config, args.out / "review.html", changes,
         decided={qid: verdict for qid, (verdict, _note) in decisions.items()},
         # Calculée sur le catalogue AVANT arbitrage : après le dédoublonnage,
         # le lieu n'a plus qu'un thème et la contestation ne se voit plus.
@@ -1466,6 +1645,29 @@ def cmd_apply_review(args: argparse.Namespace, config: Config) -> int:
     if not fresh and not fresh_themes and not effaces:
         print("Aucune décision renseignée dans la feuille de revue.", file=sys.stderr)
         return 1
+
+    # Le garde-fou qui aurait vu la panne tout de suite. Une feuille dont AUCUN
+    # identifiant n'est dans la collecte ne parle pas de ce catalogue-ci : soit
+    # elle vient d'un autre pays, soit d'un autre dépôt. L'écrire quand même ne
+    # plante pas — les identifiants ne se recoupent simplement jamais — et c'est
+    # exactement ce qui rend la panne coûteuse : deux mille quatre-vingts
+    # verdicts français sont entrés dans le fichier italien en silence.
+    collecte = {place.wikidata_id for place in read_raw(args.raw)}
+    etrangers = [qid for qid in (set(fresh) | set(fresh_themes) | effaces)
+                 if qid not in collecte]
+    if collecte and len(etrangers) == len(set(fresh) | set(fresh_themes) | effaces):
+        print(f"Aucun des {len(etrangers)} lieux de {args.review} n'est dans la "
+              f"collecte de {config.country.name} ({args.raw}).\n"
+              "Cette feuille parle d'un autre catalogue — rien n'a été écrit.",
+              file=sys.stderr)
+        return 1
+    if etrangers:
+        print(f"⚠ {len(etrangers)} décision(s) portent sur des lieux absents de "
+              f"la collecte, ignorées (ex. {', '.join(sorted(etrangers)[:3])}).",
+              file=sys.stderr)
+        fresh = {q: v for q, v in fresh.items() if q in collecte}
+        fresh_themes = {q: v for q, v in fresh_themes.items() if q in collecte}
+        effaces = {q for q in effaces if q in collecte}
 
     path = args.manual / "decisions.csv"
     decisions = read_decisions(path)
@@ -2507,6 +2709,160 @@ def _list_photos(args: argparse.Namespace, qid: str, photos: dict[str, str]) -> 
     return 0
 
 
+def _plus_forte_chute(scores: list[float], cap: int) -> tuple[int, float, float] | None:
+    """Où la liste des candidats chute le plus fort, à partir du plafond.
+
+    Rend (rang, chute, pas courant) : garder `rang` lieux coupe juste avant la
+    plus grande marche. La recherche ne commence QU'AU plafond — une dérogation
+    ne peut que l'élever, jamais l'abaisser — et s'arrête assez loin pour voir
+    le plateau qui suit sans lire toute la ville.
+
+    Le pas courant vient avec, et ce n'est pas décoratif : la plus forte chute
+    existe toujours, même dans une liste parfaitement régulière. C'est leur
+    RAPPORT qui dit s'il y a un décrochage.
+    """
+    fin = min(len(scores) - 1, max(cap * 4, cap + 12))
+    if fin < cap:
+        return None
+    marches = [scores[k - 1] - scores[k] for k in range(cap, fin + 1)]
+    rupture = cap + max(range(len(marches)), key=lambda i: marches[i])
+    courant = sorted(marches)[len(marches) // 2]
+    return rupture, scores[rupture - 1] - scores[rupture], courant
+
+
+def cmd_derogations(args: argparse.Namespace, config: Config) -> int:
+    """Le vivier de chaque ville au pied du plafond par commune.
+
+    Une dérogation communale se décide sur un DÉCROCHAGE mesuré, jamais sur une
+    intuition : c'est ainsi que celle de Paris a été posée — « monuments 20
+    candidats, décrochage après le 8e (131 puis 114) ». Cette mesure-là avait
+    été faite à la main, une ville et un thème à la fois ; elle n'était donc
+    pas refaisable pour un deuxième pays.
+
+    Elle l'est ici. Le premier catalogue italien a montré pourquoi il le
+    fallait : le plafond y retire 572 lieux à Rome et 213 à Venise, et il a
+    emporté « Îles de Venise » en entier — vingt-huit îles qui sont toutes dans
+    la même commune. Sans le vivier sous les yeux, on ne peut ni voir cela, ni
+    choisir un chiffre autrement qu'au doigt mouillé.
+
+    Ce qui s'affiche n'est PAS une recommandation : c'est la liste des scores au
+    pied du plafond, et l'endroit où elle décroche le plus fort. Le chiffre
+    reste une décision de curation — les musées parisiens n'ont aucun
+    décrochage, et leur dérogation est un arbitrage assumé.
+    """
+    from .collections import (
+        _ville, apply_access_filter, apply_alpine_filter, apply_class_exclusion,
+        apply_geographic_scope, apply_list_membership, apply_notoriety_floor,
+        dedupe_across_themes,
+    )
+
+    plafond = config.collections.max_per_commune
+    if not plafond:
+        print("Aucun plafond par commune n'est déclaré : rien à déroger.")
+        return 0
+
+    raw_path = args.out / "places_raw.json"
+    if not raw_path.exists():
+        print(f"{raw_path} absent — lance d'abord `fetch`.", file=sys.stderr)
+        return 1
+
+    scored = score_all(_load_places(raw_path), config)
+    apply_names(scored, read_names(args.manual / "names.csv"))
+    scored, _inconnus = apply_themes(
+        scored, read_themes(args.manual / "themes.csv"),
+        {theme.id for theme in config.themes},
+    )
+    pipeline_log = logging.getLogger("roam_pipeline")
+    precedent = pipeline_log.level
+    pipeline_log.setLevel(logging.ERROR)
+    try:
+        kept, _counts = apply_decisions(
+            scored, read_decisions(args.manual / "decisions.csv"),
+            d_office=gardes_d_office(scored, config),
+        )
+        score_all(kept, config)
+        # Le même enchaînement que `build_all`, arrêté JUSTE avant le plafond
+        # par commune : c'est exactement la population qu'il voit.
+        etape = apply_geographic_scope(kept, config)
+        etape = dedupe_across_themes(etape, config)
+        etape = apply_class_exclusion(etape, config)
+        etape = apply_list_membership(etape, config)
+        etape = apply_access_filter(etape, config)
+        etape = apply_alpine_filter(etape, config)
+        au_pied = apply_notoriety_floor(etape, config)
+    finally:
+        pipeline_log.setLevel(precedent)
+
+    derogations = config.collections.commune_overrides
+    viviers: dict[str, dict[str, list[Place]]] = defaultdict(lambda: defaultdict(list))
+    noms: dict[str, str] = {}
+    for place in au_pied:
+        if not place.commune_code:
+            continue
+        ville = _ville(place.commune_code)
+        noms.setdefault(ville, place.commune_name or ville)
+        viviers[ville][place.theme_id].append(place)
+
+    def coupes(ville: str) -> int:
+        """Combien le plafond retire à cette ville, dérogations comprises."""
+        return sum(
+            max(0, len(lieux) - derogations.get(ville, {}).get(theme_id, plafond))
+            for theme_id, lieux in viviers[ville].items()
+        )
+
+    if args.ville:
+        if args.ville not in viviers:
+            print(f"Aucun lieu au pied du plafond dans la commune {args.ville}.",
+                  file=sys.stderr)
+            return 1
+        villes = [args.ville]
+    else:
+        villes = sorted(viviers, key=lambda v: -coupes(v))[: args.villes]
+
+    for ville in villes:
+        total = sum(len(lieux) for lieux in viviers[ville].values())
+        print(f"\n{noms[ville]} ({ville}) — {total} candidats au pied du "
+              f"plafond, {coupes(ville)} retirés")
+        propres = derogations.get(ville, {})
+        for theme_id, lieux in sorted(viviers[ville].items(), key=lambda kv: -len(kv[1])):
+            cap = propres.get(theme_id, plafond)
+            if len(lieux) <= cap and not args.tout:
+                continue
+            lieux.sort(key=lambda p: -p.score)
+            scores = [p.score for p in lieux]
+            # Le décrochage ne se cherche qu'À PARTIR du plafond : une
+            # dérogation ne peut que l'élever, jamais l'abaisser.
+            fin = min(len(scores) - 1, max(cap * 4, cap + 12))
+            # La plus forte chute EXISTE TOUJOURS : la nommer « décrochage »
+            # ferait dire à l'outil ce qu'il ne sait pas. Les quatre-vingts
+            # musées parisiens descendent du Louvre à Jacquemart-André sans une
+            # rupture, et le curateur l'a lu à la main. On donne donc la chute
+            # ET le pas courant, et la liste dessous tranche.
+            trouve = _plus_forte_chute(scores, cap)
+            if trouve is None:
+                rupture, verdict = None, "moins de candidats que le plafond"
+            else:
+                rupture, chute, courant = trouve
+                verdict = (
+                    f"plus forte chute après le {rupture}e "
+                    f"({scores[rupture - 1]:.0f} puis {scores[rupture]:.0f}, "
+                    f"soit {chute:.1f} ; pas courant {courant:.1f})"
+                )
+            marque = f"  [dérogation {cap}]" if theme_id in propres else ""
+            print(f"  {theme_id:<14} {len(lieux):>4} candidats · plafond {cap}"
+                  f" · {verdict}{marque}")
+            for rang, place in enumerate(lieux[: fin + 1], start=1):
+                if rang == cap:
+                    bord = "  ← plafond"
+                elif rupture is not None and rang == rupture:
+                    bord = "  ⟵ plus forte chute"
+                else:
+                    bord = ""
+                print(f"      {rang:>3}. {place.score:6.1f}  {place.name[:48]:<48}{bord}")
+    print()
+    return 0
+
+
 def cmd_pertes(args: argparse.Namespace, config: Config) -> int:
     """Quels redressements de thème ont fait DISPARAÎTRE un lieu ?
 
@@ -2849,6 +3205,11 @@ def cmd_merge(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+#: Thèmes dont les lieux sont des ruines par nature : le filet des fantômes y
+#: rabat pour la raison même qui met le lieu au catalogue.
+RUINES_PAR_NATURE = frozenset({"megalithes"})
+
+
 def cmd_fantomes(args: argparse.Namespace, config: Config) -> int:
     """Les lieux du catalogue dont le résumé dit que la chose n'est plus là.
 
@@ -2886,7 +3247,16 @@ def cmd_fantomes(args: argparse.Namespace, config: Config) -> int:
     for place, motifs in trouves:
         verdict = decisions.get(place.wikidata_id, ("—", ""))[0]
         print(f"  {place.score or 0:>6.1f}  {place.wikidata_id:<11} {place.name}")
-        print(f"          {', '.join(motifs)} · verdict actuel : {verdict}")
+        print(f"          {place.theme_id} · {', '.join(motifs)} "
+              f"· verdict actuel : {verdict}")
+        # Sur un thème dont la ruine EST le sujet, le filet se déclenche pour
+        # la raison même qui met le lieu au catalogue. Six candidats italiens,
+        # deux étaient Géla et Stabies — deux cités antiques détruites, donc
+        # deux parcs archéologiques qui se visitent. Le dire ici évite de le
+        # redécouvrir à chaque construction.
+        if place.theme_id in RUINES_PAR_NATURE:
+            print("          ⚠ thème où la destruction est le sujet : "
+                  "un site fouillé se visite, une ville disparue non")
         for ou in rangs.get(place.wikidata_id, []):
             print(f"          {ou}")
         extrait = " ".join((place.summary or "").split())[:160]
@@ -2914,11 +3284,6 @@ def cmd_verdict(args: argparse.Namespace, config: Config) -> int:
     trié et relisible, et la prochaine revue l'emporte toujours sur ce qu'on
     écrit ici — le verdict le plus récent gagne, comme partout ailleurs.
     """
-    qid = (args.wikidata_id or "").strip()
-    if not qid.startswith("Q") or not qid[1:].isdigit():
-        print(f"« {qid} » n'est pas un identifiant Wikidata.", file=sys.stderr)
-        return 1
-
     if not args.clear and args.decision not in DECISIONS:
         print(f"Verdict inconnu : {args.decision}. Verdicts valides : "
               + ", ".join(DECISIONS), file=sys.stderr)
@@ -2926,6 +3291,50 @@ def cmd_verdict(args: argparse.Namespace, config: Config) -> int:
 
     places = read_raw(args.raw)
     connus = {place.wikidata_id: place.name for place in places}
+
+    # Un NOM suffit. Écarter les quatre théâtres vénitiens démolis demandait
+    # sinon d'aller chercher quatre Q-id un par un dans la feuille de revue,
+    # et un geste qui coûte quatre allers-retours est un geste qu'on ne fait
+    # pas. L'identifiant reste accepté, et reste le seul moyen sûr quand deux
+    # lieux portent le même nom — auquel cas la commande refuse et les liste.
+    qid = (args.wikidata_id or "").strip()
+    if not (qid.startswith("Q") and qid[1:].isdigit()):
+        cherche = _fold(qid)
+        trouves = [p for p in places if _fold(p.name) == cherche]
+        if not trouves:
+            trouves = [p for p in places if cherche and cherche in _fold(p.name)]
+        if not trouves:
+            print(f"Aucun lieu collecté ne s'appelle « {qid} ».", file=sys.stderr)
+            return 1
+        # Un lieu peut être collecté sous plusieurs thèmes : c'est la MÊME
+        # entité, et un verdict la vise entière.
+        uniques = {p.wikidata_id: p for p in trouves}
+        if len(uniques) > 1:
+            print(f"« {qid} » désigne {len(uniques)} lieux — précise "
+                  "l'identifiant :", file=sys.stderr)
+            # Pas de score ici : `read_raw` rend la collecte, pas le
+            # catalogue construit, et un « 0.0 » affiché trente-quatre fois
+            # ferait croire à trente-quatre lieux sans intérêt.
+            ordre = sorted(uniques.values(), key=lambda p: (p.name, p.wikidata_id))
+            depts = geo.departements()
+            for place in ordre[:10]:
+                # Le nom NE SUFFIT PAS à choisir, et c'est justement pourquoi
+                # cette liste s'affiche : trois théâtres italiens s'appellent
+                # « Teatro comunale », au caractère près. Ce qui les sépare est
+                # l'endroit et le thème — les nommer trois fois n'aide personne.
+                zone = depts.get(place.departement_code or "")
+                ou = " · ".join(x for x in (
+                    place.commune_name,
+                    zone.name if zone and zone.name != place.commune_name else None,
+                ) if x) or "sans commune"
+                print(f"  {place.wikidata_id:<11} {place.name[:34]:<34} "
+                      f"{place.theme_id:<12} {ou}", file=sys.stderr)
+            if len(ordre) > 10:
+                print(f"  … et {len(ordre) - 10} autres", file=sys.stderr)
+            return 1
+        qid = next(iter(uniques))
+        print(f"« {args.wikidata_id} » → {qid} {connus[qid]}")
+
     if qid not in connus:
         # Écarter un lieu absent de la collecte ne casse rien, mais c'est
         # presque toujours une faute de frappe sur l'identifiant.
@@ -3026,6 +3435,14 @@ def cmd_pin(args: argparse.Namespace, config: Config) -> int:
     if not args.clear:
         liste = args.manual / "places.csv"
         contenu = liste.read_bytes() if liste.exists() else b""
+        if not contenu.strip():
+            # Sans en-tête, `DictReader` prend la première ligne pour les noms
+            # de colonnes et le fichier entier devient illisible — en silence.
+            # C'est arrivé : trois sommets des Dolomites épinglés, « ajouts
+            # manuels : 0 lieux épinglés » à chaque collecte.
+            contenu = b"wikidata_id,theme_id,note\n"
+            liste.parent.mkdir(parents=True, exist_ok=True)
+            liste.write_bytes(contenu)
         if qid.encode() not in contenu:
             fin = b"" if contenu.endswith((b"\n", b"")) else b"\n"
             note = (args.note or "epingle a la main").replace(",", " ")
@@ -3034,7 +3451,13 @@ def cmd_pin(args: argparse.Namespace, config: Config) -> int:
                 fh.write(fin + ligne)
             print(f"Inscrit dans {liste} — sans quoi la prochaine collecte "
                   "complète effacerait le drapeau.")
-    print("Relance `build` pour en tenir compte.")
+    # `pin` écrit dans la COLLECTE VERSIONNÉE ; `build`, lui, lit la copie de
+    # travail. Sans `sync` entre les deux, l'épinglage ne fait rien et ne le
+    # dit pas : trois sommets des Dolomites sont restés écartés au « filtre
+    # alpin » alors que leur drapeau était posé, et il a fallu `explain` pour
+    # s'en apercevoir.
+    print("Enchaîne avec `sync` PUIS `build` : l'épinglage vit dans la collecte "
+          "versionnée, et `build` lit la copie de travail.")
     return 0
 
 
@@ -3117,15 +3540,30 @@ def cmd_export_app(args: argparse.Namespace, config: Config) -> int:
             geo_level=c.get("geo_level"),
             geo_code=c.get("geo_code"),
             places=[
-                CollectionPlace(placeId["place_id"], placeId["tier"], placeId["rank"])
+                CollectionPlace(placeId["place_id"], placeId["tier"],
+                                placeId["rank"], name=placeId.get("name"))
                 for placeId in c["places"]
             ],
         )
         for c in raw_collections
     ]
 
-    write_app_catalog(places, collections, config, args.to)
-    print(f"Catalogue écrit dans {args.to}")
+    # LE CATALOGUE EMBARQUÉ N'APPARTIENT QU'À UN PAYS, celui sur lequel
+    # l'application s'ouvre au premier lancement, sans réseau. L'écraser avec un
+    # autre pays la ferait démarrer sur l'Italie — et `PAYS_EMBARQUE`, qui s'en
+    # déduit, changerait avec lui.
+    #
+    # C'est arrivé : `export-app --pays-config it` a remplacé les 2 080 lieux
+    # français par 2 203 italiens, en annonçant « Catalogue écrit » comme si de
+    # rien n'était. La commande datait d'un catalogue à un seul pays.
+    embarque = _pays_embarque(args.to)
+    if embarque and embarque != config.country.code:
+        print(f"Catalogue embarqué laissé tel quel : il porte {embarque}, et "
+              f"cette collecte est {config.country.code}. Le pays de départ de "
+              f"l'application ne se change pas par un `export-app`.")
+    else:
+        write_app_catalog(places, collections, config, args.to)
+        print(f"Catalogue écrit dans {args.to}")
 
     # Et le même catalogue SERVI, pour les pays que l'application ne porte pas
     # en elle. Celui du pays de départ y figure aussi : la duplication ne coûte
@@ -3136,6 +3574,17 @@ def cmd_export_app(args: argparse.Namespace, config: Config) -> int:
         print(f"  {ligne}")
     print("Relance l'application : elle le lira au prochain démarrage.")
     return 0
+
+
+def _pays_embarque(chemin: Path) -> str | None:
+    """Le pays du catalogue que l'application porte en elle, s'il existe."""
+    if not chemin.exists():
+        return None
+    try:
+        charge = json.loads(chemin.read_text(encoding="utf-8"))
+        return (charge.get("areas", {}).get("country") or [{}])[0].get("code")
+    except (json.JSONDecodeError, OSError, IndexError, AttributeError):
+        return None
 
 
 def ecrire_catalogues_servis(places, collections, config, dossier: Path) -> list[str]:
@@ -3195,11 +3644,31 @@ def ecrire_catalogues_servis(places, collections, config, dossier: Path) -> list
         })
         lignes.append(f"{code} : {len(lot)} lieux, {taille:.0f} Ko → {chemin}")
 
-    (dossier / "index.json").write_text(
-        json.dumps({"pays": index}, ensure_ascii=False, indent=2) + "\n",
+    # L'INDEX SE COMPLÈTE, IL NE SE REMPLACE PAS. Il dit à l'application quels
+    # pays existent et où les prendre ; le réécrire avec le seul pays du jour
+    # efface les autres. `export-app --pays-config it` a ainsi rendu un index
+    # qui ne contenait plus que l'Italie — la France, pourtant servie dans le
+    # même dossier, devenait invisible à l'application.
+    chemin_index = dossier / "index.json"
+    connus: dict[str, dict] = {}
+    if chemin_index.exists():
+        try:
+            for entree in json.loads(chemin_index.read_text(encoding="utf-8"))["pays"]:
+                connus[entree["code"]] = entree
+        except (json.JSONDecodeError, OSError, KeyError, TypeError):
+            connus = {}
+    for entree in index:
+        connus[entree["code"]] = entree
+    fusionne = [connus[code] for code in sorted(connus)]
+    chemin_index.write_text(
+        json.dumps({"pays": fusionne}, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
-    lignes.append(f"index : {len(index)} pays → {dossier / 'index.json'}")
+    ecrits = ", ".join(e["code"] for e in index)
+    lignes.append(
+        f"index : {len(fusionne)} pays ({', '.join(e['code'] for e in fusionne)})"
+        f" → {chemin_index}" + (f", réécrit pour {ecrits}" if ecrits else "")
+    )
     return lignes
 
 
@@ -3217,12 +3686,44 @@ def cmd_export_outlines(args: argparse.Namespace, config: Config) -> int:
     if args.tolerance is not None:
         tolerances = {level: args.tolerance for level in tolerances}
 
-    counts = export_outlines(args.to, tolerances, source_dir=args.from_dir)
-    size = args.to.stat().st_size / 1024
-    print(f"Contours écrits dans {args.to} ({size:.0f} Ko)")
+    sources = {
+        level: OutlineSource(url=c.url, fichier=c.fichier,
+                             code_key=c.code_key, name_key=c.name_key)
+        for level, c in config.contours.items()
+    } or None
+    attribution = config.contours_attribution or OUTLINE_ATTRIBUTION
+
+    # LE FICHIER EMBARQUÉ N'APPARTIENT QU'AU PAYS DE DÉPART, comme le catalogue
+    # embarqué : ce sont les contours que l'application porte en elle et
+    # dessine sans réseau. Les écraser avec ceux d'un autre pays lui ferait
+    # colorier des provinces italiennes au premier lancement. Même garde-fou
+    # que `export-app`, pour la même raison, après la même mésaventure.
+    embarque = _pays_embarque(APP_CATALOG)
+    ecrit = args.to
+    if embarque and embarque != config.country.code:
+        ecrit = args.catalogues / f"{config.country.code.lower()}-contours.json"
+        print(f"Contours embarqués laissés tels quels : ils portent {embarque}, "
+              f"et cette collecte est {config.country.code}. Seule la copie "
+              f"servie est écrite.")
+
+    ecrit.parent.mkdir(parents=True, exist_ok=True)
+    from . import geo as referentiel
+    referentiel.utiliser_pays(config.country.code)
+    noms = {
+        "region": {code: a.name for code, a in referentiel.regions().items()},
+        "departement": {code: a.name for code, a in referentiel.departements().items()},
+    }
+
+    counts = export_outlines(
+        ecrit, tolerances, source_dir=args.from_dir, sources=sources,
+        attribution=attribution, depot=DEFAULT_GEO / config.country.code.lower(),
+        noms=noms,
+    )
+    size = ecrit.stat().st_size / 1024
+    print(f"Contours écrits dans {ecrit} ({size:.0f} Ko)")
     for level, count in counts.items():
         print(f"  {level:<12} {count:>3} territoires")
-    print(OUTLINE_ATTRIBUTION)
+    print(attribution)
 
     # Et la copie SERVIE, pour les pays que l'application ne porte pas en elle.
     # Elle passe par le même fichier : deux tracés d'un même pays finiraient
@@ -3230,7 +3731,8 @@ def cmd_export_outlines(args: argparse.Namespace, config: Config) -> int:
     # se voit à l'écran — c'est tout le sujet de la jointivité.
     servi = args.catalogues / f"{config.country.code.lower()}-contours.json"
     servi.parent.mkdir(parents=True, exist_ok=True)
-    servi.write_bytes(args.to.read_bytes())
+    if servi != ecrit:
+        servi.write_bytes(ecrit.read_bytes())
     print(f"Copie servie : {servi} ({servi.stat().st_size / 1024:.0f} Ko)")
     print("Relance `export-app` pour que l'index les annonce.")
     return 0
@@ -3780,7 +4282,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="fait entrer les candidats d'OpenStreetMap dans le catalogue (réseau requis)",
     )
     adopt.add_argument(
-        "--candidates", type=Path, help="feuille de candidats (défaut : data/out/candidates.csv)"
+        "--candidates", type=Path,
+        help="feuille de candidats (défaut : candidates.csv du dossier de sortie)"
     )
     adopt.add_argument(
         "--skip-summaries",
@@ -3991,7 +4494,8 @@ def build_parser() -> argparse.ArgumentParser:
         "verdict",
         help="écarte ou valide un lieu sans passer par la revue (keep, drop, "
              "promote, demote)")
-    verdict.add_argument("wikidata_id")
+    verdict.add_argument("wikidata_id", metavar="LIEU",
+                         help="l'identifiant Wikidata, ou le nom du lieu")
     verdict.add_argument("decision", nargs="?", default="",
                          help="keep, drop, promote, promote2 ou demote — `promote2` fait entrer un lieu dans sa collection nationale ET l'y monte d'un cran")
     verdict.add_argument("--note", help="pourquoi ce verdict")
@@ -4004,6 +4508,15 @@ def build_parser() -> argparse.ArgumentParser:
     epingle.add_argument("--theme", help="n'épingler que ce rattachement")
     epingle.add_argument("--note", help="pourquoi cet épinglage")
     epingle.add_argument("--clear", action="store_true", help="retirer l'épinglage")
+
+    derog = sub.add_parser(
+        "derogations",
+        help="le vivier de chaque ville au pied du plafond par commune")
+    derog.add_argument("--ville", help="ne regarder que cette commune (son code)")
+    derog.add_argument("--villes", type=int, default=5,
+                       help="combien de villes montrer (défaut : 5)")
+    derog.add_argument("--tout", action="store_true",
+                       help="montrer aussi les thèmes que le plafond ne touche pas")
 
     sub.add_parser(
         "pertes", help="quels redressements de thème écartent un lieu du catalogue")
@@ -4063,6 +4576,26 @@ def _ranger_par_pays(args: argparse.Namespace, config: Config) -> None:
             setattr(args, nom, racine / defaut.name)
 
 
+def _chemins_du_pays(args: argparse.Namespace, config: Config) -> None:
+    """Tous les chemins d'un pays, rangés dans le BON ORDRE.
+
+    `--review` se posait avant `_ranger_par_pays` : il pointait `data/out/` —
+    la France — pendant que les décisions s'écrivaient dans
+    `data/it/manual/`. Une revue italienne a ainsi versé deux mille
+    quatre-vingts verdicts FRANÇAIS dans le fichier italien, sans en
+    enregistrer un seul des siens, et sans un mot : les identifiants de deux
+    pays ne se recoupent jamais, donc rien ne plantait.
+
+    Les deux gestes vivent ici ensemble pour qu'on ne puisse plus les séparer.
+    """
+    _ranger_par_pays(args, config)
+    # Le brouillon écrit par `review` au fil des clics. La grande feuille
+    # `review.csv` faisait un mauvais défaut : sa colonne `decision` est vide,
+    # elle n'apporte donc jamais rien.
+    if getattr(args, "review", None) is None and args.command == "apply-review":
+        args.review = args.out / AUTOSAVE
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     _defauts(args)
@@ -4070,16 +4603,12 @@ def main(argv: list[str] | None = None) -> int:
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(levelname)-7s %(message)s",
     )
-    if getattr(args, "review", None) is None and args.command == "apply-review":
-        # Le brouillon écrit par `review` au fil des clics. La grande feuille
-        # `review.csv` faisait un mauvais défaut : sa colonne `decision` est
-        # vide, elle n'apporte donc jamais rien.
-        args.review = args.out / AUTOSAVE
-
     config = load_config(args.config, pays=getattr(args, "pays_config", None))
-    _ranger_par_pays(args, config)
+    _chemins_du_pays(args, config)
     # Le référentiel — provinces et régions — avant qu'une table ne soit lue.
     geo.utiliser_pays(config.country.code)
+    # Et la langue des libellés avant qu'une requête ne parte.
+    wd.utiliser_langues(config.country.langues)
     handlers = {
         "verify-qids": cmd_verify_qids,
         "suggest-qids": cmd_suggest_qids,
@@ -4100,6 +4629,7 @@ def main(argv: list[str] | None = None) -> int:
         "verdict": cmd_verdict,
         "pin": cmd_pin,
         "label-probe": cmd_label_probe,
+        "derogations": cmd_derogations,
         "pertes": cmd_pertes,
         "merge": cmd_merge,
         "weigh": cmd_weigh,

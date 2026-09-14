@@ -597,8 +597,8 @@ constructions d'affilée rendent le même octet.
 | fichier | ce qu'il dit |
 |---|---|
 | `scoring.yaml` | Q38 / IT / Italie / d'Italie, et les contours des 110 provinces |
-| `themes.yaml` | `villages` retiré, `maisons` sans liste d'État, les églises entrent et leur plafond tombe |
-| `labels.yaml` | quatorze listes françaises retirées, l'UNESCO gardée |
+| `themes.yaml` | `villages` rendu par la liste italienne, `forets` et `cirques` retirés, `maisons` sans liste d'État, les églises entrent et leur plafond tombe |
+| `labels.yaml` | quatorze listes françaises retirées, l'UNESCO gardée, les Borghi più belli ajoutés |
 
 Les contours viennent d'`openpolis/geojson-italy`, découpage officiel de
 l'ISTAT, vérifié : 110 provinces, 5,4 Mo. Les noms de propriétés ne se
@@ -682,10 +682,30 @@ elles rendent la commune française la plus proche, ou rien. La passe
 locaux, eux, ne donnent pas la commune. Elles sont maintenant gardées par le
 code du pays, et le disent dans le journal.
 
-Conséquence à connaître : hors de France, la commune vient de Wikidata seule.
-Les sondages italiens la donnaient sur tous les lieux testés — Turin, Rome,
-Florence, Velletri, Cesena — mais ce qui n'en a pas restera hors de la maille
-la plus fine de la carte de conquête.
+⚠ **La conséquence écrite ici était fausse, et le premier build l'a prouvée.**
+« Hors de France, la commune vient de Wikidata seule » : non. `resolve_admin`
+ne remplit QUE le département depuis Wikidata ; il n'écrit ni `commune_code` ni
+`commune_name`, et il n'existe que deux endroits dans tout le pipeline qui les
+écrivent — l'API française, et les contours. Le premier catalogue italien est
+donc sorti avec **zéro commune sur 2 563 lieux**. Trois conséquences, toutes
+visibles dans sa sortie :
+
+- `max_per_commune: 6` n'a pas mordu une seule fois — la colonne `commune` du
+  tableau en entonnoir est identique à `plancher` pour les vingt et un thèmes.
+  Rome garde ainsi quatre-vingts églises, là où le même plafond en retire cent
+  vingt à Paris.
+- la commune manque à chaque fiche de l'application, qui retombe sur la
+  province.
+- la maille la plus fine de la carte de conquête est vide.
+
+**Corrigé** : `enrich` rattache maintenant la commune par point-dans-polygone
+quand une couche communale existe, avant tout appel d'API. `config/it/`
+déclare celle de l'ISTAT — 7 896 communes, 35 Mo, `com_istat_code` /
+`name` / `prov_istat_code`. Mesuré ici : 2,8 s de chargement, 231 Mo en
+mémoire, 12 000 points rattachés en 0,7 s, et huit points de contrôle justes,
+y compris les pièges (Cinque Terre → Riomaggiore, les trulli → Alberobello).
+La France ne déclare pas de couche communale et garde ses deux API : rien n'y
+change.
 
 **`discover`** délimite la France en dur, par un rectangle et par une zone
 `ISO3166-1="FR"`. Il ne plantait pas : il aurait proposé des lieux français
@@ -715,9 +735,484 @@ Paris a été posée. Elles viennent donc après la première collecte, pas avan
 été posés après un build, en lisant que le catalogue en portait 193 pour 61
 montrés. Le premier build italien donnera la même lecture.
 
-**« I Borghi più belli d'Italia »**, à résoudre avec `label-probe`. C'est
-l'équivalent exact des Plus Beaux Villages, et il rend au thème `villages` de
-quoi exister.
+**Les listes italiennes restantes.** Les monuments nationaux, les jardins
+historiques, les parcs nationaux et régionaux, les réserves naturelles : rien
+n'est écrit tant que `suggest-qids` puis `verify-qids` ne l'ont pas résolu. Les
+Borghi più belli, eux, sont faits — section suivante.
+
+### Les trois thèmes que la mesure italienne a tranchés — FAIT
+
+**Villages : rendus.** `suggest-qids` sur « I borghi più belli » rend six
+résultats ; c'est **Q127107** qui est l'association — « association culturelle
+italienne » —, comme Q1010307 l'est en France. Les Q110890335/6/7 sont des
+pages de listes régionales : `member_of` sur elles ne rendrait qu'une région.
+Le label est écrit dans `config/it/labels.yaml` sur le modèle exact du
+français : `member_of`, bonus 30, `makes_collection`, `garde_d_office`.
+
+Ce dernier est une **extrapolation assumée**, et c'est la seule ligne de tout
+`config/it/` qui n'est pas une mesure. La revue française a relu 352 lieux de
+listes à jury et n'en a écarté aucun (185 villages, 102 détours, 54 Grands
+Sites, 11 forêts d'exception) ; les Borghi sont du même genre — association,
+jury, liste finie — mais n'ont jamais été relus. Si la première revue italienne
+écarte des bourgs, c'est cette ligne qui saute, et elle seule.
+
+Le plancher d'affichage du thème (3 langues) ne bouge pas : un lieu porté par
+une liste officielle de son thème le franchit d'office
+(`collections.py`, `apply_notoriety_floor`), comme les Maisons des Illustres en
+France — 147 d'entre elles ne tenaient qu'à cette dispense.
+
+**Forêts : retirées.** `gaps --pays Q38 --class Q4421` :
+
+    forêt (Q4421)
+     ≥0   ≥1   ≥2   ≥3   ≥4   ≥6   ≥8  ≥10  ≥12  ≥15  ≥20
+     93   83   18    5    2    1    0    0    0    0    0
+
+Contre 2 920 françaises, dont 156 à trois langues. Le plancher d'affichage du
+thème est à 4 : **deux** forêts italiennes le passent. Et rien ne les repêche —
+la classe propre du thème, `Q3079027`, est la forêt *domaniale*, un statut du
+droit français ; le label Forêt d'Exception, qui portait sept des trente-deux
+forêts françaises du catalogue, est une liste de l'ONF. Abaisser le plancher à
+2 rendrait 18 lieux, mais c'est la bande des bois communaux, que la mesure
+française écarte à dessein.
+
+**Cirques : retirés.** `gaps --pays Q38 --class Q388227` :
+
+    cirque glaciaire (Q388227)
+     ≥0   ≥1   ≥2   ≥3   ≥4   ≥6   ≥8  ≥10  ≥12  ≥15  ≥20
+      2    2    1    1    1    0    0    0    0    0    0
+
+Et la collecte le confirme sur les trois classes du thème réunies : **un** lieu
+candidat pour toute l'Italie. Ce n'est pas une lacune de Wikidata, c'est de la
+géographie — le cirque est une forme pyrénéenne et jurassienne.
+
+Dans les deux cas, le motif est celui qui avait retiré `villages` avant que la
+liste italienne ne le rende : un thème qui promet une catégorie et rend deux
+lignes est pire qu'un thème absent. C'est une décision de curation, pas de
+configuration, et elle tient en une ligne à retirer.
+
+### Le plafond par commune, une fois les communes là — MESURÉ
+
+Le build suivant, avec les communes rattachées, a fait mordre `max_per_commune`
+pour la première fois : **1 118 lieux retirés** — Rome 572, Venise 213, Milan
+64, Florence 61, Naples 53. Le catalogue passe de 2 563 à **2 373 lieux**, et
+les lieux jetés faute de collection tombent de 702 à 44.
+
+Ce que le plafond a coûté, thème par thème, entre la colonne `plancher` et la
+colonne `commune` : églises 550 → 235, monuments 617 → 189, mégalithes 454 →
+235, îles 116 → 90, musées 184 → 134, ponts 45 → 32.
+
+Et il a emporté **dix collections entières**, dont « Îles de Venise » (28
+lieux), « Sommets du Piémont » (23) et « Littoral et plages de Sicile » (18).
+Les vingt-huit îles de Venise sont toutes dans la même commune : à six par
+thème, il en reste six. C'est exactement le cas qu'une dérogation existe pour
+traiter — Paris a la sienne pour la même raison.
+
+**`derogations` rend cette décision refaisable.** Celle de Paris avait été
+mesurée à la main, une ville et un thème à la fois ; la commande donne
+maintenant, pour les villes que le plafond coupe le plus, le vivier au pied du
+plafond thème par thème, la plus forte chute et le **pas courant** à côté. Ce
+dernier n'est pas décoratif : une plus forte chute existe toujours, même dans
+une liste régulière, et c'est leur rapport qui dit s'il y a un décrochage. Sur
+Paris, la commande retrouve ce que le curateur avait lu — jardins, chute de
+15,0 pour un pas courant de 1,3 (une falaise) ; musées, chute de 5,1 pour un pas
+de 0,9 (« trente-deux institutions se suivent sans rupture »).
+
+Les codes ISTAT des villes concernées, lus dans la couche communale et non de
+mémoire : Rome 058091, Venise 027042, Milan 015146, Florence 048017, Naples
+063049, Turin 001272, Palerme 082053, Bologne 037006.
+
+### Les huit dérogations italiennes — MESURÉES
+
+Sorties de `derogations`, chacune à la plus forte chute quand elle sort du pas
+courant. Là où elle n'en sort pas, il n'y a pas de ligne.
+
+| ville | thème | candidats | chute / pas | plafond |
+|---|---|---|---|---|
+| Rome `058091` | églises | 203 | 2,3 / 0,5 | **9** |
+| | sites antiques | 203 | 4,8 / 0,4 | **8** |
+| | monuments | 140 | 5,4 / 0,6 | **10** |
+| | musées | 29 | 9,8 / 1,5 | **10** |
+| Venise `027042` | îles | 29 | 9,1 / 0,9 | **8** |
+| | églises | 58 | 3,6 / 0,6 | **10** |
+| | monuments | 131 | 2,5 / 0,4 | **8** |
+| Florence `048017` | musées | 16 | 18,2 / 1,6 | **13** |
+
+**Milan et Naples n'en ont aucune, et c'est un résultat.** Leurs viviers sont
+des plateaux : onze palais milanais entre 67 et 70 points, dix-sept palais
+napolitains entre 55 et 65. Le plafond y coupe exactement ce qu'il doit couper.
+Deux mesures confirment même le six en s'y arrêtant d'elles-mêmes — les maisons
+de Milan chutent de 6,6 juste après le sixième, les monuments de Florence de
+2,4 pour un pas de 0,4, au sixième également.
+
+Les huit îles de Venise sont la raison d'être de tout ceci : à six, la
+collection « Îles de Venise » disparaissait en entier.
+
+**Deux observations à porter en revue**, lues dans ces mêmes viviers :
+
+- **Le Vatican n'est pas l'Italie, et Rome perd Saint-Pierre.** Les 203 églises
+  romaines du vivier ne contiennent ni Saint-Pierre, ni la chapelle Sixtine, ni
+  les musées du Vatican : `apply_geographic_scope` les situe en Q237. Le filtre
+  a raison, le guide a tort — un voyageur français qui va à Rome va au Vatican.
+  Saint-Marin pose la même question.
+- **Quatre des vingt-cinq premiers « monuments » de Venise sont des théâtres
+  DISPARUS** — San Cassiano (démoli en 1812), San Benedetto, San Samuele, San
+  Moisè. `fantomes` est fait pour ça.
+
+### Les piazzas : le seul thème que la France n'a pas — ÉCRIT
+
+`gaps --pays Q38 --class Q174782`, lieux italiens par plancher :
+
+     ≥0    ≥1   ≥2   ≥3   ≥4   ≥6   ≥8  ≥10  ≥12  ≥15  ≥20
+   1711  1241  561  297  193  115   74   53   42   35   20
+
+Aucune falaise au-dessus de deux langues : la seule vraie rupture est entre 1 et
+2 (1 241 → 561), la bande des places de quartier qui n'ont qu'un article
+italien — le même piège que les 2 884 forêts françaises à une langue. Le
+plancher est donc un choix, et il est calé sur `monuments`, le thème le plus
+proche par nature : 6 en affichage (115 lieux), 4 en collecte (193), les 78
+d'écart laissant de quoi repêcher.
+
+Le thème arrive **en dernier** dans l'ordre fusionné, et c'est voulu : l'ordre
+est la priorité éditoriale, et une piazza qui est aussi un site antique — le
+Forum, le Campidoglio — doit rester un site antique.
+
+**Le glyphe devait exister AVANT le thème.** `ThemeIcon` rend `null` quand
+`TRACES` ne connaît pas l'identifiant, et la carte native n'enregistre que les
+PNG présents : un thème sans tracé disparaît des deux côtés sans un mot. Un
+test du pipeline lit maintenant `themeIcons.tsx` et vérifie que chaque thème de
+chaque pays a le sien.
+
+### Ce que le premier build complet a montré — et la règle qu'il a cassée
+
+2 456 lieux, 211 collections, les huit dérogations actives, les piazzas dedans.
+Le thème des places rend **74 lieux** au catalogue (225 collectés, 123 au-dessus
+du plancher, 82 après le plafond communal) : plus que les ponts (32), les
+grottes (30) ou les jardins (56). Le plancher calé sur `monuments` tient.
+
+Mais les dérogations ont rendu les lieux **sans rendre les collections**.
+« Îles de Venise » est réapparue avec ses huit îles — et a été écartée aussitôt
+par une AUTRE règle, `min_diameter_km: 25`, qui la juge « trop resserrée pour
+être un voyage » : quinze kilomètres.
+
+Cinq croisements italiens tombent sur cette règle, et **quatre le méritent** :
+les musées de Florence (2 km), les monuments de Venise (1 km), les églises de
+Venise (11 km) sont bien la promenade d'une journée dans une seule ville, ce
+que la règle dit refuser en toutes lettres — « on ne collectionne pas ce qui se
+fait à pied en une après-midi sans quitter sa ville ».
+
+Le cinquième, non. On ne va à Murano, Burano et Torcello qu'en vaporetto, et il
+y faut la journée. **Sur l'eau, le diamètre ne mesure plus l'effort.**
+
+`always_cross` existe pour ce cas — « le rapport est une heuristique, la
+décision est un jugement » — mais il ne pouvait pas le traiter : la coupe au
+diamètre passait AVANT, et l'exception n'agissait que sur le rapport de thème.
+Elle agit maintenant sur les deux, ce qui est ce que « gardés QUOI QU'IL
+ARRIVE » a toujours prétendu dire. La France est byte-identique après le
+changement — `plages-region-93` fait 34 km et n'a jamais eu besoin de la
+dispense.
+
+Une seule ligne en Italie : `iles-departement-027`. Les quatre autres restent
+dehors, et c'est la règle qui a raison.
+
+### Le Vatican et Saint-Marin, absorbés — FAIT
+
+Ce sont des **pays** chez Wikidata : `P17` y vaut Q237 et Q238, jamais Q38. La
+collecte italienne ne les voyait donc pas, et les 203 églises romaines du vivier
+de `derogations` n'avaient ni Saint-Pierre, ni la chapelle Sixtine, ni les
+musées du Vatican. Le filtre avait raison ; le guide avait tort.
+
+`geo.enclaves` les déclare, avec la province à laquelle les rattacher — Rome
+(058) et Rimini (099), lues dans `data/reference/it/departements.csv`. Ce
+rattachement n'est pas de la géopolitique : un lieu sans département sort du
+catalogue avant d'être jugé, et surtout **on va à Saint-Pierre depuis Rome**.
+`country_code` reste vide sur ces lieux — la mention en ferait un catalogue à
+part (`pays_de`), alors qu'ils sont là pour être dans celui de l'Italie.
+
+Les Q-id ne viennent pas de mémoire. Wikidata est injoignable depuis le
+conteneur ; ils sont lus dans la table `datasets/country-codes`, qui **se
+vérifie sur ce dépôt** : elle donne IT → Q38 et FR → Q142, exactement ce que
+`config/` écrit déjà, puis VA → Q237 et SM → Q238.
+
+⚠ Q237 y est libellé « Saint-Siège ». Wikidata distingue parfois le Saint-Siège
+de l'État de la Cité du Vatican. La collecte tranchera sans ambiguïté : si le
+Vatican rend zéro lieu quand Saint-Marin en rend, c'est l'entité voisine qu'il
+faut. `fetch` journalise les enclaves absorbées pour que la question se voie.
+
+La requête française ne change pas d'un caractère : un seul pays reste écrit en
+dur, `?pays` n'entre dans le `SELECT` que lié. Catalogue français byte-identique.
+
+**Ça marche** : 21 lieux d'enclave au catalogue, et la basilique Saint-Pierre y
+est l'église la mieux notée d'Italie (187,8, juste derrière le Colisée). Q237
+était la bonne entité. Suivent les musées du Vatican, la chapelle Sixtine, le
+palais, la place Saint-Pierre, les jardins ; côté Saint-Marin, le mont Titano,
+la basilique, les trois tours, le palais public.
+
+⚠ **Et le mécanisme avait un défaut, que seul le catalogue réel a montré.** Un
+lieu qui DÉBORDE sur une enclave remonte deux fois de Wikidata, une ligne par
+`P17`, et les deux se valent en complétude : c'est l'ordre de la réponse qui
+décidait, donc rien. La péninsule italienne — Italie, Saint-Marin ET Vatican —
+a vu sa ligne saint-marinaise l'emporter, le rattachement d'enclave lui a donné
+la province de Rimini, et **une péninsule de mille kilomètres est entrée au
+catalogue comme deuxième meilleure plage d'Italie**, N1#2 du « meilleur de
+Rimini ». L'Apennin du Nord est entré par la même porte.
+
+Le pays PRINCIPAL gagne désormais sur une enclave : un lieu que Wikidata situe
+en Italie est italien, même s'il déborde. L'enclave ne sert plus qu'à ce
+qu'elle SEULE contient.
+
+⚠ **Mais cela ne suffit pas à écarter la péninsule, et l'affirmer était une
+erreur.** Elle a un point de coordonnées, ce point tombe dans une commune
+italienne réelle (066018, province de L'Aquila), et la couche communale lui
+donne donc un département de toute façon. Aucune règle ne l'écartera : c'est
+un lieu régulier à tous égards, qui n'est simplement pas un lieu. C'est la
+définition même de ce qu'une REVUE tranche, et pas une configuration.
+
+Elle a tout de même révélé un vrai défaut. `align_departements` dit « c'est la
+commune qui gagne » — encore faut-il savoir lire son code, et
+`departement_from_insee` connaît la France et elle seule : deux chiffres, trois
+pour l'outre-mer, une lettre pour la Corse. Les codes ISTAT en font trois pour
+la province et six pour la commune. Hors de France, la commune ne gagnait donc
+RIEN, et la péninsule portait à la fois la commune de L'Aquila et le
+département de Rimini sans que rien ne tranche — un lieu sur 2 466, mais rien
+n'empêchait qu'ils soient cent.
+
+`departement_du_code_communal` cherche le plus long préfixe qui soit un
+département connu, quel que soit le pays. La règle retrouve les trois cas
+français d'elle-même : 97411 → 974 avant 97, 2A004 → 2A, 75056 → 75. Catalogue
+français byte-identique.
+
+### La feuille de revue ne porte que ce qui se décide
+
+`garde_d_office` dit qu'une commission a déjà fait le travail — mesuré sur la
+revue française, 352 lieux de listes à jury relus, zéro écarté. Les laisser dans
+la feuille demandait au curateur de RATIFIER ce qu'aucune décision ne peut
+changer : 388 bourgs italiens sur 2 456 lignes, un sixième de la revue. Leur
+niveau ne se décide pas en revue de toute façon — il vient du rang dans la
+collection, donc de la notoriété, comme en France.
+
+Un lieu portant déjà un verdict reste dans la feuille : il a été jugé une fois,
+et le curateur doit pouvoir y revenir. C'est ce qui laisse la feuille française
+intacte — ses 2 080 lignes sont toutes tranchées.
+
+### `verdict` accepte un nom
+
+Écarter les quatre théâtres vénitiens démolis demandait d'aller chercher quatre
+Q-id un par un dans la feuille. Un geste qui coûte quatre allers-retours est un
+geste qu'on ne fait pas. Le nom suffit désormais ; l'identifiant reste accepté,
+et reste le seul moyen sûr quand deux lieux le partagent — auquel cas la
+commande refuse et liste les dix mieux notés.
+
+### « Le meilleur d'Italie » n'existait pas
+
+`geo.area("country")` ne rend la France QUE quand le dépôt parle de la France,
+et `None` sinon. La garde était juste — intituler « Le meilleur de France » une
+collection de lieux italiens est une faute qui ne plante pas et qu'on lirait
+dans l'application — mais elle a **supprimé la collection au lieu de la
+renommer**. L'Italie n'avait donc pas sa liste nationale : la plus importante
+d'un guide, et la seule qui manquait.
+
+Le nom du pays vit dans la configuration : c'est elle qu'il faut lire, pas une
+constante de module. Son niveau 1, une fois la collection rendue, dit à lui
+seul que le brassage par thème fonctionne :
+
+    #1 Colisée · #2 Saint-Pierre · #3 Castel del Monte · #4 Bergame
+    #5 Villa d'Este · #6 tour de Pise · #7 Piazza dei Miracoli
+    #8 Vésuve · #9 Ponte Vecchio · #10 Palais Pitti
+
+Dix lieux, dix thèmes, huit régions. Catalogue français byte-identique.
+
+### La part des églises, mesurée après onze revues
+
+Le curateur a trouvé les niveaux 1 et 2 chargés en églises et en sites
+antiques. La mesure lui donne à moitié raison, et pas là où il croyait.
+
+**Rome n'a pas trente églises** : la commune en porte NEUF — exactement sa
+dérogation — et onze avec les deux du Vatican. Le plafond communal fait son
+travail, et `max_theme_share` fait le sien : « Le meilleur de Rome » compte 11
+églises sur 80, soit 14 %.
+
+Mais au niveau du CATALOGUE, l'écart est réel :
+
+| thème | Italie | France |
+|---|---|---|
+| églises | 263 — **11,5 %** | 80 — 3,8 % |
+| sites antiques | 210 — 9,2 % | 104 — 5,0 % |
+| villages | 387 — 16,9 % | 290 — 13,9 % |
+
+La cause est une décision prise sciemment et remise à plus tard :
+`cathedrales.catalogue_cap: null` en Italie, quand la France plafonne à 80.
+
+**Aucune falaise où couper.** Les 263 églises descendent par marches de 0,1
+point ; la plus forte chute ne vient qu'au 259e rang. C'est donc un arbitrage,
+comme les musées parisiens — mais un arbitrage dont le coût se mesure :
+
+| plafond | catalogue | églises | part | collections |
+|---|---|---|---|---|
+| aucun | 2 285 | 263 | 11,5 % | 203 |
+| 200 | 2 205 | 186 | 8,4 % | 200 |
+| 150 | 2 168 | 146 | 6,7 % | 201 |
+| 100 | 2 125 | 97 | 4,6 % | 199 |
+
+Le catalogue perd peu de collections dans tous les cas : la question est
+éditoriale, pas technique.
+
+**L'équilibre RÉGIONAL, lui, est meilleur qu'en France** : 20 régions
+italiennes, médiane 96 lieux, de 226 (Lombardie) à 13 (Molise) — un rapport de
+17. La France va de 273 à 8, soit 34.
+
+### Deux lieux du même site ne commencent pas deux fois un palmarès
+
+« Le meilleur de Pise » ouvrait sur CINQ lieux de la seule Piazza dei
+Miracoli — la tour, la place, le dôme, le baptistère, le Campo Santo — et « Le
+meilleur d'Italie » en prenait deux de ses dix premiers.
+
+Ce ne sont pas des doublons : on les visite séparément, chacun a son billet, et
+`dedupe` ne les voit pas — elle ne compare QUE des lieux du même thème, et la
+tour est un monument quand la place est une piazza. Le voisin n'est donc jamais
+retiré du catalogue ; ce qui lui arrive dépend de ce que la collection a sous la
+main. Là où elle peut se remplir sans lui, il cède la place ; là où elle ne le
+peut pas, il revient à la passe suivante et se range APRÈS les autres.
+
+⚠ Ce second rang a demandé une correction que la première écriture n'avait pas
+vue : `assign_tiers` RETRIE par la clé `ordre`, si bien que le voisin repris à
+la passe relâchée retrouvait sa place au score. « Le meilleur de Pise » rouvrait
+sur trois lieux de la même place, et seule la version large — celle où le voisin
+est simplement écarté — semblait marcher.
+
+**Deux cents mètres**, lu dans les paires mesurées. Sous 150 m on ne trouve que
+des évidences (dôme de Milan ↔ Piazza del Duomo, 50 m). Entre 150 et 200 m, les
+quatre paires ajoutées sont toutes du même site : tour de Pise ↔ Piazza dei
+Miracoli (155 m), Vallée des Temples ↔ temple de la Concorde (195 m), Olympéion
+↔ temple d'Héraclès (185 m), musées du Capitole ↔ Vittoriano (187 m). La
+première paire discutable n'arrive qu'à 241 m — villa Médicis ↔
+Trinité-des-Monts, qui sont deux visites.
+
+Résultat : les paires voisines d'un même niveau 1 tombent de **96 à 18**, et
+celles qui restent sont dans des collections trop maigres pour faire autrement.
+
+**La France l'a prise ensuite, après mesure sur son catalogue livré.** Elle y
+avait 37 paires voisines en niveau 1, et pas des cas limites : le site
+d'Étretat avec la Porte d'Aval (88 m, qui EST le site d'Étretat), Bruniquel
+avec les châteaux de Bruniquel (54 m), l'abbaye de Fontevraud avec le village
+qui porte son nom (174 m), l'Aude trois fois sur le même carrefour de Narbonne.
+
+    catalogue      2 080 → 2 080 lieux, les MÊMES
+    collections      203 →   203, les mêmes
+    niveaux            91 changements, 30 descentes depuis un niveau 1
+    paires voisines    37 → 2
+
+Rien n'entre ni ne sort : la règle ne touche que l'ordre. Et elle garde le bon
+des deux — sur 32 descentes, 31 laissent en place le mieux noté (Étretat 76,9
+contre Porte d'Aval 50,2 ; Vézelay 172,9 contre sa basilique 148,0). La seule
+exception sépare Lugdunum du théâtre antique de Lyon par quatre points, sur le
+même parc archéologique.
+
+⚠ Le prix est réel. Sur les 30 lieux descendus, **trois seulement** sont
+niveau 1 dans la collection nationale de leur thème : onze y sont niveau 3, six
+niveau 2, et **dix n'y figurent pas du tout** — la cathédrale de Toul, les
+châteaux de Bruniquel, le musée de Narbonne. Pour ceux-là, la descente retire
+leur seule apparition en niveau 1. Ils restent au catalogue et au niveau 2 de
+leur département.
+
+### Bergame en villages : le même cas qu'en France
+
+Bergame — 120 000 habitants, 132 versions linguistiques — est quatrième du
+« meilleur d'Italie », dans le thème `villages`. Elle y entre par le label
+`borghi-piu-belli`, et sa notoriété de VILLE lui donne un score qu'aucun bourg
+ne peut approcher.
+
+Ce n'est pas un travers italien. Le thème est alimenté par des listes de jury,
+et ces listes contiennent des villes des deux côtés des Alpes : la France y a
+Montsoreau (158 langues), Sarlat (82), Le Puy-en-Velay (80), Bar-le-Duc (76),
+Provins (75). Le thème s'appelle « Villages de caractère » et c'est ce nom,
+plus que son contenu, qui fait sursauter.
+
+### « Je ne vois que des cathédrales » — le catalogue ou l'ordre de lecture ?
+
+Le curateur a eu cette impression en Italie, et se souvenait de l'avoir eue en
+France. Mesuré sur la feuille italienne, il avait raison, mais pas sur le
+catalogue :
+
+    NIVEAU 1 — 200 lignes, 19 blocs · chaque thème 6 % du niveau, 11 à 13 lignes
+    NIVEAU 2 — 391 lignes, 19 blocs · chaque thème 6 % du niveau, 25 lignes
+    NIVEAU 3 — 1 195 lignes (67 % de la feuille) — et là :
+        sommets 178 lignes d'affilée · megalithes 176 · monuments 149
+        lacs 109 · cathedrales 105 · musees 99
+
+Les deux tiers du travail sont au niveau 3, et l'ordre y était le thème ENTIER,
+par ordre alphabétique. Après abbayes et cascades vient le bloc de 105
+cathédrales, puis 65 châteaux — c'est exactement ce qu'il lisait au moment où il
+l'a signalé.
+
+Grouper par thème reste juste : comparer des châteaux entre eux va plus vite
+que de sauter de l'un à l'autre. Grouper TOUT un thème d'un bloc ne l'est pas.
+La feuille se lit donc par tranches de vingt-cinq, alternées entre thèmes — un
+château reste à côté d'un château, et la séance garde sa variété. Le plus long
+bloc d'un seul thème passe de **178 lignes à 25**.
+
+### Trois sommets des Dolomites épinglés — et le piège de `pin`
+
+Le filtre alpin écarte 796 sommets italiens au-dessus de 2 500 m, faute d'un
+signal d'accès. C'est la règle française, et elle a raison par défaut ; comme en
+France, ce qui se rejoint sans alpinisme revient par un épinglage. Trois l'ont
+été : Tre Cime di Lavaredo (route du refuge Auronzo), la Marmolada
+(téléphérique de Punta Rocca), le Lagazuoi (téléphérique du col de Falzarego).
+
+⚠ **`pin` écrit dans la collecte VERSIONNÉE ; `build` lit la copie de travail.**
+Sans `sync` entre les deux, l'épinglage ne fait rien et ne le dit pas — les
+trois sommets sont restés écartés au filtre alpin, drapeau posé, et il a fallu
+`explain` pour s'en apercevoir. Le message de la commande disait « relance
+`build` » : il dit maintenant `sync` PUIS `build`.
+
+### `discover` sort de France — FAIT
+
+Le chantier que l'analyse de la revue avait désigné : le curateur promeut des
+lieux sous-documentés sur Wikipédia parce que le pipeline ne sait pas encore
+qu'ils ouvrent leurs portes. En France, `discover` donne à 607 lieux un accueil
+attesté et à 293 leurs horaires ; en Italie, zéro — le bonus de 10 points et le
+malus de 20 y étaient morts.
+
+Trois choses seulement séparaient la commande d'un deuxième pays, et aucune
+n'était dans la requête Overpass elle-même :
+
+- **le code ISO**, écrit en dur dans `FRANCE_AREA`. Il vient de la
+  configuration ; c'est la zone qui délimite le pays, le rectangle ne fait que
+  découper le travail.
+- **le rectangle**. Celui de la France reste écrit en dur et volontairement
+  MÉTROPOLITAIN : le calculer sur ses contours engloberait la Réunion et la
+  Polynésie — vingt mille cellules pour cent une utiles. Ailleurs il se calcule
+  sur la couche des départements. L'Italie donne 36 cellules, contre 40 pour la
+  France.
+- **le localisateur**, qui écarte les candidats hors du pays — un rectangle
+  autour de l'Italie couvre la Suisse, l'Autriche, la Slovénie et la Croatie.
+  La France garde ses deux API ; les autres pays utilisent leurs contours
+  communaux, qui font le même travail sans réseau. Vérifié : Rome et Milan
+  passent, Bâle, Nice et un point en pleine mer sont écartés.
+
+⚠ **La cellule témoin a demandé deux essais**, et c'est le genre d'erreur qui
+ne se serait vue qu'après vingt minutes de collecte. Elle doit tomber sur un
+lieu qu'OpenStreetMap connaît à coup sûr, et les deux candidats évidents ne le
+sont pas : le mieux documenté de la collecte italienne est « Alpes », 213
+langues, dont le point est au mont Blanc — en France ; le mieux documenté des
+points réellement italiens est « Calabre », dont la coordonnée est le centroïde
+rond d'une région, 39,0000 / 16,5000, où OSM n'a évidemment rien de nommé. C'est
+le CATALOGUE qu'il faut interroger : il ne contient que des lieux passés par la
+revue et tous les filtres, et son mieux noté est le Colisée.
+
+La France est vérifiée identique — même rectangle, même témoin parisien, mêmes
+deux API.
+
+### Le plafond des églises : la question a changé de main
+
+Avant les communes, `cathedrales` portait 549 lieux au catalogue et la question
+était « quel `catalogue_cap` ? ». Le plafond par commune en a retiré 315 à lui
+seul, et le thème en compte **253**. Le travail que le `catalogue_cap` français
+faisait — empêcher une capitale d'occuper tout un thème — est fait ici par
+l'échelon en dessous, et mieux : il coupe Rome sans toucher à Assise, Orvieto
+ou Sienne. Un plafond de thème posé maintenant couperait précisément l'inverse.
+
+À revoir après la première revue italienne, pas avant : une revue qui écarte des
+églises change le chiffre sur lequel un plafond se poserait.
 
 ### Ce qu'on sait déjà pour écrire `config/it/`
 

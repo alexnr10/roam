@@ -13,10 +13,11 @@ import math
 import re
 import unicodedata
 from collections import Counter, defaultdict
+from collections.abc import Callable
 from dataclasses import replace
 
 from .config import Config
-from .geo import area, departements, region_of, regions
+from .geo import area, country_area, departements, region_of, regions
 from .models import Collection, CollectionPlace, Place
 from .score import assign_tiers, rescued
 
@@ -182,7 +183,9 @@ def _decoupe(texte: str) -> list[str]:
     return [mot for mot in re.split(r"[^a-z0-9]+", sans_accents) if mot]
 
 
-def twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
+def twins(
+    places: list[Place], config: "Config | None" = None
+) -> dict[str, list[tuple[Place, float, str]]]:
     """Les paires de lieux proches que `dedupe` ne peut pas voir.
 
     `dedupe` ne compare qu'à l'intérieur d'un thème et qu'à cent cinquante
@@ -205,6 +208,19 @@ def twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
     Renvoie, par identifiant, les jumeaux trouvés : (l'autre lieu, la distance,
     le motif).
     """
+    # La portée est par THÈME, et elle doit l'être. Mesuré à deux kilomètres à
+    # l'intérieur d'un même thème : le littoral français rend douze paires, les
+    # monuments soixante-dix et les musées soixante-cinq — le Louvre et Orsay
+    # sont à 692 m, le palais Pitti et les Offices à 551 m, et ce sont DEUX
+    # visites. Une portée unique ne peut pas distinguer « le Louvre et Orsay »
+    # de « le cap et la plage en contrebas » ; le thème, lui, le sait.
+    portees = {
+        theme.id: theme.twin_radius_m or NAMED_TWIN_DISTANCE_M
+        for theme in (config.themes if config else ())
+    }
+    rayon_max = max([NAMED_TWIN_DISTANCE_M, *portees.values()])
+    cote = max(0.01, rayon_max / 80_000)
+
     grille: dict[tuple[float, float], list[Place]] = defaultdict(list)
     for place in places:
         grille[(round(place.lat, 2), round(place.lon, 2))].append(place)
@@ -212,8 +228,10 @@ def twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
     jumeaux: dict[str, list[tuple[Place, float, str]]] = defaultdict(list)
     vus: set[tuple[str, str]] = set()
     for place in places:
-        for dlat in (-0.01, 0.0, 0.01):
-            for dlon in (-0.01, 0.0, 0.01):
+        pas = [round(k * 0.01, 2) for k in range(-int(cote * 100) - 1,
+                                                  int(cote * 100) + 2)]
+        for dlat in pas:
+            for dlon in pas:
                 voisins = grille.get(
                     (round(place.lat + dlat, 2), round(place.lon + dlon, 2)), []
                 )
@@ -222,7 +240,9 @@ def twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
                     if couple in vus or couple[0] == couple[1]:
                         continue
                     distance = haversine_m(place.lat, place.lon, autre.lat, autre.lon)
-                    if distance >= NAMED_TWIN_DISTANCE_M:
+                    rayon = max(portees.get(place.theme_id, NAMED_TWIN_DISTANCE_M),
+                                portees.get(autre.theme_id, NAMED_TWIN_DISTANCE_M))
+                    if distance >= rayon:
                         continue
                     communs = _mots_distinctifs(
                         place.name, place.commune_name
@@ -234,11 +254,16 @@ def twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
                     # plus loin ET à l'intérieur d'un thème : l'abbaye de Lérins
                     # et sa tour-monastère sont à 160 m, deux fiches pour un
                     # même rocher, et `dedupe` s'arrête à 150.
+                    large = rayon > NAMED_TWIN_DISTANCE_M
                     if autre.theme_id == place.theme_id:
                         # En deçà de son seuil, `dedupe` a déjà tranché — une
                         # paire qui arrive ici de si près n'existe pas en vrai.
-                        # Au-delà, il ne voit plus rien : c'est le nom qui parle.
-                        if not communs or distance < DUPLICATE_DISTANCE_M:
+                        if distance < DUPLICATE_DISTANCE_M:
+                            continue
+                        # Au-delà, c'est le nom qui parle — sauf dans un thème
+                        # à portée large, où le voisinage suffit à poser la
+                        # question.
+                        if not communs and not large:
                             continue
                     elif not communs and distance >= DUPLICATE_DISTANCE_M:
                         continue
@@ -247,6 +272,8 @@ def twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
                         motif = "nom partagé : " + ", ".join(sorted(communs))
                     elif distance < SAME_FOOTPRINT_M:
                         motif = "même emplacement"
+                    elif distance >= NAMED_TWIN_DISTANCE_M:
+                        motif = f"à {distance:.0f} m, dans le même thème"
                     else:
                         motif = "à quelques pas"
                     jumeaux[place.wikidata_id].append((autre, distance, motif))
@@ -273,8 +300,14 @@ def diameter_km(places: list[Place]) -> float:
     )
 
 
-def _spread(ordered: list[Place], limit: int, max_per_dept: int) -> list[Place]:
-    """Choisit `limit` lieux sans laisser un département occuper la collection.
+def _spread(
+    ordered: list[Place], limit: int, max_per_dept: int,
+    clef: Callable[[Place], str | None] | None = None,
+) -> list[Place]:
+    """Choisit `limit` lieux sans laisser un territoire occuper la collection.
+
+    `clef` dit ce qu'est un territoire. Par défaut le département ; les labels
+    d'aires y passent le parc, pour n'en garder qu'un lieu chacun.
 
     Le score mesure la documentation d'un lieu, et Paris est documenté comme
     nulle part ailleurs : la collection nationale des ponts comptait vingt-cinq
@@ -291,9 +324,10 @@ def _spread(ordered: list[Place], limit: int, max_per_dept: int) -> list[Place]:
     retenus: list[Place] = []
     reportes: list[Place] = []
     par_dept: Counter[str] = Counter()
+    clef = clef or (lambda p: p.departement_code)
 
     for place in ordered:
-        dept = place.departement_code or "?"
+        dept = clef(place) or "?"
         if len(retenus) >= limit:
             break
         if par_dept[dept] >= max_per_dept:
@@ -366,7 +400,8 @@ def _rank_within_theme(members: list[Place]) -> dict[str, float]:
     return rangs
 
 
-def _mix_themes(ordered: list[Place], limit: int, part: float) -> list[Place]:
+def _mix_themes(ordered: list[Place], limit: int, part: float,
+                rayon: float = 0.0) -> list[Place]:
     """Empêche un seul thème d'occuper tout un « Le meilleur de… ».
 
     « Le meilleur de Paris » comptait quarante et un musées sur quatre-vingts.
@@ -384,26 +419,61 @@ def _mix_themes(ordered: list[Place], limit: int, part: float) -> list[Place]:
     repêchage : le Centre-Val de Loire n'a pas soixante lieux hors châteaux à
     offrir, alors son plafond s'établit à trente et un. Mieux vaut une région
     un peu châtelaine qu'une collection trop courte.
+
+    `rayon` ajoute la diversité GÉOGRAPHIQUE de la même façon. « Le meilleur de
+    Pise » ouvrait sur cinq lieux de la seule Piazza dei Miracoli — la tour, la
+    place, le dôme, le baptistère, le Campo Santo — et « Le meilleur d'Italie »
+    y prenait deux de ses dix premiers. Ce ne sont pas des doublons : on les
+    visite séparément, et chacun mérite le catalogue. Mais un palmarès qui
+    commence deux fois au même endroit ne dit rien du territoire.
+
+    Ce ne sont pas des doublons — on les visite séparément, chacun a son billet
+    — et le voisin n'est donc jamais retiré du CATALOGUE. Ce qui lui arrive
+    dépend de ce que la collection a sous la main : là où elle peut se remplir
+    sans lui, il lui cède la place (« Le meilleur d'Italie » prend le lac de
+    Côme plutôt qu'une deuxième entrée pisane) ; là où elle ne le peut pas, il
+    revient à la passe suivante et le second rendu dit de le ranger APRÈS les
+    autres, donc un niveau plus bas.
+
+    L'ordre de relâchement compte. Le voisinage cède AVANT le quota de thème :
+    une collection courte vaut mieux qu'une collection resserrée sur un thème,
+    et c'est le défaut que `part` existe pour empêcher.
     """
     plafond = max(3, int(limit * part))
     limite = max(plafond, limit)
     retenus: list[Place] = []
     par_theme: Counter[str] = Counter()
     vus: set[str] = set()
+    serre = rayon > 0
+    voisins: set[str] = set()
 
-    while len(retenus) < limit and plafond <= limite:
+    while len(retenus) < limit and (serre or plafond <= limite):
         avant = len(retenus)
         for place in ordered:
             if len(retenus) >= limit:
                 break
             if place.wikidata_id in vus or par_theme[place.theme_id] >= plafond:
                 continue
+            if serre and any(
+                haversine_m(place.lat, place.lon, autre.lat, autre.lon) < rayon
+                for autre in retenus
+            ):
+                continue
             retenus.append(place)
             vus.add(place.wikidata_id)
             par_theme[place.theme_id] += 1
+            if not serre and rayon > 0 and any(
+                autre is not place
+                and haversine_m(place.lat, place.lon, autre.lat, autre.lon) < rayon
+                for autre in retenus
+            ):
+                voisins.add(place.wikidata_id)
         if len(retenus) == avant:
-            plafond += 1
-    return retenus
+            if serre:
+                serre = False
+            else:
+                plafond += 1
+    return retenus, voisins
 
 
 def _finalize(
@@ -430,7 +500,14 @@ def _finalize(
         # comparer leurs documentations, pas leur intérêt.
         rangs = _rank_within_theme(ordered)
         ordre = lambda p: (rangs[p.wikidata_id], -p.score, p.name)  # noqa: E731
-        ordered = _mix_themes(sorted(ordered, key=ordre), limit, theme_share)
+        ordered, voisins = _mix_themes(
+            sorted(ordered, key=ordre), limit, theme_share, rules.min_distance_m)
+        if voisins:
+            # `assign_tiers` RETRIE par `ordre` : sans ce rang, le voisin repris
+            # à la passe relâchée retrouvait sa place au score et « Le meilleur
+            # de Pise » rouvrait sur trois lieux de la Piazza dei Miracoli.
+            ordre = lambda p: (  # noqa: E731
+                p.wikidata_id in voisins, rangs[p.wikidata_id], -p.score, p.name)
     else:
         ordered = ordered[:limit]
     # Seules les collections THÉMATIQUES : c'est d'elles que parle la revue
@@ -453,7 +530,13 @@ def _finalize(
 
     collection.places = [
         CollectionPlace(place_id=place.wikidata_id, tier=tier, rank=rank,
-                        forced=place.wikidata_id in forces, natural_tier=naturel)
+                        forced=place.wikidata_id in forces, natural_tier=naturel,
+                        # Le nom que le lieu porte DANS cette collection, quand
+                        # ce n'est pas le sien : « parc national du
+                        # Grand-Paradis » plutôt que « Jardin botanique alpin
+                        # Paradisia ». Nulle part ailleurs.
+                        name=(place.label_noms.get(collection.label_id)
+                              if collection.label_id else None))
         for place, tier, rank, naturel in assign_tiers(
             ordered, config.tiers, ordre, sans_deplacement=paient)
     ]
@@ -595,6 +678,48 @@ def build_theme_collections(places: list[Place], config: Config) -> list[Collect
     return out
 
 
+def _un_par_aire(
+    label_id: str, members: list[Place], cap: int, plancher: int = 0
+) -> tuple[list[Place], int]:
+    """Un seul lieu par aire, et c'est le meilleur — pour les labels d'aires.
+
+    Les autres labels sont des listes de LIEUX : les Plus Beaux Villages
+    désignent Rocamadour, et la collection les prend tous. « Parcs nationaux
+    d'Italie » désigne des PARCS, et ce qu'on en veut est le meilleur lieu de
+    chacun. Prendre les mieux notés tous parcs confondus donnerait huit lieux
+    des Cinque Terre et rien du Grand-Paradis — une collection qui porte le nom
+    des parcs sans les représenter.
+
+    Le plafond devient donc le nombre d'aires DISTINCTES, et le quota un lieu
+    par aire. `_spread` fait le reste : il parcourt dans l'ordre du score, donc
+    le lieu retenu pour un parc est son mieux noté.
+
+    Un membre sans aire — rattaché à la main, par exemple — n'est pas perdu :
+    il forme son propre groupe et garde sa place.
+
+    Et la règle ne doit pas TUER la collection : si les parcs représentés sont
+    moins nombreux que le plancher, `_spread` complète avec les meilleurs
+    écartés. Un deuxième lieu des Cinque Terre vaut mieux qu'une collection
+    trop courte pour exister — c'est déjà l'arbitrage du quota par département.
+    """
+    groupes = {p.wikidata_id: p.label_groupes.get(label_id) for p in members}
+    if not any(groupes.values()):
+        return members, cap
+
+    ordonnes = sorted(members, key=lambda p: (-p.score, p.name))
+    aires = {groupes[p.wikidata_id] or p.wikidata_id for p in ordonnes}
+    vise = min(len(members), max(len(aires), plancher))
+    retenus = _spread(ordonnes, vise, 1,
+                      clef=lambda p: groupes[p.wikidata_id] or p.wikidata_id)
+    LOG.info(
+        "label %s : %s lieux dans %s aires → %s retenus, le mieux noté de "
+        "chaque aire%s",
+        label_id, len(members), len(aires), len(retenus),
+        f" (complété jusqu'au plancher de {plancher})" if vise > len(aires) else "",
+    )
+    return retenus, len(retenus) or 1
+
+
 def build_label_collections(places: list[Place], config: Config) -> list[Collection]:
     out = []
     muets: list[str] = []
@@ -613,7 +738,10 @@ def build_label_collections(places: list[Place], config: Config) -> list[Collect
         )
         # Un label est une liste officielle et finie : on ne la tronque pas,
         # sinon la collection ne correspond plus au label qu'elle affiche.
-        built = _finalize(collection, members, config, cap=len(members) or 1)
+        cap = len(members) or 1
+        members, cap = _un_par_aire(
+            label.id, members, cap, config.collections.min_places)
+        built = _finalize(collection, members, config, cap=cap)
         if built:
             out.append(built)
 
@@ -643,7 +771,7 @@ def build_geo_collections(places: list[Place], config: Config) -> list[Collectio
                 buckets[code].append(place)
 
         for code, members in buckets.items():
-            zone = area(level, code)
+            zone = _zone(level, code, config)
             if zone is None:
                 continue
             collection = Collection(
@@ -699,6 +827,24 @@ def theme_lift(members: int, dans_la_zone: int, dans_le_pays: int, total: int) -
     return (members / dans_la_zone) / (dans_le_pays / total)
 
 
+def _zone(level: str, code: str, config: Config):
+    """Le territoire d'une collection, pays compris.
+
+    `area("country")` ne rend la France QUE quand le dépôt parle de la France,
+    et `None` sinon — la garde était juste : intituler « Le meilleur de
+    France » une collection de lieux italiens est une faute qui ne plante pas
+    et qu'on lirait dans l'application.
+
+    Mais elle a supprimé la collection au lieu de la renommer. L'Italie n'avait
+    donc PAS de « Le meilleur d'Italie » — la liste qui compte le plus dans un
+    guide, et la seule qui manquait. Le nom du pays vit dans la configuration :
+    c'est elle qu'il faut lire, pas une constante de module.
+    """
+    if level == "country":
+        return country_area(config)
+    return area(level, code)
+
+
 def build_cross_collections(places: list[Place], config: Config) -> list[Collection]:
     """Croisements thème × géographie (« Châteaux du Cantal »).
 
@@ -722,7 +868,7 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
                 par_zone[code] += 1
 
         for (theme_id, code), members in buckets.items():
-            zone = area(level, code)
+            zone = _zone(level, code, config)
             if zone is None:
                 continue
             theme = config.theme(theme_id)
@@ -742,17 +888,27 @@ def build_cross_collections(places: list[Place], config: Config) -> list[Collect
             # écarte parfois les extrémités.
             retenus = [par_id[m.place_id] for m in built.places]
             etendue = diameter_km(retenus)
-            if etendue < config.collections.min_diameter_km:
-                serres.append((etendue, len(built.places), built.name))
-                continue
             rapport = theme_lift(
                 len(built.places), par_zone[code], par_theme[theme_id], len(places)
             )
+            # `always_cross` dit « quoi qu'il arrive », et cela vaut aussi pour
+            # l'étendue. Elle ne le faisait pas : la coupe au diamètre passait
+            # AVANT, et une décision de curateur ne pouvait pas rattraper un
+            # croisement jugé trop resserré.
+            #
+            # Ce n'est pas théorique. Les huit îles de la lagune de Venise
+            # tiennent dans quinze kilomètres, et le diamètre les traite donc
+            # comme les trente et un ponts de Paris — alors qu'aller à Murano,
+            # Burano et Torcello se fait en vaporetto et prend la journée. Sur
+            # l'eau, le diamètre ne mesure plus l'effort.
             if collection.slug in config.collections.always_cross:
                 # Le rapport est une heuristique, la décision est un jugement.
                 # Elle doit se voir : une exception qui agit en silence est une
                 # règle qu'on ne peut plus discuter.
                 gardes.append((rapport, built.name))
+            elif etendue < config.collections.min_diameter_km:
+                serres.append((etendue, len(built.places), built.name))
+                continue
             elif rapport < config.collections.min_theme_lift:
                 banals.append((rapport, len(built.places), built.name))
                 continue

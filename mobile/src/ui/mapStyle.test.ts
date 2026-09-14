@@ -1,5 +1,5 @@
 import { colors } from '../theme';
-import { REGIONS } from '../lib/regions';
+import { REGIONS, voisinage, voisinageDe } from '../lib/regions';
 import {
   ETOILE_COULEURS,
   OPACITE_REGION_OUVERTE,
@@ -19,7 +19,9 @@ import {
   pasDeCascade,
   rayonDesPastilles,
   repeindre,
+  coloriage,
   tonsDesRegions,
+  tonsDuPays,
 } from './mapStyle';
 
 /** Où `["zoom"]` apparaît-il dans une expression ? Les chemins, en clair. */
@@ -160,6 +162,77 @@ describe('margeDeCamera', () => {
     const marge = margeDeCamera(12, 12);
     expect(marge.top).toBe(8);
     expect(marge.left).toBe(8);
+  });
+});
+
+describe('le coloriage des régions', () => {
+  /**
+   * Quatre sables, et jamais le même de part et d'autre d'une frontière —
+   * sinon la frontière disparaît.
+   *
+   * Le défaut qui a mené ici : la table est écrite pour la France, et l'Italie
+   * y passait presque entièrement grise. Trois ou quatre régions du nord
+   * étaient colorées par ACCIDENT, leurs codes (01 à 06, 11) se trouvant être
+   * aussi ceux de la Guadeloupe, de la Martinique et de l'Île-de-France. Une
+   * table d'un pays appliquée à un autre ne dit rien : elle coïncide.
+   */
+  const conflits = (
+    tons: Record<string, string>,
+    voisins: Map<string, Set<string>>,
+  ): string[] => {
+    const trouves: string[] = [];
+    for (const [code, entoure] of voisins) {
+      for (const voisin of entoure) {
+        if (tons[code] && tons[code] === tons[voisin]) trouves.push(`${code}/${voisin}`);
+      }
+    }
+    return trouves;
+  };
+
+  it('déduit le voisinage des contours jointifs eux-mêmes', () => {
+    // Les contours partagent EXACTEMENT les mêmes sommets sur une frontière
+    // commune — le pipeline les découpe en arcs partagés. Il n'y a donc aucune
+    // géométrie à intersecter, juste des sommets à compter.
+    const voisins = voisinage();
+    expect(voisins.get('11')?.size).toBeGreaterThanOrEqual(5); // Île-de-France
+    expect(voisins.get('53')).toContain('52'); // Bretagne / Pays de la Loire
+    expect(voisins.get('94')?.size).toBe(0); // la Corse ne touche personne
+  });
+
+  it('ne laisse aucune frontière française sans contraste', () => {
+    expect(conflits(REGION_TONE_BY_CODE, voisinage())).toEqual([]);
+  });
+
+  it("colorie l'Italie, qui n'a pas de table écrite à la main", () => {
+    // Le vrai fichier servi, pas une maquette : c'est lui qui part sur les
+    // téléphones.
+    const contours = require('../../../catalogues/it-contours.json');
+    const voisins = voisinageDe(contours.region.features);
+    expect(voisins.size).toBe(20);
+
+    // La mesure du défaut, gardée : la table française ne rencontrait que six
+    // des vingt codes italiens, et par pure coïncidence de numérotation. Les
+    // quatorze autres retombaient sur la teinte par défaut — d'où une Italie
+    // presque entièrement grise, avec quelques régions du nord colorées.
+    const parHasard = [...voisins.keys()].filter((code) => code in REGION_TONE_BY_CODE);
+    expect(parHasard.length).toBeLessThan(8);
+
+    const tons = coloriage(voisins);
+    expect(Object.keys(tons)).toHaveLength(20);
+    expect(conflits(tons, voisins)).toEqual([]);
+    // Les quatre teintes servent : avec deux, l'ensemble penche.
+    expect(new Set(Object.values(tons)).size).toBe(4);
+  });
+
+  it('rend le même coloriage à chaque démarrage', () => {
+    const voisins = voisinage();
+    expect(coloriage(voisins)).toEqual(coloriage(voisins));
+  });
+
+  it('donne à la France sa table, et à un pays inconnu un calcul', () => {
+    const voisins = voisinage();
+    expect(tonsDuPays('FR', voisins)).toBe(REGION_TONE_BY_CODE);
+    expect(tonsDuPays('ZZ', voisins)).toEqual(coloriage(voisins));
   });
 });
 

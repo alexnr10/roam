@@ -206,6 +206,122 @@ export function voile(): GeoJSON.Feature<GeoJSON.Polygon> {
   };
 }
 
+/**
+ * La part des lieux que la vue de départ doit contenir.
+ *
+ * Pas cent pour cent, et c'est tout le point. L'union BRUTE des contours
+ * français va de la Guadeloupe à La Réunion : une vue de départ qui montre le
+ * globe entier pour quatre lieux à l'autre bout du monde n'est pas une vue de
+ * départ. On cadre là où le catalogue est, et l'outre-mer se découvre en
+ * dérivant — un trou net apparaît dans le voile, ce qu'aucun encart n'aurait
+ * dit aussi bien.
+ */
+const PART_CADREE = 0.95;
+
+/**
+ * L'emprise du pays regardé — ce que la caméra doit cadrer.
+ *
+ * Elle était une CONSTANTE, et cette constante était la France. En changeant de
+ * pays depuis « Moi », la carte gardait donc son cadrage français : l'Italie
+ * apparaissait en morceau, contre le bord droit de l'écran, ce qui se lit comme
+ * une carte cassée. La pastille de retour ramenait au même endroit.
+ *
+ * Les contours d'abord, région par région, des plus peuplées en lieux aux
+ * moins peuplées, jusqu'à en couvrir `PART_CADREE`. À défaut de contours — un
+ * pays peut très bien arriver sans — l'étendue de ses lieux, qui n'est pas la
+ * frontière mais cadre ce qu'on est venu voir. Et `null` si on ne sait rien :
+ * l'appelant garde alors son cadrage de départ plutôt que de sauter sur le
+ * méridien de Greenwich.
+ */
+export function bornesDuPays(): Emprise | null {
+  let ouest = 180;
+  let sud = 90;
+  let est = -180;
+  let nord = -90;
+  let vu = false;
+
+  const elargir = (o: number, s: number, e: number, n: number) => {
+    if (o < ouest) ouest = o;
+    if (s < sud) sud = s;
+    if (e > est) est = e;
+    if (n > nord) nord = n;
+    vu = true;
+  };
+
+  const parRegion = new Map<string, number>();
+  for (const lieu of places) {
+    if (!lieu.regionCode) continue;
+    parRegion.set(lieu.regionCode, (parRegion.get(lieu.regionCode) ?? 0) + 1);
+  }
+
+  if (REGIONS.size > 0) {
+    const total = [...parRegion.values()].reduce((somme, n) => somme + n, 0);
+    // Sans aucun rattachement, on ne peut pas trier : on prend tout.
+    const classees = [...REGIONS.keys()].sort(
+      (a, b) => (parRegion.get(b) ?? 0) - (parRegion.get(a) ?? 0) || a.localeCompare(b),
+    );
+    let couverts = 0;
+    for (const code of classees) {
+      const feature = REGIONS.get(code);
+      if (!feature) continue;
+      const [[o, s], [e, n]] = emprise(feature.geometry);
+      elargir(o, s, e, n);
+      couverts += parRegion.get(code) ?? 0;
+      if (total > 0 && couverts >= total * PART_CADREE) break;
+    }
+    if (vu) return [[ouest, sud], [est, nord]];
+  }
+
+  for (const lieu of places) elargir(lieu.lon, lieu.lat, lieu.lon, lieu.lat);
+  return vu ? [[ouest, sud], [est, nord]] : null;
+}
+
+/**
+ * Qui touche qui, parmi les régions dessinées.
+ *
+ * Les contours sont JOINTIFS par construction — le pipeline les découpe en arcs
+ * partagés, simplifie chaque arc une seule fois, puis recoud. Deux régions
+ * voisines portent donc EXACTEMENT les mêmes sommets sur leur frontière
+ * commune, et il suffit de les compter : aucune géométrie à intersecter.
+ *
+ * Sert au coloriage — quatre sables, et jamais le même de part et d'autre
+ * d'une frontière, sans quoi la frontière disparaît.
+ */
+export function voisinage(): Map<string, Set<string>> {
+  return voisinageDe(REGIONS.values());
+}
+
+/** La même chose sur une collection quelconque — c'est ce qui la rend testable. */
+export function voisinageDe(
+  features: Iterable<GeoJSON.Feature<Geometrie, { code: string; nom: string }>>,
+): Map<string, Set<string>> {
+  const parSommet = new Map<string, string[]>();
+  const voisins = new Map<string, Set<string>>();
+
+  for (const feature of features) {
+    const code = feature.properties.code;
+    voisins.set(code, new Set());
+    for (const polygone of polygones(feature.geometry)) {
+      for (const anneau of polygone) {
+        for (const [lon, lat] of anneau) {
+          const cle = `${lon},${lat}`;
+          const ici = parSommet.get(cle);
+          if (ici) { if (!ici.includes(code)) ici.push(code); }
+          else parSommet.set(cle, [code]);
+        }
+      }
+    }
+  }
+
+  for (const codes of parSommet.values()) {
+    if (codes.length < 2) continue;
+    for (const un of codes) {
+      for (const autre of codes) if (un !== autre) voisins.get(un)?.add(autre);
+    }
+  }
+  return voisins;
+}
+
 /** Région d'un département, par son code. */
 export const regionDuDepartement = (code: string): string | null =>
   regionParDepartement.get(code) ?? null;

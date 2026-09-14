@@ -135,6 +135,55 @@ describe('la référence servie', () => {
     }
   });
 
+  it('laisse l’adresse choisir la référence, sur le web', () => {
+    // UNE SEULE page publiée, deux publics. Le lien donné sert la version
+    // figée ; le même lien suivi de `?catalogues=main` sert ce qui est en
+    // cours. C'est ainsi qu'on regarde l'Italie sans la montrer à personne.
+    const avant = process.env.EXPO_PUBLIC_ROAM_CATALOGUES;
+    try {
+      process.env.EXPO_PUBLIC_ROAM_CATALOGUES = 'v0.1-france';
+      jest.isolateModules(() => {
+        const module = require('./catalogues');
+        expect(module.referenceServie()).toBe('v0.1-france');
+      });
+      // @ts-expect-error — on simule l'adresse d'un navigateur
+      global.location = { search: '?catalogues=main' };
+      jest.isolateModules(() => {
+        const module = require('./catalogues');
+        expect(module.referenceServie()).toBe('main');
+        expect(module.BASE).toContain('/main/catalogues');
+      });
+    } finally {
+      // @ts-expect-error — nettoyage du faux `location`
+      delete global.location;
+      if (avant === undefined) delete process.env.EXPO_PUBLIC_ROAM_CATALOGUES;
+      else process.env.EXPO_PUBLIC_ROAM_CATALOGUES = avant;
+    }
+  });
+
+  it('refuse une référence que l’adresse aurait fabriquée', () => {
+    // La référence entre dans une URL de `raw.githubusercontent` : une valeur
+    // libre y ferait chercher un catalogue chez n'importe qui.
+    const avant = process.env.EXPO_PUBLIC_ROAM_CATALOGUES;
+    try {
+      process.env.EXPO_PUBLIC_ROAM_CATALOGUES = 'v0.1-france';
+      for (const mauvaise of ['../../autre', 'v1/../../autre', '/main', 'main/',
+                              'https://ailleurs.example', 'a b', '', '.git',
+                              'x'.repeat(65)]) {
+        // @ts-expect-error — on simule l'adresse d'un navigateur
+        global.location = { search: `?catalogues=${encodeURIComponent(mauvaise)}` };
+        jest.isolateModules(() => {
+          expect(require('./catalogues').referenceServie()).toBe('v0.1-france');
+        });
+      }
+    } finally {
+      // @ts-expect-error — nettoyage du faux `location`
+      delete global.location;
+      if (avant === undefined) delete process.env.EXPO_PUBLIC_ROAM_CATALOGUES;
+      else process.env.EXPO_PUBLIC_ROAM_CATALOGUES = avant;
+    }
+  });
+
   it('retombe sur la configuration quand rien n’est inliné', () => {
     // LE point du mécanisme, et le seul qui ne se voie pas : si la lecture
     // échouait, tout retomberait sur `main` sans un mot, et les catalogues
@@ -161,6 +210,44 @@ describe('la référence servie', () => {
       );
       expect(require('./catalogues').referenceServie()).toBe(REFERENCE_PAR_DEFAUT);
     });
+  });
+
+  it("survit au ramenage du chemin à la racine de la page autonome", () => {
+    // La page publiée est UN SEUL fichier, servi sous un chemin quelconque.
+    // Expo Router lisant `location.pathname`, un préambule ramène le chemin à
+    // la racine AVANT que le bundle ne s'exécute. Il effaçait aussi la
+    // question — et `?catalogues=` est lue à l'évaluation de ce module,
+    // c'est-à-dire exactement dans cette fenêtre-là. La porte de service
+    // marchait en test et ne marchait pas sur la page : seul un navigateur l'a
+    // montré, donc on le tient ici.
+    const source = require('fs').readFileSync(
+      require('path').join(__dirname, '../../scripts/inline-web-build.mjs'), 'utf8',
+    );
+    const debut = source.indexOf('var initial = location.href;');
+    const fin = source.indexOf("addEventListener('load'", debut);
+    expect(debut).toBeGreaterThan(0);
+    expect(fin).toBeGreaterThan(debut);
+
+    const faux = {
+      pathname: '/roam/roam-apercu.html',
+      search: '?catalogues=main',
+      hash: '',
+      href: 'https://x.example/roam/roam-apercu.html?catalogues=main',
+    };
+    const history = {
+      replaceState(_etat: unknown, _titre: string, url: string) {
+        const [chemin, question = ''] = url.split('?');
+        faux.pathname = chemin;
+        faux.search = question ? `?${question}` : '';
+      },
+      pushState() {},
+    };
+    // eslint-disable-next-line no-new-func
+    new Function('location', 'history', 'addEventListener', 'console',
+                 source.slice(debut, fin))(faux, history, () => {}, console);
+
+    expect(faux.pathname).toBe('/');
+    expect(faux.search).toBe('?catalogues=main');
   });
 
   it('est déclarée dans app.json', () => {

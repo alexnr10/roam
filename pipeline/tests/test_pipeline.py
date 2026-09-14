@@ -1666,15 +1666,37 @@ class TestOpenStreetMap(unittest.TestCase):
         )
         self.assertEqual([s.name for s in find_candidates([], [maigre, riche])], ["Riche", "Maigre"])
 
-    def test_the_overpass_query_is_bounded_by_the_french_border(self):
+    def test_the_overpass_query_is_bounded_by_the_country_border(self):
         from roam_pipeline.overpass import cell_query
 
+        # L'emprise découpe le travail ; c'est la ZONE qui dit où est le pays,
+        # et elle s'applique à chaque clause — sans quoi le rectangle français
+        # rendrait le zoo de Bâle et la Pinacothèque de Brera.
         query = cell_query((48.0, 2.0, 50.0, 4.0))
-        # L'emprise découpe le travail ; c'est la zone qui dit où est la France.
         self.assertIn('area["ISO3166-1"="FR"]', query)
         for line in query.splitlines():
             if line.strip().startswith("nwr"):
-                self.assertIn("(area.fr)", line)
+                self.assertIn("(area.pays)", line)
+
+    def test_the_border_follows_the_configured_country(self):
+        # Le code ISO vivait en dur : `discover` refusait donc de tourner
+        # ailleurs, et le catalogue italien est resté sans une seule donnée
+        # d'accueil du public.
+        from roam_pipeline.overpass import cell_query
+
+        query = cell_query((44.0, 8.0, 46.0, 10.0), pays="it")
+        self.assertIn('area["ISO3166-1"="IT"]', query)
+        self.assertNotIn("FR", query)
+
+    def test_le_temoin_entoure_le_point_donne(self):
+        # Hors de France, le témoin se dérive du meilleur lieu du catalogue.
+        from roam_pipeline.overpass import temoin_autour
+
+        sud, ouest, nord, est = temoin_autour(41.8902, 12.4922)
+        self.assertLess(sud, 41.8902)
+        self.assertLess(41.8902, nord)
+        self.assertLess(ouest, 12.4922)
+        self.assertLess(12.4922, est)
 
     def test_candidates_outside_france_are_dropped(self):
         from roam_pipeline.discover import keep_in_france
@@ -4827,7 +4849,7 @@ class TestRelabelCannotCreatePlaces(unittest.TestCase):
             with _capture() as sortie:
                 with unittest.mock.patch("roam_pipeline.cli.wd.SparqlClient"), \
                      unittest.mock.patch("roam_pipeline.cli.fetch_label_members",
-                                         side_effect=lambda _c, l, _m, country: membres.get(l.id, set())):
+                                         side_effect=lambda _c, l, _m, country, groupes=None, noms=None: membres.get(l.id, set())):
                     cmd_relabel(args, CONFIG)
             return sortie.getvalue()
 
@@ -6782,7 +6804,7 @@ class TestThemeShareInGeoCollections(unittest.TestCase):
         # court », vérifiée par le test suivant.
         lot = self._lot({"musees": 60, "jardins": 30, "ponts": 30,
                          "cathedrales": 30})
-        retenus = _mix_themes(lot, 80, 0.25)
+        retenus, _voisins = _mix_themes(lot, 80, 0.25)
         self.assertEqual(len(retenus), 80)
         self.assertEqual(Counter(p.theme_id for p in retenus)["musees"], 20)
 
@@ -6790,7 +6812,7 @@ class TestThemeShareInGeoCollections(unittest.TestCase):
         # Le Centre-Val de Loire n'a pas soixante lieux hors châteaux : son
         # plafond monte jusqu'à ce que la collection soit pleine.
         lot = self._lot({"chateaux": 70, "abbayes": 10, "musees": 8})
-        retenus = _mix_themes(lot, 80, 0.25)
+        retenus, _voisins = _mix_themes(lot, 80, 0.25)
         self.assertEqual(len(retenus), 80)
         self.assertGreater(Counter(p.theme_id for p in retenus)["chateaux"], 20)
 
@@ -6798,7 +6820,7 @@ class TestThemeShareInGeoCollections(unittest.TestCase):
         # La Creuse a douze lieux : elle n'a rien à sélectionner. Une part
         # calculée sur les lieux PRÉSENTS la ramenait à huit.
         lot = self._lot({"chateaux": 5, "megalithes": 5, "ponts": 1, "forets": 1})
-        retenus = _mix_themes(lot, 80, 0.25)
+        retenus, _voisins = _mix_themes(lot, 80, 0.25)
         self.assertEqual(len(retenus), 12)
 
     def test_a_mixed_collection_ranks_by_rank_not_by_score(self):
@@ -7765,6 +7787,33 @@ class TestThemeLift(unittest.TestCase):
         # qu'on ne peut plus discuter.
         self.assertIn("gardés par décision", "\n".join(journal.output))
 
+    def test_a_named_crossing_survives_the_diameter_too(self):
+        # « Quoi qu'il arrive » ne valait que pour le rapport : la coupe au
+        # diamètre passait AVANT, et une décision de curateur ne pouvait pas
+        # rattraper un croisement jugé trop resserré.
+        #
+        # Les huit îles de la lagune de Venise tiennent dans quinze kilomètres,
+        # et le diamètre les traitait donc comme les trente et un ponts de
+        # Paris — alors qu'on n'y va qu'en vaporetto et qu'il y faut la
+        # journée. Sur l'eau, le diamètre ne mesure plus l'effort.
+        from roam_pipeline.collections import build_cross_collections
+
+        serre = TestCollectionDiameter._places(10, spread_km=2.0)
+        strict = replace(CONFIG, collections=replace(
+            CONFIG.collections, min_diameter_km=25.0, min_theme_lift=0.0,
+            cross_theme_levels=["departement"], always_cross=[],
+        ))
+        with self.assertLogs("roam_pipeline.collections", level="INFO") as journal:
+            self.assertEqual(build_cross_collections(serre, strict), [])
+        self.assertIn("trop resserrés", "\n".join(journal.output))
+
+        garde = replace(strict, collections=replace(
+            strict.collections, always_cross=["ponts-departement-75"]))
+        with self.assertLogs("roam_pipeline.collections", level="INFO") as journal:
+            built = build_cross_collections(serre, garde)
+        self.assertEqual(len(built), 1)
+        self.assertIn("gardés par décision", "\n".join(journal.output))
+
     def test_the_configured_threshold_spares_the_loire(self):
         # Les châteaux du Centre-Val de Loire valent ×3,0, les mégalithes du
         # Morbihan ×4,8 : le seuil doit passer sous les deux.
@@ -8014,20 +8063,157 @@ class TestSurcoucheDePays(unittest.TestCase):
         self.assertEqual(it.scoring.sitelinks_weight, CONFIG.scoring.sitelinks_weight)
         self.assertEqual(it.tiers.tier1_size, CONFIG.tiers.tier1_size)
 
+    def test_l_italie_n_herite_pas_de_la_derogation_parisienne(self):
+        # `commune_overrides` est un dictionnaire, et un dictionnaire fusionne
+        # clé par clé : sans un `null` explicite, l'Italie portait la
+        # dérogation de Paris. Inerte — aucun code ISTAT ne fait cinq
+        # chiffres — mais annoncée à chaque build, ce qui est une fausse piste.
+        it = load_config(pays="it")
+        self.assertNotIn("75056", it.collections.commune_overrides)
+        self.assertIn("75056", CONFIG.collections.commune_overrides)
+        # Le plafond lui-même reste : c'est la règle générale.
+        self.assertEqual(it.collections.max_per_commune,
+                         CONFIG.collections.max_per_commune)
+
+    def test_une_ville_a_null_est_retiree_et_non_gardee_vide(self):
+        # Une ville gardée avec un dictionnaire vide serait inerte, mais elle
+        # continuerait d'être annoncée dans le journal de chaque construction.
+        vide = fusionner(
+            {"collections": {"commune_overrides": {"75056": {"musees": 10}}}},
+            {"collections": {"commune_overrides": {"75056": None}}},
+        )
+        self.assertEqual(vide["collections"]["commune_overrides"]["75056"], None)
+
+    def test_les_derogations_italiennes_sont_celles_que_derogations_a_mesurees(self):
+        # Chaque ligne coupe à la plus forte chute rendue par `derogations`,
+        # quand cette chute sort du pas courant. Rome : églises 9 (2,3 pour un
+        # pas de 0,5), sites antiques 8 (4,8 / 0,4), monuments 10 (5,4 / 0,6),
+        # musées 10 (9,8 / 1,5). Venise : îles 8 (9,1 / 0,9), églises 10
+        # (3,6 / 0,6), monuments 8 (2,5 / 0,4). Florence : musées 13
+        # (18,2 / 1,6). Milan et Naples n'ont que des plateaux.
+        #
+        # Rome a gagné une septième place monumentale le jour où la place
+        # Saint-Pierre a reçu une commune : le groupe de tête compte un membre
+        # de plus, la chute reste la même (6,2 pour un pas de 2, entre le Largo
+        # di Torre Argentina et le Campo de' Fiori) et passe du sixième rang au
+        # septième. Les églises, elles, ne bougent pas — la mesure refaite avec
+        # la basilique Saint-Pierre et la chapelle Sixtine dans le vivier coupe
+        # toujours après le neuvième.
+        villes = load_config(pays="it").collections.commune_overrides
+        self.assertEqual(villes["058091"], {   # Rome
+            "cathedrales": 9, "megalithes": 8, "monuments": 10, "musees": 10,
+            "piazzas": 7})
+        self.assertEqual(villes["027042"], {   # Venise
+            "cathedrales": 10, "iles": 8, "monuments": 8})
+        self.assertEqual(villes["048017"], {"musees": 13})   # Florence
+        for sans in ("015146", "063049"):     # Milan, Naples
+            self.assertNotIn(sans, villes)
+        # Les huit îles de Venise sont la raison d'être de tout ceci : à six,
+        # la collection « Îles de Venise » disparaissait en entier.
+        self.assertGreater(villes["027042"]["iles"],
+                           load_config(pays="it").collections.max_per_commune)
+
     def test_l_italie_garde_l_unesco_et_perd_les_listes_francaises(self):
         # L'UNESCO est la seule des quinze qui ne soit pas nationale — et elle
         # vaut d'autant plus ici : l'Italie porte le plus grand nombre de biens
-        # inscrits au monde.
+        # inscrits au monde. Les Borghi più belli sont la première liste
+        # NATIONALE italienne résolue ; les parcs nationaux sont la seconde
+        # déclarée, et la première en attente de ses identifiants.
         it = load_config(pays="it")
-        self.assertEqual([lbl.id for lbl in it.labels], ["unesco"])
+        self.assertEqual(
+            sorted(lbl.id for lbl in it.labels),
+            ["borghi-piu-belli", "parchi-nazionali", "unesco"],
+        )
+        # Déclarée ne veut pas dire active : tant que la classe et la propriété
+        # ne sont pas résolues, le label ne collecte rien — et le dit.
+        parcs = next(lbl for lbl in it.labels if lbl.id == "parchi-nazionali")
+        self.assertFalse(parcs.collects)   # il tamponne, il ne crée pas de lieu
+        # À LA MAIN, et c'est une mesure qui l'a décidé. Interrogée chez
+        # Wikidata, la propriété marquait 44 lieux du catalogue — 25 dans deux
+        # parcs, 12 sur des phares — quand Vernazza, Paestum, les Tre Cime et
+        # la Marmolada, qui sont dans des parcs nationaux, ne la portaient pas.
+        self.assertTrue(parcs.is_manual)
+        self.assertTrue(parcs.makes_collection)
+        self.assertEqual(parcs.score_bonus, 20)
 
-    def test_un_theme_qui_ne_peut_rien_collecter_est_retire(self):
-        # `villages` n'a AUCUNE classe Wikidata : il vit entièrement des Plus
-        # Beaux Villages de France. Un thème vide promet une catégorie et rend
-        # une liste blanche.
+    def test_les_borghi_sont_ecrits_comme_les_plus_beaux_villages(self):
+        # L'équivalent exact, et il doit l'être jusque dans la forme de la
+        # requête : c'est l'ASSOCIATION qui est interrogée (`member_of`), pas
+        # une page de liste régionale.
+        borghi = next(
+            lbl for lbl in load_config(pays="it").labels
+            if lbl.id == "borghi-piu-belli"
+        )
+        villages = next(
+            lbl for lbl in CONFIG.labels if lbl.id == "plus-beaux-villages"
+        )
+        self.assertEqual(borghi.query_kind, villages.query_kind)
+        self.assertEqual(borghi.qid, "Q127107")
+        self.assertEqual(borghi.score_bonus, villages.score_bonus)
+        self.assertTrue(borghi.makes_collection)
+        # Extrapolé de la revue française — 352 lieux de listes à jury relus,
+        # zéro écarté. Si la revue italienne écarte, c'est cette ligne qui
+        # saute.
+        self.assertTrue(borghi.garde_d_office)
+
+    def test_les_villages_italiens_vivent_de_la_liste_italienne(self):
+        # Le thème n'a AUCUNE classe Wikidata : il vit entièrement de ses
+        # listes. Les françaises sont retirées ; sans la liste italienne il
+        # promettrait une catégorie et rendrait une liste blanche.
+        villages = load_config(pays="it").theme("villages")
+        self.assertEqual(villages.from_labels, ["borghi-piu-belli"])
+        self.assertEqual(villages.wikidata_classes, [])
+        # Le reste du thème ne bouge pas.
+        self.assertEqual(villages.min_sitelinks, CONFIG.theme("villages").min_sitelinks)
+        self.assertEqual(villages.cap, CONFIG.theme("villages").cap)
+
+    def test_l_italie_garde_les_iles_de_venise_contre_le_diametre(self):
+        # `min_diameter_km` écarte cinq croisements italiens, et quatre le
+        # méritent — les musées de Florence tiennent dans deux kilomètres. Le
+        # cinquième, non : les huit îles de la lagune tiennent dans quinze
+        # kilomètres mais demandent la journée et le vaporetto.
         it = load_config(pays="it")
-        self.assertNotIn("villages", [t.id for t in it.themes])
-        self.assertIn("villages", [t.id for t in CONFIG.themes])
+        self.assertEqual(it.collections.always_cross, ["iles-departement-027"])
+        # La règle elle-même ne bouge pas : c'est une exception, pas un
+        # abaissement du seuil pour tout le monde.
+        self.assertEqual(it.collections.min_diameter_km,
+                         CONFIG.collections.min_diameter_km)
+        # Et la France garde la sienne — une liste sans `id` REMPLACE.
+        self.assertEqual(CONFIG.collections.always_cross, ["plages-region-93"])
+
+    def test_l_italie_ajoute_le_seul_theme_que_la_france_n_a_pas(self):
+        # `place (Q174782)` n'est déclarée par aucun thème du dépôt : en France
+        # une place est un carrefour, en Italie c'est une destination. La
+        # surcouche doit donc pouvoir AJOUTER un thème, pas seulement en
+        # corriger un.
+        it = load_config(pays="it")
+        piazzas = it.theme("piazzas")
+        self.assertEqual(piazzas.wikidata_classes, ["Q174782"])
+        self.assertNotIn("piazzas", [t.id for t in CONFIG.themes])
+        # Calé sur `monuments`, le thème le plus proche par nature : 115 lieux
+        # passent l'affichage, 193 sont collectés (`gaps --pays Q38`).
+        self.assertEqual(piazzas.min_sitelinks, CONFIG.theme("monuments").min_sitelinks)
+        self.assertEqual(piazzas.fetch_min_sitelinks,
+                         CONFIG.theme("monuments").fetch_min_sitelinks)
+        # Une piazza est ouverte, toujours : le bonus d'accueil du public n'y
+        # mesurerait que la présence d'une balise.
+        self.assertFalse(piazzas.gated)
+        # EN DERNIER dans l'ordre : l'ordre est la priorité éditoriale, et une
+        # piazza qui est aussi un site antique — le Forum — reste un site
+        # antique.
+        self.assertEqual([t.id for t in it.themes][-1], "piazzas")
+
+    def test_un_theme_que_la_mesure_ne_porte_pas_est_retire(self):
+        # Mesuré par `gaps --pays Q38` : la classe « forêt » (Q4421) rend deux
+        # lieux italiens au plancher d'affichage du thème (4 langues), et les
+        # trois classes de `cirques` un seul pour tout le pays. Ni la forêt
+        # DOMANIALE — un statut du droit français — ni le label Forêt
+        # d'Exception ne les repêchent.
+        italiens = [t.id for t in load_config(pays="it").themes]
+        francais = [t.id for t in CONFIG.themes]
+        for theme_id in ("forets", "cirques"):
+            self.assertNotIn(theme_id, italiens)
+            self.assertIn(theme_id, francais)
 
     def test_aucun_theme_italien_ne_depend_d_une_liste_retiree(self):
         # La validation le refuserait, et c'est bien ; encore faut-il que le
@@ -8038,17 +8224,1469 @@ class TestSurcoucheDePays(unittest.TestCase):
             for label_id in theme.from_labels:
                 self.assertIn(label_id, connus, f"{theme.id} → {label_id}")
 
-    def test_les_eglises_entrent_et_le_plafond_tombe(self):
-        # Les deux ensemble, ou rien : quatre-vingts places pour cathédrales,
-        # basiliques ET églises dans le pays dont les églises sont le patrimoine
-        # principal serait un contresens.
+    def test_les_eglises_entrent_et_le_plafond_est_pose_apres_mesure(self):
+        # Les quatre-vingts français auraient été un contresens ici. Le plafond
+        # a donc d'abord été RETIRÉ, puis posé après onze revues, sur une
+        # mesure : sans lui, 263 églises pour 11,5 % du catalogue contre 3,8 %
+        # en France ; à 150, 146 pour 6,7 % — deux collections perdues.
         eglises = load_config(pays="it").theme("cathedrales")
-        self.assertIsNone(eglises.catalogue_cap)
+        self.assertEqual(eglises.catalogue_cap, 150)
+        self.assertGreater(eglises.catalogue_cap, CONFIG.theme("cathedrales").catalogue_cap)
         self.assertIn("Q16970", [b.qid for b in eglises.broad_classes])
 
     def test_un_pays_inconnu_le_dit(self):
         with self.assertRaises(SystemExit):
             load_config(pays="xx")
+
+
+class TestEmpriseDuPays(unittest.TestCase):
+    """`discover` hors de France : le rectangle, le témoin et le localisateur."""
+
+    def tearDown(self):
+        geo.utiliser_pays("FR")
+
+    @staticmethod
+    def _args(pays):
+        import argparse
+        from roam_pipeline.cli import BASE_DIR
+        racine = BASE_DIR / "data" / (pays.lower() if pays != "FR" else "")
+        return argparse.Namespace(
+            geo=BASE_DIR / "data" / "reference" / "geo",
+            out=(racine / "out") if pays != "FR" else BASE_DIR / "data" / "out")
+
+    def test_la_france_garde_ses_constantes(self):
+        # Son rectangle est MÉTROPOLITAIN à dessein : le calculer sur les
+        # contours engloberait la Réunion et la Polynésie.
+        from roam_pipeline.cli import _emprise_du_pays, BASE_DIR
+        from roam_pipeline.overpass import FRANCE_BBOX, PROBE_CELL
+        from roam_pipeline.geocode import departements_for
+
+        geo.utiliser_pays("FR")
+        args = self._args("FR")
+        emprise, temoin, situer = _emprise_du_pays(
+            args, CONFIG, BASE_DIR / "data" / "out" / "places_raw.json")
+        self.assertEqual(emprise, FRANCE_BBOX)
+        self.assertEqual(temoin, PROBE_CELL)
+        self.assertIs(situer, departements_for)
+
+    def test_l_italie_calcule_la_sienne_sur_ses_contours(self):
+        from roam_pipeline.cli import _emprise_du_pays, BASE_DIR
+
+        config = load_config(pays="it")
+        geo.utiliser_pays("IT")
+        args = self._args("IT")
+        if not (args.geo / "it" / "commune.geojson").exists():
+            self.skipTest("contours italiens absents — `geo-layers` les télécharge")
+        # La copie de travail n'est pas versionnée : sur un dépôt fraîchement
+        # cloné, c'est `sync` qui la reconstitue.
+        collecte = BASE_DIR / "data" / "it" / "out" / "places_raw.json"
+        if not collecte.exists():
+            self.skipTest("collecte italienne absente — `sync` la reconstitue")
+        emprise, temoin, situer = _emprise_du_pays(args, config, collecte)
+        sud, ouest, nord, est = emprise
+        self.assertTrue(sud < 40 < nord and ouest < 12 < est, emprise)
+        # Le témoin doit entourer un lieu du CATALOGUE : le mieux documenté de
+        # la collecte est « Alpes », dont le point est au mont Blanc, et le
+        # mieux documenté des points italiens est « Calabre », centroïde rond
+        # d'une région où OSM n'a rien de nommé.
+        ts, to, tn, te = temoin
+        self.assertTrue(41 < ts < 42 and 12 < to < 13, temoin)
+        # Et le localisateur garde l'Italie, écarte les voisins.
+        trouve = situer([("rome", 41.8902, 12.4922), ("bale", 47.54, 7.57),
+                         ("mer", 40.0, 5.0)])
+        self.assertIn("rome", trouve)
+        self.assertNotIn("bale", trouve)
+        self.assertNotIn("mer", trouve)
+
+
+class TestLabelDansUneAire(unittest.TestCase):
+    """« Le Vésuve est DANS le parc du Vésuve » ne se dit pas comme les autres.
+
+    Les cinq premiers types de requête pointent l'objet directement : le lieu
+    est membre de l'association, protégé au titre du label. L'objet est alors
+    une entité unique. Un parc national n'est pas ça — le lieu est situé dans
+    quelque chose qui appartient à une CLASSE, et il faut deux sauts.
+
+    L'obstacle était noté dans la configuration française depuis le début, sur
+    le label `parc-national` : « la requête prévue ramènerait les parcs
+    eux-mêmes, pas les lieux qui s'y trouvent ». Ce type de requête est ce qui
+    manquait pour le lever, ici et là-bas.
+    """
+
+    def test_la_requete_fait_les_deux_sauts(self):
+        from roam_pipeline.wikidata import label_members_query
+
+        sparql = label_members_query(
+            "dans_une_aire", "Q999", country="Q38", via_property="P888")
+        self.assertIn("?item wdt:P888 ?aire", sparql)
+        self.assertIn("?aire wdt:P31/wdt:P279* wd:Q999", sparql)
+
+    def test_la_requete_rend_l_aire_avec_le_lieu(self):
+        # Sans elle, la collection ne saurait pas de quel parc vient un lieu,
+        # et prendrait les mieux notés tous parcs confondus.
+        from roam_pipeline.wikidata import label_members_query
+
+        sparql = label_members_query(
+            "dans_une_aire", "Q999", country="Q38", via_property="P888")
+        self.assertIn("SELECT DISTINCT ?item ?aire", sparql)
+
+    def test_sans_propriete_la_requete_refuse_de_partir(self):
+        # Le piège qu'il fallait fermer : une propriété vide ne lève rien dans
+        # SPARQL, elle rend zéro membre en silence.
+        from roam_pipeline.wikidata import label_members_query
+
+        with self.assertRaises(ValueError) as cas:
+            label_members_query("dans_une_aire", "Q999", country="Q38")
+        self.assertIn("suggest-qids --property", str(cas.exception))
+
+    def test_les_autres_types_sont_intacts(self):
+        from roam_pipeline.wikidata import label_members_query
+
+        self.assertIn("wdt:P463 wd:Q1010307",
+                      label_members_query("member_of", "Q1010307", country="Q142"))
+        self.assertIn("wdt:P1435 wd:Q9259",
+                      label_members_query("heritage", "Q9259", country="Q142"))
+
+    def test_la_france_reclame_encore_ses_deux_identifiants(self):
+        """`suggest-qids` doit demander la classe ET la propriété."""
+        from roam_pipeline.cli import _pending_terms
+
+        termes = {(owner, kind) for owner, _t, kind in _pending_terms(load_config())}
+        self.assertIn(("label parc-national", "item"), termes)
+        self.assertIn(("label parc-national (propriété)", "property"), termes)
+
+    def test_l_italie_ne_reclame_rien(self):
+        # Un label manuel n'attend aucun identifiant : sa liste est le fichier.
+        from roam_pipeline.cli import _pending_terms
+
+        config = load_config(pays="it")
+        self.assertFalse([o for o, _t, _k in _pending_terms(config)
+                          if "parchi" in o])
+
+    def test_la_liste_des_parcs_est_lisible_et_fournie(self):
+        from roam_pipeline.cli import BASE_DIR
+        from roam_pipeline.fetch import _read_manual_label
+
+        config = load_config(pays="it")
+        parcs = next(l for l in config.labels if l.id == "parchi-nazionali")
+        dossier = BASE_DIR / "data" / "it" / "manual"
+        if not (dossier / "parchi-nazionali.csv").exists():
+            self.skipTest("liste des parcs absente")
+        membres = _read_manual_label(parcs, dossier)
+        # Une collection en exige huit ; l'amorce en compte seize.
+        self.assertGreaterEqual(len(membres), 8, membres)
+        self.assertTrue(all(q.startswith("Q") and q[1:].isdigit() for q in membres),
+                        membres)
+
+    def test_chaque_parc_donne_son_nom_a_son_lieu_phare(self):
+        """Dans CETTE collection, et nulle part ailleurs.
+
+        Une liste de parcs représentés chacun par un lieu phare doit annoncer
+        le parc : « Grand-Paradis » et non « Jardin botanique alpin Paradisia »,
+        qui ne dit rien de ce qu'on va voir. Ailleurs — sur sa fiche, dans la
+        recherche, dans ses autres collections — le lieu garde son nom, qui est
+        celui qu'on cherche sur place.
+        """
+        from roam_pipeline.cli import BASE_DIR
+        from roam_pipeline.fetch import _read_manual_label
+
+        config = load_config(pays="it")
+        parcs = next(l for l in config.labels if l.id == "parchi-nazionali")
+        dossier = BASE_DIR / "data" / "it" / "manual"
+        if not (dossier / "parchi-nazionali.csv").exists():
+            self.skipTest("liste des parcs absente")
+        noms: dict[str, str] = {}
+        membres = _read_manual_label(parcs, dossier, quiet=True, noms=noms)
+        # Pas un lieu sans son parc : une ligne oubliée laisserait un nom de
+        # lieu isolé au milieu d'une liste de parcs, et c'est précisément ce
+        # qu'on corrige.
+        self.assertEqual(set(noms), membres)
+        self.assertTrue(all(nom.strip() for nom in noms.values()), noms)
+
+    def test_le_nom_de_collection_ne_deborde_pas_sur_les_autres(self):
+        """Le renommage est porté par le LABEL, pas par le lieu."""
+        from roam_pipeline.collections import _finalize
+        from roam_pipeline.models import Collection
+
+        config = load_config(pays="it")
+        lieux = [
+            make_place(f"Lieu {i}", "villages", wikidata_id=f"Q{900 + i}",
+                       score=100 - i)
+            for i in range(10)
+        ]
+        lieux[0].label_noms = {"parchi-nazionali": "Grand-Paradis"}
+
+        parc = _finalize(Collection(slug="label-parchi-nazionali", name="Parcs",
+                                    kind="label", label_id="parchi-nazionali"),
+                         list(lieux), config)
+        theme = _finalize(Collection(slug="theme-villages", name="Villages",
+                                     kind="theme", theme_id="villages"),
+                          list(lieux), config)
+        self.assertIsNotNone(parc)
+        self.assertIsNotNone(theme)
+        renomme = {cp.place_id: cp.name for cp in parc.places}
+        self.assertEqual(renomme["Q900"], "Grand-Paradis")
+        self.assertIsNone(renomme["Q901"])
+        # La même collecte, une autre collection : aucun renommage.
+        self.assertEqual({cp.name for cp in theme.places}, {None})
+
+    def test_un_lieu_par_parc_reste_disponible_pour_la_geometrie(self):
+        """La mécanique Wikidata n'est pas jetée, seulement débranchée."""
+        from roam_pipeline.wikidata import label_members_query
+
+        sparql = label_members_query("dans_une_aire", "Q46169", country="Q38",
+                                     via_property="P3018")
+        self.assertIn("?item wdt:P3018 ?aire", sparql)
+        self.assertIn("?aire wdt:P31/wdt:P279* wd:Q46169", sparql)
+        # La classe est le PARC, pas l'aire protégée : Q473972 ramènerait les
+        # réserves régionales et les oasis.
+        self.assertNotIn("Q473972", sparql)
+
+    def test_un_label_en_attente_ne_collecte_rien_et_le_dit(self):
+        from roam_pipeline.fetch import fetch_label_members
+        from pathlib import Path
+
+        import dataclasses
+        from roam_pipeline.config import Label
+
+        label = Label(
+            id="parchi-nazionali", name="Parcs", authority="", score_bonus=20,
+            makes_collection=True, query_kind="dans_une_aire",
+            qid="Q46169", via_property="P3018",
+        )
+        # Un client qui explose : la garde doit sortir AVANT toute requête.
+        class _Jamais:
+            def query(self, _sparql):
+                raise AssertionError("aucune requête ne doit partir")
+
+        # Sans la classe : la première garde.
+        sans_classe = dataclasses.replace(label, qid=None, search="parc")
+        with self.assertLogs("roam_pipeline.fetch", level="WARNING") as journal:
+            membres = fetch_label_members(
+                _Jamais(), sans_classe, Path("data/it/manual"), country="Q38")
+        self.assertEqual(membres, set())
+        self.assertTrue(any("identifiant non résolu" in m for m in journal.output))
+
+        # La classe résolue, la propriété seule manquante : la seconde. C'est
+        # la garde qui compte — une propriété vide ne lève rien dans SPARQL,
+        # elle rend zéro membre en silence.
+        sans_propriete = dataclasses.replace(label, via_property=None)
+        self.assertTrue(sans_propriete.attend_une_propriete)
+        with self.assertLogs("roam_pipeline.fetch", level="WARNING") as journal:
+            membres = fetch_label_members(
+                _Jamais(), sans_propriete, Path("data/it/manual"), country="Q38")
+        self.assertEqual(membres, set())
+        self.assertTrue(any("propriété de situation" in m for m in journal.output))
+
+
+class TestRevueNeRemontePas(unittest.TestCase):
+    """Décider ne doit pas renvoyer en haut de la page de revue.
+
+    `render()` reconstruisait toute la grille à chaque clic. C'est juste quand
+    un filtre change ; c'est un saut au début de la liste à chaque décision
+    quand on relit trois cents sosies — on décide, on remonte, on redescend
+    chercher où l'on en était.
+
+    Vérifié dans un navigateur sur la vraie page italienne : filtre « Sosies »
+    et filtre « À décider », 0 pixel d'écart ; changement de filtre, retour en
+    haut comme attendu.
+    """
+
+    def _page(self):
+        from roam_pipeline.cli import BASE_DIR
+        chemin = BASE_DIR / "data" / "it" / "out" / "review.html"
+        if not chemin.exists():
+            chemin = BASE_DIR / "data" / "out" / "review.html"
+        if not chemin.exists():
+            self.skipTest("page de revue absente — `build` la produit")
+        return chemin.read_text(encoding="utf-8")
+
+    def test_la_carte_porte_son_identifiant(self):
+        """Sans lui, on ne saurait pas laquelle remplacer."""
+        self.assertIn("el.dataset.id = p.id", self._page())
+
+    def test_une_decision_ne_rappelle_pas_render(self):
+        page = self._page()
+        # Les deux points de décision — les boutons et le sélecteur de thème —
+        # passent par le rafraîchissement ciblé.
+        self.assertIn("rafraichir(p)", page)
+        self.assertIn("ancienne.replaceWith(card(p))", page)
+
+    def test_le_defilement_est_rendu_apres_reconstruction(self):
+        page = self._page()
+        self.assertIn("const y = window.scrollY", page)
+        self.assertIn("garderPosition ? Math.min(y, document.body.scrollHeight) : 0",
+                      page)
+
+    def test_un_changement_de_filtre_remonte_bien(self):
+        # L'inverse compte autant : une autre liste s'affiche, on veut son début.
+        self.assertIn("onchange = () => render(false)", self._page())
+
+
+class TestPorteeDesSosiesParTheme(unittest.TestCase):
+    """« Le cap qui donne sur une plage également collectée. »
+
+    Ce n'est pas un doublon — chacun mérite sa fiche — mais les voir se suivre
+    dans un palmarès donne l'impression d'un remplissage. Le signalement des
+    sosies s'arrêtait à trois cents mètres et exigeait un nom partagé à
+    l'intérieur d'un thème : le cap Croisette et la calanque de Callelongue, à
+    1 357 m et sans un mot commun, passaient au travers.
+
+    Une portée UNIQUE ne pouvait pas régler le cas. Mesuré à deux kilomètres
+    dans un même thème : le littoral français rend douze paires, les monuments
+    soixante-dix et les musées soixante-cinq — le Louvre et Orsay sont à 692 m,
+    le palais Pitti et les Offices à 551 m, et ce sont deux visites. La portée
+    est donc par thème.
+    """
+
+    @staticmethod
+    def _cote(nom, theme, lat, lon):
+        p = make_place(nom, theme=theme, wikidata_id=f"Q{abs(hash(nom)) % 99999}")
+        p.lat, p.lon, p.commune_name = lat, lon, "Ailleurs"
+        return p
+
+    def _config(self, rayon):
+        import dataclasses
+        config = load_config()
+        return dataclasses.replace(config, themes=tuple(
+            dataclasses.replace(t, twin_radius_m=rayon if t.id == "plages" else 0.0)
+            for t in config.themes))
+
+    def test_le_cap_et_la_plage_sont_signales(self):
+        from roam_pipeline.collections import twins
+
+        # 1,1 km l'un de l'autre, aucun mot commun, même thème.
+        cap = self._cote("Cap la Houssaye", "plages", 43.2000, 5.4000)
+        plage = self._cote("Plage de Boucan Canot", "plages", 43.2100, 5.4000)
+        self.assertEqual(twins([cap, plage], self._config(0)), {})
+        signale = twins([cap, plage], self._config(2000))
+        self.assertEqual(len(signale), 2)
+        _autre, distance, motif = signale[cap.wikidata_id][0]
+        self.assertIn("même thème", motif)
+        self.assertGreater(distance, 1000)
+
+    def test_les_musees_voisins_ne_le_sont_pas(self):
+        """Le Louvre et Orsay sont à 692 m et restent deux visites."""
+        from roam_pipeline.collections import twins
+
+        louvre = self._cote("Musée du Louvre", "musees", 48.8606, 2.3376)
+        orsay = self._cote("Musée d'Orsay", "musees", 48.8600, 2.3266)
+        self.assertEqual(twins([louvre, orsay], self._config(2000)), {})
+
+    def test_la_portee_large_ne_supprime_rien(self):
+        # Le signalement alimente la REVUE, pas la construction : les calanques
+        # de Sugiton et Morgiou seront signalées et resteront deux calanques si
+        # le curateur le dit.
+        from roam_pipeline.collections import twins
+
+        a = self._cote("Calanque de Sugiton", "plages", 43.2100, 5.4500)
+        b = self._cote("Calanque de Morgiou", "plages", 43.2150, 5.4500)
+        signale = twins([a, b], self._config(2000))
+        self.assertEqual(len(signale), 2)          # signalés…
+        self.assertEqual(len([a, b]), 2)           # …et toujours là
+
+    def test_le_defaut_ne_change_rien(self):
+        from roam_pipeline.collections import twins, NAMED_TWIN_DISTANCE_M
+
+        config = load_config()
+        self.assertTrue(all(t.twin_radius_m in (0.0, 2000.0) for t in config.themes))
+        # Sans configuration du tout, la portée d'origine s'applique.
+        loin = self._cote("Plage A", "plages", 43.2000, 5.4000)
+        pres = self._cote("Plage B", "plages", 43.2100, 5.4000)
+        self.assertEqual(twins([loin, pres]), {})
+        self.assertEqual(NAMED_TWIN_DISTANCE_M, 300.0)
+
+
+class TestVocabulaireDeNamesMatch(unittest.TestCase):
+    """`names_match` ne connaissait qu'un vocabulaire français et incomplet.
+
+    Le rapprochement écarte deux lieux quand leurs NATURES diffèrent, et les
+    rapproche quand ils partagent une partie distinctive. Encore faut-il savoir
+    ce qui est une nature : « palazzo », « palais », « couvent », « calanque »
+    n'étaient pas dans la table, et comptaient donc comme des noms propres.
+
+    Mesuré sur les deux catalogues, à moins de 350 m l'un de l'autre — la
+    distance où le rapprochement décide :
+
+        France   525 paires de lieux DISTINCTS confondues → 314
+        Italie  3 799                                     → 552
+
+    `palazzo` à lui seul faisait 1 288 paires, `palais` 845, `temple` 330.
+    Ce n'est pas cosmétique : `apply_visit_info` s'en sert pour donner à un lieu
+    les horaires d'un objet OpenStreetMap, et `find_candidates` pour décider
+    qu'un site est DÉJÀ au catalogue.
+    """
+
+    def test_deux_calanques_voisines_ne_sont_pas_la_meme(self):
+        from roam_pipeline.discover import names_match
+
+        self.assertFalse(names_match("Calanque de Sugiton", "Calanque de Morgiou"))
+        self.assertFalse(names_match("Calanque de Port-Miou", "Calanque d'En-Vau"))
+        self.assertFalse(names_match("Cala Violina", "Cala Civette"))
+
+    def test_la_plage_et_la_pointe_qui_la_nomme_le_sont(self):
+        from roam_pipeline.discover import names_match
+
+        self.assertTrue(names_match("Spiaggia di Punta Molentis", "Punta Molentis"))
+        self.assertTrue(names_match("Plage de Punta Penna",
+                                    "Promontorio di Punta Penna"))
+
+    def test_deux_palais_voisins_ne_sont_pas_le_meme(self):
+        from roam_pipeline.discover import names_match
+
+        self.assertFalse(names_match("Palais Davia Bargellini", "Palais Fantuzzi"))
+        self.assertFalse(names_match("Palazzo Isolani", "Palazzo degli Strazzaroli"))
+        self.assertFalse(names_match("Couvent des Cordelières",
+                                     "Couvent des Anglaises"))
+
+    def test_deux_eglises_mariales_voisines_non_plus(self):
+        # « santa » et « maria » sont les « saint » et « dame » de l'italien :
+        # ils nomment le patron, pas le lieu.
+        from roam_pipeline.discover import names_match
+
+        self.assertFalse(names_match("Chiesa di Santa Maria del Carmine",
+                                     "Chiesa di Santa Maria Maddalena"))
+
+    def test_le_pluriel_ne_separe_pas_un_lieu_de_lui_meme(self):
+        """La régression que la table a failli introduire.
+
+        Mettre « plage » ET « plages » parmi les types faisait répondre « deux
+        natures différentes » aux « Plages du Prado » et à la « Plage du
+        Prado ». Les types se comparent donc au singulier.
+        """
+        from roam_pipeline.discover import names_match
+
+        self.assertTrue(names_match("Plages du Prado", "Plage du Prado"))
+        self.assertTrue(names_match("Spiagge di Rena Bianca",
+                                    "Spiaggia di Rena Bianca"))
+
+    def test_les_cas_documentes_tiennent_toujours(self):
+        from roam_pipeline.discover import names_match
+
+        # « mont » reste hors des types, à dessein.
+        self.assertTrue(names_match("abbaye du Mont-Saint-Michel",
+                                    "Mont-Saint-Michel"))
+        self.assertFalse(names_match("château de la Roche", "moulin de la Roche"))
+
+    def test_le_littoral_ne_confond_plus_rien(self):
+        """Le contrôle sur les vraies données, qui est l'objet de tout ceci."""
+        import json
+        from roam_pipeline.cli import BASE_DIR
+        from roam_pipeline.collections import haversine_m
+        from roam_pipeline.discover import names_match
+
+        chemin = BASE_DIR / "data" / "out" / "places.json"
+        if not chemin.exists():
+            self.skipTest("catalogue français absent")
+        charge = json.loads(chemin.read_text(encoding="utf-8"))
+        lot = [x for x in (charge["places"] if isinstance(charge, dict) else charge)
+               if x["theme_id"] == "plages"]
+        confondues = [
+            (a["name"], b["name"])
+            for i, a in enumerate(lot) for b in lot[i + 1:]
+            if haversine_m(a["lat"], a["lon"], b["lat"], b["lon"]) <= 3000
+            and names_match(a["name"], b["name"])
+        ]
+        # Les calanques de Marseille se voisinent à 550 m et ne doivent PAS
+        # se confondre : ce sont deux calanques, pas un doublon.
+        self.assertEqual(confondues, [], confondues)
+
+
+class TestListeAmputee(unittest.TestCase):
+    """Une liste manuelle qui réclame un lieu que le catalogue n'a plus.
+
+    Sur « Parcs nationaux d'Italie », chaque ligne est LE lieu phare d'un parc :
+    l'écarter en revue emporte le parc entier hors de la collection, et rien ne
+    le disait. L'avertissement de `relabel` ne couvre que les listes qui
+    ALIMENTENT un thème ; une liste qui se contente de tamponner n'en alimente
+    aucun, et passait donc entre les mailles.
+    """
+
+    @staticmethod
+    def _liste(tmp, qids):
+        dossier = Path(tmp)
+        (dossier / "parchi-nazionali.csv").write_text(
+            "wikidata_id,name\n" + "".join(f"{q},lieu {q}\n" for q in qids),
+            encoding="utf-8")
+        return dossier
+
+    def test_un_membre_ecarte_est_annonce(self):
+        from roam_pipeline.cli import _alerter_listes_amputees
+
+        config = load_config(pays="it")
+        garde = make_place("Vésuve", theme="volcans", wikidata_id="Q524")
+        with tempfile.TemporaryDirectory() as tmp:
+            dossier = self._liste(tmp, ["Q524", "Q999", "Q1000"])
+            with self.assertLogs("roam", level="WARNING") as journal:
+                _alerter_listes_amputees(config, dossier, [garde])
+        texte = "\n".join(journal.output)
+        self.assertIn("parchi-nazionali", texte)
+        self.assertIn("2 membre(s)", texte)
+        self.assertIn("Q999", texte)
+        self.assertNotIn("Q524", texte)     # celui-là est bien là
+
+    def test_une_liste_entiere_ne_dit_rien(self):
+        from roam_pipeline.cli import _alerter_listes_amputees
+
+        config = load_config(pays="it")
+        lieux = [make_place("Vésuve", theme="volcans", wikidata_id="Q524")]
+        with tempfile.TemporaryDirectory() as tmp:
+            dossier = self._liste(tmp, ["Q524"])
+            with self.assertNoLogs("roam", level="WARNING"):
+                _alerter_listes_amputees(config, dossier, lieux)
+
+    def test_la_liste_italienne_reelle_est_entiere(self):
+        """Le contrôle sur les vraies données : 26 parcs, 26 représentants."""
+        import csv, json
+        from roam_pipeline.cli import BASE_DIR
+
+        liste = BASE_DIR / "data" / "it" / "manual" / "parchi-nazionali.csv"
+        bati = BASE_DIR / "data" / "it" / "out" / "places.json"
+        if not (liste.exists() and bati.exists()):
+            self.skipTest("catalogue italien absent")
+        inscrits = {r["wikidata_id"] for r in csv.DictReader(
+            [l.rstrip() for l in liste.read_text(encoding="utf-8").splitlines()
+             if l.strip() and not l.lstrip().startswith("#")])}
+        charge = json.loads(bati.read_text(encoding="utf-8"))
+        presents = {x["wikidata_id"] for x in
+                    (charge["places"] if isinstance(charge, dict) else charge)}
+        self.assertEqual(inscrits - presents, set())
+
+
+class TestLabelsApresCollectePartielle(unittest.TestCase):
+    """`fetch --only X` laissait les autres thèmes avec les labels de la veille.
+
+    `apply_labels` ne touche que les lieux de la collecte du jour, et une
+    reprise partielle ne réécrit que les fichiers des thèmes demandés. Les
+    autres gardaient donc leurs labels périmés, sans un mot.
+
+    Mesuré sur l'Italie après un `fetch --only villages` : la liste des parcs
+    nationaux comptait vingt-six lignes, le catalogue vingt et un porteurs —
+    six labels que le fichier ne demandait plus, onze jamais posés. La
+    collection affichait un mélange des deux versions de la liste.
+    """
+
+    def _collecte(self, tmp, labels_par_lieu):
+        from roam_pipeline.raw import write_raw
+
+        racine = Path(tmp)
+        (racine / "raw").mkdir(parents=True, exist_ok=True)
+        lieux = []
+        for qid, theme, labels in labels_par_lieu:
+            p = make_place(qid, theme=theme, wikidata_id=qid, sitelinks=30)
+            p.labels = list(labels)
+            lieux.append(p)
+        write_raw(racine / "raw", lieux, {p.theme_id for p in lieux})
+        return racine
+
+    def test_un_theme_non_recollecte_perd_ses_labels_perimes(self):
+        from roam_pipeline.fetch import apply_labels
+        from roam_pipeline.raw import read_shard, write_raw
+
+        with tempfile.TemporaryDirectory() as tmp:
+            racine = self._collecte(tmp, [
+                ("Q1", "chateaux", ["parcs"]),      # label devenu faux
+                ("Q2", "sommets", []),              # label à poser
+            ])
+            membres = {"parcs": {"Q2"}}
+            # Ce que fait désormais la fin de `run_fetch` sur les thèmes
+            # qu'elle n'a pas recollectés.
+            retouches, relabelles = set(), []
+            for shard in ("chateaux", "sommets"):
+                lot = read_shard(racine / "raw", shard)
+                avant = [sorted(p.labels or ()) for p in lot]
+                apply_labels(lot, membres, {})
+                if any(sorted(p.labels or ()) != v for p, v in zip(lot, avant)):
+                    retouches.add(shard)
+                relabelles.extend(lot)
+            self.assertEqual(retouches, {"chateaux", "sommets"})
+            write_raw(racine / "raw", relabelles, retouches)
+
+            apres = {p.wikidata_id: p.labels
+                     for s in ("chateaux", "sommets")
+                     for p in read_shard(racine / "raw", s)}
+        self.assertEqual(apres["Q1"], [])            # le périmé est parti
+        self.assertEqual(apres["Q2"], ["parcs"])     # le manquant est posé
+
+    def test_un_theme_dont_rien_ne_change_n_est_pas_reecrit(self):
+        # La protection de `write_raw` tient : une reprise partielle qui ne
+        # bouge aucun label ne doit toucher aucun fichier de plus.
+        from roam_pipeline.fetch import apply_labels
+        from roam_pipeline.raw import read_shard
+
+        with tempfile.TemporaryDirectory() as tmp:
+            racine = self._collecte(tmp, [("Q1", "chateaux", ["parcs"])])
+            lot = read_shard(racine / "raw", "chateaux")
+            avant = [sorted(p.labels or ()) for p in lot]
+            apply_labels(lot, {"parcs": {"Q1"}}, {})
+            self.assertEqual([sorted(p.labels or ()) for p in lot], avant)
+
+
+class TestListeSansEnTete(unittest.TestCase):
+    """Un CSV sans en-tête se lit en silence et ne rend rien.
+
+    `places.csv` italien portait trois sommets des Dolomites épinglés à la
+    main. La collecte annonçait « ajouts manuels : 0 lieux épinglés » à chaque
+    fois, sans qu'une ligne dise pourquoi : `DictReader` prenait la première
+    donnée pour les noms de colonnes, et « wikidata_id » n'existait plus.
+
+    C'est `pin` qui créait le fichier ainsi — il ajoute sa ligne en mode
+    ajout, et sur un fichier absent la première ligne écrite est une donnée.
+    En France le fichier avait été écrit à la main, avec son en-tête : le
+    défaut n'a pu se voir qu'au deuxième pays.
+    """
+
+    def test_le_fichier_sans_en_tete_est_refuse_bruyamment(self):
+        from roam_pipeline.fetch import read_csv_rows
+
+        with tempfile.TemporaryDirectory() as tmp:
+            chemin = Path(tmp) / "places.csv"
+            chemin.write_text("Q1257207,sommets,épinglé\nQ203241,sommets,\n",
+                              encoding="utf-8")
+            with self.assertLogs("roam_pipeline.fetch", level="ERROR") as journal:
+                self.assertEqual(read_csv_rows(chemin), [])
+            self.assertTrue(any("première ligne est une DONNÉE" in m
+                                for m in journal.output))
+
+    def test_le_fichier_avec_en_tete_se_lit(self):
+        from roam_pipeline.fetch import read_csv_rows
+
+        with tempfile.TemporaryDirectory() as tmp:
+            chemin = Path(tmp) / "places.csv"
+            chemin.write_text("wikidata_id,theme_id,note\nQ1257207,sommets,x\n",
+                              encoding="utf-8")
+            lignes = read_csv_rows(chemin)
+        self.assertEqual(lignes, [{"wikidata_id": "Q1257207",
+                                   "theme_id": "sommets", "note": "x"}])
+
+    def test_les_commentaires_restent_ignores(self):
+        from roam_pipeline.fetch import read_csv_rows
+
+        with tempfile.TemporaryDirectory() as tmp:
+            chemin = Path(tmp) / "places.csv"
+            chemin.write_text("# une explication\n\nwikidata_id,theme_id\nQ1,sommets\n",
+                              encoding="utf-8")
+            self.assertEqual(read_csv_rows(chemin),
+                             [{"wikidata_id": "Q1", "theme_id": "sommets"}])
+
+    def test_la_liste_italienne_porte_son_en_tete(self):
+        from roam_pipeline.cli import BASE_DIR
+        from roam_pipeline.fetch import read_place_list
+
+        chemin = BASE_DIR / "data" / "it" / "manual" / "places.csv"
+        if not chemin.exists():
+            self.skipTest("liste italienne absente")
+        epingles = read_place_list(load_config(pays="it"), chemin)
+        # Les trois sommets des Dolomites — Tre Cime, Marmolada, Lagazuoi — et
+        # Cicogna, hameau d'accès du Val Grande, qu'aucune classe collectée ne
+        # reconnaît : une frazione n'est pas une classe de Roam.
+        self.assertGreaterEqual(len(epingles), 3, epingles)
+        self.assertEqual(set(epingles.values()), {"sommets", "villages"})
+
+
+class TestLangueDesLibelles(unittest.TestCase):
+    """Wikidata rend le Q-id lui-même quand il n'a pas la langue demandée.
+
+    Avec « fr,en », 128 entités italiennes sont revenues nommées
+    « Q100293619 » et la collecte les a jetées comme « sans libellé
+    exploitable » — l'Aquarium de Naples, l'Antiquarium d'Herculanum, le jardin
+    botanique alpin Bruno-Peyronel. Elles ont un nom : il est en italien.
+    """
+
+    def tearDown(self):
+        from roam_pipeline import wikidata as wd
+        wd.utiliser_langues("fr,en")
+
+    def test_la_france_demande_le_francais_et_l_anglais(self):
+        self.assertEqual(load_config().country.langues, "fr,en")
+
+    def test_l_italie_glisse_l_italien_entre_les_deux(self):
+        # Le français DEVANT — le catalogue est français — et l'anglais
+        # DERRIÈRE l'italien : « Acquario di Napoli » vaut mieux que
+        # « Aquarium of Naples » pour un lieu qu'on visite à Naples.
+        self.assertEqual(load_config(pays="it").country.langues, "fr,it,en")
+
+    def test_toutes_les_requetes_suivent(self):
+        from roam_pipeline import wikidata as wd
+
+        wd.utiliser_langues("fr,it,en")
+        requetes = [
+            wd.items_query(["Q1"]),
+            wd.theme_query(["Q1"], 4, country="Q38"),
+            wd.entity_flags_query(["Q1"]),
+        ]
+        for sparql in requetes:
+            if "wikibase:label" in sparql:
+                self.assertIn('wikibase:language "fr,it,en"', sparql)
+        # Au moins une en porte, sans quoi le test ne prouverait rien.
+        self.assertTrue(any("wikibase:label" in q for q in requetes))
+
+
+class TestUnLieuParParc(unittest.TestCase):
+    """« Un lieu par parc, et le lieu phare. »
+
+    Les autres labels sont des listes de LIEUX : les Plus Beaux Villages
+    désignent Rocamadour, et la collection les prend tous. « Parcs nationaux
+    d'Italie » désigne des PARCS, et ce qu'on en veut est le meilleur lieu de
+    chacun. Sans cette règle, la collection prendrait les mieux notés tous
+    parcs confondus — huit lieux des Cinque Terre et rien du Grand-Paradis.
+    """
+
+    @staticmethod
+    def _lot(triplets):
+        lieux = []
+        for nom, parc, score in triplets:
+            p = make_place(nom, theme="sommets", wikidata_id=f"Q{len(lieux)}",
+                           score=score)
+            p.labels = ["parchi-nazionali"]
+            if parc:
+                p.label_groupes = {"parchi-nazionali": parc}
+            lieux.append(p)
+        return lieux
+
+    def test_le_meilleur_de_chaque_parc_et_lui_seul(self):
+        from roam_pipeline.collections import _un_par_aire
+
+        membres = self._lot([
+            ("Vernazza", "Q_cinque", 95), ("Riomaggiore", "Q_cinque", 92),
+            ("Monterosso", "Q_cinque", 88), ("Manarola", "Q_cinque", 84),
+            ("Grand-Paradis", "Q_paradis", 70), ("Cogne", "Q_paradis", 61),
+            ("Vésuve", "Q_vesuve", 80),
+        ])
+        retenus, cap = _un_par_aire("parchi-nazionali", membres, len(membres))
+        self.assertEqual([p.name for p in retenus],
+                         ["Vernazza", "Vésuve", "Grand-Paradis"])
+        self.assertEqual(cap, 3)
+
+    def test_un_membre_sans_aire_garde_sa_place(self):
+        # Rattaché à la main, ou porté par une liste sans géométrie : il forme
+        # son propre groupe plutôt que de disparaître.
+        from roam_pipeline.collections import _un_par_aire
+
+        membres = self._lot([("Vernazza", "Q_cinque", 95),
+                             ("Riomaggiore", "Q_cinque", 92),
+                             ("Orphelin", None, 50)])
+        retenus, _cap = _un_par_aire("parchi-nazionali", membres, len(membres))
+        self.assertEqual(sorted(p.name for p in retenus), ["Orphelin", "Vernazza"])
+
+    def test_la_regle_ne_tue_pas_la_collection(self):
+        # Deux parcs seulement, un plancher à huit : plutôt qu'une collection
+        # de deux qui n'existerait pas, on complète avec les meilleurs écartés.
+        from roam_pipeline.collections import _un_par_aire
+
+        membres = self._lot([(f"L{i}", "Q_a" if i % 2 else "Q_b", 100 - i)
+                             for i in range(12)])
+        retenus, cap = _un_par_aire("parchi-nazionali", membres, 12, plancher=8)
+        self.assertEqual(len(retenus), 8)
+        self.assertEqual(cap, 8)
+        # Les deux premiers restent les mieux notés de chaque parc.
+        self.assertEqual([p.name for p in retenus[:2]], ["L0", "L1"])
+
+    def test_un_label_sans_aire_n_est_pas_touche(self):
+        # Les Plus Beaux Villages restent une liste de lieux : on les prend
+        # tous, et la règle ne doit pas s'y appliquer par mégarde.
+        from roam_pipeline.collections import _un_par_aire
+
+        membres = self._lot([("Gordes", None, 90), ("Eze", None, 85),
+                             ("Camon", None, 70)])
+        retenus, cap = _un_par_aire("plus-beaux-villages", membres, 3)
+        self.assertEqual(len(retenus), 3)
+        self.assertEqual(cap, 3)
+
+    def test_le_rattachement_survit_a_l_ecriture(self):
+        from roam_pipeline.models import Place
+
+        p = make_place("Vésuve", theme="volcans", wikidata_id="Q1")
+        p.labels = ["parchi-nazionali"]
+        p.label_groupes = {"parchi-nazionali": "Q635414"}
+        relu = Place.from_dict(p.to_dict())
+        self.assertEqual(relu.label_groupes, {"parchi-nazionali": "Q635414"})
+
+    def test_apply_labels_reporte_l_aire(self):
+        from roam_pipeline.fetch import apply_labels
+
+        p = make_place("Vésuve", theme="volcans", wikidata_id="Q1")
+        autre = make_place("Ailleurs", theme="volcans", wikidata_id="Q2")
+        apply_labels([p, autre], {"parchi-nazionali": {"Q1"}},
+                     {"parchi-nazionali": {"Q1": "Q635414", "Q2": "Q999"}})
+        self.assertEqual(p.label_groupes, {"parchi-nazionali": "Q635414"})
+        # Q2 n'a pas le label : il n'hérite pas de l'aire non plus.
+        self.assertEqual(autre.label_groupes, {})
+
+
+class TestCommuneAuLarge(unittest.TestCase):
+    """Un contour communal s'arrête au trait de côte.
+
+    Cherchée par le seul point-dans-polygone, la passe communale laissait 68
+    lieux italiens sans commune contre 4 en France — et la liste disait tout :
+    le Bigo de Gênes, le Castel dell'Ovo sur son îlot, Miramare et Duino en
+    falaise, les pylônes du détroit de Messine. Des points tombés de quelques
+    centaines de mètres au large de leur propre ville, qui échappaient donc au
+    plafond par commune et à la maille la plus fine de la carte de conquête.
+
+    Mesuré sur les soixante-huit, avec la couche communale italienne : tous
+    rattachés, 59 au premier palier de cinq cents mètres, et les réponses sont
+    les bonnes — Castel dell'Ovo à Naples, le Bigo à Gênes, Miramare à Trieste.
+    Les 29 lieux de la collecte brute qui restent sans commune sont ceux qui
+    n'en ont pas : volcans sous-marins, épaves, et massifs dont le centroïde
+    tombe en Autriche ou en Slovénie.
+    """
+
+    def setUp(self):
+        # Les codes de département se normalisent selon le pays courant : « 012 »
+        # lu comme français rend « 15 ».
+        geo.utiliser_pays("IT")
+
+    def tearDown(self):
+        geo.utiliser_pays("FR")
+
+    @staticmethod
+    def _couche():
+        from roam_pipeline.localisation import Localisateur, Zone
+
+        # Un carré d'un centième de degré — environ 1,1 km de côté.
+        carre = [[(12.00, 45.00), (12.01, 45.00), (12.01, 45.01),
+                  (12.00, 45.01), (12.00, 45.00)]]
+        return Localisateur([Zone(code="012345", name="Portoville", level="commune",
+                                  parent_code="012", bbox=(12.00, 45.00, 12.01, 45.01),
+                                  polygones=[carre])])
+
+    def test_un_lieu_au_large_recoit_sa_commune(self):
+        from roam_pipeline.fetch import _communes_par_contour
+
+        # 300 m à l'est du contour : un château sur son rocher.
+        lieu = make_place("Q1", theme="chateaux")
+        lieu.lat, lieu.lon, lieu.commune_code = 45.005, 12.014, None
+        self.assertEqual(_communes_par_contour([lieu], self._couche()), 1)
+        self.assertEqual(lieu.commune_code, "012345")
+        self.assertEqual(lieu.commune_name, "Portoville")
+        self.assertEqual(lieu.departement_code, "012")
+
+    def test_le_large_lointain_ne_recoit_rien(self):
+        # Un volcan sous-marin à cinquante kilomètres n'a pas de commune, et
+        # lui en inventer une serait pire que de le laisser sans.
+        from roam_pipeline.fetch import _communes_par_contour
+
+        lieu = make_place("Q2", theme="volcans")
+        lieu.lat, lieu.lon, lieu.commune_code = 45.005, 12.60, None
+        self.assertEqual(_communes_par_contour([lieu], self._couche()), 0)
+        self.assertIsNone(lieu.commune_code)
+
+    def test_une_commune_deja_connue_n_est_pas_touchee(self):
+        from roam_pipeline.fetch import _communes_par_contour
+
+        lieu = make_place("Q3", theme="musees")
+        lieu.lat, lieu.lon = 45.005, 12.014
+        lieu.commune_code, lieu.commune_name = "099999", "Ailleurs"
+        self.assertEqual(_communes_par_contour([lieu], self._couche()), 0)
+        self.assertEqual(lieu.commune_code, "099999")
+
+
+class TestPorteDesReservesNaturelles(unittest.TestCase):
+    """Un parc national n'est pas une plage.
+
+    `leisure=nature_reserve` était rangé dans « Littoral et plages ». Mesuré
+    sur les deux catalogues : la porte rapporte 3 candidats en France pour ZÉRO
+    lieu retenu, et 630 en Italie — 42 % de la feuille — dont 89 entrés au
+    catalogue, tous des aires protégées. Le parc national du Vésuve entrait en
+    plage quand le volcan a déjà son thème.
+    """
+
+    def test_une_reserve_naturelle_n_est_plus_une_plage(self):
+        from roam_pipeline.discover import guess_theme
+
+        self.assertIsNone(guess_theme({"leisure": "nature_reserve"}))
+
+    def test_les_autres_portes_tiennent(self):
+        from roam_pipeline.discover import guess_theme
+
+        self.assertEqual(guess_theme({"leisure": "garden"}), "jardins")
+        self.assertEqual(guess_theme({"tourism": "museum"}), "musees")
+        self.assertEqual(guess_theme({"historic": "castle"}), "chateaux")
+
+    def test_overpass_ne_demande_plus_les_reserves(self):
+        # Fermer la porte doit aussi cesser de RAPPORTER les objets qu'elle
+        # laissait entrer, sans quoi on paierait six cents réponses pour les
+        # jeter juste après.
+        from roam_pipeline.discover import tag_filters_for
+        from roam_pipeline.overpass import TAG_FILTERS
+
+        self.assertEqual(tag_filters_for({"plages"}), [])
+        self.assertFalse([f for f in TAG_FILTERS if "nature_reserve" in f])
+
+    def test_les_deux_tables_ne_divergent_pas(self):
+        """Ce qu'on demande à Overpass et ce qu'on sait nommer, à l'identique.
+
+        Les deux listes sont écrites à la main dans deux fichiers. Une porte
+        fermée d'un seul côté coûte soit des réponses payées pour rien —
+        `find_candidates` les jetterait à l'étape « thème reconnu » —, soit un
+        thème qui ne reçoit plus rien sans que personne ne le dise.
+        """
+        import re
+        from roam_pipeline.discover import THEME_BY_TAG
+        from roam_pipeline.overpass import TAG_FILTERS
+
+        demande: dict[str, set[str]] = {}
+        for motif in TAG_FILTERS:
+            cle, valeurs = re.fullmatch(r'(\w+)~"\^\((.+)\)\$"', motif).groups()
+            demande.setdefault(cle, set()).update(valeurs.split("|"))
+
+        nomme: dict[str, set[str]] = {}
+        for cle, valeur, _theme in THEME_BY_TAG:
+            nomme.setdefault(cle, set()).add(valeur)
+
+        self.assertEqual(demande, nomme)
+
+    def test_la_liste_adoptee_italienne_ne_porte_plus_de_plage(self):
+        import csv
+        from roam_pipeline.cli import BASE_DIR
+
+        chemin = BASE_DIR / "data" / "it" / "manual" / "candidates.csv"
+        if not chemin.exists():
+            self.skipTest("liste italienne absente")
+        lignes = [l.rstrip() for l in chemin.read_text(encoding="utf-8").splitlines()
+                  if l.strip() and not l.lstrip().startswith("#")]
+        themes = {row["theme_id"] for row in csv.DictReader(lignes)}
+        self.assertNotIn("plages", themes)
+
+
+class TestCellulesTombees(unittest.TestCase):
+    """Une cellule perdue laisse un trou que rien ne vient combler.
+
+    Mesuré sur la collecte italienne : « 2 cellule(s) sur 36 abandonnées ». Le
+    client avait déjà insisté trois fois en changeant de miroir, mais sur
+    trente-cinq secondes ; la grille entière en prend vingt minutes, et rien ne
+    permettait de redemander CES deux cellules — `--cells` prend les N
+    premières, pas les manquantes.
+    """
+
+    class _Client:
+        """Overpass qui sature, puis se remet."""
+
+        def __init__(self, tombent, retombent=()):
+            self.tombent = set(tombent)
+            self.retombent = set(retombent)
+            self.abandonnees = []
+            self.appels = []
+
+        def fetch_cell(self, cell, tags=None):
+            self.appels.append(cell)
+            premier = self.appels.count(cell) == 1
+            if cell in self.tombent and (premier or cell in self.retombent):
+                self.abandonnees.append(cell)
+                return []
+            return [f"site-{cell}"]
+
+    @staticmethod
+    def _grille(n):
+        return [(float(i), 0.0, float(i) + 1, 1.0) for i in range(n)]
+
+    def test_la_cellule_tombee_est_redemandee(self):
+        from roam_pipeline.cli import _collecter_cellules
+
+        grille = self._grille(4)
+        client = self._Client(tombent={grille[1], grille[2]})
+        with contextlib.redirect_stdout(io.StringIO()):
+            osm = _collecter_cellules(client, grille, None)
+
+        # Quatre cellules, deux tombées, deux reprises : rien ne manque.
+        self.assertEqual(len(osm), 4)
+        self.assertEqual(client.appels[:4], grille)
+        self.assertEqual(sorted(client.appels[4:]), sorted([grille[1], grille[2]]))
+        self.assertEqual(client.abandonnees, [])
+
+    def test_une_collecte_entiere_ne_declenche_aucune_reprise(self):
+        from roam_pipeline.cli import _collecter_cellules
+
+        grille = self._grille(3)
+        client = self._Client(tombent=())
+        with contextlib.redirect_stdout(io.StringIO()) as sortie:
+            osm = _collecter_cellules(client, grille, None)
+
+        self.assertEqual(len(osm), 3)
+        self.assertEqual(client.appels, grille)
+        self.assertNotIn("Seconde tentative", sortie.getvalue())
+
+    def test_ce_qui_tombe_deux_fois_reste_compte(self):
+        # L'avertissement final doit annoncer les cellules tombées DEUX fois,
+        # et non celles du premier passage : sinon la reprise, en réussissant,
+        # laisserait croire à un trou qui n'existe plus.
+        from roam_pipeline.cli import _collecter_cellules
+
+        grille = self._grille(3)
+        client = self._Client(tombent={grille[0], grille[1]},
+                              retombent={grille[1]})
+        with contextlib.redirect_stdout(io.StringIO()):
+            osm = _collecter_cellules(client, grille, None)
+
+        self.assertEqual(len(osm), 2)
+        self.assertEqual(client.abandonnees, [grille[1]])
+
+    def test_la_cellule_se_lit_en_coordonnees(self):
+        from roam_pipeline.cli import _cellule
+
+        self.assertEqual(_cellule((41.5, 12.0, 42.0, 12.5)),
+                         "41.50,12.00 \u2192 42.00,12.50")
+
+
+class TestOrdreDeLaRevue(unittest.TestCase):
+    """La feuille se lit par tranches de thème, pas par thème entier.
+
+    Mesuré sur la revue italienne : les niveaux 1 et 2 tournent joliment, mais
+    le niveau 3 fait les deux tiers de la feuille et s'y lisait par blocs de
+    cent à cent quatre-vingts lignes — 178 sommets d'affilée, puis 176 sites
+    antiques, puis 149 monuments. Le catalogue est équilibré ; c'est l'ORDRE DE
+    LECTURE qui ne l'était pas.
+    """
+
+    @staticmethod
+    def _lot(tailles):
+        places, tiers = [], {}
+        for theme, n in tailles:
+            for i in range(n):
+                qid = f"Q{theme}{i}"
+                places.append(make_place(qid, theme=theme, score=n - i))
+                places[-1].wikidata_id = qid
+                tiers[qid] = 3
+        return places, tiers
+
+    def test_les_gros_themes_sont_coupes_en_tranches(self):
+        from roam_pipeline.export import _par_tranches, TRANCHE
+
+        places, tiers = self._lot([("a", 100), ("b", 30)])
+        ordre = _par_tranches(places, tiers)
+        # Le premier bloc d'un seul thème ne dépasse pas la tranche.
+        premier = 0
+        for p in ordre:
+            if p.theme_id != ordre[0].theme_id:
+                break
+            premier += 1
+        self.assertLessEqual(premier, TRANCHE)
+
+    def test_rien_ne_se_perd_ni_ne_se_duplique(self):
+        from roam_pipeline.export import _par_tranches
+
+        places, tiers = self._lot([("a", 100), ("b", 30), ("c", 10)])
+        ordre = _par_tranches(places, tiers)
+        self.assertEqual(len(ordre), len(places))
+        self.assertEqual({p.wikidata_id for p in ordre},
+                         {p.wikidata_id for p in places})
+
+    def test_les_niveaux_restent_dans_l_ordre(self):
+        # Relire d'abord les incontournables donne déjà un catalogue jouable :
+        # le niveau prime sur tout le reste.
+        from roam_pipeline.export import _par_tranches
+
+        places, tiers = self._lot([("a", 5)])
+        for i, p in enumerate(places):
+            tiers[p.wikidata_id] = 1 if i < 2 else 3
+        ordre = _par_tranches(places, tiers)
+        self.assertEqual([tiers[p.wikidata_id] for p in ordre], [1, 1, 3, 3, 3])
+
+    def test_dans_une_tranche_le_meilleur_score_est_en_tete(self):
+        from roam_pipeline.export import _par_tranches
+
+        places, tiers = self._lot([("a", 5)])
+        ordre = _par_tranches(places, tiers)
+        self.assertEqual([p.score for p in ordre], sorted((p.score for p in places), reverse=True))
+
+
+class TestVoisinsDansUneCollection(unittest.TestCase):
+    """Deux lieux du même site ne commencent pas deux fois un palmarès."""
+
+    @staticmethod
+    def _lieu(nom, theme, lat, lon, score):
+        return make_place(nom, theme=theme, lat=lat, lon=lon, score=score)
+
+    def test_le_voisin_est_repousse_pas_ecarte(self):
+        # La tour de Pise et la Piazza dei Miracoli sont à 155 m : on les visite
+        # séparément, chacune mérite le catalogue. Mais un palmarès qui commence
+        # deux fois au même endroit ne dit rien du territoire.
+        from roam_pipeline.collections import _mix_themes
+
+        tour = self._lieu("Tour", "monuments", 43.72301, 10.39662, 166.0)
+        place = self._lieu("Piazza", "piazzas", 43.72343, 10.39478, 163.0)
+        loin = self._lieu("Ailleurs", "lacs", 45.0, 9.0, 100.0)
+        ordre = [tour, place, loin]
+
+        serre = _mix_themes(list(ordre), limit=3, part=1.0, rayon=200.0)[0]
+        self.assertEqual([p.name for p in serre], ["Tour", "Ailleurs", "Piazza"])
+        # Rien n'est perdu : les trois sont là, le voisin est simplement dernier.
+        self.assertEqual(len(serre), 3)
+
+    def test_sans_rayon_l_ordre_reste_celui_du_score(self):
+        from roam_pipeline.collections import _mix_themes
+
+        ordre = [
+            self._lieu("Tour", "monuments", 43.72301, 10.39662, 166.0),
+            self._lieu("Piazza", "piazzas", 43.72343, 10.39478, 163.0),
+            self._lieu("Ailleurs", "lacs", 45.0, 9.0, 100.0),
+        ]
+        self.assertEqual([p.name for p in _mix_themes(list(ordre), 3, 1.0)[0]],
+                         ["Tour", "Piazza", "Ailleurs"])
+
+    def test_le_voisinage_cede_avant_le_quota_de_theme(self):
+        # Une collection courte vaut mieux qu'une collection resserrée sur un
+        # thème : c'est le défaut que `part` existe pour empêcher.
+        from roam_pipeline.collections import _mix_themes
+
+        proches = [self._lieu(f"P{i}", "cathedrales", 43.7230 + i * 1e-5, 10.3966, 100 - i)
+                   for i in range(4)]
+        retenus = _mix_themes(list(proches), limit=4, part=0.5, rayon=200.0)[0]
+        # Quatre places, quatre lieux : le rayon a cédé pour remplir.
+        self.assertEqual(len(retenus), 4)
+
+    def test_les_deux_pays_declarent_le_meme_rayon(self):
+        # Deux cents mètres, mesuré sur les paires italiennes puis vérifié sur
+        # le catalogue français livré : 37 paires voisines en niveau 1 → 2,
+        # sans qu'un seul lieu entre ni sorte du catalogue.
+        self.assertEqual(CONFIG.collections.min_distance_m, 200.0)
+        self.assertEqual(load_config(pays="it").collections.min_distance_m,
+                         CONFIG.collections.min_distance_m)
+
+
+class TestFeuilleDeRevueDuBonPays(unittest.TestCase):
+    """La feuille lue doit être celle du pays qu'on relit.
+
+    `--review` se posait AVANT le rangement par pays : il pointait
+    `data/out/` — la France — pendant que les décisions s'écrivaient dans
+    `data/it/manual/`. Une revue italienne a ainsi versé 2 080 verdicts
+    français dans le fichier italien, sans en enregistrer un seul des siens.
+    Rien n'a planté : les identifiants ne se recoupent jamais.
+    """
+
+    def test_la_feuille_suit_le_pays(self):
+        from roam_pipeline.cli import build_parser, _defauts, _chemins_du_pays, AUTOSAVE
+
+        for pays, attendu in ((None, "out"), ("it", "it")):
+            argv = ["apply-review"] + (["--pays-config", pays] if pays else [])
+            args = build_parser().parse_args(argv)
+            _defauts(args)
+            _chemins_du_pays(args, load_config(pays=pays))
+            with self.subTest(pays=pays or "fr"):
+                self.assertIn(attendu, args.review.parts)
+                self.assertEqual(args.review.parent, args.out)
+                self.assertEqual(args.review.name, AUTOSAVE)
+
+
+class TestDepartementDuCodeCommunal(unittest.TestCase):
+    """« C'est la commune qui gagne » — encore faut-il savoir lire son code.
+
+    `departement_from_insee` connaît la France et elle seule. Hors de France,
+    `align_departements` ne gagnait donc rien : la péninsule italienne portait
+    la commune 066018, dans la province de L'Aquila, ET le département 099,
+    Rimini, sans que rien ne tranche.
+    """
+
+    def tearDown(self):
+        geo.utiliser_pays("FR")
+
+    def test_les_trois_cas_francais_se_retrouvent_seuls(self):
+        # Le plus LONG préfixe connu : 974 avant 97, et la Corse sur sa lettre.
+        geo.utiliser_pays("FR")
+        for code, attendu in (("75056", "75"), ("97411", "974"),
+                              ("2A004", "2A"), ("29019", "29")):
+            with self.subTest(code=code):
+                self.assertEqual(geo.departement_du_code_communal(code), attendu)
+
+    def test_les_codes_istat_se_lisent_sur_trois_chiffres(self):
+        geo.utiliser_pays("IT")
+        for code, attendu in (("066018", "066"), ("058091", "058"),
+                              ("015146", "015")):
+            with self.subTest(code=code):
+                self.assertEqual(geo.departement_du_code_communal(code), attendu)
+
+    def test_un_code_inconnu_ne_rend_rien(self):
+        # Mieux vaut ne rien corriger que corriger au hasard.
+        geo.utiliser_pays("FR")
+        for code in ("", None, "999999", "ZZ"):
+            with self.subTest(code=code):
+                self.assertIsNone(geo.departement_du_code_communal(code))
+
+
+class TestEnclaves(unittest.TestCase):
+    """Le Vatican et Saint-Marin sont des pays chez Wikidata."""
+
+    def test_l_italie_interroge_ses_enclaves(self):
+        it = load_config(pays="it")
+        self.assertEqual(it.country.qids, ["Q38", "Q237", "Q238"])
+        self.assertEqual([(e.name, e.departement) for e in it.country.enclaves],
+                         [("Vatican", "058"), ("Saint-Marin", "099")])
+
+    def test_la_france_n_interroge_qu_elle_meme(self):
+        # Monaco et Andorre existent, mais rien ne les a demandés : une
+        # enclave se déclare, elle ne se devine pas.
+        self.assertEqual(CONFIG.country.qids, ["Q142"])
+        self.assertEqual(CONFIG.country.enclaves, ())
+
+    def test_la_requete_francaise_ne_change_pas(self):
+        # Un seul pays reste écrit en dur, et `?pays` n'entre pas dans le
+        # SELECT : une variable libre changerait la requête sans rien apprendre.
+        from roam_pipeline import wikidata as wd
+
+        requete = wd.theme_query(["Q1"], 3, country="Q142")
+        self.assertIn("?item wdt:P17 wd:Q142 .", requete)
+        self.assertNotIn("?pays", requete)
+
+    def test_plusieurs_pays_passent_par_un_VALUES(self):
+        from roam_pipeline import wikidata as wd
+
+        requete = wd.theme_query(["Q1"], 3, country=["Q38", "Q237", "Q238"])
+        self.assertIn("VALUES ?pays { wd:Q38 wd:Q237 wd:Q238 }", requete)
+        self.assertIn("?admin ?frwiki ?pays", requete)
+
+    def test_un_lieu_d_enclave_recoit_la_province_qui_l_entoure(self):
+        # Sans département, il sortirait du catalogue avant d'être jugé.
+        from roam_pipeline.fetch import _row_to_place
+
+        geo.utiliser_pays("IT")
+        try:
+            enclaves = {e.qid: e for e in load_config(pays="it").country.enclaves}
+            place = _row_to_place({
+                "item": "http://www.wikidata.org/entity/Q12345",
+                "itemLabel": "Basilique",
+                "coord": "Point(12.4534 41.9022)",
+                "sitelinks": "40",
+                "pays": "http://www.wikidata.org/entity/Q237",
+            }, CONFIG.themes[0], enclaves)
+            self.assertEqual(place.departement_code, "058")
+            self.assertEqual(place.region_code, geo.region_of("058").code)
+            self.assertEqual(place.commune_name, "Vatican")
+            # `country_code` reste VIDE : la mention en ferait un catalogue à
+            # part, alors qu'il est là pour être dans celui de l'Italie.
+            self.assertEqual(place.country_code, "")
+        finally:
+            geo.utiliser_pays("FR")
+
+    def test_le_pays_principal_gagne_sur_l_enclave(self):
+        # La péninsule italienne est en Italie, à Saint-Marin ET au Vatican :
+        # elle remonte trois fois, une ligne par `P17`, et les trois se valent
+        # en complétude. L'ordre de la réponse décidait, donc rien — et le jour
+        # où la ligne saint-marinaise a gagné, une péninsule de mille
+        # kilomètres est entrée comme DEUXIÈME meilleure plage d'Italie.
+        from roam_pipeline.fetch import _rang_du_pays
+
+        italienne = {"pays": "http://www.wikidata.org/entity/Q38"}
+        saint_marin = {"pays": "http://www.wikidata.org/entity/Q238"}
+        self.assertLess(_rang_du_pays(italienne, "Q38"),
+                        _rang_du_pays(saint_marin, "Q38"))
+
+    def test_sans_colonne_pays_rien_ne_change(self):
+        # La requête française ne rend pas `?pays` : toutes ses lignes doivent
+        # rester à égalité, sans quoi le classement changerait le catalogue.
+        from roam_pipeline.fetch import _rang_du_pays
+
+        self.assertEqual(_rang_du_pays({}, "Q142"), 0)
+
+    def test_un_lieu_ordinaire_n_est_pas_touche(self):
+        from roam_pipeline.fetch import _row_to_place
+
+        place = _row_to_place({
+            "item": "http://www.wikidata.org/entity/Q243",
+            "itemLabel": "Tour Eiffel",
+            "coord": "Point(2.2945 48.8584)",
+            "sitelinks": "100",
+        }, CONFIG.themes[0], {"Q237": load_config(pays="it").country.enclaves[0]})
+        self.assertIsNone(place.departement_code)
+
+
+class TestFeuilleDeRevue(unittest.TestCase):
+    """La feuille ne porte que ce qui se DÉCIDE."""
+
+    @staticmethod
+    def _config(garde: bool):
+        label = replace(CONFIG.labels[0], id="jury", garde_d_office=garde,
+                        makes_collection=True)
+        return replace(CONFIG, labels=[label])
+
+    def test_un_lieu_garde_d_office_sort_de_la_feuille(self):
+        # Trois cent quatre-vingt-huit bourgs italiens sur deux mille quatre
+        # cent cinquante-six lignes : un sixième de la revue pour un verdict
+        # connu d'avance. Leur niveau vient de leur rang, pas d'une décision.
+        from roam_pipeline.review import a_relire
+
+        bourg = make_place("Bourg", labels=["jury"])
+        autre = make_place("Autre chose")
+        with _capture():
+            reste = a_relire([bourg, autre], self._config(True), {})
+        self.assertEqual([p.name for p in reste], ["Autre chose"])
+
+    def test_sans_le_drapeau_la_feuille_ne_perd_rien(self):
+        from roam_pipeline.review import a_relire
+
+        bourg = make_place("Bourg", labels=["jury"])
+        self.assertEqual(len(a_relire([bourg], self._config(False), {})), 1)
+
+    def test_un_verdict_deja_pris_reste_relisible(self):
+        # Il a été jugé une fois : le curateur doit pouvoir revenir dessus.
+        # C'est ce qui laisse la feuille française intacte — ses 352 lieux de
+        # listes à jury portent tous un verdict.
+        from roam_pipeline.review import a_relire
+
+        bourg = make_place("Bourg", labels=["jury"])
+        reste = a_relire([bourg], self._config(True),
+                         {bourg.wikidata_id: ("keep", "")})
+        self.assertEqual(len(reste), 1)
+
+
+class TestChaqueThemeAUnGlyphe(unittest.TestCase):
+    """Un thème sans tracé n'a ni symbole sur la carte ni pastille de filtre.
+
+    `ThemeIcon` rend `null` quand `TRACES` ne connaît pas l'identifiant, et la
+    carte native n'enregistre que les PNG qui existent : le thème disparaît
+    des deux côtés SANS UN MOT. C'est le mode de défaillance d'un pays qui
+    ajoute un thème — et l'Italie en ajoute un.
+    """
+
+    @staticmethod
+    def _traces() -> set[str]:
+        source = (Path(__file__).resolve().parents[2]
+                  / "mobile" / "src" / "ui" / "themeIcons.tsx").read_text(encoding="utf-8")
+        corps = source.split("export const TRACES", 1)[1].split("export const THEME_IDS", 1)[0]
+        return set(re.findall(r"^  ['\"]?([a-z-]+)['\"]?: \[", corps, re.M))
+
+    def test_tous_les_themes_de_tous_les_pays_ont_leur_trace(self):
+        traces = self._traces()
+        for pays in (None, "it"):
+            for theme in load_config(pays=pays).themes:
+                with self.subTest(pays=pays or "fr", theme=theme.id):
+                    self.assertIn(theme.id, traces)
+
+    def test_la_piazza_en_fait_partie(self):
+        # Le cas qui a motivé ce garde-fou.
+        self.assertIn("piazzas", self._traces())
+
+
+class TestPlusForteChute(unittest.TestCase):
+    """Où couper le vivier d'une ville — la mesure, pas le verdict."""
+
+    def test_la_recherche_ne_commence_qu_au_plafond(self):
+        # Une dérogation ne peut qu'ÉLEVER le plafond. Une chute avant lui ne
+        # l'intéresse pas : la proposer reviendrait à conseiller de couper plus
+        # court que la règle générale.
+        scores = [200.0, 100.0, 99.0, 98.0, 97.0, 96.0, 95.0, 60.0, 59.0, 58.0]
+        rang, chute, _pas = cli._plus_forte_chute(scores, cap=6)
+        self.assertEqual(rang, 7)
+        self.assertAlmostEqual(chute, 35.0)
+
+    def test_le_pas_courant_accompagne_la_chute(self):
+        # La plus forte chute existe toujours, même dans une liste régulière.
+        # C'est leur rapport qui dit s'il y a un décrochage — sans le pas, un
+        # escalier parfait passerait pour une falaise.
+        scores = [100.0 - i for i in range(30)]
+        rang, chute, pas = cli._plus_forte_chute(scores, cap=6)
+        self.assertAlmostEqual(chute, 1.0)
+        self.assertAlmostEqual(pas, 1.0)
+
+    def test_une_falaise_se_distingue_du_pas_courant(self):
+        scores = [100.0, 99.0, 98.0, 97.0, 96.0, 95.0, 94.0, 93.0, 60.0, 59.0, 58.0]
+        rang, chute, pas = cli._plus_forte_chute(scores, cap=6)
+        self.assertEqual(rang, 8)
+        self.assertAlmostEqual(chute, 33.0)
+        self.assertAlmostEqual(pas, 1.0)
+
+    def test_moins_de_candidats_que_le_plafond_ne_dit_rien(self):
+        self.assertIsNone(cli._plus_forte_chute([100.0, 90.0], cap=6))
+
+
+class TestCommuneParContour(unittest.TestCase):
+    """La commune hors de France : par les contours, ou pas du tout.
+
+    Les deux API que `enrich_communes` interroge sont nationales, et
+    `resolve_admin` ne remplit que le département. Le premier catalogue italien
+    est sorti avec ZÉRO commune sur 2 563 lieux : le plafond par commune n'a
+    pas mordu une fois (quatre-vingts églises gardées dans la seule Rome), la
+    commune manquait à chaque fiche, et la maille la plus fine de la carte de
+    conquête était vide.
+    """
+
+    @staticmethod
+    def _carre(x0, y0, cote=1.0):
+        return [(x0, y0), (x0 + cote, y0), (x0 + cote, y0 + cote), (x0, y0 + cote)]
+
+    def _couche(self, code, name, parent):
+        polygones = [[self._carre(12.0, 41.0)]]
+        return localisation.Localisateur([localisation.Zone(
+            code=code, name=name, level="commune", parent_code=parent,
+            bbox=localisation._bbox(polygones), polygones=polygones)])
+
+    def tearDown(self):
+        geo.utiliser_pays("FR")
+
+    def test_les_contours_rattachent_hors_de_france_sans_un_appel(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        geo.utiliser_pays("IT")
+        lieu = make_place("Colisée", lat=41.5, lon=12.5, departement_code=None)
+        appels = []
+
+        class Interdit:
+            def reverse_communes(self, points):
+                appels.append(points)
+                raise AssertionError("aucune API française hors de France")
+
+        self.assertEqual(
+            enrich_communes([lieu], Interdit(), None,
+                            communes=self._couche("058091", "Roma", "058"),
+                            pays="IT"),
+            1,
+        )
+        self.assertEqual(appels, [])
+        self.assertEqual(lieu.commune_code, "058091")
+        self.assertEqual(lieu.commune_name, "Roma")
+
+    def test_la_commune_fait_autorite_sur_le_departement_et_la_region(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        # Le contour communal porte le code de sa province ; la région s'en
+        # déduit par le référentiel, jamais par une seconde source.
+        geo.utiliser_pays("IT")
+        lieu = make_place("Colisée", lat=41.5, lon=12.5, departement_code=None)
+        enrich_communes([lieu], None, None,
+                        communes=self._couche("058091", "Roma", "058"), pays="IT")
+        self.assertEqual(lieu.departement_code, "058")
+        self.assertEqual(lieu.region_code, geo.region_of("058").code)
+
+    def test_sans_couche_communale_rien_ne_rattache_hors_de_france(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        # Le comportement qui a produit le catalogue italien sans communes. Il
+        # reste juste — il ne doit simplement plus être le seul possible.
+        geo.utiliser_pays("IT")
+        lieu = make_place("Colisée", lat=41.5, lon=12.5, departement_code=None)
+        self.assertEqual(enrich_communes([lieu], None, None, pays="IT"), 0)
+        self.assertIsNone(lieu.commune_code)
+
+    def test_un_lieu_deja_rattache_n_est_pas_repris(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        # Relancer la passe ne doit rien coûter ni rien écraser : c'est ce qui
+        # rend `enrich` rejouable.
+        geo.utiliser_pays("IT")
+        lieu = make_place("Colisée", lat=41.5, lon=12.5,
+                          commune_code="058091", commune_name="Roma")
+        self.assertEqual(
+            enrich_communes([lieu], None, None,
+                            communes=self._couche("999999", "Ailleurs", "099"),
+                            pays="IT"),
+            0,
+        )
+        self.assertEqual(lieu.commune_code, "058091")
+
+    def test_un_point_hors_de_toute_commune_reste_sans_commune(self):
+        from roam_pipeline.fetch import enrich_communes
+
+        # Une plage au large, un phare en mer : le silence vaut mieux qu'un
+        # rangement arbitraire.
+        geo.utiliser_pays("IT")
+        large = make_place("Îlot", lat=39.0, lon=9.0, departement_code=None)
+        self.assertEqual(
+            enrich_communes([large], None, None,
+                            communes=self._couche("058091", "Roma", "058"),
+                            pays="IT"),
+            0,
+        )
+        self.assertIsNone(large.commune_code)
 
 
 class TestReferentielParPays(unittest.TestCase):

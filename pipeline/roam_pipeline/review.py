@@ -113,6 +113,37 @@ def merge_decisions(
     return fusionnees
 
 
+def a_relire(
+    places: list[Place], config, decisions: dict[str, tuple[str, str]] | None = None
+) -> list[Place]:
+    """Ce qu'il reste à lire : le catalogue moins ce qui est gardé d'office.
+
+    Le drapeau `garde_d_office` dit qu'une commission a déjà fait le travail.
+    Laisser ces lieux dans la feuille demande au curateur de RATIFIER ce
+    qu'aucune décision ne peut changer : trois cent quatre-vingt-huit bourgs
+    italiens sur deux mille quatre cent cinquante-six lignes, un sixième de la
+    revue, pour un verdict connu d'avance. Leur niveau, lui, ne se décide pas
+    en revue : il vient du rang dans la collection, donc de la notoriété.
+
+    Un lieu sur lequel un verdict EXISTE reste, quoi qu'il arrive : il a été
+    jugé une fois, et le curateur doit pouvoir revenir dessus.
+    """
+    d_office = gardes_d_office(places, config)
+    if not d_office:
+        return list(places)
+    juges = set(decisions or {})
+    garde = [p for p in places
+             if p.wikidata_id not in d_office or p.wikidata_id in juges]
+    epargnes = len(places) - len(garde)
+    if epargnes:
+        LOG.info(
+            "revue : %s lieux gardés d'office par une liste à jury, hors "
+            "feuille — leur niveau vient de leur rang, pas d'une décision",
+            epargnes,
+        )
+    return garde
+
+
 def gardes_d_office(places: list[Place], config) -> set[str]:
     """Les lieux qu'une liste de jury garde sans passer par la revue.
 

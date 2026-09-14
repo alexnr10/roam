@@ -89,6 +89,33 @@ rappelle tant qu'elle n'est pas reprise**.
 l'application. Il ne contient que les lieux effectivement rattachés à une collection : un
 lieu que l'application ne pourrait afficher nulle part n'a rien à y faire.
 
+### Mettre à jour les catalogues servis
+
+`export-app` travaille sur UNE collecte. Rafraîchir tous les pays demande donc
+un passage par pays, dans n'importe quel ordre :
+
+```bash
+python -m roam_pipeline export-app                    # France
+python -m roam_pipeline export-app --pays-config it   # Italie
+```
+
+Chaque passage écrit `catalogues/<code>.json` et **complète** `catalogues/index.json`
+sans toucher aux autres pays — c'est ce qui permet de refaire l'Italie seule sans
+faire disparaître la France. Les emprises, elles, ne sont connues que du pays de la
+collecte : c'est son propre passage qui les pose.
+
+Le catalogue EMBARQUÉ, `mobile/src/data/catalog.json`, n'appartient qu'au pays de
+départ. Un passage sur un autre pays le laisse tel quel et le dit : l'application ne
+change pas de pays de départ par un `export-app`.
+
+Rien à recompiler ensuite. Les catalogues servis sont relus à CHAQUE démarrage — c'est
+tout l'intérêt : il suffit de pousser `catalogues/`.
+
+Attention à `v0.1-france`, en revanche. Cette branche est la version figée qu'on a
+donnée : y fusionner `main` y ferait entrer `it.json` et l'entrée `IT` de l'index, donc
+apparaître un deuxième pays chez qui n'a rien demandé. Pour donner une France à jour
+sans l'Italie, n'y porter que `catalogues/fr.json` et un index réduit à `FR`.
+
 ### Les contours de la carte de conquête
 
 `export-outlines` écrit `mobile/src/data/outlines.json` : les tracés des régions et des

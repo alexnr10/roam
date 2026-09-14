@@ -808,6 +808,27 @@ themes:
     # seuil global les emporterait, alors que ce sont elles que le minimum
     # régional a été écrit pour sauver.
     min_region_pool: 5
+    # LE CAP ET LA PLAGE EN CONTREBAS sont une seule halte, et le catalogue les
+    # tient pour deux lieux. Ce n'est pas un doublon — chacun mérite sa fiche —
+    # mais les voir se suivre dans un palmarès donne l'impression d'un
+    # remplissage.
+    #
+    # Le signalement des sosies s'arrête à trois cents mètres, et il a raison
+    # partout ailleurs. Mesuré à DEUX KILOMÈTRES à l'intérieur d'un même thème :
+    #
+    #     plages 12 paires   ← lisible en revue
+    #     monuments 70 · musees 65 · megalithes 26   ← le Louvre et Orsay
+    #                                                  sont à 692 m, le palais
+    #                                                  Pitti et les Offices à
+    #                                                  551 m, et ce sont DEUX
+    #                                                  visites
+    #
+    # Une portée unique ne peut pas distinguer les deux cas. Le thème, lui, le
+    # sait : sur le littoral, deux lieux à moins de deux kilomètres posent une
+    # question, et c'est la revue qui tranche. RIEN N'EST ÉCARTÉ ici — les
+    # calanques de Sugiton et Morgiou, à 550 m, resteront deux calanques si le
+    # curateur le dit.
+    twin_radius_m: 2000
     wikidata_classes: [Q40080, Q107679, Q185113, Q191992, Q34763, Q1026259, Q6502866]
     # plage, falaise, cap, cap (promontoire marin), péninsule, calanque,
     # falaise côtière.

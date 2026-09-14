@@ -1,0 +1,120 @@
+# Les parcs nationaux d'Italie, UN LIEU PHARE PAR PARC.
+#
+# Ce fichier est une liste de LIEUX, pas de parcs : le label tamponne un lieu
+# que le catalogue tient déjà, et la collection rassemble ces lieux-là. Le parc
+# lui-même n'entre pas au catalogue — on ne veut pas le Vésuve ET le parc
+# national du Vésuve.
+#
+# Y FIGURER VAUT DEUX CHOSES : vingt points de score, et la DISPENSE du
+# plancher de notoriété du thème. Le mont Pollino est ici pour cette raison —
+# sept versions linguistiques pour un plancher à huit, il sortait du catalogue
+# alors que le parc porte son nom.
+#
+# POURQUOI À LA MAIN. Wikidata porte une propriété d'appartenance (P3018) et le
+# pipeline sait l'interroger — c'est le type de requête `dans_une_aire`,
+# toujours en place. Mais sur l'Italie elle est vide aux trois quarts : 44 lieux
+# du catalogue la portaient, dont 25 dans deux parcs et 12 sur des phares,
+# tandis que Vernazza, Paestum, les Tre Cime et la Marmolada ne la portaient
+# pas. Ce n'est pas un jeu de données, c'est le travail de quelques
+# contributeurs sur leurs parcs de prédilection.
+#
+# LA COLONNE `nom_dans_la_collection` PORTE LE NOM DU PARC, et c'est sous ce
+# nom-là que le lieu apparaît DANS cette collection — nulle part ailleurs. Une
+# liste de parcs représentés chacun par un lieu phare ne se lit pas autrement :
+# « Jardin botanique alpin Paradisia » ne dit rien à qui cherche le
+# Grand-Paradis. Sur sa fiche, dans la recherche et dans ses autres
+# collections, le lieu garde son nom — c'est le sien, et c'est celui qu'on
+# cherche sur place.
+#
+# Le générique est retiré : la collection s'appelle déjà « Parcs nationaux
+# d'Italie », et vingt-six lignes commençant par « parc national de » ne se
+# lisent plus. Le remettre ne demande que de réécrire cette colonne.
+#
+# LA COLONNE `note` PORTE DEUX MENTIONS, et elles ne valent pas la même chose :
+#
+#   « attesté »    le résumé Wikipédia du lieu dit « parc national de X », ou
+#                  le lieu porte le nom du parc. C'est une preuve.
+#   « à vérifier » le nom du parc apparaît dans le résumé sans que rien ne dise
+#                  que le lieu est dedans. C'est un indice, et il t'appartient.
+#
+# TROIS LIGNES SONT UN CHOIX PAR DÉFAUT, faute de mieux — marquées « province
+# du parc ». Le lieu demandé n'était pas dans la collecte, et celui retenu est
+# le meilleur que le catalogue tienne dans le territoire du parc, identifié par
+# sa COMMUNE et non par un texte :
+#
+#     Stelvio           massif de l'Ortles, commune Stelvio/Stilfs
+#     Apennin lucanien  Grumentum, commune Grumento Nova, en Val d'Agri
+#     Sila              lac Arvo, commune San Giovanni in Fiore
+#
+# LES VINGT-SIX PARCS ONT LEUR LIGNE. Les deux derniers ont demandé chacun un
+# détour, et tous deux illustrent une règle du pipeline :
+#
+#   DOLOMITES BELLUNOISES — lago della Stua. Deux entités portent ce nom chez
+#   Wikidata : Q953113, commune de Brennero (province 021, au col du Brenner),
+#   et Q3825880, commune de Cesiomaggiore (province 025, Belluno). C'est la
+#   SECONDE. Elle ne porte que trois versions linguistiques pour un plancher
+#   des lacs à six : elle n'entre que par la dispense qu'accorde cette liste.
+#
+#   Le Monte Schiara, sommet emblématique du parc, reste dehors et c'est
+#   voulu : il ne se monte pas, le filtre alpin l'écarte à 2 565 m, et seul
+#   `pin` passerait outre — épingler un sommet inaccessible serait exactement
+#   l'erreur que cette règle existe pour empêcher.
+#
+#   VAL GRANDE — Cicogna. Deux frazioni de ce nom ; les CONTOURS COMMUNAUX ont
+#   tranché, pas le libellé : Q18445963 tombe dans Cossogno (province 103,
+#   Verbano-Cusio-Ossola), Q18484870 dans Terranuova Bracciolini (province 051,
+#   Arezzo). Aucune classe collectée ne la reconnaît — une frazione n'est pas
+#   une classe de Roam — elle est donc inscrite dans `places.csv`, qui impose
+#   son thème, et n'entrera qu'au prochain `fetch`.
+#
+# ⚠ « Sila », le massif, EST dans la collecte (Q1088296, 24 langues) mais porte
+# un verdict `drop` de la revue : le curateur l'a déjà écarté. L'inscrire ici
+# le ferait rentrer par la fenêtre, et ce n'est pas au label de défaire un
+# jugement. La réserve « I Giganti della Sila » (Q3936596) existe chez Wikidata
+# mais c'est une AIRE PROTÉGÉE — la classe même qu'on vient de purger du thème
+# « plages », et qu'aucun thème de Roam ne revendique.
+#
+# Trois faux positifs écartés au passage, pour qu'on ne les repropose pas : le
+# Conservatoire San Pietro a Majella est à Naples, et Herculanum et Pompéi ne
+# sont pas DANS le parc du Vésuve — elles sont sous ses cendres, ce qui n'est
+# pas pareil.
+#
+# POUR AJOUTER OU CORRIGER UNE LIGNE, le Q-id se lit dans la collecte plutôt
+# qu'il ne s'invente :
+#
+#     python -m roam_pipeline explain --pays-config it "Vernazza"
+#         → Vernazza  (Q270328)
+#
+# Puis `relabel` et `build`. Une ligne retirée le reste.
+#
+# ⚠ RIEN NE VÉRIFIE qu'un lieu inscrit est vraiment dans le parc annoncé : le
+# nom du parc n'est là que pour la lecture humaine, c'est le Q-id qui fait foi.
+# C'est ce que la couche de contours réglerait — elle saurait dire « Vernazza
+# est dans le parc des Cinque Terre », et ce fichier pourrait se relire seul.
+wikidata_id,name,nom_dans_la_collection,note
+Q524,Vésuve,Vésuve,parc national Vésuve (attesté)
+Q215897,Castel del Monte,Alta Murgia,parc national Alta Murgia (choix du curateur)
+Q204152,Isola del Giglio,Archipel toscan,parc national Archipel toscan (à vérifier)
+Q51935,Monte Sant'Angelo,Gargano,parc national Gargano (à vérifier)
+Q340757,La Maddalena,Archipel de La Maddalena,parc national Archipel de La Maddalena (attesté)
+Q54612,Gerace,Aspromonte,parc national Aspromonte (attesté)
+Q270328,Vernazza,Cinque Terre,parc national Cinque Terre (à vérifier)
+Q94966,Sarnano,Monts Sibyllins,parc national Monts Sibyllins (à vérifier)
+Q128170,San Felice Circeo,Circeo,parc national Circeo (attesté)
+Q50148,Scanno,"Abruzzes, Latium et Molise",parc national Abruzzes Latium et Molise (attesté)
+Q51433,Castelli,Gran Sasso et Monti della Laga,parc national Gran Sasso e Monti della Laga (attesté)
+Q730500,Asinara,Asinara,parc national Asinara (attesté)
+Q1249309,Pantelleria,Île de Pantelleria,parc national Île de Pantelleria (attesté)
+Q14552418,Sanctuaire de l'Averne,Forêts casentinoises,parc national Forêts casentinoises (attesté)
+Q3861856,Mont Pollino,Pollino,parc national Pollino (attesté)
+Q1638880,Jardin botanique alpin Paradisia,Grand-Paradis,parc national Grand-Paradis (attesté)
+Q385753,Punta La Marmora,Gennargentu,parc national Gennargentu (à vérifier)
+Q510076,Pietra di Bismantova,Apennin tosco-émilien,parc national Apennin tosco-émilien (à vérifier)
+Q1131545,Cap Palinuro,Cilento et Val de Diano,parc national Cilento et Val de Diano (à vérifier)
+Q3392526,Grotte de Cavallone,Majella,parc national Majella (attesté)
+Q898150,Matese,Matese,parc national Matese (attesté)
+Q63521967,Massif de l'Ortles,Stelvio,parc national Stelvio (province du parc)
+Q1550380,Grumentum,Apennin lucanien-Val d'Agri,parc national Apennin lucanien-Val d'Agri (province du parc)
+Q3825626,Lac Arvo,Sila,parc national Sila (province du parc)
+Q3825880,Lago della Stua,Dolomites bellunoises,parc national Dolomites bellunoises (choix du curateur)
+Q18445963,Cicogna,Val Grande,parc national Val Grande (choix du curateur — entre au prochain fetch)

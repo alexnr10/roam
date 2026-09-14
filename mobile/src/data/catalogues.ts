@@ -60,6 +60,12 @@ export const REFERENCE_PAR_DEFAUT = 'main';
 /**
  * La référence servie, dans l'ordre où elle peut être connue.
  *
+ * 0. **`?catalogues=` dans l'adresse**, sur le web seulement. Une porte de
+ *    service, et elle a une raison précise : UNE SEULE page publiée, deux
+ *    publics. Le lien qu'on donne sert la version figée — la France, et elle ne
+ *    bougera pas sous les pieds de qui l'a reçue ; le même lien suivi de
+ *    `?catalogues=main` sert ce qui est en cours, l'Italie comprise. Personne
+ *    n'y arrive par hasard, et celui qui l'écrit sait ce qu'il demande.
  * 1. **`EXPO_PUBLIC_ROAM_CATALOGUES`**, inlinée dans le bundle à la
  *    compilation. C'est la seule qui marche PARTOUT.
  * 2. La configuration Expo, pour une application compilée.
@@ -76,7 +82,29 @@ export const REFERENCE_PAR_DEFAUT = 'main';
  * bundling : elle est donc dans le fichier livré, vérifiable en le lisant, et
  * ne dépend d'aucun manifeste à l'exécution.
  */
+/**
+ * Une référence git plausible, et rien d'autre.
+ *
+ * Elle entre dans une URL de `raw.githubusercontent.com/alexnr10/roam/…` :
+ * une valeur libre ferait chercher le catalogue chez n'importe qui. Un premier
+ * motif, trop permissif, laissait passer `../../autre` — le point et la barre
+ * étant l'un et l'autre légitimes dans `v0.1-france` et `feature/x`. Chaque
+ * segment commence donc par une lettre ou un chiffre, et `..` est refusé
+ * partout.
+ */
+const REFERENCE_VALIDE = /^(?!.*\.\.)\w[\w.-]*(?:\/\w[\w.-]*)*$/;
+
 export function referenceServie(): string {
+  // L'adresse d'abord, et elle n'existe que sur le web. Le motif borne ce qui
+  // peut passer : la référence entre dans une URL de `raw.githubusercontent`,
+  // et une valeur libre y ferait chercher un catalogue n'importe où.
+  try {
+    const cherche = typeof location !== 'undefined' ? location.search : '';
+    const demande = new URLSearchParams(cherche).get('catalogues')?.trim();
+    if (demande && demande.length <= 64 && REFERENCE_VALIDE.test(demande)) return demande;
+  } catch {
+    // Pas de `location`, pas de `URLSearchParams` : on continue sans.
+  }
   const inlinee = process.env.EXPO_PUBLIC_ROAM_CATALOGUES;
   if (typeof inlinee === 'string' && inlinee.trim()) return inlinee.trim();
   try {

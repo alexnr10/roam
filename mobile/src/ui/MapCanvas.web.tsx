@@ -6,10 +6,12 @@ import type { GeoJSONSource, MapLayerMouseEvent, Map as MapLibreMap } from 'mapl
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { paysCourant } from '../data/catalog';
 import { EMPTY_OUTLINES, outlinesFor } from '../data/outlines';
 import type { Emprise } from '../lib/regions';
 import {
   REGIONS,
+  bornesDuPays,
   centreDe,
   emprise,
   partDuCadre,
@@ -18,9 +20,11 @@ import {
   regionDuCadre,
   regionDuDepartement,
   voile,
+  voisinage,
 } from '../lib/regions';
 import { etoilesDe } from '../lib/etoiles';
 import { useCatalogue } from '../lib/useCatalogue';
+import { usePays } from '../store/pays';
 import { colors, spacing, type } from '../theme';
 import type { Place } from '../types';
 import type { MapCanvasProps } from './MapCanvas';
@@ -38,6 +42,7 @@ import {
   pasDeCascade,
   TRANSITION,
   resolveBasemap,
+  tonsDuPays,
 } from './mapStyle';
 import {
   SOURCE_DEPTS,
@@ -247,6 +252,7 @@ export function MapCanvas({
    * contenu suit tout seul. Ce qui ne suit pas, c'est React, et donc la carte.
    */
   const versionDuCatalogue = useCatalogue();
+  const { recadrage } = usePays();
 
   const [ouverte, setOuverte] = useState<string | null>(null);
   const [degraded, setDegraded] = useState(false);
@@ -288,7 +294,7 @@ export function MapCanvas({
         instance = new maplibregl.Map({
           container: container.current,
           style: style as maplibregl.StyleSpecification,
-          bounds: FRANCE_BOUNDS,
+          bounds: bornesDuPays() ?? FRANCE_BOUNDS,
           // FRANCE_BOUNDS est la vue de DÉPART, pas une limite : aucun
           // `maxBounds`, aucun `maxZoom` bridé. La carte reste une vraie carte
           // du monde, librement navigable — c'est ainsi qu'on atteint les cinq
@@ -382,6 +388,7 @@ export function MapCanvas({
         for (const couche of couchesDeLaCarte({
           natif: false,
           avecPolices: Boolean(instance.getStyle()?.glyphs),
+          tons: tonsDuPays(paysCourant(), voisinage()),
         })) {
           instance.addLayer(couche as never);
         }
@@ -540,6 +547,53 @@ export function MapCanvas({
       setReady(false);
     };
   }, []);
+
+  /**
+   * Le recadrage sur un pays CHOISI.
+   *
+   * Pas sur un pays franchi : traverser la frontière en se promenant bascule
+   * le catalogue, et faire bondir la caméra sur l'Italie entière au premier
+   * pas au-delà de Menton serait insupportable. Depuis « Moi », en revanche,
+   * on vient de demander un autre pays — et le garder cadré sur le précédent
+   * montre l'Italie en morceau contre le bord droit, ce qui se lit comme une
+   * carte cassée.
+   *
+   * Le compteur part à zéro et n'avance qu'au choix explicite : le premier
+   * affichage n'est donc pas recadré, il l'est déjà.
+   */
+  useEffect(() => {
+    const instance = map.current;
+    if (!ready || !instance || !recadrage) return;
+    ouverteRef.current = null;
+    zoomOuverture.current = null;
+    setOuverte(null);
+    onRegion.current?.(null);
+    const bornes = bornesDuPays();
+    if (bornes) instance.fitBounds(bornes, { padding: 12, duration: 600 });
+  }, [ready, recadrage]);
+
+  /**
+   * Le coloriage, qui suit le pays.
+   *
+   * Les couches ne sont posées qu'UNE FOIS, à la création de la carte : sans
+   * ce rappel, l'expression de couleur resterait celle du pays de départ, et
+   * un deuxième pays serait peint par les quelques codes de régions que les
+   * deux découpages ont en commun — c'est-à-dire par hasard.
+   */
+  useEffect(() => {
+    const instance = map.current;
+    if (!ready || !instance || !instance.getLayer('region-aplat')) return;
+    // On REDEMANDE la couche plutôt que de réécrire son expression ici : deux
+    // écritures d'une même chose finissent toujours par diverger, et celle-ci
+    // porte aussi le survol.
+    const aplat = couchesDeLaCarte({
+      natif: false,
+      tons: tonsDuPays(paysCourant(), voisinage()),
+    }).find((couche) => couche.id === 'region-aplat');
+    if (aplat) {
+      instance.setPaintProperty('region-aplat', 'fill-color', aplat.paint['fill-color'] as never);
+    }
+  }, [ready, versionDuCatalogue]);
 
   /**
    * Les contours, qui suivent le catalogue.
@@ -748,7 +802,7 @@ export function MapCanvas({
     setOuverte(null);
     onRegion.current?.(null);
     const depart = setTimeout(() => {
-      instance.fitBounds(FRANCE_BOUNDS, {
+      instance.fitBounds(bornesDuPays() ?? FRANCE_BOUNDS, {
         padding: 12,
         duration: TRANSITION.retour.zoom,
         easing: bezier(TRANSITION.courbe),

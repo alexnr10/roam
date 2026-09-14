@@ -77,6 +77,13 @@ class Theme:
     # Thème alimenté par des listes officielles plutôt que par une classe
     # Wikidata : les labels sont déjà une curation humaine, finie et fiable.
     from_labels: list[str] = field(default_factory=list)
+    #: Portée du signalement des SOSIES pour ce thème, en mètres.
+    #
+    # Zéro — le défaut — laisse la règle ordinaire : trois cents mètres, et un
+    # nom partagé exigé à l'intérieur d'un thème. Une valeur plus grande dit
+    # que dans CE thème, deux lieux voisins sont probablement une seule visite
+    # même sans partager un mot : un cap et la plage en contrebas.
+    twin_radius_m: float = 0.0
     # Termes à résoudre avec `suggest-qids` — présents tant qu'un identifiant
     # reste à confirmer.
     search: list[str] = field(default_factory=list)
@@ -134,10 +141,26 @@ class Label:
     # Un verdict explicite l'emporte toujours : le curateur garde le dernier
     # mot sur ce qu'une liste lui propose.
     garde_d_office: bool = False
+    #: La PROPRIÉTÉ par laquelle un lieu se rattache à l'objet du label.
+    #
+    # Les cinq premiers types de requête pointent l'objet directement : le lieu
+    # EST membre de, EST protégé au titre de. « Le Vésuve est dans le parc
+    # national du Vésuve » ne se dit pas comme ça — il faut une propriété de
+    # situation, et l'objet n'est plus une liste mais une CLASSE d'aires.
+    #
+    # Déclarée en configuration et jamais en dur : une propriété écrite de
+    # mémoire ne lève rien, elle rend zéro résultat en silence.
+    via_property: str | None = None
+    via_property_search: str | None = None
 
     @property
     def is_manual(self) -> bool:
         return self.query_kind == "manual"
+
+    @property
+    def attend_une_propriete(self) -> bool:
+        """Ce label a besoin d'une propriété qui n'est pas encore résolue."""
+        return self.query_kind == "dans_une_aire" and not self.via_property
 
 
 @dataclass(frozen=True)
@@ -270,6 +293,10 @@ class CollectionRules:
     # (« plages-region-93 »). Le rapport de caractérisation est une heuristique ;
     # une ligne ici est un jugement, et il l'emporte.
     always_cross: list[str] = field(default_factory=list)
+    # Distance en deçà de laquelle deux lieux d'une collection MIXTE comptent
+    # pour le même site. Le second n'est pas écarté : il est repoussé après les
+    # autres, donc d'un niveau. Zéro n'applique rien.
+    min_distance_m: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -291,6 +318,48 @@ class Layer:
 
 
 @dataclass(frozen=True)
+class Contour:
+    """Une couche de contours à DESSINER, pour la carte de conquête.
+
+    À ne pas confondre avec `Layer`, qui sert au RATTACHEMENT : les deux
+    peuvent venir du même fichier, ou non. La France dessine les régions et
+    départements avec outre-mer de france-geojson, alors qu'elle ne rattache
+    que par les départements ; l'Italie dessine et rattache par le même
+    découpage ISTAT.
+
+    `fichier` nomme, quand il existe, le fichier que `geo-layers` a déjà
+    téléchargé : on le préfère alors au réseau, pour que les codes dessinés
+    soient EXACTEMENT ceux sur lesquels le catalogue a été rattaché.
+    """
+
+    level: str
+    url: str | None = None
+    fichier: str | None = None
+    code_key: str = "code"
+    name_key: str = "nom"
+
+
+@dataclass(frozen=True)
+class Enclave:
+    """Un micro-État enclavé, rattaché au catalogue qui l'entoure.
+
+    Le Vatican et Saint-Marin sont des pays chez Wikidata : `P17` y vaut Q237
+    et Q238, jamais Q38. La collecte italienne ne les voyait donc pas, et les
+    203 églises romaines du vivier n'avaient ni Saint-Pierre, ni la chapelle
+    Sixtine, ni les musées du Vatican. Le filtre avait raison ; le guide avait
+    tort — un voyageur français qui va à Rome va au Vatican.
+
+    `departement` dit à quelle province le rattacher, parce qu'un lieu sans
+    département sort du catalogue avant même d'être jugé. C'est un choix de
+    GUIDE et non de géopolitique : on va à Saint-Pierre depuis Rome.
+    """
+
+    qid: str
+    name: str
+    departement: str
+
+
+@dataclass(frozen=True)
 class Country:
     """Le pays que ce catalogue décrit.
 
@@ -306,6 +375,19 @@ class Country:
     code: str
     name: str
     de_form: str
+    #: Langues du service de libellés de Wikidata, dans l'ordre de préférence.
+    #
+    # Le français d'abord — le catalogue est français — puis la langue du pays,
+    # puis l'anglais. Sans la langue du pays, Wikidata rend le Q-id lui-même
+    # quand il ne connaît que le nom local, et la collecte jette le lieu.
+    langues: str = "fr,en"
+    #: Les micro-États enclavés que ce catalogue absorbe.
+    enclaves: tuple[Enclave, ...] = ()
+
+    @property
+    def qids(self) -> list[str]:
+        """Tous les pays à interroger : le principal, puis ses enclaves."""
+        return [self.qid, *(enclave.qid for enclave in self.enclaves)]
 
 
 @dataclass(frozen=True)
@@ -318,6 +400,12 @@ class Config:
     tiers: Tiers
     collections: CollectionRules
     alerts: Alerts
+    #: Les contours à dessiner, par échelle. Vide = ceux de `outlines.SOURCES`,
+    #: qui sont ceux de la France.
+    contours: dict[str, Contour] = field(default_factory=dict)
+    #: La mention de source des contours. La Licence ouverte l'exige pour la
+    #: France, CC-BY pour l'ISTAT : la carte la porte à l'écran.
+    contours_attribution: str = ""
     exclusions: Exclusions = field(default_factory=Exclusions)
     visitors: Visitors = field(default_factory=Visitors)
     pageviews: Pageviews = field(default_factory=Pageviews)
@@ -438,6 +526,7 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
             wikidata_classes=[str(q) for q in (t.get("wikidata_classes") or [])],
             gated=bool(t.get("gated", True)),
             from_labels=list(t.get("from_labels") or []),
+            twin_radius_m=float(t.get("twin_radius_m") or 0.0),
             search=list(t.get("search") or []),
             name_hints=[str(h) for h in (t.get("name_hints") or [])],
             max_per_departement=(
@@ -466,6 +555,8 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
                 search=q.get("search"),
                 collects=bool(lbl.get("collects", False)),
                 garde_d_office=bool(lbl.get("garde_d_office", False)),
+                via_property=q.get("property"),
+                via_property_search=q.get("property_search"),
             )
         )
 
@@ -476,6 +567,7 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
         min_places=int(raw["collections"]["min_places"]),
         max_places=int(raw["collections"]["max_places"]),
         max_per_commune=int(raw["collections"].get("max_per_commune", 0)),
+        min_distance_m=float(raw["collections"].get("min_distance_m", 0.0)),
         min_per_region=int(raw["collections"].get("min_per_region", 0)),
         geo_levels=list(raw["geo"]["levels"]),
         cross_theme_levels=list(raw["geo"]["cross_theme_levels"]),
@@ -486,11 +578,16 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
         min_diameter_km=float(raw["collections"].get("min_diameter_km", 0.0)),
         min_theme_lift=float(raw["collections"].get("min_theme_lift", 0.0)),
         always_cross=[str(slug) for slug in (raw["collections"].get("always_cross") or [])],
+        # Une ville à `null` est RETIRÉE, pas gardée vide. Un dictionnaire
+        # fusionne clé par clé : sans cela, la surcouche d'un pays héritait de
+        # la dérogation parisienne et n'avait aucun moyen de s'en défaire —
+        # inerte, mais annoncée dans le journal de chaque construction.
         commune_overrides={
-            str(ville): {str(t): int(n) for t, n in (plafonds or {}).items()}
+            str(ville): {str(t): int(n) for t, n in plafonds.items()}
             for ville, plafonds in (
                 raw["collections"].get("commune_overrides") or {}
             ).items()
+            if plafonds
         },
     )
 
@@ -524,6 +621,14 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
     country = Country(
         qid=str(pays["qid"]), code=str(pays["code"]),
         name=str(pays["name"]), de_form=str(pays["de_form"]),
+        langues=str(pays.get("langues") or "fr,en"),
+        # `enclaves` est frère de `country` dans le fichier — il décrit ce que
+        # le catalogue absorbe, pas le pays lui-même.
+        enclaves=tuple(
+            Enclave(qid=str(e["qid"]), name=str(e["name"]),
+                    departement=str(e["departement"]))
+            for e in (raw["geo"].get("enclaves") or [])
+        ),
     )
 
     layers = {
@@ -537,9 +642,26 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
         for level, bloc in (raw["geo"].get("layers") or {}).items()
     }
 
+    # Les contours à DESSINER. Bloc séparé des `layers` parce que les deux ne
+    # coïncident pas : la France rattache par les seuls départements mais
+    # dessine aussi les régions, outre-mer compris.
+    dessins = raw["geo"].get("contours") or {}
+    contours = {
+        level: Contour(
+            level=level,
+            url=(str(bloc["url"]) if bloc.get("url") else None),
+            fichier=(str(bloc["fichier"]) if bloc.get("fichier") else None),
+            code_key=str(bloc.get("code_key", "code")),
+            name_key=str(bloc.get("name_key", "nom")),
+        )
+        for level, bloc in (dessins.get("niveaux") or {}).items()
+    }
+
     return Config(
         country=country,
         layers=layers,
+        contours=contours,
+        contours_attribution=str(dessins.get("attribution") or ""),
         themes=themes,
         labels=labels,
         scoring=scoring,

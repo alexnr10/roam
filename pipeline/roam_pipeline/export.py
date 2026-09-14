@@ -204,6 +204,51 @@ def review_tiers(collections: list[Collection]) -> dict[str, int]:
     return _membership(collections)[1]
 
 
+#: Longueur d'une tranche de revue, en lignes. Vingt-cinq tient dans un écran
+#: de téléphone en deux ou trois défilements, et c'est la taille des blocs de
+#: niveau 2 que le curateur a lus sans rien signaler.
+TRANCHE = 25
+
+
+def _par_tranches(places: list[Place], best_tier: dict[str, int]) -> list[Place]:
+    """L'ordre de lecture de la revue : par niveau, puis par tranches de thème.
+
+    Grouper par thème est juste — comparer des châteaux entre eux va plus vite
+    que de sauter de l'un à l'autre — mais grouper TOUT un thème d'un bloc ne
+    l'est pas. Mesuré sur la revue italienne : les niveaux 1 et 2 tournent
+    joliment, onze à vingt-cinq lignes par thème, six pour cent du niveau
+    chacun. Le niveau 3, lui, fait les deux tiers de la feuille et s'y lit par
+    blocs de cent à cent quatre-vingts lignes — 178 sommets d'affilée, puis 176
+    sites antiques, puis 149 monuments.
+
+    Le catalogue est équilibré ; c'est l'ORDRE DE LECTURE qui ne l'est pas, et
+    le curateur l'a senti avant qu'on le mesure : « j'ai l'impression de ne voir
+    que des cathédrales, des abbayes, des musées et des sites antiques », en
+    Italie comme en France.
+
+    On coupe donc chaque thème en tranches et on les alterne. Un château reste
+    à côté d'un château sur vingt-cinq lignes, et la séance garde sa variété.
+    """
+    par_theme: dict[tuple[int, str], list[Place]] = defaultdict(list)
+    for place in places:
+        par_theme[(best_tier.get(place.wikidata_id, 9), place.theme_id)].append(place)
+    for lot in par_theme.values():
+        lot.sort(key=lambda p: (-p.score, p.name))
+
+    ordered: list[Place] = []
+    for niveau in sorted({cle[0] for cle in par_theme}):
+        themes = sorted(t for lv, t in par_theme if lv == niveau)
+        tour = 0
+        while themes:
+            for theme in themes:
+                lot = par_theme[(niveau, theme)]
+                ordered.extend(lot[tour * TRANCHE:(tour + 1) * TRANCHE])
+            tour += 1
+            themes = [t for t in themes
+                      if len(par_theme[(niveau, t)]) > tour * TRANCHE]
+    return ordered
+
+
 def write_review_csv(
     places: list[Place],
     collections: list[Collection],
@@ -226,10 +271,7 @@ def write_review_csv(
     # est décourageant ; relire d'abord les 200 incontournables donne déjà un
     # catalogue jouable, et comparer des châteaux entre eux va plus vite que
     # de sauter d'un thème à l'autre.
-    ordered = sorted(
-        places,
-        key=lambda p: (best_tier.get(p.wikidata_id, 9), p.theme_id, -p.score, p.name),
-    )
+    ordered = _par_tranches(places, best_tier)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8", newline="") as fh:
@@ -572,7 +614,7 @@ def write_review_html(
     # Ce que le dédoublonnage ne peut pas voir : il ne compare qu'à l'intérieur
     # d'un thème. « Palais du Louvre » et « musée du Louvre » sont à dix mètres
     # et dans deux thèmes différents ; aucune règle ne dit lequel garder.
-    jumeaux = twins(places)
+    jumeaux = twins(places, config)
 
     # Les thèmes s'alternent au lieu de se suivre. Rangés par identifiant, les
     # abbayes ouvraient chaque niveau — deux cents d'affilée avant la première
@@ -589,11 +631,13 @@ def write_review_html(
     # et la refaire par lieu coûterait deux mille parcours.
     doubles = remplacants(places)
     rows = []
-    for place in sorted(
-        places,
-        key=lambda p: (p.wikidata_id not in nationale,
-                       best_tier.get(p.wikidata_id, 9), p.theme_id, -p.score, p.name),
-    ):
+    # Même ordre de lecture que la feuille CSV — par tranches de thème, et non
+    # par thème entier — mais la page garde sa coupe principale : ce qui est
+    # dans la collection nationale du thème d'abord. C'est la page que le
+    # curateur lit vraiment ; le défaut qu'il a signalé est ici.
+    dedans = [p for p in places if p.wikidata_id in nationale]
+    dehors = [p for p in places if p.wikidata_id not in nationale]
+    for place in _par_tranches(dedans, best_tier) + _par_tranches(dehors, best_tier):
         dept = depts.get(place.departement_code or "")
         parts = score_breakdown(place, config)
         # Deux raisons de douter du rattachement, et une seule d'entre elles
@@ -1063,6 +1107,7 @@ function card(p) {
   const d = decisions[p.id] || "";
   const theme = themeNow(p);
   el.className = "card" + (d ? " " + d : "") + (theme !== p.themeId ? " rethemed" : "");
+  el.dataset.id = p.id;
 
   const img = p.image
     ? `<img class="thumb" loading="lazy" src="${p.image}" alt=""
@@ -1166,7 +1211,7 @@ function card(p) {
     if (picker.value === p.themeId) delete themeOf[p.id];
     else themeOf[p.id] = picker.value;
     save();
-    render();
+    rafraichir(p);
   };
 
   el.querySelectorAll("[data-act]").forEach(btn => {
@@ -1175,15 +1220,50 @@ function card(p) {
       decisions[p.id] = decisions[p.id] === act ? "" : act;
       if (!decisions[p.id] && !(p.id in DECIDED)) delete decisions[p.id];
       save();
-      render();
+      rafraichir(p);
     };
   });
   return el;
 }
 
-function render() {
+// Décider ne doit pas renvoyer en haut de page. `render()` reconstruit toute la
+// grille — c'est juste quand un filtre change, et c'est un saut au début de la
+// liste à chaque clic quand on relit deux cents sosies : on décide, on remonte,
+// on redescend chercher où l'on en était.
+//
+// Deux cas, et deux traitements. Si le lieu RESTE affiché après sa décision —
+// c'est le cas du filtre « Sosies », qui ne regarde pas les verdicts — seule sa
+// carte est remplacée, à sa place exacte, et rien ne bouge. S'il doit
+// DISPARAÎTRE — filtre « À décider » — la grille est bien reconstruite, mais la
+// position de défilement est rendue ensuite.
+function rafraichir(p) {
+  const encore = visible().some(q => q.id === p.id);
+  const ancienne = grid.querySelector(`[data-id="${CSS.escape(p.id)}"]`);
+  if (encore && ancienne) {
+    ancienne.replaceWith(card(p));
+    compteurs(visible());
+    return;
+  }
+  render(true);
+}
+
+// `garderPosition` distingue les deux appelants. Une DÉCISION doit laisser
+// l'écran où il est ; un CHANGEMENT DE FILTRE affiche une autre liste, et
+// revenir en haut est alors ce qu'on attend.
+function render(garderPosition) {
+  const y = window.scrollY;
   const list = visible();
   grid.replaceChildren(...list.map(card));
+  // Rendue APRÈS le remplacement, et bornée à la hauteur qui reste : sur une
+  // liste qui vient de raccourcir, insister laisserait l'écran sous son contenu.
+  window.scrollTo({
+    top: garderPosition ? Math.min(y, document.body.scrollHeight) : 0,
+    behavior: "instant",
+  });
+  compteurs(list);
+}
+
+function compteurs(list) {
   // Compté sur les lieux de la page, jamais sur les clés du stockage : c'est
   // la seconde barrière contre « plus de décidés que de lieux ».
   const done = DATA.filter(p => decisions[p.id]).length;
@@ -1213,7 +1293,7 @@ function render() {
 }
 
 for (const id of ["theme", "region", "tier", "state"]) {
-  document.getElementById(id).onchange = render;
+  document.getElementById(id).onchange = () => render(false);
 }
 
 function feuille() {
@@ -1433,7 +1513,13 @@ def write_app_catalog(
             "placeCount": len(collection.places),
             "tierCounts": collection.tier_counts,
             "places": [
-                {"placeId": cp.place_id, "tier": cp.tier, "rank": cp.rank}
+                {
+                    "placeId": cp.place_id, "tier": cp.tier, "rank": cp.rank,
+                    # Facultatif, et absent partout sauf là où il sert : le nom
+                    # que le lieu porte DANS cette collection. L'application
+                    # retombe sur le sien.
+                    **({"name": cp.name} if cp.name else {}),
+                }
                 for cp in collection.places
             ],
         }

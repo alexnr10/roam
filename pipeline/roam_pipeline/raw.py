@@ -63,6 +63,12 @@ def _payload(place: Place) -> dict:
     if not payload.get("country_code"):
         payload.pop("country_code", None)
     payload.pop("slug", None)
+    # Vide = le lieu porte son propre nom dans toutes ses collections, ce qui
+    # est le cas de onze mille lieux sur onze mille et quelques. L'écrire
+    # partout coûterait un jour de diff pour zéro information — et surtout un
+    # diff qui cacherait les vingt-six lignes qui, elles, disent quelque chose.
+    if not payload.get("label_noms"):
+        payload.pop("label_noms", None)
     return payload
 
 
@@ -118,6 +124,16 @@ def _load(path: Path) -> list[Place]:
         except TypeError as exc:
             LOG.error("%s : lieu illisible (%s)", path.name, exc)
     return places
+
+
+def read_shard(raw_dir: Path, shard: str) -> list[Place]:
+    """Les lieux d'UN fichier, tels qu'ils y sont écrits.
+
+    À la différence de `read_raw`, aucun arbitrage entre thèmes : c'est le
+    contenu brut du fichier, qu'on veut pouvoir corriger puis réécrire à sa
+    place.
+    """
+    return _load(_path(raw_dir, shard))
 
 
 def read_raw(raw_dir: Path) -> list[Place]:

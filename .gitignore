@@ -22,26 +22,39 @@ venv/
 # Les décisions ne vivent pas là : elles vont du navigateur à `decisions.csv`
 # par `apply-review`. Pour verser une feuille vraiment remplie à la main,
 # `git add -f` reste possible et sera un geste délibéré.
+# ⚠️ LES MOTIFS SONT GÉNÉRIQUES, et ce n'est pas de la coquetterie. Ils étaient
+# écrits en dur pour la France — `pipeline/data/out/…` — et le deuxième pays l'a
+# payé : toutes les sorties italiennes de `pipeline/data/it/out/` sont restées
+# versionnées, dont un `places_raw.json` de DIX-NEUF MÉGAOCTETS réécrit à chaque
+# construction. Deux machines qui reconstruisent le même catalogue produisaient
+# deux fichiers de quinze mille lignes, et chaque `git pull` finissait en
+# conflit sur cinq fichiers que `build` régénère en une minute.
+#
+# `pipeline/data/**/out/` couvre `data/out/` ET `data/<pays>/out/` : en gitignore,
+# `**` vaut pour zéro répertoire ou plus. Un troisième pays n'aura rien à écrire.
+#
 # `places_raw.json` est la copie de travail, reconstituée par `sync` depuis
 # `pipeline/data/raw/`. Un commentaire en FIN de ligne ne fonctionne pas ici :
 # git prend la ligne entière comme motif, et le fichier cesse d'être ignoré.
-pipeline/data/out/places_raw.json
-pipeline/data/out/places.json
-pipeline/data/out/collections.json
-pipeline/data/out/seed.sql
+pipeline/data/**/out/places_raw.json
+pipeline/data/**/out/places.json
+pipeline/data/**/out/collections.json
+pipeline/data/**/out/seed.sql
 # La PAGE de revue se reconstruit à l'identique depuis le catalogue et les
 # décisions. `review.csv`, lui, reste hors de cette liste : une feuille remplie
 # à la main est du travail humain, et le dépôt doit pouvoir la sauver.
-pipeline/data/out/review.html
+pipeline/data/**/out/review.html
 # Le brouillon écrit par le serveur de revue à chaque clic, et relu par
 # `apply-review`. Ce n'est pas une mémoire : c'est le trajet entre le navigateur
 # et `decisions.csv`, qui lui est versionné.
-pipeline/data/out/review-decisions.csv
-pipeline/data/out/review-decisions.part
-pipeline/data/out/review-decisions.precedent.csv
-pipeline/data/out/review.csv
+pipeline/data/**/out/review-decisions.csv
+pipeline/data/**/out/review-decisions.part
+pipeline/data/**/out/review-decisions.precedent.csv
+pipeline/data/**/out/review.csv
 # `fetch-state.json` est en revanche PETIT et utile à conserver : il dit quels
 # thèmes ont une collecte en échec, et `build` le rappelle à chaque passage.
+# `label-orphelins.csv` et la feuille COMPLÈTE `candidates.csv` restent
+# versionnés eux aussi — la seconde coûte vingt minutes de requêtes Overpass.
 
 # Node / Expo (à venir)
 node_modules/
@@ -55,7 +68,7 @@ dist/
 # Feuilles d'un essai restreint (`discover --only`). La feuille complète,
 # elle, est versionnée : elle coûte vingt minutes de requêtes Overpass et
 # porte les seuls faits de terrain du catalogue.
-pipeline/data/out/candidates-*.csv
+pipeline/data/**/out/candidates-*.csv
 
 # Contours administratifs du RATTACHEMENT (`geo-layers`). Trois mégaoctets pour
 # la France, davantage ailleurs, et parfaitement régénérables depuis une URL

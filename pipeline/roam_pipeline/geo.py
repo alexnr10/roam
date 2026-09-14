@@ -129,6 +129,33 @@ def region_of(departement_code: str) -> Area | None:
     return regions().get(dept.parent_code)
 
 
+def departement_du_code_communal(code: str | None) -> str | None:
+    """Le département que PRÉFIXE un code de commune, quel que soit le pays.
+
+    `departement_from_insee` connaît la France et elle seule : deux chiffres,
+    trois pour l'outre-mer, une lettre pour la Corse. Les codes ISTAT en font
+    trois pour la province et six pour la commune, si bien qu'`align_departements`
+    — « c'est la commune qui gagne » — ne gagnait rien du tout hors de France.
+
+    Mesuré sur le premier catalogue italien : un seul lieu s'en trouvait mal,
+    mais spectaculairement. La péninsule italienne portait la commune 066018,
+    dans la province de L'Aquila, ET le département 099, Rimini. Rien ne
+    tranchait, parce que rien ne savait lire un code italien.
+
+    On cherche donc le plus LONG préfixe qui soit un département connu. La
+    règle retrouve les trois cas français d'elle-même : 97411 → 974 avant 97,
+    2A004 → 2A, 75056 → 75.
+    """
+    if not code:
+        return None
+    code = code.strip().upper()
+    connus = departements()
+    for taille in range(min(len(code) - 1, 5), 0, -1):
+        if code[:taille] in connus:
+            return code[:taille]
+    return None
+
+
 def normalize_dept_code(raw: str | None) -> str | None:
     """Normalise un code INSEE de département venant de Wikidata ('1' → '01')."""
     if not raw:
