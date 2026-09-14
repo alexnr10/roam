@@ -276,6 +276,52 @@ export function bornesDuPays(): Emprise | null {
   return vu ? [[ouest, sud], [est, nord]] : null;
 }
 
+/**
+ * Qui touche qui, parmi les régions dessinées.
+ *
+ * Les contours sont JOINTIFS par construction — le pipeline les découpe en arcs
+ * partagés, simplifie chaque arc une seule fois, puis recoud. Deux régions
+ * voisines portent donc EXACTEMENT les mêmes sommets sur leur frontière
+ * commune, et il suffit de les compter : aucune géométrie à intersecter.
+ *
+ * Sert au coloriage — quatre sables, et jamais le même de part et d'autre
+ * d'une frontière, sans quoi la frontière disparaît.
+ */
+export function voisinage(): Map<string, Set<string>> {
+  return voisinageDe(REGIONS.values());
+}
+
+/** La même chose sur une collection quelconque — c'est ce qui la rend testable. */
+export function voisinageDe(
+  features: Iterable<GeoJSON.Feature<Geometrie, { code: string; nom: string }>>,
+): Map<string, Set<string>> {
+  const parSommet = new Map<string, string[]>();
+  const voisins = new Map<string, Set<string>>();
+
+  for (const feature of features) {
+    const code = feature.properties.code;
+    voisins.set(code, new Set());
+    for (const polygone of polygones(feature.geometry)) {
+      for (const anneau of polygone) {
+        for (const [lon, lat] of anneau) {
+          const cle = `${lon},${lat}`;
+          const ici = parSommet.get(cle);
+          if (ici) { if (!ici.includes(code)) ici.push(code); }
+          else parSommet.set(cle, [code]);
+        }
+      }
+    }
+  }
+
+  for (const codes of parSommet.values()) {
+    if (codes.length < 2) continue;
+    for (const un of codes) {
+      for (const autre of codes) if (un !== autre) voisins.get(un)?.add(autre);
+    }
+  }
+  return voisins;
+}
+
 /** Région d'un département, par son code. */
 export const regionDuDepartement = (code: string): string | null =>
   regionParDepartement.get(code) ?? null;

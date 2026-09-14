@@ -6,6 +6,7 @@ import type { GeoJSONSource, MapLayerMouseEvent, Map as MapLibreMap } from 'mapl
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { paysCourant } from '../data/catalog';
 import { EMPTY_OUTLINES, outlinesFor } from '../data/outlines';
 import type { Emprise } from '../lib/regions';
 import {
@@ -19,6 +20,7 @@ import {
   regionDuCadre,
   regionDuDepartement,
   voile,
+  voisinage,
 } from '../lib/regions';
 import { etoilesDe } from '../lib/etoiles';
 import { useCatalogue } from '../lib/useCatalogue';
@@ -40,6 +42,7 @@ import {
   pasDeCascade,
   TRANSITION,
   resolveBasemap,
+  tonsDuPays,
 } from './mapStyle';
 import {
   SOURCE_DEPTS,
@@ -385,6 +388,7 @@ export function MapCanvas({
         for (const couche of couchesDeLaCarte({
           natif: false,
           avecPolices: Boolean(instance.getStyle()?.glyphs),
+          tons: tonsDuPays(paysCourant(), voisinage()),
         })) {
           instance.addLayer(couche as never);
         }
@@ -567,6 +571,29 @@ export function MapCanvas({
     const bornes = bornesDuPays();
     if (bornes) instance.fitBounds(bornes, { padding: 12, duration: 600 });
   }, [ready, recadrage]);
+
+  /**
+   * Le coloriage, qui suit le pays.
+   *
+   * Les couches ne sont posées qu'UNE FOIS, à la création de la carte : sans
+   * ce rappel, l'expression de couleur resterait celle du pays de départ, et
+   * un deuxième pays serait peint par les quelques codes de régions que les
+   * deux découpages ont en commun — c'est-à-dire par hasard.
+   */
+  useEffect(() => {
+    const instance = map.current;
+    if (!ready || !instance || !instance.getLayer('region-aplat')) return;
+    // On REDEMANDE la couche plutôt que de réécrire son expression ici : deux
+    // écritures d'une même chose finissent toujours par diverger, et celle-ci
+    // porte aussi le survol.
+    const aplat = couchesDeLaCarte({
+      natif: false,
+      tons: tonsDuPays(paysCourant(), voisinage()),
+    }).find((couche) => couche.id === 'region-aplat');
+    if (aplat) {
+      instance.setPaintProperty('region-aplat', 'fill-color', aplat.paint['fill-color'] as never);
+    }
+  }, [ready, versionDuCatalogue]);
 
   /**
    * Les contours, qui suivent le catalogue.

@@ -586,10 +586,80 @@ export function opaciteDesTraits(maximum = 1): unknown[] {
   return ['interpolate', ['linear'], ['zoom'], 8.2, maximum, 10.5, 0];
 }
 
+export type TonDeRegion = keyof typeof REGION_TONES;
+
+/** L'ordre de préférence des sables, quand le coloriage a le choix. */
+const ORDRE_DES_TONS: TonDeRegion[] = ['lin', 'sable', 'sauge', 'terre'];
+
+/**
+ * Les coloriages faits à la main, par pays.
+ *
+ * La France a le sien depuis le début, et il ne bouge pas. Un pays qui n'y
+ * figure pas n'est PAS laissé sans couleur : il se colorie tout seul, par
+ * `coloriage`. C'est la correction d'un défaut qui s'est vu tout de suite —
+ * l'Italie sortait presque entièrement grise, avec trois ou quatre régions du
+ * nord colorées par accident, parce que leurs codes (01 à 06, 11) se trouvent
+ * être aussi ceux de la Guadeloupe, de la Martinique et de l'Île-de-France.
+ * Une table écrite pour un pays et appliquée à un autre ne dit rien : elle
+ * coïncide par hasard.
+ */
+const TONS_A_LA_MAIN: Record<string, Record<string, TonDeRegion>> = {
+  FR: REGION_TONE_BY_CODE,
+};
+
+/**
+ * Quatre sables sur une carte, et jamais le même de part et d'autre d'une
+ * frontière — sinon la frontière disparaît.
+ *
+ * C'est un coloriage de carte au sens propre, et quatre teintes y suffisent
+ * toujours. On sert les régions les plus entourées d'abord (ce sont elles qui
+ * contraignent le reste), et à choix égal la teinte la moins employée : sans
+ * cet équilibrage, la dernière teinte n'apparaît que deux fois et l'ensemble
+ * penche.
+ *
+ * Déterministe : même découpage, même coloriage, à chaque démarrage.
+ */
+export function coloriage(voisins: Map<string, Set<string>>): Record<string, TonDeRegion> {
+  const parEntourage = [...voisins.keys()].sort(
+    (a, b) => (voisins.get(b)?.size ?? 0) - (voisins.get(a)?.size ?? 0) || a.localeCompare(b),
+  );
+  const tons: Record<string, TonDeRegion> = {};
+  const emploi = new Map<TonDeRegion, number>(ORDRE_DES_TONS.map((ton) => [ton, 0]));
+
+  for (const code of parEntourage) {
+    const pris = new Set<TonDeRegion>();
+    for (const voisin of voisins.get(code) ?? []) {
+      const deja = tons[voisin];
+      if (deja) pris.add(deja);
+    }
+    // Plus de quatre voisins deux à deux distincts est impossible sur une carte
+    // plane ; si cela arrivait (contours abîmés), on reprend toute la palette
+    // plutôt que de rendre `undefined`.
+    const libres = ORDRE_DES_TONS.filter((ton) => !pris.has(ton));
+    const candidats = libres.length > 0 ? libres : ORDRE_DES_TONS;
+    const choisi = candidats.reduce((meilleur, ton) =>
+      (emploi.get(ton) ?? 0) < (emploi.get(meilleur) ?? 0) ? ton : meilleur,
+    );
+    tons[code] = choisi;
+    emploi.set(choisi, (emploi.get(choisi) ?? 0) + 1);
+  }
+  return tons;
+}
+
+/** Le coloriage d'un pays : le sien s'il en a un, sinon celui qu'on calcule. */
+export function tonsDuPays(
+  pays: string,
+  voisins: Map<string, Set<string>>,
+): Record<string, TonDeRegion> {
+  return TONS_A_LA_MAIN[pays] ?? coloriage(voisins);
+}
+
 /** L'expression qui donne son sable à chaque région. Un coloriage, pas un hachage. */
-export function tonsDesRegions(): unknown[] {
+export function tonsDesRegions(
+  tons: Record<string, TonDeRegion> = REGION_TONE_BY_CODE,
+): unknown[] {
   const cas: unknown[] = ['match', ['get', 'code']];
-  for (const [code, ton] of Object.entries(REGION_TONE_BY_CODE)) {
+  for (const [code, ton] of Object.entries(tons)) {
     cas.push(code, REGION_TONES[ton]);
   }
   cas.push(REGION_TONES.lin);

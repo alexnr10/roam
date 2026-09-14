@@ -8,6 +8,7 @@ import { StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 
 import { outlinesFor } from '../data/outlines';
 import { etoilesDe } from '../lib/etoiles';
+import { paysCourant } from '../data/catalog';
 import { useCatalogue } from '../lib/useCatalogue';
 import type { Emprise } from '../lib/regions';
 import {
@@ -18,6 +19,7 @@ import {
   regionDuCadre,
   regionDuDepartement,
   voile,
+  voisinage,
 } from '../lib/regions';
 import { colors, spacing, type } from '../theme';
 import type { Coordinates, Place } from '../types';
@@ -37,6 +39,7 @@ import {
   SEUIL_REGION,
   TRANSITION,
   resolveBasemap,
+  tonsDuPays,
 } from './mapStyle';
 
 /**
@@ -560,8 +563,12 @@ function CarteNative({
         // pâlir à l'arrêt donne un clignotement, et après l'atterrissage un
         // deuxième temps mort. C'est la transition du style qui les emmène.
         attenuation: ouverte ? ATTENUATION_AUTRES : 1,
+        // Le coloriage suit le PAYS : une table écrite pour la France
+        // appliquée à un autre découpage ne peint que par coïncidence de
+        // codes, c'est-à-dire presque rien.
+        tons: tonsDuPays(paysCourant(), voisinage()),
       }),
-    [ouverte, highlightedId, departements, style],
+    [ouverte, highlightedId, departements, style, versionDuCatalogue],
   );
 
   /**

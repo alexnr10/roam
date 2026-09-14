@@ -13,6 +13,7 @@ import {
   tailleDesGlyphes,
   tonsDesRegions,
 } from './mapStyle';
+import type { TonDeRegion } from './mapStyle';
 
 /**
  * Les couches de la carte, une fois pour les deux plateformes.
@@ -64,6 +65,8 @@ export type EtatDeLaCarte = {
   avecPolices?: boolean;
   /** Ce qu'il reste des AUTRES régions pendant le vol. */
   attenuation?: number;
+  /** Le coloriage du pays regardé. Celui de la France par défaut. */
+  tons?: Record<string, TonDeRegion>;
 };
 
 /** Le fondu d'une propriété de peinture, côté natif seulement. */
@@ -78,6 +81,7 @@ export function couchesDeLaCarte({
   departements = [],
   avecPolices = true,
   attenuation = 1,
+  tons,
 }: EtatDeLaCarte): Couche[] {
   const opacite = opaciteDesPastilles(misEnAvant);
   const fondu = transition(natif, TRANSITION.lieux.apparition);
@@ -123,12 +127,12 @@ export function couchesDeLaCarte({
     source: SOURCE_REGIONS,
     paint: {
       'fill-color': natif
-        ? tonsDesRegions()
+        ? tonsDesRegions(tons)
         : [
             'case',
             ['boolean', ['feature-state', 'hover'], false],
             REGION_LINES.hover,
-            tonsDesRegions(),
+            tonsDesRegions(tons),
           ],
       'fill-opacity': natif
         ? opaciteDesAplatsNative(ouverte, attenuation)
