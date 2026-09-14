@@ -183,7 +183,9 @@ def _decoupe(texte: str) -> list[str]:
     return [mot for mot in re.split(r"[^a-z0-9]+", sans_accents) if mot]
 
 
-def twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
+def twins(
+    places: list[Place], config: "Config | None" = None
+) -> dict[str, list[tuple[Place, float, str]]]:
     """Les paires de lieux proches que `dedupe` ne peut pas voir.
 
     `dedupe` ne compare qu'à l'intérieur d'un thème et qu'à cent cinquante
@@ -206,6 +208,19 @@ def twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
     Renvoie, par identifiant, les jumeaux trouvés : (l'autre lieu, la distance,
     le motif).
     """
+    # La portée est par THÈME, et elle doit l'être. Mesuré à deux kilomètres à
+    # l'intérieur d'un même thème : le littoral français rend douze paires, les
+    # monuments soixante-dix et les musées soixante-cinq — le Louvre et Orsay
+    # sont à 692 m, le palais Pitti et les Offices à 551 m, et ce sont DEUX
+    # visites. Une portée unique ne peut pas distinguer « le Louvre et Orsay »
+    # de « le cap et la plage en contrebas » ; le thème, lui, le sait.
+    portees = {
+        theme.id: theme.twin_radius_m or NAMED_TWIN_DISTANCE_M
+        for theme in (config.themes if config else ())
+    }
+    rayon_max = max([NAMED_TWIN_DISTANCE_M, *portees.values()])
+    cote = max(0.01, rayon_max / 80_000)
+
     grille: dict[tuple[float, float], list[Place]] = defaultdict(list)
     for place in places:
         grille[(round(place.lat, 2), round(place.lon, 2))].append(place)
@@ -213,8 +228,10 @@ def twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
     jumeaux: dict[str, list[tuple[Place, float, str]]] = defaultdict(list)
     vus: set[tuple[str, str]] = set()
     for place in places:
-        for dlat in (-0.01, 0.0, 0.01):
-            for dlon in (-0.01, 0.0, 0.01):
+        pas = [round(k * 0.01, 2) for k in range(-int(cote * 100) - 1,
+                                                  int(cote * 100) + 2)]
+        for dlat in pas:
+            for dlon in pas:
                 voisins = grille.get(
                     (round(place.lat + dlat, 2), round(place.lon + dlon, 2)), []
                 )
@@ -223,7 +240,9 @@ def twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
                     if couple in vus or couple[0] == couple[1]:
                         continue
                     distance = haversine_m(place.lat, place.lon, autre.lat, autre.lon)
-                    if distance >= NAMED_TWIN_DISTANCE_M:
+                    rayon = max(portees.get(place.theme_id, NAMED_TWIN_DISTANCE_M),
+                                portees.get(autre.theme_id, NAMED_TWIN_DISTANCE_M))
+                    if distance >= rayon:
                         continue
                     communs = _mots_distinctifs(
                         place.name, place.commune_name
@@ -235,11 +254,16 @@ def twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
                     # plus loin ET à l'intérieur d'un thème : l'abbaye de Lérins
                     # et sa tour-monastère sont à 160 m, deux fiches pour un
                     # même rocher, et `dedupe` s'arrête à 150.
+                    large = rayon > NAMED_TWIN_DISTANCE_M
                     if autre.theme_id == place.theme_id:
                         # En deçà de son seuil, `dedupe` a déjà tranché — une
                         # paire qui arrive ici de si près n'existe pas en vrai.
-                        # Au-delà, il ne voit plus rien : c'est le nom qui parle.
-                        if not communs or distance < DUPLICATE_DISTANCE_M:
+                        if distance < DUPLICATE_DISTANCE_M:
+                            continue
+                        # Au-delà, c'est le nom qui parle — sauf dans un thème
+                        # à portée large, où le voisinage suffit à poser la
+                        # question.
+                        if not communs and not large:
                             continue
                     elif not communs and distance >= DUPLICATE_DISTANCE_M:
                         continue
@@ -248,6 +272,8 @@ def twins(places: list[Place]) -> dict[str, list[tuple[Place, float, str]]]:
                         motif = "nom partagé : " + ", ".join(sorted(communs))
                     elif distance < SAME_FOOTPRINT_M:
                         motif = "même emplacement"
+                    elif distance >= NAMED_TWIN_DISTANCE_M:
+                        motif = f"à {distance:.0f} m, dans le même thème"
                     else:
                         motif = "à quelques pas"
                     jumeaux[place.wikidata_id].append((autre, distance, motif))

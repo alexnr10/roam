@@ -614,7 +614,7 @@ def write_review_html(
     # Ce que le dédoublonnage ne peut pas voir : il ne compare qu'à l'intérieur
     # d'un thème. « Palais du Louvre » et « musée du Louvre » sont à dix mètres
     # et dans deux thèmes différents ; aucune règle ne dit lequel garder.
-    jumeaux = twins(places)
+    jumeaux = twins(places, config)
 
     # Les thèmes s'alternent au lieu de se suivre. Rangés par identifiant, les
     # abbayes ouvraient chaque niveau — deux cents d'affilée avant la première

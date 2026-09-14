@@ -77,6 +77,13 @@ class Theme:
     # Thème alimenté par des listes officielles plutôt que par une classe
     # Wikidata : les labels sont déjà une curation humaine, finie et fiable.
     from_labels: list[str] = field(default_factory=list)
+    #: Portée du signalement des SOSIES pour ce thème, en mètres.
+    #
+    # Zéro — le défaut — laisse la règle ordinaire : trois cents mètres, et un
+    # nom partagé exigé à l'intérieur d'un thème. Une valeur plus grande dit
+    # que dans CE thème, deux lieux voisins sont probablement une seule visite
+    # même sans partager un mot : un cap et la plage en contrebas.
+    twin_radius_m: float = 0.0
     # Termes à résoudre avec `suggest-qids` — présents tant qu'un identifiant
     # reste à confirmer.
     search: list[str] = field(default_factory=list)
@@ -491,6 +498,7 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
             wikidata_classes=[str(q) for q in (t.get("wikidata_classes") or [])],
             gated=bool(t.get("gated", True)),
             from_labels=list(t.get("from_labels") or []),
+            twin_radius_m=float(t.get("twin_radius_m") or 0.0),
             search=list(t.get("search") or []),
             name_hints=[str(h) for h in (t.get("name_hints") or [])],
             max_per_departement=(

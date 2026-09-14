@@ -8427,6 +8427,80 @@ class TestLabelDansUneAire(unittest.TestCase):
         self.assertTrue(any("propriété de situation" in m for m in journal.output))
 
 
+class TestPorteeDesSosiesParTheme(unittest.TestCase):
+    """« Le cap qui donne sur une plage également collectée. »
+
+    Ce n'est pas un doublon — chacun mérite sa fiche — mais les voir se suivre
+    dans un palmarès donne l'impression d'un remplissage. Le signalement des
+    sosies s'arrêtait à trois cents mètres et exigeait un nom partagé à
+    l'intérieur d'un thème : le cap Croisette et la calanque de Callelongue, à
+    1 357 m et sans un mot commun, passaient au travers.
+
+    Une portée UNIQUE ne pouvait pas régler le cas. Mesuré à deux kilomètres
+    dans un même thème : le littoral français rend douze paires, les monuments
+    soixante-dix et les musées soixante-cinq — le Louvre et Orsay sont à 692 m,
+    le palais Pitti et les Offices à 551 m, et ce sont deux visites. La portée
+    est donc par thème.
+    """
+
+    @staticmethod
+    def _cote(nom, theme, lat, lon):
+        p = make_place(nom, theme=theme, wikidata_id=f"Q{abs(hash(nom)) % 99999}")
+        p.lat, p.lon, p.commune_name = lat, lon, "Ailleurs"
+        return p
+
+    def _config(self, rayon):
+        import dataclasses
+        config = load_config()
+        return dataclasses.replace(config, themes=tuple(
+            dataclasses.replace(t, twin_radius_m=rayon if t.id == "plages" else 0.0)
+            for t in config.themes))
+
+    def test_le_cap_et_la_plage_sont_signales(self):
+        from roam_pipeline.collections import twins
+
+        # 1,1 km l'un de l'autre, aucun mot commun, même thème.
+        cap = self._cote("Cap la Houssaye", "plages", 43.2000, 5.4000)
+        plage = self._cote("Plage de Boucan Canot", "plages", 43.2100, 5.4000)
+        self.assertEqual(twins([cap, plage], self._config(0)), {})
+        signale = twins([cap, plage], self._config(2000))
+        self.assertEqual(len(signale), 2)
+        _autre, distance, motif = signale[cap.wikidata_id][0]
+        self.assertIn("même thème", motif)
+        self.assertGreater(distance, 1000)
+
+    def test_les_musees_voisins_ne_le_sont_pas(self):
+        """Le Louvre et Orsay sont à 692 m et restent deux visites."""
+        from roam_pipeline.collections import twins
+
+        louvre = self._cote("Musée du Louvre", "musees", 48.8606, 2.3376)
+        orsay = self._cote("Musée d'Orsay", "musees", 48.8600, 2.3266)
+        self.assertEqual(twins([louvre, orsay], self._config(2000)), {})
+
+    def test_la_portee_large_ne_supprime_rien(self):
+        # Le signalement alimente la REVUE, pas la construction : les calanques
+        # de Sugiton et Morgiou seront signalées et resteront deux calanques si
+        # le curateur le dit.
+        from roam_pipeline.collections import twins
+
+        a = self._cote("Calanque de Sugiton", "plages", 43.2100, 5.4500)
+        b = self._cote("Calanque de Morgiou", "plages", 43.2150, 5.4500)
+        signale = twins([a, b], self._config(2000))
+        self.assertEqual(len(signale), 2)          # signalés…
+        self.assertEqual(len([a, b]), 2)           # …et toujours là
+
+    def test_le_defaut_ne_change_rien(self):
+        from roam_pipeline.collections import twins, NAMED_TWIN_DISTANCE_M
+
+        config = load_config()
+        self.assertTrue(all(t.twin_radius_m in (0.0, 2000.0) for t in config.themes))
+        # Sans configuration du tout, la portée d'origine s'applique.
+        loin = self._cote("Plage A", "plages", 43.2000, 5.4000)
+        pres = self._cote("Plage B", "plages", 43.2100, 5.4000)
+        self.assertEqual(twins([loin, pres]), {})
+        self.assertEqual(NAMED_TWIN_DISTANCE_M, 300.0)
+
+
 class TestVocabulaireDeNamesMatch(unittest.TestCase):
     """`names_match` ne connaissait qu'un vocabulaire français et incomplet.
 
