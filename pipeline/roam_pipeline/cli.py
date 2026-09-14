@@ -10,6 +10,7 @@ import csv
 import json
 import logging
 import math
+import re
 import sys
 import unicodedata
 from collections import Counter, defaultdict
@@ -949,6 +950,44 @@ def cmd_adopt(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+#: Ce qui trahit un libellé de BASE DE DONNÉES là où on attend un titre.
+#:
+#: Wikidata donne des libellés, pas des noms d'affichage, et certains ne sont
+#: le nom de rien : une entité créée pour une catégorie Commons s'appelle
+#: « Category:… », et une entité dont le libellé manque dans toutes les langues
+#: demandées revient sous son seul Q-id. Les deux arrivent jusqu'à l'écran sans
+#: que rien ne les distingue d'un vrai nom.
+_NOMS_DE_BASE = re.compile(
+    r"^\s*(?:(?:category|categoria|catégorie|kategorie|template|modèle|file|"
+    r"fichier|help|aide|wikipedia|wikipédia)\s*:|Q\d+\s*$)", re.IGNORECASE
+)
+
+
+def _alerter_noms_de_base(retained: list[Place]) -> None:
+    """Un lieu publié sous un libellé qui n'est le nom de rien.
+
+    Trouvé sur la cascade du Fontanon di Goriuda, publiée « Category:Goriuda
+    waterfall » : son entité Wikidata est une catégorie Commons, et le libellé
+    l'annonçait. Personne ne l'a vu avant que l'application ne l'affiche.
+
+    Le Q-id nu est l'autre forme du même défaut, et elle a déjà coûté : quand
+    la collecte italienne demandait ses libellés en « fr,en », cent vingt-huit
+    entités sans l'un ni l'autre sont revenues sous leur identifiant.
+
+    `rename` tranche, et sa décision survit à toutes les reconstructions.
+    """
+    fautifs = [place for place in retained if _NOMS_DE_BASE.match(place.name)]
+    if not fautifs:
+        return
+    LOG.warning(
+        "%s lieu(x) publiés sous un libellé de base de données, pas sous un "
+        "nom : %s. `rename <Q-id> « Nom choisi »` le corrige durablement.",
+        len(fautifs),
+        ", ".join(f"{p.name} ({p.wikidata_id})" for p in fautifs[:5])
+        + (f" (+{len(fautifs) - 5})" if len(fautifs) > 5 else ""),
+    )
+
+
 def _alerter_listes_amputees(
     config: Config, manual_dir: Path, retained: list[Place]
 ) -> None:
@@ -1043,6 +1082,7 @@ def _build_and_write(args: argparse.Namespace, config: Config) -> int:
     # photo sans crédit dans la collecte ne regarde personne, la même photo au
     # catalogue est une licence non respectée.
     warn_missing_credits(retained)
+    _alerter_noms_de_base(retained)
     _alerter_listes_amputees(config, args.manual, retained)
 
     # Ce qui a bougé depuis la dernière revue. Le niveau d'un lieu n'est pas une

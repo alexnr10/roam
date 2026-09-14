@@ -8299,6 +8299,45 @@ class TestEmpriseDuPays(unittest.TestCase):
         self.assertNotIn("mer", trouve)
 
 
+class TestNomsDeBase(unittest.TestCase):
+    """Un lieu publié sous un libellé qui n'est le nom de rien."""
+
+    def _alerte(self, noms: list[str]) -> str:
+        from roam_pipeline.cli import _alerter_noms_de_base
+
+        lieux = [make_place(nom) for nom in noms]
+        with self.assertLogs("roam", level="WARNING") as journal:
+            _alerter_noms_de_base(lieux)
+            logging.getLogger("roam").warning("témoin")
+        return " ".join(journal.output)
+
+    def test_la_categorie_commons_est_signalee(self):
+        # Trouvé sur la cascade du Fontanon di Goriuda, publiée sous
+        # « Category:Goriuda waterfall » : son entité Wikidata est une catégorie
+        # Commons. Personne ne l'a vu avant que l'application ne l'affiche.
+        sortie = self._alerte(["Category:Goriuda waterfall", "Cascata del Serpente"])
+        self.assertIn("Category:Goriuda waterfall", sortie)
+        self.assertNotIn("Cascata del Serpente", sortie)
+        self.assertIn("rename", sortie)
+
+    def test_le_q_id_nu_aussi(self):
+        # L'autre forme du même défaut, et elle a déjà coûté : demander les
+        # libellés en « fr,en » a rendu 128 entités italiennes sous leur seul
+        # identifiant.
+        self.assertIn("Q1234567", self._alerte(["Q1234567"]))
+
+    def test_un_vrai_nom_ne_declenche_rien(self):
+        from roam_pipeline.cli import _alerter_noms_de_base
+
+        # Ni un nom qui CONTIENT le mot, ni un nom qui commence par un Q majuscule.
+        lieux = [make_place(n) for n in
+                 ("Musée de la catégorie sociale", "Quimper", "Château de Q")]
+        with self.assertLogs("roam", level="WARNING") as journal:
+            _alerter_noms_de_base(lieux)
+            logging.getLogger("roam").warning("témoin")
+        self.assertEqual(len(journal.output), 1, journal.output)
+
+
 class TestLabelDansUneAire(unittest.TestCase):
     """« Le Vésuve est DANS le parc du Vésuve » ne se dit pas comme les autres.
 
