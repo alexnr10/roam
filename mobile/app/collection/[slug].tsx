@@ -113,6 +113,14 @@ export default function CollectionScreen() {
               const place = getPlace(member.placeId);
               if (!place) return null;
               const visited = visitedIds.has(place.id);
+              // Le nom du lieu DANS cette collection, quand ce n'est pas le
+              // sien : une liste de parcs représentés chacun par un lieu phare
+              // doit annoncer le parc. Le lieu reste dessous, en second — on
+              // doit savoir où l'on va, pas seulement ce que ça représente.
+              const titre = member.name ?? place.name;
+              const sousTitre = member.name && member.name !== place.name
+                ? place.name
+                : themeLabel(place.themeId);
               return (
                 <Pressable
                   key={place.id}
@@ -127,10 +135,10 @@ export default function CollectionScreen() {
                   />
                   <View style={{ flex: 1 }}>
                     <Text style={type.body} numberOfLines={1}>
-                      {place.name}
+                      {titre}
                     </Text>
                     <Text style={type.small} numberOfLines={1}>
-                      {themeLabel(place.themeId)}
+                      {sousTitre}
                       {place.departement ? ` · ${place.departement}` : ''}
                     </Text>
                   </View>

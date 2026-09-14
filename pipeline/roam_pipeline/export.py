@@ -1513,7 +1513,13 @@ def write_app_catalog(
             "placeCount": len(collection.places),
             "tierCounts": collection.tier_counts,
             "places": [
-                {"placeId": cp.place_id, "tier": cp.tier, "rank": cp.rank}
+                {
+                    "placeId": cp.place_id, "tier": cp.tier, "rank": cp.rank,
+                    # Facultatif, et absent partout sauf là où il sert : le nom
+                    # que le lieu porte DANS cette collection. L'application
+                    # retombe sur le sien.
+                    **({"name": cp.name} if cp.name else {}),
+                }
                 for cp in collection.places
             ],
         }

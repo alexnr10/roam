@@ -18,6 +18,18 @@
 # pas. Ce n'est pas un jeu de données, c'est le travail de quelques
 # contributeurs sur leurs parcs de prédilection.
 #
+# LA COLONNE `nom_dans_la_collection` PORTE LE NOM DU PARC, et c'est sous ce
+# nom-là que le lieu apparaît DANS cette collection — nulle part ailleurs. Une
+# liste de parcs représentés chacun par un lieu phare ne se lit pas autrement :
+# « Jardin botanique alpin Paradisia » ne dit rien à qui cherche le
+# Grand-Paradis. Sur sa fiche, dans la recherche et dans ses autres
+# collections, le lieu garde son nom — c'est le sien, et c'est celui qu'on
+# cherche sur place.
+#
+# Le générique est retiré : la collection s'appelle déjà « Parcs nationaux
+# d'Italie », et vingt-six lignes commençant par « parc national de » ne se
+# lisent plus. Le remettre ne demande que de réécrire cette colonne.
+#
 # LA COLONNE `note` PORTE DEUX MENTIONS, et elles ne valent pas la même chose :
 #
 #   « attesté »    le résumé Wikipédia du lieu dit « parc national de X », ou
@@ -79,30 +91,30 @@
 # nom du parc n'est là que pour la lecture humaine, c'est le Q-id qui fait foi.
 # C'est ce que la couche de contours réglerait — elle saurait dire « Vernazza
 # est dans le parc des Cinque Terre », et ce fichier pourrait se relire seul.
-wikidata_id,name,note
-Q524,Vésuve,parc national Vésuve (attesté)
-Q215897,Castel del Monte,parc national Alta Murgia (choix du curateur)
-Q204152,Isola del Giglio,parc national Archipel toscan (à vérifier)
-Q51935,Monte Sant'Angelo,parc national Gargano (à vérifier)
-Q340757,La Maddalena,parc national Archipel de La Maddalena (attesté)
-Q54612,Gerace,parc national Aspromonte (attesté)
-Q270328,Vernazza,parc national Cinque Terre (à vérifier)
-Q94966,Sarnano,parc national Monts Sibyllins (à vérifier)
-Q128170,San Felice Circeo,parc national Circeo (attesté)
-Q50148,Scanno,parc national Abruzzes Latium et Molise (attesté)
-Q51433,Castelli,parc national Gran Sasso e Monti della Laga (attesté)
-Q730500,Asinara,parc national Asinara (attesté)
-Q1249309,Pantelleria,parc national Île de Pantelleria (attesté)
-Q14552418,Sanctuaire de l'Averne,parc national Forêts casentinoises (attesté)
-Q3861856,Mont Pollino,parc national Pollino (attesté)
-Q1638880,Jardin botanique alpin Paradisia,parc national Grand-Paradis (attesté)
-Q385753,Punta La Marmora,parc national Gennargentu (à vérifier)
-Q510076,Pietra di Bismantova,parc national Apennin tosco-émilien (à vérifier)
-Q1131545,Cap Palinuro,parc national Cilento et Val de Diano (à vérifier)
-Q3392526,Grotte de Cavallone,parc national Majella (attesté)
-Q898150,Matese,parc national Matese (attesté)
-Q63521967,Massif de l'Ortles,parc national Stelvio (province du parc)
-Q1550380,Grumentum,parc national Apennin lucanien-Val d'Agri (province du parc)
-Q3825626,Lac Arvo,parc national Sila (province du parc)
-Q3825880,Lago della Stua,parc national Dolomites bellunoises (choix du curateur)
-Q18445963,Cicogna,parc national Val Grande (choix du curateur — entre au prochain fetch)
+wikidata_id,name,nom_dans_la_collection,note
+Q524,Vésuve,Vésuve,parc national Vésuve (attesté)
+Q215897,Castel del Monte,Alta Murgia,parc national Alta Murgia (choix du curateur)
+Q204152,Isola del Giglio,Archipel toscan,parc national Archipel toscan (à vérifier)
+Q51935,Monte Sant'Angelo,Gargano,parc national Gargano (à vérifier)
+Q340757,La Maddalena,Archipel de La Maddalena,parc national Archipel de La Maddalena (attesté)
+Q54612,Gerace,Aspromonte,parc national Aspromonte (attesté)
+Q270328,Vernazza,Cinque Terre,parc national Cinque Terre (à vérifier)
+Q94966,Sarnano,Monts Sibyllins,parc national Monts Sibyllins (à vérifier)
+Q128170,San Felice Circeo,Circeo,parc national Circeo (attesté)
+Q50148,Scanno,"Abruzzes, Latium et Molise",parc national Abruzzes Latium et Molise (attesté)
+Q51433,Castelli,Gran Sasso et Monti della Laga,parc national Gran Sasso e Monti della Laga (attesté)
+Q730500,Asinara,Asinara,parc national Asinara (attesté)
+Q1249309,Pantelleria,Île de Pantelleria,parc national Île de Pantelleria (attesté)
+Q14552418,Sanctuaire de l'Averne,Forêts casentinoises,parc national Forêts casentinoises (attesté)
+Q3861856,Mont Pollino,Pollino,parc national Pollino (attesté)
+Q1638880,Jardin botanique alpin Paradisia,Grand-Paradis,parc national Grand-Paradis (attesté)
+Q385753,Punta La Marmora,Gennargentu,parc national Gennargentu (à vérifier)
+Q510076,Pietra di Bismantova,Apennin tosco-émilien,parc national Apennin tosco-émilien (à vérifier)
+Q1131545,Cap Palinuro,Cilento et Val de Diano,parc national Cilento et Val de Diano (à vérifier)
+Q3392526,Grotte de Cavallone,Majella,parc national Majella (attesté)
+Q898150,Matese,Matese,parc national Matese (attesté)
+Q63521967,Massif de l'Ortles,Stelvio,parc national Stelvio (province du parc)
+Q1550380,Grumentum,Apennin lucanien-Val d'Agri,parc national Apennin lucanien-Val d'Agri (province du parc)
+Q3825626,Lac Arvo,Sila,parc national Sila (province du parc)
+Q3825880,Lago della Stua,Dolomites bellunoises,parc national Dolomites bellunoises (choix du curateur)
+Q18445963,Cicogna,Val Grande,parc national Val Grande (choix du curateur — entre au prochain fetch)

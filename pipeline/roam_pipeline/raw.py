@@ -63,6 +63,12 @@ def _payload(place: Place) -> dict:
     if not payload.get("country_code"):
         payload.pop("country_code", None)
     payload.pop("slug", None)
+    # Vide = le lieu porte son propre nom dans toutes ses collections, ce qui
+    # est le cas de onze mille lieux sur onze mille et quelques. L'écrire
+    # partout coûterait un jour de diff pour zéro information — et surtout un
+    # diff qui cacherait les vingt-six lignes qui, elles, disent quelque chose.
+    if not payload.get("label_noms"):
+        payload.pop("label_noms", None)
     return payload
 
 

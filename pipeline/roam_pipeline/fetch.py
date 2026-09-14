@@ -1737,6 +1737,7 @@ def enrich_visitors(
 def fetch_label_members(
     client: wd.SparqlClient, label: Label, manual_dir: Path, *, country: str,
     groupes: dict[str, str] | None = None,
+    noms: dict[str, str] | None = None,
 ) -> set[str]:
     """Q-ids des lieux portant un label.
 
@@ -1749,9 +1750,9 @@ def fetch_label_members(
     perd rien.
     """
     if label.is_manual:
-        return _read_manual_label(label, manual_dir)
+        return _read_manual_label(label, manual_dir, noms=noms)
 
-    complement = _read_manual_label(label, manual_dir, quiet=True)
+    complement = _read_manual_label(label, manual_dir, quiet=True, noms=noms)
 
     if not label.qid:
         # Label en attente de résolution : mieux vaut l'ignorer bruyamment que
@@ -1811,8 +1812,13 @@ def membres_inscrits(label: Label, manual_dir: Path) -> set[str]:
     return _read_manual_label(label, manual_dir, quiet=True)
 
 
+#: La colonne, facultative, qui renomme un lieu DANS la collection du label.
+COLONNE_NOM_DE_COLLECTION = "nom_dans_la_collection"
+
+
 def _read_manual_label(
-    label: Label, manual_dir: Path, quiet: bool = False
+    label: Label, manual_dir: Path, quiet: bool = False,
+    noms: dict[str, str] | None = None,
 ) -> set[str]:
     path = manual_dir / f"{label.id}.csv"
     if not path.exists():
@@ -1826,13 +1832,22 @@ def _read_manual_label(
             path,
         )
         return set()
-    qids = {
-        row["wikidata_id"].strip()
-        for row in read_csv_rows(path)
-        if row.get("wikidata_id")
-    }
+    qids: set[str] = set()
+    for row in read_csv_rows(path):
+        qid = (row.get("wikidata_id") or "").strip()
+        if not qid:
+            continue
+        qids.add(qid)
+        # Le nom de collection est FACULTATIF, colonne comprise : une liste qui
+        # ne la porte pas laisse chaque lieu sous son propre nom.
+        renomme = (row.get(COLONNE_NOM_DE_COLLECTION) or "").strip()
+        if renomme and noms is not None:
+            noms[qid] = renomme
     if not quiet:
         LOG.info("label %s : %s membres (liste manuelle)", label.id, len(qids))
+        if noms:
+            LOG.info("label %s : %s membres renommés dans la collection",
+                     label.id, len(noms))
     return qids
 
 
@@ -1840,6 +1855,7 @@ def apply_labels(
     places: list[Place],
     label_members: dict[str, set[str]],
     groupes_par_label: dict[str, dict[str, str]] | None = None,
+    noms_par_label: dict[str, dict[str, str]] | None = None,
 ) -> None:
     """Reporte les labels sur les lieux déjà collectés.
 
@@ -1856,6 +1872,11 @@ def apply_labels(
             label_id: groupes[place.wikidata_id]
             for label_id, groupes in groupes_par_label.items()
             if label_id in place.labels and place.wikidata_id in groupes
+        }
+        place.label_noms = {
+            label_id: noms[place.wikidata_id]
+            for label_id, noms in (noms_par_label or {}).items()
+            if label_id in place.labels and place.wikidata_id in noms
         }
 
 
@@ -1899,15 +1920,19 @@ def run_fetch(
 
     label_members: dict[str, set[str]] = {}
     groupes_par_label: dict[str, dict[str, str]] = {}
+    noms_par_label: dict[str, dict[str, str]] = {}
     for label in config.labels:
         groupes: dict[str, str] = {}
+        noms: dict[str, str] = {}
         try:
             label_members[label.id] = fetch_label_members(
                 client, label, manual_dir, country=config.country.qids,
-                groupes=groupes)
+                groupes=groupes, noms=noms)
         except Exception as exc:  # un label en échec ne doit pas tuer la collecte
             LOG.error("label %s : collecte échouée (%s)", label.id, exc)
             label_members[label.id] = set()
+        if noms:
+            noms_par_label[label.id] = noms
         if groupes:
             groupes_par_label[label.id] = groupes
             LOG.info("label %s : %s aires distinctes", label.id,
@@ -1967,7 +1992,7 @@ def run_fetch(
         LOG.error("labels collecteurs : collecte échouée (%s)", exc)
 
     resolve_admin(client, places)
-    apply_labels(places, label_members, groupes_par_label)
+    apply_labels(places, label_members, groupes_par_label, noms_par_label)
 
     # L'ouverture au public ne vient que d'OpenStreetMap, donc de `discover`,
     # qui coûte vingt minutes : une nouvelle collecte l'écraserait sans trace.
@@ -2007,7 +2032,7 @@ def run_fetch(
             continue
         lot = read_shard(raw_dir, shard)
         avant = [sorted(place.labels or ()) for place in lot]
-        apply_labels(lot, label_members, groupes_par_label)
+        apply_labels(lot, label_members, groupes_par_label, noms_par_label)
         if any(sorted(place.labels or ()) != vieux
                for place, vieux in zip(lot, avant)):
             retouches.add(shard)

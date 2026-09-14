@@ -530,7 +530,13 @@ def _finalize(
 
     collection.places = [
         CollectionPlace(place_id=place.wikidata_id, tier=tier, rank=rank,
-                        forced=place.wikidata_id in forces, natural_tier=naturel)
+                        forced=place.wikidata_id in forces, natural_tier=naturel,
+                        # Le nom que le lieu porte DANS cette collection, quand
+                        # ce n'est pas le sien : « parc national du
+                        # Grand-Paradis » plutôt que « Jardin botanique alpin
+                        # Paradisia ». Nulle part ailleurs.
+                        name=(place.label_noms.get(collection.label_id)
+                              if collection.label_id else None))
         for place, tier, rank, naturel in assign_tiers(
             ordered, config.tiers, ordre, sans_deplacement=paient)
     ]

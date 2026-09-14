@@ -416,18 +416,22 @@ def cmd_relabel(args: argparse.Namespace, config: Config) -> int:
     client = wd.SparqlClient()
     members: dict[str, set[str]] = {}
     groupes_par_label: dict[str, dict[str, str]] = {}
+    noms_par_label: dict[str, dict[str, str]] = {}
     for label in config.labels:
         groupes: dict[str, str] = {}
+        noms: dict[str, str] = {}
         try:
             members[label.id] = fetch_label_members(
                 client, label, args.manual, country=config.country.qids,
-                groupes=groupes)
+                groupes=groupes, noms=noms)
         except Exception as erreur:  # noqa: BLE001 — un label en échec n'est pas fatal
             LOG.error("label %s : collecte échouée (%s)", label.id, erreur)
             members[label.id] = set()
         if groupes:
             groupes_par_label[label.id] = groupes
-    apply_labels(places, members, groupes_par_label)
+        if noms:
+            noms_par_label[label.id] = noms
+    apply_labels(places, members, groupes_par_label, noms_par_label)
 
     # Un membre que la collecte ne contient pas ne peut pas être étiqueté :
     # `relabel` appose des labels, il ne crée pas de lieux. Cent une communes
@@ -3536,7 +3540,8 @@ def cmd_export_app(args: argparse.Namespace, config: Config) -> int:
             geo_level=c.get("geo_level"),
             geo_code=c.get("geo_code"),
             places=[
-                CollectionPlace(placeId["place_id"], placeId["tier"], placeId["rank"])
+                CollectionPlace(placeId["place_id"], placeId["tier"],
+                                placeId["rank"], name=placeId.get("name"))
                 for placeId in c["places"]
             ],
         )

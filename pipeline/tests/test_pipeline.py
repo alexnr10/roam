@@ -4849,7 +4849,7 @@ class TestRelabelCannotCreatePlaces(unittest.TestCase):
             with _capture() as sortie:
                 with unittest.mock.patch("roam_pipeline.cli.wd.SparqlClient"), \
                      unittest.mock.patch("roam_pipeline.cli.fetch_label_members",
-                                         side_effect=lambda _c, l, _m, country, groupes=None: membres.get(l.id, set())):
+                                         side_effect=lambda _c, l, _m, country, groupes=None, noms=None: membres.get(l.id, set())):
                     cmd_relabel(args, CONFIG)
             return sortie.getvalue()
 
@@ -8377,6 +8377,58 @@ class TestLabelDansUneAire(unittest.TestCase):
         self.assertGreaterEqual(len(membres), 8, membres)
         self.assertTrue(all(q.startswith("Q") and q[1:].isdigit() for q in membres),
                         membres)
+
+    def test_chaque_parc_donne_son_nom_a_son_lieu_phare(self):
+        """Dans CETTE collection, et nulle part ailleurs.
+
+        Une liste de parcs représentés chacun par un lieu phare doit annoncer
+        le parc : « Grand-Paradis » et non « Jardin botanique alpin Paradisia »,
+        qui ne dit rien de ce qu'on va voir. Ailleurs — sur sa fiche, dans la
+        recherche, dans ses autres collections — le lieu garde son nom, qui est
+        celui qu'on cherche sur place.
+        """
+        from roam_pipeline.cli import BASE_DIR
+        from roam_pipeline.fetch import _read_manual_label
+
+        config = load_config(pays="it")
+        parcs = next(l for l in config.labels if l.id == "parchi-nazionali")
+        dossier = BASE_DIR / "data" / "it" / "manual"
+        if not (dossier / "parchi-nazionali.csv").exists():
+            self.skipTest("liste des parcs absente")
+        noms: dict[str, str] = {}
+        membres = _read_manual_label(parcs, dossier, quiet=True, noms=noms)
+        # Pas un lieu sans son parc : une ligne oubliée laisserait un nom de
+        # lieu isolé au milieu d'une liste de parcs, et c'est précisément ce
+        # qu'on corrige.
+        self.assertEqual(set(noms), membres)
+        self.assertTrue(all(nom.strip() for nom in noms.values()), noms)
+
+    def test_le_nom_de_collection_ne_deborde_pas_sur_les_autres(self):
+        """Le renommage est porté par le LABEL, pas par le lieu."""
+        from roam_pipeline.collections import _finalize
+        from roam_pipeline.models import Collection
+
+        config = load_config(pays="it")
+        lieux = [
+            make_place(f"Lieu {i}", "villages", wikidata_id=f"Q{900 + i}",
+                       score=100 - i)
+            for i in range(10)
+        ]
+        lieux[0].label_noms = {"parchi-nazionali": "Grand-Paradis"}
+
+        parc = _finalize(Collection(slug="label-parchi-nazionali", name="Parcs",
+                                    kind="label", label_id="parchi-nazionali"),
+                         list(lieux), config)
+        theme = _finalize(Collection(slug="theme-villages", name="Villages",
+                                     kind="theme", theme_id="villages"),
+                          list(lieux), config)
+        self.assertIsNotNone(parc)
+        self.assertIsNotNone(theme)
+        renomme = {cp.place_id: cp.name for cp in parc.places}
+        self.assertEqual(renomme["Q900"], "Grand-Paradis")
+        self.assertIsNone(renomme["Q901"])
+        # La même collecte, une autre collection : aucun renommage.
+        self.assertEqual({cp.name for cp in theme.places}, {None})
 
     def test_un_lieu_par_parc_reste_disponible_pour_la_geometrie(self):
         """La mécanique Wikidata n'est pas jetée, seulement débranchée."""
