@@ -36,6 +36,15 @@ STOPWORDS = {
     "de", "du", "des", "la", "le", "les", "l", "d", "au", "aux", "et", "en",
     "sur", "sous", "parc", "site", "ancien", "ancienne", "saint", "sainte",
     "notre", "dame",
+    # Les mêmes, en italien. « santa » et « maria » rapprochaient à eux seuls
+    # cent cinquante-sept paires de lieux distincts ; « della » quarante. Ce
+    # sont les « saint » et « de la » du deuxième pays, et rien d'autre.
+    "santa", "santo", "della", "delle", "dello", "degli", "alla", "alle",
+    "nella", "vecchio", "vecchia", "nuovo", "nuova",
+    # Les DÉDICACES se comportent comme « saint » : elles nomment le patron,
+    # pas le lieu. Deux églises mariales voisines ne sont pas la même église.
+    "maria", "marco", "sant", "giovanni", "pietro", "giuseppe", "giorgio",
+    "jupiter", "apollon", "minerve",
 }
 
 # Le mot qui dit la NATURE du lieu. Il ne sert pas à rapprocher — « Roche » se
@@ -45,11 +54,39 @@ STOPWORDS = {
 #
 # « mont » en est volontairement absent : l'abbaye du Mont-Saint-Michel et le
 # Mont-Saint-Michel sont bien le même lieu.
+# Mesuré sur les deux catalogues : à 350 mètres l'un de l'autre, `names_match`
+# confondait 525 paires de lieux DISTINCTS en France et 3 799 en Italie. Le mot
+# partagé n'était presque jamais un toponyme — c'était le mot qui dit la nature
+# du lieu, et il manquait à cette liste : `palazzo` à lui seul faisait
+# 1 288 paires, `palais` 845, `temple` 330, `casa` 222.
+#
+# Trois familles ont été ajoutées : les types français qui manquaient (palais,
+# couvent, square, galerie, hôtel), leurs équivalents italiens, et le
+# vocabulaire du LITTORAL — sans lui, « calanque de Sugiton » et « calanque de
+# Morgiou » se ressemblaient, alors que ce sont deux calanques voisines et
+# distinctes.
 TYPES = {
     "chateau", "moulin", "eglise", "cathedrale", "basilique", "abbaye",
     "prieure", "chapelle", "musee", "jardin", "grotte", "gouffre", "cascade",
     "pont", "viaduc", "aqueduc", "phare", "fort", "manoir", "tour", "ferme",
     "dolmen", "menhir", "villa", "maison",
+    # Français : ce que la liste d'origine avait laissé passer.
+    "palais", "couvent", "commanderie", "square", "galerie", "hotel",
+    "theatre", "amphitheatre", "arenes", "temple", "sanctuaire", "ermitage",
+    "monastere", "collegiale", "beffroi", "citadelle", "donjon", "place",
+    # Italien : les mêmes mots, dans la langue du pays.
+    "palazzo", "palazzi", "casa", "chiesa", "duomo", "basilica", "castello",
+    "torre", "ponte", "giardino", "faro", "grotta", "cascata", "museo",
+    "galleria", "piazza", "campo", "convento", "abbazia", "santuario",
+    "tempio", "teatro", "anfiteatro", "necropoli", "nuraghe", "tomba",
+    # Latin : le vocabulaire des sites antiques, qui revient sur chaque forum.
+    "forum", "domus", "thermes", "terme", "aqueduc", "acquedotto", "arco",
+    # Littoral, dans les deux langues. Deux calanques voisines ne sont pas la
+    # même calanque, et une plage n'est pas le cap qui lui donne son nom.
+    "plage", "plages", "calanque", "crique", "anse", "baie", "cap", "pointe",
+    "presquile", "peninsule", "falaise", "dune", "lido",
+    "spiaggia", "spiagge", "cala", "punta", "capo", "baia", "penisola",
+    "promontorio", "scoglio", "scogli", "scogliera",
 }
 
 # Catégories OpenStreetMap → thèmes Roam. Une proposition, pas un verdict :
@@ -109,6 +146,22 @@ def _tokens(name: str) -> set[str]:
     }
 
 
+#: Les pluriels d'un mot de type, ramenés au singulier.
+#
+# Le test des types répond « deux natures différentes, donc deux lieux » dès
+# que les deux noms portent un type et que les types diffèrent. « Plages du
+# Prado » et « Plage du Prado » y tombaient : le même mot, au pluriel d'un côté.
+_PLURIELS = {"spiagge": "spiaggia", "palazzi": "palazzo", "scogli": "scoglio",
+             "gallerie": "galleria", "chiese": "chiesa", "torri": "torre"}
+
+
+def _type_canonique(mot: str) -> str:
+    """Le type, au singulier — le français par son « s », l'italien par la table."""
+    if mot in _PLURIELS:
+        return _PLURIELS[mot]
+    return mot[:-1] if mot.endswith("s") and mot[:-1] in TYPES else mot
+
+
 def names_match(left: str, right: str) -> bool:
     """Deux noms désignent-ils vraisemblablement le même lieu ?
 
@@ -119,7 +172,8 @@ def names_match(left: str, right: str) -> bool:
     rapprocher.
     """
     a, b = _tokens(left), _tokens(right)
-    left_type, right_type = a & TYPES, b & TYPES
+    left_type = {_type_canonique(mot) for mot in a & TYPES}
+    right_type = {_type_canonique(mot) for mot in b & TYPES}
     if left_type and right_type and not (left_type & right_type):
         return False
 

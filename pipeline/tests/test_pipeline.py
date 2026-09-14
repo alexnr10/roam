@@ -8427,6 +8427,101 @@ class TestLabelDansUneAire(unittest.TestCase):
         self.assertTrue(any("propriété de situation" in m for m in journal.output))
 
 
+class TestVocabulaireDeNamesMatch(unittest.TestCase):
+    """`names_match` ne connaissait qu'un vocabulaire français et incomplet.
+
+    Le rapprochement écarte deux lieux quand leurs NATURES diffèrent, et les
+    rapproche quand ils partagent une partie distinctive. Encore faut-il savoir
+    ce qui est une nature : « palazzo », « palais », « couvent », « calanque »
+    n'étaient pas dans la table, et comptaient donc comme des noms propres.
+
+    Mesuré sur les deux catalogues, à moins de 350 m l'un de l'autre — la
+    distance où le rapprochement décide :
+
+        France   525 paires de lieux DISTINCTS confondues → 314
+        Italie  3 799                                     → 552
+
+    `palazzo` à lui seul faisait 1 288 paires, `palais` 845, `temple` 330.
+    Ce n'est pas cosmétique : `apply_visit_info` s'en sert pour donner à un lieu
+    les horaires d'un objet OpenStreetMap, et `find_candidates` pour décider
+    qu'un site est DÉJÀ au catalogue.
+    """
+
+    def test_deux_calanques_voisines_ne_sont_pas_la_meme(self):
+        from roam_pipeline.discover import names_match
+
+        self.assertFalse(names_match("Calanque de Sugiton", "Calanque de Morgiou"))
+        self.assertFalse(names_match("Calanque de Port-Miou", "Calanque d'En-Vau"))
+        self.assertFalse(names_match("Cala Violina", "Cala Civette"))
+
+    def test_la_plage_et_la_pointe_qui_la_nomme_le_sont(self):
+        from roam_pipeline.discover import names_match
+
+        self.assertTrue(names_match("Spiaggia di Punta Molentis", "Punta Molentis"))
+        self.assertTrue(names_match("Plage de Punta Penna",
+                                    "Promontorio di Punta Penna"))
+
+    def test_deux_palais_voisins_ne_sont_pas_le_meme(self):
+        from roam_pipeline.discover import names_match
+
+        self.assertFalse(names_match("Palais Davia Bargellini", "Palais Fantuzzi"))
+        self.assertFalse(names_match("Palazzo Isolani", "Palazzo degli Strazzaroli"))
+        self.assertFalse(names_match("Couvent des Cordelières",
+                                     "Couvent des Anglaises"))
+
+    def test_deux_eglises_mariales_voisines_non_plus(self):
+        # « santa » et « maria » sont les « saint » et « dame » de l'italien :
+        # ils nomment le patron, pas le lieu.
+        from roam_pipeline.discover import names_match
+
+        self.assertFalse(names_match("Chiesa di Santa Maria del Carmine",
+                                     "Chiesa di Santa Maria Maddalena"))
+
+    def test_le_pluriel_ne_separe_pas_un_lieu_de_lui_meme(self):
+        """La régression que la table a failli introduire.
+
+        Mettre « plage » ET « plages » parmi les types faisait répondre « deux
+        natures différentes » aux « Plages du Prado » et à la « Plage du
+        Prado ». Les types se comparent donc au singulier.
+        """
+        from roam_pipeline.discover import names_match
+
+        self.assertTrue(names_match("Plages du Prado", "Plage du Prado"))
+        self.assertTrue(names_match("Spiagge di Rena Bianca",
+                                    "Spiaggia di Rena Bianca"))
+
+    def test_les_cas_documentes_tiennent_toujours(self):
+        from roam_pipeline.discover import names_match
+
+        # « mont » reste hors des types, à dessein.
+        self.assertTrue(names_match("abbaye du Mont-Saint-Michel",
+                                    "Mont-Saint-Michel"))
+        self.assertFalse(names_match("château de la Roche", "moulin de la Roche"))
+
+    def test_le_littoral_ne_confond_plus_rien(self):
+        """Le contrôle sur les vraies données, qui est l'objet de tout ceci."""
+        import json
+        from roam_pipeline.cli import BASE_DIR
+        from roam_pipeline.collections import haversine_m
+        from roam_pipeline.discover import names_match
+
+        chemin = BASE_DIR / "data" / "out" / "places.json"
+        if not chemin.exists():
+            self.skipTest("catalogue français absent")
+        charge = json.loads(chemin.read_text(encoding="utf-8"))
+        lot = [x for x in (charge["places"] if isinstance(charge, dict) else charge)
+               if x["theme_id"] == "plages"]
+        confondues = [
+            (a["name"], b["name"])
+            for i, a in enumerate(lot) for b in lot[i + 1:]
+            if haversine_m(a["lat"], a["lon"], b["lat"], b["lon"]) <= 3000
+            and names_match(a["name"], b["name"])
+        ]
+        # Les calanques de Marseille se voisinent à 550 m et ne doivent PAS
+        # se confondre : ce sont deux calanques, pas un doublon.
+        self.assertEqual(confondues, [], confondues)
+
+
 class TestListeAmputee(unittest.TestCase):
     """Une liste manuelle qui réclame un lieu que le catalogue n'a plus.
 
