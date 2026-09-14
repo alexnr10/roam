@@ -8347,13 +8347,45 @@ class TestLabelDansUneAire(unittest.TestCase):
         self.assertIn("wdt:P1435 wd:Q9259",
                       label_members_query("heritage", "Q9259", country="Q142"))
 
-    def test_la_france_reclame_encore_ses_deux_identifiants(self):
-        """`suggest-qids` doit demander la classe ET la propriété."""
+    def test_la_france_ne_reclame_plus_rien_non_plus(self):
+        """Le label français est passé à la liste manuelle, comme l'italien.
+
+        Il a attendu deux mois une requête d'APPARTENANCE — `dans_une_aire`
+        savait la faire — mais la mesure italienne a tranché contre : P3018 est
+        vide aux trois quarts. Un label manuel n'attend aucun identifiant, sa
+        liste EST le fichier.
+        """
         from roam_pipeline.cli import _pending_terms
 
-        termes = {(owner, kind) for owner, _t, kind in _pending_terms(load_config())}
-        self.assertIn(("label parc-national", "item"), termes)
-        self.assertIn(("label parc-national (propriété)", "property"), termes)
+        config = load_config()
+        self.assertFalse([o for o, _t, _k in _pending_terms(config)
+                          if "parc-national" in o])
+        parc = next(l for l in config.labels if l.id == "parc-national")
+        self.assertTrue(parc.is_manual)
+        self.assertTrue(parc.makes_collection)
+        # AUCUN bonus, et c'est la condition pour que la collection soit une
+        # lecture du catalogue et non un remaniement : les dix lieux sont déjà
+        # relus, des points les feraient monter dans leurs collections de thème
+        # et rebattraient des niveaux arbitrés par le curateur.
+        self.assertEqual(parc.score_bonus, 0)
+
+    def test_chaque_parc_francais_donne_son_nom_a_son_lieu_phare(self):
+        from roam_pipeline.cli import BASE_DIR
+        from roam_pipeline.fetch import _read_manual_label
+
+        config = load_config()
+        parc = next(l for l in config.labels if l.id == "parc-national")
+        dossier = BASE_DIR / "data" / "manual"
+        if not (dossier / "parc-national.csv").exists():
+            self.skipTest("liste des parcs français absente")
+        noms: dict[str, str] = {}
+        membres = _read_manual_label(parc, dossier, quiet=True, noms=noms)
+        # Une collection en exige huit ; dix parcs sur onze ont un lieu au
+        # catalogue — le parc amazonien de Guyane n'en a aucun, tous les lieux
+        # guyanais étant sur la bande côtière.
+        self.assertGreaterEqual(len(membres), 8, membres)
+        self.assertEqual(set(noms), membres)
+        self.assertTrue(all(nom.strip() for nom in noms.values()), noms)
 
     def test_l_italie_ne_reclame_rien(self):
         # Un label manuel n'attend aucun identifiant : sa liste est le fichier.

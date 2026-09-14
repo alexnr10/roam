@@ -67,8 +67,14 @@ def _payload(place: Place) -> dict:
     # est le cas de onze mille lieux sur onze mille et quelques. L'écrire
     # partout coûterait un jour de diff pour zéro information — et surtout un
     # diff qui cacherait les vingt-six lignes qui, elles, disent quelque chose.
-    if not payload.get("label_noms"):
-        payload.pop("label_noms", None)
+    # Même chose pour les deux dictionnaires de label : vides, ils ne disent
+    # rien. `label_groupes` n'existait pas quand la collecte française a été
+    # écrite, et le réintroduire vide sur onze mille lignes aurait fait un diff
+    # de quatre mille lignes pour treize vraies — celles qui marquent les parcs
+    # nationaux. Un champ constant n'est pas une donnée.
+    for vide in ("label_noms", "label_groupes"):
+        if not payload.get(vide):
+            payload.pop(vide, None)
     return payload
 
 

@@ -178,32 +178,33 @@ labels:
     # `instance`, pas `heritage` : voir la note sur réserve-naturelle ci-dessus.
     wikidata_query: { kind: instance, qid: Q1818761 }   # parc naturel régional ✓
 
-  # ⚠️ Mis en attente volontairement. La requête prévue (`instance`) ramènerait
-  # les parcs eux-mêmes, pas les lieux qui s'y trouvent — or le critère C4 de la
-  # charte porte sur l'APPARTENANCE d'un site à un parc, ce qui demande une
-  # propriété de contenance, pas une classe. Plutôt que d'expédier une requête
-  # qui ne fait pas ce qu'elle annonce, le label est neutralisé jusqu'à ce que
-  # la bonne propriété soit vérifiée.
+  # UNE LISTE DE PARCS, UN LIEU PHARE PAR PARC — comme l'Italie, et pour la
+  # même raison de fond.
   #
-  # La propriété de contenance existe désormais dans le pipeline : c'est le type
-  # de requête `dans_une_aire`, écrit pour les parcs nationaux d'Italie, qui
-  # fait les deux sauts — la propriété de situation, puis la classe de ce
-  # qu'elle atteint. Le label attend donc deux résolutions au lieu d'un fichier
-  # à saisir, et `suggest-qids` les réclame maintenant de lui-même. La propriété
-  # est MONDIALE : celle que l'Italie résoudra est celle d'ici.
+  # Le label est resté deux mois en attente d'une requête d'APPARTENANCE : la
+  # requête `instance` ramenait les parcs eux-mêmes, pas les lieux qui s'y
+  # trouvent. Le type `dans_une_aire`, écrit pour l'Italie, sait faire les deux
+  # sauts — la propriété de situation puis la classe de ce qu'elle atteint —
+  # mais la mesure italienne a tranché contre : sur 2 500 lieux, 44 seulement
+  # portaient P3018, dont 25 dans deux parcs et 12 sur des phares, tandis que
+  # les Cinque Terre et la Marmolada ne la portaient pas. Ce n'est pas un jeu
+  # de données, c'est le travail de quelques contributeurs. La mécanique reste
+  # branchée dans le pipeline, et le jour où P3018 se remplira elle servira.
   #
-  # Le comportement ne change pas tant qu'elles manquent — le label ne collecte
-  # rien, et le dit. Il le disait déjà : « pas de source Wikidata et
-  # data/manual/parc-national.csv absent — label ignoré ».
+  # AUCUN BONUS DE SCORE, et c'est un choix mesuré. En Italie il vaut vingt
+  # points : le label y sert aussi de repêchage, le mont Pollino ne tenait dans
+  # le catalogue que par lui. Ici les dix lieux sont déjà au catalogue depuis
+  # des mois et déjà relus ; vingt points les feraient monter dans leurs
+  # collections de thème et rebattraient des niveaux que le curateur a
+  # arbitrés. La collection est une LECTURE du catalogue, pas un repêchage — et
+  # le catalogue le montre : rien n'y bouge à part elle.
   - id: parc-national
-    name: Parc national
+    name: Parcs nationaux de France
     authority: Office français de la biodiversité
-    score_bonus: 10
-    makes_collection: false
-    wikidata_query:
-      kind: dans_une_aire
-      search: parc national de France
-      property_search: aire protégée
+    score_bonus: 0
+    makes_collection: true
+    collects: false
+    wikidata_query: { kind: manual }
 
   # Pas de propriété Wikidata fiable : listes à saisir à la main dans
   # data/manual/<id>.csv (colonnes : name,wikidata_id,note).

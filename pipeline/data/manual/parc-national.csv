@@ -1,0 +1,38 @@
+# Les parcs nationaux de France, UN LIEU PHARE PAR PARC.
+#
+# Même principe que `data/it/manual/parchi-nazionali.csv` : ce fichier est une
+# liste de LIEUX, pas de parcs. Le label tamponne un lieu que le catalogue
+# tient déjà, la collection rassemble ces lieux-là, et le parc lui-même n'entre
+# pas au catalogue — on ne veut pas le cirque de Gavarnie ET le parc national
+# des Pyrénées.
+#
+# LA COLONNE `nom_dans_la_collection` PORTE LE NOM DU PARC : c'est sous ce
+# nom-là que le lieu apparaît dans cette collection, et nulle part ailleurs.
+# Le générique est retiré — la collection s'appelle déjà « Parcs nationaux de
+# France ». Sur sa fiche et dans ses autres collections, le lieu garde son nom.
+#
+# LA COLONNE `note` DIT CE QUI FONDE LE RATTACHEMENT :
+#
+#   « attesté »     le résumé Wikipédia du lieu nomme le parc. C'est une preuve,
+#                   lue dans le catalogue, pas de mémoire.
+#   « à vérifier »  le lieu est dans le parc à ma connaissance, mais son résumé
+#                   ne le dit pas. C'est un indice, et il t'appartient.
+#
+# DIX PARCS SUR ONZE. Le onzième est le parc amazonien de Guyane, et il n'a
+# aucune ligne parce que le catalogue n'a rien à y mettre : les douze lieux
+# guyanais sont tous sur la bande côtière — Cayenne, Kourou, les îles du Salut,
+# l'Oyapock — quand le parc couvre le sud du département. Une ligne inventée
+# vaudrait moins qu'une absence.
+#
+# Q-ID : tous lus dans `data/out/places.json`, aucun écrit de mémoire.
+wikidata_id,name,nom_dans_la_collection,note
+Q2269718,Calanque de Sormiou,Calanques,le résumé dit « parc national des Calanques » (attesté)
+Q1836325,Mont Aigoual,Cévennes,sommet du cœur du parc — le résumé ne le dit pas (à vérifier)
+Q624323,La Grave,Écrins,le résumé dit « dans le parc national des Écrins » (attesté)
+Q1774965,Abbaye d'Auberive,Forêts,commune d'Auberive — le résumé ne dit pas le parc (à vérifier)
+Q1149310,Soufrière,Guadeloupe,le résumé dit « dans le parc national de la Guadeloupe » (attesté)
+Q2570609,Lac d'Allos,Mercantour,le résumé dit « dans le parc national du Mercantour » (attesté)
+Q1658544,Île de Port-Cros,Port-Cros,le parc porte le nom de l'île (attesté par le nom)
+Q1093112,Cirque de Gavarnie,Pyrénées,le résumé dit « du parc national des Pyrénées » (attesté)
+Q1049644,Piton de la Fournaise,La Réunion,cœur du parc — le résumé ne le dit pas (à vérifier)
+Q736370,Bonneval-sur-Arc,Vanoise,le résumé dit « dans le parc national de la Vanoise » (attesté)
