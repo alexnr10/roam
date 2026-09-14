@@ -111,10 +111,28 @@ change pas de pays de départ par un `export-app`.
 Rien à recompiler ensuite. Les catalogues servis sont relus à CHAQUE démarrage — c'est
 tout l'intérêt : il suffit de pousser `catalogues/`.
 
-Attention à `v0.1-france`, en revanche. Cette branche est la version figée qu'on a
-donnée : y fusionner `main` y ferait entrer `it.json` et l'entrée `IT` de l'index, donc
-apparaître un deuxième pays chez qui n'a rien demandé. Pour donner une France à jour
-sans l'Italie, n'y porter que `catalogues/fr.json` et un index réduit à `FR`.
+### Rafraîchir `v0.1-france`
+
+Cette branche est la version donnée. Elle n'a qu'un seul rôle : servir un
+`catalogues/` **où la France est seule**. Le reste de son contenu est inerte —
+la page publiée est construite depuis `main`, et son paquet porte déjà le
+catalogue français embarqué.
+
+Elle peut donc suivre les évolutions FRANÇAISES sans rien risquer, à condition
+de refaire son index plutôt que de le fusionner : une fusion de `main` y
+apporte `it.json` et l'entrée `IT`, et ferait apparaître un deuxième pays chez
+qui n'a rien demandé.
+
+```bash
+git checkout v0.1-france && git merge origin/main
+rm catalogues/it*.json catalogues/index.json   # l'index se REFAIT, il ne se fusionne pas
+python -m roam_pipeline export-app             # France seule : un index à un pays
+git add -A && git commit && git push -u origin v0.1-france
+```
+
+Le `rm` de l'index n'est pas une précaution de plus : `export-app` COMPLÈTE
+l'index au lieu de le remplacer — c'est ce qui permet de refaire l'Italie seule
+sans effacer la France — donc le laisser en place y reconduirait l'Italie.
 
 ### Les contours de la carte de conquête
 
