@@ -3542,8 +3542,22 @@ def cmd_export_app(args: argparse.Namespace, config: Config) -> int:
         for c in raw_collections
     ]
 
-    write_app_catalog(places, collections, config, args.to)
-    print(f"Catalogue écrit dans {args.to}")
+    # LE CATALOGUE EMBARQUÉ N'APPARTIENT QU'À UN PAYS, celui sur lequel
+    # l'application s'ouvre au premier lancement, sans réseau. L'écraser avec un
+    # autre pays la ferait démarrer sur l'Italie — et `PAYS_EMBARQUE`, qui s'en
+    # déduit, changerait avec lui.
+    #
+    # C'est arrivé : `export-app --pays-config it` a remplacé les 2 080 lieux
+    # français par 2 203 italiens, en annonçant « Catalogue écrit » comme si de
+    # rien n'était. La commande datait d'un catalogue à un seul pays.
+    embarque = _pays_embarque(args.to)
+    if embarque and embarque != config.country.code:
+        print(f"Catalogue embarqué laissé tel quel : il porte {embarque}, et "
+              f"cette collecte est {config.country.code}. Le pays de départ de "
+              f"l'application ne se change pas par un `export-app`.")
+    else:
+        write_app_catalog(places, collections, config, args.to)
+        print(f"Catalogue écrit dans {args.to}")
 
     # Et le même catalogue SERVI, pour les pays que l'application ne porte pas
     # en elle. Celui du pays de départ y figure aussi : la duplication ne coûte
@@ -3554,6 +3568,17 @@ def cmd_export_app(args: argparse.Namespace, config: Config) -> int:
         print(f"  {ligne}")
     print("Relance l'application : elle le lira au prochain démarrage.")
     return 0
+
+
+def _pays_embarque(chemin: Path) -> str | None:
+    """Le pays du catalogue que l'application porte en elle, s'il existe."""
+    if not chemin.exists():
+        return None
+    try:
+        charge = json.loads(chemin.read_text(encoding="utf-8"))
+        return (charge.get("areas", {}).get("country") or [{}])[0].get("code")
+    except (json.JSONDecodeError, OSError, IndexError, AttributeError):
+        return None
 
 
 def ecrire_catalogues_servis(places, collections, config, dossier: Path) -> list[str]:
@@ -3613,11 +3638,31 @@ def ecrire_catalogues_servis(places, collections, config, dossier: Path) -> list
         })
         lignes.append(f"{code} : {len(lot)} lieux, {taille:.0f} Ko → {chemin}")
 
-    (dossier / "index.json").write_text(
-        json.dumps({"pays": index}, ensure_ascii=False, indent=2) + "\n",
+    # L'INDEX SE COMPLÈTE, IL NE SE REMPLACE PAS. Il dit à l'application quels
+    # pays existent et où les prendre ; le réécrire avec le seul pays du jour
+    # efface les autres. `export-app --pays-config it` a ainsi rendu un index
+    # qui ne contenait plus que l'Italie — la France, pourtant servie dans le
+    # même dossier, devenait invisible à l'application.
+    chemin_index = dossier / "index.json"
+    connus: dict[str, dict] = {}
+    if chemin_index.exists():
+        try:
+            for entree in json.loads(chemin_index.read_text(encoding="utf-8"))["pays"]:
+                connus[entree["code"]] = entree
+        except (json.JSONDecodeError, OSError, KeyError, TypeError):
+            connus = {}
+    for entree in index:
+        connus[entree["code"]] = entree
+    fusionne = [connus[code] for code in sorted(connus)]
+    chemin_index.write_text(
+        json.dumps({"pays": fusionne}, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
-    lignes.append(f"index : {len(index)} pays → {dossier / 'index.json'}")
+    ecrits = ", ".join(e["code"] for e in index)
+    lignes.append(
+        f"index : {len(fusionne)} pays ({', '.join(e['code'] for e in fusionne)})"
+        f" → {chemin_index}" + (f", réécrit pour {ecrits}" if ecrits else "")
+    )
     return lignes
 
 
