@@ -15,10 +15,16 @@ on:
     branches: ["**"]
   workflow_dispatch:
 
-# Une seule publication à la fois : deux poussées rapprochées se battraient
-# pour le même site, et la plus lente gagnerait.
+# Une seule publication à la fois PAR BRANCHE : deux poussées rapprochées sur
+# la même branche se battraient pour le même site, et la plus lente gagnerait.
+#
+# Le groupe portait le seul nom du flux, donc toutes branches confondues : une
+# poussée sur `v0.1-france` a ANNULÉ la publication de `main` en cours, et le
+# site est resté sur la construction d'avant sans qu'aucune croix rouge ne le
+# dise — un « annulé » ne se lit pas comme un échec. La branche entre donc dans
+# le groupe.
 concurrency:
-  group: apercu
+  group: apercu-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -74,6 +80,12 @@ jobs:
   publier:
     needs: construire
     runs-on: ubuntu-latest
+    # LE SITE N'A QU'UNE SOURCE, et c'est `main`. Les autres branches se
+    # construisent et se testent — c'est utile, ça attrape les régressions —
+    # mais elles ne publient pas. `v0.1-france` ne sert QUE ses catalogues,
+    # lus par leur adresse brute ; si sa construction était partie sur Pages,
+    # elle aurait remplacé la page de tout le monde par la sienne.
+    if: github.ref == 'refs/heads/main'
     # Au NIVEAU DU JOB, et non de l'étape : tant que Pages n'est pas activé
     # dans les réglages du dépôt, c'est l'environnement `github-pages` qui est
     # refusé — le job échoue donc avant sa première étape, et un

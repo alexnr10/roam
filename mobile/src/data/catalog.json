@@ -29925,26 +29925,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Gorges_de_la_Loire"
   },
   {
-   "id": "Q28374564",
-   "slug": "tour-dreyfus",
-   "name": "Tour Dreyfus",
-   "themeId": "phares",
-   "lat": 5.15961,
-   "lon": -52.62665,
-   "radiusM": 200,
-   "score": 47.1,
-   "departement": "Guyane",
-   "departementCode": "973",
-   "regionCode": "03",
-   "communeCode": "97304",
-   "communeName": "Kourou",
-   "summary": "La tour Dreyfus est une petite tour de télégraphe qui se trouve sur la pointe des Roches dans la commune de Kourou en Guyane.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tour%20dreyfus%20kourou.jpg",
-   "imageAuthor": "Arria Belli",
-   "imageLicence": "CC BY-SA 3.0",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Tour_Dreyfus"
-  },
-  {
    "id": "Q18009259",
    "slug": "grande-cascade-de-tendon",
    "name": "Grande Cascade de Tendon",
@@ -30583,6 +30563,26 @@
    "imageAuthor": "Cervianenc",
    "imageLicence": "Public domain",
    "wikipediaUrl": null
+  },
+  {
+   "id": "Q663646",
+   "slug": "mont-saint-marcel",
+   "name": "Mont Saint-Marcel",
+   "themeId": "sommets",
+   "lat": 2.390833,
+   "lon": -53.017778,
+   "radiusM": 1000,
+   "score": 42.9,
+   "departement": "Guyane",
+   "departementCode": "973",
+   "regionCode": "03",
+   "communeCode": "97356",
+   "communeName": "Camopi",
+   "summary": "Le mont Saint-Marcel est l'un des plus hauts sommets de Guyane française avec 645 m d'altitude. Il est situé sur le plateau guyanais, à l'extrême sud-est du territoire, non loin de Trois Sauts et de la frontière avec le Brésil, dans la commune de Camopi.",
+   "imageUrl": null,
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mont_Saint-Marcel"
   },
   {
    "id": "Q20127619",
@@ -45274,11 +45274,11 @@
    "labelId": null,
    "geoLevel": null,
    "geoCode": null,
-   "placeCount": 36,
+   "placeCount": 35,
    "tierCounts": [
     12,
     22,
-    2
+    1
    ],
    "places": [
     {
@@ -45455,11 +45455,6 @@
      "placeId": "Q964781",
      "tier": 3,
      "rank": 35
-    },
-    {
-     "placeId": "Q28374564",
-     "tier": 3,
-     "rank": 36
     }
    ]
   },
@@ -50779,10 +50774,10 @@
    "labelId": "parc-national",
    "geoLevel": null,
    "geoCode": null,
-   "placeCount": 10,
+   "placeCount": 11,
    "tierCounts": [
     10,
-    0,
+    1,
     0
    ],
    "places": [
@@ -50799,40 +50794,40 @@
      "name": "Vanoise"
     },
     {
-     "placeId": "Q1049644",
+     "placeId": "Q244707",
      "tier": 1,
      "rank": 3,
+     "name": "Forêts"
+    },
+    {
+     "placeId": "Q1049644",
+     "tier": 1,
+     "rank": 4,
      "name": "La Réunion"
     },
     {
      "placeId": "Q1093112",
      "tier": 1,
-     "rank": 4,
+     "rank": 5,
      "name": "Pyrénées"
+    },
+    {
+     "placeId": "Q975080",
+     "tier": 1,
+     "rank": 6,
+     "name": "Port-Cros"
+    },
+    {
+     "placeId": "Q1538251",
+     "tier": 1,
+     "rank": 7,
+     "name": "Cévennes"
     },
     {
      "placeId": "Q1149310",
      "tier": 1,
-     "rank": 5,
-     "name": "Guadeloupe"
-    },
-    {
-     "placeId": "Q1836325",
-     "tier": 1,
-     "rank": 6,
-     "name": "Cévennes"
-    },
-    {
-     "placeId": "Q1658544",
-     "tier": 1,
-     "rank": 7,
-     "name": "Port-Cros"
-    },
-    {
-     "placeId": "Q1774965",
-     "tier": 1,
      "rank": 8,
-     "name": "Forêts"
+     "name": "Guadeloupe"
     },
     {
      "placeId": "Q2570609",
@@ -50845,6 +50840,12 @@
      "tier": 1,
      "rank": 10,
      "name": "Calanques"
+    },
+    {
+     "placeId": "Q663646",
+     "tier": 2,
+     "rank": 11,
+     "name": "Amazonien de Guyane"
     }
    ]
   },
@@ -63296,12 +63297,12 @@
      "rank": 10
     },
     {
-     "placeId": "Q28374564",
+     "placeId": "Q24695383",
      "tier": 2,
      "rank": 11
     },
     {
-     "placeId": "Q24695383",
+     "placeId": "Q663646",
      "tier": 2,
      "rank": 12
     }
@@ -68949,22 +68950,22 @@
      "rank": 70
     },
     {
-     "placeId": "Q135225",
+     "placeId": "Q833850",
      "tier": 3,
      "rank": 71
     },
     {
-     "placeId": "Q833850",
+     "placeId": "Q594779",
      "tier": 3,
      "rank": 72
     },
     {
-     "placeId": "Q594779",
+     "placeId": "Q1049644",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q1049644",
+     "placeId": "Q135225",
      "tier": 3,
      "rank": 74
     },
@@ -82382,6 +82383,11 @@
    {
     "code": "97314",
     "name": "Ouanary",
+    "parentCode": "973"
+   },
+   {
+    "code": "97356",
+    "name": "Camopi",
     "parentCode": "973"
    },
    {

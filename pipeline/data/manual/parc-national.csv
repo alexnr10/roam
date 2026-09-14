@@ -18,21 +18,53 @@
 #   « à vérifier »  le lieu est dans le parc à ma connaissance, mais son résumé
 #                   ne le dit pas. C'est un indice, et il t'appartient.
 #
-# DIX PARCS SUR ONZE. Le onzième est le parc amazonien de Guyane, et il n'a
-# aucune ligne parce que le catalogue n'a rien à y mettre : les douze lieux
-# guyanais sont tous sur la bande côtière — Cayenne, Kourou, les îles du Salut,
-# l'Oyapock — quand le parc couvre le sud du département. Une ligne inventée
-# vaudrait moins qu'une absence.
+# TROIS LIGNES SONT UN CHOIX DU CURATEUR, contre ma proposition d'origine :
+# les gorges du Tarn plutôt que le mont Aigoual pour les Cévennes,
+# Porquerolles plutôt que Port-Cros pour le parc qui porte pourtant le nom de
+# l'autre île, Châtillon-sur-Seine plutôt que l'abbaye d'Auberive pour les
+# Forêts. Dans les trois cas le lieu retenu est le plus connu des deux, et une
+# collection qu'on lit vaut mieux qu'une collection exacte que personne
+# n'ouvre.
+#
+# LES ONZE PARCS ONT LEUR LIGNE, et le onzième a demandé un détour.
+#
+# Le parc amazonien de Guyane n'avait aucun lieu au CATALOGUE : les douze lieux
+# guyanais retenus sont tous sur la bande côtière — Cayenne, Kourou, les îles
+# du Salut, l'Oyapock — quand le parc couvre le sud du département. La COLLECTE,
+# elle, en portait six dans les communes du parc. Cinq sont sortis, et PAS pour
+# la même raison — c'est toute la question :
+#
+#     Montagne Bellevue   Maripasoula   15 langues   drop du curateur
+#     Montagne Kotika     Papaïchton     6 langues   drop du curateur
+#     Roche Koutou        Maripasoula    4 langues   drop du curateur
+#     Saut Niagara        Saint-Élie     3 langues   drop du curateur
+#     Mont Saint-Marcel   Camopi         4 langues   PLANCHER de notoriété
+#
+# La montagne Bellevue est le point culminant de la Guyane et le meilleur
+# candidat sur le papier — mais elle a été RELUE et écartée. Une liste ne doit
+# pas rattraper par la bande ce qu'une revue a jugé : on ne la prend pas.
+#
+# Le mont Saint-Marcel, lui, n'a jamais été jugé : il tombe sur le plancher des
+# sommets, huit langues exigées contre quatre. C'est exactement le cas du mont
+# Pollino en Italie, et c'est ce que le label répare — figurer sur une liste
+# officielle DISPENSE du plancher. Il entre donc, et la Guyane cesse d'être un
+# trou dans la collection.
+#
+# DEUX CHOSES À SAVOIR, parce qu'elles sont discutables et qu'elles t'appartiennent :
+# il n'a pas de photo — la fiche s'ouvre sur le symbole du thème — et quatre
+# sommets guyanais de la même famille ont été écartés en revue. Si ce n'est pas
+# ce que tu veux voir, une ligne de moins et la Guyane redevient absente.
 #
 # Q-ID : tous lus dans `data/out/places.json`, aucun écrit de mémoire.
 wikidata_id,name,nom_dans_la_collection,note
 Q2269718,Calanque de Sormiou,Calanques,le résumé dit « parc national des Calanques » (attesté)
-Q1836325,Mont Aigoual,Cévennes,sommet du cœur du parc — le résumé ne le dit pas (à vérifier)
+Q1538251,Gorges du Tarn,Cévennes,choix du curateur — le résumé ne dit pas le parc (à vérifier)
 Q624323,La Grave,Écrins,le résumé dit « dans le parc national des Écrins » (attesté)
-Q1774965,Abbaye d'Auberive,Forêts,commune d'Auberive — le résumé ne dit pas le parc (à vérifier)
+Q244707,Châtillon-sur-Seine,Forêts,choix du curateur — le résumé ne dit pas le parc (à vérifier)
+Q663646,Mont Saint-Marcel,Amazonien de Guyane,"commune de Camopi, dans le parc — entre par la dispense de plancher (à vérifier)"
 Q1149310,Soufrière,Guadeloupe,le résumé dit « dans le parc national de la Guadeloupe » (attesté)
 Q2570609,Lac d'Allos,Mercantour,le résumé dit « dans le parc national du Mercantour » (attesté)
-Q1658544,Île de Port-Cros,Port-Cros,le parc porte le nom de l'île (attesté par le nom)
+Q975080,Île de Porquerolles,Port-Cros,choix du curateur — l'île voisine porte le nom du parc (à vérifier)
 Q1093112,Cirque de Gavarnie,Pyrénées,le résumé dit « du parc national des Pyrénées » (attesté)
 Q1049644,Piton de la Fournaise,La Réunion,cœur du parc — le résumé ne le dit pas (à vérifier)
 Q736370,Bonneval-sur-Arc,Vanoise,le résumé dit « dans le parc national de la Vanoise » (attesté)
