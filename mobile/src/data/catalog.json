@@ -18000,8 +18000,8 @@
    "communeName": "Vallon-Pont-d'Arc",
    "summary": "Le pont d'Arc est une arche naturelle monumentale et pittoresque des gorges de l'Ardèche, en Ardèche, à 5 km du village de Vallon-Pont-d'Arc, aux limites territoriales des communes de Vallon-Pont-d'Arc et Labastide-de-Virac. Inclus dans la réserve naturelle nationale des gorges de l'Ardèche, il est depuis le 24 janvier 1931 un site naturel classé de l'Ardèche.",
    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/0020%20Pont%20d%27Arc%20-%20Ard%C3%A8che.jpg",
-   "imageAuthor": "W. Bulach",
-   "imageLicence": "CC BY-SA 4.0",
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pont_d%27Arc"
   },
   {
@@ -22120,8 +22120,8 @@
    "communeName": "Sallanches",
    "summary": "La pointe Percée est un sommet de France, point culminant de la chaîne des Aravis avec 2 750 mètres d'altitude, dans le département de la Haute-Savoie.",
    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pointe%20Perc%C3%A9e%20%40%20La%20Clef%20des%20Annes%20%40%20Le%20Grand-Bornand%20%2851048270553%29.jpg",
-   "imageAuthor": "Guilhem Vellut from Annecy, France",
-   "imageLicence": "CC BY 2.0",
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pointe_Perc%C3%A9e"
   },
   {
@@ -22523,6 +22523,26 @@
    "imageAuthor": "No machine-readable author provided. Gemini1980 assumed (based on copyright claims).",
    "imageLicence": "Public domain",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Grand_Som"
+  },
+  {
+   "id": "Q910382",
+   "slug": "saul",
+   "name": "Saül",
+   "themeId": "villages",
+   "lat": 3.622778,
+   "lon": -53.208333,
+   "radiusM": 600,
+   "score": 70.3,
+   "departement": "Guyane",
+   "departementCode": "973",
+   "regionCode": "03",
+   "communeCode": null,
+   "communeName": null,
+   "summary": null,
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/French%20Guiana%20Sa%C3%BCl%20centre.jpg",
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Sa%C3%BCl_(Guyane)"
   },
   {
    "id": "Q384109",
@@ -24640,8 +24660,8 @@
    "communeName": "Biarritz",
    "summary": "Le rocher de la Vierge est une curiosité naturelle touristique en forme de longue coque de navire, surplombée par une statue de la Vierge. C'est un monument emblématique de la ville de Biarritz dans les Pyrénées-Atlantiques.",
    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Rocher%20de%20la%20Vierge%202022.jpg",
-   "imageAuthor": "Jörg Braukmann",
-   "imageLicence": "CC BY-SA 4.0",
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Rocher_de_la_Vierge"
   },
   {
@@ -26280,8 +26300,8 @@
    "communeName": "Mouthe",
    "summary": "Le Doubs (prononcé [du]) est une rivière française et suisse traversant trois départements de la région Bourgogne-Franche-Comté : le Doubs auquel il a donné son nom, le Jura et la Saône-et-Loire, ainsi que les cantons suisses de Neuchâtel et du Jura. C'est le principal affluent de la Saône et par conséquent un sous-affluent du Rhône.",
    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Source%20du%20Doubs.jpg",
-   "imageAuthor": "Arnaud 25",
-   "imageLicence": "Public domain",
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Source_du_Doubs"
   },
   {
@@ -27300,8 +27320,8 @@
    "communeName": "Orléans",
    "summary": "Le Bouillon est une résurgence formant la source principale du Loiret, affluent de la Loire.\nLa résurgence est située dans le parc floral de la Source, dans le quartier d'Orléans-la-Source situé au sud de la ville d'Orléans, chef-lieu du département du Loiret, région Centre-Val de Loire, en France.",
    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Orl%C3%A9ans%20-%20parc%20floral%20%2851%29.jpg",
-   "imageAuthor": "Fab5669",
-   "imageLicence": "CC BY-SA 4.0",
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Le_Bouillon_(Loiret)"
   },
   {
@@ -27720,8 +27740,8 @@
    "communeName": "Pierre-Châtel",
    "summary": "La Pierre Percée est une arche naturelle sur une colline de l'Isère, sur la commune de Pierre-Châtel, au sommet de la colline des Creys, ayant la particularité de posséder un trou en arc de cercle de 3 m de hauteur. La roche qui la constitue est de la cargneule.",
    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/La%20Pierre%20Perc%C3%A9e%20%28face%20nord%29%20%C3%A0%20Pierre-Ch%C3%A2tel.jpg",
-   "imageAuthor": "Jvillafruela",
-   "imageLicence": "CC BY-SA 4.0",
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/La_Pierre_Perc%C3%A9e"
   },
   {
@@ -29580,8 +29600,8 @@
    "communeName": "Étretat",
    "summary": null,
    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Porte%20d%27Aval%20%28Vue%20depuis%20la%20Manneporte%29.jpg",
-   "imageAuthor": "Jörg Braukmann",
-   "imageLicence": "CC BY-SA 4.0",
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": null
   },
   {
@@ -30000,8 +30020,8 @@
    "communeName": "Tignes",
    "summary": "L'aiguille Percée est une montagne de France située en Savoie, dans le massif de la Vanoise, au-dessus de Tignes.",
    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/L%27Aiguille%20Perc%C3%A9e%202.jpg",
-   "imageAuthor": "Tiia Monto",
-   "imageLicence": "CC BY-SA 3.0",
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Aiguille_Perc%C3%A9e_(massif_de_la_Vanoise)"
   },
   {
@@ -30480,8 +30500,8 @@
    "communeName": "Vandoncourt",
    "summary": "Le pont sarrazin est une formation géologique en forme d'arche naturelle situé sur la commune de Vandoncourt dans le département français du Doubs.",
    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/VandoncourtPontSarrazin1.JPG",
-   "imageAuthor": "Sacamol",
-   "imageLicence": "CC BY-SA 3.0",
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pont_Sarrazin"
   },
   {
@@ -30563,26 +30583,6 @@
    "imageAuthor": "Cervianenc",
    "imageLicence": "Public domain",
    "wikipediaUrl": null
-  },
-  {
-   "id": "Q663646",
-   "slug": "mont-saint-marcel",
-   "name": "Mont Saint-Marcel",
-   "themeId": "sommets",
-   "lat": 2.390833,
-   "lon": -53.017778,
-   "radiusM": 1000,
-   "score": 42.9,
-   "departement": "Guyane",
-   "departementCode": "973",
-   "regionCode": "03",
-   "communeCode": "97356",
-   "communeName": "Camopi",
-   "summary": "Le mont Saint-Marcel est l'un des plus hauts sommets de Guyane française avec 645 m d'altitude. Il est situé sur le plateau guyanais, à l'extrême sud-est du territoire, non loin de Trois Sauts et de la frontière avec le Brésil, dans la commune de Camopi.",
-   "imageUrl": null,
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mont_Saint-Marcel"
   },
   {
    "id": "Q20127619",
@@ -31420,8 +31420,8 @@
    "communeName": "Corte",
    "summary": "L’Arche de Corte, Arche de Padule ou Arcu di u scandulaghju, est une arche naturelle granitique situé à 1 500 mètres d'altitude, au-dessus de Corte, surplombant la vallée du Tavignano, en Corse.",
    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arche%20de%20corte.jpg",
-   "imageAuthor": "Altagna",
-   "imageLicence": "CC BY-SA 2.0 fr",
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Arche_de_Corte"
   },
   {
@@ -31660,8 +31660,8 @@
    "communeName": "Saint-Pierre-des-Tripiers",
    "summary": null,
    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Baousso%20del%20Biel%2005.JPG",
-   "imageAuthor": "Petr1888",
-   "imageLicence": "CC BY-SA 3.0",
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": null
   },
   {
@@ -31680,8 +31680,8 @@
    "communeName": "Étretat",
    "summary": null,
    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Regardant%20par%20la%20Manneporte.jpg",
-   "imageAuthor": "Jörg Braukmann",
-   "imageLicence": "CC BY-SA 4.0",
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": null
   },
   {
@@ -31700,8 +31700,8 @@
    "communeName": "Quenza",
    "summary": null,
    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bavella-trou-bombe.JPG",
-   "imageAuthor": "Nerijp",
-   "imageLicence": "CC BY-SA 3.0",
+   "imageAuthor": null,
+   "imageLicence": null,
    "wikipediaUrl": null
   },
   {
@@ -50776,8 +50776,8 @@
    "geoCode": null,
    "placeCount": 11,
    "tierCounts": [
-    10,
-    1,
+    11,
+    0,
     0
    ],
    "places": [
@@ -50836,16 +50836,16 @@
      "name": "Mercantour"
     },
     {
-     "placeId": "Q2269718",
+     "placeId": "Q910382",
      "tier": 1,
      "rank": 10,
-     "name": "Calanques"
+     "name": "Amazonien de Guyane"
     },
     {
-     "placeId": "Q663646",
-     "tier": 2,
+     "placeId": "Q2269718",
+     "tier": 1,
      "rank": 11,
-     "name": "Amazonien de Guyane"
+     "name": "Calanques"
     }
    ]
   },
@@ -63262,37 +63262,37 @@
      "rank": 3
     },
     {
-     "placeId": "Q24695295",
+     "placeId": "Q910382",
      "tier": 1,
      "rank": 4
     },
     {
-     "placeId": "Q3322280",
+     "placeId": "Q24695295",
      "tier": 1,
      "rank": 5
     },
     {
-     "placeId": "Q6159718",
+     "placeId": "Q3322280",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q2262571",
+     "placeId": "Q6159718",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q3322303",
+     "placeId": "Q2262571",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q3593277",
+     "placeId": "Q3322303",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q18785665",
+     "placeId": "Q3593277",
      "tier": 1,
      "rank": 10
     },
@@ -63302,7 +63302,7 @@
      "rank": 11
     },
     {
-     "placeId": "Q663646",
+     "placeId": "Q18785665",
      "tier": 2,
      "rank": 12
     }
@@ -82383,11 +82383,6 @@
    {
     "code": "97314",
     "name": "Ouanary",
-    "parentCode": "973"
-   },
-   {
-    "code": "97356",
-    "name": "Camopi",
     "parentCode": "973"
    },
    {

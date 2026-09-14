@@ -40,20 +40,21 @@
 #     Saut Niagara        Saint-Élie     3 langues   drop du curateur
 #     Mont Saint-Marcel   Camopi         4 langues   PLANCHER de notoriété
 #
-# La montagne Bellevue est le point culminant de la Guyane et le meilleur
-# candidat sur le papier — mais elle a été RELUE et écartée. Une liste ne doit
-# pas rattraper par la bande ce qu'une revue a jugé : on ne la prend pas.
+# AUCUN DES SIX N'A ÉTÉ RETENU, et la raison tient en une phrase : le parc
+# amazonien n'a pas une route. Ce sont des objets d'expédition, et un lieu qu'on
+# ne peut pas atteindre échoue deux fois dans Roam — on ne le visite pas, et la
+# validation se faisant au GPS dans un rayon, c'est une case qui ne se cochera
+# jamais. Quatre d'entre eux avaient d'ailleurs déjà été écartés en revue.
 #
-# Le mont Saint-Marcel, lui, n'a jamais été jugé : il tombe sur le plancher des
-# sommets, huit langues exigées contre quatre. C'est exactement le cas du mont
-# Pollino en Italie, et c'est ce que le label répare — figurer sur une liste
-# officielle DISPENSE du plancher. Il entre donc, et la Guyane cesse d'être un
-# trou dans la collection.
+# C'EST SAÜL QUI REPRÉSENTE LE PARC. La commune est entièrement dans son
+# périmètre, c'est la seule qui soit desservie — une piste d'atterrissage depuis
+# Cayenne — et des sentiers balisés partent du bourg. C'est le seul endroit du
+# parc où un voyageur peut se trouver.
 #
-# DEUX CHOSES À SAVOIR, parce qu'elles sont discutables et qu'elles t'appartiennent :
-# il n'a pas de photo — la fiche s'ouvre sur le symbole du thème — et quatre
-# sommets guyanais de la même famille ont été écartés en revue. Si ce n'est pas
-# ce que tu veux voir, une ligne de moins et la Guyane redevient absente.
+# Elle n'était dans aucun thème : sa seule classe déclarée est « commune
+# française » (Q484170), qu'aucune requête n'interroge. Elle est donc entrée par
+# `data/manual/places.csv`, qui impose le thème — trente-cinq langues, bien
+# au-dessus de tout plancher. Le label ne lui sert qu'à nommer le parc.
 #
 # Q-ID : tous lus dans `data/out/places.json`, aucun écrit de mémoire.
 wikidata_id,name,nom_dans_la_collection,note
@@ -61,7 +62,7 @@ Q2269718,Calanque de Sormiou,Calanques,le résumé dit « parc national des Cala
 Q1538251,Gorges du Tarn,Cévennes,choix du curateur — le résumé ne dit pas le parc (à vérifier)
 Q624323,La Grave,Écrins,le résumé dit « dans le parc national des Écrins » (attesté)
 Q244707,Châtillon-sur-Seine,Forêts,choix du curateur — le résumé ne dit pas le parc (à vérifier)
-Q663646,Mont Saint-Marcel,Amazonien de Guyane,"commune de Camopi, dans le parc — entre par la dispense de plancher (à vérifier)"
+Q910382,Saül,Amazonien de Guyane,"commune entièrement dans le parc — la seule desservie, par avion depuis Cayenne (à vérifier)"
 Q1149310,Soufrière,Guadeloupe,le résumé dit « dans le parc national de la Guadeloupe » (attesté)
 Q2570609,Lac d'Allos,Mercantour,le résumé dit « dans le parc national du Mercantour » (attesté)
 Q975080,Île de Porquerolles,Port-Cros,choix du curateur — l'île voisine porte le nom du parc (à vérifier)
