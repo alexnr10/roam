@@ -77,7 +77,6 @@ Q1056344,2,abbayes,Chartreuse de Galluzzo
 Q1056360,2,piazzas,Piazza Bra
 Q1056442,3,cathedrales,Église Sainte-Anastasie de Vérone
 Q1057382,3,sommets,Gruppo della Carega
-Q1058475,2,monuments,Palais Spada
 Q1058967,2,megalithes,Théâtre grec de Syracuse
 Q1059016,3,lacs,Lac de Pilate
 Q105946329,3,monuments,Palais Botta Adorno
@@ -269,7 +268,7 @@ Q1261544,1,maisons,Palais du Te
 Q1262976,2,ponts,Pont de l'Amiral
 Q1265593,2,monuments,Ca' Vendramin Calergi
 Q1267415,3,lacs,Lago di Valdurna
-Q1267721,3,monuments,Palais ducal d'Urbin
+Q1267721,2,monuments,Palais ducal d'Urbin
 Q1268593,3,cathedrales,Temple Malatesta
 Q1268692,2,ponts,Ponte della Paglia
 Q1268698,2,ponts,Pont des Flèches
@@ -380,7 +379,6 @@ Q1501051,1,grottes,Grotte de Neptune
 Q1502242,3,abbayes,Abbaye de Lucedio
 Q1502879,3,abbayes,Abbaye Santa Maria di Casanova
 Q1502960,2,lacs,Lac de Mezzola
-Q15076422,2,monuments,Palais des Anziani
 Q1509102,3,monuments,Arc de Trajan d'Ancône
 Q15124814,1,piazzas,Piazza di Spagna
 Q1514006,2,maisons,Palais royal de Gênes
@@ -432,7 +430,7 @@ Q1598119,3,sommets,Corno Bianco
 Q1611116,3,piazzas,Piazza del Gesù Nuovo
 Q1617215,3,monuments,Théâtre romain de Bénévent
 Q16268344,2,dunes-marais,Dune di Massenzatica
-Q1631971,3,maisons,Villa Rosebery
+Q1631971,2,maisons,Villa Rosebery
 Q16328376,3,megalithes,Hipponion
 Q16336153,3,musees,Musée et église Saint-François
 Q1635704,2,musees,Palais ducal de Mantoue
@@ -520,7 +518,6 @@ Q1775991,3,abbayes,Abbaye Santo Stefano del Bosco
 Q177695,3,villages,Ronciglione
 Q17774,3,villages,Castagnole delle Lanze
 Q177741,3,villages,Sutri
-Q1777545,2,jardins,Parco Villoresi
 Q17798,3,villages,Cocconato
 Q17821,3,villages,Mombaldone
 Q1782566,3,megalithes,Sulky
@@ -828,7 +825,7 @@ Q24038410,3,piazzas,Piazza Galvani
 Q2407092,3,cathedrales,Dôme de Padoue
 Q2407717,3,cathedrales,Cathédrale de Tricarico
 Q2408856,3,megalithes,Parc de la préhistoire de Rivolta d'Adda
-Q2413439,3,maisons,Villa Ludovisi
+Q2413439,2,maisons,Villa Ludovisi
 Q2417486,2,sommets,Monte Vettore
 Q2418618,2,maisons,Casa Buonarroti
 Q242105,1,villages,Castel Gandolfo
@@ -861,7 +858,7 @@ Q24942423,3,chateaux,Château ducal de Ceglie Messapica
 Q24942425,3,chateaux,Château de Mesagne
 Q250142,3,sommets,Monte Galero
 Q25043414,3,megalithes,Ripari Villabruna
-Q2506967,2,maisons,Villa Piovene
+Q2506967,3,maisons,Villa Piovene
 Q2517428,3,musees,Palazzo della Ragione de Padoue
 Q2518014,3,megalithes,Terina
 Q2518166,2,lacs,Lac de Campotosto
@@ -883,7 +880,7 @@ Q2576260,3,sommets,Mont Cermis
 Q2592967,3,sommets,Monte San Cristoforo
 Q2595439,3,iles,Isola di Foradada
 Q259658,2,phares,Phare du Mont Circé
-Q2598094,3,maisons,Villa Forni Cerato
+Q2598094,2,maisons,Villa Forni Cerato
 Q261233,2,musees,Museo del Novecento
 Q261439,2,monuments,Teatro Massimo Vittorio Emanuele
 Q2623043,3,lacs,Lago del Turano
@@ -934,7 +931,6 @@ Q2717102,2,piazzas,Piazza delle Erbe
 Q2718057,2,piazzas,Piazza Grande
 Q2719120,3,monuments,Palazzo Terragni
 Q271928,2,musees,Palais de la Seigneurie
-Q2721458,2,maisons,Villa Valmarana
 Q2722506,3,maisons,Villa Valmarana Bressan
 Q272777,1,megalithes,Villa d'Hadrien
 Q272968,3,megalithes,Élée
@@ -973,6 +969,7 @@ Q284789,3,villages,Sadali
 Q2860643,3,rochers,Arco naturale
 Q28668608,3,maisons,Villa Arrigona
 Q28727449,3,musees,Museo del violino
+Q2882456,2,jardins,Jardin botanique de Brera
 Q2883692,3,cathedrales,Baptistère de Parme
 Q2885882,3,lacs,Lac Ampollino
 Q2886984,2,abbayes,Basilique Saint-André
@@ -1037,7 +1034,6 @@ Q3117235,3,grottes,Grotte du Gel
 Q31445600,2,volcans,Stromboli
 Q3162382,2,jardins,Jardin botanique alpin Saussurea
 Q31678237,3,sommets,Monte Mònega
-Q3181094,2,maisons,Pinacothèque communale de Volterra
 Q3183228,2,chateaux,Château Visconti
 Q3215012,3,lacs,Lac Liscia
 Q321506,3,musees,Camp de Fossoli
@@ -1310,7 +1306,6 @@ Q3752472,3,megalithes,Frattesina
 Q3763803,3,maisons,La Mortella
 Q3763804,2,jardins,Jardin Margherita
 Q3763875,2,jardins,Giardino botanico Carsiana
-Q3763892,2,jardins,Giardino botanico di Pratorondanino
 Q3763918,3,jardins,Giardino della Minerva
 Q376571,3,chateaux,Runkelstein
 Q3768553,3,maisons,Gipsoteca canoviana
@@ -1455,6 +1450,7 @@ Q3890510,3,monuments,Palais Montalto
 Q3890540,3,monuments,Palais municipal
 Q3890608,3,monuments,Palazzo Pantaleo Spinola
 Q3890626,3,monuments,Palais patriarcal
+Q3890636,3,monuments,Palais Pazzi
 Q3890693,3,monuments,Palais Pompei
 Q3890712,3,monuments,Palazzo Pretorio
 Q3890921,3,monuments,Palais Soranzo
@@ -1466,11 +1462,7 @@ Q3891378,3,monuments,Palais Vermexio
 Q3891391,3,monuments,Palazzo dell'Annunziata
 Q3891454,3,monuments,Palais de la Loge
 Q3891477,3,monuments,Palazzo della Ragione
-Q3895396,2,jardins,Parco Emilio Alessandrini
-Q3895399,2,jardins,Parco Forlanini
-Q3895415,2,jardins,Parco Lambro
-Q3895554,2,jardins,Parco delle Cave
-Q3895579,2,jardins,Parc de trenno
+Q3895399,3,jardins,Parco Forlanini
 Q3895614,3,monuments,Parco giardino Sigurtà
 Q3895632,3,megalithes,Parc naturel des Lagoni de Mercurago
 Q3895972,3,monuments,Teatro Carignano
@@ -1522,7 +1514,6 @@ Q3966660,3,plages,Spiaggia della Lecciona
 Q3966662,3,plages,Spiaggia di Berchida
 Q3966667,3,plages,Spiaggia di Cavoli
 Q3966672,2,plages,Spiaggia rosa
-Q3966943,2,grottes,Spluga della Preta
 Q3968023,3,lacs,Estany del Càlic
 Q3976431,3,rochers,Su Gologone
 Q39783,3,villages,Mel
@@ -1619,6 +1610,7 @@ Q48155,3,villages,Follina
 Q481879,3,villages,Salemi
 Q48315714,1,cascades,Cascade Piscina Irgas
 Q486382,1,chateaux,Château Saint-Ange
+Q48810344,3,jardins,Parco Biblioteca degli Alberi
 Q488863,2,abbayes,Monastère de Saint Nicolas l'Arène
 Q489260,3,villages,Palazzolo Acréide
 Q489406,3,iles,Formica
@@ -1627,7 +1619,6 @@ Q490929,3,villages,Petralia Soprana
 Q492609,3,villages,Castelmola
 Q492622,3,villages,Montalbano Elicona
 Q494935,3,sommets,Penegal
-Q49538172,2,jardins,Parco della Vernavola
 Q495994,3,villages,Castroreale
 Q497321,2,iles,Linosa
 Q497339,2,iles,Marettimo
@@ -1891,6 +1882,7 @@ Q64269487,3,villages,Sottoguda
 Q642924,3,iles,Île Belle
 Q644288,2,megalithes,Mausolée de Galla Placidia
 Q645041,2,chateaux,Castello dell’ovo
+Q645181,2,monuments,Obélisque du Latran
 Q648679,2,lacs,Lac de Nemi
 Q649030,1,piazzas,Ghetto de Venise
 Q650088,2,maisons,Villa Melzi d'Eril
