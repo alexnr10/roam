@@ -17,6 +17,7 @@ import {
   partDuCadre,
   prochaineOuverture,
   rangDepuisLeCentre,
+  regionAu,
   regionDuCadre,
   regionDuDepartement,
   voile,
@@ -786,6 +787,40 @@ export function MapCanvas({
     onRegion.current?.(code);
     ouvrir(instance, code);
   }, [ready, demande]);
+
+  /**
+   * L'ouverture SUR SOI, au tout premier affichage.
+   *
+   * La carte s'ouvrait sur le pays entier pendant que le bandeau du bas
+   * annonçait « autour de toi » et listait la cathédrale à vingt mètres : deux
+   * écrans qui ne parlent pas du même endroit, sur la même image.
+   *
+   * On ouvre donc la région où l'on se trouve, exactement comme si on l'avait
+   * touchée dans Explorer. La RÉGION, et pas un zoom serré sur soi : c'est
+   * l'unité de cette carte, on garde de quoi savoir où l'on est dans le pays,
+   * et le bandeau montre les mêmes lieux qu'avant — il est trié par distance,
+   * donc les premiers restent les plus proches.
+   *
+   * UNE SEULE FOIS, et seulement si la carte est encore vierge. Une position
+   * GPS met quelques secondes à arriver : si elle tombait pendant qu'on
+   * regarde la Provence, elle ramènerait la carte à la maison sans prévenir.
+   */
+  const accueil = useRef(false);
+  useEffect(() => {
+    const instance = map.current;
+    if (!ready || !instance || accueil.current) return;
+    if (!position || demande || ouverteRef.current) return;
+    const code = regionAu(position.longitude, position.latitude);
+    accueil.current = true;
+    // Hors du pays du catalogue — ou sur une région sans contour — on reste sur
+    // la vue d'ensemble : c'est déjà la bonne réponse.
+    if (!code) return;
+    ouverteRef.current = code;
+    zoomOuverture.current = null;
+    setOuverte(code);
+    onRegion.current?.(code);
+    ouvrir(instance, code);
+  }, [ready, position, demande]);
 
   /**
    * Le retour à la France, par la pastille.

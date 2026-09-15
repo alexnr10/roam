@@ -15,6 +15,7 @@ import {
   REGIONS,
   bornesDuPays,
   emprise,
+  regionAu,
   prochaineOuverture,
   regionDuCadre,
   regionDuDepartement,
@@ -504,6 +505,27 @@ function CarteNative({
     if (!REGIONS.has(code)) return;
     ouvrirRegion(code);
   }, [demande, ouvrirRegion]);
+
+  /**
+   * L'ouverture SUR SOI, au tout premier affichage.
+   *
+   * La carte s'ouvrait sur le pays entier pendant que le bandeau du bas
+   * annonçait « autour de toi » et listait la cathédrale à vingt mètres : deux
+   * écrans qui ne parlent pas du même endroit. On ouvre la région où l'on se
+   * trouve, comme si on l'avait touchée dans Explorer.
+   *
+   * UNE SEULE FOIS, et seulement si la carte est encore vierge : une position
+   * GPS met quelques secondes à arriver, et si elle tombait pendant qu'on
+   * regarde la Provence elle ramènerait la carte à la maison sans prévenir.
+   */
+  const accueil = useRef(false);
+  useEffect(() => {
+    if (accueil.current || !position || demande || ouverteRef.current) return;
+    const code = regionAu(position.longitude, position.latitude);
+    accueil.current = true;
+    if (!code) return;
+    ouvrirRegion(code);
+  }, [position, demande, ouvrirRegion]);
 
   /**
    * Le retour à la France, par la pastille.
