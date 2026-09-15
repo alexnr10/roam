@@ -3,7 +3,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { FlatList, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { places as allPlaces, themeLabel, themes } from '../../src/data/catalog';
+import { places as allPlaces, nomDuPays, themeLabel, themes } from '../../src/data/catalog';
 import { useCatalogue } from '../../src/lib/useCatalogue';
 import { usePays } from '../../src/store/pays';
 import { bandeau } from '../../src/lib/carte';
@@ -224,10 +224,13 @@ export default function MapScreen() {
               style={styles.retourRegion}
               onPress={() => setRetourFrance(retourFrance + 1)}
               accessibilityRole="button"
-              accessibilityLabel="Revenir à la France entière"
+              accessibilityLabel={`Revenir à ${nomDuPays() || 'la carte'}, en entier`}
             >
               <IconeChevron size={17} color={colors.surface} />
-              <Text style={styles.retourFrance}>France</Text>
+              {/* Le pays vient du CATALOGUE, pas d'une constante : la pastille
+                  annonçait « France | Toscane » dès qu'on ouvrait une région
+                  italienne. */}
+              <Text style={styles.retourFrance}>{nomDuPays() || 'Pays'}</Text>
               <View style={styles.retourFilet} />
               <Text style={styles.retourNom} numberOfLines={1}>
                 {nomDeRegion(regionOuverte)}

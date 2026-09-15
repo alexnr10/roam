@@ -322,6 +322,31 @@ export function voisinageDe(
   return voisins;
 }
 
+/** Deux emprises se touchent-elles ? */
+function chevauche(a: Emprise, b: Emprise): boolean {
+  return a[0][0] <= b[1][0] && a[1][0] >= b[0][0]
+      && a[0][1] <= b[1][1] && a[1][1] >= b[0][1];
+}
+
+/**
+ * Les régions qui tiennent dans le cadre du pays — ce que montre la vignette.
+ *
+ * C'était une LISTE DE CODES : 01 à 04 et 06, les cinq régions d'outre-mer,
+ * sorties d'une vignette qu'elles auraient étirée sur deux océans. Ces mêmes
+ * codes, en Italie, sont le Piémont, le Val d'Aoste, la Lombardie, le Trentin
+ * et le Frioul : la vignette italienne perdait tout son nord, sans un mot.
+ * Même accident que le coloriage, même cause — une table écrite pour un pays,
+ * appliquée à un autre.
+ *
+ * La règle est donc géométrique, et c'est le cadre de `bornesDuPays` : le même
+ * que celui sur lequel la carte s'ouvre.
+ */
+export function regionsDuCadre(cadre: Emprise | null = bornesDuPays()): string[] {
+  return [...REGIONS.keys()].filter(
+    (code) => !cadre || chevauche(emprise(REGIONS.get(code)!.geometry), cadre),
+  );
+}
+
 /** Région d'un département, par son code. */
 export const regionDuDepartement = (code: string): string | null =>
   regionParDepartement.get(code) ?? null;

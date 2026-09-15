@@ -18,7 +18,7 @@ import { SelecteurDePays } from '../../src/ui/SelecteurDePays';
 import { IconeCroix, IconeRosette } from '../../src/ui/icons';
 import { Etoiles } from '../../src/ui/Etoiles';
 import { etoilesDe } from '../../src/lib/etoiles';
-import { MiniatureFrance } from '../../src/ui/regionShape';
+import { MiniaturePays } from '../../src/ui/regionShape';
 import { conquestByZone, shadeOf } from '../../src/lib/conquest';
 import { areas } from '../../src/data/catalog';
 
@@ -115,7 +115,7 @@ export default function ProfileScreen() {
       {/* La conquête et le quadrillage vivent ici : ce sont des récompenses, et
           une récompense ne réclame pas le quart de la barre d'onglets. */}
       <Pressable style={styles.conquete} onPress={() => router.push('/conquete')}>
-        <MiniatureFrance couleurs={teintes} />
+        <MiniaturePays couleurs={teintes} />
         <View style={{ flex: 1, gap: spacing.sm }}>
           <Text style={type.heading}>Ta carte de conquête</Text>
           <Text style={type.small}>

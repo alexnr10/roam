@@ -37,14 +37,22 @@
 #   « à vérifier » le nom du parc apparaît dans le résumé sans que rien ne dise
 #                  que le lieu est dedans. C'est un indice, et il t'appartient.
 #
-# TROIS LIGNES SONT UN CHOIX PAR DÉFAUT, faute de mieux — marquées « province
+# DEUX LIGNES SONT UN CHOIX PAR DÉFAUT, faute de mieux — marquées « province
 # du parc ». Le lieu demandé n'était pas dans la collecte, et celui retenu est
 # le meilleur que le catalogue tienne dans le territoire du parc, identifié par
 # sa COMMUNE et non par un texte :
 #
 #     Stelvio           massif de l'Ortles, commune Stelvio/Stilfs
-#     Apennin lucanien  Grumentum, commune Grumento Nova, en Val d'Agri
 #     Sila              lac Arvo, commune San Giovanni in Fiore
+#
+# L'APENNIN LUCANIEN A CHANGÉ DE REPRÉSENTANT, et c'est l'alerte qui l'a dit :
+# Grumentum, retenu faute de mieux, a été écarté à la revue du 15 septembre —
+# la collection perdait un parc en silence. Le massif du Sirino le remplace, et
+# il tient de plus près la demande d'origine : c'est LUI qui porte le lago
+# Laudemio. Quatre versions linguistiques pour un plancher des sommets à huit,
+# il n'entre donc que par la dispense de cette liste. Le lac du Pertusillo
+# (Q3826016, commune de Montemurro) était l'autre candidat — il nomme le Val
+# d'Agri, qui est dans le nom du parc.
 #
 # LES VINGT-SIX PARCS ONT LEUR LIGNE. Les deux derniers ont demandé chacun un
 # détour, et tous deux illustrent une règle du pipeline :
@@ -114,7 +122,7 @@ Q1131545,Cap Palinuro,Cilento et Val de Diano,parc national Cilento et Val de Di
 Q3392526,Grotte de Cavallone,Majella,parc national Majella (attesté)
 Q898150,Matese,Matese,parc national Matese (attesté)
 Q63521967,Massif de l'Ortles,Stelvio,parc national Stelvio (province du parc)
-Q1550380,Grumentum,Apennin lucanien-Val d'Agri,parc national Apennin lucanien-Val d'Agri (province du parc)
+Q3850973,Massiccio del Sirino,Apennin lucanien-Val d'Agri,le massif qui porte le lago Laudemio — commune de Lagonegro (choix du curateur ; Grumentum écarté en revue)
 Q3825626,Lac Arvo,Sila,parc national Sila (province du parc)
 Q3825880,Lago della Stua,Dolomites bellunoises,parc national Dolomites bellunoises (choix du curateur)
 Q18445963,Cicogna,Val Grande,parc national Val Grande (choix du curateur — entre au prochain fetch)

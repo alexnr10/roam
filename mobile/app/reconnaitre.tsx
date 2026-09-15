@@ -145,9 +145,13 @@ export default function RecognitionScreen() {
               onChange={(suivant) => setMode(suivant)}
             />
             {/* La région avant le thème : on se souvient d'un voyage par où il
-                a eu lieu, pas par catégorie. */}
+                a eu lieu, pas par catégorie.
+
+                « Tout le pays » plutôt que son nom : l'article change avec lui
+                — la France, l'Italie, le Portugal — et la pastille disait
+                « Toute la France » à qui parcourait l'Italie. */}
             <ChipRow
-              options={[{ value: null, label: 'Toute la France' }, ...regions]}
+              options={[{ value: null, label: 'Tout le pays' }, ...regions]}
               value={region}
               onChange={setRegion}
             />
