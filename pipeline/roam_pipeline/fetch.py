@@ -948,7 +948,50 @@ def credit_chosen_photos(
                 place.image_url = avant[place.wikidata_id]
 
 
-_CARTE = re.compile(r"location[ _-]map|[ _-]map-[a-z]{2}\b", re.IGNORECASE)
+# La contre-règle, et elle passe EN PREMIER. Quand la gravure est le lieu — un
+# abri orné, une vallée à pétroglyphes, une mosaïque, une fresque — la photo de
+# la surface gravée est la bonne image, et aucun mot des deux règles qui
+# suivent ne doit pouvoir la retirer. La Vallée des Merveilles est au catalogue.
+_CATEGORIE_EXEMPTE = re.compile(
+    r"rock art|rock engraving|rock carving|petroglyph|cave painting|cave art"
+    r"|\brupestr|prehistoric|\bmosaics?\b|\bfresco|\bgraffiti",
+    re.IGNORECASE,
+)
+
+
+# Deux familles, et la frontière entre elles est le taux de faux positifs.
+#
+# LARGE — les noms que MediaWiki fabrique lui-même pour ses cartes de
+# localisation. Aucun photographe n'appelle ainsi son fichier.
+#
+# ÉTROITE — les mots qui ne peuvent pas apparaître dans le nom d'une
+# photographie. Mesurés sur les 22 128 images des deux fichiers BRUTS, et pas
+# sur le catalogue construit : c'est là que vivent les cas limites, et les deux
+# faux positifs corrigés ci-dessous ne s'y voyaient pas autrement. Quarante-cinq
+# touches, quarante-cinq cartes, gravures ou cartes postales anciennes.
+#
+# Les sites archéologiques en fournissent la moitié, et c'est logique : quand
+# il n'y a plus rien à photographier, Wikidata met la table de Peutinger.
+#
+# Ce qui est DEHORS l'est par la mesure, pas par oubli :
+#   « veduta »  — « vue » en italien, quarante photos (Capri, Scanno) ;
+#   « antica »  — un mot du NOM du lieu (Ostie, Noto Antica) ;
+#   une année   — la date de PRISE DE VUE (« Venezia, 1963 ») ;
+#   « painting » — `Lascaux painting.jpg` est la photo d'une paroi peinte,
+#                  et c'est exactement l'image qu'il faut pour Lascaux.
+_CARTE = re.compile(
+    r"location[ _-]map|[ _-]map-[a-z]{2}\b"
+    # `tabula(?!rium)` : le Tabularium est un MONUMENT du Forum romain, et
+    # trois de ses photos étaient retirées — celle du temple de Véiovis
+    # comprise. La Table de Peutinger s'écrit `TabulaNuceria` d'un seul
+    # mot, donc une limite de mot ne suffisait pas : il faut nommer le
+    # monument pour l'épargner.
+    r"|tabula(?!rium)|peutinger|\bcassini\b|\bposizione|\bmappa\b|\blocator\b"
+    r"|\bplanimetri|\bgravure|\bincisione\b|\bengraving|lithograph|litografia"
+    r"|\baquarelle|watercolou?rs?\b|\bdessin\b|\bdisegno\b"
+    r"|old postcard|carte postale",
+    re.IGNORECASE,
+)
 
 
 def est_une_carte(nom: str) -> bool:
@@ -964,14 +1007,137 @@ def est_une_carte(nom: str) -> bool:
     ou un blason. Elle suffit à sept des huit cas.
 
     La seconde nomme les cartes matricielles, qui existent aussi
-    (`France_relief_location_map.jpg`). Elle reste étroite à dessein : le motif
-    « location map » est le nom que MediaWiki donne lui-même à ces fichiers, et
-    élargir à tout `map` écarterait la photo d'un musée de la carte.
+    (`France_relief_location_map.jpg`, `TabulaNuceria.jpg`). Elle reste étroite
+    à dessein : chacun de ses mots a été mesuré sur les 4 082 images des deux
+    catalogues, et tout ce qui rendait un seul faux positif en a été retiré —
+    élargir à tout `map` écarterait la photo du musée de la carte à jouer.
+
+    Le tiret bas vaut l'espace : Commons écrit `Calatia_posizione.jpg` là où
+    l'API rend `Calatia posizione.jpg`, et une limite de mot ne voit pas la
+    frontière dans le premier.
 
     Refuser laisse le lieu SANS image, et c'est le bon résultat : la fiche
     affiche alors son repli, qui dit la vérité, au lieu d'une image qui ment.
     """
-    return nom.lower().endswith(".svg") or bool(_CARTE.search(nom))
+    net = nom.replace("_", " ")
+    if _CATEGORIE_EXEMPTE.search(net):
+        # La même contre-règle que pour les catégories, et pour la même raison :
+        # quand la gravure EST le lieu, sa photo est la bonne image. La Grotte à
+        # la Peinture de Larchant s'illustre de ses gravures rupestres.
+        return False
+    return nom.lower().endswith(".svg") or bool(_CARTE.search(net))
+
+
+# ── Le verdict de Commons, qui est le seul fiable ──────────────────────────
+#
+# Commons SAIT qu'un fichier est une carte : il le range dans « Maps of
+# Nuceria Alfaterna ». Le nom du fichier ne le sait pas.
+#
+# Mais la liste ci-dessous est étroite, et elle l'est à cause d'un cas précis.
+# `Lascaux painting.jpg` porte ces catégories :
+#
+#     Art of Lascaux | Paintings of horses in prehistoric art |
+#     PD-Art (PD-old-100) | Artworks digital representation of 2D work | …
+#
+# C'est la photo d'une paroi peinte, et c'est exactement l'image qu'il faut
+# pour Lascaux. Une règle sur « paintings », sur « artworks » ou sur « PD-Art »
+# supprimerait la photo de la grotte de Lascaux. Ces trois motifs sont donc
+# DEHORS, définitivement.
+#
+# Restent les classements qu'aucune photographie de lieu ne peut porter : une
+# carte, un plan, un blason, un dessin d'architecte.
+_CATEGORIE_CARTE = re.compile(
+    r"\bmaps?\b|\bplans of\b|\bfloor plans?\b|\blocator\b|peutingeriana"
+    r"|\bcoats? of arms\b|\barchitectural drawings?\b|\btechnical drawings?\b"
+    r"|\blithographs? of\b|\betchings? of\b",
+    re.IGNORECASE,
+)
+
+def categorie_de_carte(categories: list[str]) -> str | None:
+    """La catégorie qui trahit une carte, ou `None` si c'est une photo.
+
+    Rend la catégorie FAUTIVE et pas un booléen : c'est elle qu'il faut
+    pouvoir lire dans le journal pour juger la règle, et la règle n'a pas été
+    mesurée sur le catalogue — Commons n'est joignable que depuis la machine
+    qui lance `enrich`. Le premier passage est donc sa revue.
+    """
+    for categorie in categories:
+        if _CATEGORIE_EXEMPTE.search(categorie):
+            return None
+    for categorie in categories:
+        if _CATEGORIE_CARTE.search(categorie):
+            return categorie
+    return None
+
+
+def drop_map_images_by_category(places: list[Place], client=None) -> int:
+    """Demande à Commons ce que sont les images, et retire les cartes.
+
+    `est_une_carte` juge sur le NOM du fichier, et c'est un juge faible :
+    mesuré sur les 4 082 images des deux catalogues, un filet large y rend
+    quatre-vingt-quinze touches pour onze cartes — « veduta » veut dire
+    « vue », « antica » appartient au nom du lieu, et une année est une date de
+    prise de vue. Le nom ne sait pas ce qu'il montre ; Commons, si.
+
+    Une requête pour cinquante fichiers, comme les crédits. Un lot qui échoue
+    ne coûte pas les autres, et un lot SANS RÉPONSE ne conclut rien : effacer
+    une photo sur le silence du réseau serait le pire des résultats.
+
+    Ce qui est retiré est réparable : `fetch` relit l'image depuis Wikidata.
+    """
+    from .commons import BATCH as COMMONS_BATCH, CommonsClient, file_title
+
+    par_titre: dict[str, list[Place]] = defaultdict(list)
+    for place in places:
+        titre = file_title(place.image_url)
+        if titre:
+            par_titre[titre].append(place)
+
+    titres = sorted(par_titre)
+    if not titres:
+        return 0
+
+    client = client or CommonsClient()
+    LOG.info(
+        "nature des images : %s fichiers demandés à Commons, %s par requête",
+        len(titres), COMMONS_BATCH,
+    )
+    retirees = 0
+    for debut in range(0, len(titres), COMMONS_BATCH):
+        lot = titres[debut:debut + COMMONS_BATCH]
+        try:
+            categories = client.categories(lot)
+        except Exception as exc:
+            LOG.warning(
+                "nature des images : lot %s échoué (%s)", debut // COMMONS_BATCH, exc)
+            continue
+        for titre, classement in categories.items():
+            if not classement:
+                # Une liste vide dit « ce fichier n'est classé nulle part », et
+                # `None` dit « Commons ne le connaît pas ». Ni l'un ni l'autre
+                # n'est un verdict de carte : `enrich_image_credits` s'occupe
+                # déjà des fichiers absents, avec son propre contrat.
+                continue
+            fautive = categorie_de_carte(classement)
+            if not fautive:
+                continue
+            for place in par_titre.get(titre, []):
+                LOG.info(
+                    "  %s : %s retirée — Commons la range dans « %s »",
+                    place.name, titre, fautive,
+                )
+                place.image_url = None
+                place.image_author = place.image_licence = None
+                place.image_credit_for = None
+                retirees += 1
+    if retirees:
+        LOG.warning(
+            "%s image(s) retirées sur le classement de Commons : ce sont des "
+            "CARTES ou des plans, pas des photos de lieu. Relis les lignes "
+            "ci-dessus — `fetch` rend son image d'origine à un lieu retiré à tort.",
+            retirees,
+        )
+    return retirees
 
 
 def fold_doubled_credits(places: list[Place]) -> int:

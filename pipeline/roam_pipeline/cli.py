@@ -51,6 +51,7 @@ from .fetch import (
     enrich_article_sizes,
     credit_chosen_photos,
     drop_map_images,
+    drop_map_images_by_category,
     fold_doubled_credits,
     enrich_image_credits,
     enrich_missing_images,
@@ -523,6 +524,13 @@ def cmd_enrich(args: argparse.Namespace, config: Config) -> int:
         # défait pas tout seul — et un `enrich` lancé avant un `git pull` suffit
         # à les faire revenir.
         drop_map_images(places)
+        # PUIS le verdict de Commons, qui est le seul fiable : le nom du
+        # fichier ne sait pas ce qu'il montre, et « Maps of Nuceria Alfaterna »
+        # le sait. Une requête pour cinquante fichiers, comme les crédits.
+        # Chaque retrait est journalisé avec la catégorie qui l'a déclenché —
+        # la règle n'a pas pu être mesurée sur le catalogue depuis un
+        # conteneur sans Commons, donc le premier passage est sa revue.
+        drop_map_images_by_category(places)
         fold_doubled_credits(places)
         # PUIS le repli sur l'article : une photo trouvée ici doit être
         # créditée comme les autres, et le crédit se demande ensuite.

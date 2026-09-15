@@ -175,6 +175,101 @@ class CommonsClient:
             if isinstance(valeur, dict)
         }
 
+    def _extmetadata(
+        self, titles: list[str], champs: str
+    ) -> dict[str, dict[str, str] | None]:
+        """`{titre DEMANDÉ: champs}` pour un lot, ou `None` si Commons l'ignore.
+
+        Le cœur partagé de `credits` et de `categories` : une seule requête,
+        un seul chemin de retour. MediaWiki normalise les titres qu'on lui
+        donne — tiret bas, accents composés — et suit les redirections d'un
+        fichier renommé ; il faut donc refaire ce chemin EN SENS INVERSE pour
+        rendre la réponse à celui qui l'a demandée. Cette gymnastique avait
+        déjà coûté leur attribution à la villa Savoye et à la pagode
+        Khánh-Anh, et la dupliquer serait la refaire rater une fois sur deux.
+
+        Un titre ABSENT du résultat n'est pas un refus : c'est le lot qui a
+        échoué, et il ne faut alors rien conclure ni rien effacer.
+        """
+        self._throttle()
+        response = self._session.get(
+            API,
+            params={
+                "action": "query",
+                "format": "json",
+                "formatversion": "2",
+                "prop": "imageinfo",
+                "iiprop": "extmetadata",
+                "iiextmetadatafilter": champs,
+                "titles": "|".join(titles),
+                # Un fichier renommé garde une redirection : la suivre évite de
+                # perdre le crédit d'une photo qui n'a fait que changer de nom.
+                "redirects": "1",
+            },
+            timeout=self.timeout_s,
+        )
+        response.raise_for_status()
+        payload = response.json().get("query", {})
+
+        alias: dict[str, str] = {}
+        for entry in payload.get("normalized", []):
+            alias[entry["from"]] = entry["to"]
+        for entry in payload.get("redirects", []):
+            alias[entry["from"]] = entry["to"]
+
+        par_titre: dict[str, dict[str, str] | None] = {}
+        for page in payload.get("pages", []):
+            if page.get("missing"):
+                par_titre[page.get("title", "")] = None
+                continue
+            infos = page.get("imageinfo") or []
+            if not infos:
+                continue
+            meta = infos[0].get("extmetadata") or {}
+            par_titre[page.get("title", "")] = {
+                clef: (valeur or {}).get("value") or ""
+                for clef, valeur in meta.items()
+            }
+
+        resultat: dict[str, dict[str, str] | None] = {}
+        for title in titles:
+            resolved = title
+            for _ in range(3):  # normalisation puis redirection, au plus
+                resolved = alias.get(resolved, resolved)
+            if resolved in par_titre:
+                resultat[title] = par_titre[resolved]
+        return resultat
+
+    def categories(self, titles: list[str]) -> dict[str, list[str] | None]:
+        """`{titre de fichier: ses catégories Commons}` pour un lot de cinquante.
+
+        C'est la SEULE source fiable pour distinguer une carte d'une photo.
+        Le nom du fichier ne suffit pas — mesuré sur les 4 082 images du
+        catalogue, un filet large y rend quatre-vingt-quinze touches pour onze
+        cartes. Commons, lui, range `TabulaNuceria.jpg` dans « Maps of Nuceria
+        Alfaterna », et le dit.
+
+        Le contrat est celui de `credits`, à trois états : une LISTE pour un
+        fichier connu (vide s'il n'est classé nulle part), `None` pour un
+        fichier que Commons dit inexistant, et une absence du résultat quand
+        le lot entier a échoué.
+        """
+        if not titles:
+            return {}
+        brut = self._extmetadata(titles, "Categories")
+        rendu: dict[str, list[str] | None] = {}
+        for titre, champs in brut.items():
+            if champs is None:
+                rendu[titre] = None
+                continue
+            # Commons sépare les catégories par une barre verticale, et n'en
+            # met aucune pour un fichier non classé. Pas de `texte` ici : ce
+            # champ ne porte pas de HTML, et son repli de doublon ferait
+            # perdre la moitié d'un classement qui se répète de bonne foi.
+            valeur = html.unescape(champs.get("Categories") or "")
+            rendu[titre] = [c.strip() for c in valeur.split("|") if c.strip()]
+        return rendu
+
     def credits(
         self, titles: list[str]
     ) -> dict[str, tuple[str | None, str | None] | None]:
@@ -199,56 +294,13 @@ class CommonsClient:
         étaient publiées sans attribution, redemandées à chaque passe et
         signalées à chaque construction, sans que rien ne puisse aboutir.
         """
-        credits: dict[str, tuple[str | None, str | None] | None] = {}
         if not titles:
-            return credits
-
-        self._throttle()
-        response = self._session.get(
-            API,
-            params={
-                "action": "query",
-                "format": "json",
-                "formatversion": "2",
-                "prop": "imageinfo",
-                "iiprop": "extmetadata",
-                "iiextmetadatafilter": "Artist|LicenseShortName",
-                "titles": "|".join(titles),
-                # Un fichier renommé garde une redirection : la suivre évite de
-                # perdre le crédit d'une photo qui n'a fait que changer de nom.
-                "redirects": "1",
-            },
-            timeout=self.timeout_s,
-        )
-        response.raise_for_status()
-        payload = response.json().get("query", {})
-
-        # MediaWiki normalise et suit les redirections : il faut refaire le
-        # chemin en sens inverse pour rendre chaque crédit à son titre d'origine.
-        alias: dict[str, str] = {}
-        for entry in payload.get("normalized", []):
-            alias[entry["from"]] = entry["to"]
-        for entry in payload.get("redirects", []):
-            alias[entry["from"]] = entry["to"]
-
-        par_titre: dict[str, tuple[str | None, str | None] | None] = {}
-        for page in payload.get("pages", []):
-            if page.get("missing"):
-                par_titre[page.get("title", "")] = None
-                continue
-            infos = page.get("imageinfo") or []
-            if not infos:
-                continue
-            meta = infos[0].get("extmetadata") or {}
-            par_titre[page.get("title", "")] = (
-                texte((meta.get("Artist") or {}).get("value")),
-                texte((meta.get("LicenseShortName") or {}).get("value")),
+            return {}
+        brut = self._extmetadata(titles, "Artist|LicenseShortName")
+        credits: dict[str, tuple[str | None, str | None] | None] = {}
+        for titre, champs in brut.items():
+            credits[titre] = None if champs is None else (
+                texte(champs.get("Artist")),
+                texte(champs.get("LicenseShortName")),
             )
-
-        for title in titles:
-            resolved = title
-            for _ in range(3):  # normalisation puis redirection, au plus
-                resolved = alias.get(resolved, resolved)
-            if resolved in par_titre:
-                credits[title] = par_titre[resolved]
         return credits

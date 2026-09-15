@@ -4307,6 +4307,116 @@ class TestMissingImages(unittest.TestCase):
         self.assertIn("Pont", vraie.image_url)
         self.assertEqual(vraie.image_author, "Un photographe")
 
+    def test_commons_says_it_is_a_map_and_the_image_goes(self):
+        # Le nom `TabulaNuceria.jpg` ne dit rien à qui ne connaît pas la Table
+        # de Peutinger. Commons, lui, le range dans « Maps of Nuceria
+        # Alfaterna » — c'est la seule source qui sache ce que montre l'image.
+        from roam_pipeline.fetch import drop_map_images_by_category
+
+        carte = self._lieu("Nuceria", article="Nuceria Alfaterna")
+        carte.image_url = ("https://commons.wikimedia.org/wiki/Special:FilePath/"
+                           "TabulaNuceria.jpg")
+        carte.image_author, carte.image_licence = "Conradi Millieri", "Public domain"
+        carte.image_credit_for = "File:TabulaNuceria.jpg"
+
+        class _Commons:
+            def categories(self, titles):
+                return {t: ["Maps of Nuceria Alfaterna", "PD Old",
+                            "Details of the Tabula Peutingeriana"] for t in titles}
+
+        with _capture():
+            self.assertEqual(drop_map_images_by_category([carte], _Commons()), 1)
+        self.assertIsNone(carte.image_url)
+        self.assertIsNone(carte.image_author)
+        self.assertIsNone(carte.image_credit_for)
+
+    def test_the_photograph_of_a_painted_wall_survives_commons(self):
+        # LE cas qui fixe l'étroitesse de la règle. `Lascaux painting.jpg` est
+        # classé dans « Paintings of horses in prehistoric art » et dans
+        # « PD-Art » : une règle sur les peintures ou sur les œuvres d'art
+        # supprimerait la photo de la grotte de Lascaux, qui est une paroi
+        # peinte. Quand la peinture EST le lieu, elle est la bonne image.
+        from roam_pipeline.fetch import drop_map_images_by_category
+
+        lascaux = self._lieu("Grotte de Lascaux", article="Grotte de Lascaux")
+        lascaux.image_url = ("https://commons.wikimedia.org/wiki/Special:FilePath/"
+                             "Lascaux%20painting.jpg")
+
+        class _Commons:
+            def categories(self, titles):
+                return {t: ["Art of Lascaux",
+                            "Paintings of horses in prehistoric art",
+                            "PD-Art (PD-old-100)",
+                            "Artworks digital representation of 2D work",
+                            "Bos primigenius in prehistoric art"] for t in titles}
+
+        with _capture():
+            self.assertEqual(drop_map_images_by_category([lascaux], _Commons()), 0)
+        self.assertIn("Lascaux", lascaux.image_url)
+
+    def test_a_carved_valley_keeps_its_engravings(self):
+        # La contre-règle passe en premier : la Vallée des Merveilles est au
+        # catalogue, et la photo de ses gravures rupestres est sa bonne image.
+        from roam_pipeline.fetch import categorie_de_carte
+
+        self.assertIsNone(categorie_de_carte(
+            ["Rock engravings of the Vallée des Merveilles", "Maps of Tende"]))
+        self.assertEqual(
+            categorie_de_carte(["Old maps of Rome", "Rome"]), "Old maps of Rome")
+
+    def test_a_silent_batch_erases_nothing(self):
+        # Effacer une photo sur le silence du réseau serait le pire résultat :
+        # un lot qui échoue, ou qui ne rend rien, ne conclut rien.
+        from roam_pipeline.fetch import drop_map_images_by_category
+
+        lieu = self._lieu("Pont du Gard", article="Pont du Gard")
+        lieu.image_url = ("https://commons.wikimedia.org/wiki/Special:FilePath/"
+                          "Pont%20du%20Gard.jpg")
+
+        class _Casse:
+            def categories(self, titles):
+                raise RuntimeError("réseau")
+
+        class _Muet:
+            def categories(self, titles):
+                return {t: [] for t in titles}
+
+        class _Inconnu:
+            def categories(self, titles):
+                return {t: None for t in titles}
+
+        for client in (_Casse(), _Muet(), _Inconnu()):
+            with _capture():
+                self.assertEqual(drop_map_images_by_category([lieu], client), 0)
+            self.assertIn("Pont", lieu.image_url)
+
+    def test_the_categories_are_asked_in_one_filtered_call(self):
+        # La passe ne doit pas rapatrier toute la fiche Commons de chaque
+        # fichier : un seul champ, et le même chemin de retour que les crédits.
+        faux = _FakeCommons({
+            "query": {
+                "normalized": [{"from": "File:Tabula_Nuceria.jpg",
+                                "to": "File:Tabula Nuceria.jpg"}],
+                "pages": [{
+                    "title": "File:Tabula Nuceria.jpg",
+                    "imageinfo": [{"extmetadata": {
+                        "Categories": {"value": "Maps of Nuceria|PD Old"},
+                    }}],
+                }],
+            }
+        })
+        self.assertEqual(
+            faux.client.categories(["File:Tabula_Nuceria.jpg"]),
+            {"File:Tabula_Nuceria.jpg": ["Maps of Nuceria", "PD Old"]},
+        )
+        self.assertEqual(faux.session.appels[0]["iiextmetadatafilter"], "Categories")
+        # Un fichier que Commons ignore rend `None`, pas une liste vide : les
+        # deux états ne veulent pas dire la même chose.
+        absent = _FakeCommons({"query": {"pages": [
+            {"title": "File:Disparu.jpg", "missing": True}]}})
+        self.assertEqual(absent.client.categories(["File:Disparu.jpg"]),
+                         {"File:Disparu.jpg": None})
+
     def test_an_article_lead_image_that_is_a_map_is_refused(self):
         # L'image de tête d'un article est parfois sa carte de localisation :
         # huit fiches du catalogue affichaient la France entière en guise de
@@ -4339,6 +4449,58 @@ class TestMissingImages(unittest.TestCase):
                       "Musée Carte Jouer - Issy-les-Moulineaux.jpg",
                       "Tour Eiffel Wikimedia Commons.jpg",
                       "Old map exhibit.jpg"):
+            self.assertFalse(est_une_carte(photo), photo)
+
+    def test_the_narrow_net_catches_the_raster_maps(self):
+        # Les onze fichiers que le motif « location map » laissait passer,
+        # relevés sur les 4 082 images des deux catalogues. Six sont des sites
+        # archéologiques : quand il n'y a plus rien à photographier, Wikidata
+        # met la carte antique.
+        from roam_pipeline.fetch import est_une_carte
+
+        for carte in ("Mondaye-dessin.jpg",
+                      "Aquarelle de Roger Bonnères - Bois de Hesse, mai 1916.jpg",
+                      "Cassini - détail Chéméré.png",
+                      "Puits des Tines (old postcard).jpg",
+                      "Tabula Peutingeriana Tauriana.png",
+                      "TabulaNuceria.jpg",
+                      "TabulaPeutingeriana-ZonaPompeia.jpg",
+                      "Calatia_posizione.jpg",
+                      "Posizionepianosa.png",
+                      "Mappa di Ostra antica.jpg",
+                      "Planimetria della montagna di Polizello.jpg"):
+            self.assertTrue(est_une_carte(carte), carte)
+
+    def test_the_narrow_net_spares_what_only_looks_like_a_drawing(self):
+        # Chaque ligne est un faux positif MESURÉ, retiré du motif pour cela.
+        # Sans elles, le filet coûtait plus de photos qu'il ne retirait de
+        # cartes : quatre-vingt-quinze touches pour onze cartes.
+        from roam_pipeline.fetch import est_une_carte
+
+        for photo in (
+            # « veduta » est le mot italien pour « vue » — quarante photos.
+            "Capri - veduta 1.JPG",
+            "Veduta di Pacentro.jpg",
+            # « esposizione » contient « posizione », et n'est pas une carte.
+            "Cathedral (Vicenza) - Sud esposizione.jpg",
+            # « antica » appartient au NOM du lieu.
+            "Noto-antica-stadttor.jpg",
+            "Pisa, orto botanico, zona antica 21.jpg",
+            # L'année est la date de prise de vue, pas l'âge de l'image.
+            "Paolo Monti - Servizio fotografico (Venezia, 1963) - BEIC.jpg",
+            "Lanester - Pont du Bonhomme 1898.jpg",
+            # La photo d'une paroi peinte EST la bonne image de Lascaux, et
+            # celle de ses gravures est la bonne image de la Grotte à la
+            # Peinture de Larchant : la contre-règle passe avant tout.
+            "Lascaux painting.jpg",
+            "Wall painting from Stabiae, 1st century.jpg",
+            "Gravures rupestres grotte à la peinture Larchant 1.jpg",
+            # Le Tabularium est un MONUMENT du Forum romain, pas une table
+            # antique — trois de ses photos étaient retirées par « tabula ».
+            "Rome Forum Romanum Tabularium.JPG",
+            "Temple of Veiovis - Tabularium - Rome 2016.jpg",
+            "Portico degli dei consenti sullo sfondo del tabularium.jpg",
+        ):
             self.assertFalse(est_une_carte(photo), photo)
 
     def test_a_batch_without_an_answer_concludes_nothing(self):
