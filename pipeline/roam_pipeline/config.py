@@ -26,6 +26,17 @@ class BroadClass:
 
     qid: str
     fetch_min_sitelinks: int
+    #: La classe désigne-t-elle une AIRE plutôt qu'un lieu ? Alors n'admettre
+    #: que ceux dont le point culminant est documenté.
+    #
+    # « Chaîne de montagnes » a été ajoutée pour la montagne Sainte-Victoire et
+    # le massif de l'Estérel, que Wikidata ne déclare pas « montagne ». Elle
+    # ramène aussi le massif du Mont-Blanc, les Alpes cottiennes et l'Apennin
+    # abruzzais, qui ne sont pas des lieux où l'on va : leurs coordonnées sont
+    # le centre d'un massif, et la validation de Roam se fait au GPS dans un
+    # rayon. L'altitude tranche entre les deux — Sainte-Victoire culmine à
+    # 1 014 m, l'Estérel à 618, et une chaîne n'a pas de sommet.
+    require_elevation: bool = False
 
 
 @dataclass(frozen=True)
@@ -533,7 +544,9 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
                 int(t["max_per_departement"]) if t.get("max_per_departement") else None
             ),
             broad_classes=[
-                BroadClass(qid=str(b["qid"]), fetch_min_sitelinks=int(b["fetch_min_sitelinks"]))
+                BroadClass(qid=str(b["qid"]),
+                           fetch_min_sitelinks=int(b["fetch_min_sitelinks"]),
+                           require_elevation=bool(b.get("require_elevation", False)))
                 for b in (t.get("broad_classes") or [])
             ],
         )

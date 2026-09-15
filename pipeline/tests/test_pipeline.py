@@ -8299,6 +8299,50 @@ class TestEmpriseDuPays(unittest.TestCase):
         self.assertNotIn("mer", trouve)
 
 
+class TestAiresSansSommet(unittest.TestCase):
+    """Une chaîne de montagnes sans point culminant n'est pas un lieu."""
+
+    def _filtre(self, lieux):
+        from roam_pipeline.collections import apply_broad_class_elevation
+        return {p.name for p in apply_broad_class_elevation(lieux, CONFIG)}
+
+    def test_l_aire_sort_et_le_massif_a_sommet_reste(self):
+        # Sainte-Victoire et l'Estérel sont entrés par « chaîne de montagnes » :
+        # Wikidata ne les déclare pas « montagne », et sans cette classe ils
+        # manquaient. Ils culminent, eux — 1 014 m et 618 m. Le massif du
+        # Mont-Blanc, non : ses coordonnées sont un centre de gravité, et la
+        # validation de Roam se fait au GPS dans un rayon.
+        lieux = [
+            make_place("Montagne Sainte-Victoire", "sommets",
+                       via_broad_class=True, elevation_m=1014),
+            make_place("Massif du Mont-Blanc", "sommets", via_broad_class=True),
+        ]
+        self.assertEqual(self._filtre(lieux), {"Montagne Sainte-Victoire"})
+
+    def test_un_sommet_venu_d_ailleurs_garde_sa_place(self):
+        # Le champ vide dit que Wikidata ne porte pas la propriété, pas que le
+        # lieu n'existe pas : le résumé du mont Bar donne lui-même ses 1 172 m.
+        lieux = [make_place("Mont Bar", "sommets"),
+                 make_place("Roche d'Oëtre", "sommets")]
+        self.assertEqual(len(self._filtre(lieux)), 2)
+
+    def test_l_epingle_passe_outre(self):
+        lieux = [make_place("Massif épinglé", "sommets",
+                            via_broad_class=True, pinned=True)]
+        self.assertEqual(len(self._filtre(lieux)), 1)
+
+    def test_un_theme_sans_classe_exigeante_n_est_pas_touche(self):
+        # La règle ne vaut que pour les thèmes qui déclarent une classe
+        # générique marquée : ailleurs elle ne doit rien voir.
+        lieux = [make_place("Musée sans altitude", "musees", via_broad_class=True)]
+        self.assertEqual(len(self._filtre(lieux)), 1)
+
+    def test_la_classe_large_des_sommets_l_exige_vraiment(self):
+        theme = CONFIG.theme("sommets")
+        self.assertTrue(any(b.require_elevation for b in theme.broad_classes),
+                        "la classe « chaîne de montagnes » doit exiger l'altitude")
+
+
 class TestNomsDeBase(unittest.TestCase):
     """Un lieu publié sous un libellé qui n'est le nom de rien."""
 

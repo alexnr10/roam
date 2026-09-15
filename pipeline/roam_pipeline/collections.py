@@ -1526,6 +1526,54 @@ def apply_alpine_filter(places: list[Place], config: Config) -> list[Place]:
     return kept
 
 
+def apply_broad_class_elevation(places: list[Place], config: Config) -> list[Place]:
+    """Une AIRE n'est pas un lieu : elle n'a pas de point culminant.
+
+    « Chaîne de montagnes » est déclarée par le thème `sommets` pour une raison
+    précise — Wikidata ne dit pas « montagne » de la montagne Sainte-Victoire ni
+    du massif de l'Estérel, et sans elle ces deux-là manquaient. Mais la même
+    classe ramène le massif du Mont-Blanc, les Alpes cottiennes, l'Apennin
+    abruzzais : des étendues dont les coordonnées sont un centre de gravité.
+
+    Or Roam valide au GPS, dans un rayon : on ne peut pas « être » sur un
+    massif. Une aire est donc, dans un guide, la même erreur qu'un sommet
+    inaccessible — une case qui ne se cochera jamais.
+
+    L'ALTITUDE TRANCHE. Sainte-Victoire culmine à 1 014 m, l'Estérel à 618 :
+    Wikidata documente leur point haut parce qu'elles en ont un. Une chaîne n'en
+    a pas. Et la règle ne porte QUE sur ce qui vient d'une classe générique
+    ainsi marquée : un sommet sans altitude venu d'ailleurs reste, parce que son
+    champ vide ne dit que l'absence d'une propriété — le résumé du mont Bar
+    donne lui-même ses 1 172 mètres.
+
+    Un lieu épinglé y échappe : le curateur a déjà tranché.
+    """
+    exigeants = {
+        theme.id for theme in config.themes
+        if any(broad.require_elevation for broad in theme.broad_classes)
+    }
+    if not exigeants:
+        return places
+
+    gardes: list[Place] = []
+    ecartes: list[str] = []
+    for place in places:
+        aire = (place.via_broad_class and place.theme_id in exigeants
+                and not place.elevation_m and not place.pinned)
+        if aire:
+            ecartes.append(place.name)
+        else:
+            gardes.append(place)
+    if ecartes:
+        LOG.info(
+            "%s aire(s) écartée(s) : venues d'une classe générique et sans point "
+            "culminant — %s%s",
+            len(ecartes), ", ".join(sorted(ecartes)[:8]),
+            f" (+{len(ecartes) - 8})" if len(ecartes) > 8 else "",
+        )
+    return gardes
+
+
 def apply_class_exclusion(places: list[Place], config: Config) -> list[Place]:
     """Écarte les lieux qui relèvent d'une classe disqualifiante.
 
@@ -1855,8 +1903,11 @@ def _build_un_pays(
     en_france = apply_geographic_scope(fix_region_codes(places), config)
     un_theme = dedupe_across_themes(en_france, config)
     dans_le_sujet = apply_class_exclusion(un_theme, config)
+    # Puis les AIRES : une chaîne de montagnes sans point culminant n'est pas un
+    # lieu où l'on va. Juste après l'exclusion par classe, dont c'est la suite.
+    un_point = apply_broad_class_elevation(dans_le_sujet, config)
     # Pour un thème qui n'existe que par ses listes, en sortir c'est sortir.
-    sur_liste = apply_list_membership(dans_le_sujet, config)
+    sur_liste = apply_list_membership(un_point, config)
     accessible = apply_access_filter(sur_liste, config)
     non_alpin = apply_alpine_filter(accessible, config)
     au_dessus = apply_notoriety_floor(non_alpin, config)

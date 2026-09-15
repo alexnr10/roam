@@ -697,8 +697,34 @@ themes:
     # Une chaîne n'est pas un point, et la plupart n'en sont pas un : c'est
     # pourquoi le plancher de collecte est ici très haut. En dessous, on
     # ramènerait tous les chaînons des Alpes et des Pyrénées.
+    #
+    # ET L'ALTITUDE TRANCHE entre les deux familles qu'elle ramène. Sainte-
+    # Victoire culmine à 1 014 m, l'Estérel à 618 : Wikidata documente leur
+    # point haut, parce qu'elles en ont un et qu'on y monte. Le massif du
+    # Mont-Blanc, les Alpes cottiennes, l'Apennin abruzzais n'en ont pas — ce
+    # sont des étendues, leurs coordonnées sont un centre de gravité, et la
+    # validation de Roam se fait au GPS dans un rayon. On ne peut pas « être »
+    # sur un massif.
+    #
+    # Mesuré sur les deux catalogues avant de le poser :
+    #
+    #     France   43 lieux entrés par cette classe, 0 perdu
+    #     Italie   34 lieux entrés par cette classe, 9 perdus
+    #
+    # Les neuf sont les Sept-Communes, l'Apennin abruzzais, le gruppo
+    # dell'Adamello, la catena del Canin, les Vedrette di Ries, le groupe de
+    # Fanes, le massif de l'Ortles, les monti della Daunia et les Alpi
+    # Ticinesi. Restent les champs Phlégréens, l'Aspromonte, les monts
+    # Sibyllins, le Monte Baldo, le Matese — tous avec leur altitude.
+    #
+    # La règle ne touche QUE ce qui vient de cette classe. Les sommets sans
+    # altitude venus d'ailleurs restent : la Roche d'Oëtre, le mont Bar, la
+    # Cima Ovest des Tre Cime. Leur champ vide dit que Wikidata ne porte pas la
+    # propriété, pas qu'ils ne sont pas des lieux — le résumé du mont Bar donne
+    # lui-même ses 1 172 mètres.
     broad_classes:
       - qid: Q46831           # chaîne de montagnes
+        require_elevation: true
         fetch_min_sitelinks: 8
 
   # Avant `plages` : une dune est une plage, mais on y va pour la dune.

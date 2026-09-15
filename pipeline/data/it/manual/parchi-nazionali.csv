@@ -37,12 +37,23 @@
 #   « à vérifier » le nom du parc apparaît dans le résumé sans que rien ne dise
 #                  que le lieu est dedans. C'est un indice, et il t'appartient.
 #
-# DEUX LIGNES SONT UN CHOIX PAR DÉFAUT, faute de mieux — marquées « province
+# LE STELVIO A CHANGÉ DE REPRÉSENTANT pour la même raison que l'Apennin
+# lucanien : le massif de l'Ortles est une AIRE, et la règle des classes
+# génériques l'écarte désormais du catalogue — une chaîne de montagnes sans
+# point culminant n'est pas un lieu où l'on va. Le sommet, l'Ortles lui-même,
+# ne peut pas le remplacer : le filtre alpin l'écarte, il ne se monte pas.
+#
+# Le Messner Mountain Museum Ortles est à SOLDA, qui était la demande
+# d'origine, dans le parc, avec des horaires attestés et 6 540 visiteurs par
+# an. Deux versions linguistiques seulement : il n'entre que par la dispense de
+# cette liste. Le jardin botanique alpin Rezia, à Bormio, est l'autre candidat
+# — même figure que le jardin Paradisia pour le Grand-Paradis.
+#
+# UNE LIGNE EST UN CHOIX PAR DÉFAUT, faute de mieux — marquée « province
 # du parc ». Le lieu demandé n'était pas dans la collecte, et celui retenu est
 # le meilleur que le catalogue tienne dans le territoire du parc, identifié par
 # sa COMMUNE et non par un texte :
 #
-#     Stelvio           massif de l'Ortles, commune Stelvio/Stilfs
 #     Sila              lac Arvo, commune San Giovanni in Fiore
 #
 # L'APENNIN LUCANIEN A CHANGÉ DE REPRÉSENTANT DEUX FOIS, et la seconde dit
@@ -136,7 +147,7 @@ Q510076,Pietra di Bismantova,Apennin tosco-émilien,parc national Apennin tosco-
 Q1131545,Cap Palinuro,Cilento et Val de Diano,parc national Cilento et Val de Diano (à vérifier)
 Q3392526,Grotte de Cavallone,Majella,parc national Majella (attesté)
 Q898150,Matese,Matese,parc national Matese (attesté)
-Q63521967,Massif de l'Ortles,Stelvio,parc national Stelvio (province du parc)
+Q55352675,Messner Mountain Museum Ortles,Stelvio,"à Solda, dans le parc — horaires attestés, 6 540 visiteurs par an (choix du curateur)"
 Q3826016,Lac du Pertusillo,Apennin lucanien-Val d'Agri,"retenue de l'Agri, commune de Montemurro — le Val d'Agri est dans le nom du parc (à vérifier)"
 Q3825626,Lac Arvo,Sila,parc national Sila (province du parc)
 Q3825880,Lago della Stua,Dolomites bellunoises,parc national Dolomites bellunoises (choix du curateur)
