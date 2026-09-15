@@ -209,13 +209,16 @@ export default function ProfileScreen() {
           collection qui démarre à zéro ne dit rien de son propriétaire, alors
           que la moitié de ce qu'il a vu dans sa vie est au catalogue. */}
       <View style={styles.reconnaissance}>
+        {/* Trois lignes d'explication et un bouton dont le verbe n'appartenait
+            à personne — « reconnaître mes lieux » ne dit ni ce qu'on va voir ni
+            ce qu'on va faire. Le pavé expliquait le MÉCANISME ; or l'écran qui
+            s'ouvre le dit déjà, et mieux : « Où es-tu déjà allé ? Touche ce que
+            tu reconnais. » Ce bloc-ci n'a qu'un travail, donner envie d'y
+            aller. Le bouton reprend donc les mots de sa destination, et le
+            reste tombe. */}
         <Text style={type.heading}>Tu y es sûrement déjà allé</Text>
-        <Text style={type.small}>
-          {places.length} lieux au catalogue, et une vie de voyages derrière toi. Passe-les
-          en photos et coche ce que tu reconnais — c'est plus rapide que de les chercher
-          un par un.
-        </Text>
-        <Button label="Reconnaître mes lieux" onPress={() => router.push('/reconnaitre')} />
+        <Text style={type.small}>{places.length} lieux, en photos.</Text>
+        <Button label="Coche ce que tu reconnais" onPress={() => router.push('/reconnaitre')} />
       </View>
 
       <Text style={[type.heading, { marginBottom: spacing.md }]}>Badges</Text>

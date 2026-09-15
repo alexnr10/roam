@@ -158,22 +158,31 @@ export default function PlaceScreen() {
               <Text style={type.small}>rayon {place.radiusM} m</Text>
             </View>
 
-            <Button
-              label={evaluation.canCheckIn ? 'Je suis sur place' : 'Trop loin pour valider'}
-              disabled={!evaluation.canCheckIn}
-              onPress={() => checkIn(place, 'gps', evaluation.distanceM ?? undefined)}
-            />
+            {/* UN SEUL BOUTON, et c'est la distance qui décide lequel.
+                Ils étaient deux : « Trop loin pour valider », grisé, au-dessus
+                de « J'y suis déjà allé ». Le premier occupait la place du geste
+                principal pour ne rien faire, et les deux disaient la même chose
+                — j'ai visité ce lieu — dans deux mots différents. On lisait un
+                refus là où il y avait une offre.
 
-            {/* Sans ça, l'utilisateur démarre à 0 % partout et décroche. */}
+                Sur place, le bouton VALIDE : c'est la visite vérifiée, celle
+                qui compte au GPS. Ailleurs, il DÉCLARE — sans quoi on démarre à
+                zéro pour cent partout et on décroche. L'état, lui, se lit
+                au-dessus : « Encore 3,2 km », « Position indisponible ». La
+                distance informe, le bouton agit. */}
             <Button
-              label="J'y suis déjà allé"
-              tone="secondary"
-              onPress={() => checkIn(place, 'declared')}
+              label={evaluation.canCheckIn ? "J'y suis" : "J'y suis déjà allé"}
+              onPress={() =>
+                evaluation.canCheckIn
+                  ? checkIn(place, 'gps', evaluation.distanceM ?? undefined)
+                  : checkIn(place, 'declared')
+              }
             />
-            <Text style={[type.small, { textAlign: 'center' }]}>
-              Une visite déclarée compte dans tes pourcentages, mais n'est pas
-              marquée « vérifiée ».
-            </Text>
+            {evaluation.canCheckIn ? null : (
+              <Text style={[type.small, { textAlign: 'center' }]}>
+                Elle comptera, sans être vérifiée.
+              </Text>
+            )}
 
             {/* L'autre geste possible sur une fiche : pas « j'y étais » mais
                 « j'irai ». Il n'apparaît que sur un lieu non visité — une fois
