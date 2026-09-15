@@ -135,6 +135,15 @@ export type MapCanvasProps = {
    */
   retour?: number;
   /**
+   * Demande de RECADRAGE sur la région déjà ouverte.
+   *
+   * Un compteur, comme `retour`. C'est le premier cran du chemin inverse :
+   * toucher un lieu zoome dessus, et on veut revenir à la région avant de
+   * revenir au pays. Deux crans, deux appuis — la pastille change de nom entre
+   * les deux et dit chaque fois où elle mène.
+   */
+  recadrer?: number;
+  /**
    * Une région à ouvrir, demandée depuis un autre écran.
    *
    * De la forme `code#nonce` : le nonce distingue deux demandes portant sur la
@@ -231,6 +240,7 @@ function CarteNative({
   onCentre,
   retour,
   ouvrir: demande,
+  recadrer,
 }: MapCanvasProps & { modules: typeof import('@maplibre/maplibre-react-native') }) {
   const {
     Camera,
@@ -505,6 +515,19 @@ function CarteNative({
     if (!REGIONS.has(code)) return;
     ouvrirRegion(code);
   }, [demande, ouvrirRegion]);
+
+  /**
+   * Le premier cran du retour : la région, pas encore le pays.
+   *
+   * On rejoue le vol d'ouverture de la région déjà ouverte. L'ancre de zoom
+   * repart à zéro — sans quoi elle resterait celle du lieu, et le moindre
+   * dézoom refermerait la région qu'on vient de retrouver.
+   */
+  useEffect(() => {
+    if (!recadrer) return;
+    const code = ouverteRef.current;
+    if (code) ouvrirRegion(code);
+  }, [recadrer, ouvrirRegion]);
 
   /**
    * L'ouverture SUR SOI, au tout premier affichage.

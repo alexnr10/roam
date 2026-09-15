@@ -103,6 +103,8 @@ export default function MapScreen() {
   const [regionOuverte, setRegionOuverte] = useState<string | null>(null);
   /** Un compteur, pas un booléen : chaque incrément est UN retour demandé. */
   const [retourFrance, setRetourFrance] = useState(0);
+  /** Le cran d'avant : revenir à la région sans quitter la région. */
+  const [retourRegion, setRetourRegion] = useState(0);
   const rail = useRef<FlatList<Place> | null>(null);
   // Sur un ordinateur, la molette ne défile que verticalement : le bandeau
   // restait bloqué sur les trois vignettes visibles, sans indice qu'il y en
@@ -181,6 +183,11 @@ export default function MapScreen() {
   const openPlace = (place: Place) => router.push(`/place/${place.id}`);
 
   const enAvant = choisi ?? auMilieu ?? null;
+  /**
+   * Un lieu est mis en avant DANS une région ouverte : la carte est zoomée sur
+   * lui, et le premier retour doit rendre la région, pas le pays.
+   */
+  const surUnLieu = Boolean(enAvant && regionOuverte);
   const distance = (place: Place) =>
     position ? formatDistance(distanceToPlace(position, place)) : null;
 
@@ -200,6 +207,7 @@ export default function MapScreen() {
           onRegionChange={setRegionOuverte}
           onCentre={regarder}
           retour={retourFrance}
+          recadrer={retourRegion}
           ouvrir={regionDemandee ? `${regionDemandee}#${n ?? ''}` : null}
           highlightedId={enAvant?.id ?? suggestion?.id ?? null}
           focus={enAvant ? { lat: enAvant.lat, lon: enAvant.lon } : null}
@@ -219,21 +227,47 @@ export default function MapScreen() {
           {/* La pastille de retour n'existe qu'une fois une région ouverte.
               Dézoomer referme aussi — mais un chemin qu'on VOIT vaut mieux
               qu'un geste qu'il faut deviner. */}
+          {/* DEUX CRANS, PAS UN SAUT. Toucher un lieu zoome dessus ; la
+              pastille ramenait alors au pays entier, et on perdait la région
+              qu'on venait d'ouvrir. Elle défait maintenant un geste à la fois
+              — le lieu, puis la région — et change de nom entre les deux.
+
+              La grammaire ne bouge pas : le premier mot est toujours la
+              DESTINATION, le second l'endroit où l'on est.
+
+                  ‹ Bretagne │ Cathédrale Saint-Vincent
+                  ‹ France   │ Bretagne                  */}
           {!enRecherche && regionOuverte ? (
             <Pressable
               style={styles.retourRegion}
-              onPress={() => setRetourFrance(retourFrance + 1)}
+              onPress={
+                surUnLieu
+                  ? () => {
+                      // Les deux, sinon le lieu du bandeau reprendrait la main
+                      // et la caméra repartirait sur lui.
+                      setChoisi(null);
+                      setAuMilieu(null);
+                      setRetourRegion(retourRegion + 1);
+                    }
+                  : () => setRetourFrance(retourFrance + 1)
+              }
               accessibilityRole="button"
-              accessibilityLabel={`Revenir à ${nomDuPays() || 'la carte'}, en entier`}
+              accessibilityLabel={
+                surUnLieu
+                  ? `Revenir à ${nomDeRegion(regionOuverte)}, en entier`
+                  : `Revenir à ${nomDuPays() || 'la carte'}, en entier`
+              }
             >
               <IconeChevron size={17} color={colors.surface} />
               {/* Le pays vient du CATALOGUE, pas d'une constante : la pastille
                   annonçait « France | Toscane » dès qu'on ouvrait une région
                   italienne. */}
-              <Text style={styles.retourFrance}>{nomDuPays() || 'Pays'}</Text>
+              <Text style={styles.retourFrance}>
+                {surUnLieu ? nomDeRegion(regionOuverte) : nomDuPays() || 'Pays'}
+              </Text>
               <View style={styles.retourFilet} />
               <Text style={styles.retourNom} numberOfLines={1}>
-                {nomDeRegion(regionOuverte)}
+                {surUnLieu && enAvant ? enAvant.name : nomDeRegion(regionOuverte)}
               </Text>
             </Pressable>
           ) : null}

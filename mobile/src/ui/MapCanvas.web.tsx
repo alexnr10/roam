@@ -123,6 +123,7 @@ export function MapCanvas({
   onCentre,
   retour,
   ouvrir: demande,
+  recadrer,
 }: MapCanvasProps) {
   const container = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreMap | null>(null);
@@ -787,6 +788,26 @@ export function MapCanvas({
     onRegion.current?.(code);
     ouvrir(instance, code);
   }, [ready, demande]);
+
+  /**
+   * Le premier cran du retour : la région, pas encore le pays.
+   *
+   * Toucher un lieu zoome dessus. La pastille ramène alors à la RÉGION, et
+   * c'est un second appui qui rend le pays — deux crans pour deux échelles,
+   * au lieu d'un saut qui perd tout le contexte d'un coup.
+   *
+   * L'ancre de zoom repart à zéro : elle avait été posée à l'échelle du lieu,
+   * et sans cette remise le moindre dézoom refermerait la région qu'on vient
+   * tout juste de retrouver.
+   */
+  useEffect(() => {
+    const instance = map.current;
+    if (!ready || !instance || !recadrer) return;
+    const code = ouverteRef.current;
+    if (!code) return;
+    zoomOuverture.current = null;
+    ouvrir(instance, code);
+  }, [ready, recadrer]);
 
   /**
    * L'ouverture SUR SOI, au tout premier affichage.
