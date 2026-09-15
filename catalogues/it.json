@@ -16658,6 +16658,26 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Entella"
   },
   {
+   "id": "Q3826016",
+   "slug": "lac-du-pertusillo",
+   "name": "Lac du Pertusillo",
+   "themeId": "lacs",
+   "lat": 40.283333,
+   "lon": 15.983333,
+   "radiusM": 1500,
+   "score": 67.9,
+   "departement": "Potenza",
+   "departementCode": "076",
+   "regionCode": "17",
+   "communeCode": "076052",
+   "communeName": "Montemurro",
+   "summary": "Le lac du Pertusillo est un lac artificiel italien situé dans la province de Potenza dans la région de la Basilicate. Il a été créé entre 1957 et 1962 lors de la construction d'une digue sur le cours de la rivière Agri.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pertusillo.png",
+   "imageAuthor": "Montemurro at Italian Wikipedia",
+   "imageLicence": "Public domain",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_du_Pertusillo"
+  },
+  {
    "id": "Q89128241",
    "slug": "hotel-de-ville-de-trieste",
    "name": "Hôtel de ville de Trieste",
@@ -25016,26 +25036,6 @@
    "imageAuthor": "groucho85. Original uploader was Groucho85 at it.wikipedia",
    "imageLicence": "Public domain",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cascades_de_Stanghe"
-  },
-  {
-   "id": "Q3850973",
-   "slug": "massiccio-del-sirino",
-   "name": "Massiccio del Sirino",
-   "themeId": "sommets",
-   "lat": 40.132778,
-   "lon": 15.836111,
-   "radiusM": 1000,
-   "score": 53.8,
-   "departement": "Potenza",
-   "departementCode": "076",
-   "regionCode": "17",
-   "communeCode": "076039",
-   "communeName": "Lagonegro",
-   "summary": null,
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lago%20Laudemio%201.png",
-   "imageAuthor": "Potito m. petrone",
-   "imageLicence": "CC BY-SA 3.0",
-   "wikipediaUrl": null
   },
   {
    "id": "Q724869",
@@ -45488,8 +45488,8 @@
    "placeCount": 50,
    "tierCounts": [
     12,
-    20,
-    18
+    21,
+    17
    ],
    "places": [
     {
@@ -45598,147 +45598,147 @@
      "rank": 21
     },
     {
-     "placeId": "Q1727103",
+     "placeId": "Q3826016",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q3825909",
+     "placeId": "Q1727103",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q2518166",
+     "placeId": "Q3825909",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q572562",
+     "placeId": "Q2518166",
      "tier": 2,
      "rank": 25
     },
     {
-     "placeId": "Q1467712",
+     "placeId": "Q572562",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q1475787",
+     "placeId": "Q1467712",
      "tier": 2,
      "rank": 27
     },
     {
-     "placeId": "Q691103",
+     "placeId": "Q1475787",
      "tier": 2,
      "rank": 28
     },
     {
-     "placeId": "Q3825896",
+     "placeId": "Q691103",
      "tier": 2,
      "rank": 29
     },
     {
-     "placeId": "Q3825844",
+     "placeId": "Q3825896",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q1026494",
+     "placeId": "Q3825844",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q1502960",
+     "placeId": "Q1026494",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q1800441",
-     "tier": 3,
+     "placeId": "Q1502960",
+     "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q1246006",
+     "placeId": "Q1800441",
      "tier": 3,
      "rank": 34
     },
     {
-     "placeId": "Q1129358",
+     "placeId": "Q1246006",
      "tier": 3,
      "rank": 35
     },
     {
-     "placeId": "Q656674",
+     "placeId": "Q1129358",
      "tier": 3,
      "rank": 36
     },
     {
-     "placeId": "Q432545",
+     "placeId": "Q656674",
      "tier": 3,
      "rank": 37
     },
     {
-     "placeId": "Q511180",
+     "placeId": "Q432545",
      "tier": 3,
      "rank": 38
     },
     {
-     "placeId": "Q1399844",
+     "placeId": "Q511180",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q1052694",
+     "placeId": "Q1399844",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q2438157",
+     "placeId": "Q1052694",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q252074",
+     "placeId": "Q2438157",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q3825859",
+     "placeId": "Q252074",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q878556",
+     "placeId": "Q3825859",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q3825864",
+     "placeId": "Q878556",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q63177",
+     "placeId": "Q3825864",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q2222728",
+     "placeId": "Q63177",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q63172",
+     "placeId": "Q2222728",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q764710",
+     "placeId": "Q63172",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q2239600",
+     "placeId": "Q764710",
      "tier": 3,
      "rank": 50
     }
@@ -49121,22 +49121,22 @@
      "name": "Sila"
     },
     {
-     "placeId": "Q898150",
+     "placeId": "Q3826016",
      "tier": 2,
      "rank": 23,
+     "name": "Apennin lucanien-Val d'Agri"
+    },
+    {
+     "placeId": "Q898150",
+     "tier": 2,
+     "rank": 24,
      "name": "Matese"
     },
     {
      "placeId": "Q18445963",
      "tier": 2,
-     "rank": 24,
-     "name": "Val Grande"
-    },
-    {
-     "placeId": "Q3850973",
-     "tier": 2,
      "rank": 25,
-     "name": "Apennin lucanien-Val d'Agri"
+     "name": "Val Grande"
     },
     {
      "placeId": "Q3825880",
@@ -53101,27 +53101,27 @@
      "rank": 2
     },
     {
-     "placeId": "Q6657726",
+     "placeId": "Q3826016",
      "tier": 1,
      "rank": 3
     },
     {
-     "placeId": "Q52691",
+     "placeId": "Q6657726",
      "tier": 1,
      "rank": 4
     },
     {
-     "placeId": "Q52638",
+     "placeId": "Q52691",
      "tier": 1,
      "rank": 5
     },
     {
-     "placeId": "Q52511",
+     "placeId": "Q52638",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q3861183",
+     "placeId": "Q52511",
      "tier": 1,
      "rank": 7
     },
@@ -53146,7 +53146,7 @@
      "rank": 11
     },
     {
-     "placeId": "Q3850973",
+     "placeId": "Q3861183",
      "tier": 2,
      "rank": 12
     }
@@ -65225,27 +65225,27 @@
      "rank": 5
     },
     {
-     "placeId": "Q52691",
+     "placeId": "Q3826016",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q52638",
+     "placeId": "Q52691",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q52511",
+     "placeId": "Q52638",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q52320",
+     "placeId": "Q52511",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q2705822",
+     "placeId": "Q52320",
      "tier": 1,
      "rank": 10
     },
@@ -65255,7 +65255,7 @@
      "rank": 11
     },
     {
-     "placeId": "Q3861183",
+     "placeId": "Q2705822",
      "tier": 2,
      "rank": 12
     },
@@ -65295,7 +65295,7 @@
      "rank": 19
     },
     {
-     "placeId": "Q3850973",
+     "placeId": "Q3861183",
      "tier": 2,
      "rank": 20
     },
@@ -68208,17 +68208,17 @@
      "rank": 75
     },
     {
-     "placeId": "Q731916",
+     "placeId": "Q191739",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q191739",
+     "placeId": "Q54747",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q54747",
+     "placeId": "Q731916",
      "tier": 3,
      "rank": 78
     },
@@ -79673,11 +79673,6 @@
     "parentCode": "076"
    },
    {
-    "code": "076039",
-    "name": "Lagonegro",
-    "parentCode": "076"
-   },
-   {
     "code": "076044",
     "name": "Maratea",
     "parentCode": "076"
@@ -79685,6 +79680,11 @@
    {
     "code": "076048",
     "name": "Melfi",
+    "parentCode": "076"
+   },
+   {
+    "code": "076052",
+    "name": "Montemurro",
     "parentCode": "076"
    },
    {

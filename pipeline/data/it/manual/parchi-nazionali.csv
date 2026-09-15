@@ -45,14 +45,29 @@
 #     Stelvio           massif de l'Ortles, commune Stelvio/Stilfs
 #     Sila              lac Arvo, commune San Giovanni in Fiore
 #
-# L'APENNIN LUCANIEN A CHANGÉ DE REPRÉSENTANT, et c'est l'alerte qui l'a dit :
-# Grumentum, retenu faute de mieux, a été écarté à la revue du 15 septembre —
-# la collection perdait un parc en silence. Le massif du Sirino le remplace, et
-# il tient de plus près la demande d'origine : c'est LUI qui porte le lago
-# Laudemio. Quatre versions linguistiques pour un plancher des sommets à huit,
-# il n'entre donc que par la dispense de cette liste. Le lac du Pertusillo
-# (Q3826016, commune de Montemurro) était l'autre candidat — il nomme le Val
-# d'Agri, qui est dans le nom du parc.
+# L'APENNIN LUCANIEN A CHANGÉ DE REPRÉSENTANT DEUX FOIS, et la seconde dit
+# quelque chose sur ce qu'est un lieu.
+#
+# Grumentum, retenu faute de mieux, a été écarté à la revue du 15 septembre :
+# l'alerte des listes amputées l'a signalé, sans quoi la collection perdait un
+# parc en silence. J'ai d'abord pris le MASSIF DU SIRINO (Q3850973), parce que
+# c'est lui qui porte le lago Laudemio demandé à l'origine — sa photo est même
+# « Lago Laudemio 1.png ».
+#
+# C'était une erreur, et elle se lisait dans la donnée : le massif n'a PAS
+# D'ALTITUDE. Un sommet du catalogue en porte une ; une aire n'en porte pas,
+# parce qu'elle n'est pas un point. Ses coordonnées sont le centre d'un
+# massif, et la validation de Roam se fait au GPS dans un rayon : on ne peut
+# pas « être » sur un massif. C'est la règle qui a déjà écarté les sommets
+# guyanais, et qui fait qu'on catalogue un lieu DANS un parc plutôt que le parc.
+#
+# Le lac du Pertusillo est un lieu : une retenue de l'Agri, à 532 m, au bord
+# d'une route, avec un résumé et une photo. Et il nomme le Val d'Agri, qui est
+# dans le nom du parc. Cinq versions linguistiques pour un plancher des lacs à
+# six : il n'entre que par la dispense de cette liste.
+#
+# Le mont Volturino (Q3862131, 1 835 m, commune de Marsicovetere) reste le
+# candidat si l'on veut un vrai sommet du parc — il en est un, lui.
 #
 # LES VINGT-SIX PARCS ONT LEUR LIGNE. Les deux derniers ont demandé chacun un
 # détour, et tous deux illustrent une règle du pipeline :
@@ -122,7 +137,7 @@ Q1131545,Cap Palinuro,Cilento et Val de Diano,parc national Cilento et Val de Di
 Q3392526,Grotte de Cavallone,Majella,parc national Majella (attesté)
 Q898150,Matese,Matese,parc national Matese (attesté)
 Q63521967,Massif de l'Ortles,Stelvio,parc national Stelvio (province du parc)
-Q3850973,Massiccio del Sirino,Apennin lucanien-Val d'Agri,le massif qui porte le lago Laudemio — commune de Lagonegro (choix du curateur ; Grumentum écarté en revue)
+Q3826016,Lac du Pertusillo,Apennin lucanien-Val d'Agri,"retenue de l'Agri, commune de Montemurro — le Val d'Agri est dans le nom du parc (à vérifier)"
 Q3825626,Lac Arvo,Sila,parc national Sila (province du parc)
 Q3825880,Lago della Stua,Dolomites bellunoises,parc national Dolomites bellunoises (choix du curateur)
 Q18445963,Cicogna,Val Grande,parc national Val Grande (choix du curateur — entre au prochain fetch)
