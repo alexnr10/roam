@@ -3,6 +3,7 @@ import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec';
 import {
   type EtatDeLaCarte,
   SOURCE_DEPTS,
+  SOURCE_DEPTS_NOMS,
   SOURCE_LIEUX,
   SOURCE_REGIONS,
   SOURCE_VOILE,
@@ -38,6 +39,7 @@ function styleAvec(couches: ReturnType<typeof couchesDeLaCarte>) {
       [SOURCE_LIEUX]: vide,
       [SOURCE_REGIONS]: vide,
       [SOURCE_DEPTS]: vide,
+      [SOURCE_DEPTS_NOMS]: vide,
       [SOURCE_VOILE]: vide,
     },
     layers: couches,

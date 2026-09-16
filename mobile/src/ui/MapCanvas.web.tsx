@@ -9,6 +9,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { paysCourant } from '../data/catalog';
 import { EMPTY_OUTLINES, outlinesFor } from '../data/outlines';
+import { pointsDeNom } from '../lib/etiquettes';
 import type { Emprise } from '../lib/regions';
 import {
   REGIONS,
@@ -48,6 +49,7 @@ import {
 } from './mapStyle';
 import {
   SOURCE_DEPTS,
+  SOURCE_DEPTS_NOMS,
   SOURCE_LIEUX,
   SOURCE_REGIONS,
   SOURCE_VOILE,
@@ -355,7 +357,13 @@ export function MapCanvas({
         // régional n'aurait jamais créé la source, et le pays suivant se serait
         // retrouvé sans couche du tout — impossible à rattraper sans reprendre
         // la carte entière.
-        for (const id of [SOURCE_VOILE, SOURCE_REGIONS, SOURCE_DEPTS, SOURCE_LIEUX]) {
+        for (const id of [
+          SOURCE_VOILE,
+          SOURCE_REGIONS,
+          SOURCE_DEPTS,
+          SOURCE_DEPTS_NOMS,
+          SOURCE_LIEUX,
+        ]) {
           instance.addSource(id, {
             type: 'geojson',
             data: { type: 'FeatureCollection', features: [] },
@@ -621,6 +629,9 @@ export function MapCanvas({
       [SOURCE_VOILE]: voile(),
       [SOURCE_REGIONS]: outlinesFor('region') ?? EMPTY_OUTLINES,
       [SOURCE_DEPTS]: outlinesFor('departement') ?? EMPTY_OUTLINES,
+      // Les noms suivent les contours, mais réduits à un point par
+      // territoire : c'est la même donnée, dite une seule fois.
+      [SOURCE_DEPTS_NOMS]: pointsDeNom(outlinesFor('departement')),
     };
     for (const [id, data] of Object.entries(donnees)) {
       const source = instance.getSource(id) as GeoJSONSource | undefined;

@@ -48,7 +48,12 @@ SOURCES: dict[str, str] = {
     "departement": f"{BASE}/departements-avec-outre-mer.geojson",
 }
 
-ATTRIBUTION = "Contours IGN Admin Express — Licence ouverte (Etalab)"
+# Courte À DESSEIN : cette mention partage une seule ligne de dix points
+# avec celles du fond de carte et des photos, et « Admin Express » y
+# poussait le tout sur trois lignes. La Licence ouverte demande de nommer
+# la SOURCE et la licence — « IGN » et « Licence ouverte » les nomment ;
+# le nom du jeu de données n'est pas exigé.
+ATTRIBUTION = "Contours IGN (Licence ouverte)"
 
 #: Grille de quantification, en degrés. 1e-4° vaut environ onze mètres : le pas
 #: est déjà plus fin que ce que rend un pixel à l'échelle d'un département, et

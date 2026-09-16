@@ -34,6 +34,10 @@ describe('contours des territoires', () => {
 
   it('emporte sa mention de source', () => {
     // Licence ouverte : citer la source est une obligation, pas un ornement.
-    expect(attributionDesContours()).toMatch(/Etalab/);
+    // On éprouve ce que la mention NOMME — le producteur et la licence — et
+    // non sa rédaction : elle a été raccourcie pour tenir sur la ligne de
+    // crédits, qu'elle partage avec le fond de carte et les photos.
+    expect(attributionDesContours()).toMatch(/IGN/);
+    expect(attributionDesContours()).toMatch(/Licence ouverte/i);
   });
 });

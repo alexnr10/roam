@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 
 import { outlinesFor } from '../data/outlines';
+import { pointsDeNom } from '../lib/etiquettes';
 import { etoilesDe } from '../lib/etoiles';
 import { paysCourant } from '../data/catalog';
 import { useCatalogue } from '../lib/useCatalogue';
@@ -26,6 +27,7 @@ import { colors, spacing, type } from '../theme';
 import type { Coordinates, Place } from '../types';
 import {
   SOURCE_DEPTS,
+  SOURCE_DEPTS_NOMS,
   SOURCE_LIEUX,
   SOURCE_REGIONS,
   SOURCE_VOILE,
@@ -323,6 +325,13 @@ function CarteNative({
   const contoursDepts = useMemo(
     () => outlinesFor('departement'),
     [versionDuCatalogue],
+  );
+  // Un point par territoire, et pas un par morceau : MapLibre pose une
+  // étiquette au centre de CHAQUE polygone, et « Lecce » s'écrivait trois fois
+  // au-dessus des Pouilles. Voir `pointsDeNom`.
+  const nomsDepts = useMemo(
+    () => pointsDeNom(contoursDepts),
+    [contoursDepts],
   );
   const leVoile = useMemo(() => voile(), [versionDuCatalogue]);
 
@@ -702,6 +711,12 @@ function CarteNative({
         {contoursDepts ? (
           <GeoJSONSource id={SOURCE_DEPTS} data={contoursDepts}>
             {poser(SOURCE_DEPTS)}
+          </GeoJSONSource>
+        ) : null}
+
+        {contoursDepts ? (
+          <GeoJSONSource id={SOURCE_DEPTS_NOMS} data={nomsDepts}>
+            {poser(SOURCE_DEPTS_NOMS)}
           </GeoJSONSource>
         ) : null}
 

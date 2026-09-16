@@ -35,6 +35,10 @@ import type { TonDeRegion } from './mapStyle';
 export const SOURCE_LIEUX = 'places';
 export const SOURCE_REGIONS = 'regions';
 export const SOURCE_DEPTS = 'departements';
+/** Les noms de départements : des POINTS, un par territoire — voir
+ *  `pointsDeNom`. Donner les polygones à MapLibre écrivait le nom une
+ *  fois par morceau, et le Finistère en a dix-neuf. */
+export const SOURCE_DEPTS_NOMS = 'departements-noms';
 export const SOURCE_VOILE = 'voile';
 
 export type Couche = {
@@ -275,11 +279,15 @@ export function couchesDeLaCarte({
   // plupart par collision, et c'est très bien ainsi. Absents quand le fond
   // n'apporte pas ses polices — le style de secours hors réseau n'en a pas, et
   // une couche de texte sans police est refusée en silence.
+  //
+  // La source est celle des POINTS, pas celle des polygones : MapLibre pose
+  // une étiquette au centre de chaque polygone, et « Lecce » s'écrivait trois
+  // fois au-dessus des Pouilles — une par morceau de la province.
   if (avecPolices) {
     couches.push({
       id: 'departement-nom',
       type: 'symbol',
-      source: SOURCE_DEPTS,
+      source: SOURCE_DEPTS_NOMS,
       filter: ['in', ['get', 'code'], ['literal', departements]],
       layout: {
         'text-field': ['get', 'nom'],

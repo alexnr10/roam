@@ -2085,8 +2085,12 @@ class TestShippedOutlines(unittest.TestCase):
             self.assertIn(code, drawn)
 
     def test_the_licence_travels_with_the_data(self):
-        # Licence ouverte : la mention de source est une obligation, pas un ornement.
-        self.assertIn("Etalab", self.data["attribution"])
+        # Licence ouverte : la mention de source est une obligation, pas un
+        # ornement. On éprouve ce qu'elle NOMME — le producteur et la licence —
+        # et non sa rédaction : elle a été raccourcie pour tenir sur la ligne
+        # de crédits, qu'elle partage avec le fond de carte et les photos.
+        self.assertIn("IGN", self.data["attribution"])
+        self.assertIn("Licence ouverte", self.data["attribution"])
 
     def test_the_file_stays_light_enough_to_embed(self):
         self.assertLess(self.PATH.stat().st_size, 900 * 1024)
