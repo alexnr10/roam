@@ -2598,6 +2598,63 @@ def cmd_photo(args: argparse.Namespace, config: Config) -> int:
     return 0
 
 
+def _suffixe_pays(args: argparse.Namespace) -> str:
+    """` --pays-config it`, ou rien du tout — à recopier dans une commande.
+
+    Une commande imprimée doit pouvoir être COLLÉE telle quelle. Sans ce
+    suffixe, `photo --manquantes --pays-config it` proposait « photo Q2258873
+    --list », qui cherche un lieu italien dans la collecte française et répond
+    « n'est pas dans la collecte » — la bonne réponse à la mauvaise question.
+    """
+    code = getattr(args, "pays_config", None)
+    return f" --pays-config {code}" if code else ""
+
+
+def _autre_pays_de(qid: str, args: argparse.Namespace) -> str | None:
+    """Le code du pays dont la collecte contient ce lieu, s'il est ailleurs.
+
+    « Q2258873 n'est pas dans la collecte » est vrai et inutile : le lieu
+    existe, il est simplement dans l'autre pays, et c'est le drapeau qui
+    manque. Chercher coûte la lecture de quelques fichiers déjà sur le disque,
+    et transforme un constat en remède.
+
+    Renvoie `None` quand le lieu est introuvable partout — là, l'identifiant
+    est vraiment en cause.
+    """
+    racine = BASE_DIR / "data"
+    ailleurs = {}
+    if args.raw != DEFAULT_RAW:
+        ailleurs[""] = DEFAULT_RAW  # le pays du dépôt, quand on est sur un autre
+    for dossier in sorted(racine.iterdir()) if racine.exists() else []:
+        if dossier.is_dir() and (dossier / "raw").is_dir() and dossier / "raw" != args.raw:
+            ailleurs[dossier.name] = dossier / "raw"
+    for code, chemin in ailleurs.items():
+        for shard in chemin.glob("*.json"):
+            try:
+                lot = json.loads(shard.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            if any(x.get("wikidata_id") == qid for x in lot):
+                return code
+    return None
+
+
+def _introuvable(qid: str, args: argparse.Namespace) -> int:
+    """Le message d'un lieu absent de CETTE collecte, avec le remède s'il existe."""
+    code = _autre_pays_de(qid, args)
+    if code is None:
+        print(f"{qid} n'est dans aucune collecte — vérifie l'identifiant.",
+              file=sys.stderr)
+    elif code:
+        print(f"{qid} n'est pas dans cette collecte : il est dans celle de "
+              f"« {code} ». Rejoue la commande avec --pays-config {code}.",
+              file=sys.stderr)
+    else:
+        print(f"{qid} n'est pas dans cette collecte : il est dans celle du "
+              "dépôt. Rejoue la commande SANS --pays-config.", file=sys.stderr)
+    return 1
+
+
 def _photos_manquantes(args: argparse.Namespace, photos: dict[str, str]) -> int:
     """Les lieux du CATALOGUE sans photo, et ce qu'il reste à tenter pour eux.
 
@@ -2619,11 +2676,12 @@ def _photos_manquantes(args: argparse.Namespace, photos: dict[str, str]) -> int:
     pistes = [p for p in sans if p.commons_category]
     orphelins = [p for p in sans if not p.commons_category]
 
+    pays = _suffixe_pays(args)
     print(f"{len(sans)} lieu(x) du catalogue sans photo.\n")
     if pistes:
         print(f"  Une catégorie Commons existe — à ouvrir ({len(pistes)}) :")
         for place in sorted(pistes, key=lambda p: p.name):
-            print(f"      photo {place.wikidata_id:<12} --list   # {place.name}")
+            print(f"      photo {place.wikidata_id:<12} --list{pays}   # {place.name}")
         print()
     if orphelins:
         print(f"  Rien sur Commons, ni catégorie ni image d'article ({len(orphelins)}) :")
@@ -2631,7 +2689,7 @@ def _photos_manquantes(args: argparse.Namespace, photos: dict[str, str]) -> int:
             dept = place.departement_code or "??"
             print(f"      {place.wikidata_id:<12} {place.name} ({dept})")
         print("\n  Ceux-là demandent une photo à téléverser sur Wikimedia Commons,")
-        print("  puis « photo <Q-id> <nom du fichier> ».")
+        print(f"  puis « photo <Q-id> <nom du fichier>{pays} ».")
     return 0
 
 
@@ -2658,8 +2716,7 @@ def _photo_credit(args: argparse.Namespace, qid: str, photos: dict[str, str]) ->
 
     lieu = next((p for p in _load_places(raw_path) if p.wikidata_id == qid), None)
     if lieu is None:
-        print(f"{qid} n'est pas dans la collecte.", file=sys.stderr)
-        return 1
+        return _introuvable(qid, args)
 
     # La photo telle qu'elle sera PUBLIÉE : le choix du curateur l'emporte.
     url = photo_url(photos[qid]) if qid in photos else lieu.image_url
@@ -2711,8 +2768,7 @@ def _list_photos(args: argparse.Namespace, qid: str, photos: dict[str, str]) -> 
 
     lieu = next((p for p in _load_places(raw_path) if p.wikidata_id == qid), None)
     if lieu is None:
-        print(f"{qid} n'est pas dans la collecte.", file=sys.stderr)
-        return 1
+        return _introuvable(qid, args)
     actuelle = file_title(lieu.image_url)
 
     # Sans catégorie Commons, il reste l'image de tête de l'article : c'est

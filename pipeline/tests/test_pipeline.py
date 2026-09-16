@@ -4307,6 +4307,20 @@ class TestMissingImages(unittest.TestCase):
         self.assertIn("Pont", vraie.image_url)
         self.assertEqual(vraie.image_author, "Un photographe")
 
+    def test_a_printed_command_carries_its_country(self):
+        # Une commande imprimée doit pouvoir être COLLÉE telle quelle.
+        # `photo --manquantes --pays-config it` proposait « photo Q2258873
+        # --list », qui cherche un lieu italien dans la collecte française et
+        # répond « n'est pas dans la collecte » : la bonne réponse à la
+        # mauvaise question.
+        import argparse
+        from roam_pipeline.cli import _suffixe_pays
+
+        self.assertEqual(
+            _suffixe_pays(argparse.Namespace(pays_config="it")), " --pays-config it")
+        self.assertEqual(_suffixe_pays(argparse.Namespace(pays_config=None)), "")
+        self.assertEqual(_suffixe_pays(argparse.Namespace()), "")
+
     def test_commons_says_it_is_a_map_and_the_image_goes(self):
         # Le nom `TabulaNuceria.jpg` ne dit rien à qui ne connaît pas la Table
         # de Peutinger. Commons, lui, le range dans « Maps of Nuceria
