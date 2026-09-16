@@ -660,8 +660,10 @@ function CarteNative({
         // La carte reste une vraie carte du monde, librement navigable : c'est
         // ainsi qu'on atteint les cinq régions d'outre-mer, sans encart dans un
         // coin. L'emprise de la France n'est qu'une vue de DÉPART.
-        attribution
-        attributionPosition={{ bottom: 8, right: 8 }}
+        // Voir `ATTRIBUTION_DU_FOND` : la mention est portée par la ligne de
+        // crédits de l'écran, qui est toujours visible, et pas par un « i »
+        // qu'on peut refermer.
+        attribution={false}
         logo={false}
         // La rotation et l'inclinaison n'apportent rien à un guide, et se
         // déclenchent sans qu'on l'ait voulu en zoomant à deux doigts : la

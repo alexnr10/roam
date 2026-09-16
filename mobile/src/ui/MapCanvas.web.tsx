@@ -1,5 +1,6 @@
-// La feuille de style de MapLibre porte les contrôles et la mention
-// d'attribution d'OpenStreetMap, qui est une obligation de la licence ODbL.
+// La feuille de style de MapLibre porte les contrôles de la carte. La mention
+// d'attribution, elle, est rendue par l'application : voir
+// `ATTRIBUTION_DU_FOND`, qui dit pourquoi.
 import 'maplibre-gl/dist/maplibre-gl.css';
 import * as maplibregl from 'maplibre-gl';
 import type { GeoJSONSource, MapLayerMouseEvent, Map as MapLibreMap } from 'maplibre-gl';
@@ -302,7 +303,11 @@ export function MapCanvas({
           // du monde, librement navigable — c'est ainsi qu'on atteint les cinq
           // régions d'outre-mer, sans encart dans un coin.
           fitBoundsOptions: { padding: 12 },
-          attributionControl: { compact: true },
+          // Pas de contrôle d'attribution : il s'ouvre tout seul au premier
+          // rendu et vient se poser en travers de notre ligne de crédits.
+          // La mention est portée par cette ligne, qui ne se replie jamais —
+          // voir `ATTRIBUTION_DU_FOND`.
+          attributionControl: false,
         });
       } catch (error) {
         // WebGL2 absent : MapLibre lève ici même. Sans ce filet, l'exception

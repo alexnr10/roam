@@ -35,6 +35,7 @@ import {
   SearchField,
 } from '../../src/ui/components';
 import { MapCanvas } from '../../src/ui/MapCanvas';
+import { ATTRIBUTION_DU_FOND } from '../../src/ui/mapStyle';
 import { IconeChevron, IconeCroix } from '../../src/ui/icons';
 import { ThemeIcon } from '../../src/ui/themeIcons';
 import { Etoiles } from '../../src/ui/Etoiles';
@@ -465,13 +466,20 @@ export default function MapScreen() {
             </Text>
           ) : null}
 
-          {/* La Licence ouverte exige la mention des contours, et les licences
-              de Commons celle des photos. Ce n'est pas une politesse — et
-              c'est pour cela qu'elle suit le PAYS : la ligne était écrite en
-              dur, elle créditait donc l'IGN sous des contours italiens, qui
-              viennent de l'ISTAT et demandent leur propre mention. */}
-          <Text style={styles.credit} numberOfLines={2}>
-            {[attributionDesContours(), 'Photos Wikimedia Commons']
+          {/* La seule mention d'attribution de l'application, et elle porte
+              les trois sources : le FOND (ODbL d'OpenStreetMap), les CONTOURS
+              (Licence ouverte) et les PHOTOS (Commons).
+
+              Le fond y est venu parce que le contrôle de MapLibre s'ouvrait
+              tout seul au premier rendu, par-dessus cette ligne — deux textes
+              superposés à l'ouverture de l'application. Une ligne qui ne se
+              replie jamais tient l'obligation mieux qu'une pastille.
+
+              Les contours suivent le PAYS : la ligne était écrite en dur, elle
+              créditait donc l'IGN sous des contours italiens, qui viennent de
+              l'ISTAT et demandent leur propre mention. */}
+          <Text style={styles.credit} numberOfLines={3}>
+            {[ATTRIBUTION_DU_FOND, attributionDesContours(), 'Photos Wikimedia Commons']
               .filter(Boolean)
               .join(' · ')}
           </Text>

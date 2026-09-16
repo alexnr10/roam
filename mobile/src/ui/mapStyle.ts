@@ -21,6 +21,26 @@ export const BASEMAP_STYLES = [
 ];
 
 /**
+ * La mention du fond de carte, telle que le style OpenFreeMap la déclare.
+ *
+ * Elle est écrite ICI et non laissée au contrôle de MapLibre, et c'est une
+ * correction d'affichage, pas un raccourci juridique : le contrôle `compact`
+ * s'ouvre TOUT SEUL au premier rendu et ne se replie qu'au premier geste. La
+ * toute première vue de l'application montrait donc une pastille blanche
+ * posée en travers de notre propre ligne de crédits — deux textes superposés,
+ * illisibles tous les deux, qui disparaissaient dès qu'on touchait la carte.
+ *
+ * L'obligation reste entière et elle est tenue : la ligne du bas est TOUJOURS
+ * visible, elle ne se replie jamais, et elle nomme les trois sources que le
+ * style demande de citer. C'est même plus fiable qu'un contrôle qu'on peut
+ * refermer.
+ *
+ * Si `BASEMAP_STYLES` change de fournisseur, cette chaîne change avec lui —
+ * elle recopie ce que le style annonce, elle ne l'invente pas.
+ */
+export const ATTRIBUTION_DU_FOND = 'OpenFreeMap · © OpenMapTiles · © OpenStreetMap';
+
+/**
  * Emprise de la France métropolitaine. Vue de DÉPART, pas une limite.
  *
  * La carte reste une vraie carte du monde, librement navigable : aucun
