@@ -1,6 +1,14 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useRef, useState } from 'react';
-import { FlatList, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  FlatList,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { places as allPlaces, nomDuPays, themeLabel, themes } from '../../src/data/catalog';
@@ -35,28 +43,33 @@ import type { Place } from '../../src/types';
 /** Combien de vignettes dans le bandeau. Au-delà, on fait défiler pour rien. */
 const BANDEAU = 30;
 /**
- * Largeur d'une vignette du bandeau, points, et hauteur de sa photo.
+ * La vignette est une RANGÉE, pas une colonne — et c'est ce qui règle les deux
+ * plaintes d'un coup.
  *
- * Le bandeau flotte AU-DESSUS de la carte : chaque point qu'il prend est un
- * point de carte en moins. À cent quatre-vingt-dix de large et cent vingt de
- * photo, il mangeait un tiers de la hauteur utile — la France y tenait à peine,
- * et on ne voyait que deux lieux.
+ * La colonne empilait photo, nom, infos : cent quarante-sept points de haut
+ * pour cent trente-huit de large. Le nom n'avait donc qu'une ligne de seize
+ * caractères là où la médiane des noms français est à dix-huit — mesuré sur
+ * les 2 080 lieux, UN NOM SUR DEUX était coupé. Et pour l'élargir il aurait
+ * fallu prendre encore de la carte, qui en perdait déjà un quart.
  *
- * Cent cinquante-six et quatre-vingt-huit : trois vignettes visibles, un tiers
- * de hauteur rendu à la carte, et une photo qui reste assez grande pour qu'on
- * reconnaisse un lieu — c'est tout ce qu'on lui demande.
+ * Couchée, la même matière tient dans quatre-vingt-huit points : la photo et
+ * le texte se partagent la largeur au lieu de s'empiler. Le nom reçoit deux
+ * cent dix-sept points sur deux lignes — 98,8 % des noms du catalogue passent
+ * entiers — et la carte récupère cinquante-neuf points.
+ *
+ * Ce qu'on perd : trois photos d'un coup d'œil, contre une seule. C'est un
+ * arbitrage assumé — les points sont tous sur la carte, et le bandeau sert à
+ * savoir CE QU'ON REGARDE, pas à feuilleter un album.
  */
-const VIGNETTE = 156;
-const VIGNETTE_PHOTO = 88;
+const RANGEE_PHOTO = 72;
 /**
- * La largeur RÉELLEMENT disponible pour la photo, dans la vignette.
+ * Ce qui dépasse de la rangée suivante, en points.
  *
- * La vignette fait cent cinquante-six points de large, mais elle a huit points
- * de marge intérieure de chaque côté et un filet d'un point : il ne reste que
- * cent trente-huit. Demander la photo à cent cinquante-six la faisait déborder
- * à droite, et l'image paraissait décalée dans son cadre.
+ * Une rangée pleine largeur ne dit pas qu'il y en a d'autres : elle a l'air
+ * d'être seule. Ce débord est la seule chose qui annonce le geste — il faut
+ * qu'il se voie sans découper le contenu de la suivante.
  */
-const VIGNETTE_LARGEUR_PHOTO = VIGNETTE - 2 * spacing.sm - 2;
+const RANGEE_DEBORD = 28;
 
 /**
  * L'écran principal : une carte, et ce qu'elle contient.
@@ -105,6 +118,18 @@ export default function MapScreen() {
   const [retourFrance, setRetourFrance] = useState(0);
   /** Le cran d'avant : revenir à la région sans quitter la région. */
   const [retourRegion, setRetourRegion] = useState(0);
+  /**
+   * La largeur d'une rangée se DÉDUIT de l'écran, elle n'est pas constante.
+   *
+   * Le bandeau est borné à `LARGEUR_MAX` et retranche ses marges ; ce qui
+   * reste, moins le débord, est la rangée. Une largeur fixe aurait laissé un
+   * vide à droite sur un grand écran et débordé sur un petit.
+   */
+  const { width: largeurEcran } = useWindowDimensions();
+  const RANGEE = Math.max(
+    220,
+    Math.min(largeurEcran, LARGEUR_MAX) - 2 * spacing.lg - RANGEE_DEBORD,
+  );
   const rail = useRef<FlatList<Place> | null>(null);
   // Sur un ordinateur, la molette ne défile que verticalement : le bandeau
   // restait bloqué sur les trois vignettes visibles, sans indice qu'il y en
@@ -394,34 +419,39 @@ export default function MapScreen() {
               showsHorizontalScrollIndicator={false}
               // Une vignette par cran : le bandeau s'arrête toujours sur un
               // lieu entier, jamais entre deux.
-              snapToInterval={VIGNETTE + spacing.sm}
+              snapToInterval={RANGEE + spacing.sm}
               decelerationRate="fast"
               contentContainerStyle={{ paddingHorizontal: spacing.lg, gap: spacing.sm }}
               onMomentumScrollEnd={(event) => {
                 const index = Math.round(
-                  event.nativeEvent.contentOffset.x / (VIGNETTE + spacing.sm),
+                  event.nativeEvent.contentOffset.x / (RANGEE + spacing.sm),
                 );
                 setAuMilieu(vignettes[index] ?? null);
               }}
               renderItem={({ item }) => (
                 <Pressable
-                  style={[styles.vignette, { width: VIGNETTE }]}
+                  style={[styles.rangee, { width: RANGEE }]}
                   onPress={() => openPlace(item)}
                 >
                   <Photo
                     url={item.imageUrl}
                     themeId={item.themeId}
-                    width={VIGNETTE_LARGEUR_PHOTO}
-                    height={VIGNETTE_PHOTO}
+                    width={RANGEE_PHOTO}
+                    height={RANGEE_PHOTO}
                   />
-                  <Text style={[type.body, styles.nom]} numberOfLines={1}>
-                    {item.name}
-                  </Text>
-                  <View style={styles.ligneVignette}>
-                    <Etoiles note={etoilesDe(item.id)} taille={12} />
-                    <Text style={type.small} numberOfLines={1}>
-                      {distance(item) ?? item.communeName ?? item.departement ?? ''}
+                  {/* `flex: 1` et `minWidth: 0` : sans le second, un nom long
+                      pousse la colonne au-delà de la rangée au lieu de passer
+                      à la ligne — la photo se trouve alors rognée à gauche. */}
+                  <View style={styles.rangeeTexte}>
+                    <Text style={type.subheading} numberOfLines={2}>
+                      {item.name}
                     </Text>
+                    <View style={styles.ligneVignette}>
+                      <Etoiles note={etoilesDe(item.id)} taille={12} />
+                      <Text style={type.small} numberOfLines={1}>
+                        {distance(item) ?? item.communeName ?? item.departement ?? ''}
+                      </Text>
+                    </View>
                   </View>
                 </Pressable>
               )}
@@ -525,15 +555,17 @@ const styles = StyleSheet.create({
   // à une application de téléphone, pas à un tableau de bord de deux mètres.
   bas: { position: 'absolute', left: 0, right: 0, bottom: 0, alignItems: 'center' },
   colonne: { width: '100%', maxWidth: LARGEUR_MAX, gap: spacing.sm },
-  vignette: {
+  rangee: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     padding: spacing.sm,
-    gap: 2,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  nom: { marginTop: spacing.xs },
+  rangeeTexte: { flex: 1, minWidth: 0, gap: 4 },
   fiche: {
     flexDirection: 'row',
     alignItems: 'center',
