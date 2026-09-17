@@ -9,6 +9,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { paysCourant } from '../data/catalog';
 import { distanceM } from '../lib/geo';
+import { animer, type Animation } from '../lib/animation';
 import { EMPTY_OUTLINES, outlinesFor } from '../data/outlines';
 import { pointsDeNom } from '../lib/etiquettes';
 import type { Emprise } from '../lib/regions';
@@ -46,7 +47,7 @@ import {
   pasDeCascade,
   TRANSITION,
   VOYAGE_M,
-  VOYAGE_MS,
+  dureeDuVol,
   resolveBasemap,
   tonsDuPays,
 } from './mapStyle';
@@ -162,8 +163,6 @@ export function MapCanvas({
   const regionPrecedente = useRef<string | null>(null);
   /** Ce qu'il reste des autres régions, en cours d'animation. */
   const attenuation = useRef(1);
-  const image = useRef<number | null>(null);
-  const imageAplats = useRef<number | null>(null);
   /**
    * Le lieu mis en avant, gardé en référence.
    *
@@ -192,59 +191,49 @@ export function MapCanvas({
    * appliquer. Une seule propriété est réécrite par image, quel que soit le
    * nombre de lieux — l'expression, elle, fait le reste dans le GPU.
    */
-  const boucler = React.useCallback(
+  /**
+   * Les deux animations en cours : les pastilles, et les aplats de région.
+   *
+   * Le mécanisme lui-même vit dans `lib/animation` — il porte un piège qui a
+   * coûté un vrai défaut (une animation annulée qui aboutissait quand même, et
+   * vidait la carte), et il y est éprouvé sur une horloge de banc d'essai.
+   */
+  const animation = useRef<Animation | null>(null);
+  const animationAplats = useRef<Animation | null>(null);
+
+  const lancer = React.useCallback(
     (
-      registre: React.MutableRefObject<number | null>,
+      registre: React.MutableRefObject<Animation | null>,
       duree: number,
       surImage: (avancement: number, ecoule: number) => void,
       surFin?: () => void,
     ) => {
-      const debut = performance.now();
-      let fini = false;
-      const finir = () => {
-        if (fini) return;
-        fini = true;
+      registre.current?.arreter();
+      // La référence se vide quand l'animation s'ACHÈVE, et pas seulement
+      // quand on l'arrête : une référence qui reste pleine ferait croire à une
+      // animation éternellement en cours, et le recul des autres pastilles —
+      // qui s'abstient pendant une animation — ne reviendrait jamais.
+      registre.current = animer(duree, surImage, () => {
         registre.current = null;
-        clearTimeout(filet);
-        surImage(1, duree);
         surFin?.();
-      };
-      const pas = () => {
-        const ecoule = performance.now() - debut;
-        const avancement = Math.min(1, ecoule / duree);
-        if (avancement >= 1) return finir();
-        surImage(avancement, ecoule);
-        registre.current = requestAnimationFrame(pas);
-      };
-      /**
-       * Le filet.
-       *
-       * `requestAnimationFrame` ne s'exécute pas dans un onglet en arrière-plan
-       * et se fait rationner sur une machine chargée : l'animation s'arrête
-       * alors en chemin, et les lieux restent à l'opacité où elle les a laissés
-       * — invisibles. Une animation qui ne finit pas doit quand même AVOIR
-       * fini.
-       */
-      const filet = setTimeout(finir, duree + 150);
-      if (registre.current !== null) cancelAnimationFrame(registre.current);
-      registre.current = requestAnimationFrame(pas);
+      });
     },
     [],
   );
 
-  const animer = React.useCallback(
+  const animerPastilles = React.useCallback(
     (duree: number, surImage: (a: number, e: number) => void, surFin?: () => void) =>
-      boucler(image, duree, surImage, surFin),
-    [boucler],
+      lancer(animation, duree, surImage, surFin),
+    [lancer],
   );
   const animerAplats = React.useCallback(
     (duree: number, surImage: (a: number, e: number) => void) =>
-      boucler(imageAplats, duree, surImage),
-    [boucler],
+      lancer(animationAplats, duree, surImage),
+    [lancer],
   );
   const arreterAnimation = React.useCallback(() => {
-    if (image.current !== null) cancelAnimationFrame(image.current);
-    image.current = null;
+    animation.current?.arreter();
+    animation.current = null;
   }, []);
 
   /** L'opacité des pastilles hors animation : pleine, ou en retrait. */
@@ -558,8 +547,12 @@ export function MapCanvas({
 
     return () => {
       cancelled = true;
-      if (image.current !== null) cancelAnimationFrame(image.current);
-      if (imageAplats.current !== null) cancelAnimationFrame(imageAplats.current);
+      // Les deux animations : une seule survivante rappellerait une carte qui
+      // n'existe plus. `arreter` coupe l'image ET le filet.
+      animation.current?.arreter();
+      animationAplats.current?.arreter();
+      animation.current = null;
+      animationAplats.current = null;
       created?.remove();
       map.current = null;
       setReady(false);
@@ -689,7 +682,7 @@ export function MapCanvas({
       if (!changementDeRegion) return;
       // Le fondu de sortie s'applique aux points ENCORE en place : les vider
       // d'abord ne laisserait rien à effacer.
-      animer(TRANSITION.retour.lieux, (avancement) => {
+      animerPastilles(TRANSITION.retour.lieux, (avancement) => {
         opacifier(instance, ['*', OPACITE_PLEINE, 1 - avancement] as never);
       }, () => {
         source.setData({ type: 'FeatureCollection', features: [] });
@@ -717,7 +710,7 @@ export function MapCanvas({
     // prendre, et l'attente ne se lit que comme une lenteur.
     const delai = misEnAvant.current ? 0 : TRANSITION.lieux.delai;
     opacifier(instance, opaciteEnCascade(0, pas) as never);
-    animer(delai + cascade, (avancement, ecoule) => {
+    animerPastilles(delai + cascade, (avancement, ecoule) => {
       opacifier(instance, opaciteEnCascade(ecoule - delai, pas) as never);
     }, () => {
       opacifier(instance, opaciteAuRepos());
@@ -788,7 +781,7 @@ export function MapCanvas({
     // Jamais pendant une animation, dans un sens comme dans l'autre : écrire
     // l'opacité ici couperait la cascade en cours, et les pastilles
     // surgiraient d'un coup. La cascade se termine elle-même sur cet état.
-    if (image.current !== null) return;
+    if (animation.current !== null) return;
     if (map.current) opacifier(map.current, opaciteAuRepos());
   }, [ready, highlightedId]);
 
@@ -936,13 +929,13 @@ export function MapCanvas({
     const cible: [number, number] = [focusLon, focusLat];
     const zoom = Math.max(instance.getZoom(), 11);
     const centre = instance.getCenter();
-    const loin =
-      distanceM(centre.lat, centre.lng, focusLat, focusLon) > VOYAGE_M;
+    const distance = distanceM(centre.lat, centre.lng, focusLat, focusLon);
+    const duree = dureeDuVol(distance);
     // `flyTo` prend de la hauteur, traverse, puis redescend ; `easeTo` glisse
     // à plat. Le premier raconte le trajet, le second ne convient qu'à ce qui
     // est déjà sous les yeux.
-    if (loin) instance.flyTo({ center: cible, zoom, duration: VOYAGE_MS, curve: 1.6 });
-    else instance.easeTo({ center: cible, zoom, duration: 600 });
+    if (distance > VOYAGE_M) instance.flyTo({ center: cible, zoom, duration: duree, curve: 1.6 });
+    else instance.easeTo({ center: cible, zoom, duration: duree });
   }, [ready, focusLat, focusLon]);
 
   // Position de l'utilisateur : un marqueur distinct, pas un point du catalogue.

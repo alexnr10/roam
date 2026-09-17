@@ -461,8 +461,29 @@ export function depouiller(style: any) {
  */
 export const VOYAGE_M = 200_000;
 
-/** La durée d'un voyage, en millisecondes. Assez long pour être suivi de l'œil. */
-export const VOYAGE_MS = 2200;
+/**
+ * La durée d'un déplacement de caméra, d'après la distance à parcourir.
+ *
+ * Une durée FIXE ne peut pas convenir des deux côtés : deux secondes deux pour
+ * aller au village voisin sont une éternité, et pour traverser l'Europe, un
+ * clignement d'œil. C'est ce second cas qui se voyait — on arrivait sans avoir
+ * rien vu du trajet.
+ *
+ * La racine carrée, et non la distance elle-même : doubler la distance ne
+ * doit pas doubler l'attente. Un vol ne se juge pas au kilomètre parcouru mais
+ * au dépaysement, et le dépaysement croît bien plus lentement que la carte.
+ *
+ *     10 km  → 1,1 s        700 km  → 2,9 s
+ *    100 km  → 1,6 s      1 100 km  → 3,5 s
+ *    300 km  → 2,2 s      2 000 km  → 4,0 s (plafond)
+ *
+ * Le plafond existe parce qu'au-delà, la caméra est si haute que le paysage ne
+ * change plus : on regarderait un globe tourner.
+ */
+export function dureeDuVol(metres: number): number {
+  const km = Math.max(0, metres) / 1000;
+  return Math.min(4000, Math.round(800 + 80 * Math.sqrt(km)));
+}
 
 export const TRANSITION = {
   zoom: 900,

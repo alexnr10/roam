@@ -22,6 +22,7 @@ import {
   coloriage,
   tonsDesRegions,
   tonsDuPays,
+  dureeDuVol,
 } from './mapStyle';
 
 /** Où `["zoom"]` apparaît-il dans une expression ? Les chemins, en clair. */
@@ -688,5 +689,36 @@ describe('opaciteDesTraits', () => {
     // L'ombre des régions vit à 0,35 : l'effacement ne doit pas la rendre plus
     // présente qu'elle ne l'était.
     expect((opaciteDesTraits(0.35).slice(3) as number[])[1]).toBe(0.35);
+  });
+});
+
+describe('dureeDuVol', () => {
+  it('croît avec la distance, mais moins vite qu’elle', () => {
+    // Doubler la distance ne doit pas doubler l'attente : un vol se juge au
+    // dépaysement, qui croît bien plus lentement que la carte.
+    const proche = dureeDuVol(10_000);
+    const moyen = dureeDuVol(300_000);
+    const lointain = dureeDuVol(1_100_000);
+    expect(proche).toBeLessThan(moyen);
+    expect(moyen).toBeLessThan(lointain);
+    expect(lointain / proche).toBeLessThan(30_000 / 300); // bien moins que la distance
+  });
+
+  it('reste lisible aux deux bouts', () => {
+    // Un pas de côté ne doit pas traîner, un bout à l'autre de l'Europe ne
+    // doit pas être un clignement d'œil — c'est ce second cas qu'on corrige.
+    expect(dureeDuVol(0)).toBeGreaterThanOrEqual(700);
+    expect(dureeDuVol(0)).toBeLessThanOrEqual(1000);
+    expect(dureeDuVol(1_100_000)).toBeGreaterThan(3000);
+  });
+
+  it('plafonne : au-delà, le paysage ne change plus', () => {
+    expect(dureeDuVol(2_000_000)).toBe(4000);
+    expect(dureeDuVol(20_000_000)).toBe(4000);
+  });
+
+  it('ne se laisse pas surprendre par une distance absurde', () => {
+    expect(dureeDuVol(-1)).toBe(dureeDuVol(0));
+    expect(Number.isFinite(dureeDuVol(0))).toBe(true);
   });
 });

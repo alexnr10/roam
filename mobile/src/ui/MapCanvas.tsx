@@ -42,8 +42,7 @@ import {
   margeDeCamera,
   SEUIL_REGION,
   TRANSITION,
-  VOYAGE_M,
-  VOYAGE_MS,
+  dureeDuVol,
   resolveBasemap,
   tonsDuPays,
 } from './mapStyle';
@@ -608,15 +607,15 @@ function CarteNative({
       const zoom = (await carte.current?.getZoom()) ?? 0;
       const centre = await carte.current?.getCenter();
       if (annule) return;
-      // La même règle que sur le web : au-delà de `VOYAGE_M`, aller au lieu
-      // est un voyage, et la caméra prend son temps pour qu'il se lise.
-      const loin = centre
-        ? distanceM(centre[1], centre[0], focusLat, focusLon) > VOYAGE_M
-        : false;
+      // La même règle que sur le web : la durée se déduit de la distance, et
+      // non d'un seuil. Sans centre connu, on garde la durée d'un pas de côté.
+      const duree = centre
+        ? dureeDuVol(distanceM(centre[1], centre[0], focusLat, focusLon))
+        : dureeDuVol(0);
       camera.current?.easeTo({
         center: [focusLon, focusLat],
         zoom: Math.max(zoom, 11),
-        duration: loin ? VOYAGE_MS : 600,
+        duration: duree,
       });
     })();
     return () => {
