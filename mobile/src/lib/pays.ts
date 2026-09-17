@@ -84,6 +84,26 @@ function enclaveDe(petit: PaysConnu, grand: PaysConnu): boolean {
  * entrer est un geste, pas un tremblement. La règle du candidat unique
  * s'applique quand même — deux enclaves superposées ne se devinent pas.
  */
+/**
+ * Le pays qui ENTOURE celui-ci, s'il en est une enclave.
+ *
+ * Sert au dernier cran de la pastille de retour. Depuis le Vatican, reculer
+ * n'a pas de sens — le pays tient déjà dans l'écran, et le cran suivant
+ * répétait donc le précédent. Le vrai cran d'après est géographique : on sort
+ * de l'enclave vers le pays qui la contient.
+ *
+ * Un seul candidat, comme partout ailleurs : deux pays qui contiendraient
+ * celui-ci ne se devinent pas.
+ */
+export function paysEnglobant(courant: string, connus: PaysConnu[]): string | null {
+  const ici = connus.find((p) => p.code === courant);
+  if (!ici || ici.emprises.length === 0) return null;
+  const hotes = connus.filter(
+    (autre) => autre.code !== courant && enclaveDe(ici, autre),
+  );
+  return hotes.length === 1 ? hotes[0].code : null;
+}
+
 export function paysAAdopter(
   lon: number,
   lat: number,

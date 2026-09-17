@@ -17,10 +17,17 @@ import { usePays } from '../../src/store/pays';
 import { bandeau } from '../../src/lib/carte';
 import { etoilesDe } from '../../src/lib/etoiles';
 import { attributionDesContours } from '../../src/data/outlines';
-import { dansLaRegion as estDansLaRegion, nomDeRegion } from '../../src/lib/regions';
+import {
+  bornesDuPays,
+  centreDe,
+  dUnSeulTenant,
+  dansLaRegion as estDansLaRegion,
+  nomDeRegion,
+  regionAu,
+} from '../../src/lib/regions';
 import type { Emprise as EmpriseCarte } from '../../src/lib/regions';
 import { enBoite, useLieuxDesEnclaves } from '../../src/lib/enclaves';
-import type { Emprise } from '../../src/lib/pays';
+import { paysEnglobant, type Emprise } from '../../src/lib/pays';
 import { evaluateCheckIn, suggestCheckIn } from '../../src/lib/checkin';
 import { distanceToPlace, formatDistance } from '../../src/lib/geo';
 import { useCheckIn } from '../../src/lib/useCheckIn';
@@ -175,6 +182,22 @@ export default function MapScreen() {
    * Personne, devant le Château Saint-Ange, ne se demande dans quel État il
    * se trouve.
    */
+  /**
+   * Le pays qui nous entoure, quand on est dans une enclave.
+   *
+   * Depuis le Vatican, reculer n'a pas de sens : le pays tient déjà dans
+   * l'écran, et le dernier cran de la pastille répétait le précédent —
+   * « ‹ Vatican │ Vatican », deux fois. Le vrai cran d'après est
+   * géographique : on sort vers l'Italie, dans la région qui contient
+   * l'enclave.
+   */
+  const hote = useMemo(() => paysEnglobant(pays, disponibles), [pays, disponibles]);
+  const nomDuPaysHote = hote
+    ? disponibles.find((p) => p.code === hote)?.name ?? hote
+    : null;
+  /** Une région à ouvrir décidée ici, et non reçue d'un autre écran. */
+  const [sortie, setSortie] = useState<string | null>(null);
+
   const voisins = useLieuxDesEnclaves(cadre, pays, disponibles);
   const visible = useMemo(() => {
     if (voisins.length === 0) return duPays;
@@ -280,6 +303,30 @@ export default function MapScreen() {
   };
 
   /**
+   * Sortir d'une enclave : le pays qui l'entoure, à l'endroit où elle est.
+   *
+   * On bascule d'abord — il faut les contours du pays hôte pour savoir dans
+   * QUELLE de ses régions l'enclave se trouve, et `regionAu` ne peut répondre
+   * qu'une fois le catalogue actif. Sans recadrage : c'est l'ouverture de la
+   * région qui cadre, et un saut sur l'Italie entière la précéderait pour
+   * rien.
+   *
+   * La caméra part sur la région, donc son centre quitte l'enclave — sans
+   * quoi le mouvement suivant nous y ramènerait aussitôt, une enclave étant
+   * par définition dans son hôte.
+   */
+  const sortirDeLEnclave = async () => {
+    if (!hote) return;
+    const bornes = bornesDuPays();
+    setChoisi(null);
+    setAuMilieu(null);
+    await choisir(hote, false);
+    const [lon, lat] = bornes ? centreDe(bornes) : [0, 0];
+    const region = regionAu(lon, lat);
+    setSortie(region ? `${region}#${Date.now()}` : null);
+  };
+
+  /**
    * Toucher une pastille — la sienne, ou celle d'une enclave posée dessus.
    *
    * Un lieu du Vatican touché depuis Rome demande d'abord que son catalogue
@@ -308,6 +355,13 @@ export default function MapScreen() {
    * lui, et le premier retour doit rendre la région, pas le pays.
    */
   const surUnLieu = Boolean(enAvant && regionOuverte);
+  /**
+   * Le dernier cran, dans une enclave : sortir plutôt que reculer.
+   *
+   * Un pays d'un seul tenant n'a qu'une région, qui est lui-même : « revenir
+   * au pays, en entier » refait donc ce que le cran précédent vient de faire.
+   */
+  const sortieDEnclave = Boolean(!surUnLieu && hote && dUnSeulTenant());
   const distance = (place: Place) =>
     position ? formatDistance(distanceToPlace(position, place)) : null;
 
@@ -328,7 +382,7 @@ export default function MapScreen() {
           onCentre={surLeCentre}
           retour={retourFrance}
           recadrer={retourRegion}
-          ouvrir={regionDemandee ? `${regionDemandee}#${n ?? ''}` : null}
+          ouvrir={sortie ?? (regionDemandee ? `${regionDemandee}#${n ?? ''}` : null)}
           highlightedId={enAvant?.id ?? suggestion?.id ?? null}
           // La région vient du LIEU : lui seul sait où il est rattaché.
           focus={
@@ -374,13 +428,17 @@ export default function MapScreen() {
                       setAuMilieu(null);
                       setRetourRegion(retourRegion + 1);
                     }
-                  : () => setRetourFrance(retourFrance + 1)
+                  : sortieDEnclave
+                    ? () => void sortirDeLEnclave()
+                    : () => setRetourFrance(retourFrance + 1)
               }
               accessibilityRole="button"
               accessibilityLabel={
                 surUnLieu
                   ? `Revenir à ${nomDeRegion(regionOuverte)}, en entier`
-                  : `Revenir à ${nomDuPays() || 'la carte'}, en entier`
+                  : sortieDEnclave
+                    ? `Sortir vers ${nomDuPaysHote}`
+                    : `Revenir à ${nomDuPays() || 'la carte'}, en entier`
               }
             >
               <IconeChevron size={17} color={colors.surface} />
@@ -388,7 +446,11 @@ export default function MapScreen() {
                   annonçait « France | Toscane » dès qu'on ouvrait une région
                   italienne. */}
               <Text style={styles.retourFrance}>
-                {surUnLieu ? nomDeRegion(regionOuverte) : nomDuPays() || 'Pays'}
+                {surUnLieu
+                  ? nomDeRegion(regionOuverte)
+                  : sortieDEnclave
+                    ? nomDuPaysHote
+                    : nomDuPays() || 'Pays'}
               </Text>
               <View style={styles.retourFilet} />
               <Text style={styles.retourNom} numberOfLines={1}>

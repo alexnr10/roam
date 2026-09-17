@@ -112,6 +112,21 @@ export function dUnSeulTenant(): boolean {
 }
 
 /**
+ * L'emprise à cadrer pour montrer cette région — ou ce pays.
+ *
+ * `REGIONS.get(code)` seul ne répondait rien pour `PAYS_ENTIER`, et les deux
+ * cartes se contentaient alors de ne rien faire : au Vatican, la pastille de
+ * retour désélectionnait le lieu SANS reculer la caméra. Le premier cran
+ * paraissait mort, et il fallait l'actionner deux fois.
+ */
+export function empriseDeLaRegion(code: string | null): Emprise | null {
+  if (!code) return null;
+  if (code === PAYS_ENTIER) return bornesDuPays();
+  const feature = REGIONS.get(code);
+  return feature ? emprise(feature.geometry) : null;
+}
+
+/**
  * Ce code désigne-t-il une région qu'on peut ouvrir ICI ?
  *
  * `REGIONS.has` seul disait non à `PAYS_ENTIER`, et trois gardes l'employaient :

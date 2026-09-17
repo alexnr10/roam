@@ -17,6 +17,7 @@ import {
   REGIONS,
   bornesDuPays,
   dansLaRegion,
+  empriseDeLaRegion,
   regionConnue,
   emprise,
   regionAu,
@@ -390,9 +391,9 @@ function CarteNative({
    * cent soixante-douze points débordant du cadre de l'autre.
    */
   const voler = useCallback((code: string) => {
-    const feature = REGIONS.get(code);
-    if (!feature) return;
-    const [[ouest, sud], [est, nord]] = emprise(feature.geometry);
+    const bornes = empriseDeLaRegion(code);
+    if (!bornes) return;
+    const [[ouest, sud], [est, nord]] = bornes;
     camera.current?.fitBounds([ouest, sud, est, nord], {
       padding: margeRef.current,
       duration: TRANSITION.zoom,

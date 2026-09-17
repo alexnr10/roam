@@ -10,6 +10,7 @@ import {
   contient,
   dUnSeulTenant,
   dansLaRegion,
+  empriseDeLaRegion,
   regionConnue,
   emprise,
   lieuxDe,
@@ -498,6 +499,16 @@ describe('un pays d’un seul tenant', () => {
 
   it('porte le nom du pays, pas le code interne', () => {
     expect(nomDeRegion(PAYS_ENTIER)).toBe('Vatican');
+  });
+
+  it('a une emprise à cadrer : sans elle, le premier retour ne faisait rien', () => {
+    // Les deux cartes cadrent par `REGIONS.get(code)`, qui ne répond rien pour
+    // le pays entier : au Vatican, la pastille de retour désélectionnait le
+    // lieu SANS reculer la caméra, et il fallait l'actionner deux fois.
+    expect(empriseDeLaRegion(PAYS_ENTIER)).toEqual(bornesDuPays());
+    expect(empriseDeLaRegion(PAYS_ENTIER)).not.toBeNull();
+    expect(empriseDeLaRegion('12')).toBeNull();
+    expect(empriseDeLaRegion(null)).toBeNull();
   });
 
   it('est une région CONNUE : sinon la carte la referme aussitôt ouverte', () => {

@@ -1,4 +1,4 @@
-import { dansLEmprise, paysAAdopter, type PaysConnu } from './pays';
+import { dansLEmprise, paysAAdopter, paysEnglobant, type PaysConnu } from './pays';
 
 const FR: PaysConnu = { code: 'FR', name: 'France', emprises: [[-5, 42, 8, 51]] };
 const IT: PaysConnu = { code: 'IT', name: 'Italie', emprises: [[6, 36, 19, 47]] };
@@ -96,5 +96,38 @@ describe('une enclave', () => {
   it('ne devine pas entre deux enclaves superposées', () => {
     const AUTRE: PaysConnu = { code: 'XX', name: 'Autre', emprises: [[12.44, 41.90, 12.46, 41.91]] };
     expect(paysAAdopter(SAINT_PIERRE[0], SAINT_PIERRE[1], 'IT', [ITALIE, VA, AUTRE])).toBeNull();
+  });
+});
+
+
+/**
+ * Sortir d'une enclave : le dernier cran de la pastille de retour.
+ *
+ * Depuis le Vatican, reculer n'a pas de sens — le pays tient dans l'écran, et
+ * « revenir au pays, en entier » refaisait ce que le cran précédent venait de
+ * faire : « ‹ Vatican │ Vatican », deux fois de suite.
+ */
+describe('paysEnglobant', () => {
+  const VA: PaysConnu = { code: 'VA', name: 'Vatican', emprises: [[12.4483, 41.9019, 12.4575, 41.9064]] };
+  const ITALIE: PaysConnu = { code: 'IT', name: 'Italie', emprises: [[11.7, 41.3, 13.3, 42.3]] };
+
+  it('rend le pays qui contient l’enclave', () => {
+    expect(paysEnglobant('VA', [ITALIE, VA])).toBe('IT');
+  });
+
+  it('ne rend rien pour un pays qui n’est l’enclave de personne', () => {
+    expect(paysEnglobant('IT', [ITALIE, VA, FR])).toBeNull();
+    expect(paysEnglobant('FR', CONNUS)).toBeNull();
+  });
+
+  it('ne devine pas entre deux hôtes possibles', () => {
+    const AUTRE: PaysConnu = { code: 'XX', name: 'Autre', emprises: [[11, 41, 14, 43]] };
+    expect(paysEnglobant('VA', [ITALIE, AUTRE, VA])).toBeNull();
+  });
+
+  it('ne rend rien sans emprise, des deux côtés', () => {
+    expect(paysEnglobant('ZZ', [ITALIE, VA])).toBeNull();
+    const sans: PaysConnu = { code: 'SM', name: 'Saint-Marin', emprises: [] };
+    expect(paysEnglobant('SM', [ITALIE, sans])).toBeNull();
   });
 });

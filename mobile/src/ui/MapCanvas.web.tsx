@@ -18,6 +18,7 @@ import {
   bornesDuPays,
   centreDe,
   dansLaRegion,
+  empriseDeLaRegion,
   regionConnue,
   emprise,
   partDuCadre,
@@ -1077,9 +1078,8 @@ function poserSurvol(instance: MapLibreMap, code: string | null, actif: boolean)
  * soixante-douze points débordant du cadre de l'autre.
  */
 function ouvrir(instance: MapLibreMap, code: string) {
-  const feature = REGIONS.get(code);
-  if (!feature) return;
-  const bornes = emprise(feature.geometry);
+  const bornes = empriseDeLaRegion(code);
+  if (!bornes) return;
   const cadre = instance.getContainer();
   instance.fitBounds(bornes, {
     padding: margeDeCamera(cadre.clientWidth, cadre.clientHeight),
