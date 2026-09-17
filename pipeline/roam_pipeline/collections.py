@@ -987,6 +987,12 @@ def fix_region_codes(places: list[Place]) -> list[Place]:
     plutôt que de le garder faux.
     """
     connues = regions()
+    # Un pays SANS subdivision n'a pas de répertoire à opposer aux lieux : tout
+    # y serait « inconnu », et la passe effacerait le rattachement de chacun en
+    # annonçant l'avoir corrigé. Il n'y a rien à corriger là où il n'y a rien à
+    # connaître.
+    if not connues:
+        return places
     corriges: list[tuple[Place, str]] = []
     for place in places:
         if not place.region_code or place.region_code in connues:

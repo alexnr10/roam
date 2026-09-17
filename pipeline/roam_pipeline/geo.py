@@ -51,6 +51,32 @@ def _dossier() -> Path:
     return DATA_DIR if _PAYS == "FR" else DATA_DIR / _PAYS.lower()
 
 
+def _ouvrir(nom: str):
+    """Le fichier du référentiel, ou une erreur qui dit quoi faire.
+
+    `FileNotFoundError` nu ne disait rien à qui ouvre un pays : un chemin
+    absolu vers un fichier qu'on n'a jamais vu, au milieu d'une pile d'appels.
+    Le premier `build --pays-config va` s'est arrêté là.
+
+    Un pays SANS subdivision est un cas légitime — le Vatican fait
+    quarante-quatre hectares — mais il se déclare, par un fichier vide qui ne
+    porte que son en-tête. Ce qui ne se déclare pas, c'est l'oubli.
+    """
+    chemin = _dossier() / nom
+    if chemin.exists():
+        return chemin.open(encoding="utf-8")
+    raise FileNotFoundError(
+        f"référentiel géographique absent pour {_PAYS} : {chemin} est introuvable.\n"
+        f"Un pays a besoin de `regions.csv` et `departements.csv` dans "
+        f"`data/reference/{_PAYS.lower()}/`.\n"
+        f"S'il n'a AUCUNE subdivision — le Vatican, par exemple — les deux "
+        f"fichiers existent quand même, vides, avec leur seule ligne d'en-tête :\n"
+        f"    regions.csv       code,name,de_form\n"
+        f"    departements.csv  code,name,de_form,region_code\n"
+        f"et `geo.require_departement: false` dans sa configuration."
+    )
+
+
 @dataclass(frozen=True)
 class Area:
     code: str
@@ -67,7 +93,7 @@ class Area:
 @lru_cache(maxsize=None)
 def regions() -> dict[str, Area]:
     out: dict[str, Area] = {}
-    with (_dossier() / "regions.csv").open(encoding="utf-8") as fh:
+    with _ouvrir("regions.csv") as fh:
         for row in csv.DictReader(fh):
             out[row["code"]] = Area(
                 code=row["code"], name=row["name"], de_form=row["de_form"], level="region"
@@ -78,7 +104,7 @@ def regions() -> dict[str, Area]:
 @lru_cache(maxsize=None)
 def departements() -> dict[str, Area]:
     out: dict[str, Area] = {}
-    with (_dossier() / "departements.csv").open(encoding="utf-8") as fh:
+    with _ouvrir("departements.csv") as fh:
         for row in csv.DictReader(fh):
             out[row["code"]] = Area(
                 code=row["code"],
