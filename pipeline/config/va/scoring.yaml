@@ -1,0 +1,28 @@
+# Le Vatican : ce qui diffère de la configuration du dépôt.
+#
+#     python -m roam_pipeline --pays-config va <commande>
+#
+# ⚠ LE Q-ID EST À VÉRIFIER AVANT DE COLLECTER. `Q237` est libellé
+# « Saint-Siège » chez Wikidata, qui distingue parfois le Saint-Siège de l'État
+# de la Cité du Vatican. `P17` des lieux pointe peut-être l'autre entité.
+#
+# La collecte le dira sans ambiguïté : si elle rend ZÉRO lieu, c'est l'entité
+# voisine qu'il faut, et `suggest-qids Vatican` la donnera. Ne pas corriger ce
+# Q-id de mémoire.
+
+geo:
+  country:
+    qid: Q237
+    code: VA
+    name: Vatican
+    de_form: du Vatican
+    langues: fr,it,en
+
+  # Le Vatican n'a AUCUNE subdivision administrative : c'est un État d'un demi
+  # kilomètre carré. Il n'y a pas de département à exiger.
+  require_departement: false
+
+  # Vingt-cinq lieux passent le plancher d'affichage de leur thème, mesuré sur
+  # la collecte italienne existante — plus que plusieurs provinces italiennes.
+  # Saint-Pierre, la Sixtine, la place, les musées, les jardins, le palais, les
+  # nécropoles, six chapelles. Le plancher du dépôt convient tel quel.

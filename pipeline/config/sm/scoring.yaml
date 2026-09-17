@@ -1,0 +1,44 @@
+# Saint-Marin : ce qui diffère de la configuration du dépôt.
+#
+#     python -m roam_pipeline --pays-config sm <commande>
+#
+# Saint-Marin est un PAYS, pas une enclave à absorber. Le catalogue italien
+# l'absorbait — `config/it/scoring.yaml`, bloc `enclaves` — et ce raccourci
+# avait une raison honnête : un lieu sans département sort du catalogue avant
+# d'être jugé, donc il fallait bien lui en donner un. On lui donnait Rimini.
+#
+# C'est une erreur géographique, et elle se voyait : la carte ouvrait les
+# Marches au-dessus de Saint-Marin et filtrait les lieux de l'Émilie-Romagne.
+# Elles ne se rencontraient jamais.
+
+geo:
+  country:
+    qid: Q238
+    code: SM
+    name: Saint-Marin
+    de_form: de Saint-Marin
+    # L'italien au milieu, pour la même raison qu'en Italie : le service de
+    # libellés rend le Q-ID lui-même quand aucune langue demandée n'existe.
+    langues: fr,it,en
+
+  # PAS DE DÉPARTEMENT, et ce n'est pas un manque : Saint-Marin se divise en
+  # neuf castelli, ce qui est la maille d'une COMMUNE, pas d'un département.
+  # Exiger un département ici viderait le catalogue de tous ses lieux.
+  require_departement: false
+
+collections:
+  # HUIT, exactement. Mesuré sur la collecte italienne existante : Saint-Marin
+  # y a dix-sept lieux distincts, dont douze passent le plancher d'affichage de
+  # leur thème — mais quatre d'entre eux ne sont pas à Saint-Marin. « Les
+  # Apennins », « la péninsule italienne », « l'Apennin du Nord » et « l'Apennin
+  # tosco-romagnol » y ont été rattachés par PROXIMITÉ, faute de savoir où les
+  # mettre : ce sont des massifs qui traversent l'Italie entière.
+  #
+  # Restent huit lieux qui sont vraiment à Saint-Marin : le mont Titano, les
+  # trois tours, la Guaita, la Cesta, le Montale, le Monte San Cristoforo, la
+  # basilique, le palais public. Exactement le plancher.
+  #
+  # Le laisser à huit est donc un pari serré : un lieu de moins, et le pays
+  # n'aurait AUCUNE collection. Le baisser serait plus sûr, mais une collection
+  # de quatre lieux n'est pas une collection. Huit, et on vérifie au build.
+  min_places: 8
