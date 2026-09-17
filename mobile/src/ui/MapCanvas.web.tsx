@@ -18,6 +18,7 @@ import {
   bornesDuPays,
   centreDe,
   dansLaRegion,
+  regionConnue,
   emprise,
   partDuCadre,
   prochaineOuverture,
@@ -646,7 +647,7 @@ export function MapCanvas({
    * traverse une frontière et on s'arrête.
    */
   useEffect(() => {
-    if (!ouverte || REGIONS.has(ouverte)) return;
+    if (!ouverte || regionConnue(ouverte)) return;
     ouverteRef.current = null;
     zoomOuverture.current = null;
     setOuverte(null);
@@ -914,7 +915,7 @@ export function MapCanvas({
     // Ouverte au départ, la région a les deux secondes du vol pour se peupler,
     // et la carte est déjà pleine quand on arrive.
     const region = focusRegion ?? regionAu(focusLon, focusLat);
-    if (region && REGIONS.has(region) && region !== ouverteRef.current) {
+    if (region && regionConnue(region) && region !== ouverteRef.current) {
       ouverteRef.current = region;
       // `null` et non le zoom courant : c'est le premier `moveend` qui posera
       // l'ancre, à l'altitude d'arrivée. La poser d'ici, au zoom de DÉPART,

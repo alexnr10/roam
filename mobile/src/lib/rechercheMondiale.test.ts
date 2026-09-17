@@ -144,16 +144,31 @@ describe('le même lieu dans deux pays', () => {
   const ITALIE = { code: 'IT', name: 'Italie', places: [saintPierre, lieu('Colisée', 300)] };
   const VATICAN = { code: 'VA', name: 'Vatican', places: [saintPierre] };
 
-  it('ne sort qu’une fois, celle du pays qu’on regarde', () => {
+  it('ne sort qu’une fois, et c’est celle du PLUS PETIT pays', () => {
+    // La basilique est au Vatican, pas en Italie. Garder la ligne italienne
+    // parce qu'on regarde l'Italie la faisait disparaître du Vatican.
     const trouves = fusionner('basilique saint-pierre', 'IT', [ITALIE, VATICAN]);
     expect(trouves).toHaveLength(1);
-    expect(trouves[0].pays).toBe('IT');
+    expect(trouves[0].pays).toBe('VA');
   });
 
-  it('et celle du Vatican quand c’est lui qu’on regarde', () => {
+  it('dit la même chose depuis le Vatican', () => {
     const trouves = fusionner('basilique saint-pierre', 'VA', [ITALIE, VATICAN]);
     expect(trouves).toHaveLength(1);
     expect(trouves[0].pays).toBe('VA');
+  });
+
+  it('garde le RANG que la pertinence a donné', () => {
+    // Saint-Pierre reste devant, elle change seulement de drapeau.
+    const auxLiens = lieu('Basilique Saint-Pierre-aux-Liens', 110);
+    const trouves = fusionner('basilique saint-pierre', 'IT', [
+      { code: 'IT', name: 'Italie', places: [saintPierre, auxLiens, lieu('Colisée', 300)] },
+      VATICAN,
+    ]);
+    expect(trouves.map((r) => [r.place.name, r.pays])).toEqual([
+      ['Basilique Saint-Pierre', 'VA'],
+      ['Basilique Saint-Pierre-aux-Liens', 'IT'],
+    ]);
   });
 
   it('ne confond pas deux lieux qui commencent pareil', () => {

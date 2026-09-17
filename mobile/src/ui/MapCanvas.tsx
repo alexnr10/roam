@@ -17,6 +17,7 @@ import {
   REGIONS,
   bornesDuPays,
   dansLaRegion,
+  regionConnue,
   emprise,
   regionAu,
   prochaineOuverture,
@@ -606,7 +607,7 @@ function CarteNative({
     // sur la carte, et attendre `moveend` faisait atterrir sur une carte vide
     // qui se remplissait ensuite. Voir la version web, qui le détaille.
     const region = focusRegion ?? regionAu(focusLon, focusLat);
-    if (region && REGIONS.has(region) && region !== ouverteRef.current) {
+    if (region && regionConnue(region) && region !== ouverteRef.current) {
       ouverteRef.current = region;
       zoomOuverture.current = null;
       setOuverte(region);

@@ -10,6 +10,7 @@ import {
   contient,
   dUnSeulTenant,
   dansLaRegion,
+  regionConnue,
   emprise,
   lieuxDe,
   nomDeRegion,
@@ -499,6 +500,17 @@ describe('un pays d’un seul tenant', () => {
     expect(nomDeRegion(PAYS_ENTIER)).toBe('Vatican');
   });
 
+  it('est une région CONNUE : sinon la carte la referme aussitôt ouverte', () => {
+    // Le garde-fou « cette région n'existe pas dans ce pays » est écrit sur
+    // `REGIONS.has`, qui dit non au pays entier. La carte ouvrait donc le
+    // Vatican au `moveend` et le refermait dans la foulée : les pastilles
+    // apparaissaient puis disparaissaient, et un vol atterrissait sur du vide.
+    expect(REGIONS.has(PAYS_ENTIER)).toBe(false);
+    expect(regionConnue(PAYS_ENTIER)).toBe(true);
+    expect(regionConnue(null)).toBe(false);
+    expect(regionConnue('12')).toBe(false);
+  });
+
   it('perce le voile de son emprise, au lieu de se couvrir lui-même', () => {
     const anneaux = voile().geometry.coordinates;
     expect(anneaux).toHaveLength(2);
@@ -527,5 +539,9 @@ describe('un pays QUI a des régions n’est pas touché', () => {
     expect(dUnSeulTenant()).toBe(false);
     expect(regionAu(5, 5)).toBe('G');
     expect(regionAu(50, 50)).toBeNull();
+    // Et le pays entier n'y est PAS une région ouvrable : le garde-fou qui
+    // referme une région absente doit continuer de le faire.
+    expect(regionConnue('G')).toBe(true);
+    expect(regionConnue(PAYS_ENTIER)).toBe(false);
   });
 });

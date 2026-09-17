@@ -111,6 +111,20 @@ export function dUnSeulTenant(): boolean {
   return REGIONS.size === 0;
 }
 
+/**
+ * Ce code désigne-t-il une région qu'on peut ouvrir ICI ?
+ *
+ * `REGIONS.has` seul disait non à `PAYS_ENTIER`, et trois gardes l'employaient :
+ * celui qui referme une région quand le pays change sous elle, et les deux qui
+ * ouvrent la région au DÉPART d'un vol. Au Vatican, la carte ouvrait donc le
+ * pays au `moveend` et le refermait dans la foulée — mesuré : les pastilles
+ * apparaissaient puis disparaissaient, et un vol atterrissait sur du vide.
+ */
+export function regionConnue(code: string | null): boolean {
+  if (!code) return false;
+  return REGIONS.has(code) || (code === PAYS_ENTIER && dUnSeulTenant());
+}
+
 /** Ce lieu est-il dans la région ouverte ? */
 export function dansLaRegion(place: { regionCode?: string | null }, code: string): boolean {
   return code === PAYS_ENTIER || place.regionCode === code;

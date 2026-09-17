@@ -129,18 +129,36 @@ export function fusionner(
   const ici = fouillables.filter((pays) => pays.code === paysCourant).flatMap(marquer);
   const ailleurs = fouillables.filter((pays) => pays.code !== paysCourant).flatMap(marquer);
 
-  // UN Q-id, UNE ligne. Deux catalogues peuvent revendiquer le même lieu — la
-  // basilique Saint-Pierre est Q12512 en Italie ET au Vatican tant que la
-  // collecte italienne absorbe l'enclave — et la recherche le montrait deux
-  // fois, sans rien pour les distinguer qu'une pastille de pays. C'est une
-  // faute de données, mais l'écran n'a pas à la répéter : la première
-  // occurrence gagne, donc celle du pays qu'on regarde.
-  const vus = new Set<string>();
+  // UN Q-id, UNE ligne — ET C'EST CELLE DU PLUS PETIT PAYS.
+  //
+  // Deux catalogues peuvent revendiquer le même lieu : la basilique
+  // Saint-Pierre est Q12512 en Italie ET au Vatican, tant que la collecte
+  // italienne absorbe l'enclave. C'est une faute de données, mais l'écran n'a
+  // pas à la répéter.
+  //
+  // Garder la première occurrence — celle du pays qu'on regarde — était le
+  // mauvais sens : la basilique n'apparaissait plus QU'EN ITALIE, ce qu'elle
+  // n'est pas. Un doublon de ce genre naît toujours d'un grand catalogue qui a
+  // absorbé le lieu d'un petit pays ; c'est donc le petit qui en est le
+  // propriétaire. Dix-neuf lieux contre deux mille soixante-neuf : le Vatican
+  // gagne, et la ligne porte sa pastille.
+  //
+  // Le RANG, lui, ne bouge pas : la ligne garde la place que sa pertinence lui
+  // a donnée, elle change seulement de pays. Sans quoi Saint-Pierre passerait
+  // derrière Saint-Pierre-aux-Liens pour avoir changé de drapeau.
+  const taille = new Map(fouillables.map((pays) => [pays.code, pays.places.length]));
+  const rang = new Map<string, number>();
   const uniques: ResultatMondial[] = [];
   for (const resultat of [...ici, ...ailleurs]) {
-    if (vus.has(resultat.place.id)) continue;
-    vus.add(resultat.place.id);
-    uniques.push(resultat);
+    const deja = rang.get(resultat.place.id);
+    if (deja === undefined) {
+      rang.set(resultat.place.id, uniques.length);
+      uniques.push(resultat);
+      continue;
+    }
+    const ancien = taille.get(uniques[deja].pays) ?? Infinity;
+    const nouveau = taille.get(resultat.pays) ?? Infinity;
+    if (nouveau < ancien) uniques[deja] = resultat;
   }
   return uniques.slice(0, limite);
 }
