@@ -89,6 +89,33 @@ export function contient(geometry: Geometrie, lon: number, lat: number): boolean
 /** Les contours de région, indexés par code INSEE. */
 export let REGIONS = new Map<string, GeoJSON.Feature<Geometrie, { code: string; nom: string }>>();
 
+/**
+ * Le code de la région d'un pays qui n'en a pas : le pays lui-même.
+ *
+ * La carte n'affiche les pastilles que DANS une région ouverte. C'est la bonne
+ * mécanique pour la France et l'Italie — dix-huit et vingt aplats qu'on ouvre
+ * un par un — et c'est une carte vide pour le Vatican, qui fait quarante-quatre
+ * hectares et n'a aucune subdivision : `regionAu` ne répond jamais, rien ne
+ * s'ouvre, et la source des lieux reste vide. Mesuré sur le catalogue servi :
+ * dix-neuf lieux, zéro contour, zéro lieu ouvrable.
+ *
+ * Un pays qui tient dans un écran n'a rien à ouvrir : il EST ouvert. Ce code
+ * est la région que ce pays-là présente, et `lieuxDe` lui rend tout le
+ * catalogue. Aucune donnée à télécharger — c'est l'absence de contour qui le
+ * déclenche, et c'est elle qui décrit le cas.
+ */
+export const PAYS_ENTIER = '__pays__';
+
+/** Le pays regardé n'a aucun contour de région : il est d'un seul tenant. */
+export function dUnSeulTenant(): boolean {
+  return REGIONS.size === 0;
+}
+
+/** Ce lieu est-il dans la région ouverte ? */
+export function dansLaRegion(place: { regionCode?: string | null }, code: string): boolean {
+  return code === PAYS_ENTIER || place.regionCode === code;
+}
+
 let nomsDeRegion = new Map<string, string>();
 let regionParDepartement = new Map<string, string>();
 
@@ -116,7 +143,10 @@ indexer();
 surChangement(indexer);
 
 export const nomDeRegion = (code: string): string =>
-  nomsDeRegion.get(code) ?? REGIONS.get(code)?.properties.nom ?? code;
+  (code === PAYS_ENTIER ? areas.country[0]?.name : undefined) ??
+  nomsDeRegion.get(code) ??
+  REGIONS.get(code)?.properties.nom ??
+  code;
 
 /**
  * La région sous un point — celle qu'on ouvre.
@@ -127,6 +157,7 @@ export const nomDeRegion = (code: string): string =>
  * monde tente en premier, et il ne s'apprend pas.
  */
 export function regionAu(lon: number, lat: number): string | null {
+  if (dUnSeulTenant()) return PAYS_ENTIER;
   for (const [code, feature] of REGIONS) {
     if (contient(feature.geometry, lon, lat)) return code;
   }
@@ -146,6 +177,7 @@ export function regionAu(lon: number, lat: number): string | null {
  * rectangle contient ce point et qui remplit l'écran.
  */
 export function regionDuCadre(cadre: Emprise): string | null {
+  if (dUnSeulTenant()) return PAYS_ENTIER;
   const [lon, lat] = centreDe(cadre);
   const dessus = regionAu(lon, lat);
   if (dessus) {
@@ -250,6 +282,28 @@ export function anneauDuMonde(): Anneau {
  */
 export function voile(): GeoJSON.Feature<GeoJSON.Polygon> {
   const anneaux: GeoJSON.Position[][] = [anneauDuMonde()];
+  // Un pays sans contour perçait le monde de RIEN : le voile couvrait alors la
+  // carte entière, le pays compris. Son emprise fait le trou — un rectangle
+  // plutôt qu'une frontière, ce qui suffit à quarante-quatre hectares et ne
+  // demande aucune donnée de plus.
+  if (dUnSeulTenant()) {
+    const bornes = bornesDuPays();
+    if (bornes) {
+      const [[ouest, sud], [est, nord]] = bornes;
+      anneaux.push([
+        [ouest, sud],
+        [est, sud],
+        [est, nord],
+        [ouest, nord],
+        [ouest, sud],
+      ]);
+    }
+    return {
+      type: 'Feature',
+      properties: {},
+      geometry: { type: 'Polygon', coordinates: anneaux },
+    };
+  }
   for (const feature of REGIONS.values()) {
     for (const polygone of polygones(feature.geometry)) {
       anneaux.push(polygone[0]);
@@ -409,6 +463,7 @@ export const regionDuDepartement = (code: string): string | null =>
 
 /** Les lieux d'une région. Le catalogue porte déjà le rattachement. */
 export function lieuxDe(regionCode: string) {
+  if (regionCode === PAYS_ENTIER) return places;
   return places.filter((place) => place.regionCode === regionCode);
 }
 

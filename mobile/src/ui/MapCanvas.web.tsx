@@ -17,6 +17,7 @@ import {
   REGIONS,
   bornesDuPays,
   centreDe,
+  dansLaRegion,
   emprise,
   partDuCadre,
   prochaineOuverture,
@@ -691,7 +692,7 @@ export function MapCanvas({
       return;
     }
 
-    const dedans = places.filter((place) => place.regionCode === ouverte);
+    const dedans = places.filter((place) => dansLaRegion(place, ouverte));
     source.setData(toFeatureCollection(dedans, visitedIds, ouverte));
 
     if (!changementDeRegion) {

@@ -1,5 +1,6 @@
 import { places } from '../data/catalog';
 import {
+  PAYS_ENTIER,
   REGIONS,
   anneauDuMonde,
   bornesDuPays,
@@ -7,7 +8,11 @@ import {
   cheminSvg,
   cheminSvgDans,
   contient,
+  dUnSeulTenant,
+  dansLaRegion,
   emprise,
+  lieuxDe,
+  nomDeRegion,
   prochaineOuverture,
   rangDepuisLeCentre,
   regionAu,
@@ -443,5 +448,84 @@ describe('regionDuCadre, quand le centre n’est sur aucune région', () => {
       areas: { region: [], departement: [], commune: [], country: [] },
     } as never);
     expect(regionLaMieuxRepresentee([[4.0, 0.0], [5.0, 1.0]])).toBeNull();
+  });
+});
+
+
+/**
+ * Un pays sans contour de région — le Vatican, Saint-Marin.
+ *
+ * La mécanique d'ouverture est faite pour la France : dix-huit aplats qu'on
+ * ouvre un par un, et les pastilles n'apparaissent que DANS celui qui est
+ * ouvert. Appliquée telle quelle à un État de quarante-quatre hectares, elle
+ * rendait une carte vide — mesuré sur `catalogues/va.json` : dix-neuf lieux,
+ * zéro contour, zéro lieu ouvrable, et un voile sans trou par-dessus.
+ */
+describe('un pays d’un seul tenant', () => {
+  const sansContour = { attribution: '', region: { type: 'FeatureCollection', features: [] } };
+  const vatican = {
+    places: [
+      { id: 'Q12512', name: 'Basilique Saint-Pierre', lat: 41.9022, lon: 12.4534, regionCode: null },
+      { id: 'Q2943', name: 'Chapelle Sixtine', lat: 41.9030, lon: 12.4544, regionCode: null },
+    ],
+    collections: [],
+    themes: [],
+    areas: { region: [], departement: [], commune: [], country: [{ code: 'VA', name: 'Vatican' }] },
+  };
+
+  beforeEach(() => {
+    chargerContours(sansContour as never);
+    chargerCatalogue(vatican as never);
+  });
+
+  it('se reconnaît à l’absence de contour', () => {
+    expect(REGIONS.size).toBe(0);
+    expect(dUnSeulTenant()).toBe(true);
+  });
+
+  it('est ouvert partout : la carte ne peut pas rester vide', () => {
+    expect(regionAu(12.4534, 41.9022)).toBe(PAYS_ENTIER);
+    expect(regionDuCadre([[12.44, 41.89], [12.46, 41.91]])).toBe(PAYS_ENTIER);
+  });
+
+  it('rend TOUT le catalogue à la région ouverte', () => {
+    expect(lieuxDe(PAYS_ENTIER)).toHaveLength(2);
+    // Les lieux n'ont aucun code de région : c'est le test qui échouait avant.
+    expect(places.every((lieu) => !lieu.regionCode)).toBe(true);
+    expect(places.every((lieu) => dansLaRegion(lieu, PAYS_ENTIER))).toBe(true);
+  });
+
+  it('porte le nom du pays, pas le code interne', () => {
+    expect(nomDeRegion(PAYS_ENTIER)).toBe('Vatican');
+  });
+
+  it('perce le voile de son emprise, au lieu de se couvrir lui-même', () => {
+    const anneaux = voile().geometry.coordinates;
+    expect(anneaux).toHaveLength(2);
+    const [[ouest, sud]] = [anneaux[1][0]];
+    expect(ouest).toBeCloseTo(12.4534, 3);
+    expect(sud).toBeCloseTo(41.9022, 3);
+  });
+});
+
+describe('un pays QUI a des régions n’est pas touché', () => {
+  it('ne rend pas le code de pays hors de tout contour', () => {
+    chargerContours({
+      attribution: '',
+      region: {
+        type: 'FeatureCollection',
+        features: [
+          { type: 'Feature', properties: { code: 'G', nom: 'Grande' },
+            geometry: { type: 'Polygon', coordinates: [[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]] } },
+        ],
+      },
+    } as never);
+    chargerCatalogue({
+      places: [], collections: [], themes: [],
+      areas: { region: [], departement: [], commune: [], country: [] },
+    } as never);
+    expect(dUnSeulTenant()).toBe(false);
+    expect(regionAu(5, 5)).toBe('G');
+    expect(regionAu(50, 50)).toBeNull();
   });
 });

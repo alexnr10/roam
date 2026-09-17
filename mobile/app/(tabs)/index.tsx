@@ -17,7 +17,7 @@ import { usePays } from '../../src/store/pays';
 import { bandeau } from '../../src/lib/carte';
 import { etoilesDe } from '../../src/lib/etoiles';
 import { attributionDesContours } from '../../src/data/outlines';
-import { nomDeRegion } from '../../src/lib/regions';
+import { dansLaRegion as estDansLaRegion, nomDeRegion } from '../../src/lib/regions';
 import { evaluateCheckIn, suggestCheckIn } from '../../src/lib/checkin';
 import { distanceToPlace, formatDistance } from '../../src/lib/geo';
 import { useCheckIn } from '../../src/lib/useCheckIn';
@@ -179,7 +179,7 @@ export default function MapScreen() {
    * ou le mieux classé quand on ne sait pas où est l'utilisateur.
    */
   const dansLaRegion = useMemo(
-    () => (regionOuverte ? visible.filter((p) => p.regionCode === regionOuverte) : visible),
+    () => (regionOuverte ? visible.filter((p) => estDansLaRegion(p, regionOuverte)) : visible),
     [visible, regionOuverte],
   );
   const vignettes = useMemo(

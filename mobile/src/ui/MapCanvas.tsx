@@ -16,6 +16,7 @@ import type { Emprise } from '../lib/regions';
 import {
   REGIONS,
   bornesDuPays,
+  dansLaRegion,
   emprise,
   regionAu,
   prochaineOuverture,
@@ -353,7 +354,7 @@ function CarteNative({
    * ce qu'il y a dessous.
    */
   const dedans = useMemo(
-    () => (ouverte ? places.filter((place) => place.regionCode === ouverte) : []),
+    () => (ouverte ? places.filter((place) => dansLaRegion(place, ouverte)) : []),
     [places, ouverte],
   );
   const donnees = useMemo(
