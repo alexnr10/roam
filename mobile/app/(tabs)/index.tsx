@@ -261,7 +261,12 @@ export default function MapScreen() {
           recadrer={retourRegion}
           ouvrir={regionDemandee ? `${regionDemandee}#${n ?? ''}` : null}
           highlightedId={enAvant?.id ?? suggestion?.id ?? null}
-          focus={enAvant ? { lat: enAvant.lat, lon: enAvant.lon } : null}
+          // La région vient du LIEU : lui seul sait où il est rattaché.
+          focus={
+            enAvant
+              ? { lat: enAvant.lat, lon: enAvant.lon, regionCode: enAvant.regionCode }
+              : null
+          }
         />
       </View>
 

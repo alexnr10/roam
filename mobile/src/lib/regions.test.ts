@@ -13,9 +13,13 @@ import {
   regionAu,
   regionDuCadre,
   regionDuDepartement,
+  regionLaMieuxRepresentee,
   remplitLEcran,
   voile,
 } from './regions';
+import type { Emprise } from './regions';
+import { chargerContours } from '../data/outlines';
+import { chargerCatalogue } from '../data/catalog';
 
 describe('emprise', () => {
   it('encadre un polygone simple', () => {
@@ -386,5 +390,58 @@ describe('la projection du croquis', () => {
     const rapport = (Math.max(...ys) - Math.min(...ys)) / (Math.max(...xs) - Math.min(...xs));
     expect(rapport).toBeGreaterThan(0.75);
     expect(rapport).toBeLessThan(1.3);
+  });
+});
+
+describe('regionDuCadre, quand le centre n’est sur aucune région', () => {
+  // Deux régions voisines, et entre elles un TROU — Saint-Marin, qui n'est
+  // dans aucune région italienne parce que c'est un autre pays. Le repli sur
+  // la plus petite emprise y choisissait la mauvaise : celle dont le rectangle
+  // est le plus petit, sans regarder ce qu'il y a dessous.
+  const carre = (x: number, y: number, c: number): number[][] => [
+    [x, y], [x + c, y], [x + c, y + c], [x, y + c], [x, y],
+  ];
+  const contours = {
+    attribution: '',
+    region: {
+      type: 'FeatureCollection',
+      features: [
+        // « Grande » : un carré de dix, au nord du trou.
+        { type: 'Feature', properties: { code: 'G', nom: 'Grande' },
+          geometry: { type: 'Polygon', coordinates: [carre(0, 2, 10)] } },
+        // « Petite » : un carré de trois, au sud du trou. Emprise plus petite.
+        { type: 'Feature', properties: { code: 'P', nom: 'Petite' },
+          geometry: { type: 'Polygon', coordinates: [carre(3, -4, 3)] } },
+      ],
+    },
+  };
+
+  it('ouvre la région des LIEUX qu’on regarde, pas celle au plus petit cadre', () => {
+    chargerContours(contours as never);
+    chargerCatalogue({
+      places: [
+        // Trois lieux dans le trou, rattachés à la GRANDE région.
+        { id: 'a', name: 'a', lat: 0.5, lon: 4.5, regionCode: 'G' },
+        { id: 'b', name: 'b', lat: 0.6, lon: 4.6, regionCode: 'G' },
+        { id: 'c', name: 'c', lat: 0.4, lon: 4.4, regionCode: 'G' },
+        // Un seul rattaché à la petite, et plus loin.
+        { id: 'd', name: 'd', lat: -3.5, lon: 4.5, regionCode: 'P' },
+      ],
+      collections: [], themes: [], areas: { region: [], departement: [], commune: [], country: [] },
+    } as never);
+    // Un cadre centré dans le trou, sur les trois lieux.
+    const cadre: Emprise = [[4.0, 0.0], [5.0, 1.0]];
+    expect(regionAu(4.5, 0.5)).toBeNull();
+    expect(regionLaMieuxRepresentee(cadre)).toBe('G');
+    expect(regionDuCadre(cadre)).toBe('G');
+  });
+
+  it('ne dit rien quand le cadre ne montre aucun lieu', () => {
+    chargerContours(contours as never);
+    chargerCatalogue({
+      places: [], collections: [], themes: [],
+      areas: { region: [], departement: [], commune: [], country: [] },
+    } as never);
+    expect(regionLaMieuxRepresentee([[4.0, 0.0], [5.0, 1.0]])).toBeNull();
   });
 });

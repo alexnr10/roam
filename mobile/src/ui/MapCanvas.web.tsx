@@ -893,6 +893,7 @@ export function MapCanvas({
   // la recherche — l'utilisateur ne pourrait plus la déplacer.
   const focusLat = focus?.lat ?? null;
   const focusLon = focus?.lon ?? null;
+  const focusRegion = focus?.regionCode ?? null;
   useEffect(() => {
     if (!ready || focusLat === null || focusLon === null) return;
     const instance = map.current;
@@ -911,8 +912,8 @@ export function MapCanvas({
     //
     // Ouverte au départ, la région a les deux secondes du vol pour se peupler,
     // et la carte est déjà pleine quand on arrive.
-    const region = regionAu(focusLon, focusLat);
-    if (region && region !== ouverteRef.current) {
+    const region = focusRegion ?? regionAu(focusLon, focusLat);
+    if (region && REGIONS.has(region) && region !== ouverteRef.current) {
       ouverteRef.current = region;
       // `null` et non le zoom courant : c'est le premier `moveend` qui posera
       // l'ancre, à l'altitude d'arrivée. La poser d'ici, au zoom de DÉPART,
@@ -936,7 +937,7 @@ export function MapCanvas({
     // est déjà sous les yeux.
     if (distance > VOYAGE_M) instance.flyTo({ center: cible, zoom, duration: duree, curve: 1.6 });
     else instance.easeTo({ center: cible, zoom, duration: duree });
-  }, [ready, focusLat, focusLon]);
+  }, [ready, focusLat, focusLon, focusRegion]);
 
   // Position de l'utilisateur : un marqueur distinct, pas un point du catalogue.
   useEffect(() => {

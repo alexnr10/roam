@@ -153,6 +153,29 @@ export function regionDuCadre(cadre: Emprise): string | null {
     if (feature && remplitLEcran(emprise(feature.geometry), cadre)) return dessus;
   }
 
+  // Le centre n'est sur AUCUNE région : on demande aux lieux.
+  //
+  // Ce cas n'est pas rare — 130 lieux italiens et 147 français tombent hors de
+  // tout contour, parce que les tracés sont simplifiés et que la mer les
+  // rogne : le Mont Saint-Michel, l'île de Sein, le phare de Cordouan. Et
+  // Saint-Marin, qui n'est dans aucune région italienne pour une raison
+  // autrement meilleure : c'est un autre pays.
+  //
+  // Les LIEUX du cadre savent mieux que les polygones ce qu'on regarde. Le
+  // repli sur la plus petite emprise, lui, ne savait que deviner : au-dessus
+  // de Saint-Marin il choisissait les Marches parce que leur rectangle est
+  // plus petit que celui de l'Émilie-Romagne, à laquelle les lieux de
+  // Saint-Marin sont rattachés. On ouvrait donc une région, et on filtrait les
+  // lieux d'une autre — elles ne se rencontraient jamais.
+  //
+  // Mesuré sur les deux catalogues, en cadrant successivement sur chacun des
+  // 4 156 lieux : 24 lieux dont le cadre ouvrait une autre région que la leur,
+  // 7 après cette règle. Et elle ne s'applique QU'ICI, en repli : essayée
+  // partout, elle faisait passer l'Italie de 14 injoignables à 39, car elle
+  // écrasait alors des réponses justes.
+  const parLesLieux = regionLaMieuxRepresentee(cadre);
+  if (parLesLieux) return parLesLieux;
+
   let meilleure: string | null = null;
   let plusPetite = Infinity;
   for (const [code, feature] of REGIONS) {
@@ -165,6 +188,39 @@ export function regionDuCadre(cadre: Emprise): string | null {
       plusPetite = aire;
       meilleure = code;
     }
+  }
+  return meilleure;
+}
+
+/**
+ * La région dont le cadre montre le plus de lieux, ou `null` s'il n'en montre
+ * aucun.
+ *
+ * Une égalité se tranche par le code, pour que deux appels sur le même cadre
+ * rendent toujours la même chose : une région qui changerait d'un rendu à
+ * l'autre ferait clignoter le bandeau.
+ */
+export function regionLaMieuxRepresentee(cadre: Emprise): string | null {
+  const compte = new Map<string, number>();
+  for (const place of places) {
+    if (!place.regionCode) continue;
+    if (place.lon < cadre[0][0] || place.lon > cadre[1][0]) continue;
+    if (place.lat < cadre[0][1] || place.lat > cadre[1][1]) continue;
+    compte.set(place.regionCode, (compte.get(place.regionCode) ?? 0) + 1);
+  }
+  let meilleure: string | null = null;
+  let plus = 0;
+  for (const [code, combien] of [...compte].sort((a, b) => a[0].localeCompare(b[0]))) {
+    if (combien <= plus) continue;
+    // La même condition que pour l'autre repli, et elle n'est pas
+    // facultative : une région doit REMPLIR l'écran pour être dite ouverte.
+    // Sans elle, une vue de la France entière ouvrait l'Occitanie — celle qui
+    // porte le plus de lieux — au lieu de ne rien ouvrir du tout. Regarder un
+    // pays n'est pas regarder un endroit.
+    const feature = REGIONS.get(code);
+    if (!feature || !remplitLEcran(emprise(feature.geometry), cadre)) continue;
+    plus = combien;
+    meilleure = code;
   }
   return meilleure;
 }

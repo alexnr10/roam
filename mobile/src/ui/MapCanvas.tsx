@@ -105,7 +105,15 @@ export type MapCanvasProps = {
   /** Lieu à mettre en avant (celui qu'on propose de valider, ou le lieu choisi). */
   highlightedId?: string | null;
   /** Lieu sur lequel recentrer la carte, quand le choix vient d'ailleurs. */
-  focus?: { lat: number; lon: number } | null;
+  /**
+   * Où aller, et à quelle RÉGION ce lieu appartient.
+   *
+   * La région vient du lieu et non d'un point sur un polygone : un lieu sait à
+   * quelle région il est rattaché, un contour ne fait que le deviner. Et il
+   * devine mal là où il compte — Saint-Marin n'est dans aucune région
+   * italienne, le Mont Saint-Michel tombe dans la baie.
+   */
+  focus?: { lat: number; lon: number; regionCode?: string | null } | null;
   /**
    * La carte a été touchée AILLEURS que sur un point.
    *
@@ -590,13 +598,14 @@ function CarteNative({
   // frappe dans la recherche.
   const focusLat = focus?.lat ?? null;
   const focusLon = focus?.lon ?? null;
+  const focusRegion = focus?.regionCode ?? null;
   useEffect(() => {
     if (focusLat === null || focusLon === null) return;
     // La région s'ouvre au DÉPART du vol : c'est elle qui pose les pastilles
     // sur la carte, et attendre `moveend` faisait atterrir sur une carte vide
     // qui se remplissait ensuite. Voir la version web, qui le détaille.
-    const region = regionAu(focusLon, focusLat);
-    if (region && region !== ouverteRef.current) {
+    const region = focusRegion ?? regionAu(focusLon, focusLat);
+    if (region && REGIONS.has(region) && region !== ouverteRef.current) {
       ouverteRef.current = region;
       zoomOuverture.current = null;
       setOuverte(region);
@@ -621,7 +630,7 @@ function CarteNative({
     return () => {
       annule = true;
     };
-  }, [focusLat, focusLon]);
+  }, [focusLat, focusLon, focusRegion]);
 
   const couches = useMemo(
     () =>
