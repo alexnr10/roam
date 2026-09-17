@@ -27,18 +27,27 @@ geo:
   require_departement: false
 
 collections:
-  # HUIT, exactement. Mesuré sur la collecte italienne existante : Saint-Marin
-  # y a dix-sept lieux distincts, dont douze passent le plancher d'affichage de
-  # leur thème — mais quatre d'entre eux ne sont pas à Saint-Marin. « Les
-  # Apennins », « la péninsule italienne », « l'Apennin du Nord » et « l'Apennin
-  # tosco-romagnol » y ont été rattachés par PROXIMITÉ, faute de savoir où les
-  # mettre : ce sont des massifs qui traversent l'Italie entière.
+  # SIX, ET NON HUIT — mesuré, et c'est une protection.
   #
-  # Restent huit lieux qui sont vraiment à Saint-Marin : le mont Titano, les
-  # trois tours, la Guaita, la Cesta, le Montale, le Monte San Cristoforo, la
-  # basilique, le palais public. Exactement le plancher.
+  # Le plancher du dépôt est à huit lieux : en dessous, une collection n'en est
+  # pas une. Il vaut pour la France, où un thème qui ne rend que sept lieux a
+  # échoué à trouver son sujet. Il ne vaut pas pour un pays de soixante et un
+  # kilomètres carrés, où le catalogue ENTIER fait huit lieux.
   #
-  # Le laisser à huit est donc un pari serré : un lieu de moins, et le pays
-  # n'aurait AUCUNE collection. Le baisser serait plus sûr, mais une collection
-  # de quatre lieux n'est pas une collection. Huit, et on vérifie au build.
-  min_places: 8
+  # À huit, la construction passe tout juste :
+  #
+  #     Le meilleur de Saint-Marin — 8 lieux, paliers [7, 1, 0]
+  #
+  # C'est-à-dire qu'un seul `drop` en revue ferait tomber la collection à sept,
+  # et le pays n'aurait plus AUCUNE collection : ses lieux seraient écartés
+  # faute de collection, le catalogue servi serait vide, et rien ne le dirait
+  # autrement qu'un avertissement au milieu du `build`. Six laisse deux
+  # arbitrages de marge.
+  #
+  # Le même plancher décide des collections de THÈME, et il faut le vérifier :
+  # une fois `sommets` recollecté sans sa porte « chaîne de montagnes », le
+  # thème le plus fourni du pays en garde quatre. Descendre à six n'en crée
+  # donc aucune. Avant cette recollecte, `sommets` en compte six — les deux
+  # Apennins compris — et une collection de thème apparaît, doublon de la
+  # collection nationale. Elle disparaît avec eux.
+  min_places: 6

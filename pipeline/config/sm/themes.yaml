@@ -4,12 +4,13 @@
 # `labels.yaml` ne suffit pas — la référence resterait, pendante. On vide donc
 # ici ce qu'ils vont chercher.
 #
-# AUCUN THÈME N'EST RETIRÉ, et c'est délibéré. Saint-Marin n'a évidemment ni
-# plage ni volcan, et une dizaine de thèmes ne rendront rien — mais le dépôt
-# ne retire un thème qu'après l'avoir MESURÉ, jamais sur une intuition. Le
-# premier `fetch` dira lesquels rendent zéro, et c'est alors qu'ils
-# sauteront, avec le chiffre en commentaire. Une requête qui ne rend rien coûte
-# une seconde ; un thème retiré à tort coûte un lieu qu'on ne verra jamais.
+# SEIZE THÈMES SONT RETIRÉS, et aucun ne l'a été sur une intuition. Ce fichier
+# a d'abord été écrit sans en retirer un seul, exprès : le dépôt ne retire un
+# thème qu'après l'avoir MESURÉ. Le premier `fetch --pays-config sm` a
+# interrogé vingt-deux thèmes et n'en a rempli que sept ; le septième ne
+# rendait qu'un débordement. Chacun part avec son chiffre en commentaire. Une
+# requête qui ne rend rien coûte une seconde ; un thème retiré à tort coûte un
+# lieu qu'on ne verra jamais.
 
 themes:
   # RETIRÉ, et non vidé : le thème `villages` n'a AUCUNE classe Wikidata et ne
@@ -28,3 +29,88 @@ themes:
   # classes Wikidata du thème restent : elles ne dépendent d'aucun État.
   - id: maisons
     from_labels: []
+
+  # ── Les quinze thèmes que la collecte a rendus VIDES ───────────────────
+  #
+  # Mesuré par le premier `fetch --pays-config sm` : vingt-deux thèmes
+  # interrogés, sept remplis. Ce n'est pas une surprise sur un État de
+  # soixante et un kilomètres carrés, sans côte, sans lac et sans volcan —
+  # mais c'est mesuré, et c'est à cela que sert un premier passage.
+  #
+  # Chacun revient en retirant sa ligne, le jour où un lieu justifierait
+  # qu'on le redemande.
+  - id: abbayes
+    retire: true
+  - id: grottes
+    retire: true
+  - id: megalithes
+    retire: true
+  - id: jardins
+    retire: true
+  - id: phares
+    retire: true
+  - id: ponts
+    retire: true
+  - id: cascades
+    retire: true
+  - id: cirques
+    retire: true
+  - id: gorges
+    retire: true
+  - id: lacs
+    retire: true
+  - id: iles
+    retire: true
+  - id: volcans
+    retire: true
+  - id: dunes-marais
+    retire: true
+  - id: forets
+    retire: true
+  - id: rochers
+    retire: true
+
+  # ── La plage de Saint-Marin : le même faux positif qu'au Vatican ───────
+  #
+  # Ce thème n'est pas rentré vide, et c'est pire. Il a rendu UN candidat :
+  #
+  #     Q145694  Péninsule italienne   103 langues
+  #
+  # Mille kilomètres de botte, déclarée à Saint-Marin parce que Wikidata lui
+  # donne TROIS pays — l'Italie, Saint-Marin et le Vatican. Le catalogue
+  # italien ne s'en aperçoit pas : la péninsule n'a pas de province, et un lieu
+  # sans province sort avant d'être jugé. Saint-Marin n'a PAS de subdivision
+  # (`require_departement: false`), donc rien ne l'arrête.
+  #
+  # Saint-Marin est enclavé dans les terres, à vingt kilomètres de l'Adriatique.
+  # Le thème ne peut rien rendre d'autre qu'un débordement.
+  - id: plages
+    retire: true
+
+  # ── Les sommets : la porte « chaîne de montagnes » ne rend QUE l'Apennin ─
+  #
+  # Le thème a rendu huit candidats, et la porte large les sépare exactement
+  # en deux familles :
+  #
+  #     par une classe PROPRE (montagne, col)      par « chaîne de montagnes »
+  #       Mont Titano             53 langues         Apennins        105 langues
+  #       Guaita                  21                 Apennin du Nord  10
+  #       Montale                 15                 Apennin tosco-   8
+  #       Monte San Cristoforo    14                   romagnol
+  #       Monte Carlo              4
+  #
+  # Les trois de droite sont la même chaîne, longue de mille deux cents
+  # kilomètres, du Piémont à la Calabre. `require_elevation` ne les arrête
+  # pas : deux d'entre elles portent bien une altitude, celle du Corno Grande,
+  # à trois cents kilomètres d'ici. Et l'Apennin, avec ses cent cinq versions
+  # linguistiques, serait devenu le PREMIER LIEU DE SAINT-MARIN.
+  #
+  # La porte reste ouverte en France et en Italie, où elle est mesurée et où
+  # elle rend la Sainte-Victoire et l'Estérel — des massifs qu'on gravit. Un
+  # pays de soixante et un kilomètres carrés n'a pas de massif : tout ce qui
+  # entre par cette porte y est forcément un débordement.
+  #
+  # Les cinq de gauche restent, et ce sont les bons : le mont Titan et les
+  # trois tours qui le couronnent.
+  - id: sommets
+    broad_classes: []

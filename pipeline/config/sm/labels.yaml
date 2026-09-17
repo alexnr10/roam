@@ -48,3 +48,20 @@ labels:
     retire: true
   - id: pavillon-bleu
     retire: true
+
+  # ── L'UNESCO aussi, et c'est mesuré ───────────────────────────────────
+  #
+  # Celui-là avait été gardé, au motif que le bien inscrit englobe le mont
+  # Titan — donc un vrai lieu du catalogue. La collecte dit le contraire :
+  # AUCUN des quinze lieux de Saint-Marin ne porte de label, et le seul membre
+  # que la requête ait trouvé est dans `label-orphelins.csv` :
+  #
+  #     Q15613336  Centre historique de Saint-Marin et mont Titano
+  #
+  # C'est l'ENSEMBLE inscrit, pas un lieu où l'on va : Wikidata ne relie pas
+  # le bien au mont lui-même. Une collection d'un membre qui n'est pas un lieu
+  # n'est pas une collection, et le label interrogeait Wikidata pour rien.
+  #
+  # Il revient le jour où le bien sera relié à ses composantes.
+  - id: unesco
+    retire: true
