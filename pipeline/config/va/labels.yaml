@@ -11,8 +11,21 @@
 # requêtes Wikidata pour rien, et c'est exactement ce qui se voyait au premier
 # `fetch`.
 #
-# L'UNESCO RESTE, et c'est la seule qui le mérite : c'est une liste
-# internationale, et la cité du Vatican tout entière y figure.
+# L'UNESCO EST RETIRÉE ELLE AUSSI, et c'est une mesure qui l'a décidé, pas un
+# principe. Le premier `fetch` lui a trouvé DEUX membres — « Centre historique
+# de Rome, les biens du Saint-Siège… » et « Vatican (Q237) », c'est-à-dire le
+# PAYS lui-même — et les a écartés tous les deux faute de thème.
+#
+# C'est juste : le bien inscrit au patrimoine mondial est la cité du Vatican
+# ENTIÈRE, pas tel ou tel de ses lieux. Le label ne peut donc jamais avoir de
+# membre ici, et il annonçait à chaque construction une collection sans aucun
+# lieu.
+#
+# Il reste actif à Saint-Marin, où le bien inscrit est « le centre historique
+# et le mont Titano » — le mont Titano est un lieu du catalogue.
+#
+# Si Wikidata inscrit un jour un lieu vatican à titre propre, cette ligne
+# saute.
 #
 # Ce qu'il faudrait mettre à la place des quatorze autres se résout avec
 # `suggest-qids` puis `verify-qids`, une liste à la fois. Rien n'est écrit ici
@@ -20,6 +33,8 @@
 # qui ne collecte rien et ne le dit pas.
 
 labels:
+  - id: unesco
+    retire: true
   - id: plus-beaux-villages
     retire: true
   - id: plus-beaux-detours

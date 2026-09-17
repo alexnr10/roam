@@ -29,6 +29,49 @@ themes:
   - id: maisons
     from_labels: []
 
+  # ── Les cathédrales : sans la porte « église », il n'y en a qu'UNE ─────
+  #
+  # Le premier `fetch --pays-config va` a rendu UN lieu pour ce thème : la
+  # basilique Saint-Pierre. Elle est une basilique (Q163687), donc une classe
+  # propre du thème la revendique.
+  #
+  # Tout le reste du Vatican religieux est passé à travers, LA CHAPELLE SIXTINE
+  # COMPRISE — quatre-vingt-dix versions linguistiques, deuxième lieu du pays
+  # par la notoriété. Une chapelle n'est ni une cathédrale ni une basilique :
+  # aucune classe propre ne la réclame.
+  #
+  # Compté sur la collecte italienne, commune du Vatican, thème cathédrales :
+  # dix lieux, dont UN par une classe propre et NEUF par la porte générique
+  # « église ». Ce sont eux qui manquent :
+  #
+  #     Chapelle Sixtine                        90 langues
+  #     Antique basilique vaticane              30
+  #     Chapelle Nicoline                       18
+  #     Chapelle Paolina                        17
+  #     Santo Stefano degli Abissini            12
+  #     Saint-Martin-et-Saint-Sébastien         12
+  #     Sainte-Anne-des-Palefreniers            12
+  #     San Pellegrino                           8
+  #     Santo Stefano degli Ungheresi            8
+  #
+  # C'est le même oubli que pour les places : le Vatican hérite de la
+  # configuration du DÉPÔT, qui est française, et non de celle de l'Italie —
+  # or la porte « église » y a été ouverte pour le pays dont les églises SONT
+  # le patrimoine principal. Le Vatican l'est encore davantage.
+  #
+  # Huit langues, le seuil italien, et pour la même raison : une porte large
+  # cède devant n'importe quelle porte précise, et une église qui est aussi une
+  # basilique reste une basilique.
+  #
+  # PAS DE `catalogue_cap` ici. L'Italie en a un — cent cinquante — parce que
+  # sans lui son catalogue portait deux cent soixante-trois églises, un lieu
+  # sur neuf. Le Vatican fait quarante-quatre hectares : le plafond n'aurait
+  # rien à couper.
+  - id: cathedrales
+    broad_classes:
+      - qid: Q16970
+        fetch_min_sitelinks: 8
+
   # ── Les treize thèmes que la collecte a rendus VIDES ───────────────────
   #
   # Mesuré par le premier `fetch --pays-config va` : zéro lieu pour chacun. Ce
