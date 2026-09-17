@@ -24,6 +24,17 @@ export type Match = {
   place: Place;
   /** Ce qui a répondu : le nom du lieu, ou l'endroit où il se trouve. */
   par: 'nom' | 'lieu';
+  /**
+   * À quel point il répond. Plus c'est haut, mieux c'est.
+   *
+   * Sortie parce que la recherche traverse les frontières : `fusionner`
+   * interroge un catalogue par pays et devait remettre les réponses en ordre.
+   * Sans cette note, elle les empilait pays par pays — et depuis la France,
+   * « basilique saint pierre » rendait la basilique Saint-Pierre-aux-Liens,
+   * italienne, AVANT la basilique Saint-Pierre, vaticane, qui est pourtant le
+   * nom exact. L'échelle n'a pas de sens hors de cette comparaison.
+   */
+  note: number;
 };
 
 const VIDES = new Set([
@@ -41,7 +52,19 @@ export function fold(texte: string): string {
   return texte
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
-    .toLowerCase();
+    .toLowerCase()
+    // LE TRAIT D'UNION EST UNE ESPACE. Personne ne le tape : « basilique saint
+    // pierre » ne trouvait pas « Basilique Saint-Pierre » comme une phrase —
+    // ni égale, ni commençant par, ni contenant — et le lieu ne revenait que
+    // par le repli mot à mot, à la note la plus basse, derrière « Basilique
+    // Saint-Pierre-aux-Liens » qui y arrivait par le même chemin.
+    //
+    // L'apostrophe et le point suivent, pour la même raison : « ile d yeu »,
+    // « mont st michel ». Tout ce qui n'est ni lettre ni chiffre devient une
+    // espace, et les espaces se réduisent à une seule — sans quoi « saint  -
+    // pierre » resterait différent de « saint pierre ».
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
 }
 
 /**
@@ -142,7 +165,6 @@ const PLAFOND_TRADUIT = 2;
 /** Les mots porteurs d'un texte, ponctuation et articles ôtés. */
 function mots(texte: string): string[] {
   return fold(texte)
-    .replace(/[^a-z0-9]+/g, ' ')
     .split(' ')
     .filter((mot) => mot.length > 0 && !VIDES.has(mot));
 }
@@ -267,11 +289,12 @@ export function search(places: Place[], recherche: string, limite = 40): Match[]
 
     if (parNom === 0 && parLieu === 0 && parMots === 0) continue;
     const gagnant = parNom >= parLieu ? 'nom' : 'lieu';
+    const note = parMots > 0
+      ? parMots
+      : gagnant === 'nom' ? parNom * 2 : parLieu * 2 - 1;
     notes.push({
-      match: { place, par: parMots > 0 ? 'nom' : gagnant },
-      note: parMots > 0
-        ? parMots
-        : gagnant === 'nom' ? parNom * 2 : parLieu * 2 - 1,
+      match: { place, par: parMots > 0 ? 'nom' : gagnant, note },
+      note,
       score: place.score ?? 0,
     });
   }

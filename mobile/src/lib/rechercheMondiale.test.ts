@@ -185,3 +185,44 @@ describe('le même lieu dans deux pays', () => {
     ]);
   });
 });
+
+
+/**
+ * La pertinence d'abord, le pays ensuite.
+ *
+ * Chaque catalogue est interrogé séparément, et les réponses étaient empilées
+ * pays par pays : tout l'italien, puis tout le vatican. Depuis la France,
+ * « basilique saint pierre » rendait donc Saint-Pierre-aux-Liens AVANT
+ * Saint-Pierre, qui est le nom exact.
+ */
+describe('l’ordre entre pays', () => {
+  const IT_DEUX = {
+    code: 'IT',
+    name: 'Italie',
+    places: [lieu('Basilique Saint-Pierre-aux-Liens', 111)],
+  };
+  const VA_UN = {
+    code: 'VA',
+    name: 'Vatican',
+    places: [lieu('Basilique Saint-Pierre', 188)],
+  };
+
+  it('classe le nom exact devant, quel que soit le pays d’où l’on cherche', () => {
+    for (const depuis of ['FR', 'IT', 'VA']) {
+      const trouves = fusionner('basilique saint pierre', depuis, [FR, IT_DEUX, VA_UN]);
+      expect(trouves.map((r) => [r.place.name, r.pays])).toEqual([
+        ['Basilique Saint-Pierre', 'VA'],
+        ['Basilique Saint-Pierre-aux-Liens', 'IT'],
+      ]);
+    }
+  });
+
+  it('garde le privilège du pays courant à pertinence ÉGALE', () => {
+    // Deux lieux que « pont » atteint de la même façon : celui d'ici passe
+    // devant, et l'ordre s'inverse quand on change de pays.
+    const ICI = { code: 'FR', name: 'France', places: [lieu('Pont du Gard', 200)] };
+    const LA = { code: 'IT', name: 'Italie', places: [lieu('Pont des Soupirs', 200)] };
+    expect(fusionner('pont', 'FR', [ICI, LA])[0].pays).toBe('FR');
+    expect(fusionner('pont', 'IT', [ICI, LA])[0].pays).toBe('IT');
+  });
+});

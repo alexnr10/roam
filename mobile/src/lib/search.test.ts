@@ -191,3 +191,45 @@ describe('une recherche à plusieurs mots', () => {
       .toBe('Place des Miracles de Lourdes');
   });
 });
+
+
+/**
+ * Le trait d'union, que personne ne tape.
+ *
+ * « basilique saint pierre » ne trouvait pas « Basilique Saint-Pierre » comme
+ * une PHRASE : ni égale, ni commençant par, ni contenant. Le lieu ne revenait
+ * que par le repli mot à mot, à la note la plus basse — donc derrière
+ * « Basilique Saint-Pierre-aux-Liens », qui y arrivait par le même chemin.
+ */
+describe('les séparateurs ne comptent pas', () => {
+  const lieu = (name: string, score = 0): Place =>
+    ({ id: name, slug: name, name, themeId: 'cathedrales', lat: 0, lon: 0, score } as unknown as Place);
+
+  it('lit un nom à trait d’union tapé avec des espaces', () => {
+    expect(fold('Basilique Saint-Pierre')).toBe('basilique saint pierre');
+    expect(fold("Île d'Yeu")).toBe('ile d yeu');
+    expect(fold('  Mont   St-Michel  ')).toBe('mont st michel');
+  });
+
+  it('reconnaît alors le nom EXACT, et le classe devant', () => {
+    const trouves = search(
+      [lieu('Basilique Saint-Pierre-aux-Liens', 111), lieu('Basilique Saint-Pierre', 188)],
+      'basilique saint pierre',
+    );
+    expect(trouves.map((m) => m.place.name)).toEqual([
+      'Basilique Saint-Pierre',
+      'Basilique Saint-Pierre-aux-Liens',
+    ]);
+    // Nom exact contre « commence par » : quatre contre trois, doublés.
+    expect(trouves[0].note).toBe(8);
+    expect(trouves[1].note).toBe(6);
+  });
+
+  it('trouve encore avec le trait d’union, au même rang', () => {
+    const trouves = search(
+      [lieu('Basilique Saint-Pierre-aux-Liens', 111), lieu('Basilique Saint-Pierre', 188)],
+      'basilique saint-pierre',
+    );
+    expect(trouves[0].place.name).toBe('Basilique Saint-Pierre');
+  });
+});

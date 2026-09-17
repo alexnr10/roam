@@ -129,6 +129,28 @@ export function fusionner(
   const ici = fouillables.filter((pays) => pays.code === paysCourant).flatMap(marquer);
   const ailleurs = fouillables.filter((pays) => pays.code !== paysCourant).flatMap(marquer);
 
+  // LA PERTINENCE D'ABORD, LE PAYS ENSUITE — et c'est une correction.
+  //
+  // Chaque catalogue est interrogé séparément, et les réponses étaient
+  // simplement empilées : tout le bloc italien, puis tout le bloc vatican.
+  // Depuis la France, « basilique saint pierre » rendait donc la basilique
+  // Saint-Pierre-aux-Liens AVANT la basilique Saint-Pierre, qui est le nom
+  // exact — la première ligne d'une liste où la bonne réponse était seconde,
+  // sous un nom que l'écran coupe au même endroit.
+  //
+  // Le pays courant garde son privilège, mais à pertinence ÉGALE seulement :
+  // c'est ce que le commentaire de cette fonction promettait déjà. Puis la
+  // notoriété, puis le nom — pour que deux appels rendent toujours le même
+  // ordre.
+  const rangDuPays = (code: string) => (code === paysCourant ? 0 : 1);
+  const classes = [...ici, ...ailleurs].sort(
+    (a, b) =>
+      b.note - a.note
+      || rangDuPays(a.pays) - rangDuPays(b.pays)
+      || (b.place.score ?? 0) - (a.place.score ?? 0)
+      || a.place.name.localeCompare(b.place.name, 'fr'),
+  );
+
   // UN Q-id, UNE ligne — ET C'EST CELLE DU PLUS PETIT PAYS.
   //
   // Deux catalogues peuvent revendiquer le même lieu : la basilique
@@ -149,7 +171,7 @@ export function fusionner(
   const taille = new Map(fouillables.map((pays) => [pays.code, pays.places.length]));
   const rang = new Map<string, number>();
   const uniques: ResultatMondial[] = [];
-  for (const resultat of [...ici, ...ailleurs]) {
+  for (const resultat of classes) {
     const deja = rang.get(resultat.place.id);
     if (deja === undefined) {
       rang.set(resultat.place.id, uniques.length);
