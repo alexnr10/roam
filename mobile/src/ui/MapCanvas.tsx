@@ -139,7 +139,14 @@ export type MapCanvasProps = {
    * carte ne sait rien des pays, elle dit seulement où l'on regarde, et le
    * magasin en tire ce qu'il faut charger.
    */
-  onCentre?: (lon: number, lat: number) => void;
+  /**
+   * Où regarde-t-on, et QUE voit-on ?
+   *
+   * Le centre décide du pays ; le cadre décide de ce qu'on pose dessus. Les
+   * deux partent ensemble parce qu'ils viennent du même `moveend` : demander
+   * le cadre une seconde fois coûterait un aller-retour au moteur de carte.
+   */
+  onCentre?: (lon: number, lat: number, cadre: Emprise | null) => void;
   /**
    * Demande de retour à la France entière.
    *
@@ -212,7 +219,7 @@ function toFeatureCollection(
         // ouverte changeait de sens d'un vol à l'autre — le même château
         // grossissait en passant la frontière, ce qu'aucune carte ne devrait
         // faire.
-        tier: 4 - etoilesDe(place.id),
+        tier: 4 - (place.etoiles ?? etoilesDe(place.id)),
         themeId: place.themeId,
       },
     })),
@@ -440,13 +447,13 @@ function CarteNative({
    */
   const surMouvement = useCallback(
     async (etat: { center: [number, number]; zoom: number }) => {
-      // Avant tout le reste : où regarde-t-on ? C'est de cette seule question
-      // que dépend le pays, et elle ne coûte rien.
-      surCentre.current?.(etat.center[0], etat.center[1]);
       // Le cadre n'est pas encore mesuré : on ne sait pas ce que « remplir
       // l'écran » veut dire, et répondre sur un rectangle vide reviendrait à
       // refermer une région que l'utilisateur vient d'ouvrir.
       const bande = await cadreLibre();
+      // Où regarde-t-on, et que voit-on ? Le centre décide du pays, le cadre
+      // de ce qu'on pose dessus. Un seul appel, mesuré une seule fois.
+      surCentre.current?.(etat.center[0], etat.center[1], bande ?? null);
       if (!bande) return;
       const vu = etat.zoom < SEUIL_REGION ? null : regionDuCadre(bande);
       const suite = prochaineOuverture(

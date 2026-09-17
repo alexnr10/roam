@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
   Platform,
@@ -18,6 +18,9 @@ import { bandeau } from '../../src/lib/carte';
 import { etoilesDe } from '../../src/lib/etoiles';
 import { attributionDesContours } from '../../src/data/outlines';
 import { dansLaRegion as estDansLaRegion, nomDeRegion } from '../../src/lib/regions';
+import type { Emprise as EmpriseCarte } from '../../src/lib/regions';
+import { enBoite, useLieuxDesEnclaves } from '../../src/lib/enclaves';
+import type { Emprise } from '../../src/lib/pays';
 import { evaluateCheckIn, suggestCheckIn } from '../../src/lib/checkin';
 import { distanceToPlace, formatDistance } from '../../src/lib/geo';
 import { useCheckIn } from '../../src/lib/useCheckIn';
@@ -143,10 +146,41 @@ export default function MapScreen() {
   // les dépendances de tout ce qui en dérive.
   const version = useCatalogue();
   const { pays, disponibles, regarder, choisir } = usePays();
-  const visible = useMemo(
+  const duPays = useMemo(
     () => (theme ? allPlaces.filter((p) => p.themeId === theme) : allPlaces),
     [theme, version],
   );
+
+  /**
+   * Ce que la carte montre, et le pays qui l'entoure.
+   *
+   * Le centre décide du pays, le cadre de ce qu'on pose dessus : les deux
+   * arrivent du même mouvement de caméra.
+   */
+  const [cadre, setCadre] = useState<Emprise | null>(null);
+  const surLeCentre = useCallback(
+    (lon: number, lat: number, vu: EmpriseCarte | null) => {
+      regarder(lon, lat);
+      setCadre(vu ? enBoite(vu) : null);
+    },
+    [regarder],
+  );
+
+  /**
+   * Le Vatican, vu depuis Rome.
+   *
+   * Ses dix-neuf lieux ne sont plus au catalogue italien depuis qu'il est un
+   * pays à part entière, et la carte romaine s'ouvrait donc sur un trou de
+   * quarante-quatre hectares à l'endroit où le guide a le plus à dire.
+   * Personne, devant le Château Saint-Ange, ne se demande dans quel État il
+   * se trouve.
+   */
+  const voisins = useLieuxDesEnclaves(cadre, pays, disponibles);
+  const visible = useMemo(() => {
+    if (voisins.length === 0) return duPays;
+    const gardes = theme ? voisins.filter((p) => p.themeId === theme) : voisins;
+    return [...duPays, ...gardes];
+  }, [duPays, voisins, theme]);
 
   const themeOptions = useMemo(
     () => [
@@ -187,11 +221,31 @@ export default function MapScreen() {
     [dansLaRegion, position],
   );
 
-  /** Le titre du bandeau : ce qu'on regarde, en toutes lettres. */
+  /**
+   * Le titre du bandeau : ce qu'on regarde, en toutes lettres.
+   *
+   * Le bandeau montre ce que la carte montre, Vatican compris — on veut
+   * pouvoir faire défiler jusqu'à Saint-Pierre depuis Rome. Mais dix-neuf de
+   * ces lieux ne sont pas « en Latium », et le titre ne doit pas le dire : il
+   * nomme alors les deux territoires, sans article pour ne pas avoir à
+   * décliner « au Vatican » et « en Émilie-Romagne ».
+   */
+  const paysPoses = useMemo(() => {
+    const codes = new Set(
+      dansLaRegion.map((p) => p.paysDOrigine).filter((code): code is string => Boolean(code)),
+    );
+    return [...codes]
+      .map((code) => disponibles.find((p) => p.code === code)?.name ?? code)
+      .sort((a, b) => a.localeCompare(b, 'fr'));
+  }, [dansLaRegion, disponibles]);
   const titreDuBandeau = regionOuverte
-    ? `${dansLaRegion.length} LIEU${dansLaRegion.length > 1 ? 'X' : ''} EN ${nomDeRegion(
-        regionOuverte,
-      ).toUpperCase()}`
+    ? paysPoses.length
+      ? `${dansLaRegion.length} LIEUX · ${[nomDeRegion(regionOuverte), ...paysPoses]
+          .join(' ET ')
+          .toUpperCase()}`
+      : `${dansLaRegion.length} LIEU${dansLaRegion.length > 1 ? 'X' : ''} EN ${nomDeRegion(
+          regionOuverte,
+        ).toUpperCase()}`
     : 'AUTOUR DE TOI';
 
   /**
@@ -225,6 +279,21 @@ export default function MapScreen() {
     setChoisi(resultat.place);
   };
 
+  /**
+   * Toucher une pastille — la sienne, ou celle d'une enclave posée dessus.
+   *
+   * Un lieu du Vatican touché depuis Rome demande d'abord que son catalogue
+   * devienne actif : sans quoi la vignette porterait un identifiant que le
+   * catalogue courant ne connaît pas, et sa fiche s'ouvrirait sur du vide.
+   * C'est exactement ce que fait déjà un résultat de recherche d'ailleurs.
+   */
+  const ouvrirLieu = async (place: Place) => {
+    if (place.paysDOrigine && place.paysDOrigine !== pays) {
+      await choisir(place.paysDOrigine, false);
+    }
+    setChoisi(place);
+  };
+
   // La validation vient à l'utilisateur, pas l'inverse.
   const suggestion = useMemo(
     () => suggestCheckIn(allPlaces, position, visitedIds),
@@ -250,13 +319,13 @@ export default function MapScreen() {
           places={visible}
           visitedIds={visitedIds}
           position={position}
-          onSelectPlace={setChoisi}
+          onSelectPlace={ouvrirLieu}
           // Toucher la carte à côté d'un point rend le bandeau : sans ce
           // retour, la fiche restait ouverte pour de bon et les lieux voisins
           // disparaissaient jusqu'au changement d'onglet.
           onDeselect={() => setChoisi(null)}
           onRegionChange={setRegionOuverte}
-          onCentre={regarder}
+          onCentre={surLeCentre}
           retour={retourFrance}
           recadrer={retourRegion}
           ouvrir={regionDemandee ? `${regionDemandee}#${n ?? ''}` : null}

@@ -112,7 +112,7 @@ function toFeatureCollection(
         // ouverte changeait de sens d'un vol à l'autre — le même château
         // grossissait en passant la frontière, ce qu'aucune carte ne devrait
         // faire.
-        tier: 4 - etoilesDe(place.id),
+        tier: 4 - (place.etoiles ?? etoilesDe(place.id)),
         themeId: place.themeId,
         rang: rangs[index],
       },
@@ -485,7 +485,7 @@ export function MapCanvas({
           // Avant tout le reste : où regarde-t-on ? C'est de cette seule
           // question que dépend le pays, et elle ne coûte rien.
           const centre = instance.getCenter();
-          onCentreRef.current?.(centre.lng, centre.lat);
+          onCentreRef.current?.(centre.lng, centre.lat, cadreLibre(instance));
           const zoom = instance.getZoom();
           const vue = regionSousLaCamera(instance);
           const suite = prochaineOuverture(

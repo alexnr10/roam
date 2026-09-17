@@ -30,6 +30,25 @@ export type Place = {
    */
   departementCode: string | null;
   regionCode: string | null;
+  /**
+   * Le pays d'où ce lieu VIENT, quand ce n'est pas celui qu'on regarde.
+   *
+   * Absent pour la quasi-totalité du catalogue : un lieu appartient au pays
+   * actif, et le dire à chaque ligne serait du bruit. Il n'est posé que sur
+   * les lieux d'une enclave qu'on affiche par-dessus le pays courant — le
+   * Vatican vu depuis Rome. Ils ne sont d'aucune région d'ici, et les ouvrir
+   * demande d'abord de changer de catalogue : ces deux règles se lisent sur
+   * cette seule marque.
+   */
+  paysDOrigine?: string;
+  /**
+   * La note, quand elle ne peut pas se calculer ici.
+   *
+   * `etoilesDe` lit les collections du catalogue ACTIF : un lieu du Vatican
+   * posé sur la carte italienne n'y est dans aucune, et tomberait sur une
+   * étoile. Elle voyage donc avec lui, calculée chez lui.
+   */
+  etoiles?: 1 | 2 | 3;
   communeCode?: string | null;
   communeName?: string | null;
   summary?: string | null;

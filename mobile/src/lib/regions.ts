@@ -125,8 +125,18 @@ export function regionConnue(code: string | null): boolean {
   return REGIONS.has(code) || (code === PAYS_ENTIER && dUnSeulTenant());
 }
 
-/** Ce lieu est-il dans la région ouverte ? */
-export function dansLaRegion(place: { regionCode?: string | null }, code: string): boolean {
+/**
+ * Ce lieu est-il dans la région ouverte ?
+ *
+ * Un lieu VENU D'AILLEURS y est toujours : il n'est d'aucune région d'ici, et
+ * s'il est sur la carte c'est parce qu'il est dans le cadre — le Vatican vu
+ * depuis Rome. Le filtre par région ne le concerne pas.
+ */
+export function dansLaRegion(
+  place: { regionCode?: string | null; paysDOrigine?: string },
+  code: string,
+): boolean {
+  if (place.paysDOrigine) return true;
   return code === PAYS_ENTIER || place.regionCode === code;
 }
 
