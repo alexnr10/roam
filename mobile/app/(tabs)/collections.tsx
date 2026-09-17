@@ -65,7 +65,9 @@ export default function ExplorerScreen() {
       .map((code) => ({ code, nom: nomDeRegion(code), lieux: compte.get(code) ?? 0 }))
       .filter((entree) => entree.lieux > 0)
       .sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
-  }, []);
+    // `catalogue` et non `[]` : la liste était figée à celle du pays de
+    // départ, et survivait donc à une bascule de pays.
+  }, [catalogue]);
   const metropole = regionsCarte.filter((entree) => !OUTRE_MER.has(entree.code));
   const outreMer = regionsCarte.filter((entree) => OUTRE_MER.has(entree.code));
 
@@ -76,6 +78,12 @@ export default function ExplorerScreen() {
 
   const themes = collections.filter((c) => c.kind === 'theme');
   const labels = collections.filter((c) => c.kind === 'label');
+  // « Le meilleur du Vatican », « Le meilleur de France » : la collection du
+  // PAYS n'avait aucune porte sur cet écran — on ne l'atteignait que par la
+  // barre de recherche, en sachant qu'elle existe. Sur un pays qui n'a que
+  // celle-là, Explorer s'ouvrait donc entièrement vide, avec le seul
+  // intertitre « Par région » posé sur rien.
+  const duPays = collections.filter((c) => c.kind === 'geo' && c.geoLevel === 'country');
 
   return (
     <ScrollView
@@ -105,6 +113,13 @@ export default function ExplorerScreen() {
         />
       ) : (
         <>
+          <Bloc
+            titre="Le meilleur du pays"
+            blurb="Ce qu'il faut avoir vu, tous thèmes confondus"
+            items={duPays}
+            router={router}
+          />
+
           {proches.length ? (
             <Bloc
               titre="Autour de toi"
@@ -128,13 +143,20 @@ export default function ExplorerScreen() {
             router={router}
           />
 
-          <Text style={[type.heading, { marginTop: spacing.xl }]}>Par région</Text>
-          <Text style={[type.small, { marginBottom: spacing.md }]}>
-            Touche une région : elle s'ouvre sur la carte, cadrée, avec ses lieux
-          </Text>
-          {metropole.map((entree) => (
-            <LigneRegion key={entree.code} entree={entree} onOuvrir={ouvrirSurLaCarte} />
-          ))}
+          {/* L'intertitre suit ses lignes. Un pays sans subdivision — le
+              Vatican, Saint-Marin — n'a aucune région à lister, et « Par
+              région » s'affichait seul au-dessus du vide. */}
+          {metropole.length ? (
+            <>
+              <Text style={[type.heading, { marginTop: spacing.xl }]}>Par région</Text>
+              <Text style={[type.small, { marginBottom: spacing.md }]}>
+                Touche une région : elle s'ouvre sur la carte, cadrée, avec ses lieux
+              </Text>
+              {metropole.map((entree) => (
+                <LigneRegion key={entree.code} entree={entree} onOuvrir={ouvrirSurLaCarte} />
+              ))}
+            </>
+          ) : null}
 
           {/* L'outre-mer a sa porte d'entrée, et c'est ICI qu'elle est.
               Sur la carte, cadrée sur la métropole, ces cinq régions sont hors

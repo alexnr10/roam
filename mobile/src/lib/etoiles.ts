@@ -51,15 +51,39 @@ let parLieu = new Map<string, Etoiles>();
  */
 function indexer(): void {
   parLieu = new Map<string, Etoiles>();
-  for (const collection of collections) {
-    // La collection NATIONALE d'un thème : pas de code géographique.
-    if (collection.kind !== 'theme' || collection.geoCode) continue;
+  const noter = (collection: (typeof collections)[number]) => {
     for (const membre of collection.places) {
       // Niveau 1 → trois étoiles, niveau 3 → une.
       const note = (4 - membre.tier) as Etoiles;
       const connu = parLieu.get(membre.placeId);
       if (connu === undefined || note > connu) parLieu.set(membre.placeId, note);
     }
+  };
+
+  let parTheme = false;
+  for (const collection of collections) {
+    // La collection NATIONALE d'un thème : pas de code géographique.
+    if (collection.kind !== 'theme' || collection.geoCode) continue;
+    parTheme = true;
+    noter(collection);
+  }
+  if (parTheme) return;
+
+  // AUCUNE collection thématique : tout le pays valait alors une étoile.
+  //
+  // Un thème n'a de collection qu'à partir de huit lieux. Le Vatican en compte
+  // dix-neuf en tout, son thème le plus fourni en garde cinq : il n'a donc
+  // aucune collection de thème, et ses dix-neuf lieux tombaient tous sur le
+  // défaut — la basilique Saint-Pierre à une étoile, grise, alors qu'elle en
+  // porte trois de l'autre côté de la rue.
+  //
+  // À cette échelle, la collection du PAYS est le barème : « Le meilleur du
+  // Vatican » compare exactement ce qu'il y a à comparer. On ne s'en sert que
+  // faute de mieux — là où des collections thématiques existent, ce sont elles
+  // qui notent, et rien ne change.
+  for (const collection of collections) {
+    if (collection.kind !== 'geo' || collection.geoLevel !== 'country') continue;
+    noter(collection);
   }
 }
 

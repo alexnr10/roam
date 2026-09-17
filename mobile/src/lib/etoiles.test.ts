@@ -1,4 +1,5 @@
-import { collections, places } from '../data/catalog';
+import { chargerCatalogue, collections, places } from '../data/catalog';
+import catalogueFrancais from '../data/catalog.json';
 import { MENTIONS, etoilesDe, repartition } from './etoiles';
 
 describe('etoilesDe', () => {
@@ -62,5 +63,69 @@ describe('etoilesDe', () => {
     // comparaison est la catégorie.
     const cascades = places.filter((place) => place.themeId === 'cascades');
     expect(cascades.some((place) => etoilesDe(place.id) === 3)).toBe(true);
+  });
+});
+
+
+/**
+ * Un pays trop petit pour avoir des collections de thème.
+ *
+ * Un thème n'en a une qu'à partir de huit lieux. Le Vatican compte dix-neuf
+ * lieux en tout, et son thème le plus fourni en garde cinq : aucune collection
+ * de thème, donc aucun barème — ses dix-neuf lieux tombaient tous sur le défaut
+ * d'une étoile, la basilique Saint-Pierre comprise.
+ */
+describe('un pays sans collection de thème', () => {
+  const vatican = {
+    places: [
+      { id: 'Q12512', name: 'Basilique Saint-Pierre', themeId: 'cathedrales', lat: 0, lon: 0, score: 188 },
+      { id: 'Q2943', name: 'Chapelle Sixtine', themeId: 'cathedrales', lat: 0, lon: 0, score: 138 },
+      { id: 'Q3671583', name: 'Église San Pellegrino', themeId: 'cathedrales', lat: 0, lon: 0, score: 60 },
+    ],
+    collections: [
+      {
+        slug: 'geo-country-va',
+        name: 'Le meilleur du Vatican',
+        kind: 'geo',
+        geoLevel: 'country',
+        geoCode: 'VA',
+        places: [
+          { placeId: 'Q12512', rank: 1, tier: 1 },
+          { placeId: 'Q2943', rank: 2, tier: 2 },
+          { placeId: 'Q3671583', rank: 3, tier: 3 },
+        ],
+      },
+    ],
+    themes: [],
+    areas: { region: [], departement: [], commune: [], country: [{ code: 'VA', name: 'Vatican' }] },
+  };
+
+  afterAll(() => chargerCatalogue(catalogueFrancais as never));
+
+  it('note sur la collection du PAYS, faute de mieux', () => {
+    chargerCatalogue(vatican as never);
+    expect(collections.filter((c) => c.kind === 'theme')).toHaveLength(0);
+    expect(etoilesDe('Q12512')).toBe(3);
+    expect(etoilesDe('Q2943')).toBe(2);
+    expect(etoilesDe('Q3671583')).toBe(1);
+  });
+
+  it('ne s’en sert PAS là où des thèmes existent', () => {
+    // La France a ses vingt-trois collections de thème : la collection du pays
+    // ne doit rien y changer, sinon les quatre-vingts lieux du « Meilleur de
+    // France » gagneraient des étoiles que leur thème leur refuse.
+    chargerCatalogue(catalogueFrancais as never);
+    const meilleurDeFrance = collections.find((c) => c.slug === 'geo-country-fr');
+    expect(meilleurDeFrance).toBeDefined();
+    const dernier = meilleurDeFrance!.places.find((m) => m.tier === 3);
+    expect(dernier).toBeDefined();
+    // Son thème peut très bien ne lui donner qu'une étoile, et c'est lui qui
+    // décide : la note ne vient pas de la collection géographique.
+    const parTheme = collections
+      .filter((c) => c.kind === 'theme' && !c.geoCode)
+      .flatMap((c) => c.places)
+      .filter((m) => m.placeId === dernier!.placeId);
+    const attendue = parTheme.length ? Math.max(...parTheme.map((m) => 4 - m.tier)) : 1;
+    expect(etoilesDe(dernier!.placeId)).toBe(attendue);
   });
 });
