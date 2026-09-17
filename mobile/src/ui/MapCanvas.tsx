@@ -593,6 +593,16 @@ function CarteNative({
   const focusLon = focus?.lon ?? null;
   useEffect(() => {
     if (focusLat === null || focusLon === null) return;
+    // La région s'ouvre au DÉPART du vol : c'est elle qui pose les pastilles
+    // sur la carte, et attendre `moveend` faisait atterrir sur une carte vide
+    // qui se remplissait ensuite. Voir la version web, qui le détaille.
+    const region = regionAu(focusLon, focusLat);
+    if (region && region !== ouverteRef.current) {
+      ouverteRef.current = region;
+      zoomOuverture.current = null;
+      setOuverte(region);
+      surRegion.current?.(region);
+    }
     let annule = false;
     (async () => {
       const zoom = (await carte.current?.getZoom()) ?? 0;

@@ -904,6 +904,30 @@ export function MapCanvas({
     if (!ready || focusLat === null || focusLon === null) return;
     const instance = map.current;
     if (!instance) return;
+
+    // LA RÉGION S'OUVRE AU DÉPART DU VOL, PAS À L'ARRIVÉE.
+    //
+    // Les pastilles ne sont posées sur la carte qu'au moment où la région
+    // s'ouvre, et la région ne s'ouvrait qu'à `moveend` — donc une fois la
+    // caméra posée. On atterrissait sur une carte VIDE, et elle se remplissait
+    // ensuite : le temps de l'aller-retour React, celui du téléversement des
+    // points, et celui de la cascade, tout cela APRÈS l'atterrissage, à
+    // l'instant précis où le navigateur est le plus occupé à décoder les
+    // tuiles du nouvel endroit. Le délai ne se voit donc pas ici, où il n'y a
+    // pas de tuiles à charger, mais il se voit sur un téléphone.
+    //
+    // Ouverte au départ, la région a les deux secondes du vol pour se peupler,
+    // et la carte est déjà pleine quand on arrive.
+    const region = regionAu(focusLon, focusLat);
+    if (region && region !== ouverteRef.current) {
+      ouverteRef.current = region;
+      // `null` et non le zoom courant : c'est le premier `moveend` qui posera
+      // l'ancre, à l'altitude d'arrivée. La poser d'ici, au zoom de DÉPART,
+      // ferait croire à un dézoom dès l'atterrissage et refermerait la région.
+      zoomOuverture.current = null;
+      setOuverte(region);
+      onRegion.current?.(region);
+    }
     // Un GLISSEMENT quand la cible est à l'écran, un VOL quand elle n'y est
     // pas. Glisser de la Bretagne à la Sicile en six cents millisecondes ne
     // montre rien : la carte devient un flou, et on ne sait pas où l'on
