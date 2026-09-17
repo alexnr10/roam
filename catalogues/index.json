@@ -1289,7 +1289,14 @@
       "name": "Vatican",
       "fichier": "va.json",
       "lieux": 19,
-      "emprises": []
+      "emprises": [
+        [
+          12.4483,
+          41.9019,
+          12.4575,
+          41.9064
+        ]
+      ]
     }
   ]
 }

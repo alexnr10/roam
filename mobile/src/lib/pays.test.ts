@@ -55,3 +55,46 @@ describe('paysAAdopter', () => {
     expect(paysAAdopter(12.5, 41.9, 'ZZ', CONNUS)).toBe('IT');
   });
 });
+
+/**
+ * L'enclave : un pays DANS le pays courant.
+ *
+ * On ne sort jamais de l'Italie en entrant au Vatican. L'hystérésis, qui
+ * protège la frontière franco-italienne du clignotement, répondait donc
+ * « reste en Italie » au-dessus même de Saint-Pierre, et le Vatican était
+ * inatteignable par la carte — mesuré sur les emprises réellement servies.
+ */
+describe('une enclave', () => {
+  // Les emprises RÉELLES de `catalogues/index.json` : celle du Vatican est
+  // celle de ses dix-neuf lieux, celle de la province de Rome contient Rome.
+  const VA: PaysConnu = { code: 'VA', name: 'Vatican', emprises: [[12.4483, 41.9019, 12.4575, 41.9064]] };
+  const ITALIE: PaysConnu = { code: 'IT', name: 'Italie', emprises: [[11.7, 41.3, 13.3, 42.3]] };
+  const SAINT_PIERRE = [12.4534, 41.9022] as const;
+
+  it('est bien DANS le pays courant, ce qui bloquait tout', () => {
+    expect(dansLEmprise(SAINT_PIERRE[0], SAINT_PIERRE[1], ITALIE.emprises)).toBe(true);
+    expect(dansLEmprise(SAINT_PIERRE[0], SAINT_PIERRE[1], VA.emprises)).toBe(true);
+  });
+
+  it('s’adopte quand même : y entrer est un geste, pas un tremblement', () => {
+    expect(paysAAdopter(SAINT_PIERRE[0], SAINT_PIERRE[1], 'IT', [ITALIE, VA])).toBe('VA');
+  });
+
+  it('se quitte en en sortant', () => {
+    // Le Colisée : hors du Vatican, dans l'Italie. La règle du candidat unique
+    // suffit, elle n'a pas changé.
+    expect(paysAAdopter(12.4922, 41.8902, 'VA', [ITALIE, VA])).toBe('IT');
+  });
+
+  it('ne fait PAS basculer un voisin qui déborde', () => {
+    // La France n'est pas dans la boîte italienne : la frontière garde son
+    // hystérésis, et le mont Blanc ne clignote pas.
+    expect(paysAAdopter(6.86, 45.83, 'FR', CONNUS)).toBeNull();
+    expect(paysAAdopter(6.86, 45.83, 'IT', CONNUS)).toBeNull();
+  });
+
+  it('ne devine pas entre deux enclaves superposées', () => {
+    const AUTRE: PaysConnu = { code: 'XX', name: 'Autre', emprises: [[12.44, 41.90, 12.46, 41.91]] };
+    expect(paysAAdopter(SAINT_PIERRE[0], SAINT_PIERRE[1], 'IT', [ITALIE, VA, AUTRE])).toBeNull();
+  });
+});

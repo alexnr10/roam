@@ -128,7 +128,21 @@ export function fusionner(
 
   const ici = fouillables.filter((pays) => pays.code === paysCourant).flatMap(marquer);
   const ailleurs = fouillables.filter((pays) => pays.code !== paysCourant).flatMap(marquer);
-  return [...ici, ...ailleurs].slice(0, limite);
+
+  // UN Q-id, UNE ligne. Deux catalogues peuvent revendiquer le même lieu — la
+  // basilique Saint-Pierre est Q12512 en Italie ET au Vatican tant que la
+  // collecte italienne absorbe l'enclave — et la recherche le montrait deux
+  // fois, sans rien pour les distinguer qu'une pastille de pays. C'est une
+  // faute de données, mais l'écran n'a pas à la répéter : la première
+  // occurrence gagne, donc celle du pays qu'on regarde.
+  const vus = new Set<string>();
+  const uniques: ResultatMondial[] = [];
+  for (const resultat of [...ici, ...ailleurs]) {
+    if (vus.has(resultat.place.id)) continue;
+    vus.add(resultat.place.id);
+    uniques.push(resultat);
+  }
+  return uniques.slice(0, limite);
 }
 
 export function useRechercheMondiale(

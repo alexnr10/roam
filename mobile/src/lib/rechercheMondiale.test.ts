@@ -130,3 +130,43 @@ describe('sur les catalogues publiés', () => {
     expect(trouves[0].pays).toBe('FR');
   });
 });
+
+/**
+ * Un Q-id, une ligne.
+ *
+ * Deux catalogues peuvent revendiquer le même lieu : la basilique Saint-Pierre
+ * est Q12512 en Italie ET au Vatican, tant que la collecte italienne absorbe
+ * l'enclave. C'est une faute de données, et elle se répare à la collecte — mais
+ * l'écran n'a pas à la répéter.
+ */
+describe('le même lieu dans deux pays', () => {
+  const saintPierre = lieu('Basilique Saint-Pierre', 180);
+  const ITALIE = { code: 'IT', name: 'Italie', places: [saintPierre, lieu('Colisée', 300)] };
+  const VATICAN = { code: 'VA', name: 'Vatican', places: [saintPierre] };
+
+  it('ne sort qu’une fois, celle du pays qu’on regarde', () => {
+    const trouves = fusionner('basilique saint-pierre', 'IT', [ITALIE, VATICAN]);
+    expect(trouves).toHaveLength(1);
+    expect(trouves[0].pays).toBe('IT');
+  });
+
+  it('et celle du Vatican quand c’est lui qu’on regarde', () => {
+    const trouves = fusionner('basilique saint-pierre', 'VA', [ITALIE, VATICAN]);
+    expect(trouves).toHaveLength(1);
+    expect(trouves[0].pays).toBe('VA');
+  });
+
+  it('ne confond pas deux lieux qui commencent pareil', () => {
+    // Deux basiliques romaines DIFFÉRENTES, et non un doublon : elles doivent
+    // rester toutes les deux. C'est l'affichage qui les coupait à une ligne.
+    const auxLiens = lieu('Basilique Saint-Pierre-aux-Liens', 110);
+    const trouves = fusionner('basilique saint-pierre', 'IT', [
+      { code: 'IT', name: 'Italie', places: [saintPierre, auxLiens] },
+      VATICAN,
+    ]);
+    expect(trouves.map((r) => r.place.name)).toEqual([
+      'Basilique Saint-Pierre',
+      'Basilique Saint-Pierre-aux-Liens',
+    ]);
+  });
+});

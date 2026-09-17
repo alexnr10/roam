@@ -3720,6 +3720,25 @@ def ecrire_catalogues_servis(places, collections, config, dossier: Path) -> list
             for zone in couches["departement"].zones
             if zone.bbox[2] >= zone.bbox[0]
         ]
+    if not emprises:
+        # UN PAYS SANS SUBDIVISION N'AVAIT AUCUNE EMPRISE, donc l'application ne
+        # pouvait pas savoir qu'on venait d'y entrer : `paysAAdopter` écarte
+        # explicitement un pays dont la liste est vide. Le Vatican était servi,
+        # téléchargeable, et inatteignable par la carte.
+        #
+        # L'étendue de ses lieux fait l'affaire. Ce n'est pas la frontière — le
+        # rectangle des dix-neuf lieux du Vatican en couvre l'essentiel sans la
+        # suivre — mais l'emprise n'a jamais servi qu'à cela : reconnaître qu'on
+        # est ARRIVÉ. Pour un État qui tient dans un écran, un rectangle le dit
+        # aussi bien que quarante boîtes départementales le disent de la France.
+        coins = [(p.lon, p.lat) for p in places if p.lat is not None and p.lon is not None]
+        if coins:
+            lons = [lon for lon, _ in coins]
+            lats = [lat for _, lat in coins]
+            emprises = [[
+                round(min(lons), 4), round(min(lats), 4),
+                round(max(lons), 4), round(max(lats), 4),
+            ]]
 
     lignes: list[str] = []
     index: list[dict] = []

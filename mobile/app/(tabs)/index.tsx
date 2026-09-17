@@ -360,7 +360,13 @@ export default function MapScreen() {
                   height={52}
                 />
                 <View style={{ flex: 1 }}>
-                  <Text style={type.body} numberOfLines={1}>
+                  {/* DEUX lignes, et c'est une correction. « Basilique
+                      Saint-Pierre » et « Basilique Saint-Pierre-aux-Liens »
+                      sont deux basiliques romaines différentes ; coupées à une
+                      ligne, elles s'affichaient toutes deux « Basilique
+                      Saint-Pierre… », au-dessus du même « Roma · Rome ». Deux
+                      lignes tiennent dans la hauteur de la photo. */}
+                  <Text style={type.body} numberOfLines={2}>
                     {item.place.name}
                   </Text>
                   <Text style={type.small} numberOfLines={1}>
