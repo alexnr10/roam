@@ -113,6 +113,15 @@ describe('sur les catalogues publiés', () => {
     expect(noms('ile')).toContain('Isola del Giglio');
   });
 
+  epreuve('lit une recherche à plusieurs mots, langues mêlées', () => {
+    const catalogues = charger();
+    const noms = (q: string) => fusionner(q, 'FR', catalogues, 40).map((r) => r.place.name);
+    // Les trois formes que quelqu'un tapera pour le même lieu.
+    expect(noms('piazza dei miracoli')).toContain('Piazza dei Miracoli');
+    expect(noms('place dei miracoli')).toContain('Piazza dei Miracoli');
+    expect(noms('place des miracles')).toContain('Piazza dei Miracoli');
+  });
+
   epreuve('ne dérange pas la recherche française', () => {
     // Le garde-fou, sur les vraies données : ce qu'on cherchait en France
     // arrive toujours en tête, pays courant d'abord.

@@ -206,21 +206,23 @@ export default function MapScreen() {
   const enRecherche = query.trim().length >= MIN_CARACTERES;
 
   /**
-   * Ouvrir un résultat, d'ici ou d'ailleurs.
+   * Aller à un résultat — d'ici ou d'ailleurs, et de la même façon.
    *
-   * Un lieu du pays courant se pose sur la carte — on veut le VOIR où il est.
+   * On NE VA PAS sur la fiche. La carte voyage jusqu'au lieu et pose sa
+   * vignette en bas ; ouvrir la fiche reste un second geste, que l'utilisateur
+   * fait s'il le veut. Un résultat de recherche répond d'abord à « où est-ce,
+   * au juste ? » — et la fiche, qui couvre la carte, escamotait la réponse.
+   *
    * Un lieu d'un autre pays demande d'abord que son catalogue devienne actif,
-   * et l'attente n'est pas facultative : sans elle, la fiche s'ouvrirait sur
-   * un identifiant que le catalogue courant ne connaît pas.
+   * et l'attente n'est pas facultative : sans elle, la vignette porterait un
+   * identifiant que le catalogue courant ne connaît pas. La bascule se fait
+   * SANS recadrage — recadrer sur l'Italie entière effacerait le voyage en le
+   * remplaçant par un saut.
    */
   const ouvrirResultat = async (resultat: (typeof resultats)[number]) => {
     setQuery('');
-    if (resultat.pays === pays) {
-      setChoisi(resultat.place);
-      return;
-    }
-    await choisir(resultat.pays);
-    router.push(`/place/${resultat.place.id}`);
+    if (resultat.pays !== pays) await choisir(resultat.pays, false);
+    setChoisi(resultat.place);
   };
 
   // La validation vient à l'utilisateur, pas l'inverse.

@@ -29,6 +29,11 @@ export type Match = {
 const VIDES = new Set([
   'de', 'des', 'du', 'la', 'le', 'les', 'l', 'd', 'et', 'aux', 'au', 'sur',
   'sous', 'en', 'a',
+  // Les mêmes, en italien : « Piazza dei Miracoli », « Ponte di Veja ».
+  // Sans eux, « place dei miracoli » exigeait que « dei » réponde aussi, et
+  // un lieu nommé « Piazza del Duomo » n'aurait jamais pu convenir.
+  'di', 'del', 'della', 'dei', 'degli', 'delle', 'dal', 'dalla', 'il', 'lo',
+  'gli', 'alla', 'ai', 'sul', 'sulla',
 ]);
 
 /** Minuscules sans accents : « Château » et « chateau » doivent se répondre. */
@@ -171,6 +176,65 @@ export function pertinence(texte: string, recherche: string): number {
   return meilleure;
 }
 
+/**
+ * Combien de lettres deux mots doivent partager pour être tenus pour le même.
+ *
+ * C'est la seule règle APPROXIMATIVE de la recherche, et elle est là pour un
+ * cas précis : le nom propre qu'on traduit de tête. « Place des miracles »
+ * pour la Piazza dei Miracoli, « Saint François d'Assise » pour la basilique
+ * d'Assisi. Le glossaire ne peut rien pour ceux-là — traduire les noms propres
+ * serait sans fin.
+ *
+ * Cinq, et pas moins : « miracles » et « miracoli » partagent « mirac »,
+ * « assise » et « Assisi » partagent « assis », « botanique » et « botanico »
+ * partagent « botani ». À quatre, « cathédrale » rejoindrait « cathare » et
+ * « Cannes » rejoindrait « Cannobio ».
+ */
+const LETTRES_COMMUNES = 5;
+
+/** Combien de lettres deux mots ont en commun, depuis le début. */
+function prefixeCommun(a: string, b: string): number {
+  const court = Math.min(a.length, b.length);
+  let n = 0;
+  while (n < court && a[n] === b[n]) n += 1;
+  return n;
+}
+
+/**
+ * Chaque mot de la recherche répond-il QUELQUE PART dans ce qu'on lui donne ?
+ *
+ * La recherche jugeait la phrase entière d'un bloc : « Piazza dei Miracoli »
+ * répondait à « piazza dei miracoli », qu'elle contient mot pour mot, mais pas
+ * à « place dei miracoli » — le glossaire ne traduit que ce qu'on tape EN
+ * ENTIER, et « place dei miracoli » n'est pas dans le glossaire.
+ *
+ * Ici chaque mot est jugé séparément, contre le nom ET la commune, et tous
+ * doivent répondre. C'est ce qui permet à « basilique assise » de trouver une
+ * basilique dont la commune est Assisi et dont le nom ne dit pas « Assise ».
+ *
+ * Rend `2` quand tous les mots répondent exactement, `1` quand l'un d'eux n'a
+ * répondu qu'à cinq lettres près, `0` sinon.
+ */
+export function pertinenceParMots(textes: string[], recherche: string): number {
+  const demandes = mots(recherche);
+  if (demandes.length < 2) return 0;
+  const disponibles = textes.flatMap((texte) => mots(texte));
+  if (disponibles.length === 0) return 0;
+
+  let exact = true;
+  for (const demande of demandes) {
+    const formes = variantes(demande);
+    if (formes.some((forme) => disponibles.some((mot) => mot.startsWith(forme)))) continue;
+    if (formes.some((forme) =>
+      disponibles.some((mot) => prefixeCommun(mot, forme) >= LETTRES_COMMUNES))) {
+      exact = false;
+      continue;
+    }
+    return 0;
+  }
+  return exact ? 2 : 1;
+}
+
 /** Combien de caractères il faut avoir tapés pour qu'une recherche ait un sens. */
 export const MIN_CARACTERES = 2;
 
@@ -193,11 +257,21 @@ export function search(places: Place[], recherche: string, limite = 40): Match[]
     const ou = [place.communeName, place.departement].filter(Boolean) as string[];
     const parLieu = Math.max(0, ...ou.map((texte) => pertinence(texte, q)));
 
-    if (parNom === 0 && parLieu === 0) continue;
+    // La phrase d'abord, mot à mot ensuite : une recherche à plusieurs mots
+    // que la phrase ne sait pas lire n'est pas forcément une recherche vide.
+    // Le repli ne peut donc qu'AJOUTER des résultats, jamais en déplacer un.
+    const parMots =
+      parNom === 0 && parLieu === 0
+        ? pertinenceParMots([place.name, ...ou], q)
+        : 0;
+
+    if (parNom === 0 && parLieu === 0 && parMots === 0) continue;
     const gagnant = parNom >= parLieu ? 'nom' : 'lieu';
     notes.push({
-      match: { place, par: gagnant },
-      note: gagnant === 'nom' ? parNom * 2 : parLieu * 2 - 1,
+      match: { place, par: parMots > 0 ? 'nom' : gagnant },
+      note: parMots > 0
+        ? parMots
+        : gagnant === 'nom' ? parNom * 2 : parLieu * 2 - 1,
       score: place.score ?? 0,
     });
   }

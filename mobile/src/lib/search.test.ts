@@ -138,3 +138,56 @@ describe('un mot générique se cherche dans les deux langues', () => {
     ]);
   });
 });
+
+describe('une recherche à plusieurs mots', () => {
+  it('trouve la Piazza dei Miracoli en tapant « place dei miracoli »', () => {
+    // Le cas rapporté. La phrase entière ne pouvait pas répondre : le
+    // glossaire ne traduit que ce qu'on tape EN ENTIER, et « place dei
+    // miracoli » n'y est pas. Chaque mot doit donc être jugé séparément.
+    const places = [lieu('Piazza dei Miracoli', { communeName: 'Pisa' })];
+    expect(search(places, 'place dei miracoli')).toHaveLength(1);
+    expect(search(places, 'piazza miracoli')).toHaveLength(1);
+  });
+
+  it('tolère cinq lettres communes pour un nom propre traduit de tête', () => {
+    // « Place des miracles » est une traduction du NOM PROPRE, que le
+    // glossaire ne peut pas porter — traduire les noms propres serait sans
+    // fin. Cinq lettres communes suffisent : « mirac ».
+    const places = [lieu('Piazza dei Miracoli', { communeName: 'Pisa' })];
+    expect(search(places, 'place des miracles')).toHaveLength(1);
+  });
+
+  it('cherche aussi dans la COMMUNE, mot par mot', () => {
+    // La basilique d'Assise ne porte pas « Assise » dans son nom : c'est sa
+    // commune qui le dit, et en italien.
+    const places = [lieu('Basilique Saint-François', { communeName: 'Assisi' })];
+    expect(search(places, 'basilique assise')).toHaveLength(1);
+  });
+
+  it('exige que TOUS les mots répondent', () => {
+    const places = [lieu('Piazza dei Miracoli', { communeName: 'Pisa' })];
+    expect(search(places, 'place de rome')).toHaveLength(0);
+    expect(search(places, 'miracoli venise')).toHaveLength(0);
+  });
+
+  it('ne se déclenche que si la phrase entière a échoué', () => {
+    // Le repli AJOUTE des résultats, il n'en déplace aucun : « pont du gard »
+    // se lit d'un bloc, et son classement ne doit pas bouger d'un cran.
+    const places = [
+      lieu('Pont du Gard', { score: 200 }),
+      lieu('Pont-Aven', { score: 150 }),
+    ];
+    expect(search(places, 'pont du gard').map((m) => m.place.name)).toEqual(['Pont du Gard']);
+  });
+
+  it('classe un accord mot à mot APRÈS une lecture directe', () => {
+    const places = [
+      lieu('Piazza dei Miracoli', { score: 10 }),
+      lieu('Place des Miracles de Lourdes', { score: 5 }),
+    ];
+    // Le second contient la phrase telle quelle : il passe devant, malgré un
+    // score cinq fois moindre.
+    expect(search(places, 'place des miracles')[0].place.name)
+      .toBe('Place des Miracles de Lourdes');
+  });
+});

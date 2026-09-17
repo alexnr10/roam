@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 
 import { outlinesFor } from '../data/outlines';
+import { distanceM } from '../lib/geo';
 import { pointsDeNom } from '../lib/etiquettes';
 import { etoilesDe } from '../lib/etoiles';
 import { paysCourant } from '../data/catalog';
@@ -41,6 +42,8 @@ import {
   margeDeCamera,
   SEUIL_REGION,
   TRANSITION,
+  VOYAGE_M,
+  VOYAGE_MS,
   resolveBasemap,
   tonsDuPays,
 } from './mapStyle';
@@ -593,11 +596,17 @@ function CarteNative({
     let annule = false;
     (async () => {
       const zoom = (await carte.current?.getZoom()) ?? 0;
+      const centre = await carte.current?.getCenter();
       if (annule) return;
+      // La même règle que sur le web : au-delà de `VOYAGE_M`, aller au lieu
+      // est un voyage, et la caméra prend son temps pour qu'il se lise.
+      const loin = centre
+        ? distanceM(centre[1], centre[0], focusLat, focusLon) > VOYAGE_M
+        : false;
       camera.current?.easeTo({
         center: [focusLon, focusLat],
         zoom: Math.max(zoom, 11),
-        duration: 600,
+        duration: loin ? VOYAGE_MS : 600,
       });
     })();
     return () => {

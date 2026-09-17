@@ -8,6 +8,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { paysCourant } from '../data/catalog';
+import { distanceM } from '../lib/geo';
 import { EMPTY_OUTLINES, outlinesFor } from '../data/outlines';
 import { pointsDeNom } from '../lib/etiquettes';
 import type { Emprise } from '../lib/regions';
@@ -44,6 +45,8 @@ import {
   opaciteEnCascade,
   pasDeCascade,
   TRANSITION,
+  VOYAGE_M,
+  VOYAGE_MS,
   resolveBasemap,
   tonsDuPays,
 } from './mapStyle';
@@ -895,11 +898,21 @@ export function MapCanvas({
     if (!ready || focusLat === null || focusLon === null) return;
     const instance = map.current;
     if (!instance) return;
-    instance.easeTo({
-      center: [focusLon, focusLat],
-      zoom: Math.max(instance.getZoom(), 11),
-      duration: 600,
-    });
+    // Un GLISSEMENT quand la cible est à l'écran, un VOL quand elle n'y est
+    // pas. Glisser de la Bretagne à la Sicile en six cents millisecondes ne
+    // montre rien : la carte devient un flou, et on ne sait pas où l'on
+    // atterrit. `flyTo` prend de la hauteur, traverse, puis redescend — le
+    // trajet se lit, et c'est ce qui fait comprendre où se trouve le lieu.
+    const cible: [number, number] = [focusLon, focusLat];
+    const zoom = Math.max(instance.getZoom(), 11);
+    const centre = instance.getCenter();
+    const loin =
+      distanceM(centre.lat, centre.lng, focusLat, focusLon) > VOYAGE_M;
+    // `flyTo` prend de la hauteur, traverse, puis redescend ; `easeTo` glisse
+    // à plat. Le premier raconte le trajet, le second ne convient qu'à ce qui
+    // est déjà sous les yeux.
+    if (loin) instance.flyTo({ center: cible, zoom, duration: VOYAGE_MS, curve: 1.6 });
+    else instance.easeTo({ center: cible, zoom, duration: 600 });
   }, [ready, focusLat, focusLon]);
 
   // Position de l'utilisateur : un marqueur distinct, pas un point du catalogue.

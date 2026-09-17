@@ -447,6 +447,23 @@ export function depouiller(style: any) {
  *   millisecondes ne se comptent pas, mais 272 pastilles apparaissant d'un
  *   coup font un clignotement, et la cascade se lit comme un remplissage.
  */
+/**
+ * Au-delà de quelle distance aller à un lieu est un VOYAGE, en mètres.
+ *
+ * Un résultat de recherche peut être à trois kilomètres ou à mille. Glisser de
+ * la Bretagne à la Sicile en six cents millisecondes ne montre rien : la carte
+ * devient un flou, et on ne sait pas où l'on a atterri. Au-delà de ce seuil,
+ * la caméra prend son temps — le trajet se lit, et c'est lui qui fait
+ * comprendre OÙ se trouve le lieu.
+ *
+ * Deux cents kilomètres : au-dessous, deux régions voisines, et le glissement
+ * reste lisible ; au-dessus, on a changé de pays ou de moitié de pays.
+ */
+export const VOYAGE_M = 200_000;
+
+/** La durée d'un voyage, en millisecondes. Assez long pour être suivi de l'œil. */
+export const VOYAGE_MS = 2200;
+
 export const TRANSITION = {
   zoom: 900,
   courbe: [0.22, 0.61, 0.36, 1] as [number, number, number, number],

@@ -59,7 +59,7 @@ type PaysContextValue = {
    * d'un lieu italien demande que le catalogue italien soit LÀ, sinon la page
    * s'ouvre sur un identifiant que le catalogue courant ne connaît pas.
    */
-  choisir: (code: string) => Promise<void>;
+  choisir: (code: string, recadrer?: boolean) => Promise<void>;
   /** Ce que la carte regarde. Bascule toute seule s'il le faut. */
   regarder: (lon: number, lat: number) => void;
 };
@@ -130,7 +130,14 @@ export function PaysProvider({ children }: { children: React.ReactNode }) {
 
   // Choisir un pays depuis un réglage n'est pas le franchir en se promenant :
   // le premier demande un recadrage, le second l'interdit.
-  const choisir = useCallback((code: string) => appliquer(code, true), [appliquer]);
+  // `recadrer` est vrai par défaut — c'est ce que veut un choix fait dans un
+  // réglage : montre-moi ce pays. Un résultat de recherche, lui, demande le
+  // contraire : la caméra doit voyager jusqu'au LIEU, et un recadrage sur le
+  // pays entier effacerait ce voyage en le remplaçant par un saut.
+  const choisir = useCallback(
+    (code: string, recadrer = true) => appliquer(code, recadrer),
+    [appliquer],
+  );
 
   const regarder = useCallback(
     (lon: number, lat: number) => {
