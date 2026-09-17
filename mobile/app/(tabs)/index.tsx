@@ -23,7 +23,8 @@ import { distanceToPlace, formatDistance } from '../../src/lib/geo';
 import { useCheckIn } from '../../src/lib/useCheckIn';
 import { useLocation } from '../../src/lib/useLocation';
 import { useRoulette } from '../../src/lib/roulette';
-import { MIN_CARACTERES, search } from '../../src/lib/search';
+import { MIN_CARACTERES } from '../../src/lib/search';
+import { useRechercheMondiale } from '../../src/lib/rechercheMondiale';
 import { useVisits } from '../../src/store/visits';
 import { LARGEUR_MAX, colors, elevation, fonts, spacing, radius, type } from '../../src/theme';
 import {
@@ -141,7 +142,7 @@ export default function MapScreen() {
   // on se promène, on passe la frontière, il suit. `version` entre donc dans
   // les dépendances de tout ce qui en dérive.
   const version = useCatalogue();
-  const { regarder } = usePays();
+  const { pays, disponibles, regarder, choisir } = usePays();
   const visible = useMemo(
     () => (theme ? allPlaces.filter((p) => p.themeId === theme) : allPlaces),
     [theme, version],
@@ -197,8 +198,30 @@ export default function MapScreen() {
    * La recherche ignore le thème : quelqu'un qui tape « etretat » ne veut pas
    * s'entendre dire que ce lieu est hors du thème choisi trois écrans plus tôt.
    */
-  const resultats = useMemo(() => search(allPlaces, query), [query, version]);
+  // La recherche traverse les frontières, la carte non : on cherche un nom
+  // qu'on a en tête, sans se demander d'abord dans quel pays il se trouve.
+  const { resultats, chargement: chargeAilleurs } = useRechercheMondiale(
+    query, pays, version, disponibles,
+  );
   const enRecherche = query.trim().length >= MIN_CARACTERES;
+
+  /**
+   * Ouvrir un résultat, d'ici ou d'ailleurs.
+   *
+   * Un lieu du pays courant se pose sur la carte — on veut le VOIR où il est.
+   * Un lieu d'un autre pays demande d'abord que son catalogue devienne actif,
+   * et l'attente n'est pas facultative : sans elle, la fiche s'ouvrirait sur
+   * un identifiant que le catalogue courant ne connaît pas.
+   */
+  const ouvrirResultat = async (resultat: (typeof resultats)[number]) => {
+    setQuery('');
+    if (resultat.pays === pays) {
+      setChoisi(resultat.place);
+      return;
+    }
+    await choisir(resultat.pays);
+    router.push(`/place/${resultat.place.id}`);
+  };
 
   // La validation vient à l'utilisateur, pas l'inverse.
   const suggestion = useMemo(
@@ -312,6 +335,7 @@ export default function MapScreen() {
             ListHeaderComponent={
               <Text style={[type.tiny, styles.titreListe]}>
                 {resultats.length} RÉSULTAT{resultats.length > 1 ? 'S' : ''}
+                {chargeAilleurs ? ' · RECHERCHE DANS LES AUTRES PAYS…' : ''}
               </Text>
             }
             ListEmptyComponent={
@@ -321,13 +345,7 @@ export default function MapScreen() {
               />
             }
             renderItem={({ item }) => (
-              <Pressable
-                style={styles.ligne}
-                onPress={() => {
-                  setQuery('');
-                  setChoisi(item.place);
-                }}
-              >
+              <Pressable style={styles.ligne} onPress={() => void ouvrirResultat(item)}>
                 <Photo
                   url={item.place.imageUrl}
                   themeId={item.place.themeId}
@@ -348,6 +366,10 @@ export default function MapScreen() {
                         }`}
                   </Text>
                 </View>
+                {/* Le pays ne se dit que lorsqu'il SURPREND : l'écrire sur
+                    chaque ligne française serait un rappel inutile, l'omettre
+                    sur une ligne italienne ferait croire à un lieu d'à côté. */}
+                {item.pays !== pays ? <Pill label={item.nomDuPays} /> : null}
                 {visitedIds.has(item.place.id) ? <Pill label="Validé" tone="verified" /> : null}
               </Pressable>
             )}

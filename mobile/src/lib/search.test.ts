@@ -1,4 +1,4 @@
-import { MIN_CARACTERES, fold, pertinence, search } from './search';
+import { MIN_CARACTERES, fold, pertinence, search, variantes } from './search';
 import type { Place } from '../types';
 
 function lieu(name: string, extra: Partial<Place> = {}): Place {
@@ -85,5 +85,56 @@ describe('recherche', () => {
   it('supporte un lieu sans commune ni département', () => {
     // Trente-neuf lieux du catalogue n'ont pas de commune.
     expect(search([lieu('Mont Blanc')], 'mont')).toHaveLength(1);
+  });
+});
+
+describe('un mot générique se cherche dans les deux langues', () => {
+  it('trouve un lieu italien par le mot français', () => {
+    // Cinq cent soixante et onze noms du catalogue italien gardent leur mot
+    // italien, parce que c'est ainsi qu'on les dit : la Piazza dei Miracoli,
+    // le Palazzo Vecchio. Personne ne tape « piazza » en cherchant une place.
+    const places = [lieu('Piazza dei Miracoli'), lieu('Palazzo Vecchio'), lieu('Ponte Vecchio')];
+    expect(search(places, 'place').map((m) => m.place.name)).toContain('Piazza dei Miracoli');
+    expect(search(places, 'palais').map((m) => m.place.name)).toContain('Palazzo Vecchio');
+    expect(search(places, 'pont').map((m) => m.place.name)).toContain('Ponte Vecchio');
+  });
+
+  it('trouve un lieu italien par le saint français', () => {
+    const places = [lieu('Basilique San Francesco'), lieu('Chiesa di Santa Chiara')];
+    expect(search(places, 'saint').map((m) => m.place.name)).toContain('Basilique San Francesco');
+    expect(search(places, 'sainte').map((m) => m.place.name)).toContain('Chiesa di Santa Chiara');
+  });
+
+  it('ne fait JAMAIS passer une traduction devant une lecture directe', () => {
+    // Le garde-fou, et il a été payé : sans plafond, « san » traduisait en
+    // « saint » et rendait 217 résultats français là où il y en avait 13.
+    // Sancerre disparaissait sous deux cents « Saint-… ».
+    const places = [
+      lieu('Saint-Guilhem-le-Désert', { score: 180 }),
+      lieu('Saint-Véran', { score: 167 }),
+      lieu('Sancerre', { score: 155 }),
+    ];
+    expect(search(places, 'san')[0].place.name).toBe('Sancerre');
+    // Les Saint restent trouvables — derrière, ce qui est leur juste place.
+    expect(search(places, 'san')).toHaveLength(3);
+  });
+
+  it('ne traduit que le mot ENTIER', () => {
+    // « pon » n'a pas besoin d'être traduit : le préfixe atteint déjà
+    // « Ponte ». Traduire un préfixe ferait dire à la table plus qu'elle ne
+    // sait — et « la » deviendrait un lac.
+    expect(variantes('pont')).toEqual(['pont', 'ponte']);
+    expect(variantes('pon')).toEqual(['pon']);
+    expect(variantes('lac')).toEqual(['lac', 'lago']);
+    expect(variantes('la')).toEqual(['la']);
+  });
+
+  it('laisse intact ce que la recherche trouvait déjà', () => {
+    // Une traduction ne peut que faire MONTER une note : le classement
+    // français d'avant doit se retrouver à l'identique.
+    const places = [lieu('Pont du Gard', { score: 200 }), lieu('Pont-Aven', { score: 150 }), lieu('Ponte Vecchio', { score: 100 })];
+    expect(search(places, 'pont').map((m) => m.place.name)).toEqual([
+      'Pont du Gard', 'Pont-Aven', 'Ponte Vecchio',
+    ]);
   });
 });

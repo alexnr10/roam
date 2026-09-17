@@ -39,6 +39,101 @@ export function fold(texte: string): string {
     .toLowerCase();
 }
 
+/**
+ * Les mots génériques, d'une langue à l'autre.
+ *
+ * Un catalogue italien porte les noms que Wikidata donne en français, et
+ * beaucoup le sont déjà — « Tour de Pise », « Lac de Côme », « Palais
+ * Farnèse ». Mais cinq cent soixante et onze noms sur deux mille soixante-seize
+ * gardent leur mot italien, parce que c'est ainsi qu'on les dit en français :
+ * le Ponte Vecchio, la Piazza dei Miracoli, le Monte Argentario.
+ *
+ * Personne ne tape « ponte » en cherchant un pont. Cette table fait donc ce
+ * qu'un lecteur ferait de tête : elle traduit LE MOT QU'ON TAPE, dans les deux
+ * sens, et la recherche essaie chaque variante.
+ *
+ * Elle ne contient que des mots GÉNÉRIQUES — ce qui désigne une catégorie de
+ * lieu, jamais un nom propre. Traduire les noms propres serait une autre
+ * affaire, et une mauvaise idée : « Livourne » et « Livorno » sont deux
+ * graphies du même nom, pas deux mots.
+ */
+const EQUIVALENTS: Record<string, string[]> = {
+  // Le bâti
+  eglise: ['chiesa'], chiesa: ['eglise'],
+  cathedrale: ['duomo', 'cattedrale'], duomo: ['cathedrale'], cattedrale: ['cathedrale'],
+  basilique: ['basilica'], basilica: ['basilique'],
+  abbaye: ['abbazia', 'badia'], abbazia: ['abbaye'], badia: ['abbaye'],
+  couvent: ['convento'], convento: ['couvent'],
+  cloitre: ['chiostro'], chiostro: ['cloitre'],
+  ermitage: ['eremo'], eremo: ['ermitage'],
+  sanctuaire: ['santuario'], santuario: ['sanctuaire'],
+  temple: ['tempio'], tempio: ['temple'],
+  chateau: ['castello'], castello: ['chateau'],
+  palais: ['palazzo'], palazzo: ['palais'],
+  forteresse: ['rocca', 'fortezza'], rocca: ['forteresse'], fortezza: ['forteresse'],
+  tour: ['torre'], torre: ['tour'],
+  pont: ['ponte'], ponte: ['pont'],
+  porte: ['porta'], porta: ['porte'],
+  musee: ['museo'], museo: ['musee'],
+  theatre: ['teatro'], teatro: ['theatre'],
+  fontaine: ['fontana'], fontana: ['fontaine'],
+  thermes: ['terme'], terme: ['thermes'],
+  phare: ['faro'], faro: ['phare'],
+  place: ['piazza'], piazza: ['place'],
+  jardin: ['giardino', 'orto'], giardino: ['jardin'], orto: ['jardin'],
+  parc: ['parco'], parco: ['parc'],
+  village: ['borgo', 'paese'], borgo: ['village'], bourg: ['borgo'],
+  tombeau: ['tomba'], tomba: ['tombeau'],
+  // Le paysage
+  lac: ['lago'], lago: ['lac'],
+  mont: ['monte'], monte: ['mont'], montagne: ['montagna'], montagna: ['montagne'],
+  ile: ['isola'], isola: ['ile'],
+  grotte: ['grotta'], grotta: ['grotte'],
+  cascade: ['cascata'], cascata: ['cascade'],
+  plage: ['spiaggia'], spiaggia: ['plage'],
+  golfe: ['golfo'], golfo: ['golfe'],
+  baie: ['baia'], baia: ['baie'],
+  cap: ['capo'], capo: ['cap'],
+  vallee: ['valle', 'val'], valle: ['vallee'],
+  gorges: ['gole'], gole: ['gorges'],
+  fleuve: ['fiume'], riviere: ['fiume'], fiume: ['fleuve'],
+  source: ['sorgente', 'fonte'], sorgente: ['source'],
+  col: ['passo'], passo: ['col'],
+  volcan: ['vulcano'], vulcano: ['volcan'],
+  // Les saints — « saint françois » doit rendre « San Francesco ».
+  saint: ['san', 'santo', 'sant'], sainte: ['santa', 'sant'],
+  san: ['saint'], santo: ['saint'], santa: ['sainte'], sant: ['saint'],
+};
+
+/**
+ * Ce qu'on tape, et ce que ça pourrait vouloir dire dans l'autre langue.
+ *
+ * La traduction ne s'applique qu'au mot ENTIER : « pont » donne « ponte »,
+ * mais « pon » ne donne rien — et n'en a pas besoin, puisque le préfixe
+ * atteint déjà « Ponte Vecchio ». Traduire un préfixe ferait dire à la table
+ * plus qu'elle ne sait.
+ */
+export function variantes(recherche: string): string[] {
+  const q = fold(recherche).trim();
+  if (!q) return [];
+  const traductions = EQUIVALENTS[q] ?? [];
+  return traductions.length ? [q, ...traductions] : [q];
+}
+
+/**
+ * Le plafond d'une correspondance obtenue par TRADUCTION.
+ *
+ * Une traduction est une hypothèse sur l'intention, pas une lecture du texte :
+ * elle doit pouvoir faire trouver, jamais faire passer devant.
+ *
+ * Sans ce plafond, « san » traduisait en « saint » et rendait deux cent
+ * dix-sept résultats là où il y en avait treize : Sancerre, Sanary, le domaine
+ * de George Sand disparaissaient sous deux cents « Saint-… » mieux notés
+ * qu'eux. Le plafond les remet à leur place — les Saint restent trouvables,
+ * derrière ce qui commence vraiment par « san ».
+ */
+const PLAFOND_TRADUIT = 2;
+
 /** Les mots porteurs d'un texte, ponctuation et articles ôtés. */
 function mots(texte: string): string[] {
   return fold(texte)
@@ -57,13 +152,23 @@ function mots(texte: string): string[] {
  */
 export function pertinence(texte: string, recherche: string): number {
   const cible = fold(texte);
-  const q = fold(recherche).trim();
-  if (!q) return 0;
-  if (cible === q) return 4;
-  if (cible.startsWith(q)) return 3;
-  if (mots(texte).some((mot) => mot.startsWith(q))) return 2;
-  if (cible.includes(q)) return 1;
-  return 0;
+  // Chaque variante est jugée, et la meilleure l'emporte. Une traduction ne
+  // peut donc que faire MONTER une note, jamais la faire baisser : ce que la
+  // recherche trouvait avant, elle le trouve toujours, au même rang.
+  let meilleure = 0;
+  const formes = variantes(recherche);
+  for (const [rang, q] of formes.entries()) {
+    let note = 0;
+    if (cible === q) note = 4;
+    else if (cible.startsWith(q)) note = 3;
+    else if (mots(texte).some((mot) => mot.startsWith(q))) note = 2;
+    else if (cible.includes(q)) note = 1;
+    // La première forme est CE QU'ON A TAPÉ : elle garde l'échelle entière.
+    // Les suivantes sont des traductions, et plafonnent.
+    if (rang > 0) note = Math.min(note, PLAFOND_TRADUIT);
+    if (note > meilleure) meilleure = note;
+  }
+  return meilleure;
 }
 
 /** Combien de caractères il faut avoir tapés pour qu'une recherche ait un sens. */

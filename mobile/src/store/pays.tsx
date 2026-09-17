@@ -51,8 +51,15 @@ type PaysContextValue = {
   recadrage: number;
   chargement: boolean;
   erreur: string | null;
-  /** Choix explicite, depuis un réglage. */
-  choisir: (code: string) => void;
+  /**
+   * Choix explicite, depuis un réglage — ou depuis un résultat de recherche
+   * qui vit dans un autre pays.
+   *
+   * Rend une promesse, et c'est ce second appel qui l'exige : ouvrir la fiche
+   * d'un lieu italien demande que le catalogue italien soit LÀ, sinon la page
+   * s'ouvre sur un identifiant que le catalogue courant ne connaît pas.
+   */
+  choisir: (code: string) => Promise<void>;
   /** Ce que la carte regarde. Bascule toute seule s'il le faut. */
   regarder: (lon: number, lat: number) => void;
 };
@@ -123,7 +130,7 @@ export function PaysProvider({ children }: { children: React.ReactNode }) {
 
   // Choisir un pays depuis un réglage n'est pas le franchir en se promenant :
   // le premier demande un recadrage, le second l'interdit.
-  const choisir = useCallback((code: string) => { appliquer(code, true); }, [appliquer]);
+  const choisir = useCallback((code: string) => appliquer(code, true), [appliquer]);
 
   const regarder = useCallback(
     (lon: number, lat: number) => {
