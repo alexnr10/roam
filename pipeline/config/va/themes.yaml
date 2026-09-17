@@ -28,3 +28,71 @@ themes:
   # classes Wikidata du thème restent : elles ne dépendent d'aucun État.
   - id: maisons
     from_labels: []
+
+  # ── Les treize thèmes que la collecte a rendus VIDES ───────────────────
+  #
+  # Mesuré par le premier `fetch --pays-config va` : zéro lieu pour chacun. Ce
+  # n'est pas une surprise sur un État d'un demi-kilomètre carré sans côte, ni
+  # lac, ni relief — mais c'est mesuré, et c'est à cela que sert un premier
+  # passage. Une requête qui ne rend rien coûte une seconde à chaque collecte ;
+  # treize en coûtent treize, pour rien.
+  #
+  # Chacun revient en retirant sa ligne, le jour où un lieu justifierait qu'on
+  # le redemande.
+  - id: chateaux
+    retire: true
+  - id: phares
+    retire: true
+  - id: ponts
+    retire: true
+  - id: cascades
+    retire: true
+  - id: cirques
+    retire: true
+  - id: gorges
+    retire: true
+  - id: lacs
+    retire: true
+  - id: iles
+    retire: true
+  - id: volcans
+    retire: true
+  - id: sommets
+    retire: true
+  - id: dunes-marais
+    retire: true
+  - id: forets
+    retire: true
+  - id: rochers
+    retire: true
+
+  # ── Les places : sans ce thème, la place Saint-Pierre n'existe pas ─────
+  #
+  # `place (Q174782)` n'est déclarée par AUCUN thème du dépôt, et c'est une
+  # décision française assumée : en France une place est un carrefour. Le thème
+  # `piazzas` a donc été créé pour l'Italie — et il n'y vit que là.
+  #
+  # Le Vatican en hérite du même besoin, et pour son lieu le plus évident : la
+  # place Saint-Pierre, soixante-six versions linguistiques, troisième lieu du
+  # Vatican par la notoriété derrière la basilique et la Sixtine. Sans ce
+  # thème, elle n'est collectée par rien — aucune autre classe ne la revendique
+  # — et le catalogue du Vatican s'ouvrirait sans sa place.
+  #
+  # La cour du Belvédère (quinze langues) entre par la même porte.
+  #
+  # Les réglages sont ceux de l'Italie, à l'exception du plancher : à six, sur
+  # un pays qui compte moins de dix places, il ne filtre rien qu'on veuille
+  # perdre. Ils y sont commentés en détail — ce fichier ne les redémontre pas.
+  - id: piazzas
+    name: Places monumentales
+    name_singular: Place
+    name_short: Places
+    name_hints: [place, piazza]
+    icon: piazza
+    kind: culture
+    gated: false
+    radius_m: 150
+    min_sitelinks: 6
+    fetch_min_sitelinks: 4
+    cap: 50
+    wikidata_classes: [Q174782]                      # place
