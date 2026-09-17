@@ -1,0 +1,576 @@
+{
+ "_note": "Généré par `roam_pipeline export-app`. Ne pas éditer à la main. Descriptions et images issues de Wikipédia et Wikimedia Commons (CC BY-SA) — l'application doit citer la source.",
+ "themes": [
+  {
+   "id": "abbayes",
+   "name": "Abbayes et monastères",
+   "nameSingular": "Abbaye",
+   "nameShort": "Abbayes",
+   "icon": "abbey"
+  },
+  {
+   "id": "cathedrales",
+   "name": "Cathédrales et basiliques",
+   "nameSingular": "Cathédrale",
+   "nameShort": "Cathédrales",
+   "icon": "cathedral"
+  },
+  {
+   "id": "maisons",
+   "name": "Maisons et demeures remarquables",
+   "nameSingular": "Maison",
+   "nameShort": "Maisons",
+   "icon": "house"
+  },
+  {
+   "id": "musees",
+   "name": "Musées",
+   "nameSingular": "Musée",
+   "nameShort": "Musées",
+   "icon": "museum"
+  },
+  {
+   "id": "monuments",
+   "name": "Monuments et édifices remarquables",
+   "nameSingular": "Monument",
+   "nameShort": "Monuments",
+   "icon": "monument"
+  },
+  {
+   "id": "grottes",
+   "name": "Grottes et gouffres",
+   "nameSingular": "Grotte",
+   "nameShort": "Grottes",
+   "icon": "cave"
+  },
+  {
+   "id": "megalithes",
+   "name": "Mégalithes et sites antiques",
+   "nameSingular": "Site",
+   "nameShort": "Mégalithes",
+   "icon": "megalith"
+  },
+  {
+   "id": "jardins",
+   "name": "Parcs et jardins",
+   "nameSingular": "Jardin",
+   "nameShort": "Jardins",
+   "icon": "garden"
+  },
+  {
+   "id": "piazzas",
+   "name": "Places monumentales",
+   "nameSingular": "Place",
+   "nameShort": "Places",
+   "icon": "piazza"
+  }
+ ],
+ "places": [
+  {
+   "id": "Q145093",
+   "slug": "palais-du-vatican",
+   "name": "Palais du Vatican",
+   "themeId": "monuments",
+   "lat": 41.903611,
+   "lon": 12.456389,
+   "radiusM": 150,
+   "score": 120.6,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Le palais du Vatican ou, selon sa dénomination officielle, le Palais apostolique (appelé aussi palais Sixte-V, ou anciennement, Sacré Palais) est une des résidences des papes au Vatican depuis leur retour d'exil d'Avignon (1377). Auparavant, et pendant plus d'un millénaire, les papes ont habité au palais du Latran à proximité de la basilique Saint-Jean-de-Latran qui est leur cathédrale, en tant qu'évêques de Rome.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2018-03-18%20Apostolischer%20Palast.jpg",
+   "imageAuthor": "Burkhard Mücke",
+   "imageLicence": "CC BY-SA 4.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palais_du_Vatican"
+  },
+  {
+   "id": "Q83425",
+   "slug": "place-saint-pierre",
+   "name": "Place Saint-Pierre",
+   "themeId": "piazzas",
+   "lat": 41.902183,
+   "lon": 12.457239,
+   "radiusM": 150,
+   "score": 116.9,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "La place Saint-Pierre (Piazza San Pietro en italien) est une grande esplanade, d'architecture baroque, située devant la basilique Saint-Pierre, au Vatican, dont elle constitue en quelque sorte le parvis, présentant sa façade sur son côté ouest. C'est là que se tient la foule lors des grandes fêtes religieuses célébrées par le pape, comme la bénédiction Urbi et orbi.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/St%20Peter%27s%20Square%2C%20Vatican%20City%20-%20April%202007.jpg",
+   "imageAuthor": "Diliff",
+   "imageLicence": "CC BY-SA 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Place_Saint-Pierre"
+  },
+  {
+   "id": "Q2158200",
+   "slug": "tombe-de-saint-pierre",
+   "name": "Tombe de saint Pierre",
+   "themeId": "megalithes",
+   "lat": 41.9022,
+   "lon": 12.4533,
+   "radiusM": 200,
+   "score": 98.7,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "La tombe de saint Pierre, découverte dans la nécropole du Vatican, se trouve sous la basilique Saint-Pierre au Vatican. Elle comprend plusieurs tombes et un emplacement construit pour commémorer l'emplacement de la tombe de l'apôtre Pierre.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Rom%2C%20Vatikan%2C%20Petrusgrab%20unterhalb%20des%20Papstaltars%20des%20Petersdoms%20in%20den%20Vatikanischen%20Grotten.jpg",
+   "imageAuthor": "Dnalor 01",
+   "imageLicence": "CC BY-SA 3.0 at",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Tombe_de_saint_Pierre"
+  },
+  {
+   "id": "Q42003",
+   "slug": "jardins-du-vatican",
+   "name": "Jardins du Vatican",
+   "themeId": "jardins",
+   "lat": 41.903056,
+   "lon": 12.450556,
+   "radiusM": 200,
+   "score": 88.4,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Les jardins du Vatican (en italien : Giardini Vaticani) au Vatican sont un ensemble de jardins urbains qui couvrent plus de la moitié de la superficie du territoire du Vatican, du Sud au Nord-Est. Ils incluent certains bâtiments, tels que radio Vatican, le monastère Mater Ecclesiae et la tour Saint-Jean.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vatikanische%20Gaerten%20Museen%20Rom.jpg",
+   "imageAuthor": "Stefan Bauer, http://www.ferras.at",
+   "imageLicence": "CC BY-SA 2.5",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Jardins_du_Vatican"
+  },
+  {
+   "id": "Q1444766",
+   "slug": "obelisque-du-vatican",
+   "name": "Obélisque du Vatican",
+   "themeId": "monuments",
+   "lat": 41.9022,
+   "lon": 12.4563,
+   "radiusM": 150,
+   "score": 88.0,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "L'obélisque du Vatican est un obélisque égyptien, transporté à Rome par ordre de Caligula pour orner la spina de son nouveau cirque du Vatican. Il a été érigé au centre de la place Saint-Pierre le 10 septembre 1586, sur ordre du pape Sixte-Quint.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Obelisque%20Saint%20Peter%27s%20square%20Vatican%20City.jpg",
+   "imageAuthor": "Jebulon",
+   "imageLicence": "CC0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ob%C3%A9lisque_du_Vatican"
+  },
+  {
+   "id": "Q2547111",
+   "slug": "cour-du-belvedere",
+   "name": "Cour du Belvédère",
+   "themeId": "piazzas",
+   "lat": 41.904167,
+   "lon": 12.454722,
+   "radiusM": 150,
+   "score": 83.1,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "La cour du Belvédère (en italien : cortile del Belvedere), au Vatican, est un vaste complexe de bâtiments sur le côté nord de la basilique Saint-Pierre et du Palais apostolique.\nÀ l'origine, elle conduisait de ce palais au palais du Belvédère.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Patio%20del%20Belvedere%2C%20Ciudad%20del%20Vaticano%2C%202022-09-14%2C%20DD%2073-75%20HDR.jpg",
+   "imageAuthor": "Diego Delso",
+   "imageLicence": "CC BY-SA 4.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cour_du_Belv%C3%A9d%C3%A8re"
+  },
+  {
+   "id": "Q4540172",
+   "slug": "monastere-mater-ecclesiae",
+   "name": "Monastère Mater Ecclesiae",
+   "themeId": "abbayes",
+   "lat": 41.90375,
+   "lon": 12.451083,
+   "radiusM": 150,
+   "score": 83.0,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Le monastère Mater Ecclesiæ au Vatican, regroupe une communauté religieuse de vie contemplative. Il se situe dans les jardins de la cité vaticane, à proximité des locaux administratifs de Radio Vatican.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Giardini%20vaticani%2C%20monastero%20di%20mater%20ecclesiae%202.jpg",
+   "imageAuthor": "Sailko",
+   "imageLicence": "CC BY 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Monast%C3%A8re_Mater_Ecclesiae_(Vatican)"
+  },
+  {
+   "id": "Q2460920",
+   "slug": "tour-des-vents",
+   "name": "Tour des vents",
+   "themeId": "monuments",
+   "lat": 41.905119,
+   "lon": 12.45415,
+   "radiusM": 150,
+   "score": 77.7,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "La tour des vents (en italien : torre dei Venti) ou la tour Grégorienne (en italien : torre Gregoriana) est une tour carrée située au nord de la basilique Saint-Pierre au-dessus de l'aile ouest qui borde la Cour de la Bibliothèque, c'est-à-dire juste au-dessus des Salles Paulines (2e étage) et de la Galerie des Tapisseries (1er étage), dans l'immense parcours des Musées du Vatican. La tour Grégorienne, conçue par l'architecte bolonais Ottaviano Mascherino (à qui est également attribuée la construction du palais apostolique), est construite entre 1578 et 1580 pour promouvoir principalement l'étude scientifique de l'astronomie sur ordre du pape Grégoire XIII, qui a également décrété la réforme historique du calendrier grégorien, promulguée en 1582 et qui est aujourd'hui le calendrier civil universel suivi par l'ensemble de la planète.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Musei%20Vaticani.jpg",
+   "imageAuthor": "Martin Hooijschuur",
+   "imageLicence": "Public domain",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Tour_des_vents_(Vatican)"
+  },
+  {
+   "id": "Q2291560",
+   "slug": "villa-pia",
+   "name": "Villa Pia",
+   "themeId": "maisons",
+   "lat": 41.904167,
+   "lon": 12.4525,
+   "radiusM": 150,
+   "score": 72.1,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "La Villa Pia (appelé aussi Casina Pio IV) est un bâtiment de style Renaissance située dans les jardins du Vatican à Rome, et sert de siège aux Académies pontificales des sciences, des sciences sociales et de saint Thomas d'Aquin.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Casino%20di%20pio%20IV%2C%2005.JPG",
+   "imageAuthor": "Sailko",
+   "imageLicence": "CC BY 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Villa_Pia"
+  },
+  {
+   "id": "Q13099380",
+   "slug": "grotte-de-lourdes",
+   "name": "Grotte de Lourdes",
+   "themeId": "grottes",
+   "lat": 41.902778,
+   "lon": 12.448333,
+   "radiusM": 200,
+   "score": 64.1,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "La grotte de Lourdes (en italien : Grotta di Lourdes, également Grotta della Madonna di Lourdes) au Vatican est une grotte artificielle située dans les jardins du Vatican. Elle est construite de 1902 à 1905 et est une réplique de la grotte de Massabielle à Lourdes en France.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vatican%20Gardens%202020%20P26%20Lourdes%20cave%20replica.jpg",
+   "imageAuthor": "Fallaner",
+   "imageLicence": "CC BY-SA 4.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Grotte_de_Lourdes_(Vatican)"
+  },
+  {
+   "id": "Q917387",
+   "slug": "palais-du-gouvernorat-du-vatican",
+   "name": "Palais du Gouvernorat du Vatican",
+   "themeId": "monuments",
+   "lat": 41.902381,
+   "lon": 12.451225,
+   "radiusM": 150,
+   "score": 63.5,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Le palais du Gouvernorat du Vatican est le siège du Gouvernorat du Vatican, c'est-à-dire du pouvoir exécutif qui gère l'État de la Cité du Vatican, de la Commission pontificale pour l'État de la Cité du Vatican, dépositaire du pouvoir législatif ainsi que de la Poste vaticane.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vatikanische%20G%C3%A4rten%2008.jpg",
+   "imageAuthor": "Burkhard Mücke",
+   "imageLicence": "CC BY-SA 4.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palais_du_Gouvernorat_du_Vatican"
+  },
+  {
+   "id": "Q12512",
+   "slug": "basilique-saint-pierre",
+   "name": "Basilique Saint-Pierre",
+   "themeId": "cathedrales",
+   "lat": 41.902222,
+   "lon": 12.453417,
+   "radiusM": 120,
+   "score": 187.8,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "La basilique Saint-Pierre (en latin : Sancti Petri et en italien : Basilica di San Pietro in Vaticano) ou la basilique papale Saint-Pierre au Vatican (Basilica Papale di San Pietro in Vaticano), parfois appelée Saint-Pierre de Rome, est l'édifice religieux le plus important du catholicisme. Elle est située au Vatican, sur la rive droite du Tibre, et sa façade s'ouvre sur la place Saint-Pierre.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Basilica%20di%20San%20Pietro%20in%20Vaticano%20September%202015-1a.jpg",
+   "imageAuthor": "Alvesgaspar",
+   "imageLicence": "CC BY-SA 4.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Basilique_Saint-Pierre"
+  },
+  {
+   "id": "Q2943",
+   "slug": "chapelle-sixtine",
+   "name": "Chapelle Sixtine",
+   "themeId": "cathedrales",
+   "lat": 41.902956,
+   "lon": 12.454433,
+   "radiusM": 120,
+   "score": 138.0,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "La chapelle Sixtine (en italien, Cappella Sistina), appelée originellement chapelle de Sixte, est une des salles des palais pontificaux du Vatican et fait partie des musées du Vatican. Remplaçant la chapelle Pauline, puis le palais du Quirinal, la chapelle Sixtine est le lieu où, traditionnellement depuis le XVe siècle, les cardinaux réunis en conclave élisent le nouveau pape, et obligatoirement depuis la constitution apostolique édictée par Jean-Paul II en 1996, intitulée Universi Dominici gregis.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sistina-interno.jpg",
+   "imageAuthor": "The original uploader was Snowdog at Italian Wikipedia .",
+   "imageLicence": "CC BY-SA 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Chapelle_Sixtine"
+  },
+  {
+   "id": "Q1644167",
+   "slug": "eglise-saint-martin-et-saint-sebastien-des-suisses-du-vatican",
+   "name": "Église Saint-Martin-et-Saint-Sébastien-des-Suisses du Vatican",
+   "themeId": "cathedrales",
+   "lat": 41.903353,
+   "lon": 12.456705,
+   "radiusM": 120,
+   "score": 69.1,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "L'église Saint-Martin-et-Saint-Sébastien-des-Suisses (en italien : chiesa dei Santi Martino e Sebastiano degli Svizzeri), (en français : église des saints Martin et Sébastien des suisses) est un lieu de culte catholique situé au Vatican, près des colonnades de la place Saint-Pierre dans elle est séparée par le ricciolo d'Italia, dans le quartier de la garde suisse pontificale (à proximité de la porte San Pellegrino et du palais apostolique). Il s'agit de l'église nationale Suisse à Rome.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Citt%C3%A0%20del%20Vaticano%2C%20chiesa%20dei%20Santi%20Martino%20e%20Sebastiano%20degli%20Svizzeri%20-%20Esterno.jpg",
+   "imageAuthor": "Pufui Pc Pifpef I",
+   "imageLicence": "CC BY-SA 4.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/%C3%89glise_Saint-Martin-et-Saint-S%C3%A9bastien-des-Suisses_du_Vatican"
+  },
+  {
+   "id": "Q1166213",
+   "slug": "eglise-santo-stefano-degli-abissini",
+   "name": "Église Santo Stefano degli Abissini",
+   "themeId": "cathedrales",
+   "lat": 41.901878,
+   "lon": 12.452161,
+   "radiusM": 120,
+   "score": 68.7,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "L'église Santo Stefano degli Abissini (en français : église saint Étienne des Abyssiniens) est un lieu de culte catholique situé au Vatican. L'église est dédiée à saint Étienne, premier martyr de la chrétienté.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Giardini%20vaticani%2C%20chiesa%20di%20santo%20stefano%20degli%20abissini%2C%2001.jpg",
+   "imageAuthor": "Sailko",
+   "imageLicence": "CC BY 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/%C3%89glise_Santo_Stefano_degli_Abissini"
+  },
+  {
+   "id": "Q3585393",
+   "slug": "eglise-sainte-anne-des-palefreniers",
+   "name": "Église Sainte-Anne-des-Palefreniers",
+   "themeId": "cathedrales",
+   "lat": 41.904151,
+   "lon": 12.457484,
+   "radiusM": 120,
+   "score": 67.5,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "L’église Sainte-Anne-des-Palefreniers (en italien : Sant'Anna dei Palafrenieri) est une église du Vatican située à proximité immédiate de la porte sainte-Anne au nord de la place Saint-Pierre. C'est le siège de l'une des deux paroisses que compte la cité pontificale (l'autre étant la basilique Saint-Pierre), ainsi que son cimetière officiel.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sant%27Anna%20dei%20Palafrenieri%20-%20esterno.jpg",
+   "imageAuthor": "Ninfamania",
+   "imageLicence": "CC BY 4.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/%C3%89glise_Sainte-Anne-des-Palefreniers"
+  },
+  {
+   "id": "Q182955",
+   "slug": "musees-du-vatican",
+   "name": "Musées du Vatican",
+   "themeId": "musees",
+   "lat": 41.906389,
+   "lon": 12.454444,
+   "radiusM": 120,
+   "score": 144.5,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Les musées du Vatican constituent un ensemble muséal situé au Vatican. Il regroupe douze musées, ce qui représente cinq galeries et mille quatre cents salles.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mura%20vaticane%20-%20ingresso%20ai%20Musei%2000410.JPG",
+   "imageAuthor": "user:Lalupa",
+   "imageLicence": "CC BY-SA 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9es_du_Vatican"
+  },
+  {
+   "id": "Q498557",
+   "slug": "appartements-borgia",
+   "name": "Appartements Borgia",
+   "themeId": "musees",
+   "lat": 41.903333,
+   "lon": 12.455,
+   "radiusM": 120,
+   "score": 84.2,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Les appartements Borgia sont une série de six pièces monumentales dans le Palais apostolique du Vatican. Elles font maintenant partie de l'accès aux Musées du Vatican où est hébergée en partie, depuis 1973, la Collection d'Art religieux moderne.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Appartamento%20borgia%2C%2005.JPG",
+   "imageAuthor": "sailko",
+   "imageLicence": "CC BY-SA 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Appartements_Borgia"
+  },
+  {
+   "id": "Q774940",
+   "slug": "pinacotheque-vaticane",
+   "name": "Pinacothèque vaticane",
+   "themeId": "musees",
+   "lat": 41.90573,
+   "lon": 12.45277,
+   "radiusM": 120,
+   "score": 76.2,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "La Pinacothèque vaticane est un département des musées du Vatican à Rome. Dans son actuel bâtiment, elle a été ouverte au public le 27 octobre 1932, sous le pontificat du pape Pie XI (1922-1939).",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pinacoteca%20vaticana%20vista%20dai%20giardini%2001.JPG",
+   "imageAuthor": "Sailko",
+   "imageLicence": "CC BY 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Pinacoth%C3%A8que_vaticane"
+  }
+ ],
+ "collections": [
+  {
+   "slug": "geo-country-va",
+   "name": "Le meilleur du Vatican",
+   "kind": "geo",
+   "themeId": null,
+   "labelId": null,
+   "geoLevel": "country",
+   "geoCode": "VA",
+   "placeCount": 19,
+   "tierCounts": [
+    10,
+    9,
+    0
+   ],
+   "places": [
+    {
+     "placeId": "Q12512",
+     "tier": 1,
+     "rank": 1
+    },
+    {
+     "placeId": "Q182955",
+     "tier": 1,
+     "rank": 2
+    },
+    {
+     "placeId": "Q145093",
+     "tier": 1,
+     "rank": 3
+    },
+    {
+     "placeId": "Q42003",
+     "tier": 1,
+     "rank": 4
+    },
+    {
+     "placeId": "Q2291560",
+     "tier": 1,
+     "rank": 5
+    },
+    {
+     "placeId": "Q83425",
+     "tier": 1,
+     "rank": 6
+    },
+    {
+     "placeId": "Q2158200",
+     "tier": 1,
+     "rank": 7
+    },
+    {
+     "placeId": "Q4540172",
+     "tier": 1,
+     "rank": 8
+    },
+    {
+     "placeId": "Q13099380",
+     "tier": 1,
+     "rank": 9
+    },
+    {
+     "placeId": "Q2943",
+     "tier": 1,
+     "rank": 10
+    },
+    {
+     "placeId": "Q1444766",
+     "tier": 2,
+     "rank": 11
+    },
+    {
+     "placeId": "Q498557",
+     "tier": 2,
+     "rank": 12
+    },
+    {
+     "placeId": "Q1644167",
+     "tier": 2,
+     "rank": 13
+    },
+    {
+     "placeId": "Q2460920",
+     "tier": 2,
+     "rank": 14
+    },
+    {
+     "placeId": "Q1166213",
+     "tier": 2,
+     "rank": 15
+    },
+    {
+     "placeId": "Q2547111",
+     "tier": 2,
+     "rank": 16
+    },
+    {
+     "placeId": "Q774940",
+     "tier": 2,
+     "rank": 17
+    },
+    {
+     "placeId": "Q3585393",
+     "tier": 2,
+     "rank": 18
+    },
+    {
+     "placeId": "Q917387",
+     "tier": 2,
+     "rank": 19
+    }
+   ]
+  }
+ ],
+ "areas": {
+  "country": [
+   {
+    "code": "VA",
+    "name": "Vatican",
+    "deForm": "du Vatican"
+   }
+  ],
+  "region": [],
+  "departement": [],
+  "commune": []
+ }
+}

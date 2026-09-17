@@ -1283,6 +1283,13 @@
         ]
       ],
       "contours": "it-contours.json"
+    },
+    {
+      "code": "VA",
+      "name": "Vatican",
+      "fichier": "va.json",
+      "lieux": 19,
+      "emprises": []
     }
   ]
 }
