@@ -9702,11 +9702,22 @@ class TestDepartementDuCodeCommunal(unittest.TestCase):
 class TestEnclaves(unittest.TestCase):
     """Le Vatican et Saint-Marin sont des pays chez Wikidata."""
 
-    def test_l_italie_interroge_ses_enclaves(self):
+    def test_l_italie_interroge_son_enclave(self):
         it = load_config(pays="it")
-        self.assertEqual(it.country.qids, ["Q38", "Q237", "Q238"])
+        self.assertEqual(it.country.qids, ["Q38", "Q238"])
         self.assertEqual([(e.name, e.departement) for e in it.country.enclaves],
-                         [("Vatican", "058"), ("Saint-Marin", "099")])
+                         [("Saint-Marin", "099")])
+
+    def test_le_vatican_n_est_plus_une_enclave_italienne(self):
+        # L'absorption était un pis-aller : le filtre avait raison, le guide
+        # avait tort. Le Vatican est maintenant collecté, construit et servi
+        # comme le pays qu'il est — l'y laisser en plus mettait Q12512 dans
+        # DEUX catalogues, et la basilique Saint-Pierre sortait deux fois de la
+        # recherche. Saint-Marin reste tant qu'il n'a pas le sien : l'en sortir
+        # ferait disparaître le mont Titan sans que rien ne le rattrape.
+        it = load_config(pays="it")
+        self.assertNotIn("Q237", it.country.qids)
+        self.assertNotIn("Vatican", [e.name for e in it.country.enclaves])
 
     def test_la_france_n_interroge_qu_elle_meme(self):
         # Monaco et Andorre existent, mais rien ne les a demandés : une
@@ -9740,13 +9751,13 @@ class TestEnclaves(unittest.TestCase):
             place = _row_to_place({
                 "item": "http://www.wikidata.org/entity/Q12345",
                 "itemLabel": "Basilique",
-                "coord": "Point(12.4534 41.9022)",
+                "coord": "Point(12.4474 43.9361)",
                 "sitelinks": "40",
-                "pays": "http://www.wikidata.org/entity/Q237",
+                "pays": "http://www.wikidata.org/entity/Q238",
             }, CONFIG.themes[0], enclaves)
-            self.assertEqual(place.departement_code, "058")
-            self.assertEqual(place.region_code, geo.region_of("058").code)
-            self.assertEqual(place.commune_name, "Vatican")
+            self.assertEqual(place.departement_code, "099")
+            self.assertEqual(place.region_code, geo.region_of("099").code)
+            self.assertEqual(place.commune_name, "Saint-Marin")
             # `country_code` reste VIDE : la mention en ferait un catalogue à
             # part, alors qu'il est là pour être dans celui de l'Italie.
             self.assertEqual(place.country_code, "")
