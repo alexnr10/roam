@@ -108,6 +108,7 @@ Q108294156,3,musees,Musée Fellini
 Q1083014,3,monuments,Palazzo Gondi
 Q10842,3,villages,Montecchio
 Q1084264,2,megalithes,Scolacium
+Q1084608,3,cathedrales,Basilique San Lorenzo Maggiore
 Q1084616,1,volcans,Monte Nuovo
 Q10855544,1,musees,Galleria dell'Accademia de Florence
 Q1085811,3,musees,Pinacothèque Ambrosienne
@@ -251,7 +252,6 @@ Q124886,3,villages,Sassoferrato
 Q1249309,1,iles,Pantelleria
 Q1249840,1,lacs,Lac de Resia
 Q12512,1,cathedrales,Basilique Saint-Pierre
-Q1255667,3,cathedrales,Église Saint-Ferdinand de Naples
 Q1255713,3,monuments,San Gennaro dei Poveri
 Q1256487,3,cathedrales,Baptistère des Orthodoxes
 Q1257207,1,sommets,Tre Cime di Lavaredo
@@ -436,7 +436,7 @@ Q1648022,1,volcans,Vulcano
 Q1650259,2,chateaux,Rocca Roveresca
 Q165069,1,chateaux,Château de Miramare
 Q16511590,2,monuments,Tour Asinelli
-Q16531852,3,musees,Belvedere di San Leucio
+Q16531852,3,monuments,Belvedere di San Leucio
 Q16536381,2,gorges,Gola del Limarò
 Q16536487,2,plages,Capo Bianco
 Q1654198,2,chateaux,Château Tyrol
@@ -535,7 +535,6 @@ Q1809639,3,cathedrales,Église San Michele in Foro
 Q1810954,3,sommets,Alpe di Succiso
 Q1811284,3,lacs,Lago Santo
 Q1811289,3,lacs,Lech dl Dragon
-Q18129123,3,monuments,Palais Albergati
 Q1815153,3,monuments,Tour Mileto
 Q18155,3,villages,Rosazza
 Q1817943,3,megalithes,Autel de Hiéron
@@ -577,7 +576,6 @@ Q1892101,3,monuments,Arc d'Auguste
 Q1892625,2,iles,Budelli
 Q189387,1,iles,Ischia
 Q1894831,3,villages,Poffabro
-Q1895574,3,cathedrales,Église Saint-Samuel de Venise
 Q1895577,3,cathedrales,Sanctuaire Marie-Auxiliatrice
 Q189883,1,musees,Palais des Doges
 Q191739,1,cathedrales,Cathédrale Santa Maria del Fiore
@@ -805,6 +803,7 @@ Q2361327,3,megalithes,Source sacrée de Su Tempiesu
 Q2368198,3,monuments,Torrazzo de Crémone
 Q23735,3,villages,Vogogna
 Q2382880,3,megalithes,S’Ena ’e Thomes
+Q23946718,3,monuments,Palais Davia Bargellini
 Q24038410,3,piazzas,Piazza Galvani
 Q2407092,3,cathedrales,Dôme de Padoue
 Q241410,3,cathedrales,Basilique San Francesco di Paola
@@ -965,10 +964,10 @@ Q2942522,3,musees,Cathédrale Santa Maria d'Anagni
 Q2942535,3,cathedrales,Cathédrale d'Agrigente
 Q2942544,3,cathedrales,Cathédrale d'Andria
 Q2942572,3,cathedrales,Cathédrale d'Otrante
-Q2942652,3,cathedrales,Cathédrale de Crotone
 Q2942710,3,cathedrales,Cathédrale de Matera
 Q2942718,3,cathedrales,Cathédrale de Monopoli
 Q2942769,3,cathedrales,Cathédrale de Ravenne
+Q2942799,3,cathedrales,Cathédrale de Sarsina
 Q2942818,3,cathedrales,Cathédrale de Spolète
 Q2942828,3,cathedrales,Cathédrale de Termoli
 Q2943,1,cathedrales,Chapelle Sixtine
@@ -1173,7 +1172,7 @@ Q3622428,3,megalithes,Argimusco
 Q3627904,3,megalithes,Aternum
 Q3629554,3,megalithes,Augusta Bagiennorum
 Q3635635,3,cathedrales,Basilique Sainte-Barbe de Mantoue
-Q3635709,3,cathedrales,Basilique San Nicola de Tolentino
+Q3635671,3,cathedrales,Basilique Notre-Dame-des-Sept-Douleurs
 Q3635774,3,cathedrales,Basilique Santa Maria in Porto
 Q3636122,3,monuments,Bastion de Malte
 Q3639574,3,maisons,Biblioteca comunale Classense
@@ -1222,9 +1221,11 @@ Q3662629,3,chateaux,Château de Grinzane Cavour
 Q3662635,3,chateaux,Château d'Introd
 Q3662681,3,chateaux,Château de Massafra
 Q3662690,2,chateaux,Château de Melfi
+Q3662774,3,musees,Château d'Oria
 Q3662840,3,chateaux,Château de Roccascalegna
 Q3662862,3,chateaux,Château Saint-Georges
 Q3662883,3,chateaux,Château royal de Sarre
+Q3662907,3,chateaux,Château de Sperlinga
 Q3662951,3,chateaux,Castello di Vezio
 Q3662983,3,musees,Château normand-souabe
 Q3662987,2,chateaux,Château souabe de Trani
@@ -1381,11 +1382,12 @@ Q3867709,3,musees,Musée archéologique national des Marches
 Q3867723,3,musees,Musée national d'Archéologie prénestine
 Q3867749,3,maisons,Museo Capitolare di Atri
 Q3867751,3,maisons,Museo casa natale Gabriele D'Annunzio
-Q3867758,3,musees,Musée archéologique régional de Centuripe
+Q3867781,3,musees,Musée civique Villa Colloredo Mels
 Q3867785,3,maisons,Museo civico archeologico di Ozieri
 Q3867896,3,maisons,Museo degli strumenti musicali
 Q3867990,3,maisons,Museo deleddiano
 Q3868042,3,musees,Musée Mille Miglia
+Q3868061,3,musees,Musée du papier d'Amalfi
 Q3868123,3,maisons,Musée des Grigne
 Q3868400,3,musees,Musée Léonard-de-Vinci
 Q3868446,3,musees,Musée provincial de Capoue
@@ -1500,7 +1502,6 @@ Q3995190,3,chateaux,Torre Grossa
 Q3995244,3,monuments,Tour Paola
 Q3995488,3,monuments,Torre della Gabbia
 Q3995542,3,monuments,Tour Calamosca
-Q3995584,3,musees,Tour de Nao
 Q3995587,3,villages,Torre di Palme
 Q4011584,3,villages,Vigoleno
 Q4012768,3,maisons,Villa Napoleonica
@@ -2063,6 +2064,7 @@ Q972079,3,monuments,Torre di Ligny
 Q972315,2,piazzas,Piazza Pretoria
 Q973243,1,phares,Phare de Punta Penna
 Q97369764,2,cascades,Cascate del Perino
+Q974832,3,cathedrales,Église Santo Stefano
 Q97621435,3,maisons,Villa Lacchia
 Q977867,3,sommets,Monte Leco
 Q978549,2,abbayes,Monastère de Fonte Avellana
