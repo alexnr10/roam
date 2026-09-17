@@ -1,0 +1,50 @@
+# Les listes d'État, à Saint-Marin.
+#
+# Quatorze des quinze labels du dépôt sont FRANÇAIS : les Monuments
+# historiques, les Plus Beaux Villages de France, les Grands Sites, les Jardins
+# remarquables, les Maisons des Illustres, les Sites classés et inscrits, les
+# Forêts d'Exception, les Réserves naturelles, les Parcs naturels régionaux et
+# nationaux, les Plus Beaux Détours, le Pavillon Bleu.
+#
+# Ils ne désignent rien à Saint-Marin, et une fusion qui ne saurait qu'ajouter
+# envoyait le pipeline les interroger toutes à chaque collecte — quatorze
+# requêtes Wikidata pour rien, et c'est exactement ce qui se voyait au premier
+# `fetch`.
+#
+# L'UNESCO RESTE, et c'est la seule qui le mérite : c'est une liste
+# internationale, et le centre historique de Saint-Marin et le mont Titano y figure.
+#
+# Ce qu'il faudrait mettre à la place des quatorze autres se résout avec
+# `suggest-qids` puis `verify-qids`, une liste à la fois. Rien n'est écrit ici
+# tant que ce n'est pas résolu contre Wikidata : un Q-id supposé est un label
+# qui ne collecte rien et ne le dit pas.
+
+labels:
+  - id: plus-beaux-villages
+    retire: true
+  - id: plus-beaux-detours
+    retire: true
+  - id: grand-site-de-france
+    retire: true
+  - id: monument-historique-classe
+    retire: true
+  - id: monument-historique-inscrit
+    retire: true
+  - id: jardin-remarquable
+    retire: true
+  - id: maisons-des-illustres
+    retire: true
+  - id: site-classe
+    retire: true
+  - id: site-inscrit
+    retire: true
+  - id: foret-exception
+    retire: true
+  - id: reserve-naturelle
+    retire: true
+  - id: parc-naturel-regional
+    retire: true
+  - id: parc-national
+    retire: true
+  - id: pavillon-bleu
+    retire: true

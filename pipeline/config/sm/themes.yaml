@@ -1,0 +1,30 @@
+# Les thèmes, à Saint-Marin : ce qui diffère.
+#
+# Deux thèmes du dépôt LISENT des listes françaises, et les retirer de
+# `labels.yaml` ne suffit pas — la référence resterait, pendante. On vide donc
+# ici ce qu'ils vont chercher.
+#
+# AUCUN THÈME N'EST RETIRÉ, et c'est délibéré. Saint-Marin n'a évidemment ni
+# plage ni volcan, et une dizaine de thèmes ne rendront rien — mais le dépôt
+# ne retire un thème qu'après l'avoir MESURÉ, jamais sur une intuition. Le
+# premier `fetch` dira lesquels rendent zéro, et c'est alors qu'ils
+# sauteront, avec le chiffre en commentaire. Une requête qui ne rend rien coûte
+# une seconde ; un thème retiré à tort coûte un lieu qu'on ne verra jamais.
+
+themes:
+  # RETIRÉ, et non vidé : le thème `villages` n'a AUCUNE classe Wikidata et ne
+  # vit que de ses listes — les Plus Beaux Villages et les Plus Beaux Détours,
+  # qui sont français. Lui laisser une liste vide rend la configuration
+  # invalide, et `load_config` le refuse : « le thème villages n'a ni classe
+  # Wikidata ni label source ». Il a raison.
+  #
+  # C'est aussi la bonne réponse sur le fond : Saint-Marin n'a pas de villages,
+  # il EST un village. Le jour où une liste locale se résout, ces deux lignes
+  # sautent et le thème revient tel quel.
+  - id: villages
+    retire: true
+
+  # Les Maisons des Illustres sont une liste du ministère français. Les six
+  # classes Wikidata du thème restent : elles ne dépendent d'aucun État.
+  - id: maisons
+    from_labels: []
