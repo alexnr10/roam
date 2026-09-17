@@ -710,9 +710,15 @@ export function MapCanvas({
 
     const pas = pasDeCascade(dedans.length);
     const cascade = pas * Math.max(0, dedans.length - 1) + TRANSITION.lieux.apparition;
+    // Aucun temps mort quand on ARRIVE SUR UN LIEU : il est au centre, donc
+    // premier de la cascade, et il doit paraître tout de suite. Le demi-
+    // seconde de silence est le temps de prendre la mesure d'un TERRITOIRE
+    // qu'on ouvre ; sur un lieu qu'on vient de nommer, il n'y a rien à
+    // prendre, et l'attente ne se lit que comme une lenteur.
+    const delai = misEnAvant.current ? 0 : TRANSITION.lieux.delai;
     opacifier(instance, opaciteEnCascade(0, pas) as never);
-    animer(TRANSITION.lieux.delai + cascade, (avancement, ecoule) => {
-      opacifier(instance, opaciteEnCascade(ecoule - TRANSITION.lieux.delai, pas) as never);
+    animer(delai + cascade, (avancement, ecoule) => {
+      opacifier(instance, opaciteEnCascade(ecoule - delai, pas) as never);
     }, () => {
       opacifier(instance, opaciteAuRepos());
     });
@@ -1026,6 +1032,13 @@ function opacifier(instance: MapLibreMap, expression: never) {
   }
   if (instance.getLayer('place-glyphe')) {
     instance.setPaintProperty('place-glyphe', 'icon-opacity', expression);
+  }
+  // L'ANNEAU de mise en avant, pour la même raison que le contour ci-dessus,
+  // et le cas se voyait encore mieux : arrivé sur un lieu cherché, il était
+  // seul à l'écran pendant une demi-seconde — un cercle vide posé sur la
+  // carte, avant que sa pastille ne le rejoigne.
+  if (instance.getLayer('place-highlight')) {
+    instance.setPaintProperty('place-highlight', 'circle-stroke-opacity', expression);
   }
 }
 

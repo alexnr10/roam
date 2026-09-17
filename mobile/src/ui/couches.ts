@@ -248,6 +248,15 @@ export function couchesDeLaCarte({
       'circle-radius': rayonDesPastilles(4),
       'circle-stroke-width': 2.4,
       'circle-stroke-color': colors.primary,
+      // L'anneau SUIT sa pastille, il ne la précède pas.
+      //
+      // `circle-stroke-opacity` vaut un par défaut, et cette couche n'était
+      // pas de la cascade : en arrivant sur un lieu cherché, l'anneau brun
+      // était donc déjà là quand le disque et le symbole étaient encore à
+      // zéro. On voyait un cercle vide pendant une demi-seconde, puis la
+      // pastille se remplissait — mesuré au chronomètre dans le navigateur.
+      'circle-stroke-opacity': opacite,
+      'circle-stroke-opacity-transition': fondu,
     },
   });
 

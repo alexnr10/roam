@@ -469,6 +469,18 @@ export const TRANSITION = {
   courbe: [0.22, 0.61, 0.36, 1] as [number, number, number, number],
   autresRegions: { quand: 'pendant' as const, duree: 260 },
   lieux: {
+    /**
+     * Le temps mort avant que les pastilles n'apparaissent, en millisecondes.
+     *
+     * Il est juste quand on OUVRE UNE RÉGION : la caméra se pose, le regard
+     * prend la mesure du territoire, puis les lieux le peuplent. Un demi-
+     * seconde de silence, et la cascade se lit comme une arrivée.
+     *
+     * Il est faux quand on arrive sur un lieu PRÉCIS, cherché par son nom. Là,
+     * on ne découvre pas un territoire : on vérifie qu'on est bien là où l'on
+     * voulait. Mesuré au chronomètre, la pastille de Gourdon n'apparaissait
+     * qu'une seconde après l'atterrissage — voir `delaiSansCible`.
+     */
     delai: 520,
     cascade: 12,
     apparition: 220,
