@@ -4,12 +4,13 @@
 # `labels.yaml` ne suffit pas — la référence resterait, pendante. On vide donc
 # ici ce qu'ils vont chercher.
 #
-# AUCUN THÈME N'EST RETIRÉ, et c'est délibéré. le Vatican n'a évidemment ni
-# plage ni volcan, et une dizaine de thèmes ne rendront rien — mais le dépôt
-# ne retire un thème qu'après l'avoir MESURÉ, jamais sur une intuition. Le
-# premier `fetch` dira lesquels rendent zéro, et c'est alors qu'ils
-# sauteront, avec le chiffre en commentaire. Une requête qui ne rend rien coûte
-# une seconde ; un thème retiré à tort coûte un lieu qu'on ne verra jamais.
+# QUINZE THÈMES SONT RETIRÉS, et aucun ne l'a été sur une intuition. Ce
+# fichier a d'abord été écrit sans en retirer un seul, exprès : le dépôt ne
+# retire un thème qu'après l'avoir MESURÉ. Le premier `fetch --pays-config va`
+# a dit lesquels rendent zéro, le premier `build` a dit lequel ne rendait qu'un
+# débordement, et c'est alors qu'ils ont sauté — chacun avec son chiffre en
+# commentaire. Une requête qui ne rend rien coûte une seconde ; un thème retiré
+# à tort coûte un lieu qu'on ne verra jamais.
 
 themes:
   # RETIRÉ, et non vidé : le thème `villages` n'a AUCUNE classe Wikidata et ne
@@ -107,6 +108,25 @@ themes:
   - id: forets
     retire: true
   - id: rochers
+    retire: true
+
+  # ── La plage du Vatican : un faux positif, et un seul ──────────────────
+  #
+  # Ce thème n'est pas rentré vide, et c'est pire. Il a rendu UN candidat :
+  #
+  #     Q145694  Péninsule italienne   103 langues
+  #
+  # Mille kilomètres de botte, déclarée au Vatican parce que Wikidata lui donne
+  # TROIS pays — l'Italie, Saint-Marin et le Vatican — et que le filtre `P17`
+  # suffit à la faire remonter. Le catalogue italien ne s'en aperçoit pas : la
+  # péninsule n'a pas de province, et un lieu sans province sort avant d'être
+  # jugé. Le Vatican n'a PAS de subdivision — `require_departement: false` —
+  # donc rien ne l'arrête, et elle s'installait quatrième du pays, au premier
+  # palier, devant la chapelle Sixtine.
+  #
+  # Le Vatican n'a pas de côte. Le thème ne peut rien rendre d'autre qu'un
+  # débordement, et il est retiré pour cela, pas par intuition.
+  - id: plages
     retire: true
 
   # ── Les places : sans ce thème, la place Saint-Pierre n'existe pas ─────
