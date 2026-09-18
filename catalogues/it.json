@@ -16258,6 +16258,26 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ponte_Coperto"
   },
   {
+   "id": "Q1369420",
+   "slug": "necropole-de-montessu",
+   "name": "Nécropole de Montessu",
+   "themeId": "megalithes",
+   "lat": 39.133333,
+   "lon": 8.668611,
+   "radiusM": 200,
+   "score": 69.0,
+   "departement": "Carbonia-Iglesias",
+   "departementCode": "119",
+   "regionCode": "20",
+   "communeCode": "119023",
+   "communeName": "Villaperuccio",
+   "summary": "La nécropole de Montessu, est un site préhistorique daté du Néolithique, situé dans la commune de Villaperuccio, dans la province de Sardaigne du Sud en Italie. La nécropole regroupe 35 domus de janas, creusées durant la période prénuragique, constituant l'une des plus grandes nécropoles à domus de janas de Sardaigne.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Necropoli%20di%20Montessu%2006.jpg",
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/N%C3%A9cropole_de_Montessu"
+  },
+  {
    "id": "Q1072853",
    "slug": "arc-d-auguste",
    "name": "Arc d'Auguste",
@@ -18038,26 +18058,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Monast%C3%A8re_de_Saint-Nicolas-l%27Ar%C3%A8ne_de_Catane"
   },
   {
-   "id": "Q649367",
-   "slug": "tour-des-alberti",
-   "name": "Tour des Alberti",
-   "themeId": "monuments",
-   "lat": 43.768,
-   "lon": 11.2599,
-   "radiusM": 150,
-   "score": 65.1,
-   "departement": "Florence",
-   "departementCode": "048",
-   "regionCode": "09",
-   "communeCode": "048017",
-   "communeName": "Firenze",
-   "summary": "La tour des Alberti est une maison-tour médiévale située à Florence, en Toscane. Cette tour de plan polygonal était le siège et la résidence des Alberti, une des familles les plus puissantes et nombreuses de la Florence médiévale.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Torre%20degli%20alberti%2012.JPG",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Tour_des_Alberti"
-  },
-  {
    "id": "Q2631149",
    "slug": "mont-velino",
    "name": "Mont Velino",
@@ -18198,6 +18198,26 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Mergozzo"
   },
   {
+   "id": "Q3995340",
+   "slug": "tour-des-amidei",
+   "name": "Tour des Amidei",
+   "themeId": "monuments",
+   "lat": 43.7689,
+   "lon": 11.2536,
+   "radiusM": 150,
+   "score": 64.8,
+   "departement": "Florence",
+   "departementCode": "048",
+   "regionCode": "09",
+   "communeCode": "048017",
+   "communeName": "Firenze",
+   "summary": "La tour des Amidei (en italien, Torre degli Amidei) est une maison-tour de briques se trouvant à Florence, en Toscane. Elle date du Haut Moyen Âge et est située près de la Piazza della Signoria.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Torre%20degli%20Amidei%2021.JPG",
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Tour_des_Amidei"
+  },
+  {
    "id": "Q476876",
    "slug": "temple-de-poseidon",
    "name": "Temple de Poséidon",
@@ -18276,26 +18296,6 @@
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Sant%27Antimo"
-  },
-  {
-   "id": "Q1228217",
-   "slug": "palazzo-orsini-di-gravina",
-   "name": "Palazzo Orsini di Gravina",
-   "themeId": "monuments",
-   "lat": 40.845237,
-   "lon": 14.251462,
-   "radiusM": 150,
-   "score": 64.7,
-   "departement": "Naples",
-   "departementCode": "063",
-   "regionCode": "15",
-   "communeCode": "063049",
-   "communeName": "Napoli",
-   "summary": "Le palazzo Orsini di Gravina est un palais de Naples, situé dans le centre historique de la ville.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Napoli%20-%20Palazzo%20Gravina.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palazzo_Orsini_di_Gravina"
   },
   {
    "id": "Q3162382",
@@ -18836,6 +18836,26 @@
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_Nonantola"
+  },
+  {
+   "id": "Q718801",
+   "slug": "palazzo-doria-d-angri",
+   "name": "Palazzo Doria d'Angri",
+   "themeId": "monuments",
+   "lat": 40.84687,
+   "lon": 14.249611,
+   "radiusM": 150,
+   "score": 63.8,
+   "departement": "Naples",
+   "departementCode": "063",
+   "regionCode": "15",
+   "communeCode": "063049",
+   "communeName": "Napoli",
+   "summary": "Le Palazzo Doria d'Angri est un palais historique situé à Naples, piazza Sette Settembre.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Napoli%20-%20Palazzo%20Doria%20d%27Angri%20%28facciata%29.jpg",
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palazzo_Doria_d%27Angri"
   },
   {
    "id": "Q1752113",
@@ -19418,6 +19438,26 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Toblino"
   },
   {
+   "id": "Q20008548",
+   "slug": "mithraeum-de-santa-maria-capua-vetere",
+   "name": "Mithraeum de Santa Maria Capua Vetere",
+   "themeId": "megalithes",
+   "lat": 41.08021,
+   "lon": 14.25213,
+   "radiusM": 200,
+   "score": 62.2,
+   "departement": "Caserta",
+   "departementCode": "061",
+   "regionCode": "15",
+   "communeCode": "061083",
+   "communeName": "Santa Maria Capua Vetere",
+   "summary": "Le mithraeum de Santa Maria Capua Vetere est un mithréum  situé dans la commune de Santa Maria Capua Vetere (l'ancienne cité antique de Capoue), province de Caserte en Campanie).\nIl est situé à proximité de l'amphithéâtre de Capoue et du musée archéologique de l'antique Capoue.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ingresso%20Mitreo.jpg",
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mithraeum_de_Santa_Maria_Capua_Vetere"
+  },
+  {
    "id": "Q35722561",
    "slug": "lac-de-cavedine",
    "name": "Lac de Cavedine",
@@ -19436,26 +19476,6 @@
    "imageAuthor": "giovanni bidi",
    "imageLicence": "CC BY 3.0",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Cavedine"
-  },
-  {
-   "id": "Q2300067",
-   "slug": "palais-civena",
-   "name": "Palais Civena",
-   "themeId": "monuments",
-   "lat": 45.543333,
-   "lon": 11.545833,
-   "radiusM": 150,
-   "score": 62.1,
-   "departement": "Vicence",
-   "departementCode": "024",
-   "regionCode": "05",
-   "communeCode": "024116",
-   "communeName": "Vicenza",
-   "summary": "Le Palais Civena (en italien : Palazzo Civena) est une résidence urbaine d'Andrea Palladio sise à Vicence, dans la province homonyme et la région Vénétie, en Italie.\nPremier palais de ville conçu par l'architecte vicentin, il est construit pour les frères Giovanni Giacomo, Pier Antonio, Vincenzo et Francesco Civena.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palazzo%20Civena%2020081203-1.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palais_Civena"
   },
   {
    "id": "Q1106893",
@@ -19638,26 +19658,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Villa_Saraceno"
   },
   {
-   "id": "Q1775911",
-   "slug": "abbaye-de-san-pastore",
-   "name": "Abbaye de San Pastore",
-   "themeId": "abbayes",
-   "lat": 42.430278,
-   "lon": 12.759722,
-   "radiusM": 150,
-   "score": 61.6,
-   "departement": "Rieti",
-   "departementCode": "057",
-   "regionCode": "12",
-   "communeCode": "057025",
-   "communeName": "Contigliano",
-   "summary": "L'abbaye de San Pastore est une abbaye cistercienne située au nord du Latium en Italie.\nFondée en 1218, elle s'établit sur le site actuel en 1236.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Abbazia%20di%20San%20Pastore%20%28Contigliano%29%20chiesa%2002.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_de_San_Pastore"
-  },
-  {
    "id": "Q1534505",
    "slug": "gorge-de-su-gorroppu",
    "name": "Gorge de Su Gorroppu",
@@ -19736,26 +19736,6 @@
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": null
-  },
-  {
-   "id": "Q1585525",
-   "slug": "san-giacomo-in-paludo",
-   "name": "San Giacomo in Paludo",
-   "themeId": "iles",
-   "lat": 45.4694,
-   "lon": 12.37945,
-   "radiusM": 2000,
-   "score": 61.2,
-   "departement": "Venise",
-   "departementCode": "027",
-   "regionCode": "05",
-   "communeCode": "027042",
-   "communeName": "Venezia",
-   "summary": "San Giacomo in Paludo est une île de la lagune de Venise d'environ 0,0125 km2.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20photographs%20of%20Venice%202013%2C%20Anton%20Nossik%2C%20007.jpg",
-   "imageAuthor": "Anton Nosik",
-   "imageLicence": "CC BY 3.0",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/San_Giacomo_in_Paludo"
   },
   {
    "id": "Q1136496",
@@ -20541,10 +20521,10 @@
    "id": "Q2304697",
    "slug": "torre-astura",
    "name": "Torre Astura",
-   "themeId": "megalithes",
+   "themeId": "monuments",
    "lat": 41.409197,
    "lon": 12.765083,
-   "radiusM": 200,
+   "radiusM": 150,
    "score": 59.4,
    "departement": "Rome",
    "departementCode": "058",
@@ -20556,26 +20536,6 @@
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Torre_Astura"
-  },
-  {
-   "id": "Q3891343",
-   "slug": "palais-du-podestat",
-   "name": "Palais du Podestat",
-   "themeId": "monuments",
-   "lat": 45.443764,
-   "lon": 10.998475,
-   "radiusM": 150,
-   "score": 59.4,
-   "departement": "Vérone",
-   "departementCode": "023",
-   "regionCode": "05",
-   "communeCode": "023091",
-   "communeName": "Verona",
-   "summary": "Le palais du Podestat (en italien : Palazzo del Podestà), ou palais du Gouvernement, est un palais médiéval de Vérone, situé entre la Piazza dei Signori et les tombeaux des Scaliger.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palazzo%20del%20Podest%C3%A0.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palais_du_Podestat_(V%C3%A9rone)"
   },
   {
    "id": "Q1800436",
@@ -20596,26 +20556,6 @@
    "imageAuthor": "The original uploader was CTHOE at German Wikipedia . ( Original text: de:Benutzer:CTHOE )",
    "imageLicence": "CC BY-SA 2.0 de",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Valvestino"
-  },
-  {
-   "id": "Q21194402",
-   "slug": "palais-cusani",
-   "name": "Palais Cusani",
-   "themeId": "monuments",
-   "lat": 44.805324,
-   "lon": 10.333021,
-   "radiusM": 150,
-   "score": 59.3,
-   "departement": "Parme",
-   "departementCode": "034",
-   "regionCode": "08",
-   "communeCode": "034027",
-   "communeName": "Parma",
-   "summary": "Le palais Cusani est un bâtiment de style Renaissance, situé piazzale San Francesco à Parme, en face de l'église de San Francesco del Prato ; il abrite le siège de la Maison de la Musique.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palazzo%20Cusani%20%28Parma%29%20-%20facciata%202022-08-06.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palais_Cusani"
   },
   {
    "id": "Q3825846",
@@ -20661,7 +20601,7 @@
    "id": "Q2940753",
    "slug": "maison-fenoglio-la-fleur",
    "name": "Maison Fenoglio-La Fleur",
-   "themeId": "monuments",
+   "themeId": "maisons",
    "lat": 45.07669,
    "lon": 7.66478,
    "radiusM": 150,
@@ -20696,26 +20636,6 @@
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Teatro_Donizetti"
-  },
-  {
-   "id": "Q3982372",
-   "slug": "theatre-romain-de-teramo",
-   "name": "Théâtre romain de Teramo",
-   "themeId": "monuments",
-   "lat": 42.657897,
-   "lon": 13.704075,
-   "radiusM": 150,
-   "score": 59.2,
-   "departement": "Teramo",
-   "departementCode": "067",
-   "regionCode": "13",
-   "communeCode": "067041",
-   "communeName": "Teramo",
-   "summary": "Le théâtre romain de Teramo est situé dans le centre historique de la ville de Teramo, entre la via Teatro Antico et la Via Luigi Paris, près de la cathédrale Santa Maria Assunta et à quelques mètres de l'amphithéâtre romain, dans la région des Abruzzes.\nConstruit à l'époque augustéenne, le théâtre est contemporaine d'autres bâtiments similaires érigés dans des villes voisines comme Amiternum, Peltuinum, Hatria et Asculum.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Teatro%20romano%20di%20Teramo.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Th%C3%A9%C3%A2tre_romain_de_Teramo"
   },
   {
    "id": "Q1569127",
@@ -20758,26 +20678,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Sauris"
   },
   {
-   "id": "Q3117098",
-   "slug": "grotte-guattari",
-   "name": "Grotte Guattari",
-   "themeId": "megalithes",
-   "lat": 41.231346,
-   "lon": 13.093214,
-   "radiusM": 200,
-   "score": 59.1,
-   "departement": "Latina",
-   "departementCode": "059",
-   "regionCode": "12",
-   "communeCode": "059025",
-   "communeName": "San Felice Circeo",
-   "summary": "La grotte Guattari est un site préhistorique du Latium, en Italie. Elle s'ouvre à une centaine de mètres de la côte tyrrhénienne, sur le versant oriental du mont Circé, à San Felice Circeo.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Grotta%20guattari.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Grotte_Guattari"
-  },
-  {
    "id": "Q3621786",
    "slug": "arc-de-riccardo",
    "name": "Arc de Riccardo",
@@ -20816,46 +20716,6 @@
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_Santo_Stefano_del_Bosco"
-  },
-  {
-   "id": "Q3867896",
-   "slug": "museo-degli-strumenti-musicali",
-   "name": "Museo degli strumenti musicali",
-   "themeId": "maisons",
-   "lat": 45.470556,
-   "lon": 9.178611,
-   "radiusM": 150,
-   "score": 59.0,
-   "departement": "Milan",
-   "departementCode": "015",
-   "regionCode": "03",
-   "communeCode": "015146",
-   "communeName": "Milano",
-   "summary": null,
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Image%20gallery%20%282%29.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": null
-  },
-  {
-   "id": "Q1458838",
-   "slug": "palais-des-elephants",
-   "name": "Palais des Éléphants",
-   "themeId": "monuments",
-   "lat": 37.503056,
-   "lon": 15.086944,
-   "radiusM": 150,
-   "score": 59.0,
-   "departement": "Catane",
-   "departementCode": "087",
-   "regionCode": "19",
-   "communeCode": "087015",
-   "communeName": "Catania",
-   "summary": "Le palais des éléphants (en italien Palazzo degli Elefanti) est l'hôtel de ville de Catane en Sicile, situé sur la place de la cathédrale.\nSa construction date de 1696 peu après le tremblement de terre de 1693.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Catania%20Palazzo%20Elefanti242r.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palais_des_%C3%89l%C3%A9phants"
   },
   {
    "id": "Q3322114",
@@ -20898,26 +20758,6 @@
    "wikipediaUrl": null
   },
   {
-   "id": "Q3802955",
-   "slug": "isola-dei-topi",
-   "name": "Isola dei Topi",
-   "themeId": "iles",
-   "lat": 42.87084,
-   "lon": 10.42341,
-   "radiusM": 2000,
-   "score": 58.9,
-   "departement": "Livourne",
-   "departementCode": "049",
-   "regionCode": "09",
-   "communeCode": "049021",
-   "communeName": "Rio",
-   "summary": "La Isola dei Topi  est une île mineure de l'archipel toscan, en mer tyrrhénienne. Elle est située dans le canal de Piombino à environ trois cents mètres au nord de Capo Castello, près de Cavo, une frazione de Rio ; administrativement, elle fait partie de la municipalité d'Elbe.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Isola%20dei%20topi%20da%20sud.jpg",
-   "imageAuthor": "F Ceragioli",
-   "imageLicence": "CC BY-SA 3.0",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Isola_dei_Topi"
-  },
-  {
    "id": "Q1059016",
    "slug": "lac-de-pilate",
    "name": "Lac de Pilate",
@@ -20938,53 +20778,13 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Pilate"
   },
   {
-   "id": "Q604541",
-   "slug": "domus-mercatorum",
-   "name": "Domus Mercatorum",
-   "themeId": "monuments",
-   "lat": 45.442731,
-   "lon": 10.997117,
-   "radiusM": 150,
-   "score": 58.9,
-   "departement": "Vérone",
-   "departementCode": "023",
-   "regionCode": "05",
-   "communeCode": "023091",
-   "communeName": "Verona",
-   "summary": "La Domus Mercatorum, ou Casa dei Mercanti (Maison des Marchands), est un édifice civil médiéval sur la Piazza delle Erbe à Vérone. Construite entre 1301 et 1304, elle abrita au Moyen Âge la Casa dei Mercanti, qui représentait les corporations des arts et métiers ; elle appartient aujourd'hui au groupe bancaire Banco BPM et à la chambre de commerce de la ville.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Domus%20Mercatorum.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Domus_Mercatorum"
-  },
-  {
-   "id": "Q3621979",
-   "slug": "zone-archeologique-de-san-pietro-degli-schiavoni",
-   "name": "Zone archéologique de San Pietro degli Schiavoni",
-   "themeId": "megalithes",
-   "lat": 40.63909,
-   "lon": 17.944751,
-   "radiusM": 200,
-   "score": 58.9,
-   "departement": "Brindisi",
-   "departementCode": "074",
-   "regionCode": "16",
-   "communeCode": "074001",
-   "communeName": "Brindisi",
-   "summary": "La zone archéologique de San Pietro degli Schiavoni (ou en dialecte de Brindisi San Pietru dilli Scauni) est située dans le centre historique de Brindisi sous le théâtre Verdi, qui présente des éléments et des découvertes de l'ancienne ville romaine de Brundisium.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arco%20di%20San%20Pietro%20degli%20Schiavoni.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Zone_arch%C3%A9ologique_de_San_Pietro_degli_Schiavoni"
-  },
-  {
    "id": "Q3936711",
    "slug": "reserve-naturelle-des-salines-de-margherita-di-savoia",
    "name": "Réserve naturelle des Salines de Margherita di Savoia",
-   "themeId": "lacs",
+   "themeId": "dunes-marais",
    "lat": 41.3893,
    "lon": 16.0634,
-   "radiusM": 1500,
+   "radiusM": 600,
    "score": 58.9,
    "departement": "Barletta-Andria-Trani",
    "departementCode": "110",
@@ -20996,26 +20796,6 @@
    "imageAuthor": "Matteo Pappadopoli",
    "imageLicence": "CC BY-SA 4.0",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/R%C3%A9serve_naturelle_des_Salines_de_Margherita_di_Savoia"
-  },
-  {
-   "id": "Q28668608",
-   "slug": "villa-arrigona",
-   "name": "Villa Arrigona",
-   "themeId": "maisons",
-   "lat": 44.97139,
-   "lon": 11.04897,
-   "radiusM": 150,
-   "score": 58.8,
-   "departement": "Mantoue",
-   "departementCode": "020",
-   "regionCode": "03",
-   "communeCode": "020056",
-   "communeName": "San Giacomo delle Segnate",
-   "summary": "La Villa Arrigona est un édifice situé à San Giacomo delle Segnate, dans la province de Mantoue.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Villa%20Arrigona%20Facciata.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Villa_Arrigona"
   },
   {
    "id": "Q830251",
@@ -21036,26 +20816,6 @@
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mont_Penna"
-  },
-  {
-   "id": "Q1446018",
-   "slug": "isola-sacra",
-   "name": "Isola Sacra",
-   "themeId": "megalithes",
-   "lat": 41.75,
-   "lon": 12.25,
-   "radiusM": 200,
-   "score": 58.7,
-   "departement": "Rome",
-   "departementCode": "058",
-   "regionCode": "12",
-   "communeCode": "058120",
-   "communeName": "Fiumicino",
-   "summary": "Isola Sacra est une zona di Roma (zone de Rome) mais aussi un quartier de la commune de Fiumicino. Elle est située sur la rive nord de l'embouchure du Tibre, au sud-ouest de Rome dans l'Agro Romano en Italie.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Necropoli%20di%20Porto%2003.JPG",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Isola_Sacra"
   },
   {
    "id": "Q1674445",
@@ -21098,104 +20858,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Serraia"
   },
   {
-   "id": "Q55165344",
-   "slug": "palazzo-di-citta",
-   "name": "Palazzo di Città",
+   "id": "Q521254",
+   "slug": "palais-poiana",
+   "name": "Palais Poiana",
    "themeId": "monuments",
-   "lat": 45.46625,
-   "lon": 7.876028,
+   "lat": 45.5475,
+   "lon": 11.545,
    "radiusM": 150,
    "score": 58.7,
-   "departement": "Turin",
-   "departementCode": "001",
-   "regionCode": "01",
-   "communeCode": "001125",
-   "communeName": "Ivrea",
-   "summary": "L'hôtel de ville d'Ivrée (localement connu, en italien, comme le Palazzo di Città) est un bâtiment historique siège de la commune d'Ivrée, au Piémont en Italie.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Town%20hall%20of%20Ivrea%20%284%29.jpg",
+   "departement": "Vicence",
+   "departementCode": "024",
+   "regionCode": "05",
+   "communeCode": "024116",
+   "communeName": "Vicenza",
+   "summary": "Le palais Poiana (en italien : Palazzo Poiana, également écrit Pojana) est une résidence urbaine, attribuée à Andrea Palladio, sise corso Palladio à Vicence, dans la province homonyme et la région Vénétie, en Italie. \nL'architecte vicentin aurait conçu ce projet dans les années 1540.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palazzo%20Poiana%20Vicenza%2021-06-08%2002.jpg",
    "imageAuthor": null,
    "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/H%C3%B4tel_de_ville_d%27Ivr%C3%A9e"
-  },
-  {
-   "id": "Q3621772",
-   "slug": "arc-d-hadrien",
-   "name": "Arc d'Hadrien",
-   "themeId": "monuments",
-   "lat": 41.0839,
-   "lon": 14.2478,
-   "radiusM": 150,
-   "score": 58.7,
-   "departement": "Caserta",
-   "departementCode": "061",
-   "regionCode": "15",
-   "communeCode": "061083",
-   "communeName": "Santa Maria Capua Vetere",
-   "summary": "L'arc d'Hadrien ou arc de Capoue  est un arc de triomphe de la Rome antique situé dans la commune de Santa Maria Capua Vetere (l'ancienne cité antique de Capoue), province de Caserte en Campanie). \nIl s'agissait à l'origine d'un arc triple, mais il ne reste aujourd'hui que trois piliers et un des arcs latéraux.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ehrenbogen%20arco%20di%20adriano.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Arc_d%27Hadrien_(Capoue)"
-  },
-  {
-   "id": "Q3825952",
-   "slug": "lac-de-fondi",
-   "name": "Lac de Fondi",
-   "themeId": "lacs",
-   "lat": 41.324,
-   "lon": 13.333,
-   "radiusM": 1500,
-   "score": 58.6,
-   "departement": "Latina",
-   "departementCode": "059",
-   "regionCode": "12",
-   "communeCode": "059007",
-   "communeName": "Fondi",
-   "summary": "Le lac de Fondi, en italien lago di Fondi, en latin, lacus Fundanus ou lacus Amyclanus, est un lac côtier dans la province de Latina en Italie. \nLe lac est situé sur le territoire de la municipalité du même nom.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lago%20di%20Fondi%202012%20by-RaBoe%2001.jpg",
-   "imageAuthor": "© Ra Boe / Wikipedia",
-   "imageLicence": "CC BY-SA 3.0 de",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_de_Fondi"
-  },
-  {
-   "id": "Q1997405",
-   "slug": "norchia",
-   "name": "Norchia",
-   "themeId": "megalithes",
-   "lat": 42.340556,
-   "lon": 11.943056,
-   "radiusM": 200,
-   "score": 58.6,
-   "departement": "Viterbo",
-   "departementCode": "056",
-   "regionCode": "12",
-   "communeCode": "056059",
-   "communeName": "Viterbo",
-   "summary": "Norchia est une ancienne cité étrusque dotée d'une nécropole adjacente, située près de Vetralla, mais sur le territoire de la municipalité de Viterbe, dans le Latium, en Italie.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Norchia.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Norchia"
-  },
-  {
-   "id": "Q3891341",
-   "slug": "palais-du-podestat",
-   "name": "Palais du Podestat",
-   "themeId": "monuments",
-   "lat": 44.060704,
-   "lon": 12.565529,
-   "radiusM": 150,
-   "score": 58.6,
-   "departement": "Rimini",
-   "departementCode": "099",
-   "regionCode": "08",
-   "communeCode": "099014",
-   "communeName": "Rimini",
-   "summary": "Le Palazzo del Podestà est un monument médiéval de Rimini qui a été érigé en 1334. Au rez-de-chaussée, il présente une élévation avec trois arcs gothiques frontaux; de l'arc central pendait la corde destinée à pendre les coupables.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palazzo%20del%20Podest%C3%A0%2C%20Rimini.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palais_du_Podestat_(Rimini)"
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palais_Poiana"
   },
   {
    "id": "Q3117235",
@@ -21236,26 +20916,6 @@
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Parc_des_Cascine"
-  },
-  {
-   "id": "Q17334557",
-   "slug": "mont-santu",
-   "name": "Mont Santu",
-   "themeId": "sommets",
-   "lat": 40.5782,
-   "lon": 8.7803,
-   "radiusM": 1000,
-   "score": 58.5,
-   "departement": "Sassari",
-   "departementCode": "112",
-   "regionCode": "20",
-   "communeCode": "112054",
-   "communeName": "Siligo",
-   "summary": "Le mont Santu (en sarde : Monte Santu) est une montagne dans le Logudoro en Sardaigne, Italie. C'est une mesa et un prolongement de la chaîne du mont Pelau.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Siligo%20-%20Monte%20Santo%20%2802%29.JPG",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mont_Santu"
   },
   {
    "id": "Q1861237",
@@ -22118,6 +21778,26 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Monte_Crostis"
   },
   {
+   "id": "Q2210251",
+   "slug": "sacca-san-biagio",
+   "name": "Sacca San Biagio",
+   "themeId": "iles",
+   "lat": 45.42591,
+   "lon": 12.31331,
+   "radiusM": 2000,
+   "score": 56.8,
+   "departement": "Venise",
+   "departementCode": "027",
+   "regionCode": "05",
+   "communeCode": "027042",
+   "communeName": "Venezia",
+   "summary": "Sacca San Biagio est une île artificielle de la lagune de Venise constituant l'extrémité occidentale de la Giudecca qui, comme elle, dépend du Sestiere de Dorsoduro. Elle est séparée de la Sacca Fisola par le Canale Sacca San Biagio et est traversé par un pont.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/R0300003.jpg",
+   "imageAuthor": "Io",
+   "imageLicence": "CC BY-SA 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Sacca_San_Biagio"
+  },
+  {
    "id": "Q3825996",
    "slug": "lac-d-ortiglieto",
    "name": "Lac d'Ortiglieto",
@@ -22658,26 +22338,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Piazza_del_Duomo_(Sienne)"
   },
   {
-   "id": "Q18558569",
-   "slug": "abbaye-san-bartolomeo",
-   "name": "Abbaye San Bartolomeo",
-   "themeId": "abbayes",
-   "lat": 42.338172,
-   "lon": 13.848847,
-   "radiusM": 150,
-   "score": 55.9,
-   "departement": "Pescara",
-   "departementCode": "068",
-   "regionCode": "13",
-   "communeCode": "068008",
-   "communeName": "Carpineto della Nora",
-   "summary": "L'Abbaye de San Bartolomeo est une ancienne abbaye bénédictine, située en Italie, dans la commune de Carpineto della Nora (Abruzzes, province de Pescara).",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Carpineto%20della%20Nora%20PE%20-%20Abbazia%20di%20San%20Bartolomeo%2012.JPG",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Abbaye_San_Bartolomeo"
-  },
-  {
    "id": "Q1406020",
    "slug": "palais-dalla-torre",
    "name": "Palais Dalla Torre",
@@ -22838,26 +22498,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lac_Liscia"
   },
   {
-   "id": "Q2624890",
-   "slug": "porta-garibaldi",
-   "name": "Porta Garibaldi",
-   "themeId": "monuments",
-   "lat": 37.499639,
-   "lon": 15.073889,
-   "radiusM": 150,
-   "score": 55.6,
-   "departement": "Catane",
-   "departementCode": "087",
-   "regionCode": "19",
-   "communeCode": "087015",
-   "communeName": "Catania",
-   "summary": "La Porta Garibaldi, construite à l'origine sous le nom de Porta Ferdinandea ou Porta Ferdinanda, est un arc de triomphe, édifié en 1768, situé au bout de la Via Giuseppe Garibaldi, entre la Piazza Palestro et la Piazza Crocifisso à Catane, en Sicile (Italie). Elle a été construite pour célébrer le mariage du roi Bourbon Ferdinand Ier des Deux-Siciles avec la princesse Habsbourg Marie-Caroline d'Autriche.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Il%20Fortino%20-%20Porta%20Garibaldi%20Catania.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Porta_Garibaldi"
-  },
-  {
    "id": "Q24938870",
    "slug": "museo-della-battaglia-e-di-anghiari",
    "name": "Museo della battaglia e di Anghiari",
@@ -22876,6 +22516,26 @@
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_de_la_bataille_d%27Anghiari"
+  },
+  {
+   "id": "Q2624890",
+   "slug": "porta-garibaldi",
+   "name": "Porta Garibaldi",
+   "themeId": "monuments",
+   "lat": 37.499639,
+   "lon": 15.073889,
+   "radiusM": 150,
+   "score": 55.6,
+   "departement": "Catane",
+   "departementCode": "087",
+   "regionCode": "19",
+   "communeCode": "087015",
+   "communeName": "Catania",
+   "summary": "La Porta Garibaldi, construite à l'origine sous le nom de Porta Ferdinandea ou Porta Ferdinanda, est un arc de triomphe, édifié en 1768, situé au bout de la Via Giuseppe Garibaldi, entre la Piazza Palestro et la Piazza Crocifisso à Catane, en Sicile (Italie). Elle a été construite pour célébrer le mariage du roi Bourbon Ferdinand Ier des Deux-Siciles avec la princesse Habsbourg Marie-Caroline d'Autriche.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Il%20Fortino%20-%20Porta%20Garibaldi%20Catania.jpg",
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Porta_Garibaldi"
   },
   {
    "id": "Q3825848",
@@ -22976,6 +22636,26 @@
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/N%C3%A9cropole_de_Campovalano"
+  },
+  {
+   "id": "Q1235868",
+   "slug": "dolmen-de-chianca",
+   "name": "Dolmen de Chianca",
+   "themeId": "megalithes",
+   "lat": 41.194099,
+   "lon": 16.487324,
+   "radiusM": 200,
+   "score": 55.4,
+   "departement": "Barletta-Andria-Trani",
+   "departementCode": "110",
+   "regionCode": "16",
+   "communeCode": "110003",
+   "communeName": "Bisceglie",
+   "summary": "Le dolmen de Chianca, ou dolmen de Bisceglie, est un dolmen, daté de l'âge du bronze (entre 2300 et 1750 av. J.-C.) situé près de Bisceglie, Province de Barletta-Andria-Trani dans les Pouilles.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Dolmen%20della%20%22Chianca%22%20Bisceglie.jpeg",
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Dolmen_de_Chianca"
   },
   {
    "id": "Q3322070",
@@ -23156,6 +22836,26 @@
    "imageAuthor": "Alessandro Gigliotti",
    "imageLicence": "CC BY 3.0",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Lagune_de_Caorle"
+  },
+  {
+   "id": "Q3889774",
+   "slug": "palais-canossa",
+   "name": "Palais Canossa",
+   "themeId": "monuments",
+   "lat": 45.440417,
+   "lon": 10.989583,
+   "radiusM": 150,
+   "score": 55.1,
+   "departement": "Vérone",
+   "departementCode": "023",
+   "regionCode": "05",
+   "communeCode": "023091",
+   "communeName": "Verona",
+   "summary": "Le Palais Canossa est un palais de Vérone, situé Corso Cavour.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palazzo%20Canossa.jpg",
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palais_Canossa_(V%C3%A9rone)"
   },
   {
    "id": "Q97621435",
@@ -24138,6 +23838,26 @@
    "wikipediaUrl": null
   },
   {
+   "id": "Q3889598",
+   "slug": "palais-barbieri",
+   "name": "Palais Barbieri",
+   "themeId": "monuments",
+   "lat": 45.4381,
+   "lon": 10.9939,
+   "radiusM": 150,
+   "score": 53.3,
+   "departement": "Vérone",
+   "departementCode": "023",
+   "regionCode": "05",
+   "communeCode": "023091",
+   "communeName": "Verona",
+   "summary": "Le palais Barbieri est un palais de style Néoclassique situé sur la piazza Bra, dans le centre historique de Vérone; il abrite aujourd'hui l'hôtel de ville.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Municipio%20Verona.JPG",
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palais_Barbieri"
+  },
+  {
    "id": "Q55165346",
    "slug": "palais-de-la-credenza",
    "name": "Palais de la Credenza",
@@ -24558,26 +24278,6 @@
    "wikipediaUrl": null
   },
   {
-   "id": "Q3671516",
-   "slug": "chiesa-di-san-nicolo-l-arena",
-   "name": "Chiesa di San Nicolò l'Arena",
-   "themeId": "monuments",
-   "lat": 37.504172,
-   "lon": 15.080409,
-   "radiusM": 150,
-   "score": 51.3,
-   "departement": "Catane",
-   "departementCode": "087",
-   "regionCode": "19",
-   "communeCode": "087015",
-   "communeName": "Catania",
-   "summary": null,
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Catane%20San%20Nicolo.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": null
-  },
-  {
    "id": "Q3884705",
    "slug": "oratorio-di-san-michele",
    "name": "Oratorio di San Michele",
@@ -24633,6 +24333,26 @@
    "communeName": "Tripi - Abakainon",
    "summary": null,
    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%E1%BC%98%CF%81%CE%B5%CE%AF%CF%80%CE%B9%CE%B1%20%CF%84%CE%BF%E1%BF%A6%20%E1%BC%88%CE%B2%CE%B1%CE%BA%CE%B1%CE%AF%CE%BD%CE%BF%CF%85.jpg",
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": null
+  },
+  {
+   "id": "Q3671516",
+   "slug": "chiesa-di-san-nicolo-l-arena",
+   "name": "Chiesa di San Nicolò l'Arena",
+   "themeId": "monuments",
+   "lat": 37.504172,
+   "lon": 15.080409,
+   "radiusM": 150,
+   "score": 51.3,
+   "departement": "Catane",
+   "departementCode": "087",
+   "regionCode": "19",
+   "communeCode": "087015",
+   "communeName": "Catania",
+   "summary": null,
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Catane%20San%20Nicolo.jpg",
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": null
@@ -32078,46 +31798,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Sant%27Aniceto"
   },
   {
-   "id": "Q15965575",
-   "slug": "chateau-de-ceppaloni",
-   "name": "Château de Ceppaloni",
-   "themeId": "chateaux",
-   "lat": 41.046158,
-   "lon": 14.760135,
-   "radiusM": 200,
-   "score": 59.0,
-   "departement": "Benevento",
-   "departementCode": "062",
-   "regionCode": "15",
-   "communeCode": "062022",
-   "communeName": "Ceppaloni",
-   "summary": "Le château de Ceppaloni est un château médiéval dominant la ville de Ceppaloni, province de Bénévent en Campanie.\nSa fondation, du moins d'après les éléments encore visibles, remonte à l'époque normande et a subi des modifications au fil du temps, notamment à l'époque angevine et aragonaise.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castello%20di%20Ceppaloni.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_de_Ceppaloni"
-  },
-  {
-   "id": "Q3662381",
-   "slug": "chateau-sueve-de-brindisi",
-   "name": "Château Suève de Brindisi",
-   "themeId": "chateaux",
-   "lat": 40.63953,
-   "lon": 17.938154,
-   "radiusM": 200,
-   "score": 58.7,
-   "departement": "Brindisi",
-   "departementCode": "074",
-   "regionCode": "16",
-   "communeCode": "074001",
-   "communeName": "Brindisi",
-   "summary": "Le château Svève (italien : castello svevo di Brindisi ou Casyello grande ou Castello di terra ou Castello svevo-aragonese ou Castello di Mare) est un château qui se trouve à Brindisi dans la province de Brindisi (Pouilles) et dont l'origine remonte au XIIIe siècle.\nL'édifice fortifié se situe à proximité du centre historique de Brindisi.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Entrata%20castello%20svevo.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_Su%C3%A8ve_de_Brindisi"
-  },
-  {
    "id": "Q948080",
    "slug": "castel-sismondo",
    "name": "Castel Sismondo",
@@ -32778,24 +32458,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cath%C3%A9drale_de_Termoli"
   },
   {
-   "id": "Q256486",
-   "slug": "cathedrale-notre-dame-de-l-assomption-de-naples",
-   "name": "Cathédrale Notre-Dame-de-l'Assomption de Naples",
+   "id": "Q718774",
+   "slug": "eglise-du-gesu-nuovo",
+   "name": "Église du Gesù Nuovo",
    "themeId": "cathedrales",
-   "lat": 40.852606,
-   "lon": 14.259528,
+   "lat": 40.847622,
+   "lon": 14.251803,
    "radiusM": 120,
-   "score": 114.9,
+   "score": 77.2,
    "departement": "Naples",
    "departementCode": "063",
    "regionCode": "15",
    "communeCode": "063049",
    "communeName": "Napoli",
-   "summary": "La cathédrale de Naples, officiellement cathédrale Notre-Dame-de-l'Assomption de Naples (en italien : cattedrale metropolitana di Santa Maria Assunta), bâtie à la fin du XIIIe et du début du XIVe siècle, est le siège de l'archidiocèse de Naples. Située à Naples en Italie, elle est dédiée à l'Assomption de la Bienheureuse Vierge Marie, et est célèbre pour les reliques de saint Janvier, saint patron de la ville, qui y sont conservées.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Naples%20duomo%20facade.jpg",
+   "summary": "L'église du Gesù Nuovo est un édifice religieux catholique de la ville de Naples (Italie), sis sur la grande place du même nom. Construite en 1584 à partir d'un ancien palais princier du XVe siècle, elle compte parmi les plus importantes du point de vue de l'histoire, de l'art et de la culture de la cité parthénopéenne.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Facciata%20della%20chiesa%20del%20Ges%C3%B9%20Nuovo%20%28Napoli%29%20-%20BW%202013-05-16.jpg",
    "imageAuthor": null,
    "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cath%C3%A9drale_Notre-Dame-de-l%27Assomption_de_Naples"
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/%C3%89glise_du_Ges%C3%B9_Nuovo_de_Naples"
   },
   {
    "id": "Q550514",
@@ -33256,6 +32936,26 @@
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/%C3%89glise_Saint-Ignace-de-Loyola_(Rome)"
+  },
+  {
+   "id": "Q256486",
+   "slug": "cathedrale-notre-dame-de-l-assomption-de-naples",
+   "name": "Cathédrale Notre-Dame-de-l'Assomption de Naples",
+   "themeId": "cathedrales",
+   "lat": 40.852606,
+   "lon": 14.259528,
+   "radiusM": 120,
+   "score": 114.9,
+   "departement": "Naples",
+   "departementCode": "063",
+   "regionCode": "15",
+   "communeCode": "063049",
+   "communeName": "Napoli",
+   "summary": "La cathédrale de Naples, officiellement cathédrale Notre-Dame-de-l'Assomption de Naples (en italien : cattedrale metropolitana di Santa Maria Assunta), bâtie à la fin du XIIIe et du début du XIVe siècle, est le siège de l'archidiocèse de Naples. Située à Naples en Italie, elle est dédiée à l'Assomption de la Bienheureuse Vierge Marie, et est célèbre pour les reliques de saint Janvier, saint patron de la ville, qui y sont conservées.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Naples%20duomo%20facade.jpg",
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cath%C3%A9drale_Notre-Dame-de-l%27Assomption_de_Naples"
   },
   {
    "id": "Q542070",
@@ -34938,24 +34638,24 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cath%C3%A9drale_de_Salerne"
   },
   {
-   "id": "Q588559",
-   "slug": "eglise-san-sebastiano-de-venise",
-   "name": "Église San Sebastiano de Venise",
+   "id": "Q2356961",
+   "slug": "eglise-san-barnaba",
+   "name": "Église San Barnaba",
    "themeId": "cathedrales",
-   "lat": 45.432,
-   "lon": 12.32,
+   "lat": 45.433056,
+   "lon": 12.32525,
    "radiusM": 120,
-   "score": 77.6,
+   "score": 77.5,
    "departement": "Venise",
    "departementCode": "027",
    "regionCode": "05",
    "communeCode": "027042",
    "communeName": "Venezia",
-   "summary": "L’église San Sebastiano est une église du XIVe siècle, située dans le quartier (sestiere)  de Dorsoduro, sur le campo San Sebastian, à Venise en Italie. Le peintre Paul Véronèse y est inhumé.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/San%20Sebastiano%20%28Venice%29%20Facade.jpg",
+   "summary": "L'église San Barnaba est une église catholique de Venise, en Italie. Elle est située dans le quartier de Dorsoduro.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Chiesa%20di%20San%20Barnaba%20-%20Venezia.jpg",
    "imageAuthor": null,
    "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/%C3%89glise_San_Sebastiano_de_Venise"
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/%C3%89glise_San_Barnaba_de_Venise"
   },
   {
    "id": "Q749536",
@@ -34976,26 +34676,6 @@
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cath%C3%A9drale_de_Brindisi"
-  },
-  {
-   "id": "Q718774",
-   "slug": "eglise-du-gesu-nuovo",
-   "name": "Église du Gesù Nuovo",
-   "themeId": "cathedrales",
-   "lat": 40.847622,
-   "lon": 14.251803,
-   "radiusM": 120,
-   "score": 77.2,
-   "departement": "Naples",
-   "departementCode": "063",
-   "regionCode": "15",
-   "communeCode": "063049",
-   "communeName": "Napoli",
-   "summary": "L'église du Gesù Nuovo est un édifice religieux catholique de la ville de Naples (Italie), sis sur la grande place du même nom. Construite en 1584 à partir d'un ancien palais princier du XVe siècle, elle compte parmi les plus importantes du point de vue de l'histoire, de l'art et de la culture de la cité parthénopéenne.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Facciata%20della%20chiesa%20del%20Ges%C3%B9%20Nuovo%20%28Napoli%29%20-%20BW%202013-05-16.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/%C3%89glise_du_Ges%C3%B9_Nuovo_de_Naples"
   },
   {
    "id": "Q650678",
@@ -35278,84 +34958,64 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Basilique_Sainte-Claire_d%27Assise"
   },
   {
-   "id": "Q2942757",
-   "slug": "cathedrale-de-potenza",
-   "name": "Cathédrale de Potenza",
+   "id": "Q2942711",
+   "slug": "cathedrale-de-melfi",
+   "name": "Cathédrale de Melfi",
    "themeId": "cathedrales",
-   "lat": 40.6403,
-   "lon": 15.80633,
+   "lat": 40.99678,
+   "lon": 15.65844,
    "radiusM": 120,
-   "score": 73.5,
+   "score": 70.7,
    "departement": "Potenza",
    "departementCode": "076",
    "regionCode": "17",
-   "communeCode": "076063",
-   "communeName": "Potenza",
-   "summary": "La cathédrale de Potenza est une église catholique romaine de Potenza, en Italie. Il s'agit de la cathédrale de l'archidiocèse de Potenza-Muro Lucano-Marsico Nuovo.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/PiazzaDuomoPZ.jpg",
+   "communeCode": "076048",
+   "communeName": "Melfi",
+   "summary": "La cathédrale de Melfi ou cathédrale Notre-Dame-de-l'Assomption (en italien : Duomo di Melfi, cattedrale di Santa Maria Assunta) est une église catholique romaine de Melfi, en Italie. Il s'agit de la cathédrale du diocèse de Melfi-Rapolla-Venosa.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cattedrale%20Melfi.jpg",
    "imageAuthor": null,
    "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cath%C3%A9drale_de_Potenza"
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cath%C3%A9drale_de_Melfi"
   },
   {
-   "id": "Q2942550",
-   "slug": "cathedrale-d-aversa",
-   "name": "Cathédrale d'Aversa",
+   "id": "Q770169",
+   "slug": "cathedrale-d-alife",
+   "name": "Cathédrale d'Alife",
    "themeId": "cathedrales",
-   "lat": 40.976389,
-   "lon": 14.202778,
+   "lat": 41.329167,
+   "lon": 14.329167,
    "radiusM": 120,
-   "score": 65.6,
+   "score": 63.5,
    "departement": "Caserta",
    "departementCode": "061",
    "regionCode": "15",
-   "communeCode": "061005",
-   "communeName": "Aversa",
-   "summary": "La cathédrale Saint-Paul-Apôtre d'Aversa (en italien : cattedrale di San Paolo Apostolo) est une église catholique romaine d'Aversa, en Italie. Il s'agit de la cathédrale du diocèse d'Aversa.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Duomo%20di%20Aversa.JPG",
+   "communeCode": "061002",
+   "communeName": "Alife",
+   "summary": "La cathédrale Notre-Dame-de-l'Assomption (en italien : cattedrale di Santa Maria Assunta) est une église catholique romaine d'Alife, en Italie. Il s'agit de la cathédrale du diocèse d'Alife-Caiazzo.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cattedrale%20di%20Alife.jpg",
    "imageAuthor": null,
    "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cath%C3%A9drale_d%27Aversa"
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cath%C3%A9drale_Santa_Maria_Assunta_d%27Alife"
   },
   {
-   "id": "Q2942623",
-   "slug": "cathedrale-de-castellaneta",
-   "name": "Cathédrale de Castellaneta",
+   "id": "Q2887105",
+   "slug": "basilique-san-martino",
+   "name": "Basilique San Martino",
    "themeId": "cathedrales",
-   "lat": 40.6293,
-   "lon": 16.9409,
+   "lat": 40.7056,
+   "lon": 17.3369,
    "radiusM": 120,
-   "score": 62.9,
+   "score": 61.5,
    "departement": "Tarente",
    "departementCode": "073",
    "regionCode": "16",
-   "communeCode": "073003",
-   "communeName": "Castellaneta",
-   "summary": "La cathédrale de Castellaneta  ou cathédrale Notre-Dame-de-l'Assomption (en italien : Cattedrale di Santa Maria Assunta) est une église catholique romaine de Castellaneta, en Italie. Il s'agit de la cathédrale du diocèse de Castellaneta.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cattedrale%20di%20Castellaneta%20%28TA%29.jpg",
+   "communeCode": "073013",
+   "communeName": "Martina Franca",
+   "summary": "La basilique San Martino (en français : Saint-Martin) est une basilique mineure située à Martina Franca, dans le centre-sud de la région des Pouilles en Italie. Elle est dédiée à Martin de Tours.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Basilique%20San%20Martino%20de%20Martina%20Franca.JPG",
    "imageAuthor": null,
    "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cath%C3%A9drale_de_Castellaneta"
-  },
-  {
-   "id": "Q2887169",
-   "slug": "basilique-du-saint-sepulcre",
-   "name": "Basilique du Saint-Sépulcre",
-   "themeId": "cathedrales",
-   "lat": 41.31908,
-   "lon": 16.28147,
-   "radiusM": 120,
-   "score": 62.6,
-   "departement": "Barletta-Andria-Trani",
-   "departementCode": "110",
-   "regionCode": "16",
-   "communeCode": "110002",
-   "communeName": "Barletta",
-   "summary": "La basilique du Saint-Sépulcre est l'une des principales églises de la ville de Barletta dans la région des Pouilles dans le Sud de l'Italie. Comme son nom l'indique, les origines de la basilique conservent des liens étroits avec la Terre sainte et le tombeau de Jésus-Christ.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Barletta%20Basilica%20del%20Santo%20Sepolcro%20Prospetto%20Nord.jpeg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Basilique_du_Saint-S%C3%A9pulcre_de_Barletta"
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Basilique_San_Martino_(Martina_Franca)"
   },
   {
    "id": "Q19877",
@@ -37958,26 +37618,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Observatoire_astronomique_de_Sormano"
   },
   {
-   "id": "Q1369420",
-   "slug": "necropole-de-montessu",
-   "name": "Nécropole de Montessu",
-   "themeId": "musees",
-   "lat": 39.133333,
-   "lon": 8.668611,
-   "radiusM": 120,
-   "score": 69.0,
-   "departement": "Carbonia-Iglesias",
-   "departementCode": "119",
-   "regionCode": "20",
-   "communeCode": "119023",
-   "communeName": "Villaperuccio",
-   "summary": "La nécropole de Montessu, est un site préhistorique daté du Néolithique, situé dans la commune de Villaperuccio, dans la province de Sardaigne du Sud en Italie. La nécropole regroupe 35 domus de janas, creusées durant la période prénuragique, constituant l'une des plus grandes nécropoles à domus de janas de Sardaigne.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Necropoli%20di%20Montessu%2006.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/N%C3%A9cropole_de_Montessu"
-  },
-  {
    "id": "Q3868446",
    "slug": "musee-provincial-de-capoue",
    "name": "Musée provincial de Capoue",
@@ -37996,26 +37636,6 @@
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_campanien_de_Capoue"
-  },
-  {
-   "id": "Q16976533",
-   "slug": "musee-civique-raffaele-marrocco",
-   "name": "Musée civique Raffaele-Marrocco",
-   "themeId": "musees",
-   "lat": 41.358147,
-   "lon": 14.375838,
-   "radiusM": 120,
-   "score": 67.5,
-   "departement": "Caserta",
-   "departementCode": "061",
-   "regionCode": "15",
-   "communeCode": "061057",
-   "communeName": "Piedimonte Matese",
-   "summary": "Le musée civique Raffaele-Marrocco (MuCiRaMa) est un musée civique (en italien : museo civico) situé dans l'édifice de la mairie de Piedimonte Matese, commune italienne de la province de Caserte dans la région Campanie en Italie.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/MuseoCivicoMarrocco.jpg",
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_civique_Raffaele_Marrocco"
   },
   {
    "id": "Q3867723",
@@ -38196,6 +37816,46 @@
    "imageAuthor": null,
    "imageLicence": null,
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palais_patriarcal_(Udine)"
+  },
+  {
+   "id": "Q3639574",
+   "slug": "biblioteca-comunale-classense",
+   "name": "Biblioteca comunale Classense",
+   "themeId": "musees",
+   "lat": 44.414325,
+   "lon": 12.200024,
+   "radiusM": 150,
+   "score": 61.6,
+   "departement": "Ravenne",
+   "departementCode": "039",
+   "regionCode": "08",
+   "communeCode": "039014",
+   "communeName": "Ravenna",
+   "summary": null,
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ingresso%20biblioteca%20Classense%20Ravenna.JPG",
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": null
+  },
+  {
+   "id": "Q4016080",
+   "slug": "volandia",
+   "name": "Volandia",
+   "themeId": "musees",
+   "lat": 45.62996,
+   "lon": 8.706107,
+   "radiusM": 150,
+   "score": 60.6,
+   "departement": "Varese",
+   "departementCode": "012",
+   "regionCode": "03",
+   "communeCode": "012123",
+   "communeName": "Somma Lombardo",
+   "summary": null,
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Museo%20Volandia%2C%20ingresso%20%28Somma%20Lombardo%29.jpg",
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": null
   },
   {
    "id": "Q33341490",
@@ -41004,11 +40664,11 @@
    "labelId": null,
    "geoLevel": null,
    "geoCode": null,
-   "placeCount": 55,
+   "placeCount": 53,
    "tierCounts": [
     11,
     25,
-    19
+    17
    ],
    "places": [
     {
@@ -41247,44 +40907,34 @@
      "rank": 47
     },
     {
-     "placeId": "Q1775911",
+     "placeId": "Q3603171",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q3603171",
+     "placeId": "Q1775223",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q1775223",
+     "placeId": "Q1775991",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q1775991",
+     "placeId": "Q3860567",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q3860567",
+     "placeId": "Q568823",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q568823",
-     "tier": 3,
-     "rank": 53
-    },
-    {
-     "placeId": "Q18558569",
-     "tier": 3,
-     "rank": 54
-    },
-    {
      "placeId": "Q3689590",
      "tier": 3,
-     "rank": 55
+     "rank": 53
     }
    ]
   },
@@ -41296,10 +40946,10 @@
    "labelId": null,
    "geoLevel": null,
    "geoCode": null,
-   "placeCount": 63,
+   "placeCount": 64,
    "tierCounts": [
     11,
-    26,
+    27,
     26
    ],
    "places": [
@@ -41484,139 +41134,144 @@
      "rank": 36
     },
     {
-     "placeId": "Q1883435",
+     "placeId": "Q718774",
      "tier": 2,
      "rank": 37
     },
     {
-     "placeId": "Q1736222",
-     "tier": 3,
+     "placeId": "Q1883435",
+     "tier": 2,
      "rank": 38
     },
     {
-     "placeId": "Q654996",
+     "placeId": "Q1736222",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q52531",
+     "placeId": "Q654996",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q713558",
+     "placeId": "Q52531",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q1354756",
+     "placeId": "Q713558",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q810103",
+     "placeId": "Q1354756",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q2287001",
+     "placeId": "Q810103",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q1282278",
+     "placeId": "Q2287001",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q2713844",
+     "placeId": "Q1282278",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q2407092",
+     "placeId": "Q2713844",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q1306549",
+     "placeId": "Q2407092",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q1145812",
+     "placeId": "Q1306549",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q1236608",
+     "placeId": "Q1145812",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q1256487",
+     "placeId": "Q1236608",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q1644597",
+     "placeId": "Q1256487",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q1581882",
+     "placeId": "Q1644597",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q1448870",
+     "placeId": "Q1581882",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q1677980",
+     "placeId": "Q1448870",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q945981",
+     "placeId": "Q1677980",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q1736225",
+     "placeId": "Q945981",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q2883692",
+     "placeId": "Q1736225",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q2263308",
+     "placeId": "Q2883692",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q4706745",
+     "placeId": "Q2263308",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q844111",
+     "placeId": "Q4706745",
      "tier": 3,
      "rank": 61
     },
     {
-     "placeId": "Q913182",
+     "placeId": "Q844111",
      "tier": 3,
      "rank": 62
     },
     {
-     "placeId": "Q3915491",
+     "placeId": "Q913182",
      "tier": 3,
      "rank": 63
+    },
+    {
+     "placeId": "Q3915491",
+     "tier": 3,
+     "rank": 64
     }
    ]
   },
@@ -44215,9 +43870,9 @@
    "labelId": null,
    "geoLevel": null,
    "geoCode": null,
-   "placeCount": 52,
+   "placeCount": 53,
    "tierCounts": [
-    12,
+    13,
     22,
     18
    ],
@@ -44283,204 +43938,209 @@
      "rank": 12
     },
     {
-     "placeId": "Q648679",
-     "tier": 2,
+     "placeId": "Q3825861",
+     "tier": 1,
      "rank": 13
     },
     {
-     "placeId": "Q849448",
+     "placeId": "Q648679",
      "tier": 2,
      "rank": 14
     },
     {
-     "placeId": "Q782896",
+     "placeId": "Q849448",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q1416530",
+     "placeId": "Q782896",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q63148",
+     "placeId": "Q1416530",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q1432181",
+     "placeId": "Q63148",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q1407745",
+     "placeId": "Q1432181",
      "tier": 2,
      "rank": 19
     },
     {
-     "placeId": "Q3825626",
+     "placeId": "Q1407745",
      "tier": 2,
      "rank": 20
     },
     {
-     "placeId": "Q1112151",
+     "placeId": "Q3825626",
      "tier": 2,
      "rank": 21
     },
     {
-     "placeId": "Q1727103",
+     "placeId": "Q1112151",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q3825909",
+     "placeId": "Q1727103",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q2518166",
+     "placeId": "Q3825909",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q572562",
+     "placeId": "Q2518166",
      "tier": 2,
      "rank": 25
     },
     {
-     "placeId": "Q1467712",
+     "placeId": "Q572562",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q1475787",
+     "placeId": "Q1467712",
      "tier": 2,
      "rank": 27
     },
     {
-     "placeId": "Q691103",
+     "placeId": "Q1475787",
      "tier": 2,
      "rank": 28
     },
     {
-     "placeId": "Q3825896",
+     "placeId": "Q691103",
      "tier": 2,
      "rank": 29
     },
     {
-     "placeId": "Q3825844",
+     "placeId": "Q3825896",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q1026494",
+     "placeId": "Q3825844",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q1502960",
+     "placeId": "Q1026494",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q1654531",
+     "placeId": "Q1502960",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q781019",
+     "placeId": "Q1654531",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q1800441",
-     "tier": 3,
+     "placeId": "Q781019",
+     "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q1246006",
+     "placeId": "Q1800441",
      "tier": 3,
      "rank": 36
     },
     {
-     "placeId": "Q1129358",
+     "placeId": "Q1246006",
      "tier": 3,
      "rank": 37
     },
     {
-     "placeId": "Q656674",
+     "placeId": "Q1129358",
      "tier": 3,
      "rank": 38
     },
     {
-     "placeId": "Q432545",
+     "placeId": "Q656674",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q511180",
+     "placeId": "Q432545",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q1399844",
+     "placeId": "Q511180",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q1052694",
+     "placeId": "Q1399844",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q3826016",
+     "placeId": "Q1052694",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q2438157",
+     "placeId": "Q3826016",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q252074",
+     "placeId": "Q2438157",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q3825859",
+     "placeId": "Q252074",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q878556",
+     "placeId": "Q3825859",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q3825864",
+     "placeId": "Q878556",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q63177",
+     "placeId": "Q3825864",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q2222728",
+     "placeId": "Q63177",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q63172",
+     "placeId": "Q2222728",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q764710",
+     "placeId": "Q63172",
      "tier": 3,
      "rank": 52
+    },
+    {
+     "placeId": "Q764710",
+     "tier": 3,
+     "rank": 53
     }
    ]
   },
@@ -45097,6 +44757,63 @@
      "placeId": "Q2576260",
      "tier": 3,
      "rank": 61
+    }
+   ]
+  },
+  {
+   "slug": "theme-dunes-marais",
+   "name": "Dunes et marais",
+   "kind": "theme",
+   "themeId": "dunes-marais",
+   "labelId": null,
+   "geoLevel": null,
+   "geoCode": null,
+   "placeCount": 8,
+   "tierCounts": [
+    5,
+    1,
+    2
+   ],
+   "places": [
+    {
+     "placeId": "Q76925",
+     "tier": 1,
+     "rank": 1
+    },
+    {
+     "placeId": "Q2258312",
+     "tier": 1,
+     "rank": 2
+    },
+    {
+     "placeId": "Q3216288",
+     "tier": 1,
+     "rank": 3
+    },
+    {
+     "placeId": "Q3936711",
+     "tier": 1,
+     "rank": 4
+    },
+    {
+     "placeId": "Q3716262",
+     "tier": 1,
+     "rank": 5
+    },
+    {
+     "placeId": "Q24935534",
+     "tier": 2,
+     "rank": 6
+    },
+    {
+     "placeId": "Q16268344",
+     "tier": 3,
+     "rank": 7
+    },
+    {
+     "placeId": "Q21995943",
+     "tier": 3,
+     "rank": 8
     }
    ]
   },
@@ -48012,12 +47729,12 @@
      "rank": 17
     },
     {
-     "placeId": "Q272777",
+     "placeId": "Q84090",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q84090",
+     "placeId": "Q272777",
      "tier": 2,
      "rank": 19
     },
@@ -48027,17 +47744,17 @@
      "rank": 20
     },
     {
-     "placeId": "Q824997",
+     "placeId": "Q223079",
      "tier": 2,
      "rank": 21
     },
     {
-     "placeId": "Q502098",
+     "placeId": "Q824997",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q223079",
+     "placeId": "Q502098",
      "tier": 2,
      "rank": 23
     },
@@ -48047,22 +47764,22 @@
      "rank": 24
     },
     {
-     "placeId": "Q1012797",
+     "placeId": "Q243467",
      "tier": 2,
      "rank": 25
     },
     {
-     "placeId": "Q243467",
+     "placeId": "Q231699",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q231699",
+     "placeId": "Q622438",
      "tier": 2,
      "rank": 27
     },
     {
-     "placeId": "Q622438",
+     "placeId": "Q192784",
      "tier": 2,
      "rank": 28
     },
@@ -48072,17 +47789,17 @@
      "rank": 29
     },
     {
-     "placeId": "Q192784",
+     "placeId": "Q1012797",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q180212",
+     "placeId": "Q1126723",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q1126723",
+     "placeId": "Q180212",
      "tier": 2,
      "rank": 32
     },
@@ -48097,7 +47814,7 @@
      "rank": 34
     },
     {
-     "placeId": "Q625149",
+     "placeId": "Q623612",
      "tier": 2,
      "rank": 35
     },
@@ -48112,12 +47829,12 @@
      "rank": 37
     },
     {
-     "placeId": "Q623612",
+     "placeId": "Q1136614",
      "tier": 3,
      "rank": 38
     },
     {
-     "placeId": "Q1136614",
+     "placeId": "Q625149",
      "tier": 3,
      "rank": 39
     },
@@ -48132,67 +47849,67 @@
      "rank": 41
     },
     {
-     "placeId": "Q648679",
+     "placeId": "Q265384",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q1219688",
+     "placeId": "Q648679",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q265384",
+     "placeId": "Q1203458",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q1203458",
+     "placeId": "Q1219688",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q2304697",
+     "placeId": "Q474857",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q474857",
+     "placeId": "Q1492387",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q1446018",
+     "placeId": "Q989650",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q1492387",
+     "placeId": "Q1579896",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q989650",
+     "placeId": "Q1132979",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q1579896",
+     "placeId": "Q243148",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q243148",
+     "placeId": "Q542070",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q542070",
+     "placeId": "Q15055388",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q15055388",
+     "placeId": "Q1283476",
      "tier": 3,
      "rank": 54
     },
@@ -48202,107 +47919,107 @@
      "rank": 55
     },
     {
-     "placeId": "Q1132979",
+     "placeId": "Q18590113",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q1283476",
+     "placeId": "Q859735",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q18590113",
+     "placeId": "Q1541068",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q859735",
+     "placeId": "Q1131991",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q1541068",
+     "placeId": "Q385910",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q385910",
+     "placeId": "Q1675176",
      "tier": 3,
      "rank": 61
     },
     {
-     "placeId": "Q1131991",
+     "placeId": "Q2304697",
      "tier": 3,
      "rank": 62
     },
     {
-     "placeId": "Q1675176",
+     "placeId": "Q5171759",
      "tier": 3,
      "rank": 63
     },
     {
-     "placeId": "Q5171759",
+     "placeId": "Q242126",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q242126",
+     "placeId": "Q114436",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q114436",
+     "placeId": "Q849448",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q849448",
+     "placeId": "Q770949",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q770949",
+     "placeId": "Q3867723",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q3867723",
+     "placeId": "Q1048826",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q1048826",
+     "placeId": "Q1582108",
      "tier": 3,
      "rank": 70
     },
     {
-     "placeId": "Q1582108",
+     "placeId": "Q3951177",
      "tier": 3,
      "rank": 71
     },
     {
-     "placeId": "Q3951177",
+     "placeId": "Q18745695",
      "tier": 3,
      "rank": 72
     },
     {
-     "placeId": "Q18745695",
+     "placeId": "Q1729630",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q1729630",
+     "placeId": "Q1439180",
      "tier": 3,
      "rank": 74
     },
     {
-     "placeId": "Q1439180",
+     "placeId": "Q506234",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q506234",
+     "placeId": "Q5786",
      "tier": 3,
      "rank": 76
     },
@@ -48312,17 +48029,17 @@
      "rank": 77
     },
     {
-     "placeId": "Q5786",
+     "placeId": "Q869513",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q869513",
+     "placeId": "Q569253",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q211295",
+     "placeId": "Q15124814",
      "tier": 3,
      "rank": 80
     }
@@ -48620,8 +48337,8 @@
    "placeCount": 80,
    "tierCounts": [
     14,
-    26,
-    40
+    27,
+    39
    ],
    "places": [
     {
@@ -48825,197 +48542,197 @@
      "rank": 40
     },
     {
-     "placeId": "Q243456",
-     "tier": 3,
+     "placeId": "Q718774",
+     "tier": 2,
      "rank": 41
     },
     {
-     "placeId": "Q3931701",
+     "placeId": "Q243456",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q718315",
+     "placeId": "Q3931701",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q432545",
+     "placeId": "Q718315",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q1073353",
+     "placeId": "Q432545",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q3322117",
+     "placeId": "Q1073353",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q3902350",
+     "placeId": "Q3322117",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q1590855",
+     "placeId": "Q3902350",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q1228217",
+     "placeId": "Q1590855",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q2941392",
+     "placeId": "Q718801",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q3330426",
+     "placeId": "Q2941392",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q650428",
+     "placeId": "Q3330426",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q1235330",
+     "placeId": "Q650428",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q1227543",
+     "placeId": "Q1235330",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q518104",
+     "placeId": "Q1227543",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q3663206",
+     "placeId": "Q518104",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q1084616",
+     "placeId": "Q3663206",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q3802965",
+     "placeId": "Q1084616",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q764710",
+     "placeId": "Q3802965",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q568823",
+     "placeId": "Q764710",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q3982012",
+     "placeId": "Q568823",
      "tier": 3,
      "rank": 61
     },
     {
-     "placeId": "Q718790",
+     "placeId": "Q3982012",
      "tier": 3,
      "rank": 62
     },
     {
-     "placeId": "Q980575",
+     "placeId": "Q718790",
      "tier": 3,
      "rank": 63
     },
     {
-     "placeId": "Q600863",
+     "placeId": "Q980575",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q682404",
+     "placeId": "Q600863",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q2332531",
+     "placeId": "Q682404",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q3777013",
+     "placeId": "Q2332531",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q33334433",
+     "placeId": "Q3777013",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q628491",
+     "placeId": "Q33334433",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q729764",
+     "placeId": "Q628491",
      "tier": 3,
      "rank": 70
     },
     {
-     "placeId": "Q384957",
+     "placeId": "Q729764",
      "tier": 3,
      "rank": 71
     },
     {
-     "placeId": "Q3517528",
+     "placeId": "Q384957",
      "tier": 3,
      "rank": 72
     },
     {
-     "placeId": "Q426339",
+     "placeId": "Q3517528",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q1611116",
+     "placeId": "Q426339",
      "tier": 3,
      "rank": 74
     },
     {
-     "placeId": "Q3663202",
+     "placeId": "Q1611116",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q241410",
+     "placeId": "Q3663202",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q3891657",
+     "placeId": "Q241410",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q3737242",
+     "placeId": "Q3891657",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q718774",
+     "placeId": "Q3737242",
      "tier": 3,
      "rank": 79
     },
@@ -49834,97 +49551,97 @@
      "rank": 36
     },
     {
-     "placeId": "Q649367",
+     "placeId": "Q1069796",
      "tier": 3,
      "rank": 37
     },
     {
-     "placeId": "Q1069796",
+     "placeId": "Q3621362",
      "tier": 3,
      "rank": 38
     },
     {
-     "placeId": "Q3621362",
+     "placeId": "Q799026",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q799026",
+     "placeId": "Q51252",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q51252",
+     "placeId": "Q1140023",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q1140023",
+     "placeId": "Q2252810",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q2252810",
+     "placeId": "Q191739",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q191739",
+     "placeId": "Q1200696",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q1200696",
+     "placeId": "Q1083014",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q1083014",
+     "placeId": "Q271928",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q271928",
+     "placeId": "Q822020",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q822020",
+     "placeId": "Q866192",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q866192",
+     "placeId": "Q51177",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q51177",
+     "placeId": "Q13453137",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q13453137",
+     "placeId": "Q22936182",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q22936182",
+     "placeId": "Q3902327",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q3902327",
+     "placeId": "Q911047",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q911047",
+     "placeId": "Q2287001",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q2287001",
+     "placeId": "Q3995340",
      "tier": 3,
      "rank": 55
     },
@@ -50122,10 +49839,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "087",
-   "placeCount": 19,
+   "placeCount": 18,
    "tierCounts": [
     10,
-    9,
+    8,
     0
    ],
    "places": [
@@ -50210,19 +49927,14 @@
      "rank": 16
     },
     {
-     "placeId": "Q1458838",
+     "placeId": "Q1109136",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q1109136",
-     "tier": 2,
-     "rank": 18
-    },
-    {
      "placeId": "Q3671516",
      "tier": 2,
-     "rank": 19
+     "rank": 18
     }
    ]
   },
@@ -50919,10 +50631,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "059",
-   "placeCount": 22,
+   "placeCount": 20,
    "tierCounts": [
     10,
-    12,
+    10,
     0
    ],
    "places": [
@@ -50952,12 +50664,12 @@
      "rank": 5
     },
     {
-     "placeId": "Q3825952",
+     "placeId": "Q3995182",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q3995182",
+     "placeId": "Q3825995",
      "tier": 1,
      "rank": 7
     },
@@ -50972,7 +50684,7 @@
      "rank": 9
     },
     {
-     "placeId": "Q3117098",
+     "placeId": "Q128170",
      "tier": 1,
      "rank": 10
     },
@@ -50992,49 +50704,39 @@
      "rank": 13
     },
     {
-     "placeId": "Q128170",
+     "placeId": "Q11913906",
      "tier": 2,
      "rank": 14
     },
     {
-     "placeId": "Q11913906",
+     "placeId": "Q909048",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q909048",
+     "placeId": "Q622536",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q622536",
+     "placeId": "Q128217",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q128217",
+     "placeId": "Q1466491",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q1466491",
+     "placeId": "Q3995244",
      "tier": 2,
      "rank": 19
     },
     {
-     "placeId": "Q3995244",
-     "tier": 2,
-     "rank": 20
-    },
-    {
-     "placeId": "Q3825995",
-     "tier": 2,
-     "rank": 21
-    },
-    {
      "placeId": "Q1639494",
      "tier": 2,
-     "rank": 22
+     "rank": 20
     }
    ]
   },
@@ -51360,11 +51062,11 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "049",
-   "placeCount": 18,
+   "placeCount": 17,
    "tierCounts": [
     10,
-    8,
-    0
+    6,
+    1
    ],
    "places": [
     {
@@ -51393,22 +51095,22 @@
      "rank": 5
     },
     {
-     "placeId": "Q208114",
+     "placeId": "Q1231948",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q1231948",
+     "placeId": "Q208114",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q3593349",
+     "placeId": "Q157686",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q157686",
+     "placeId": "Q3593349",
      "tier": 1,
      "rank": 9
     },
@@ -51438,24 +51140,19 @@
      "rank": 14
     },
     {
-     "placeId": "Q19347",
+     "placeId": "Q16555281",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q3802955",
+     "placeId": "Q33340816",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q16555281",
-     "tier": 2,
+     "placeId": "Q19347",
+     "tier": 3,
      "rank": 17
-    },
-    {
-     "placeId": "Q33340816",
-     "tier": 2,
-     "rank": 18
     }
    ]
   },
@@ -51719,7 +51416,7 @@
      "rank": 2
     },
     {
-     "placeId": "Q2942757",
+     "placeId": "Q2942711",
      "tier": 1,
      "rank": 3
     },
@@ -52002,9 +51699,9 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "067",
-   "placeCount": 10,
+   "placeCount": 9,
    "tierCounts": [
-    8,
+    7,
     2,
     0
    ],
@@ -52020,44 +51717,39 @@
      "rank": 2
     },
     {
-     "placeId": "Q3982372",
+     "placeId": "Q42564837",
      "tier": 1,
      "rank": 3
     },
     {
-     "placeId": "Q42564837",
+     "placeId": "Q3861600",
      "tier": 1,
      "rank": 4
     },
     {
-     "placeId": "Q3861600",
+     "placeId": "Q51440",
      "tier": 1,
      "rank": 5
     },
     {
-     "placeId": "Q51440",
+     "placeId": "Q51426",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q51426",
+     "placeId": "Q51460",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q51460",
-     "tier": 1,
-     "rank": 8
-    },
-    {
      "placeId": "Q3603171",
      "tier": 2,
-     "rank": 9
+     "rank": 8
     },
     {
      "placeId": "Q3867749",
      "tier": 2,
-     "rank": 10
+     "rank": 9
     }
    ]
   },
@@ -52941,10 +52633,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "099",
-   "placeCount": 12,
+   "placeCount": 11,
    "tierCounts": [
     10,
-    2,
+    1,
     0
    ],
    "places": [
@@ -53002,11 +52694,6 @@
      "placeId": "Q948080",
      "tier": 2,
      "rank": 11
-    },
-    {
-     "placeId": "Q3891341",
-     "tier": 2,
-     "rank": 12
     }
    ]
   },
@@ -53020,8 +52707,8 @@
    "geoCode": "030",
    "placeCount": 32,
    "tierCounts": [
-    11,
-    21,
+    12,
+    20,
     0
    ],
    "places": [
@@ -53076,47 +52763,47 @@
      "rank": 10
     },
     {
-     "placeId": "Q140378242",
+     "placeId": "Q3825861",
      "tier": 1,
      "rank": 11
     },
     {
-     "placeId": "Q139980983",
-     "tier": 2,
+     "placeId": "Q140378242",
+     "tier": 1,
      "rank": 12
     },
     {
-     "placeId": "Q1481385",
+     "placeId": "Q139980983",
      "tier": 2,
      "rank": 13
     },
     {
-     "placeId": "Q2271750",
+     "placeId": "Q1481385",
      "tier": 2,
      "rank": 14
     },
     {
-     "placeId": "Q53391",
+     "placeId": "Q2271750",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q3548146",
+     "placeId": "Q53391",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q53241",
+     "placeId": "Q3548146",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q2195498",
+     "placeId": "Q53241",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q3825861",
+     "placeId": "Q2195498",
      "tier": 2,
      "rank": 19
     },
@@ -53195,10 +52882,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "112",
-   "placeCount": 26,
+   "placeCount": 25,
    "tierCounts": [
     11,
-    13,
+    12,
     2
    ],
    "places": [
@@ -53238,7 +52925,7 @@
      "rank": 7
     },
     {
-     "placeId": "Q17334557",
+     "placeId": "Q732021",
      "tier": 1,
      "rank": 8
     },
@@ -53313,24 +53000,19 @@
      "rank": 22
     },
     {
-     "placeId": "Q732021",
+     "placeId": "Q2595439",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q2595439",
-     "tier": 2,
-     "rank": 24
-    },
-    {
      "placeId": "Q33337632",
      "tier": 3,
-     "rank": 25
+     "rank": 24
     },
     {
      "placeId": "Q33338374",
      "tier": 3,
-     "rank": 26
+     "rank": 25
     }
    ]
   },
@@ -53342,11 +53024,11 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "001",
-   "placeCount": 49,
+   "placeCount": 48,
    "tierCounts": [
     11,
     25,
-    13
+    12
    ],
    "places": [
     {
@@ -53405,7 +53087,7 @@
      "rank": 11
     },
     {
-     "placeId": "Q97621435",
+     "placeId": "Q2940753",
      "tier": 2,
      "rank": 12
     },
@@ -53430,12 +53112,12 @@
      "rank": 16
     },
     {
-     "placeId": "Q89412621",
+     "placeId": "Q1637553",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q1637553",
+     "placeId": "Q89412621",
      "tier": 2,
      "rank": 18
     },
@@ -53450,37 +53132,37 @@
      "rank": 20
     },
     {
-     "placeId": "Q2940753",
+     "placeId": "Q2969832",
      "tier": 2,
      "rank": 21
     },
     {
-     "placeId": "Q2969832",
+     "placeId": "Q3471768",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q3471768",
+     "placeId": "Q1892101",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q1892101",
+     "placeId": "Q97621435",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q55165344",
+     "placeId": "Q19850",
      "tier": 2,
      "rank": 25
     },
     {
-     "placeId": "Q19850",
+     "placeId": "Q962235",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q962235",
+     "placeId": "Q55165346",
      "tier": 2,
      "rank": 27
     },
@@ -53490,42 +53172,42 @@
      "rank": 28
     },
     {
-     "placeId": "Q55165346",
+     "placeId": "Q19846",
      "tier": 2,
      "rank": 29
     },
     {
-     "placeId": "Q19846",
+     "placeId": "Q19844",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q19844",
+     "placeId": "Q9400",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q9400",
+     "placeId": "Q2755827",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q2755827",
+     "placeId": "Q1895577",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q1895577",
+     "placeId": "Q115695",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q115695",
+     "placeId": "Q89591373",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q89591373",
+     "placeId": "Q3861457",
      "tier": 2,
      "rank": 36
     },
@@ -53535,64 +53217,59 @@
      "rank": 37
     },
     {
-     "placeId": "Q3861457",
+     "placeId": "Q3902347",
      "tier": 3,
      "rank": 38
     },
     {
-     "placeId": "Q3902347",
+     "placeId": "Q3825978",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q3825978",
+     "placeId": "Q3889607",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q3889607",
+     "placeId": "Q3902294",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q3902294",
+     "placeId": "Q3895972",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q3895972",
+     "placeId": "Q19829",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q19829",
+     "placeId": "Q101380751",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q101380751",
+     "placeId": "Q1062079",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q1062079",
+     "placeId": "Q55165349",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q55165349",
+     "placeId": "Q19830",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q19830",
-     "tier": 3,
-     "rank": 48
-    },
-    {
      "placeId": "Q3889843",
      "tier": 3,
-     "rank": 49
+     "rank": 48
     }
    ]
   },
@@ -53905,10 +53582,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "039",
-   "placeCount": 14,
+   "placeCount": 15,
    "tierCounts": [
     10,
-    3,
+    4,
     1
    ],
    "places": [
@@ -53963,12 +53640,12 @@
      "rank": 10
     },
     {
-     "placeId": "Q644288",
+     "placeId": "Q3639574",
      "tier": 2,
      "rank": 11
     },
     {
-     "placeId": "Q2942769",
+     "placeId": "Q644288",
      "tier": 2,
      "rank": 12
     },
@@ -53978,9 +53655,14 @@
      "rank": 13
     },
     {
+     "placeId": "Q2942769",
+     "tier": 2,
+     "rank": 14
+    },
+    {
      "placeId": "Q33343703",
      "tier": 3,
-     "rank": 14
+     "rank": 15
     }
    ]
   },
@@ -54102,7 +53784,7 @@
      "rank": 3
     },
     {
-     "placeId": "Q1369420",
+     "placeId": "Q3909152",
      "tier": 1,
      "rank": 4
     },
@@ -54112,17 +53794,17 @@
      "rank": 5
     },
     {
-     "placeId": "Q11406604",
+     "placeId": "Q1369420",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q2274063",
+     "placeId": "Q11406604",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q3909152",
+     "placeId": "Q2274063",
      "tier": 1,
      "rank": 8
     },
@@ -54156,10 +53838,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "020",
-   "placeCount": 18,
+   "placeCount": 17,
    "tierCounts": [
     10,
-    8,
+    7,
     0
    ],
    "places": [
@@ -54219,39 +53901,34 @@
      "rank": 11
     },
     {
-     "placeId": "Q28668608",
+     "placeId": "Q3662862",
      "tier": 2,
      "rank": 12
     },
     {
-     "placeId": "Q3662862",
+     "placeId": "Q20909296",
      "tier": 2,
      "rank": 13
     },
     {
-     "placeId": "Q20909296",
+     "placeId": "Q2261984",
      "tier": 2,
      "rank": 14
     },
     {
-     "placeId": "Q2261984",
+     "placeId": "Q650678",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q650678",
+     "placeId": "Q3635635",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q3635635",
-     "tier": 2,
-     "rank": 17
-    },
-    {
      "placeId": "Q3995488",
      "tier": 2,
-     "rank": 18
+     "rank": 17
     }
    ]
   },
@@ -55218,17 +54895,17 @@
      "rank": 16
     },
     {
-     "placeId": "Q1763642",
+     "placeId": "Q1406020",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q2910855",
+     "placeId": "Q1763642",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q1406020",
+     "placeId": "Q2910855",
      "tier": 2,
      "rank": 19
     },
@@ -55273,12 +54950,12 @@
      "rank": 27
     },
     {
-     "placeId": "Q3891343",
+     "placeId": "Q3889774",
      "tier": 2,
      "rank": 28
     },
     {
-     "placeId": "Q604541",
+     "placeId": "Q3889598",
      "tier": 2,
      "rank": 29
     },
@@ -55476,10 +55153,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "034",
-   "placeCount": 15,
+   "placeCount": 14,
    "tierCounts": [
     10,
-    5,
+    4,
     0
    ],
    "places": [
@@ -55519,12 +55196,12 @@
      "rank": 7
     },
     {
-     "placeId": "Q1331708",
+     "placeId": "Q3280232",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q3280232",
+     "placeId": "Q1331708",
      "tier": 1,
      "rank": 9
     },
@@ -55539,24 +55216,19 @@
      "rank": 11
     },
     {
-     "placeId": "Q21194402",
+     "placeId": "Q33014801",
      "tier": 2,
      "rank": 12
     },
     {
-     "placeId": "Q33014801",
+     "placeId": "Q3603222",
      "tier": 2,
      "rank": 13
     },
     {
-     "placeId": "Q3603222",
-     "tier": 2,
-     "rank": 14
-    },
-    {
      "placeId": "Q21194420",
      "tier": 2,
-     "rank": 15
+     "rank": 14
     }
    ]
   },
@@ -55862,10 +55534,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "062",
-   "placeCount": 12,
+   "placeCount": 11,
    "tierCounts": [
     10,
-    2,
+    1,
     0
    ],
    "places": [
@@ -55900,22 +55572,22 @@
      "rank": 6
     },
     {
-     "placeId": "Q3939447",
+     "placeId": "Q1051478",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q1051478",
+     "placeId": "Q3983249",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q3983249",
+     "placeId": "Q3939447",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q15965575",
+     "placeId": "Q23887459",
      "tier": 1,
      "rank": 10
     },
@@ -55923,11 +55595,6 @@
      "placeId": "Q1088931",
      "tier": 2,
      "rank": 11
-    },
-    {
-     "placeId": "Q23887459",
-     "tier": 2,
-     "rank": 12
     }
    ]
   },
@@ -55939,9 +55606,9 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "074",
-   "placeCount": 11,
+   "placeCount": 9,
    "tierCounts": [
-    10,
+    8,
     1,
     0
    ],
@@ -55972,34 +55639,24 @@
      "rank": 5
     },
     {
-     "placeId": "Q3662381",
+     "placeId": "Q24936766",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q24936766",
+     "placeId": "Q2051142",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q2051142",
+     "placeId": "Q24942425",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q24942425",
-     "tier": 1,
-     "rank": 9
-    },
-    {
-     "placeId": "Q3621979",
-     "tier": 1,
-     "rank": 10
-    },
-    {
      "placeId": "Q24942423",
      "tier": 2,
-     "rank": 11
+     "rank": 9
     }
    ]
   },
@@ -56011,11 +55668,11 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "056",
-   "placeCount": 25,
+   "placeCount": 24,
    "tierCounts": [
     11,
-    14,
-    0
+    12,
+    1
    ],
    "places": [
     {
@@ -56079,69 +55736,64 @@
      "rank": 12
     },
     {
-     "placeId": "Q931172",
+     "placeId": "Q1246006",
      "tier": 2,
      "rank": 13
     },
     {
-     "placeId": "Q1246006",
+     "placeId": "Q177695",
      "tier": 2,
      "rank": 14
     },
     {
-     "placeId": "Q177695",
+     "placeId": "Q1052521",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q597347",
+     "placeId": "Q159474",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q1052521",
+     "placeId": "Q159529",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q159474",
+     "placeId": "Q3995125",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q159529",
+     "placeId": "Q2165810",
      "tier": 2,
      "rank": 19
     },
     {
-     "placeId": "Q3995125",
+     "placeId": "Q3671695",
      "tier": 2,
      "rank": 20
     },
     {
-     "placeId": "Q2165810",
+     "placeId": "Q597347",
      "tier": 2,
      "rank": 21
     },
     {
-     "placeId": "Q3671695",
+     "placeId": "Q1674451",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q1997405",
+     "placeId": "Q3826072",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q1674451",
-     "tier": 2,
+     "placeId": "Q931172",
+     "tier": 3,
      "rank": 24
-    },
-    {
-     "placeId": "Q3826072",
-     "tier": 2,
-     "rank": 25
     }
    ]
   },
@@ -56240,10 +55892,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "015",
-   "placeCount": 36,
+   "placeCount": 35,
    "tierCounts": [
     13,
-    19,
+    18,
     4
    ],
    "places": [
@@ -56288,12 +55940,12 @@
      "rank": 8
     },
     {
-     "placeId": "Q838986",
+     "placeId": "Q608405",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q608405",
+     "placeId": "Q838986",
      "tier": 1,
      "rank": 10
     },
@@ -56323,17 +55975,17 @@
      "rank": 15
     },
     {
-     "placeId": "Q2525507",
+     "placeId": "Q839379",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q839379",
+     "placeId": "Q244952",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q244952",
+     "placeId": "Q2525507",
      "tier": 2,
      "rank": 18
     },
@@ -56403,29 +56055,24 @@
      "rank": 31
     },
     {
-     "placeId": "Q3867896",
-     "tier": 2,
-     "rank": 32
-    },
-    {
      "placeId": "Q929968",
      "tier": 3,
-     "rank": 33
+     "rank": 32
     },
     {
      "placeId": "Q48810344",
      "tier": 3,
-     "rank": 34
+     "rank": 33
     },
     {
      "placeId": "Q3895399",
      "tier": 3,
-     "rank": 35
+     "rank": 34
     },
     {
      "placeId": "Q2882456",
      "tier": 3,
-     "rank": 36
+     "rank": 35
     }
    ]
   },
@@ -57049,9 +56696,9 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "057",
-   "placeCount": 12,
+   "placeCount": 11,
    "tierCounts": [
-    10,
+    9,
     2,
     0
    ],
@@ -57102,19 +56749,14 @@
      "rank": 9
     },
     {
-     "placeId": "Q1775911",
-     "tier": 1,
-     "rank": 10
-    },
-    {
      "placeId": "Q3825859",
      "tier": 2,
-     "rank": 11
+     "rank": 10
     },
     {
      "placeId": "Q3826025",
      "tier": 2,
-     "rank": 12
+     "rank": 11
     }
    ]
   },
@@ -57743,10 +57385,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "068",
-   "placeCount": 12,
+   "placeCount": 11,
    "tierCounts": [
     10,
-    2,
+    1,
     0
    ],
    "places": [
@@ -57776,27 +57418,27 @@
      "rank": 5
     },
     {
-     "placeId": "Q3731375",
+     "placeId": "Q51350",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q51350",
+     "placeId": "Q3731375",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q306162",
+     "placeId": "Q51345",
      "tier": 1,
      "rank": 8
     },
     {
-     "placeId": "Q51345",
+     "placeId": "Q306162",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q18558569",
+     "placeId": "Q3627904",
      "tier": 1,
      "rank": 10
     },
@@ -57804,11 +57446,6 @@
      "placeId": "Q1774956",
      "tier": 2,
      "rank": 11
-    },
-    {
-     "placeId": "Q3627904",
-     "tier": 2,
-     "rank": 12
     }
    ]
   },
@@ -58147,7 +57784,7 @@
      "rank": 27
     },
     {
-     "placeId": "Q1585525",
+     "placeId": "Q1861237",
      "tier": 2,
      "rank": 28
     },
@@ -58162,7 +57799,7 @@
      "rank": 30
     },
     {
-     "placeId": "Q1861237",
+     "placeId": "Q686709",
      "tier": 2,
      "rank": 31
     },
@@ -58177,12 +57814,12 @@
      "rank": 33
     },
     {
-     "placeId": "Q588559",
+     "placeId": "Q2210251",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q686709",
+     "placeId": "Q616676",
      "tier": 2,
      "rank": 35
     },
@@ -58202,82 +57839,82 @@
      "rank": 38
     },
     {
-     "placeId": "Q616676",
+     "placeId": "Q3826136",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q3826136",
+     "placeId": "Q217527",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q217527",
+     "placeId": "Q52517",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q52517",
+     "placeId": "Q754194",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q754194",
+     "placeId": "Q3889924",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q3889924",
+     "placeId": "Q52629",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q52629",
+     "placeId": "Q3889925",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q3889925",
+     "placeId": "Q1052171",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q1052171",
+     "placeId": "Q52509",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q52509",
+     "placeId": "Q3747209",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q3747209",
+     "placeId": "Q2603961",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q2603961",
+     "placeId": "Q1270723",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q1270723",
+     "placeId": "Q1268698",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q1268698",
+     "placeId": "Q3654630",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q3654630",
+     "placeId": "Q3940563",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q3940563",
+     "placeId": "Q2356961",
      "tier": 3,
      "rank": 54
     },
@@ -58630,42 +58267,42 @@
      "rank": 15
     },
     {
-     "placeId": "Q2300067",
+     "placeId": "Q387517",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q387517",
+     "placeId": "Q1449273",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q1449273",
+     "placeId": "Q21208502",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q21208502",
+     "placeId": "Q729773",
      "tier": 2,
      "rank": 19
     },
     {
-     "placeId": "Q729773",
+     "placeId": "Q284719",
      "tier": 2,
      "rank": 20
     },
     {
-     "placeId": "Q284719",
+     "placeId": "Q2573936",
      "tier": 2,
      "rank": 21
     },
     {
-     "placeId": "Q2573936",
+     "placeId": "Q2298605",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q2298605",
+     "placeId": "Q521254",
      "tier": 2,
      "rank": 23
     },
@@ -58707,7 +58344,7 @@
      "rank": 3
     },
     {
-     "placeId": "Q2942623",
+     "placeId": "Q2887105",
      "tier": 1,
      "rank": 4
     },
@@ -58895,10 +58532,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "061",
-   "placeCount": 12,
+   "placeCount": 11,
    "tierCounts": [
     10,
-    2,
+    1,
     0
    ],
    "places": [
@@ -58918,12 +58555,12 @@
      "rank": 3
     },
     {
-     "placeId": "Q2942550",
+     "placeId": "Q770169",
      "tier": 1,
      "rank": 4
     },
     {
-     "placeId": "Q657102",
+     "placeId": "Q20008548",
      "tier": 1,
      "rank": 5
     },
@@ -58948,19 +58585,14 @@
      "rank": 9
     },
     {
-     "placeId": "Q16976533",
+     "placeId": "Q657102",
      "tier": 1,
      "rank": 10
     },
     {
-     "placeId": "Q3621772",
-     "tier": 2,
-     "rank": 11
-    },
-    {
      "placeId": "Q998123",
      "tier": 2,
-     "rank": 12
+     "rank": 11
     }
    ]
   },
@@ -58972,10 +58604,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "012",
-   "placeCount": 11,
+   "placeCount": 12,
    "tierCounts": [
     10,
-    0,
+    1,
     1
    ],
    "places": [
@@ -59020,19 +58652,24 @@
      "rank": 8
     },
     {
-     "placeId": "Q3860567",
+     "placeId": "Q4016080",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q1574784",
+     "placeId": "Q3860567",
      "tier": 1,
      "rank": 10
     },
     {
+     "placeId": "Q1574784",
+     "tier": 2,
+     "rank": 11
+    },
+    {
      "placeId": "Q56543513",
      "tier": 3,
-     "rank": 11
+     "rank": 12
     }
    ]
   },
@@ -59194,12 +58831,12 @@
      "rank": 5
     },
     {
-     "placeId": "Q2942544",
+     "placeId": "Q3469627",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q2887169",
+     "placeId": "Q2942544",
      "tier": 1,
      "rank": 7
     },
@@ -59209,7 +58846,7 @@
      "rank": 8
     },
     {
-     "placeId": "Q3469627",
+     "placeId": "Q1235868",
      "tier": 1,
      "rank": 9
     },
@@ -59326,7 +58963,7 @@
      "rank": 17
     },
     {
-     "placeId": "Q272777",
+     "placeId": "Q848386",
      "tier": 2,
      "rank": 18
     },
@@ -59336,7 +58973,7 @@
      "rank": 19
     },
     {
-     "placeId": "Q848386",
+     "placeId": "Q272777",
      "tier": 2,
      "rank": 20
     },
@@ -59366,7 +59003,7 @@
      "rank": 25
     },
     {
-     "placeId": "Q1012797",
+     "placeId": "Q223079",
      "tier": 2,
      "rank": 26
     },
@@ -59376,12 +59013,12 @@
      "rank": 27
     },
     {
-     "placeId": "Q223079",
+     "placeId": "Q597957",
      "tier": 2,
      "rank": 28
     },
     {
-     "placeId": "Q597957",
+     "placeId": "Q1012797",
      "tier": 2,
      "rank": 29
     },
@@ -59391,27 +59028,27 @@
      "rank": 30
     },
     {
-     "placeId": "Q180212",
+     "placeId": "Q824997",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q334051",
+     "placeId": "Q648679",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q824997",
+     "placeId": "Q180212",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q648679",
+     "placeId": "Q192784",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q207808",
+     "placeId": "Q159498",
      "tier": 2,
      "rank": 35
     },
@@ -59431,52 +59068,52 @@
      "rank": 38
     },
     {
-     "placeId": "Q159498",
+     "placeId": "Q622438",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q622438",
+     "placeId": "Q334051",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q192784",
+     "placeId": "Q1133295",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q1133295",
+     "placeId": "Q2530284",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q2530284",
+     "placeId": "Q231699",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q231699",
+     "placeId": "Q207808",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q625149",
+     "placeId": "Q128217",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q128217",
+     "placeId": "Q625149",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q849448",
+     "placeId": "Q1126723",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q1126723",
+     "placeId": "Q849448",
      "tier": 3,
      "rank": 48
     },
@@ -59491,7 +59128,7 @@
      "rank": 50
     },
     {
-     "placeId": "Q2564175",
+     "placeId": "Q1136614",
      "tier": 3,
      "rank": 51
     },
@@ -59501,142 +59138,142 @@
      "rank": 52
     },
     {
-     "placeId": "Q931172",
+     "placeId": "Q623612",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q623612",
+     "placeId": "Q678313",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q678313",
+     "placeId": "Q2564175",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q1136614",
+     "placeId": "Q180355",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q114436",
+     "placeId": "Q1246006",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q1246006",
+     "placeId": "Q931172",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q1219688",
+     "placeId": "Q265384",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q180355",
+     "placeId": "Q431470",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q3983252",
+     "placeId": "Q1881229",
      "tier": 3,
      "rank": 61
     },
     {
-     "placeId": "Q431470",
+     "placeId": "Q114436",
      "tier": 3,
      "rank": 62
     },
     {
-     "placeId": "Q1881229",
+     "placeId": "Q909048",
      "tier": 3,
      "rank": 63
     },
     {
-     "placeId": "Q265384",
+     "placeId": "Q1334215",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q909048",
+     "placeId": "Q1219688",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q1334215",
+     "placeId": "Q774654",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q3825859",
+     "placeId": "Q177695",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q597347",
+     "placeId": "Q3983252",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q774654",
+     "placeId": "Q3825859",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q177695",
+     "placeId": "Q1203458",
      "tier": 3,
      "rank": 70
     },
     {
-     "placeId": "Q3558833",
+     "placeId": "Q159474",
      "tier": 3,
      "rank": 71
     },
     {
-     "placeId": "Q1203458",
+     "placeId": "Q597347",
      "tier": 3,
      "rank": 72
     },
     {
-     "placeId": "Q159474",
+     "placeId": "Q1071076",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q2304697",
+     "placeId": "Q3558833",
      "tier": 3,
      "rank": 74
     },
     {
-     "placeId": "Q833129",
+     "placeId": "Q242120",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q1071076",
+     "placeId": "Q1492387",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q3825952",
+     "placeId": "Q3215397",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q3117098",
+     "placeId": "Q1579896",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q242120",
+     "placeId": "Q224202",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q1492387",
+     "placeId": "Q1283476",
      "tier": 3,
      "rank": 80
     }
@@ -59773,27 +59410,27 @@
      "rank": 23
     },
     {
-     "placeId": "Q378280",
+     "placeId": "Q1478407",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q692847",
+     "placeId": "Q378280",
      "tier": 2,
      "rank": 25
     },
     {
-     "placeId": "Q1478407",
+     "placeId": "Q692847",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q261439",
+     "placeId": "Q34834195",
      "tier": 2,
      "rank": 27
     },
     {
-     "placeId": "Q34834195",
+     "placeId": "Q261439",
      "tier": 2,
      "rank": 28
     },
@@ -59823,37 +59460,37 @@
      "rank": 33
     },
     {
-     "placeId": "Q1000054",
+     "placeId": "Q1736222",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q56212",
+     "placeId": "Q1000054",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q1249309",
+     "placeId": "Q56212",
      "tier": 3,
      "rank": 36
     },
     {
-     "placeId": "Q1736222",
+     "placeId": "Q1249309",
      "tier": 3,
      "rank": 37
     },
     {
-     "placeId": "Q1429352",
+     "placeId": "Q1034749",
      "tier": 3,
      "rank": 38
     },
     {
-     "placeId": "Q1034749",
+     "placeId": "Q1954223",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q1954223",
+     "placeId": "Q1429352",
      "tier": 3,
      "rank": 40
     },
@@ -59948,22 +59585,22 @@
      "rank": 58
     },
     {
-     "placeId": "Q2047529",
+     "placeId": "Q21192696",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q21192696",
+     "placeId": "Q1800431",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q1800431",
+     "placeId": "Q478417",
      "tier": 3,
      "rank": 61
     },
     {
-     "placeId": "Q478417",
+     "placeId": "Q2047529",
      "tier": 3,
      "rank": 62
     },
@@ -59978,42 +59615,42 @@
      "rank": 64
     },
     {
-     "placeId": "Q489260",
+     "placeId": "Q733217",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q3983181",
+     "placeId": "Q489260",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q733217",
+     "placeId": "Q3983181",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q1478356",
+     "placeId": "Q33326324",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q33326324",
+     "placeId": "Q499519",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q499519",
+     "placeId": "Q3983262",
      "tier": 3,
      "rank": 70
     },
     {
-     "placeId": "Q3983262",
+     "placeId": "Q56199",
      "tier": 3,
      "rank": 71
     },
     {
-     "placeId": "Q56199",
+     "placeId": "Q2942535",
      "tier": 3,
      "rank": 72
     },
@@ -60028,32 +59665,32 @@
      "rank": 74
     },
     {
-     "placeId": "Q1059942",
+     "placeId": "Q1478356",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q2449559",
+     "placeId": "Q1059942",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q499239",
+     "placeId": "Q2449559",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q432659",
+     "placeId": "Q499239",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q497339",
+     "placeId": "Q432659",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q28219837",
+     "placeId": "Q497339",
      "tier": 3,
      "rank": 80
     }
@@ -60225,17 +59862,17 @@
      "rank": 30
     },
     {
-     "placeId": "Q208114",
+     "placeId": "Q1061229",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q1061229",
+     "placeId": "Q188490",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q188490",
+     "placeId": "Q208114",
      "tier": 2,
      "rank": 33
     },
@@ -60335,42 +59972,42 @@
      "rank": 52
     },
     {
-     "placeId": "Q3593349",
+     "placeId": "Q3661177",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q3661177",
+     "placeId": "Q545578",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q545578",
+     "placeId": "Q1752113",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q1752113",
+     "placeId": "Q637237",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q637237",
+     "placeId": "Q1231948",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q1231948",
+     "placeId": "Q91119",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q91119",
+     "placeId": "Q1282278",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q1282278",
+     "placeId": "Q3593349",
      "tier": 3,
      "rank": 60
     },
@@ -60440,37 +60077,37 @@
      "rank": 73
     },
     {
-     "placeId": "Q19347",
+     "placeId": "Q2263308",
      "tier": 3,
      "rank": 74
     },
     {
-     "placeId": "Q2263308",
+     "placeId": "Q1283790",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q1283790",
+     "placeId": "Q3105331",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q3105331",
+     "placeId": "Q3531065",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q3531065",
+     "placeId": "Q3868400",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q3868400",
+     "placeId": "Q52084",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q52084",
+     "placeId": "Q3815086",
      "tier": 3,
      "rank": 80
     }
@@ -60486,8 +60123,8 @@
    "geoCode": "15",
    "placeCount": 80,
    "tierCounts": [
-    14,
-    29,
+    13,
+    30,
     37
    ],
    "places": [
@@ -60557,97 +60194,97 @@
      "rank": 13
     },
     {
-     "placeId": "Q290549",
-     "tier": 1,
-     "rank": 14
-    },
-    {
      "placeId": "Q1041718",
      "tier": 2,
-     "rank": 15
+     "rank": 14
     },
     {
      "placeId": "Q841554",
      "tier": 2,
-     "rank": 16
+     "rank": 15
     },
     {
      "placeId": "Q782896",
      "tier": 2,
-     "rank": 17
+     "rank": 16
     },
     {
      "placeId": "Q59116",
      "tier": 2,
-     "rank": 18
+     "rank": 17
     },
     {
      "placeId": "Q848422",
      "tier": 2,
-     "rank": 19
+     "rank": 18
     },
     {
      "placeId": "Q729873",
      "tier": 2,
-     "rank": 20
+     "rank": 19
     },
     {
      "placeId": "Q372769",
      "tier": 2,
-     "rank": 21
+     "rank": 20
     },
     {
      "placeId": "Q2860643",
      "tier": 2,
-     "rank": 22
+     "rank": 21
     },
     {
      "placeId": "Q43332",
      "tier": 2,
-     "rank": 23
+     "rank": 22
     },
     {
      "placeId": "Q729764",
      "tier": 2,
-     "rank": 24
+     "rank": 23
     },
     {
      "placeId": "Q80591",
      "tier": 2,
-     "rank": 25
+     "rank": 24
     },
     {
      "placeId": "Q645041",
      "tier": 2,
-     "rank": 26
+     "rank": 25
     },
     {
      "placeId": "Q514901",
      "tier": 2,
-     "rank": 27
+     "rank": 26
     },
     {
      "placeId": "Q1241298",
      "tier": 2,
-     "rank": 28
+     "rank": 27
     },
     {
      "placeId": "Q3322117",
      "tier": 2,
-     "rank": 29
+     "rank": 28
     },
     {
      "placeId": "Q934070",
      "tier": 2,
-     "rank": 30
+     "rank": 29
     },
     {
      "placeId": "Q926401",
      "tier": 2,
-     "rank": 31
+     "rank": 30
     },
     {
      "placeId": "Q81814",
+     "tier": 2,
+     "rank": 31
+    },
+    {
+     "placeId": "Q547910",
      "tier": 2,
      "rank": 32
     },
@@ -60657,32 +60294,32 @@
      "rank": 33
     },
     {
-     "placeId": "Q547910",
+     "placeId": "Q1139820",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q1139820",
+     "placeId": "Q2699249",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q2699249",
+     "placeId": "Q1051820",
      "tier": 2,
      "rank": 36
     },
     {
-     "placeId": "Q1051820",
+     "placeId": "Q980745",
      "tier": 2,
      "rank": 37
     },
     {
-     "placeId": "Q980745",
+     "placeId": "Q2142241",
      "tier": 2,
      "rank": 38
     },
     {
-     "placeId": "Q16531852",
+     "placeId": "Q290549",
      "tier": 2,
      "rank": 39
     },
@@ -60722,22 +60359,22 @@
      "rank": 46
     },
     {
-     "placeId": "Q2142241",
+     "placeId": "Q80785",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q80785",
+     "placeId": "Q2015116",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q266587",
+     "placeId": "Q16531852",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q2015116",
+     "placeId": "Q266587",
      "tier": 3,
      "rank": 50
     },
@@ -60752,7 +60389,7 @@
      "rank": 52
     },
     {
-     "placeId": "Q3981916",
+     "placeId": "Q453634",
      "tier": 3,
      "rank": 53
     },
@@ -60762,97 +60399,97 @@
      "rank": 54
     },
     {
-     "placeId": "Q453634",
+     "placeId": "Q1635935",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q1635935",
+     "placeId": "Q55037",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q55037",
+     "placeId": "Q542944",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q1174435",
+     "placeId": "Q3981916",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q542944",
+     "placeId": "Q1174435",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q3361360",
+     "placeId": "Q898155",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q898155",
+     "placeId": "Q1617215",
      "tier": 3,
      "rank": 61
     },
     {
-     "placeId": "Q1617215",
+     "placeId": "Q755123",
      "tier": 3,
      "rank": 62
     },
     {
-     "placeId": "Q755123",
+     "placeId": "Q55073",
      "tier": 3,
      "rank": 63
     },
     {
-     "placeId": "Q55073",
+     "placeId": "Q718315",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q718315",
+     "placeId": "Q432545",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q432545",
+     "placeId": "Q222410",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q32186691",
+     "placeId": "Q810104",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q810104",
+     "placeId": "Q3361360",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q222410",
+     "placeId": "Q586646",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q586646",
+     "placeId": "Q32186691",
      "tier": 3,
      "rank": 70
     },
     {
-     "placeId": "Q3663206",
+     "placeId": "Q55141",
      "tier": 3,
      "rank": 71
     },
     {
-     "placeId": "Q55141",
+     "placeId": "Q3663206",
      "tier": 3,
      "rank": 72
     },
     {
-     "placeId": "Q3662603",
+     "placeId": "Q1590855",
      "tier": 3,
      "rank": 73
     },
@@ -60862,27 +60499,27 @@
      "rank": 74
     },
     {
-     "placeId": "Q1590855",
+     "placeId": "Q2738834",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q2738834",
+     "placeId": "Q20008548",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q1228217",
+     "placeId": "Q1073353",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q2941392",
+     "placeId": "Q3662603",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q1073353",
+     "placeId": "Q2941392",
      "tier": 3,
      "rank": 79
     },
@@ -61004,12 +60641,12 @@
      "rank": 19
     },
     {
-     "placeId": "Q1190657",
+     "placeId": "Q1635704",
      "tier": 2,
      "rank": 20
     },
     {
-     "placeId": "Q1635704",
+     "placeId": "Q1190657",
      "tier": 2,
      "rank": 21
     },
@@ -61049,12 +60686,12 @@
      "rank": 28
     },
     {
-     "placeId": "Q63148",
+     "placeId": "Q2705493",
      "tier": 2,
      "rank": 29
     },
     {
-     "placeId": "Q2705493",
+     "placeId": "Q63148",
      "tier": 2,
      "rank": 30
     },
@@ -61079,12 +60716,12 @@
      "rank": 34
     },
     {
-     "placeId": "Q1261544",
+     "placeId": "Q133963",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q133963",
+     "placeId": "Q1261544",
      "tier": 2,
      "rank": 36
     },
@@ -61099,12 +60736,12 @@
      "rank": 38
     },
     {
-     "placeId": "Q1227391",
+     "placeId": "Q947082",
      "tier": 2,
      "rank": 39
     },
     {
-     "placeId": "Q947082",
+     "placeId": "Q1227391",
      "tier": 2,
      "rank": 40
     },
@@ -61154,17 +60791,17 @@
      "rank": 49
     },
     {
-     "placeId": "Q1547160",
+     "placeId": "Q112127",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q112127",
+     "placeId": "Q742377",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q742377",
+     "placeId": "Q338367",
      "tier": 3,
      "rank": 52
     },
@@ -61174,7 +60811,7 @@
      "rank": 53
     },
     {
-     "placeId": "Q338367",
+     "placeId": "Q1547160",
      "tier": 3,
      "rank": 54
     },
@@ -61194,27 +60831,27 @@
      "rank": 57
     },
     {
-     "placeId": "Q838986",
+     "placeId": "Q1581882",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q1581882",
+     "placeId": "Q3825844",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q3825844",
+     "placeId": "Q101202",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q101202",
+     "placeId": "Q870031",
      "tier": 3,
      "rank": 61
     },
     {
-     "placeId": "Q870031",
+     "placeId": "Q838986",
      "tier": 3,
      "rank": 62
     },
@@ -61224,27 +60861,27 @@
      "rank": 63
     },
     {
-     "placeId": "Q1579923",
+     "placeId": "Q47181",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q47181",
+     "placeId": "Q677220",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q677220",
+     "placeId": "Q2001128",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q2001128",
+     "placeId": "Q3183228",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q3183228",
+     "placeId": "Q16626658",
      "tier": 3,
      "rank": 68
     },
@@ -61269,17 +60906,17 @@
      "rank": 72
     },
     {
-     "placeId": "Q2525507",
+     "placeId": "Q2368198",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q2368198",
+     "placeId": "Q2239600",
      "tier": 3,
      "rank": 74
     },
     {
-     "placeId": "Q2239600",
+     "placeId": "Q1533416",
      "tier": 3,
      "rank": 75
     },
@@ -61304,7 +60941,7 @@
      "rank": 79
     },
     {
-     "placeId": "Q1533416",
+     "placeId": "Q2525507",
      "tier": 3,
      "rank": 80
     }
@@ -61436,12 +61073,12 @@
      "rank": 22
     },
     {
-     "placeId": "Q921014",
+     "placeId": "Q1945976",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q1945976",
+     "placeId": "Q921014",
      "tier": 2,
      "rank": 24
     },
@@ -61471,17 +61108,17 @@
      "rank": 29
     },
     {
-     "placeId": "Q1945873",
+     "placeId": "Q538419",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q538419",
+     "placeId": "Q845310",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q845310",
+     "placeId": "Q1945873",
      "tier": 2,
      "rank": 32
     },
@@ -61491,12 +61128,12 @@
      "rank": 33
     },
     {
-     "placeId": "Q33333130",
+     "placeId": "Q2005265",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q2005265",
+     "placeId": "Q33333130",
      "tier": 2,
      "rank": 35
     },
@@ -61551,12 +61188,12 @@
      "rank": 45
     },
     {
-     "placeId": "Q3909149",
+     "placeId": "Q1732146",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q1732146",
+     "placeId": "Q3909149",
      "tier": 3,
      "rank": 47
     },
@@ -61566,22 +61203,22 @@
      "rank": 48
     },
     {
-     "placeId": "Q660633",
+     "placeId": "Q3215012",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q3215012",
+     "placeId": "Q2223903",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q2223903",
+     "placeId": "Q1892625",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q1892625",
+     "placeId": "Q660633",
      "tier": 3,
      "rank": 52
     },
@@ -61606,7 +61243,7 @@
      "rank": 56
     },
     {
-     "placeId": "Q1151133",
+     "placeId": "Q959458",
      "tier": 3,
      "rank": 57
     },
@@ -61616,17 +61253,17 @@
      "rank": 58
     },
     {
-     "placeId": "Q959458",
+     "placeId": "Q27503671",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q3861687",
+     "placeId": "Q2361327",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q27503671",
+     "placeId": "Q3861687",
      "tier": 3,
      "rank": 61
     },
@@ -61636,17 +61273,17 @@
      "rank": 62
     },
     {
-     "placeId": "Q2361327",
+     "placeId": "Q120399",
      "tier": 3,
      "rank": 63
     },
     {
-     "placeId": "Q120399",
+     "placeId": "Q1474759",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q1474759",
+     "placeId": "Q1151133",
      "tier": 3,
      "rank": 65
     },
@@ -61656,17 +61293,17 @@
      "rank": 66
     },
     {
-     "placeId": "Q1225474",
+     "placeId": "Q2107814",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q220990",
+     "placeId": "Q1225474",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q17334557",
+     "placeId": "Q220990",
      "tier": 3,
      "rank": 69
     },
@@ -61686,7 +61323,7 @@
      "rank": 72
     },
     {
-     "placeId": "Q2107814",
+     "placeId": "Q2461943",
      "tier": 3,
      "rank": 73
     },
@@ -61696,12 +61333,12 @@
      "rank": 74
     },
     {
-     "placeId": "Q2461943",
+     "placeId": "Q2250212",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q2250212",
+     "placeId": "Q1945886",
      "tier": 3,
      "rank": 76
     },
@@ -61716,12 +61353,12 @@
      "rank": 78
     },
     {
-     "placeId": "Q1945886",
+     "placeId": "Q1369420",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q2274063",
+     "placeId": "Q1060495",
      "tier": 3,
      "rank": 80
     }
@@ -61735,11 +61372,11 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "16",
-   "placeCount": 80,
+   "placeCount": 78,
    "tierCounts": [
     10,
-    25,
-    45
+    26,
+    42
    ],
    "places": [
     {
@@ -61783,12 +61420,12 @@
      "rank": 8
     },
     {
-     "placeId": "Q28375947",
+     "placeId": "Q3936711",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q3716262",
+     "placeId": "Q28375947",
      "tier": 1,
      "rank": 10
     },
@@ -61813,12 +61450,12 @@
      "rank": 14
     },
     {
-     "placeId": "Q513023",
+     "placeId": "Q51935",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q51935",
+     "placeId": "Q513023",
      "tier": 2,
      "rank": 16
     },
@@ -61828,12 +61465,12 @@
      "rank": 17
     },
     {
-     "placeId": "Q1448870",
+     "placeId": "Q52174",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q52174",
+     "placeId": "Q1448870",
      "tier": 2,
      "rank": 19
     },
@@ -61858,12 +61495,12 @@
      "rank": 23
     },
     {
-     "placeId": "Q843722",
+     "placeId": "Q51863",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q51863",
+     "placeId": "Q843722",
      "tier": 2,
      "rank": 25
     },
@@ -61873,22 +61510,22 @@
      "rank": 26
     },
     {
-     "placeId": "Q3662583",
+     "placeId": "Q636793",
      "tier": 2,
      "rank": 27
     },
     {
-     "placeId": "Q636793",
+     "placeId": "Q3662583",
      "tier": 2,
      "rank": 28
     },
     {
-     "placeId": "Q277433",
+     "placeId": "Q51966",
      "tier": 2,
      "rank": 29
     },
     {
-     "placeId": "Q51966",
+     "placeId": "Q277433",
      "tier": 2,
      "rank": 30
     },
@@ -61898,32 +61535,32 @@
      "rank": 31
     },
     {
-     "placeId": "Q383884",
+     "placeId": "Q52198",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q52198",
+     "placeId": "Q383884",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q2942718",
+     "placeId": "Q476876",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q476876",
+     "placeId": "Q1089148",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q573650",
-     "tier": 3,
+     "placeId": "Q3716262",
+     "tier": 2,
      "rank": 36
     },
     {
-     "placeId": "Q511180",
+     "placeId": "Q573650",
      "tier": 3,
      "rank": 37
     },
@@ -61938,27 +61575,27 @@
      "rank": 39
     },
     {
-     "placeId": "Q24942423",
+     "placeId": "Q511180",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q1089148",
+     "placeId": "Q24942423",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q3662397",
+     "placeId": "Q51895",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q51895",
+     "placeId": "Q2942718",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q753363",
+     "placeId": "Q3662397",
      "tier": 3,
      "rank": 44
     },
@@ -61968,22 +61605,22 @@
      "rank": 45
     },
     {
-     "placeId": "Q3662774",
+     "placeId": "Q115933381",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q115933381",
+     "placeId": "Q11184602",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q11184602",
+     "placeId": "Q753363",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q174693",
+     "placeId": "Q3662774",
      "tier": 3,
      "rank": 49
     },
@@ -61993,154 +61630,144 @@
      "rank": 50
     },
     {
-     "placeId": "Q2968443",
+     "placeId": "Q937054",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q3936711",
+     "placeId": "Q52022",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q3621979",
+     "placeId": "Q174693",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q52022",
+     "placeId": "Q2968443",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q2942544",
+     "placeId": "Q51950",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q3662381",
+     "placeId": "Q2942544",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q51950",
+     "placeId": "Q24936766",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q24936766",
+     "placeId": "Q33335467",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q33335467",
+     "placeId": "Q3469627",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q937054",
+     "placeId": "Q51889",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q51889",
+     "placeId": "Q749536",
      "tier": 3,
      "rank": 61
     },
     {
-     "placeId": "Q2942572",
+     "placeId": "Q2051142",
      "tier": 3,
      "rank": 62
     },
     {
-     "placeId": "Q2051142",
+     "placeId": "Q51849",
      "tier": 3,
      "rank": 63
     },
     {
-     "placeId": "Q51849",
+     "placeId": "Q2942572",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q2942623",
+     "placeId": "Q3662681",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q3662681",
+     "placeId": "Q63851952",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q63851952",
+     "placeId": "Q3961352",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q3961352",
+     "placeId": "Q2887105",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q2887169",
+     "placeId": "Q2258864",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q2258864",
+     "placeId": "Q24942425",
      "tier": 3,
      "rank": 70
     },
     {
-     "placeId": "Q24942425",
+     "placeId": "Q1235868",
      "tier": 3,
      "rank": 71
     },
     {
-     "placeId": "Q3469627",
+     "placeId": "Q949581",
      "tier": 3,
      "rank": 72
     },
     {
-     "placeId": "Q949581",
+     "placeId": "Q3378175",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q3378175",
+     "placeId": "Q3621793",
      "tier": 3,
      "rank": 74
     },
     {
-     "placeId": "Q3621793",
+     "placeId": "Q116254821",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q116254821",
+     "placeId": "Q450145",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q450145",
+     "placeId": "Q844111",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q844111",
-     "tier": 3,
-     "rank": 78
-    },
-    {
-     "placeId": "Q749536",
-     "tier": 3,
-     "rank": 79
-    },
-    {
      "placeId": "Q929598",
      "tier": 3,
-     "rank": 80
+     "rank": 78
     }
    ]
   },
@@ -63643,7 +63270,7 @@
      "rank": 15
     },
     {
-     "placeId": "Q2942757",
+     "placeId": "Q2942711",
      "tier": 2,
      "rank": 16
     },
@@ -63677,11 +63304,11 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "13",
-   "placeCount": 60,
+   "placeCount": 58,
    "tierCounts": [
     10,
     26,
-    24
+    22
    ],
    "places": [
     {
@@ -63725,12 +63352,12 @@
      "rank": 8
     },
     {
-     "placeId": "Q3982372",
+     "placeId": "Q3867751",
      "tier": 1,
      "rank": 9
     },
     {
-     "placeId": "Q3867751",
+     "placeId": "Q3889420",
      "tier": 1,
      "rank": 10
     },
@@ -63820,17 +63447,17 @@
      "rank": 27
     },
     {
-     "placeId": "Q3731375",
+     "placeId": "Q50071",
      "tier": 2,
      "rank": 28
     },
     {
-     "placeId": "Q50071",
+     "placeId": "Q51356",
      "tier": 2,
      "rank": 29
     },
     {
-     "placeId": "Q51356",
+     "placeId": "Q3731375",
      "tier": 2,
      "rank": 30
     },
@@ -63855,7 +63482,7 @@
      "rank": 34
     },
     {
-     "placeId": "Q306162",
+     "placeId": "Q42564837",
      "tier": 2,
      "rank": 35
     },
@@ -63875,27 +63502,27 @@
      "rank": 38
     },
     {
-     "placeId": "Q42564837",
+     "placeId": "Q51345",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q51345",
+     "placeId": "Q3861742",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q3861742",
+     "placeId": "Q47093",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q47093",
+     "placeId": "Q50123",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q50123",
+     "placeId": "Q306162",
      "tier": 3,
      "rank": 43
     },
@@ -63910,32 +63537,32 @@
      "rank": 45
     },
     {
-     "placeId": "Q3603171",
+     "placeId": "Q49887",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q49887",
+     "placeId": "Q50111",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q50111",
+     "placeId": "Q51268",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q51268",
+     "placeId": "Q50169",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q50169",
+     "placeId": "Q50124",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q50124",
+     "placeId": "Q3603171",
      "tier": 3,
      "rank": 51
     },
@@ -63945,44 +63572,34 @@
      "rank": 52
     },
     {
-     "placeId": "Q18558569",
+     "placeId": "Q3861600",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q3861600",
+     "placeId": "Q3290960",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q3889420",
+     "placeId": "Q3684377",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q3290960",
+     "placeId": "Q3867749",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q3684377",
+     "placeId": "Q3661538",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q3867749",
-     "tier": 3,
-     "rank": 58
-    },
-    {
-     "placeId": "Q3661538",
-     "tier": 3,
-     "rank": 59
-    },
-    {
      "placeId": "Q3627904",
      "tier": 3,
-     "rank": 60
+     "rank": 58
     }
    ]
   },
@@ -63997,8 +63614,8 @@
    "placeCount": 80,
    "tierCounts": [
     10,
-    27,
-    43
+    28,
+    42
    ],
    "places": [
     {
@@ -64072,22 +63689,22 @@
      "rank": 14
     },
     {
-     "placeId": "Q2306368",
+     "placeId": "Q3330620",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q3330620",
+     "placeId": "Q111833",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q111833",
+     "placeId": "Q2306368",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q2096472",
+     "placeId": "Q2706867",
      "tier": 2,
      "rank": 18
     },
@@ -64097,12 +63714,12 @@
      "rank": 19
     },
     {
-     "placeId": "Q2706867",
+     "placeId": "Q52962",
      "tier": 2,
      "rank": 20
     },
     {
-     "placeId": "Q52962",
+     "placeId": "Q2096472",
      "tier": 2,
      "rank": 21
     },
@@ -64117,7 +63734,7 @@
      "rank": 23
     },
     {
-     "placeId": "Q1054370",
+     "placeId": "Q774128",
      "tier": 2,
      "rank": 24
     },
@@ -64127,12 +63744,12 @@
      "rank": 25
     },
     {
-     "placeId": "Q774128",
+     "placeId": "Q111856",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q111856",
+     "placeId": "Q1054370",
      "tier": 2,
      "rank": 27
     },
@@ -64142,7 +63759,7 @@
      "rank": 28
     },
     {
-     "placeId": "Q2047639",
+     "placeId": "Q1276962",
      "tier": 2,
      "rank": 29
     },
@@ -64152,12 +63769,12 @@
      "rank": 30
     },
     {
-     "placeId": "Q1276962",
+     "placeId": "Q99933",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q99933",
+     "placeId": "Q2047639",
      "tier": 2,
      "rank": 32
     },
@@ -64172,7 +63789,7 @@
      "rank": 34
     },
     {
-     "placeId": "Q3747192",
+     "placeId": "Q1113843",
      "tier": 2,
      "rank": 35
     },
@@ -64187,82 +63804,82 @@
      "rank": 37
     },
     {
-     "placeId": "Q16268344",
-     "tier": 3,
+     "placeId": "Q1775907",
+     "tier": 2,
      "rank": 38
     },
     {
-     "placeId": "Q33343703",
+     "placeId": "Q16268344",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q20744415",
+     "placeId": "Q33343703",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q1386054",
+     "placeId": "Q20744415",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q1033649",
+     "placeId": "Q1386054",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q1256487",
+     "placeId": "Q1033649",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q1113843",
+     "placeId": "Q3747192",
      "tier": 3,
      "rank": 44
     },
     {
-     "placeId": "Q94856",
+     "placeId": "Q1256487",
      "tier": 3,
      "rank": 45
     },
     {
-     "placeId": "Q3603222",
+     "placeId": "Q94856",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q2091949",
+     "placeId": "Q822085",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q822085",
+     "placeId": "Q3603222",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q2641550",
+     "placeId": "Q2091949",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q111942",
+     "placeId": "Q2641550",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q111972",
+     "placeId": "Q111942",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q1753598",
+     "placeId": "Q111972",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q3891285",
+     "placeId": "Q1753598",
      "tier": 3,
      "rank": 53
     },
@@ -64282,7 +63899,7 @@
      "rank": 56
     },
     {
-     "placeId": "Q1331708",
+     "placeId": "Q3757722",
      "tier": 3,
      "rank": 57
     },
@@ -64292,17 +63909,17 @@
      "rank": 58
     },
     {
-     "placeId": "Q580842",
+     "placeId": "Q3891285",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q671933",
+     "placeId": "Q580842",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q3757722",
+     "placeId": "Q671933",
      "tier": 3,
      "rank": 61
     },
@@ -64317,37 +63934,37 @@
      "rank": 63
     },
     {
-     "placeId": "Q111937",
+     "placeId": "Q2560897",
      "tier": 3,
      "rank": 64
     },
     {
-     "placeId": "Q2560897",
+     "placeId": "Q111937",
      "tier": 3,
      "rank": 65
     },
     {
-     "placeId": "Q3889913",
+     "placeId": "Q1331708",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q3661081",
+     "placeId": "Q108294156",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q111202",
+     "placeId": "Q3661081",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q1287865",
+     "placeId": "Q111202",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q108294156",
+     "placeId": "Q1287865",
      "tier": 3,
      "rank": 70
     },
@@ -64357,47 +63974,47 @@
      "rank": 71
     },
     {
-     "placeId": "Q102631",
+     "placeId": "Q1106485",
      "tier": 3,
      "rank": 72
     },
     {
-     "placeId": "Q3635774",
+     "placeId": "Q102631",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q1106485",
+     "placeId": "Q3889913",
      "tier": 3,
      "rank": 74
     },
     {
-     "placeId": "Q3890054",
+     "placeId": "Q3635774",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q477225",
+     "placeId": "Q48789692",
      "tier": 3,
      "rank": 76
     },
     {
-     "placeId": "Q3902144",
+     "placeId": "Q477225",
      "tier": 3,
      "rank": 77
     },
     {
-     "placeId": "Q100785",
+     "placeId": "Q3902144",
      "tier": 3,
      "rank": 78
     },
     {
-     "placeId": "Q178699",
+     "placeId": "Q100785",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q48789692",
+     "placeId": "Q178699",
      "tier": 3,
      "rank": 80
     }
@@ -64751,8 +64368,8 @@
    "placeCount": 68,
    "tierCounts": [
     11,
-    26,
-    31
+    27,
+    30
    ],
    "places": [
     {
@@ -64936,37 +64553,37 @@
      "rank": 36
     },
     {
-     "placeId": "Q140378242",
+     "placeId": "Q3825861",
      "tier": 2,
      "rank": 37
     },
     {
-     "placeId": "Q33325267",
-     "tier": 3,
+     "placeId": "Q140378242",
+     "tier": 2,
      "rank": 38
     },
     {
-     "placeId": "Q1481385",
+     "placeId": "Q33325267",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q53388",
+     "placeId": "Q1481385",
      "tier": 3,
      "rank": 40
     },
     {
-     "placeId": "Q1736225",
+     "placeId": "Q53388",
      "tier": 3,
      "rank": 41
     },
     {
-     "placeId": "Q637182",
+     "placeId": "Q1736225",
      "tier": 3,
      "rank": 42
     },
     {
-     "placeId": "Q3825861",
+     "placeId": "Q637182",
      "tier": 3,
      "rank": 43
     },
@@ -65173,7 +64790,7 @@
      "rank": 12
     },
     {
-     "placeId": "Q97621435",
+     "placeId": "Q2940753",
      "tier": 2,
      "rank": 13
     },
@@ -65193,22 +64810,22 @@
      "rank": 16
     },
     {
-     "placeId": "Q3683671",
+     "placeId": "Q22536",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q22536",
+     "placeId": "Q201902",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q201902",
+     "placeId": "Q63141",
      "tier": 2,
      "rank": 19
     },
     {
-     "placeId": "Q63141",
+     "placeId": "Q3683671",
      "tier": 2,
      "rank": 20
     },
@@ -65273,17 +64890,17 @@
      "rank": 32
     },
     {
-     "placeId": "Q89412621",
+     "placeId": "Q18040",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q18040",
+     "placeId": "Q1787480",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q1787480",
+     "placeId": "Q19824",
      "tier": 2,
      "rank": 35
     },
@@ -65303,12 +64920,12 @@
      "rank": 38
     },
     {
-     "placeId": "Q19824",
+     "placeId": "Q1467712",
      "tier": 3,
      "rank": 39
     },
     {
-     "placeId": "Q1467712",
+     "placeId": "Q89412621",
      "tier": 3,
      "rank": 40
     },
@@ -65338,72 +64955,72 @@
      "rank": 45
     },
     {
-     "placeId": "Q2940753",
+     "placeId": "Q3322070",
      "tier": 3,
      "rank": 46
     },
     {
-     "placeId": "Q3322070",
+     "placeId": "Q9400",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q9400",
+     "placeId": "Q1120660",
      "tier": 3,
      "rank": 48
     },
     {
-     "placeId": "Q1120660",
+     "placeId": "Q3825794",
      "tier": 3,
      "rank": 49
     },
     {
-     "placeId": "Q3825794",
+     "placeId": "Q155031",
      "tier": 3,
      "rank": 50
     },
     {
-     "placeId": "Q155031",
+     "placeId": "Q17774",
      "tier": 3,
      "rank": 51
     },
     {
-     "placeId": "Q55165344",
+     "placeId": "Q2211082",
      "tier": 3,
      "rank": 52
     },
     {
-     "placeId": "Q17774",
+     "placeId": "Q1048781",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q2211082",
+     "placeId": "Q250142",
      "tier": 3,
      "rank": 54
     },
     {
-     "placeId": "Q1048781",
+     "placeId": "Q20281",
      "tier": 3,
      "rank": 55
     },
     {
-     "placeId": "Q250142",
+     "placeId": "Q3902364",
      "tier": 3,
      "rank": 56
     },
     {
-     "placeId": "Q20281",
+     "placeId": "Q3825757",
      "tier": 3,
      "rank": 57
     },
     {
-     "placeId": "Q3902364",
+     "placeId": "Q97621435",
      "tier": 3,
      "rank": 58
     },
     {
-     "placeId": "Q3825757",
+     "placeId": "Q55165346",
      "tier": 3,
      "rank": 59
     },
@@ -65443,52 +65060,52 @@
      "rank": 66
     },
     {
-     "placeId": "Q55165346",
+     "placeId": "Q833321",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q833321",
+     "placeId": "Q962235",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q962235",
+     "placeId": "Q3861469",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q3861469",
+     "placeId": "Q17341",
      "tier": 3,
      "rank": 70
     },
     {
-     "placeId": "Q17341",
+     "placeId": "Q21097741",
      "tier": 3,
      "rank": 71
     },
     {
-     "placeId": "Q21097741",
+     "placeId": "Q17366",
      "tier": 3,
      "rank": 72
     },
     {
-     "placeId": "Q17366",
+     "placeId": "Q1555998",
      "tier": 3,
      "rank": 73
     },
     {
-     "placeId": "Q1555998",
+     "placeId": "Q19846",
      "tier": 3,
      "rank": 74
     },
     {
-     "placeId": "Q19846",
+     "placeId": "Q89591373",
      "tier": 3,
      "rank": 75
     },
     {
-     "placeId": "Q89591373",
+     "placeId": "Q799944",
      "tier": 3,
      "rank": 76
     },
@@ -66291,12 +65908,12 @@
      "rank": 22
     },
     {
-     "placeId": "Q1257207",
+     "placeId": "Q204152",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q204152",
+     "placeId": "Q1257207",
      "tier": 2,
      "rank": 24
     },
@@ -66341,12 +65958,12 @@
      "rank": 32
     },
     {
-     "placeId": "Q385753",
+     "placeId": "Q13139",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q13139",
+     "placeId": "Q385753",
      "tier": 2,
      "rank": 34
     },
@@ -66391,12 +66008,12 @@
      "rank": 42
     },
     {
-     "placeId": "Q510076",
+     "placeId": "Q56084",
      "tier": 3,
      "rank": 43
     },
     {
-     "placeId": "Q56084",
+     "placeId": "Q510076",
      "tier": 3,
      "rank": 44
     },
@@ -66441,12 +66058,12 @@
      "rank": 52
     },
     {
-     "placeId": "Q1129380",
+     "placeId": "Q242105",
      "tier": 3,
      "rank": 53
     },
     {
-     "placeId": "Q242105",
+     "placeId": "Q1129380",
      "tier": 3,
      "rank": 54
     },
@@ -66476,12 +66093,12 @@
      "rank": 59
     },
     {
-     "placeId": "Q731916",
+     "placeId": "Q235163",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q235163",
+     "placeId": "Q731916",
      "tier": 3,
      "rank": 61
     },
@@ -66506,22 +66123,22 @@
      "rank": 65
     },
     {
-     "placeId": "Q15648",
+     "placeId": "Q270328",
      "tier": 3,
      "rank": 66
     },
     {
-     "placeId": "Q270328",
+     "placeId": "Q15648",
      "tier": 3,
      "rank": 67
     },
     {
-     "placeId": "Q1048836",
+     "placeId": "Q463400",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q463400",
+     "placeId": "Q1048836",
      "tier": 3,
      "rank": 69
     },
@@ -66536,7 +66153,7 @@
      "rank": 71
     },
     {
-     "placeId": "Q223079",
+     "placeId": "Q54612",
      "tier": 3,
      "rank": 72
     },
@@ -66546,7 +66163,7 @@
      "rank": 73
     },
     {
-     "placeId": "Q54612",
+     "placeId": "Q223079",
      "tier": 3,
      "rank": 74
     },
@@ -66571,12 +66188,12 @@
      "rank": 78
     },
     {
-     "placeId": "Q1945737",
+     "placeId": "Q128089",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q128089",
+     "placeId": "Q1945737",
      "tier": 3,
      "rank": 80
     }
@@ -66590,10 +66207,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "058",
-   "placeCount": 18,
+   "placeCount": 16,
    "tierCounts": [
     10,
-    8,
+    6,
     0
    ],
    "places": [
@@ -66648,44 +66265,34 @@
      "rank": 10
     },
     {
-     "placeId": "Q2304697",
+     "placeId": "Q1579896",
      "tier": 2,
      "rank": 11
     },
     {
-     "placeId": "Q1446018",
+     "placeId": "Q1132979",
      "tier": 2,
      "rank": 12
     },
     {
-     "placeId": "Q1579896",
+     "placeId": "Q18590113",
      "tier": 2,
      "rank": 13
     },
     {
-     "placeId": "Q1132979",
+     "placeId": "Q1131991",
      "tier": 2,
      "rank": 14
     },
     {
-     "placeId": "Q18590113",
+     "placeId": "Q5171759",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q1131991",
-     "tier": 2,
-     "rank": 16
-    },
-    {
-     "placeId": "Q5171759",
-     "tier": 2,
-     "rank": 17
-    },
-    {
      "placeId": "Q1439180",
      "tier": 2,
-     "rank": 18
+     "rank": 16
     }
    ]
   },
@@ -67604,17 +67211,17 @@
      "rank": 5
     },
     {
-     "placeId": "Q1585525",
+     "placeId": "Q1861237",
      "tier": 1,
      "rank": 6
     },
     {
-     "placeId": "Q1861237",
+     "placeId": "Q686709",
      "tier": 1,
      "rank": 7
     },
     {
-     "placeId": "Q686709",
+     "placeId": "Q2210251",
      "tier": 1,
      "rank": 8
     }
@@ -67921,68 +67528,6 @@
     {
      "placeId": "Q3860195",
      "tier": 1,
-     "rank": 9
-    }
-   ]
-  },
-  {
-   "slug": "monuments-departement-001",
-   "name": "Monuments et édifices remarquables de Turin",
-   "kind": "geo",
-   "themeId": "monuments",
-   "labelId": null,
-   "geoLevel": "departement",
-   "geoCode": "001",
-   "placeCount": 9,
-   "tierCounts": [
-    8,
-    1,
-    0
-   ],
-   "places": [
-    {
-     "placeId": "Q19826",
-     "tier": 1,
-     "rank": 1
-    },
-    {
-     "placeId": "Q3895972",
-     "tier": 1,
-     "rank": 2
-    },
-    {
-     "placeId": "Q89412621",
-     "tier": 1,
-     "rank": 3
-    },
-    {
-     "placeId": "Q2940753",
-     "tier": 1,
-     "rank": 4
-    },
-    {
-     "placeId": "Q55165344",
-     "tier": 1,
-     "rank": 5
-    },
-    {
-     "placeId": "Q101380751",
-     "tier": 1,
-     "rank": 6
-    },
-    {
-     "placeId": "Q55165346",
-     "tier": 1,
-     "rank": 7
-    },
-    {
-     "placeId": "Q55165349",
-     "tier": 1,
-     "rank": 8
-    },
-    {
-     "placeId": "Q3889843",
-     "tier": 2,
      "rank": 9
     }
    ]
@@ -69222,10 +68767,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "12",
-   "placeCount": 32,
+   "placeCount": 28,
    "tierCounts": [
     10,
-    21,
+    17,
     1
    ],
    "places": [
@@ -69300,94 +68845,74 @@
      "rank": 14
     },
     {
-     "placeId": "Q2304697",
+     "placeId": "Q1579896",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q3117098",
+     "placeId": "Q1132979",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q1446018",
+     "placeId": "Q18590113",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q1997405",
+     "placeId": "Q2210995",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q1579896",
+     "placeId": "Q3604770",
      "tier": 2,
      "rank": 19
     },
     {
-     "placeId": "Q1132979",
+     "placeId": "Q3914222",
      "tier": 2,
      "rank": 20
     },
     {
-     "placeId": "Q18590113",
+     "placeId": "Q11913906",
      "tier": 2,
      "rank": 21
     },
     {
-     "placeId": "Q2210995",
+     "placeId": "Q1665908",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q3604770",
+     "placeId": "Q622536",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q3914222",
+     "placeId": "Q1131991",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q11913906",
+     "placeId": "Q5171759",
      "tier": 2,
      "rank": 25
     },
     {
-     "placeId": "Q1665908",
+     "placeId": "Q1439180",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q622536",
+     "placeId": "Q1639494",
      "tier": 2,
      "rank": 27
     },
     {
-     "placeId": "Q1131991",
-     "tier": 2,
-     "rank": 28
-    },
-    {
-     "placeId": "Q5171759",
-     "tier": 2,
-     "rank": 29
-    },
-    {
-     "placeId": "Q1439180",
-     "tier": 2,
-     "rank": 30
-    },
-    {
-     "placeId": "Q1639494",
-     "tier": 2,
-     "rank": 31
-    },
-    {
      "placeId": "Q931172",
      "tier": 3,
-     "rank": 32
+     "rank": 28
     }
    ]
   },
@@ -69591,10 +69116,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "15",
-   "placeCount": 30,
+   "placeCount": 31,
    "tierCounts": [
     12,
-    18,
+    19,
     0
    ],
    "places": [
@@ -69694,59 +69219,64 @@
      "rank": 19
     },
     {
-     "placeId": "Q2941392",
+     "placeId": "Q20008548",
      "tier": 2,
      "rank": 20
     },
     {
-     "placeId": "Q1228725",
+     "placeId": "Q2941392",
      "tier": 2,
      "rank": 21
     },
     {
-     "placeId": "Q1051478",
+     "placeId": "Q1228725",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q3983249",
+     "placeId": "Q1051478",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q23887459",
+     "placeId": "Q3983249",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q657102",
+     "placeId": "Q23887459",
      "tier": 2,
      "rank": 25
     },
     {
-     "placeId": "Q650428",
+     "placeId": "Q657102",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q1227543",
+     "placeId": "Q650428",
      "tier": 2,
      "rank": 27
     },
     {
-     "placeId": "Q518104",
+     "placeId": "Q1227543",
      "tier": 2,
      "rank": 28
     },
     {
-     "placeId": "Q682404",
+     "placeId": "Q518104",
      "tier": 2,
      "rank": 29
     },
     {
-     "placeId": "Q1018282",
+     "placeId": "Q682404",
      "tier": 2,
      "rank": 30
+    },
+    {
+     "placeId": "Q1018282",
+     "tier": 2,
+     "rank": 31
     }
    ]
   },
@@ -69758,10 +69288,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "20",
-   "placeCount": 26,
+   "placeCount": 27,
    "tierCounts": [
     10,
-    16,
+    17,
     0
    ],
    "places": [
@@ -69846,54 +69376,59 @@
      "rank": 16
     },
     {
-     "placeId": "Q2274063",
+     "placeId": "Q1369420",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q994358",
+     "placeId": "Q2274063",
      "tier": 2,
      "rank": 18
     },
     {
-     "placeId": "Q2382880",
+     "placeId": "Q994358",
      "tier": 2,
      "rank": 19
     },
     {
-     "placeId": "Q3874164",
+     "placeId": "Q2382880",
      "tier": 2,
      "rank": 20
     },
     {
-     "placeId": "Q2222749",
+     "placeId": "Q3874164",
      "tier": 2,
      "rank": 21
     },
     {
-     "placeId": "Q3879892",
+     "placeId": "Q2222749",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q1137496",
+     "placeId": "Q3879892",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q1134283",
+     "placeId": "Q1137496",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q3991144",
+     "placeId": "Q1134283",
      "tier": 2,
      "rank": 25
     },
     {
-     "placeId": "Q1024978",
+     "placeId": "Q3991144",
      "tier": 2,
      "rank": 26
+    },
+    {
+     "placeId": "Q1024978",
+     "tier": 2,
+     "rank": 27
     }
    ]
   },
@@ -70153,173 +69688,6 @@
      "placeId": "Q3995587",
      "tier": 2,
      "rank": 32
-    }
-   ]
-  },
-  {
-   "slug": "villages-region-07",
-   "name": "Villages de caractère de Ligurie",
-   "kind": "geo",
-   "themeId": "villages",
-   "labelId": null,
-   "geoLevel": "region",
-   "geoCode": "07",
-   "placeCount": 30,
-   "tierCounts": [
-    10,
-    20,
-    0
-   ],
-   "places": [
-    {
-     "placeId": "Q270328",
-     "tier": 1,
-     "rank": 1
-    },
-    {
-     "placeId": "Q269831",
-     "tier": 1,
-     "rank": 2
-    },
-    {
-     "placeId": "Q269808",
-     "tier": 1,
-     "rank": 3
-    },
-    {
-     "placeId": "Q270737",
-     "tier": 1,
-     "rank": 4
-    },
-    {
-     "placeId": "Q269823",
-     "tier": 1,
-     "rank": 5
-    },
-    {
-     "placeId": "Q268067",
-     "tier": 1,
-     "rank": 6
-    },
-    {
-     "placeId": "Q269476",
-     "tier": 1,
-     "rank": 7
-    },
-    {
-     "placeId": "Q270548",
-     "tier": 1,
-     "rank": 8
-    },
-    {
-     "placeId": "Q270968",
-     "tier": 1,
-     "rank": 9
-    },
-    {
-     "placeId": "Q270189",
-     "tier": 1,
-     "rank": 10
-    },
-    {
-     "placeId": "Q270320",
-     "tier": 2,
-     "rank": 11
-    },
-    {
-     "placeId": "Q268361",
-     "tier": 2,
-     "rank": 12
-    },
-    {
-     "placeId": "Q267005",
-     "tier": 2,
-     "rank": 13
-    },
-    {
-     "placeId": "Q270058",
-     "tier": 2,
-     "rank": 14
-    },
-    {
-     "placeId": "Q270613",
-     "tier": 2,
-     "rank": 15
-    },
-    {
-     "placeId": "Q268902",
-     "tier": 2,
-     "rank": 16
-    },
-    {
-     "placeId": "Q265298",
-     "tier": 2,
-     "rank": 17
-    },
-    {
-     "placeId": "Q270761",
-     "tier": 2,
-     "rank": 18
-    },
-    {
-     "placeId": "Q269943",
-     "tier": 2,
-     "rank": 19
-    },
-    {
-     "placeId": "Q268558",
-     "tier": 2,
-     "rank": 20
-    },
-    {
-     "placeId": "Q270164",
-     "tier": 2,
-     "rank": 21
-    },
-    {
-     "placeId": "Q270858",
-     "tier": 2,
-     "rank": 22
-    },
-    {
-     "placeId": "Q227641",
-     "tier": 2,
-     "rank": 23
-    },
-    {
-     "placeId": "Q270151",
-     "tier": 2,
-     "rank": 24
-    },
-    {
-     "placeId": "Q270606",
-     "tier": 2,
-     "rank": 25
-    },
-    {
-     "placeId": "Q270593",
-     "tier": 2,
-     "rank": 26
-    },
-    {
-     "placeId": "Q519047",
-     "tier": 2,
-     "rank": 27
-    },
-    {
-     "placeId": "Q3072384",
-     "tier": 2,
-     "rank": 28
-    },
-    {
-     "placeId": "Q3833022",
-     "tier": 2,
-     "rank": 29
-    },
-    {
-     "placeId": "Q3862288",
-     "tier": 2,
-     "rank": 30
     }
    ]
   },
@@ -71078,10 +70446,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "03",
-   "placeCount": 20,
+   "placeCount": 18,
    "tierCounts": [
     10,
-    9,
+    7,
     1
    ],
    "places": [
@@ -71156,34 +70524,24 @@
      "rank": 14
     },
     {
-     "placeId": "Q3867896",
+     "placeId": "Q3868468",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q28668608",
+     "placeId": "Q3868123",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q3868468",
+     "placeId": "Q18416869",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q3868123",
-     "tier": 2,
-     "rank": 18
-    },
-    {
-     "placeId": "Q18416869",
-     "tier": 2,
-     "rank": 19
-    },
-    {
      "placeId": "Q29997039",
      "tier": 3,
-     "rank": 20
+     "rank": 18
     }
    ]
   },
@@ -71415,118 +70773,6 @@
      "placeId": "Q1268692",
      "tier": 1,
      "rank": 9
-    }
-   ]
-  },
-  {
-   "slug": "monuments-region-08",
-   "name": "Monuments et édifices remarquables d'Émilie-Romagne",
-   "kind": "geo",
-   "themeId": "monuments",
-   "labelId": null,
-   "geoLevel": "region",
-   "geoCode": "08",
-   "placeCount": 19,
-   "tierCounts": [
-    10,
-    9,
-    0
-   ],
-   "places": [
-    {
-     "placeId": "Q1449217",
-     "tier": 1,
-     "rank": 1
-    },
-    {
-     "placeId": "Q2306368",
-     "tier": 1,
-     "rank": 2
-    },
-    {
-     "placeId": "Q2096472",
-     "tier": 1,
-     "rank": 3
-    },
-    {
-     "placeId": "Q1054370",
-     "tier": 1,
-     "rank": 4
-    },
-    {
-     "placeId": "Q2047639",
-     "tier": 1,
-     "rank": 5
-    },
-    {
-     "placeId": "Q604770",
-     "tier": 1,
-     "rank": 6
-    },
-    {
-     "placeId": "Q3890540",
-     "tier": 1,
-     "rank": 7
-    },
-    {
-     "placeId": "Q16511590",
-     "tier": 1,
-     "rank": 8
-    },
-    {
-     "placeId": "Q1072853",
-     "tier": 1,
-     "rank": 9
-    },
-    {
-     "placeId": "Q3891285",
-     "tier": 1,
-     "rank": 10
-    },
-    {
-     "placeId": "Q1331708",
-     "tier": 2,
-     "rank": 11
-    },
-    {
-     "placeId": "Q21194420",
-     "tier": 2,
-     "rank": 12
-    },
-    {
-     "placeId": "Q3889913",
-     "tier": 2,
-     "rank": 13
-    },
-    {
-     "placeId": "Q321950",
-     "tier": 2,
-     "rank": 14
-    },
-    {
-     "placeId": "Q3890054",
-     "tier": 2,
-     "rank": 15
-    },
-    {
-     "placeId": "Q21194402",
-     "tier": 2,
-     "rank": 16
-    },
-    {
-     "placeId": "Q3891341",
-     "tier": 2,
-     "rank": 17
-    },
-    {
-     "placeId": "Q20089199",
-     "tier": 2,
-     "rank": 18
-    },
-    {
-     "placeId": "Q3361310",
-     "tier": 2,
-     "rank": 19
     }
    ]
   },
@@ -72053,10 +71299,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "16",
-   "placeCount": 16,
+   "placeCount": 15,
    "tierCounts": [
     10,
-    6,
+    5,
     0
    ],
    "places": [
@@ -72106,7 +71352,7 @@
      "rank": 9
     },
     {
-     "placeId": "Q3662381",
+     "placeId": "Q24936766",
      "tier": 1,
      "rank": 10
     },
@@ -72121,24 +71367,19 @@
      "rank": 12
     },
     {
-     "placeId": "Q24936766",
+     "placeId": "Q2051142",
      "tier": 2,
      "rank": 13
     },
     {
-     "placeId": "Q2051142",
+     "placeId": "Q3662681",
      "tier": 2,
      "rank": 14
     },
     {
-     "placeId": "Q3662681",
-     "tier": 2,
-     "rank": 15
-    },
-    {
      "placeId": "Q24942425",
      "tier": 2,
-     "rank": 16
+     "rank": 15
     }
    ]
   },
@@ -72334,10 +71575,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "16",
-   "placeCount": 15,
+   "placeCount": 14,
    "tierCounts": [
     10,
-    5,
+    4,
     0
    ],
    "places": [
@@ -72407,14 +71648,9 @@
      "rank": 13
     },
     {
-     "placeId": "Q2942623",
+     "placeId": "Q2887105",
      "tier": 2,
      "rank": 14
-    },
-    {
-     "placeId": "Q2887169",
-     "tier": 2,
-     "rank": 15
     }
    ]
   },
@@ -72426,10 +71662,10 @@
    "labelId": null,
    "geoLevel": "region",
    "geoCode": "08",
-   "placeCount": 18,
+   "placeCount": 19,
    "tierCounts": [
     10,
-    8,
+    9,
     0
    ],
    "places": [
@@ -72522,6 +71758,11 @@
      "placeId": "Q23946718",
      "tier": 2,
      "rank": 18
+    },
+    {
+     "placeId": "Q3639574",
+     "tier": 2,
+     "rank": 19
     }
    ]
   },
@@ -74392,6 +73633,11 @@
     "parentCode": "012"
    },
    {
+    "code": "012123",
+    "name": "Somma Lombardo",
+    "parentCode": "012"
+   },
+   {
     "code": "012128",
     "name": "Travedona-Monate",
     "parentCode": "012"
@@ -74779,11 +74025,6 @@
    {
     "code": "020055",
     "name": "San Benedetto Po",
-    "parentCode": "020"
-   },
-   {
-    "code": "020056",
-    "name": "San Giacomo delle Segnate",
     "parentCode": "020"
    },
    {
@@ -76687,11 +75928,6 @@
     "parentCode": "057"
    },
    {
-    "code": "057025",
-    "name": "Contigliano",
-    "parentCode": "057"
-   },
-   {
     "code": "057027",
     "name": "Fara in Sabina",
     "parentCode": "057"
@@ -76837,11 +76073,6 @@
     "parentCode": "058"
    },
    {
-    "code": "058120",
-    "name": "Fiumicino",
-    "parentCode": "058"
-   },
-   {
     "code": "059001",
     "name": "Aprilia",
     "parentCode": "059"
@@ -76849,11 +76080,6 @@
    {
     "code": "059005",
     "name": "Cisterna di Latina",
-    "parentCode": "059"
-   },
-   {
-    "code": "059007",
-    "name": "Fondi",
     "parentCode": "059"
    },
    {
@@ -76962,8 +76188,8 @@
     "parentCode": "060"
    },
    {
-    "code": "061005",
-    "name": "Aversa",
+    "code": "061002",
+    "name": "Alife",
     "parentCode": "061"
    },
    {
@@ -76979,11 +76205,6 @@
    {
     "code": "061053",
     "name": "Orta di Atella",
-    "parentCode": "061"
-   },
-   {
-    "code": "061057",
-    "name": "Piedimonte Matese",
     "parentCode": "061"
    },
    {
@@ -77024,11 +76245,6 @@
    {
     "code": "062011",
     "name": "Buonalbergo",
-    "parentCode": "062"
-   },
-   {
-    "code": "062022",
-    "name": "Ceppaloni",
     "parentCode": "062"
    },
    {
@@ -77452,11 +76668,6 @@
     "parentCode": "068"
    },
    {
-    "code": "068008",
-    "name": "Carpineto della Nora",
-    "parentCode": "068"
-   },
-   {
     "code": "068009",
     "name": "Castiglione a Casauria",
     "parentCode": "068"
@@ -77687,8 +76898,8 @@
     "parentCode": "072"
    },
    {
-    "code": "073003",
-    "name": "Castellaneta",
+    "code": "073013",
+    "name": "Martina Franca",
     "parentCode": "073"
    },
    {
@@ -77819,11 +77030,6 @@
    {
     "code": "076061",
     "name": "Pietrapertosa",
-    "parentCode": "076"
-   },
-   {
-    "code": "076063",
-    "name": "Potenza",
     "parentCode": "076"
    },
    {
@@ -78712,6 +77918,11 @@
     "parentCode": "110"
    },
    {
+    "code": "110003",
+    "name": "Bisceglie",
+    "parentCode": "110"
+   },
+   {
     "code": "110004",
     "name": "Canosa di Puglia",
     "parentCode": "110"
@@ -78759,11 +77970,6 @@
    {
     "code": "112050",
     "name": "Sassari",
-    "parentCode": "112"
-   },
-   {
-    "code": "112054",
-    "name": "Siligo",
     "parentCode": "112"
    },
    {
