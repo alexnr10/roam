@@ -1285,6 +1285,20 @@
       "contours": "it-contours.json"
     },
     {
+      "code": "SM",
+      "name": "Saint-Marin",
+      "fichier": "sm.json",
+      "lieux": 8,
+      "emprises": [
+        [
+          12.4464,
+          43.9069,
+          12.4647,
+          43.9372
+        ]
+      ]
+    },
+    {
       "code": "VA",
       "name": "Vatican",
       "fichier": "va.json",
