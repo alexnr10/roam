@@ -104,35 +104,38 @@ themes:
   - id: sommets
     broad_classes: []
 
-  # ── Les places : sans ce thème, Monaco s'ouvre sans la place du Casino ──
+  # ── Les places : MESURÉ, et le thème rend ZÉRO ────────────────────────
   #
-  # `place (Q174782)` n'est déclarée par AUCUN thème du dépôt, et c'est une
-  # décision française assumée : en France une place est un carrefour. Le thème
-  # `piazzas` a donc été créé pour l'Italie, puis redéclaré au Vatican — sans
-  # lui, le catalogue vatican s'ouvrait sans la place Saint-Pierre, troisième
-  # lieu du pays.
+  # `place (Q174782)` n'est déclarée par aucun thème du dépôt — en France une
+  # place est un carrefour — et le Vatican avait donc failli s'ouvrir sans la
+  # place Saint-Pierre, son troisième lieu. Le thème a été redéclaré ici POUR
+  # ÊTRE MESURÉ, avec les réglages du Vatican, parce que Monaco a la place du
+  # Casino et la place du Palais et qu'une ville-État se lit par ses places.
   #
-  # Aucun des vingt et un candidats du premier passage n'est une place. Monaco a
-  # pourtant la place du Casino et la place du Palais, qui sont deux de ses
-  # adresses les plus connues — et une ville-État se lit par ses places.
+  # `fetch --pays-config mc --only piazzas` a rendu ZÉRO. `fetch-state.json`
+  # l'écrit sans ambiguïté :
   #
-  # CE THÈME EST DÉCLARÉ POUR ÊTRE MESURÉ, comme les vingt-deux autres l'ont été
-  # au premier passage : s'il rend zéro, il sautera au prochain tour, avec son
-  # chiffre. Les réglages sont ceux du Vatican, à qui la même question était
-  # posée dans les mêmes termes.
+  #     piazzas : {"ok": true, "lieux": 0}
+  #
+  # La requête a donc abouti — ce n'est pas une panne de réseau — et aucun lieu
+  # monégasque n'est une `Q174782` d'au moins quatre langues. Deux explications
+  # restent possibles, et elles ne se départagent pas d'ici :
+  #
+  #   — LE PLANCHER. Les 226 piazzas italiennes entrent toutes par cette classe,
+  #     et les plus modestes sont exactement à quatre langues, le plancher de
+  #     collecte. Une place du Casino à deux ou trois langues serait coupée.
+  #
+  #   — LA CLASSE. Wikidata peut ne pas modéliser ces places comme des
+  #     `Q174782`, ou ne pas en faire des items du tout — la place du Casino est
+  #     peut-être décrite dans l'article du casino.
+  #
+  # `probe "Place du Casino" "Place du Palais"` tranche en une commande : elle
+  # dit si l'item existe, ses classes et ses langues. Le thème est retiré en
+  # attendant, parce qu'un thème déclaré qui rend zéro coûte une requête à
+  # chaque collecte et ment sur ce que le pays contient. Il revient avec un
+  # plancher mesuré le jour où `probe` montre qu'il y a quelque chose à prendre.
   - id: piazzas
-    name: Places monumentales
-    name_singular: Place
-    name_short: Places
-    name_hints: [place, piazza]
-    icon: piazza
-    kind: culture
-    gated: false
-    radius_m: 150
-    min_sitelinks: 6
-    fetch_min_sitelinks: 4
-    cap: 50
-    wikidata_classes: [Q174782]                      # place
+    retire: true
 
   # ── LES PLANCHERS DE NOTORIÉTÉ, RAMENÉS À CEUX DE LA COLLECTE ──────────
   #
