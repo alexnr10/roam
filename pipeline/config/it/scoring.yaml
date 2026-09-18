@@ -51,60 +51,47 @@ geo:
   # La province est l'échelon qui correspond au département : cent dix contre
   # cent une, pour un pays d'un tiers plus petit. La région italienne, elle,
   # compte vingt unités — presque les dix-huit françaises.
-  # ── Les enclaves : le Vatican et Saint-Marin ──────────────────────────
+  # ── Les enclaves : IL N'Y EN A PLUS, et c'est l'aboutissement ─────────
   #
-  # Ce sont des PAYS chez Wikidata : `P17` y vaut Q237 et Q238, jamais Q38. La
-  # collecte italienne ne les voyait donc pas — et les 203 églises romaines du
-  # vivier de `derogations` n'avaient ni Saint-Pierre, ni la chapelle Sixtine,
-  # ni les musées du Vatican. Le filtre avait raison ; le guide avait tort.
+  # Le Vatican et Saint-Marin sont des PAYS chez Wikidata : `P17` y vaut Q237 et
+  # Q238, jamais Q38. La collecte italienne ne les voyait donc pas, et les 203
+  # églises romaines du vivier de `derogations` n'avaient ni Saint-Pierre, ni la
+  # chapelle Sixtine, ni les musées du Vatican. On les a d'abord ABSORBÉS : la
+  # requête interrogeait les trois pays, et chaque lieu d'enclave recevait une
+  # province italienne — 058 Rome, 099 Rimini — sans quoi il sortait du
+  # catalogue avant d'être jugé (`apply_geographic_scope`).
   #
-  # `departement` dit à quelle province les rattacher, et ce n'est pas de la
-  # géopolitique : un lieu sans département sort du catalogue avant d'être
-  # jugé (`apply_geographic_scope`), et surtout on va à Saint-Pierre DEPUIS
-  # Rome. Les deux codes sont lus dans `data/reference/it/departements.csv` :
-  # 058 Rome, 099 Rimini — la ville italienne la plus proche de Saint-Marin.
+  # C'était un pis-aller, et il était écrit comme tel : « le filtre avait
+  # raison ; le guide avait tort ». Le guide n'a plus tort. Les deux pays sont
+  # collectés, construits et servis pour eux-mêmes :
   #
-  # Les Q-id ne viennent pas de mémoire : ils sont lus dans la table
-  # `datasets/country-codes`, qui donne IT → Q38 et FR → Q142 — soit exactement
-  # ce que ce dépôt écrit déjà — et VA → Q237, SM → Q238.
+  #     Le meilleur du Vatican     19 lieux, paliers [10, 9, 0]
+  #     Le meilleur de Saint-Marin  8 lieux, paliers [7, 1, 0]
   #
-  # ⚠ Q237 y est libellé « Saint-Siège ». Wikidata distingue parfois le
-  # Saint-Siège de l'État de la Cité du Vatican, et `P17` des lieux pointe
-  # peut-être l'autre. La collecte le dira sans ambiguïté : si le Vatican rend
-  # ZÉRO lieu alors que Saint-Marin en rend, c'est l'entité voisine qu'il faut,
-  # et `suggest-qids` la donnera. `fetch` journalise les enclaves absorbées
-  # pour que la question se voie.
-  #
-  # ── LE VATICAN EN EST SORTI, parce qu'il a le sien ────────────────────
-  #
-  # L'absorption était un PIS-ALLER, et il est écrit plus haut : « le filtre
-  # avait raison, le guide avait tort ». Le guide n'a plus tort — le Vatican
-  # est collecté, construit et servi comme le pays qu'il est, avec ses dix-neuf
-  # lieux et sa collection. L'y laisser en plus rendait Q12512 présent dans
-  # DEUX catalogues : la basilique Saint-Pierre sortait deux fois de la
+  # Les garder ici en plus mettait les mêmes Q-id dans DEUX catalogues. Ce
+  # n'est pas cosmétique : la basilique Saint-Pierre sortait deux fois de la
   # recherche, et la carte la dessinait en Italie comme au Vatican.
   #
-  # Mesuré sur la construction italienne, avant et après : onze lieux partent —
-  # cinq du Vatican, six de Saint-Marin — et quatre arrivent. Saint-Pierre
-  # quitte la tête de « Cathédrales et basiliques », que le Dôme de Milan
-  # reprend.
+  # Ce que la carte fait maintenant est mieux que l'absorption : au-dessus de
+  # Rome, elle POSE les lieux du Vatican par-dessus le Latium, et au-dessus de
+  # Rimini ceux de Saint-Marin par-dessus l'Émilie-Romagne — sans les mélanger,
+  # chacun gardant son pays, ses étoiles et sa fiche. On va toujours à
+  # Saint-Pierre depuis Rome ; c'est à l'écran que ça se dit, plus dans la
+  # donnée.
   #
-  # ⚠ RETIRER CETTE LIGNE NE SUFFIT PAS. `enclaves` ne joue qu'à la COLLECTE :
-  # elle décide des pays interrogés et pose la province. Les lignes déjà
-  # écrites dans `data/it/raw/` y restent, avec leur province de Rome. Il faut
-  # donc recollecter les thèmes qui en portent — dix, mesurés :
+  # ⚠ CETTE CLÉ NE SE ROUVRE PAS À LA LÉGÈRE. `enclaves` ne joue qu'à la
+  # COLLECTE : y remettre un pays ne suffit pas à le faire entrer, et l'en
+  # retirer ne suffit pas à le faire sortir — les lignes déjà écrites dans
+  # `data/it/raw/` gardent leur province. Les deux sens demandent une
+  # recollecte des thèmes concernés. Pour mémoire, ceux qui portaient
+  # Saint-Marin étaient au nombre de sept :
   #
-  #     fetch --pays-config it --only musees cathedrales monuments megalithes \
-  #           maisons piazzas jardins abbayes grottes plages
+  #     fetch --pays-config it --only cathedrales chateaux maisons monuments \
+  #           musees plages sommets
   #
-  # Saint-Marin RESTE, et ce n'est pas une inconséquence : il n'est pas encore
-  # collecté. L'en sortir aujourd'hui ferait disparaître le mont Titan, la
-  # basilique et les trois tours sans que rien ne les rattrape. Cette ligne
-  # part le jour où `data/sm/` existe, par le même geste.
-  enclaves:
-    - qid: Q238
-      name: Saint-Marin
-      departement: "099"      # province de Rimini
+  # Un troisième micro-État se collecte donc directement pour lui-même, sans
+  # passer par ici : c'est le chemin que Q237 et Q238 ont fini par prendre.
+  enclaves: []
 
   # ── LES CONTOURS À DESSINER ───────────────────────────────────────────
   #

@@ -9702,22 +9702,28 @@ class TestDepartementDuCodeCommunal(unittest.TestCase):
 class TestEnclaves(unittest.TestCase):
     """Le Vatican et Saint-Marin sont des pays chez Wikidata."""
 
-    def test_l_italie_interroge_son_enclave(self):
+    def test_l_italie_n_absorbe_plus_personne(self):
+        # L'absorption était un PIS-ALLER, et la configuration l'écrivait :
+        # « le filtre avait raison ; le guide avait tort ». Le guide n'a plus
+        # tort — le Vatican et Saint-Marin sont collectés, construits et servis
+        # pour eux-mêmes, 19 et 8 lieux. Les garder ici en plus mettait les
+        # mêmes Q-id dans DEUX catalogues : la basilique Saint-Pierre sortait
+        # deux fois de la recherche.
         it = load_config(pays="it")
-        self.assertEqual(it.country.qids, ["Q38", "Q238"])
-        self.assertEqual([(e.name, e.departement) for e in it.country.enclaves],
-                         [("Saint-Marin", "099")])
+        self.assertEqual(it.country.qids, ["Q38"])
+        self.assertEqual(it.country.enclaves, ())
 
-    def test_le_vatican_n_est_plus_une_enclave_italienne(self):
-        # L'absorption était un pis-aller : le filtre avait raison, le guide
-        # avait tort. Le Vatican est maintenant collecté, construit et servi
-        # comme le pays qu'il est — l'y laisser en plus mettait Q12512 dans
-        # DEUX catalogues, et la basilique Saint-Pierre sortait deux fois de la
-        # recherche. Saint-Marin reste tant qu'il n'a pas le sien : l'en sortir
-        # ferait disparaître le mont Titan sans que rien ne le rattrape.
-        it = load_config(pays="it")
-        self.assertNotIn("Q237", it.country.qids)
-        self.assertNotIn("Vatican", [e.name for e in it.country.enclaves])
+    def test_le_mecanisme_reste_declarable(self):
+        # Vidée, la clé n'est pas retirée : un troisième micro-État se
+        # collecterait pour lui-même, mais rien n'interdit d'absorber un
+        # territoire qui n'aurait pas de quoi tenir un catalogue.
+        from roam_pipeline.config import Enclave
+
+        pays = replace(
+            load_config(pays="it").country,
+            enclaves=(Enclave(qid="Q238", name="Saint-Marin", departement="099"),),
+        )
+        self.assertEqual(pays.qids, ["Q38", "Q238"])
 
     def test_la_france_n_interroge_qu_elle_meme(self):
         # Monaco et Andorre existent, mais rien ne les a demandés : une
@@ -9747,7 +9753,12 @@ class TestEnclaves(unittest.TestCase):
 
         geo.utiliser_pays("IT")
         try:
-            enclaves = {e.qid: e for e in load_config(pays="it").country.enclaves}
+            # Déclarée ici, et non lue dans la configuration italienne : elle
+            # n'en a plus. C'est la MÉCANIQUE qu'on éprouve, pas le réglage.
+            from roam_pipeline.config import Enclave
+
+            enclaves = {"Q238": Enclave(qid="Q238", name="Saint-Marin",
+                                        departement="099")}
             place = _row_to_place({
                 "item": "http://www.wikidata.org/entity/Q12345",
                 "itemLabel": "Basilique",
@@ -9759,7 +9770,8 @@ class TestEnclaves(unittest.TestCase):
             self.assertEqual(place.region_code, geo.region_of("099").code)
             self.assertEqual(place.commune_name, "Saint-Marin")
             # `country_code` reste VIDE : la mention en ferait un catalogue à
-            # part, alors qu'il est là pour être dans celui de l'Italie.
+            # part, alors que le lieu absorbé est là pour être dans celui du
+            # pays qui l'absorbe.
             self.assertEqual(place.country_code, "")
         finally:
             geo.utiliser_pays("FR")
@@ -9785,6 +9797,7 @@ class TestEnclaves(unittest.TestCase):
         self.assertEqual(_rang_du_pays({}, "Q142"), 0)
 
     def test_un_lieu_ordinaire_n_est_pas_touche(self):
+        from roam_pipeline.config import Enclave
         from roam_pipeline.fetch import _row_to_place
 
         place = _row_to_place({
@@ -9792,7 +9805,8 @@ class TestEnclaves(unittest.TestCase):
             "itemLabel": "Tour Eiffel",
             "coord": "Point(2.2945 48.8584)",
             "sitelinks": "100",
-        }, CONFIG.themes[0], {"Q237": load_config(pays="it").country.enclaves[0]})
+        }, CONFIG.themes[0],
+            {"Q237": Enclave(qid="Q237", name="Vatican", departement="058")})
         self.assertIsNone(place.departement_code)
 
 
