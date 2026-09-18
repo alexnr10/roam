@@ -7,11 +7,12 @@
 # demander à Wikidata quels monuments monégasques sont classés au titre du
 # code du patrimoine français : zéro, par construction.
 #
-# `unesco` EST GARDÉ, et c'est la même discipline que partout ici : on ne
-# retire qu'après avoir mesuré. Le premier `fetch` dira ce que le label rend —
-# et s'il rend zéro, ou seulement l'ensemble inscrit sans les lieux qui le
-# composent, il partira comme au Vatican et à Saint-Marin, avec son chiffre.
-# `data/mc/out/label-orphelins.csv` est le fichier qui le dira.
+# `unesco` PART AUSSI, et c'est mesuré : le premier `fetch --pays-config mc` a
+# rendu « label unesco : 0 membres ». Pas même un orphelin, contrairement au
+# Vatican et à Saint-Marin, dont la requête trouvait au moins l'ensemble
+# inscrit — Monaco n'a aucun bien au patrimoine mondial.
+#
+# Il revient le jour où la principauté en inscrira un.
 
 labels:
   - id: plus-beaux-villages
@@ -41,4 +42,6 @@ labels:
   - id: parc-national
     retire: true
   - id: pavillon-bleu
+    retire: true
+  - id: unesco
     retire: true

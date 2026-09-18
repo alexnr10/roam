@@ -4,35 +4,21 @@
 # `labels.yaml` ne suffit pas — la référence resterait, pendante. On vide donc
 # ici ce qu'ils vont chercher.
 #
-# AUCUN THÈME N'EST RETIRÉ, et c'est délibéré. Monaco n'a évidemment ni volcan
-# ni cirque glaciaire, et une bonne moitié des thèmes ne rendront rien — mais
-# le dépôt ne retire un thème qu'après l'avoir MESURÉ, jamais sur une
-# intuition. C'est la discipline qui a servi deux fois : au Vatican, le thème
-# `cathedrales` semblait évident et n'a rendu qu'UN lieu sans la porte
-# « église » — la chapelle Sixtine passait à travers. À Saint-Marin, `sommets`
+# QUINZE THÈMES SONT RETIRÉS, et aucun ne l'a été sur une intuition. Ce fichier
+# a d'abord été écrit sans en retirer un seul, exprès : le dépôt ne retire un
+# thème qu'après l'avoir MESURÉ. C'est la discipline qui a servi deux fois — au
+# Vatican, `cathedrales` semblait évident et ne rendait qu'UN lieu sans la porte
+# « église », la chapelle Sixtine passant à travers ; à Saint-Marin, `sommets`
 # semblait vide et portait tout le pays.
 #
-# Le premier `fetch --pays-config mc` dira lesquels rendent zéro, et c'est
-# alors qu'ils sauteront, avec le chiffre en commentaire. Une requête qui ne
-# rend rien coûte une seconde ; un thème retiré à tort coûte un lieu qu'on ne
-# verra jamais.
+# Le premier `fetch --pays-config mc` a interrogé vingt-deux thèmes et n'en a
+# rempli que sept, pour vingt et un lieux :
 #
-# ⚠ DEUX CHOSES À REGARDER dans la sortie du premier passage, parce que les
-# deux enclaves italiennes les ont eues :
+#     musees 6 · plages 4 · sommets 4 · jardins 3 · monuments 2
+#     cathedrales 1 · maisons 1
 #
-#   — les PLACES. `place (Q174782)` n'est déclarée par aucun thème du dépôt,
-#     parce qu'en France une place est un carrefour. Le Vatican a donc failli
-#     s'ouvrir sans la place Saint-Pierre, et il a fallu lui redéclarer un
-#     thème `piazzas`. Monaco a la place du Casino et la place du Palais : si
-#     elles manquent, c'est là qu'il faudra regarder.
-#
-#   — les DÉBORDEMENTS. Wikidata donne parfois plusieurs pays à un même lieu,
-#     et un pays sans subdivision n'a rien pour les arrêter : la péninsule
-#     italienne, cent trois langues, s'est installée en tête des plages du
-#     Vatican ET de Saint-Marin, et l'Apennin serait devenu le premier lieu
-#     saint-marinais. Monaco est sur la côte et au pied des Alpes : la
-#     Méditerranée, la Riviera ou les Alpes-Maritimes peuvent très bien
-#     remonter. Tout candidat plus grand que le pays est un débordement.
+# Deux requêtes ont rendu un HTTP 502 et sont passées au deuxième essai : la
+# collecte est complète, le service était simplement encombré.
 
 themes:
   # RETIRÉ, et non vidé : le thème `villages` n'a AUCUNE classe Wikidata et ne
@@ -52,3 +38,44 @@ themes:
   # d'aucun État, et la villa Sauber comme la villa Paloma sont des maisons.
   - id: maisons
     from_labels: []
+
+  # ── Les quinze thèmes que la collecte a rendus VIDES ───────────────────
+  #
+  # Mesuré par le premier `fetch --pays-config mc` : zéro lieu candidat pour
+  # chacun. Ce n'est pas une surprise sur un État de deux kilomètres carrés,
+  # entièrement bâti, sans cours d'eau ni relief propre — mais c'est mesuré, et
+  # c'est à cela que sert un premier passage. Une requête qui ne rend rien coûte
+  # une seconde à chaque collecte ; quinze en coûtent quinze, pour rien.
+  #
+  # Chacun revient en retirant sa ligne, le jour où un lieu justifierait qu'on
+  # le redemande.
+  - id: abbayes
+    retire: true
+  - id: chateaux
+    retire: true
+  - id: grottes
+    retire: true
+  - id: megalithes
+    retire: true
+  - id: phares
+    retire: true
+  - id: ponts
+    retire: true
+  - id: cascades
+    retire: true
+  - id: cirques
+    retire: true
+  - id: gorges
+    retire: true
+  - id: lacs
+    retire: true
+  - id: iles
+    retire: true
+  - id: volcans
+    retire: true
+  - id: dunes-marais
+    retire: true
+  - id: forets
+    retire: true
+  - id: rochers
+    retire: true
