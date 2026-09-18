@@ -104,38 +104,51 @@ themes:
   - id: sommets
     broad_classes: []
 
-  # ── Les places : MESURÉ, et le thème rend ZÉRO ────────────────────────
+  # ── Les places : LA CLASSE ÉTAIT BONNE, LE PLANCHER COUPAIT ───────────
   #
   # `place (Q174782)` n'est déclarée par aucun thème du dépôt — en France une
   # place est un carrefour — et le Vatican avait donc failli s'ouvrir sans la
-  # place Saint-Pierre, son troisième lieu. Le thème a été redéclaré ici POUR
-  # ÊTRE MESURÉ, avec les réglages du Vatican, parce que Monaco a la place du
-  # Casino et la place du Palais et qu'une ville-État se lit par ses places.
+  # place Saint-Pierre. Le thème a été redéclaré ici avec les réglages du
+  # Vatican, et le premier passage a rendu ZÉRO : `fetch-state.json` écrivait
+  # `piazzas : {"ok": true, "lieux": 0}`, donc une requête aboutie et vide.
   #
-  # `fetch --pays-config mc --only piazzas` a rendu ZÉRO. `fetch-state.json`
-  # l'écrit sans ambiguïté :
+  # Deux explications tenaient — la classe ou le plancher — et `probe` a tranché
+  # en une commande :
   #
-  #     piazzas : {"ok": true, "lieux": 0}
+  #     place du Casino   Q95598843   Monaco, Monte-Carlo   1 langue
+  #                       classes déclarées : place (Q174782)
+  #     place du Palais   Q96214118   Monaco, Monaco-Ville  2 langues, article fr
+  #                       classes déclarées : place (Q174782)
   #
-  # La requête a donc abouti — ce n'est pas une panne de réseau — et aucun lieu
-  # monégasque n'est une `Q174782` d'au moins quatre langues. Deux explications
-  # restent possibles, et elles ne se départagent pas d'ici :
+  # LA CLASSE EST LA BONNE. C'est le plancher de collecte, à quatre langues,
+  # qui les écartait — et il est hérité du Vatican, où la place Saint-Pierre en
+  # a soixante-six et la cour du Belvédère quinze. Monaco est documenté tout
+  # autrement : ses deux adresses les plus connues au monde ont une et deux
+  # versions linguistiques.
   #
-  #   — LE PLANCHER. Les 226 piazzas italiennes entrent toutes par cette classe,
-  #     et les plus modestes sont exactement à quatre langues, le plancher de
-  #     collecte. Une place du Casino à deux ou trois langues serait coupée.
+  # Le plancher descend donc à UN, comme celui des plages du dépôt, et pour la
+  # même raison qui y est écrite : le plancher mesure la documentation, pas la
+  # valeur. Sur deux kilomètres carrés, le vivier de `Q174782` ne peut pas
+  # déborder — et ce que la collecte ramènera de trop se lit en deux minutes en
+  # revue.
   #
-  #   — LA CLASSE. Wikidata peut ne pas modéliser ces places comme des
-  #     `Q174782`, ou ne pas en faire des items du tout — la place du Casino est
-  #     peut-être décrite dans l'article du casino.
-  #
-  # `probe "Place du Casino" "Place du Palais"` tranche en une commande : elle
-  # dit si l'item existe, ses classes et ses langues. Le thème est retiré en
-  # attendant, parce qu'un thème déclaré qui rend zéro coûte une requête à
-  # chaque collecte et ment sur ce que le pays contient. Il revient avec un
-  # plancher mesuré le jour où `probe` montre qu'il y a quelque chose à prendre.
+  # Leurs scores seront bas, faute d'article et de consultations : la place du
+  # Casino sortira au dernier palier. C'est honnête — une étoile ne dit pas
+  # « médiocre », elle dit « à voir en passant », et ce que Roam sait d'elle
+  # tient en une ligne de Wikidata.
   - id: piazzas
-    retire: true
+    name: Places monumentales
+    name_singular: Place
+    name_short: Places
+    name_hints: [place, piazza]
+    icon: piazza
+    kind: culture
+    gated: false
+    radius_m: 150
+    min_sitelinks: 1
+    fetch_min_sitelinks: 1
+    cap: 50
+    wikidata_classes: [Q174782]                      # place
 
   # ── LES PLANCHERS DE NOTORIÉTÉ, RAMENÉS À CEUX DE LA COLLECTE ──────────
   #

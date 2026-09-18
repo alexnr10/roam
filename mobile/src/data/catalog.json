@@ -23905,26 +23905,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/%C3%8Elet_%C3%A0_Cabrit"
   },
   {
-   "id": "Q1069352",
-   "slug": "chemin-des-revoires",
-   "name": "Chemin des Révoires",
-   "themeId": "sommets",
-   "lat": 43.732778,
-   "lon": 7.4125,
-   "radiusM": 1000,
-   "score": 67.3,
-   "departement": "Alpes-Maritimes",
-   "departementCode": "06",
-   "regionCode": "93",
-   "communeCode": "06150",
-   "communeName": "La Turbie",
-   "summary": "Le chemin des Révoires (monégasque : cami̍n d’ë Revëre) était un ancien chemin montagneux, dans l'actuel quartier du Jardin exotique à Monaco.\nLe point culminant de la principauté s'y trouve à proximité, sur les pentes du mont Agel, appartenant géographiquement aux Alpes.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/MonacoLibreDeDroits.jpg",
-   "imageAuthor": null,
-   "imageLicence": "CC BY-SA 3.0",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Chemin_des_R%C3%A9voires"
-  },
-  {
    "id": "Q4784839",
    "slug": "arboretum-de-pezanin",
    "name": "Arboretum de Pézanin",
@@ -59001,10 +58981,10 @@
    "labelId": null,
    "geoLevel": "departement",
    "geoCode": "06",
-   "placeCount": 38,
+   "placeCount": 37,
    "tierCounts": [
     13,
-    25,
+    24,
     0
    ],
    "places": [
@@ -59114,89 +59094,84 @@
      "rank": 21
     },
     {
-     "placeId": "Q3546930",
+     "placeId": "Q1034146",
      "tier": 2,
      "rank": 22
     },
     {
-     "placeId": "Q1034146",
+     "placeId": "Q3329265",
      "tier": 2,
      "rank": 23
     },
     {
-     "placeId": "Q3329265",
+     "placeId": "Q236609",
      "tier": 2,
      "rank": 24
     },
     {
-     "placeId": "Q236609",
+     "placeId": "Q6159750",
      "tier": 2,
      "rank": 25
     },
     {
-     "placeId": "Q6159750",
+     "placeId": "Q6159686",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q6159686",
+     "placeId": "Q1368360",
      "tier": 2,
      "rank": 27
     },
     {
-     "placeId": "Q1368360",
+     "placeId": "Q243012",
      "tier": 2,
      "rank": 28
     },
     {
-     "placeId": "Q243012",
+     "placeId": "Q1563354",
      "tier": 2,
      "rank": 29
     },
     {
-     "placeId": "Q1563354",
+     "placeId": "Q841580",
      "tier": 2,
      "rank": 30
     },
     {
-     "placeId": "Q841580",
+     "placeId": "Q736943",
      "tier": 2,
      "rank": 31
     },
     {
-     "placeId": "Q736943",
+     "placeId": "Q3330734",
      "tier": 2,
      "rank": 32
     },
     {
-     "placeId": "Q3330734",
+     "placeId": "Q2820744",
      "tier": 2,
      "rank": 33
     },
     {
-     "placeId": "Q2820744",
+     "placeId": "Q3546930",
      "tier": 2,
      "rank": 34
     },
     {
-     "placeId": "Q1069352",
+     "placeId": "Q630118",
      "tier": 2,
      "rank": 35
     },
     {
-     "placeId": "Q630118",
+     "placeId": "Q779689",
      "tier": 2,
      "rank": 36
     },
     {
-     "placeId": "Q779689",
-     "tier": 2,
-     "rank": 37
-    },
-    {
      "placeId": "Q292148",
      "tier": 2,
-     "rank": 38
+     "rank": 37
     }
    ]
   },
@@ -64283,12 +64258,12 @@
      "rank": 25
     },
     {
-     "placeId": "Q1518970",
+     "placeId": "Q1858504",
      "tier": 2,
      "rank": 26
     },
     {
-     "placeId": "Q1858504",
+     "placeId": "Q1518970",
      "tier": 2,
      "rank": 27
     },
@@ -64388,12 +64363,12 @@
      "rank": 46
     },
     {
-     "placeId": "Q1369923",
+     "placeId": "Q747588",
      "tier": 3,
      "rank": 47
     },
     {
-     "placeId": "Q747588",
+     "placeId": "Q1369923",
      "tier": 3,
      "rank": 48
     },
@@ -64448,17 +64423,17 @@
      "rank": 58
     },
     {
-     "placeId": "Q2096741",
+     "placeId": "Q3330218",
      "tier": 3,
      "rank": 59
     },
     {
-     "placeId": "Q3330218",
+     "placeId": "Q292564",
      "tier": 3,
      "rank": 60
     },
     {
-     "placeId": "Q292564",
+     "placeId": "Q2096741",
      "tier": 3,
      "rank": 61
     },
@@ -64493,17 +64468,17 @@
      "rank": 67
     },
     {
-     "placeId": "Q1189890",
+     "placeId": "Q274678",
      "tier": 3,
      "rank": 68
     },
     {
-     "placeId": "Q274678",
+     "placeId": "Q3329666",
      "tier": 3,
      "rank": 69
     },
     {
-     "placeId": "Q3329666",
+     "placeId": "Q1189890",
      "tier": 3,
      "rank": 70
     },
@@ -64548,12 +64523,12 @@
      "rank": 78
     },
     {
-     "placeId": "Q2983361",
+     "placeId": "Q965394",
      "tier": 3,
      "rank": 79
     },
     {
-     "placeId": "Q965394",
+     "placeId": "Q1788518",
      "tier": 3,
      "rank": 80
     }

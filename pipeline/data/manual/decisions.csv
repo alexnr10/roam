@@ -88,7 +88,7 @@ Q1067494,drop,Tour du Temple,detruite en 1808
 Q1067900,drop,Massif de la Chartreuse,
 Q1068630,drop,Chaîne des Puys,
 Q106934,keep,Cathédrale Notre-Dame d'Amiens,
-Q1069352,keep,Chemin des Révoires,
+Q1069352,drop,Chemin des Révoires,"mesuré : ce lieu est À MONACO, pas en France. Ses coordonnées (7.4125 43.7328) tombent dans l'emprise monégasque — c'en est même l'extrémité ouest — et c'est le point culminant de la principauté, dans le quartier des Révoires. Le pipeline français l'avait rattaché à La Turbie, la commune française la plus proche, faute de mieux : Wikidata lui donne les deux pays. Il est au catalogue de Monaco depuis que celui-ci existe, et le garder ici mettait le même Q-id dans deux catalogues. Le mont Agel, lui, reste : son sommet est à Peille, en France."
 Q1073098,keep,Pont des Invalides,
 Q1075988,drop,Palais du Louvre,
 Q1083336,keep,Cathédrale Saint-Pierre d'Annecy,
