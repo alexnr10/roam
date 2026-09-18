@@ -1,0 +1,9 @@
+# Le thème d'un lieu, quand celui que la collecte lui donne est faux.
+#
+# Changer de thème, c'est changer de collection et de voisins : un lieu mal
+# rangé n'est pas seulement mal étiqueté, il concourt contre les mauvais.
+#
+# Pour trouver un identifiant : python -m roam_pipeline explain "musée Dior"
+#
+wikidata_id,theme_id,note
+Q3351922,monuments,"le rocher de Monaco est rentré par le thème `plages` — une de ses classes de cap ou de promontoire y est déclarée, légitimement, pour le littoral français. Mais c'est le promontoire qui porte la vieille ville et le palais, pas une plage : on y monte, on ne s'y baigne pas. Le thème `rochers` n'existe pas ici, sa collecte a rendu zéro ; `monuments` est le bon voisinage."

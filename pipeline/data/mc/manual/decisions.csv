@@ -1,0 +1,15 @@
+# Décisions éditoriales, cumulées au fil des revues.
+#
+# keep    : validé, et conservé même si un plancher venait à monter.
+# drop    : écarté du catalogue.
+# promote : remonté dans le classement. Sur un lieu hors de sa collection
+#           nationale, il l'y fait ENTRER, à son rang, et rien de plus.
+# promote2: le fait entrer ET le monte d'un cran. À n'employer que là où
+#           `promote` ne ferait qu'entrer — ailleurs il vaut `promote`.
+# demote  : descendu dans le classement.
+#
+# Ce fichier est la mémoire de la curation. Le supprimer perd tout le travail
+# de relecture ; en corriger une ligne suffit à revenir sur un verdict.
+#
+wikidata_id,decision,name,note
+Q1517182,drop,Mont Agel,"mesuré : ce sommet est FRANÇAIS. Le catalogue français le porte déjà — commune de Peille (Alpes-Maritimes), rang 34 des Sommets et rang 8 du Meilleur des Alpes-Maritimes. Son point de coordonnées est à 5,1 km du centre de Monaco, hors des 1,7 × 1,8 km du pays. Wikidata lui donne les deux pays parce que le versant descend sur la principauté, mais on ne peut pas être sur le mont Agel en étant à Monaco. Le garder ici mettait le même Q-id dans DEUX catalogues, ce que la session vient de défaire pour la basilique Saint-Pierre. Retire cette ligne pour revenir dessus."

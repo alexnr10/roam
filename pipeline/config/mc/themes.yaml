@@ -79,3 +79,106 @@ themes:
     retire: true
   - id: rochers
     retire: true
+
+  # ── Les sommets : la porte large rend les ALPES ────────────────────────
+  #
+  # Quatre candidats, et la porte « chaîne de montagnes » les sépare exactement
+  # en deux, comme à Saint-Marin :
+  #
+  #     par une classe PROPRE              par la porte large
+  #       Mont Agel            22 langues    Alpes              213 langues
+  #       Chemin des Révoires  16            Alpes occidentales  40
+  #
+  # Les Alpes sont à TROIS CENT TRENTE KILOMÈTRES de Monaco — leur point de
+  # coordonnées est en Suisse, au Mont Rose — et les Alpes occidentales à deux
+  # cent trente-huit, en Savoie. Avec deux cent treize versions linguistiques,
+  # les Alpes seraient devenues, et de très loin, le premier lieu de Monaco.
+  #
+  # `require_elevation` ne les arrête pas : elles portent 4 810 mètres, ceux du
+  # mont Blanc. C'est le même piège qu'à Saint-Marin, où deux Apennins portaient
+  # l'altitude du Corno Grande, à trois cents kilomètres de là.
+  #
+  # La porte reste ouverte en France et en Italie, où elle est mesurée et où elle
+  # rend la Sainte-Victoire et l'Estérel — des massifs qu'on gravit. Un pays
+  # d'un kilomètre sept sur un kilomètre huit n'a pas de massif.
+  - id: sommets
+    broad_classes: []
+
+  # ── Les places : sans ce thème, Monaco s'ouvre sans la place du Casino ──
+  #
+  # `place (Q174782)` n'est déclarée par AUCUN thème du dépôt, et c'est une
+  # décision française assumée : en France une place est un carrefour. Le thème
+  # `piazzas` a donc été créé pour l'Italie, puis redéclaré au Vatican — sans
+  # lui, le catalogue vatican s'ouvrait sans la place Saint-Pierre, troisième
+  # lieu du pays.
+  #
+  # Aucun des vingt et un candidats du premier passage n'est une place. Monaco a
+  # pourtant la place du Casino et la place du Palais, qui sont deux de ses
+  # adresses les plus connues — et une ville-État se lit par ses places.
+  #
+  # CE THÈME EST DÉCLARÉ POUR ÊTRE MESURÉ, comme les vingt-deux autres l'ont été
+  # au premier passage : s'il rend zéro, il sautera au prochain tour, avec son
+  # chiffre. Les réglages sont ceux du Vatican, à qui la même question était
+  # posée dans les mêmes termes.
+  - id: piazzas
+    name: Places monumentales
+    name_singular: Place
+    name_short: Places
+    name_hints: [place, piazza]
+    icon: piazza
+    kind: culture
+    gated: false
+    radius_m: 150
+    min_sitelinks: 6
+    fetch_min_sitelinks: 4
+    cap: 50
+    wikidata_classes: [Q174782]                      # place
+
+  # ── LES PLANCHERS DE NOTORIÉTÉ, RAMENÉS À CEUX DE LA COLLECTE ──────────
+  #
+  # Le dépôt pose DEUX planchers par thème : `fetch_min_sitelinks`, en dessous
+  # duquel un lieu n'est pas assez documenté pour être un lieu, et
+  # `min_sitelinks`, plus haut, qui ÉCLAIRCIT un gros catalogue. Le second est
+  # mesuré sur la France, où les musées à douze langues séparent le Louvre de
+  # milliers de collections municipales.
+  #
+  # Sur deux kilomètres carrés, il n'y a rien à éclaircir, et il coupe dans le
+  # vif. Mesuré sur le premier passage — `musees` garde UN lieu sur six :
+  #
+  #      33  Musée océanographique            ← le seul au-dessus de douze
+  #      10  Musée de l'automobile
+  #       8  Musée des timbres et des monnaies
+  #       5  Nouveau musée national (villa Sauber, villa Paloma)
+  #       5  Musée d'Anthropologie préhistorique
+  #       5  Napoleon Museum
+  #
+  # Aucun de ces cinq n'est une collection de village : ce sont les institutions
+  # d'un État. Le plancher ne mesure pas leur valeur, il mesure la DOCUMENTATION
+  # — la configuration du dépôt le dit elle-même, « un square parisien a un
+  # article de Wikipédia, un beau jardin du Gers n'en a pas ». Monaco est
+  # uniformément moins documenté que la France, pas uniformément moins riche.
+  #
+  # La règle est donc générale et non un réglage au cas par cas : sur un pays de
+  # vingt et un candidats, le plancher de collection VAUT celui de la collecte.
+  # Le premier filtre reste entier, le second n'a plus de catalogue à éclaircir.
+  #
+  # Ce que ça change, thème par thème (candidats gardés) :
+  #
+  #      musees       1 → 6      cathedrales  1 → 1
+  #      monuments    2 → 2      jardins      3 → 3
+  #      sommets      2 → 2      plages       inchangé (déjà à un)
+  #
+  # Si le catalogue te paraît trop large, les paliers se lisent dans la table
+  # du `build` : à six langues les musées tombent à trois, à huit à trois aussi.
+  - id: musees
+    min_sitelinks: 4
+  - id: cathedrales
+    min_sitelinks: 4
+  - id: monuments
+    min_sitelinks: 4
+  - id: jardins
+    min_sitelinks: 3
+  - id: sommets
+    min_sitelinks: 4
+  - id: maisons
+    min_sitelinks: 2
