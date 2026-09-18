@@ -24,6 +24,7 @@ import {
   dansLaRegion as estDansLaRegion,
   nomDeRegion,
   regionAu,
+  regionLaPlusProche,
 } from '../../src/lib/regions';
 import type { Emprise as EmpriseCarte } from '../../src/lib/regions';
 import { enBoite, useLieuxDesEnclaves } from '../../src/lib/enclaves';
@@ -322,7 +323,12 @@ export default function MapScreen() {
     setAuMilieu(null);
     await choisir(hote, false);
     const [lon, lat] = bornes ? centreDe(bornes) : [0, 0];
-    const region = regionAu(lon, lat);
+    // UNE ENCLAVE EST UN TROU DANS SON HÔTE, donc `regionAu` n'a le plus
+    // souvent rien à répondre : au centre du Vatican elle rend le Latium, au
+    // centre de Saint-Marin elle ne rend rien, et ce cran ne faisait rien
+    // là-bas. La région dont le contour passe le plus près est la bonne
+    // réponse — l'Émilie-Romagne à 2,8 km, devant les Marches à 4,4.
+    const region = regionAu(lon, lat) ?? regionLaPlusProche(lon, lat);
     setSortie(region ? `${region}#${Date.now()}` : null);
   };
 

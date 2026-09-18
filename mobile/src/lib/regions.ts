@@ -204,6 +204,53 @@ export function regionAu(lon: number, lat: number): string | null {
 }
 
 /**
+ * La région dont le CONTOUR passe le plus près de ce point.
+ *
+ * `regionAu` répond par un lancer de rayon : elle ne peut rien dire d'un point
+ * qui n'est dans aucun contour. Or cela arrive, et pas au hasard — les tracés
+ * sont simplifiés, et la mer les ronge : 130 lieux italiens et 147 français
+ * tombent dehors, le Mont Saint-Michel et l'île de Sein compris.
+ *
+ * Et cela arrive SYSTÉMATIQUEMENT pour une enclave, qui est un trou dans son
+ * hôte. Mesuré sur les contours servis : au centre du Vatican, `regionAu` rend
+ * le Latium ; au centre de Saint-Marin, elle ne rend RIEN. Le dernier cran de
+ * la pastille de retour — sortir vers la région qui entoure le pays — marchait
+ * donc au Vatican et ne faisait rien à Saint-Marin.
+ *
+ * La distance au sommet le plus proche suffit à trancher, et elle tranche
+ * juste :
+ *
+ *     Saint-Marin       Émilie-Romagne 2,82 km · Marches 4,45 km
+ *     Mont Saint-Michel Normandie      1,12 km · Bretagne 4,11 km
+ *
+ * Coûteuse — tous les sommets de toutes les régions — mais appelée sur un
+ * appui, pas sur un mouvement de caméra.
+ */
+export function regionLaPlusProche(lon: number, lat: number): string | null {
+  // Un degré de longitude vaut moins qu'un degré de latitude dès qu'on quitte
+  // l'équateur : sans ce facteur, la comparaison favorise l'est et l'ouest.
+  const aplatissement = Math.cos((lat * Math.PI) / 180);
+  let meilleure: string | null = null;
+  let plusCourt = Infinity;
+  for (const [code, feature] of REGIONS) {
+    for (const polygone of polygones(feature.geometry)) {
+      for (const anneau of polygone) {
+        for (const [x, y] of anneau) {
+          const dx = (x - lon) * aplatissement;
+          const dy = y - lat;
+          const carre = dx * dx + dy * dy;
+          if (carre < plusCourt) {
+            plusCourt = carre;
+            meilleure = code;
+          }
+        }
+      }
+    }
+  }
+  return meilleure;
+}
+
+/**
  * La région que le cadre montre — celle qu'on ouvre.
  *
  * D'abord la terre sous le centre du cadre, ce qui règle les treize régions

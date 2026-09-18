@@ -12,6 +12,7 @@ import {
   dansLaRegion,
   empriseDeLaRegion,
   regionConnue,
+  regionLaPlusProche,
   emprise,
   lieuxDe,
   nomDeRegion,
@@ -554,5 +555,90 @@ describe('un pays QUI a des régions n’est pas touché', () => {
     // referme une région absente doit continuer de le faire.
     expect(regionConnue('G')).toBe(true);
     expect(regionConnue(PAYS_ENTIER)).toBe(false);
+  });
+});
+
+
+/**
+ * Sortir d'une enclave : elle est un TROU dans son hôte.
+ *
+ * `regionAu` répond par un lancer de rayon, donc elle ne dit rien d'un point
+ * qui n'est dans aucun contour. Au centre du Vatican elle rend le Latium — la
+ * simplification l'a laissé dedans — mais au centre de Saint-Marin elle ne rend
+ * RIEN, et le dernier cran de la pastille de retour ne faisait donc rien là-bas.
+ */
+describe('regionLaPlusProche', () => {
+  const carre = (x: number, y: number, c: number): [number, number][] => [
+    [x, y], [x + c, y], [x + c, y + c], [x, y + c], [x, y],
+  ];
+  const contours = {
+    attribution: '',
+    region: {
+      type: 'FeatureCollection',
+      features: [
+        { type: 'Feature', properties: { code: 'A', nom: 'Proche' },
+          geometry: { type: 'Polygon', coordinates: [carre(0, 0, 4)] } },
+        { type: 'Feature', properties: { code: 'B', nom: 'Loin' },
+          geometry: { type: 'Polygon', coordinates: [carre(20, 20, 4)] } },
+      ],
+    },
+  };
+
+  beforeEach(() => {
+    chargerContours(contours as never);
+    chargerCatalogue({
+      places: [], collections: [], themes: [],
+      areas: { region: [], departement: [], commune: [], country: [] },
+    } as never);
+  });
+
+  it('rend la région dont le contour passe le plus près', () => {
+    // Un point hors des deux, mais à côté du premier.
+    expect(regionAu(-1, 2)).toBeNull();
+    expect(regionLaPlusProche(-1, 2)).toBe('A');
+    expect(regionLaPlusProche(19, 22)).toBe('B');
+  });
+
+  it('répond aussi pour un point DEDANS : c’est un repli, pas un test', () => {
+    // `regionAu` passe avant, dans l'appelant ; ici la fonction ne refuse rien.
+    expect(regionLaPlusProche(1, 1)).toBe('A');
+  });
+
+  it('ne rend rien quand il n’y a aucun contour', () => {
+    // `chargerContours` SEUL ne réindexe rien : c'est le catalogue qui
+    // déclenche la reconstruction de la table des régions, laquelle lit les
+    // contours. L'application les charge toujours dans cet ordre, et un test
+    // qui n'appelle que le premier mesure l'état précédent.
+    chargerContours({ attribution: '', region: { type: 'FeatureCollection', features: [] } } as never);
+    chargerCatalogue({
+      places: [], collections: [], themes: [],
+      areas: { region: [], departement: [], commune: [], country: [] },
+    } as never);
+    expect(REGIONS.size).toBe(0);
+    expect(regionLaPlusProche(1, 1)).toBeNull();
+  });
+
+  it('aplatit la longitude : sans quoi l’est et l’ouest gagnent toujours', () => {
+    // Deux régions à la même distance en DEGRÉS d'un point très au nord : celle
+    // qui est décalée en longitude est en réalité plus proche en kilomètres.
+    chargerContours({
+      attribution: '',
+      region: {
+        type: 'FeatureCollection',
+        features: [
+          { type: 'Feature', properties: { code: 'EST', nom: 'Est' },
+            geometry: { type: 'Polygon', coordinates: [carre(3, 60, 1)] } },
+          { type: 'Feature', properties: { code: 'NORD', nom: 'Nord' },
+            geometry: { type: 'Polygon', coordinates: [carre(0, 63, 1)] } },
+        ],
+      },
+    } as never);
+    chargerCatalogue({
+      places: [], collections: [], themes: [],
+      areas: { region: [], departement: [], commune: [], country: [] },
+    } as never);
+    // À 60° de latitude, trois degrés de longitude font la moitié de trois
+    // degrés de latitude.
+    expect(regionLaPlusProche(0, 60)).toBe('EST');
   });
 });
