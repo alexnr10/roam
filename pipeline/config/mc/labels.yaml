@@ -1,0 +1,44 @@
+# Les listes, à Monaco : aucune de celles du dépôt.
+#
+# Les quinze labels du dépôt sont des dispositifs FRANÇAIS — un classement du
+# ministère de la Culture, une marque d'une association loi 1901, un arrêté
+# préfectoral. Monaco a son propre patrimoine, protégé par ses propres textes,
+# et aucun de ces quinze ne s'y applique. Les interroger reviendrait à
+# demander à Wikidata quels monuments monégasques sont classés au titre du
+# code du patrimoine français : zéro, par construction.
+#
+# `unesco` EST GARDÉ, et c'est la même discipline que partout ici : on ne
+# retire qu'après avoir mesuré. Le premier `fetch` dira ce que le label rend —
+# et s'il rend zéro, ou seulement l'ensemble inscrit sans les lieux qui le
+# composent, il partira comme au Vatican et à Saint-Marin, avec son chiffre.
+# `data/mc/out/label-orphelins.csv` est le fichier qui le dira.
+
+labels:
+  - id: plus-beaux-villages
+    retire: true
+  - id: plus-beaux-detours
+    retire: true
+  - id: grand-site-de-france
+    retire: true
+  - id: monument-historique-classe
+    retire: true
+  - id: monument-historique-inscrit
+    retire: true
+  - id: jardin-remarquable
+    retire: true
+  - id: maisons-des-illustres
+    retire: true
+  - id: site-classe
+    retire: true
+  - id: site-inscrit
+    retire: true
+  - id: foret-exception
+    retire: true
+  - id: reserve-naturelle
+    retire: true
+  - id: parc-naturel-regional
+    retire: true
+  - id: parc-national
+    retire: true
+  - id: pavillon-bleu
+    retire: true

@@ -1,0 +1,44 @@
+# Monaco : ce qui diffère du dépôt.
+#
+# ⚠ CE FICHIER NE SE CHARGE PAS ENCORE, ET C'EST VOULU.
+#
+# Le Q-id est à résoudre, et il ne s'écrit pas de mémoire. C'est la règle de ce
+# dépôt, et elle a été payée : un Q-id de PAYS entre dans le filtre `P17` de
+# chaque requête, donc s'y tromper ne rend pas un thème vide, ça rend le pays
+# vide — après une demi-heure de collecte. `load_config` refuse maintenant tout
+# ce qui n'a pas la forme d'un Q-id, et nomme la commande à lancer :
+#
+#     python -m roam_pipeline suggest-qids "Monaco"
+#
+# Attention au piège que le Vatican a tendu : Wikidata distingue parfois l'ÉTAT
+# de son gouvernement ou de sa capitale, et pour Q237 le libellé rendu était
+# « Saint-Siège ». À Monaco la question se pose deux fois, parce que la
+# principauté, la commune de Monaco et le quartier de Monaco-Ville portent des
+# noms voisins. Le bon candidat est l'ÉTAT SOUVERAIN ; si la collecte rend zéro
+# lieu, c'est l'entité voisine qu'il faut.
+geo:
+  country:
+    qid: A_RESOUDRE
+    code: MC
+    name: Monaco
+    # « du Vatican », « de Saint-Marin », « de Monaco » : cette forme sert aux
+    # titres de collection — « Le meilleur de Monaco ».
+    de_form: de Monaco
+    # Le français est la seule langue officielle de la principauté, et les
+    # libellés Wikidata des lieux monégasques sont donc déjà français. L'italien
+    # suit quand même, comme pour les deux enclaves italiennes : le monégasque
+    # est un parler ligure, et des noms comme « Monte-Carlo » ou « la
+    # Condamine » ont leur graphie italienne. `langues` ne choisit que l'ordre
+    # des libellés demandés au service, il ne coûte rien de plus par langue.
+    langues: fr,it,en
+
+  # Monaco n'a pas de subdivision au deuxième échelon : ses quartiers sont la
+  # maille d'une COMMUNE. Sans cette ligne, `apply_geographic_scope` écarte
+  # chaque lieu avant de le juger, et le catalogue sort vide.
+  # `data/reference/mc/README.md` dit pourquoi les deux CSV sont vides.
+  require_departement: false
+
+# PAS DE `collections.min_places` POUR L'INSTANT, et c'est une leçon de
+# Saint-Marin. Il y avait été abaissé à six APRÈS avoir mesuré que le pays n'en
+# tenait que huit, et que le plancher du dépôt ne laissait donc aucune marge de
+# revue. On mesure d'abord, on abaisse ensuite, avec le chiffre.

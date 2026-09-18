@@ -631,8 +631,23 @@ def load_config(config_dir: Path | None = None, pays: str | None = None) -> Conf
 
     _validate(themes, labels, exclusions, visitors)
     pays = raw["geo"]["country"]
+    # LE Q-ID DU PAYS N'ÉTAIT PAS VÉRIFIÉ, alors que ceux des thèmes le sont
+    # depuis toujours. C'est pourtant le plus coûteux à se tromper : il entre
+    # dans le filtre `P17` de CHAQUE requête, donc un Q-id erroné ne rend pas
+    # un thème vide, il rend le PAYS vide — après une demi-heure de collecte.
+    #
+    # Le garde-fou sert aussi de jalon : un nouveau pays peut déposer sa
+    # configuration avec un Q-id explicitement à résoudre, qui refuse alors de
+    # se charger au lieu d'interroger Wikidata pour rien.
+    qid = str(pays["qid"])
+    if not qid.startswith("Q") or not qid[1:].isdigit():
+        raise ValueError(
+            f"Q-id de pays invalide : {qid}. Il entre dans le filtre de pays de "
+            f"chaque requête — résous-le avec `suggest-qids \"{pays['name']}\"` "
+            f"et relis la réponse avant de l'écrire."
+        )
     country = Country(
-        qid=str(pays["qid"]), code=str(pays["code"]),
+        qid=qid, code=str(pays["code"]),
         name=str(pays["name"]), de_form=str(pays["de_form"]),
         langues=str(pays.get("langues") or "fr,en"),
         # `enclaves` est frère de `country` dans le fichier — il décrit ce que

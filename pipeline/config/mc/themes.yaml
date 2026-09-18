@@ -1,0 +1,54 @@
+# Les thèmes, à Monaco : ce qui diffère.
+#
+# Deux thèmes du dépôt LISENT des listes françaises, et les retirer de
+# `labels.yaml` ne suffit pas — la référence resterait, pendante. On vide donc
+# ici ce qu'ils vont chercher.
+#
+# AUCUN THÈME N'EST RETIRÉ, et c'est délibéré. Monaco n'a évidemment ni volcan
+# ni cirque glaciaire, et une bonne moitié des thèmes ne rendront rien — mais
+# le dépôt ne retire un thème qu'après l'avoir MESURÉ, jamais sur une
+# intuition. C'est la discipline qui a servi deux fois : au Vatican, le thème
+# `cathedrales` semblait évident et n'a rendu qu'UN lieu sans la porte
+# « église » — la chapelle Sixtine passait à travers. À Saint-Marin, `sommets`
+# semblait vide et portait tout le pays.
+#
+# Le premier `fetch --pays-config mc` dira lesquels rendent zéro, et c'est
+# alors qu'ils sauteront, avec le chiffre en commentaire. Une requête qui ne
+# rend rien coûte une seconde ; un thème retiré à tort coûte un lieu qu'on ne
+# verra jamais.
+#
+# ⚠ DEUX CHOSES À REGARDER dans la sortie du premier passage, parce que les
+# deux enclaves italiennes les ont eues :
+#
+#   — les PLACES. `place (Q174782)` n'est déclarée par aucun thème du dépôt,
+#     parce qu'en France une place est un carrefour. Le Vatican a donc failli
+#     s'ouvrir sans la place Saint-Pierre, et il a fallu lui redéclarer un
+#     thème `piazzas`. Monaco a la place du Casino et la place du Palais : si
+#     elles manquent, c'est là qu'il faudra regarder.
+#
+#   — les DÉBORDEMENTS. Wikidata donne parfois plusieurs pays à un même lieu,
+#     et un pays sans subdivision n'a rien pour les arrêter : la péninsule
+#     italienne, cent trois langues, s'est installée en tête des plages du
+#     Vatican ET de Saint-Marin, et l'Apennin serait devenu le premier lieu
+#     saint-marinais. Monaco est sur la côte et au pied des Alpes : la
+#     Méditerranée, la Riviera ou les Alpes-Maritimes peuvent très bien
+#     remonter. Tout candidat plus grand que le pays est un débordement.
+
+themes:
+  # RETIRÉ, et non vidé : le thème `villages` n'a AUCUNE classe Wikidata et ne
+  # vit que de ses listes — les Plus Beaux Villages et les Plus Beaux Détours,
+  # qui sont français. Lui laisser une liste vide rend la configuration
+  # invalide, et `load_config` le refuse : « le thème villages n'a ni classe
+  # Wikidata ni label source ». Il a raison.
+  #
+  # C'est aussi la bonne réponse sur le fond : Monaco n'a pas de villages, il
+  # est une ville-État. Ses quartiers ne sont pas des villages, et
+  # Monaco-Ville, le vieux rocher, est un quartier.
+  - id: villages
+    retire: true
+
+  # Les Maisons des Illustres sont une liste du ministère français de la
+  # Culture. Les six classes Wikidata du thème restent : elles ne dépendent
+  # d'aucun État, et la villa Sauber comme la villa Paloma sont des maisons.
+  - id: maisons
+    from_labels: []

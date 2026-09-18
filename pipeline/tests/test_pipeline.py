@@ -9862,6 +9862,28 @@ class TestDepartementDuCodeCommunal(unittest.TestCase):
 class TestEnclaves(unittest.TestCase):
     """Le Vatican et Saint-Marin sont des pays chez Wikidata."""
 
+    def test_un_q_id_de_pays_se_verifie(self):
+        # Les Q-id des thèmes sont vérifiés depuis toujours, celui du PAYS ne
+        # l'était pas — et c'est le plus coûteux à se tromper : il entre dans le
+        # filtre `P17` de chaque requête, donc un Q-id erroné ne rend pas un
+        # thème vide, il rend le pays vide, après une demi-heure de collecte.
+        #
+        # Le garde-fou sert aussi de jalon : Monaco a déposé sa configuration
+        # avec un Q-id explicitement à résoudre, qui refuse de se charger au
+        # lieu d'interroger Wikidata pour rien.
+        with self.assertRaises(ValueError) as leve:
+            load_config(pays="mc")
+        message = str(leve.exception)
+        self.assertIn("Q-id de pays invalide", message)
+        # Le message NOMME la commande : sans elle, le curateur doit deviner.
+        self.assertIn("suggest-qids", message)
+        self.assertIn("Monaco", message)
+
+    def test_les_pays_resolus_se_chargent(self):
+        for code, attendu in (("it", "Q38"), ("va", "Q237"), ("sm", "Q238")):
+            self.assertEqual(load_config(pays=code).country.qid, attendu)
+        self.assertEqual(CONFIG.country.qid, "Q142")
+
     def test_l_italie_n_absorbe_plus_personne(self):
         # L'absorption était un PIS-ALLER, et la configuration l'écrivait :
         # « le filtre avait raison ; le guide avait tort ». Le guide n'a plus
