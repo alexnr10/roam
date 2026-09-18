@@ -1,0 +1,469 @@
+{
+ "_note": "Généré par `roam_pipeline export-app`. Ne pas éditer à la main. Descriptions et images issues de Wikipédia et Wikimedia Commons (CC BY-SA) — l'application doit citer la source.",
+ "themes": [
+  {
+   "id": "cathedrales",
+   "name": "Cathédrales et basiliques",
+   "nameSingular": "Cathédrale",
+   "nameShort": "Cathédrales",
+   "icon": "cathedral"
+  },
+  {
+   "id": "maisons",
+   "name": "Maisons et demeures remarquables",
+   "nameSingular": "Maison",
+   "nameShort": "Maisons",
+   "icon": "house"
+  },
+  {
+   "id": "musees",
+   "name": "Musées",
+   "nameSingular": "Musée",
+   "nameShort": "Musées",
+   "icon": "museum"
+  },
+  {
+   "id": "monuments",
+   "name": "Monuments et édifices remarquables",
+   "nameSingular": "Monument",
+   "nameShort": "Monuments",
+   "icon": "monument"
+  },
+  {
+   "id": "jardins",
+   "name": "Parcs et jardins",
+   "nameSingular": "Jardin",
+   "nameShort": "Jardins",
+   "icon": "garden"
+  },
+  {
+   "id": "sommets",
+   "name": "Sommets",
+   "nameSingular": "Sommet",
+   "nameShort": "Sommets",
+   "icon": "mountain"
+  },
+  {
+   "id": "plages",
+   "name": "Littoral et plages",
+   "nameSingular": "Site",
+   "nameShort": "Plages",
+   "icon": "beach"
+  },
+  {
+   "id": "piazzas",
+   "name": "Places monumentales",
+   "nameSingular": "Place",
+   "nameShort": "Places",
+   "icon": "piazza"
+  }
+ ],
+ "places": [
+  {
+   "id": "Q1164788",
+   "slug": "palais-du-prince",
+   "name": "Palais du Prince",
+   "themeId": "monuments",
+   "lat": 43.731417,
+   "lon": 7.420275,
+   "radiusM": 150,
+   "score": 103.4,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Le palais de Monaco, communément appelé le Palais princier (monégasque : Palaçi d’u Pri̍ncipu), est la résidence officielle du prince de Monaco depuis 1297. Il est situé en haut du rocher de Monaco, quartier le plus ancien de la principauté de Monaco, surplombant la mer Méditerranée de soixante mètres.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palais%20Princier%20de%20Monaco.jpg",
+   "imageAuthor": "Jorge Franganillo",
+   "imageLicence": "CC BY 4.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palais_de_Monaco"
+  },
+  {
+   "id": "Q1577048",
+   "slug": "opera-de-monte-carlo",
+   "name": "Opéra de Monte-Carlo",
+   "themeId": "monuments",
+   "lat": 43.738889,
+   "lon": 7.428333,
+   "radiusM": 150,
+   "score": 82.8,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "L'opéra de Monte-Carlo ou salle Garnier est une salle de spectacle attenante au casino de Monte-Carlo dans le quartier Monte-Carlo à Monaco. Le nouveau casino et l'opéra ont été conçus par l'architecte Charles Garnier sous l'impulsion de Marie Blanc (veuve de François Blanc) et furent inaugurés le 25 janvier 1879 par un spectacle de Sarah Bernhardt.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Op%C3%A9ra%20de%20Monte-Carlo-Monaco.JPG",
+   "imageAuthor": "Gilbert Bochenek",
+   "imageLicence": "CC BY-SA 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Op%C3%A9ra_de_Monte-Carlo"
+  },
+  {
+   "id": "Q3351922",
+   "slug": "rocher-de-monaco",
+   "name": "Rocher de Monaco",
+   "themeId": "monuments",
+   "lat": 43.73102,
+   "lon": 7.42516,
+   "radiusM": 500,
+   "score": 77.2,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Monaco-Ville (monégasque : Mu̍negu-A̍utu) est un quartier de Monaco.\nC'est la partie la plus ancienne de la principauté, que l'on appelle aussi communément « Rocher de Monaco » (monégasque : Roca de Mu̍negu) voire, localement, « le Rocher » (monégasque : a Roca), dénomination favorite de la presse à sensation.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Monaco%20Ville%20from%20T%C3%AAte%20de%20Chien%20-%20panoramio.jpg",
+   "imageAuthor": "Santiago Puig Vilado…",
+   "imageLicence": "CC BY-SA 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Rocher_de_Monaco"
+  },
+  {
+   "id": "Q1384208",
+   "slug": "jardin-exotique-de-monaco",
+   "name": "Jardin exotique de Monaco",
+   "themeId": "jardins",
+   "lat": 43.731511,
+   "lon": 7.413778,
+   "radiusM": 200,
+   "score": 74.1,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Le jardin exotique de Monaco est un jardin botanique situé à Monaco, géré par la mairie de Monaco. Il est situé à la base de la falaise du quartier ordonnancé monégasque dit du « Jardin exotique », lui même situé dans le quartier traditionnel de La Condamine.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Chorisia%20Monaco.jpg",
+   "imageAuthor": "Tangopaso",
+   "imageLicence": "Public domain",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Jardin_exotique_de_Monaco"
+  },
+  {
+   "id": "Q1069352",
+   "slug": "chemin-des-revoires",
+   "name": "Chemin des Révoires",
+   "themeId": "sommets",
+   "lat": 43.732778,
+   "lon": 7.4125,
+   "radiusM": 1000,
+   "score": 67.3,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Le chemin des Révoires (monégasque : cami̍n d’ë Revëre) était un ancien chemin montagneux, dans l'actuel quartier du Jardin exotique à Monaco.\nLe point culminant de la principauté s'y trouve à proximité, sur les pentes du mont Agel, appartenant géographiquement aux Alpes.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/MonacoLibreDeDroits.jpg",
+   "imageAuthor": null,
+   "imageLicence": "CC BY-SA 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Chemin_des_R%C3%A9voires"
+  },
+  {
+   "id": "Q15229360",
+   "slug": "jardin-japonais-de-monaco",
+   "name": "Jardin japonais de Monaco",
+   "themeId": "jardins",
+   "lat": 43.742325,
+   "lon": 7.430978,
+   "radiusM": 200,
+   "score": 63.2,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Le jardin japonais de Monaco (monégasque : giardi̍n giapunese de Mu̍negu) est un jardin public de la fin du XXe siècle située à Monaco.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Jardinmonaco3bis.jpg",
+   "imageAuthor": "User:Parisette",
+   "imageLicence": "Public domain",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Jardin_japonais_de_Monaco"
+  },
+  {
+   "id": "Q16900477",
+   "slug": "jardins-saint-martin",
+   "name": "Jardins Saint-Martin",
+   "themeId": "jardins",
+   "lat": 43.730062,
+   "lon": 7.423561,
+   "radiusM": 200,
+   "score": 59.0,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Les jardins Saint-Martin (monégasque : giardi̍n San Martin) sont un jardin public-jardin botanique du Rocher de Monaco, face à la mer Méditerranée sur la Riviera méditerranéenne de la Côte d'Azur.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Monaco%20-%20panoramio%20%2848%29.jpg",
+   "imageAuthor": "avu-edm",
+   "imageLicence": "CC BY 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Jardins_Saint-Martin"
+  },
+  {
+   "id": "Q851527",
+   "slug": "musee-oceanographique-de-monaco",
+   "name": "Musée océanographique de Monaco",
+   "themeId": "musees",
+   "lat": 43.730833,
+   "lon": 7.425278,
+   "radiusM": 120,
+   "score": 126.0,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Le musée océanographique de Monaco ou Musée océanographique est un musée océanographique-aquarium public de style néo-baroque, du Rocher de Monaco, sur la Côte d'Azur, fondé face à la mer Méditerranée en 1889 par le prince Albert Ier de Monaco, et inauguré en 1910. Propriété de sa fondation Institut océanographique, Fondation Albert Ier, Prince de Monaco, il est entre autres dirigé par le commandant Cousteau de 1957 à 1988.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Monaco%20BW%202011-06-07%2017-50-43.jpg",
+   "imageAuthor": "Berthold Werner",
+   "imageLicence": "CC BY-SA 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_oc%C3%A9anographique_de_Monaco"
+  },
+  {
+   "id": "Q16010845",
+   "slug": "musee-de-l-automobile-de-monaco",
+   "name": "Musée de l'automobile de Monaco",
+   "themeId": "musees",
+   "lat": 43.735401,
+   "lon": 7.421811,
+   "radiusM": 120,
+   "score": 68.8,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "La Collection Automobiles de S.A.S. le Prince de Monaco, ou \"Musée de l'automobile de Monaco\" a été fondée par le prince Rainier III de Monaco, dans le but de partager sa passion.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Musee%20de%20l%27automobile%20de%20Monaco.jpg",
+   "imageAuthor": "Gael13011",
+   "imageLicence": "CC BY 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_de_l%27automobile_de_Monaco"
+  },
+  {
+   "id": "Q3330282",
+   "slug": "musee-des-timbres-et-des-monnaies-de-monaco",
+   "name": "Musée des timbres et des monnaies de Monaco",
+   "themeId": "musees",
+   "lat": 43.73088,
+   "lon": 7.41759,
+   "radiusM": 120,
+   "score": 66.0,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Le musée des timbres et des monnaies de Monaco est un musée fondé en 1950 par le prince Rainier III de Monaco, pour exposer ses collections particulières de pièces de monnaie, médailles, billets et de timbres de l’histoire philatélique et postale de Monaco.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/MUSEE%20DES%20TIMBRES%20ET%20DES%20MONNAIES%20-%20panoramio.jpg",
+   "imageAuthor": "Валерий Дед",
+   "imageLicence": "CC BY 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mus%C3%A9e_des_timbres_et_des_monnaies_de_Monaco"
+  },
+  {
+   "id": "Q3345073",
+   "slug": "nouveau-musee-national-de-monaco",
+   "name": "Nouveau musée national de Monaco",
+   "themeId": "musees",
+   "lat": 43.7328,
+   "lon": 7.41389,
+   "radiusM": 120,
+   "score": 59.3,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Le nouveau musée national de Monaco, ou simplement Nouveau Musée national, est le musée d'art de la principauté de Monaco. Il valorise son patrimoine et diffuse la création contemporaine au travers d’expositions temporaires dans ses deux établissements : la villa Paloma et la villa Sauber.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Nouveau%20mus%C3%A9e%20national%20de%20Monaco%20%28novembre%202021%29.jpg",
+   "imageAuthor": "Benoît Prieur",
+   "imageLicence": "CC0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Nouveau_Mus%C3%A9e_national_(Monaco)"
+  },
+  {
+   "id": "Q2264191",
+   "slug": "napoleon-museum",
+   "name": "Napoleon Museum",
+   "themeId": "musees",
+   "lat": 43.73126,
+   "lon": 7.42013,
+   "radiusM": 120,
+   "score": 36.7,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": null,
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cannon%20Monaco2.jpg",
+   "imageAuthor": "Tangopaso",
+   "imageLicence": "Public domain",
+   "wikipediaUrl": null
+  },
+  {
+   "id": "Q667450",
+   "slug": "cathedrale-notre-dame-immaculee-de-monaco",
+   "name": "Cathédrale Notre-Dame-Immaculée de Monaco",
+   "themeId": "cathedrales",
+   "lat": 43.730214,
+   "lon": 7.422664,
+   "radiusM": 120,
+   "score": 100.0,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "La cathédrale Notre-Dame-Immaculée de Monaco est un édifice religieux romano-byzantin situé à Monaco. Érigée sous le principat de Charles III, elle est l'église principale de l'archidiocèse monégasque.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Monaco%20BW%202011-06-07%2016-07-20.jpg",
+   "imageAuthor": "User:Berthold Werner",
+   "imageLicence": "CC BY-SA 3.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cath%C3%A9drale_Notre-Dame-Immacul%C3%A9e_de_Monaco"
+  },
+  {
+   "id": "Q122942810",
+   "slug": "plage-du-larvotto",
+   "name": "Plage du Larvotto",
+   "themeId": "plages",
+   "lat": 43.74603,
+   "lon": 7.43313,
+   "radiusM": 500,
+   "score": 19.1,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": null,
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Plage%20de%20Larvotto%20%28Monaco%29%20en%20novembre%202021%20%283%29.jpg",
+   "imageAuthor": "Benoît Prieur",
+   "imageLicence": "CC0",
+   "wikipediaUrl": null
+  },
+  {
+   "id": "Q27557569",
+   "slug": "ciappaira",
+   "name": "Ciappaira",
+   "themeId": "plages",
+   "lat": 43.731944,
+   "lon": 7.428056,
+   "radiusM": 500,
+   "score": 11.1,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": null,
+   "imageUrl": null,
+   "imageAuthor": null,
+   "imageLicence": null,
+   "wikipediaUrl": null
+  }
+ ],
+ "collections": [
+  {
+   "slug": "geo-country-mc",
+   "name": "Le meilleur de Monaco",
+   "kind": "geo",
+   "themeId": null,
+   "labelId": null,
+   "geoLevel": "country",
+   "geoCode": "MC",
+   "placeCount": 15,
+   "tierCounts": [
+    2,
+    5,
+    8
+   ],
+   "places": [
+    {
+     "placeId": "Q851527",
+     "tier": 1,
+     "rank": 1
+    },
+    {
+     "placeId": "Q1164788",
+     "tier": 1,
+     "rank": 2
+    },
+    {
+     "placeId": "Q667450",
+     "tier": 2,
+     "rank": 3
+    },
+    {
+     "placeId": "Q1577048",
+     "tier": 2,
+     "rank": 4
+    },
+    {
+     "placeId": "Q3351922",
+     "tier": 2,
+     "rank": 5
+    },
+    {
+     "placeId": "Q1384208",
+     "tier": 2,
+     "rank": 6
+    },
+    {
+     "placeId": "Q16010845",
+     "tier": 2,
+     "rank": 7
+    },
+    {
+     "placeId": "Q1069352",
+     "tier": 3,
+     "rank": 8
+    },
+    {
+     "placeId": "Q3330282",
+     "tier": 3,
+     "rank": 9
+    },
+    {
+     "placeId": "Q15229360",
+     "tier": 3,
+     "rank": 10
+    },
+    {
+     "placeId": "Q3345073",
+     "tier": 3,
+     "rank": 11
+    },
+    {
+     "placeId": "Q16900477",
+     "tier": 3,
+     "rank": 12
+    },
+    {
+     "placeId": "Q2264191",
+     "tier": 3,
+     "rank": 13
+    },
+    {
+     "placeId": "Q122942810",
+     "tier": 3,
+     "rank": 14
+    },
+    {
+     "placeId": "Q27557569",
+     "tier": 3,
+     "rank": 15
+    }
+   ]
+  }
+ ],
+ "areas": {
+  "country": [
+   {
+    "code": "MC",
+    "name": "Monaco",
+    "deForm": "de Monaco"
+   }
+  ],
+  "region": [],
+  "departement": [],
+  "commune": []
+ }
+}

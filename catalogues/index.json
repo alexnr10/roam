@@ -1285,6 +1285,20 @@
       "contours": "it-contours.json"
     },
     {
+      "code": "MC",
+      "name": "Monaco",
+      "fichier": "mc.json",
+      "lieux": 15,
+      "emprises": [
+        [
+          7.4125,
+          43.7301,
+          7.4331,
+          43.746
+        ]
+      ]
+    },
+    {
       "code": "SM",
       "name": "Saint-Marin",
       "fichier": "sm.json",
