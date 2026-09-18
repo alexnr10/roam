@@ -177,9 +177,9 @@
    "geoCode": "SM",
    "placeCount": 6,
    "tierCounts": [
-    6,
-    0,
-    0
+    1,
+    2,
+    3
    ],
    "places": [
     {
@@ -189,27 +189,27 @@
     },
     {
      "placeId": "Q810102",
-     "tier": 1,
+     "tier": 2,
      "rank": 2
     },
     {
-     "placeId": "Q2711604",
-     "tier": 1,
+     "placeId": "Q1705125",
+     "tier": 2,
      "rank": 3
     },
     {
-     "placeId": "Q2592701",
-     "tier": 1,
+     "placeId": "Q2711604",
+     "tier": 3,
      "rank": 4
     },
     {
-     "placeId": "Q1705125",
-     "tier": 1,
+     "placeId": "Q2592701",
+     "tier": 3,
      "rank": 5
     },
     {
      "placeId": "Q2224877",
-     "tier": 1,
+     "tier": 3,
      "rank": 6
     }
    ]

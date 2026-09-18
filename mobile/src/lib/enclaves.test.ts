@@ -130,9 +130,17 @@ describe('sur les catalogues publiés', () => {
 
     const va = JSON.parse(fs.readFileSync(chemins[0], 'utf8')) as Catalog;
     const lieux = lieuxMarques('VA', va);
-    expect(lieux).toHaveLength(19);
+    // Le NOMBRE ne s'écrit pas en dur : il suit la revue, et fixer dix-neuf
+    // ici a fait échouer ce test le jour où le curateur en a écarté un.
+    expect(lieux).toHaveLength(va.places.length);
     expect(lieux.every((l) => l.paysDOrigine === 'VA')).toBe(true);
+    // La basilique Saint-Pierre est première du pays : trois étoiles, et la
+    // note vient de CHEZ elle — le catalogue italien ne la connaît plus.
     const saintPierre = lieux.find((l) => l.id === 'Q12512');
     expect(saintPierre?.etoiles).toBe(3);
+    // Et la hiérarchie existe : un pays sans collection de thème ne sort plus
+    // tout son catalogue à trois étoiles.
+    const notes = new Set(lieux.map((l) => l.etoiles));
+    expect(notes.size).toBeGreaterThan(1);
   });
 });

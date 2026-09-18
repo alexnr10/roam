@@ -1986,6 +1986,7 @@ def _build_un_pays(
         + build_geo_collections(kept, config)
         + build_cross_collections(kept, config)
     )
+    hierarchiser_le_pays(collections, kept, config)
 
     # Un lieu qui n'entre dans aucune collection ne sert à rien : on le sort.
     used = {cp.place_id for c in collections for cp in c.places}
@@ -2090,6 +2091,78 @@ def warn_surprising_promotions(
             ", ".join(place.name for place in sorted(inutiles, key=lambda p: p.name)),
         )
     return [place for _nom, place in montes]
+
+
+def hierarchiser_le_pays(
+    collections: list[Collection], kept: list[Place], config
+) -> None:
+    """Un pays sans collection de thème doit quand même classer ses lieux.
+
+    Les niveaux se comptent en NOMBRES ABSOLUS : les dix premiers d'une
+    collection sont au niveau 1, les vingt-cinq suivants au niveau 2. C'est
+    juste pour une collection pleine — quatre-vingts lieux font 12 %, 31 % et
+    56 %, ce qui est la répartition que le catalogue français montre aussi
+    (11,8 / 25,6 / 62,5 sur deux mille lieux).
+
+    Ce n'est pas juste quand la collection est la SEULE du pays. Le Vatican a
+    dix-neuf lieux, Saint-Marin huit : le budget de dix suffit à tout mettre au
+    premier niveau, et les six lieux de Saint-Marin sortaient tous à trois
+    étoiles. Autant qu'un thème français entier, sur un pays de soixante et un
+    kilomètres carrés — et surtout AUCUNE hiérarchie, alors que l'échelle de
+    Roam n'a de sens que graduée.
+
+    On garde donc les proportions d'une collection pleine, appliquées à la
+    taille réelle :
+
+        Vatican      18 lieux → [2, 6, 10]   au lieu de [10, 8, 0]
+        Saint-Marin   6 lieux → [1, 2, 3]    au lieu de [6, 0, 0]
+
+    Le repli ne joue QUE là où il n'y a aucune collection de thème : ailleurs,
+    ce sont les thèmes qui notent, et les cent cinquante petites collections
+    départementales de la France et de l'Italie ne bougent pas d'un cran.
+
+    LE NIVEAU SUIT LE SCORE, PAS LE RANG. Une collection géographique se
+    remplit en faisant TOURNER les thèmes — un château, une cascade, une
+    abbaye — pour que son premier niveau ne soit pas dix cathédrales. C'est bon
+    pour choisir qui entre et dans quel ordre on lit, ce n'est pas un classement
+    par mérite : au Vatican, la rotation plaçait la chapelle Sixtine dixième,
+    derrière la Villa Pia, parce qu'une cathédrale était déjà passée. Découpé
+    sur ce rang, le premier essai a donné une étoile à la Sixtine et deux à la
+    Villa Pia. Le score, lui, les remet dans l'ordre : 138 contre 72.
+
+    Le DÉPLACEMENT DU CURATEUR est conservé. Il vit dans l'écart entre le
+    niveau et le niveau naturel : un `promote` sur la chapelle Sixtine doit
+    survivre au recalcul, sans quoi la règle effacerait un jugement.
+    """
+    if any(c.kind == "theme" for c in collections):
+        return
+    plein = max(1, config.collections.max_places)
+    scores = {p.wikidata_id: p.score for p in kept}
+    for collection in collections:
+        if collection.kind != "geo" or collection.geo_level != "country":
+            continue
+        combien = len(collection.places)
+        if not combien:
+            continue
+        premier = max(1, round(combien * config.tiers.tier1_size / plein))
+        second = max(1, round(combien * config.tiers.tier2_size / plein))
+        merite = sorted(
+            collection.places,
+            key=lambda cp: (-scores.get(cp.place_id, 0.0), cp.place_id),
+        )
+        for index, cp in enumerate(merite):
+            naturel = 1 if index < premier else 2 if index < premier + second else 3
+            deplacement = cp.tier - cp.natural_tier if cp.natural_tier else 0
+            cp.natural_tier = naturel
+            cp.tier = min(3, max(1, naturel + deplacement))
+        # Le niveau d'abord, le score ensuite : les étoiles et l'ordre de
+        # lecture disent alors la même chose, ce qui est tout l'intérêt d'avoir
+        # découpé sur le mérite.
+        collection.places.sort(
+            key=lambda cp: (cp.tier, -scores.get(cp.place_id, 0.0), cp.place_id),
+        )
+        for rang, cp in enumerate(collection.places, start=1):
+            cp.rank = rang
 
 
 def warn_no_collection(collections, kept, config) -> None:

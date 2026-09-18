@@ -1133,6 +1133,87 @@ class TestStarvedThemes(unittest.TestCase):
         self.assertEqual([c.slug for c in built], [])
         self.assertIn("rochers 5", "\n".join(logs.output))
 
+    def test_un_pays_sans_theme_garde_une_hierarchie(self):
+        # Les niveaux se comptent en nombres ABSOLUS : dix au premier,
+        # vingt-cinq au second. C'est juste pour une collection pleine — 80
+        # lieux font 12 / 31 / 56 %, la répartition du catalogue français. Ça ne
+        # l'est pas quand la collection est la SEULE du pays : les six lieux de
+        # Saint-Marin sortaient tous à trois étoiles, autant qu'un thème
+        # français entier, et sans aucune hiérarchie.
+        from roam_pipeline.collections import hierarchiser_le_pays
+        from roam_pipeline.models import Collection, CollectionPlace
+
+        lieux = [
+            make_place(f"Lieu {i:02d}", sitelinks=60 - i, wikidata_id=f"Q{i}")
+            for i in range(18)
+        ]
+        scored = score_all(lieux, CONFIG)
+        pays = Collection(
+            slug="geo-country-va", name="Le meilleur du Vatican", kind="geo",
+            geo_level="country", geo_code="VA",
+            places=[CollectionPlace(p.wikidata_id, 1, i + 1, natural_tier=1)
+                    for i, p in enumerate(scored)],
+        )
+        hierarchiser_le_pays([pays], scored, CONFIG)
+        # 18 lieux sur un plein de 80 : 10/80 et 25/80 arrondis.
+        self.assertEqual(pays.tier_counts, [2, 6, 10])
+        # Le niveau suit le SCORE, et l'ordre de lecture suit le niveau.
+        par_score = sorted(scored, key=lambda p: -p.score)
+        self.assertEqual(
+            [cp.place_id for cp in pays.places[:2]],
+            [p.wikidata_id for p in par_score[:2]],
+        )
+
+    def test_la_hierarchie_du_pays_garde_le_deplacement(self):
+        # Un `promote` sur la chapelle Sixtine doit survivre au recalcul : sinon
+        # la règle effacerait un jugement.
+        from roam_pipeline.collections import hierarchiser_le_pays
+        from roam_pipeline.models import Collection, CollectionPlace
+
+        lieux = [
+            make_place(f"Lieu {i:02d}", sitelinks=60 - i, wikidata_id=f"Q{i}")
+            for i in range(18)
+        ]
+        scored = score_all(lieux, CONFIG)
+        dernier = min(scored, key=lambda p: p.score).wikidata_id
+        pays = Collection(
+            slug="geo-country-va", name="Le meilleur du Vatican", kind="geo",
+            geo_level="country", geo_code="VA",
+            # Le dernier par le score, remonté d'un cran par le curateur.
+            places=[
+                CollectionPlace(p.wikidata_id,
+                                2 if p.wikidata_id == dernier else 1,
+                                i + 1,
+                                natural_tier=3 if p.wikidata_id == dernier else 1)
+                for i, p in enumerate(scored)
+            ],
+        )
+        hierarchiser_le_pays([pays], scored, CONFIG)
+        promu = next(cp for cp in pays.places if cp.place_id == dernier)
+        self.assertEqual(promu.natural_tier, 3)
+        self.assertEqual(promu.tier, 2)
+
+    def test_un_pays_qui_a_des_themes_ne_bouge_pas(self):
+        # Le repli ne joue QUE là où il n'y a aucune collection de thème :
+        # ailleurs ce sont les thèmes qui notent, et les cent cinquante petites
+        # collections départementales de la France ne doivent pas bouger d'un
+        # cran. Mesuré aussi sur l'Italie reconstruite : `geo-country-it` reste
+        # à [11, 25, 44].
+        from roam_pipeline.collections import hierarchiser_le_pays
+        from roam_pipeline.models import Collection, CollectionPlace
+
+        lieux = [make_place(f"Lieu {i}", wikidata_id=f"Q{i}") for i in range(6)]
+        scored = score_all(lieux, CONFIG)
+        theme = Collection(slug="theme-chateaux", name="Châteaux", kind="theme")
+        pays = Collection(
+            slug="geo-country-fr", name="Le meilleur de France", kind="geo",
+            geo_level="country", geo_code="FR",
+            places=[CollectionPlace(p.wikidata_id, 1, i + 1, natural_tier=1)
+                    for i, p in enumerate(scored)],
+        )
+        hierarchiser_le_pays([theme, pays], scored, CONFIG)
+        self.assertEqual(pays.tier_counts, [6, 0, 0])
+
     def test_aucune_collection_se_dit(self):
         # LE SILENCE ÉTAIT LA PANNE. Saint-Marin tient huit lieux pour un
         # plancher de six : trois `drop` en revue passent dessous, toutes ses

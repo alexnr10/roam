@@ -438,9 +438,9 @@
    "geoCode": "VA",
    "placeCount": 18,
    "tierCounts": [
-    10,
-    8,
-    0
+    2,
+    6,
+    10
    ],
    "places": [
     {
@@ -454,83 +454,83 @@
      "rank": 2
     },
     {
-     "placeId": "Q145093",
-     "tier": 1,
+     "placeId": "Q2943",
+     "tier": 2,
      "rank": 3
     },
     {
-     "placeId": "Q42003",
-     "tier": 1,
+     "placeId": "Q145093",
+     "tier": 2,
      "rank": 4
     },
     {
-     "placeId": "Q2291560",
-     "tier": 1,
+     "placeId": "Q83425",
+     "tier": 2,
      "rank": 5
     },
     {
-     "placeId": "Q83425",
-     "tier": 1,
+     "placeId": "Q2158200",
+     "tier": 2,
      "rank": 6
     },
     {
-     "placeId": "Q2158200",
-     "tier": 1,
+     "placeId": "Q42003",
+     "tier": 2,
      "rank": 7
-    },
-    {
-     "placeId": "Q4540172",
-     "tier": 1,
-     "rank": 8
-    },
-    {
-     "placeId": "Q13099380",
-     "tier": 1,
-     "rank": 9
-    },
-    {
-     "placeId": "Q2943",
-     "tier": 1,
-     "rank": 10
     },
     {
      "placeId": "Q1444766",
      "tier": 2,
-     "rank": 11
+     "rank": 8
     },
     {
      "placeId": "Q498557",
-     "tier": 2,
-     "rank": 12
-    },
-    {
-     "placeId": "Q2460920",
-     "tier": 2,
-     "rank": 13
-    },
-    {
-     "placeId": "Q1166213",
-     "tier": 2,
-     "rank": 14
+     "tier": 3,
+     "rank": 9
     },
     {
      "placeId": "Q2547111",
-     "tier": 2,
-     "rank": 15
+     "tier": 3,
+     "rank": 10
+    },
+    {
+     "placeId": "Q4540172",
+     "tier": 3,
+     "rank": 11
+    },
+    {
+     "placeId": "Q2460920",
+     "tier": 3,
+     "rank": 12
     },
     {
      "placeId": "Q774940",
-     "tier": 2,
-     "rank": 16
+     "tier": 3,
+     "rank": 13
+    },
+    {
+     "placeId": "Q2291560",
+     "tier": 3,
+     "rank": 14
+    },
+    {
+     "placeId": "Q1166213",
+     "tier": 3,
+     "rank": 15
     },
     {
      "placeId": "Q3585393",
-     "tier": 2,
+     "tier": 3,
+     "rank": 16
+    },
+    {
+     "placeId": "Q13099380",
+     "tier": 3,
      "rank": 17
     },
     {
      "placeId": "Q917387",
-     "tier": 2,
+     "tier": 3,
      "rank": 18
     }
    ]
