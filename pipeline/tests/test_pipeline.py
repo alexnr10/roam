@@ -12,6 +12,7 @@ import io
 import json
 import logging
 import re
+import shutil
 import sys
 import tempfile
 import unicodedata
@@ -9871,16 +9872,39 @@ class TestEnclaves(unittest.TestCase):
         # Le garde-fou sert aussi de jalon : Monaco a déposé sa configuration
         # avec un Q-id explicitement à résoudre, qui refuse de se charger au
         # lieu d'interroger Wikidata pour rien.
-        with self.assertRaises(ValueError) as leve:
-            load_config(pays="mc")
+        # Le pays est déclaré dans un calque temporaire : Monaco a d'abord servi
+        # de cobaye avec un `A_RESOUDRE`, mais son Q-id est résolu maintenant, et
+        # un test qui dépend d'une configuration inachevée meurt avec elle.
+        with tempfile.TemporaryDirectory() as tmp:
+            racine = Path(tmp) / "config"
+            shutil.copytree(CONFIG_DIR, racine)
+            calque = racine / "zz"
+            calque.mkdir()
+            (calque / "scoring.yaml").write_text(
+                "geo:\n"
+                "  country:\n"
+                "    qid: A_RESOUDRE\n"
+                "    code: ZZ\n"
+                "    name: Pays d'essai\n"
+                "    de_form: du Pays d'essai\n",
+                encoding="utf-8",
+            )
+            with self.assertRaises(ValueError) as leve:
+                load_config(config_dir=racine, pays="zz")
         message = str(leve.exception)
         self.assertIn("Q-id de pays invalide", message)
-        # Le message NOMME la commande : sans elle, le curateur doit deviner.
+        # Le message NOMME la commande, et le pays : sans eux, le curateur doit
+        # deviner ce qu'on attend de lui.
         self.assertIn("suggest-qids", message)
-        self.assertIn("Monaco", message)
+        self.assertIn("Pays d'essai", message)
 
     def test_les_pays_resolus_se_chargent(self):
-        for code, attendu in (("it", "Q38"), ("va", "Q237"), ("sm", "Q238")):
+        # Chacun a été résolu par `suggest-qids`, jamais écrit de mémoire, et
+        # chacun a eu son homonyme : Q237 est libellé « Saint-Siège », et
+        # « Monaco » rendait aussi la commune, le quartier, le club de football
+        # et un groupe de rock britannique.
+        for code, attendu in (("it", "Q38"), ("va", "Q237"), ("sm", "Q238"),
+                              ("mc", "Q235")):
             self.assertEqual(load_config(pays=code).country.qid, attendu)
         self.assertEqual(CONFIG.country.qid, "Q142")
 

@@ -1,24 +1,31 @@
 # Monaco : ce qui diffère du dépôt.
 #
-# ⚠ CE FICHIER NE SE CHARGE PAS ENCORE, ET C'EST VOULU.
+# LE Q-ID NE VIENT PAS DE MÉMOIRE. `suggest-qids "Monaco"` a rendu six
+# candidats, et les trois pièges annoncés y étaient tous :
 #
-# Le Q-id est à résoudre, et il ne s'écrit pas de mémoire. C'est la règle de ce
-# dépôt, et elle a été payée : un Q-id de PAYS entre dans le filtre `P17` de
-# chaque requête, donc s'y tromper ne rend pas un thème vide, ça rend le pays
-# vide — après une demi-heure de collecte. `load_config` refuse maintenant tout
-# ce qui n'a pas la forme d'un Q-id, et nomme la commande à lancer :
+#     Q235        Monaco              micro État d'Europe fondé en 1297   ← celui-ci
+#     Q3685392    commune de Monaco   unique commune de la principauté
+#     Q55115      Monaco-Ville        quartier de Monaco
+#     Q180305     AS Monaco FC        club de football monégasque
+#     Q1943982    Monaco              groupe de musique britannique
+#     Q16861797   Monaco              nom de famille
 #
-#     python -m roam_pipeline suggest-qids "Monaco"
+# Q235 est l'ÉTAT, et c'est ce que `P17` désigne : « pays ». Les deux entités
+# voisines décrivent l'échelon administratif, que Wikidata porte sur `P131`
+# — « situé dans l'entité territoriale » — et non sur `P17`. Choisir la commune
+# aurait rendu zéro lieu pour un pays qui en a.
 #
-# Attention au piège que le Vatican a tendu : Wikidata distingue parfois l'ÉTAT
-# de son gouvernement ou de sa capitale, et pour Q237 le libellé rendu était
-# « Saint-Siège ». À Monaco la question se pose deux fois, parce que la
-# principauté, la commune de Monaco et le quartier de Monaco-Ville portent des
-# noms voisins. Le bon candidat est l'ÉTAT SOUVERAIN ; si la collecte rend zéro
-# lieu, c'est l'entité voisine qu'il faut.
+# Le fichier a d'abord porté `A_RESOUDRE`, qui refusait de se charger : c'est ce
+# garde-fou qui a rendu l'étape obligatoire au lieu d'être recommandée. Un Q-id
+# de PAYS entre dans le filtre de chaque requête, donc s'y tromper ne rend pas un
+# thème vide, ça rend le pays vide — après une demi-heure de collecte.
+#
+# ⚠ SI LA COLLECTE REND ZÉRO LIEU, c'est l'entité voisine qu'il faut, et la
+# liste ci-dessus dit laquelle essayer. Le Vatican a tendu ce piège : Q237 y est
+# libellé « Saint-Siège ».
 geo:
   country:
-    qid: A_RESOUDRE
+    qid: Q235
     code: MC
     name: Monaco
     # « du Vatican », « de Saint-Marin », « de Monaco » : cette forme sert aux
