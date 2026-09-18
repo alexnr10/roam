@@ -327,26 +327,6 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Chapelle_Sixtine"
   },
   {
-   "id": "Q1644167",
-   "slug": "eglise-saint-martin-et-saint-sebastien-des-suisses-du-vatican",
-   "name": "Église Saint-Martin-et-Saint-Sébastien-des-Suisses du Vatican",
-   "themeId": "cathedrales",
-   "lat": 41.903353,
-   "lon": 12.456705,
-   "radiusM": 120,
-   "score": 69.1,
-   "departement": null,
-   "departementCode": null,
-   "regionCode": null,
-   "communeCode": null,
-   "communeName": null,
-   "summary": "L'église Saint-Martin-et-Saint-Sébastien-des-Suisses (en italien : chiesa dei Santi Martino e Sebastiano degli Svizzeri), (en français : église des saints Martin et Sébastien des suisses) est un lieu de culte catholique situé au Vatican, près des colonnades de la place Saint-Pierre dans elle est séparée par le ricciolo d'Italia, dans le quartier de la garde suisse pontificale (à proximité de la porte San Pellegrino et du palais apostolique). Il s'agit de l'église nationale Suisse à Rome.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Citt%C3%A0%20del%20Vaticano%2C%20chiesa%20dei%20Santi%20Martino%20e%20Sebastiano%20degli%20Svizzeri%20-%20Esterno.jpg",
-   "imageAuthor": "Pufui Pc Pifpef I",
-   "imageLicence": "CC BY-SA 4.0",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/%C3%89glise_Saint-Martin-et-Saint-S%C3%A9bastien-des-Suisses_du_Vatican"
-  },
-  {
    "id": "Q1166213",
    "slug": "eglise-santo-stefano-degli-abissini",
    "name": "Église Santo Stefano degli Abissini",
@@ -456,10 +436,10 @@
    "labelId": null,
    "geoLevel": "country",
    "geoCode": "VA",
-   "placeCount": 19,
+   "placeCount": 18,
    "tierCounts": [
     10,
-    9,
+    8,
     0
    ],
    "places": [
@@ -524,39 +504,34 @@
      "rank": 12
     },
     {
-     "placeId": "Q1644167",
+     "placeId": "Q2460920",
      "tier": 2,
      "rank": 13
     },
     {
-     "placeId": "Q2460920",
+     "placeId": "Q1166213",
      "tier": 2,
      "rank": 14
     },
     {
-     "placeId": "Q1166213",
+     "placeId": "Q2547111",
      "tier": 2,
      "rank": 15
     },
     {
-     "placeId": "Q2547111",
+     "placeId": "Q774940",
      "tier": 2,
      "rank": 16
     },
     {
-     "placeId": "Q774940",
+     "placeId": "Q3585393",
      "tier": 2,
      "rank": 17
     },
     {
-     "placeId": "Q3585393",
-     "tier": 2,
-     "rank": 18
-    },
-    {
      "placeId": "Q917387",
      "tier": 2,
-     "rank": 19
+     "rank": 18
     }
    ]
   }

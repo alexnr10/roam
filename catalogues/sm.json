@@ -66,10 +66,30 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Mont_Titano"
   },
   {
+   "id": "Q1705125",
+   "slug": "palais-public-de-saint-marin",
+   "name": "Palais public de Saint-Marin",
+   "themeId": "monuments",
+   "lat": 43.936786,
+   "lon": 12.446436,
+   "radiusM": 150,
+   "score": 73.3,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Le Palais public (en italien : Palazzo Pubblico) est l'hôtel de ville de Saint-Marin et également le siège du gouvernement. Il abrite les principaux organes institutionnels et administratifs de la République : les capitaines-régents, le Grand Conseil général, le Conseil des Douze et le Congrès d'État.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palazzo%20Pubblico%20-%20esterno.jpg",
+   "imageAuthor": "Fiat 500e",
+   "imageLicence": "CC BY 4.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palais_public_de_Saint-Marin"
+  },
+  {
    "id": "Q2711604",
    "slug": "guaita",
    "name": "Guaita",
-   "themeId": "sommets",
+   "themeId": "monuments",
    "lat": 43.9354,
    "lon": 12.4496,
    "radiusM": 1000,
@@ -86,10 +106,30 @@
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Guaita"
   },
   {
+   "id": "Q2592701",
+   "slug": "cesta",
+   "name": "Cesta",
+   "themeId": "monuments",
+   "lat": 43.9328,
+   "lon": 12.4515,
+   "radiusM": 150,
+   "score": 66.7,
+   "departement": null,
+   "departementCode": null,
+   "regionCode": null,
+   "communeCode": null,
+   "communeName": null,
+   "summary": "Cesta ou De La Fratta est un des trois pics du mont Titano, qui surplombent la ville de Saint-Marin, capitale de la République de Saint-Marin. Les deux autres pics sont Guaita et Montale.",
+   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Torre%20Cesta%20-%20San%20Marino%20-%20GT%2001%20-%202024%2004%2030.jpg",
+   "imageAuthor": "Terragio67",
+   "imageLicence": "CC BY-SA 4.0",
+   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cesta_(Saint-Marin)"
+  },
+  {
    "id": "Q2224877",
    "slug": "montale",
    "name": "Montale",
-   "themeId": "sommets",
+   "themeId": "monuments",
    "lat": 43.9301,
    "lon": 12.4526,
    "radiusM": 1000,
@@ -104,26 +144,6 @@
    "imageAuthor": "Commonists",
    "imageLicence": "CC BY-SA 4.0",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Montale_(Saint-Marin)"
-  },
-  {
-   "id": "Q2592967",
-   "slug": "monte-san-cristoforo",
-   "name": "Monte San Cristoforo",
-   "themeId": "sommets",
-   "lat": 43.906944,
-   "lon": 12.464722,
-   "radiusM": 1000,
-   "score": 43.3,
-   "departement": null,
-   "departementCode": null,
-   "regionCode": null,
-   "communeCode": null,
-   "communeName": null,
-   "summary": null,
-   "imageUrl": null,
-   "imageAuthor": null,
-   "imageLicence": null,
-   "wikipediaUrl": null
   },
   {
    "id": "Q810102",
@@ -144,66 +164,6 @@
    "imageAuthor": "trolvag",
    "imageLicence": "CC BY-SA 3.0",
    "wikipediaUrl": "https://fr.wikipedia.org/wiki/Basilique_de_Saint-Marin"
-  },
-  {
-   "id": "Q2287080",
-   "slug": "trois-tours-de-saint-marin",
-   "name": "Trois tours de Saint-Marin",
-   "themeId": "chateaux",
-   "lat": 43.935,
-   "lon": 12.45,
-   "radiusM": 200,
-   "score": 76.5,
-   "departement": null,
-   "departementCode": null,
-   "regionCode": null,
-   "communeCode": null,
-   "communeName": null,
-   "summary": "Les Trois tours de Saint-Marin sont un ensemble de tours situées sur le mont Titano, qui surplombe la ville de Saint-Marin, capitale de la République de Saint-Marin. Ces tours assurèrent la défense de la Ville de Saint-Marin et se retrouvent stylisées sur les armoiries de la république.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fortress%20of%20Guaita%20-%20First%20Tower%20%28San%20Marino%29.jpg",
-   "imageAuthor": "Commonists",
-   "imageLicence": "CC BY-SA 4.0",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Trois_tours_de_Saint-Marin"
-  },
-  {
-   "id": "Q1705125",
-   "slug": "palais-public-de-saint-marin",
-   "name": "Palais public de Saint-Marin",
-   "themeId": "musees",
-   "lat": 43.936786,
-   "lon": 12.446436,
-   "radiusM": 120,
-   "score": 73.3,
-   "departement": null,
-   "departementCode": null,
-   "regionCode": null,
-   "communeCode": null,
-   "communeName": null,
-   "summary": "Le Palais public (en italien : Palazzo Pubblico) est l'hôtel de ville de Saint-Marin et également le siège du gouvernement. Il abrite les principaux organes institutionnels et administratifs de la République : les capitaines-régents, le Grand Conseil général, le Conseil des Douze et le Congrès d'État.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palazzo%20Pubblico%20-%20esterno.jpg",
-   "imageAuthor": "Fiat 500e",
-   "imageLicence": "CC BY 4.0",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Palais_public_de_Saint-Marin"
-  },
-  {
-   "id": "Q2592701",
-   "slug": "cesta",
-   "name": "Cesta",
-   "themeId": "musees",
-   "lat": 43.9328,
-   "lon": 12.4515,
-   "radiusM": 120,
-   "score": 66.7,
-   "departement": null,
-   "departementCode": null,
-   "regionCode": null,
-   "communeCode": null,
-   "communeName": null,
-   "summary": "Cesta ou De La Fratta est un des trois pics du mont Titano, qui surplombent la ville de Saint-Marin, capitale de la République de Saint-Marin. Les deux autres pics sont Guaita et Montale.",
-   "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Torre%20Cesta%20-%20San%20Marino%20-%20GT%2001%20-%202024%2004%2030.jpg",
-   "imageAuthor": "Terragio67",
-   "imageLicence": "CC BY-SA 4.0",
-   "wikipediaUrl": "https://fr.wikipedia.org/wiki/Cesta_(Saint-Marin)"
   }
  ],
  "collections": [
@@ -215,10 +175,10 @@
    "labelId": null,
    "geoLevel": "country",
    "geoCode": "SM",
-   "placeCount": 8,
+   "placeCount": 6,
    "tierCounts": [
-    7,
-    1,
+    6,
+    0,
     0
    ],
    "places": [
@@ -233,7 +193,7 @@
      "rank": 2
     },
     {
-     "placeId": "Q2287080",
+     "placeId": "Q2711604",
      "tier": 1,
      "rank": 3
     },
@@ -248,19 +208,9 @@
      "rank": 5
     },
     {
-     "placeId": "Q2711604",
-     "tier": 1,
-     "rank": 6
-    },
-    {
      "placeId": "Q2224877",
      "tier": 1,
-     "rank": 7
-    },
-    {
-     "placeId": "Q2592967",
-     "tier": 2,
-     "rank": 8
+     "rank": 6
     }
    ]
   }

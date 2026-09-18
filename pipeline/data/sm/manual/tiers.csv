@@ -1,0 +1,18 @@
+# Niveau de chaque lieu tel que le curateur l'a vu à sa dernière revue.
+#
+# Le niveau d'un lieu n'est pas une propriété du lieu : c'est son rang dans sa
+# collection. Ajouter un signal au score, ou seulement collecter dix lieux de
+# plus, peut donc faire descendre un lieu qu'on avait validé — sans que rien ne
+# le dise.
+#
+# Ce fichier est la photographie du dernier état VU. `build` compare et signale
+# les écarts ; `apply-review` la met à jour, parce que c'est le moment où le
+# curateur a regardé.
+#
+wikidata_id,tier,theme,name
+Q158526,3,sommets,Mont Titano
+Q1705125,3,monuments,Palais public de Saint-Marin
+Q2224877,3,monuments,Montale
+Q2592701,3,monuments,Cesta
+Q2711604,3,monuments,Guaita
+Q810102,3,cathedrales,Basilique de Saint-Marin

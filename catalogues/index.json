@@ -1288,12 +1288,12 @@
       "code": "SM",
       "name": "Saint-Marin",
       "fichier": "sm.json",
-      "lieux": 8,
+      "lieux": 6,
       "emprises": [
         [
           12.4464,
-          43.9069,
-          12.4647,
+          43.9283,
+          12.4526,
           43.9372
         ]
       ]
@@ -1302,7 +1302,7 @@
       "code": "VA",
       "name": "Vatican",
       "fichier": "va.json",
-      "lieux": 19,
+      "lieux": 18,
       "emprises": [
         [
           12.4483,

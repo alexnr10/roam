@@ -1,0 +1,22 @@
+# Décisions éditoriales, cumulées au fil des revues.
+#
+# keep    : validé, et conservé même si un plancher venait à monter.
+# drop    : écarté du catalogue.
+# promote : remonté dans le classement. Sur un lieu hors de sa collection
+#           nationale, il l'y fait ENTRER, à son rang, et rien de plus.
+# promote2: le fait entrer ET le monte d'un cran. À n'employer que là où
+#           `promote` ne ferait qu'entrer — ailleurs il vaut `promote`.
+# demote  : descendu dans le classement.
+#
+# Ce fichier est la mémoire de la curation. Le supprimer perd tout le travail
+# de relecture ; en corriger une ligne suffit à revenir sur un verdict.
+#
+wikidata_id,decision,name,note
+Q158526,keep,Mont Titano,
+Q1705125,keep,Palais public de Saint-Marin,
+Q2224877,keep,Montale,
+Q2287080,drop,Trois tours de Saint-Marin,
+Q2592701,keep,Cesta,
+Q2592967,drop,Monte San Cristoforo,
+Q2711604,keep,Guaita,
+Q810102,keep,Basilique de Saint-Marin,

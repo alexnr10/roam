@@ -1,0 +1,33 @@
+# Décisions éditoriales, cumulées au fil des revues.
+#
+# keep    : validé, et conservé même si un plancher venait à monter.
+# drop    : écarté du catalogue.
+# promote : remonté dans le classement. Sur un lieu hors de sa collection
+#           nationale, il l'y fait ENTRER, à son rang, et rien de plus.
+# promote2: le fait entrer ET le monte d'un cran. À n'employer que là où
+#           `promote` ne ferait qu'entrer — ailleurs il vaut `promote`.
+# demote  : descendu dans le classement.
+#
+# Ce fichier est la mémoire de la curation. Le supprimer perd tout le travail
+# de relecture ; en corriger une ligne suffit à revenir sur un verdict.
+#
+wikidata_id,decision,name,note
+Q1166213,keep,Église Santo Stefano degli Abissini,
+Q12512,keep,Basilique Saint-Pierre,
+Q13099380,keep,Grotte de Lourdes,
+Q1444766,keep,Obélisque du Vatican,
+Q145093,keep,Palais du Vatican,
+Q1644167,drop,Église Saint-Martin-et-Saint-Sébastien-des-Suisses du Vatican,
+Q182955,keep,Musées du Vatican,
+Q2158200,keep,Tombe de saint Pierre,
+Q2291560,keep,Villa Pia,
+Q2460920,keep,Tour des vents,
+Q2547111,keep,Cour du Belvédère,
+Q2943,keep,Chapelle Sixtine,
+Q3585393,keep,Église Sainte-Anne-des-Palefreniers,
+Q42003,keep,Jardins du Vatican,
+Q4540172,keep,Monastère Mater Ecclesiae,
+Q498557,keep,Appartements Borgia,
+Q774940,keep,Pinacothèque vaticane,
+Q83425,keep,Place Saint-Pierre,
+Q917387,keep,Palais du Gouvernorat du Vatican,
