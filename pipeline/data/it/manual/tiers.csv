@@ -116,7 +116,6 @@ Q1088991,3,lacs,Lago di Ancipa
 Q1089148,3,iles,Île de San Nicola
 Q1089361,3,chateaux,Château de l'Empereur
 Q10895,3,villages,San Gemini
-Q1089655,3,lacs,Lac de Ganna
 Q1089692,3,sommets,Mont Penice
 Q10907,3,villages,Stroncone
 Q1091732,3,sommets,Monte Bove
@@ -394,7 +393,7 @@ Q157824,2,villages,Piombino
 Q1579896,3,megalithes,Labicum
 Q1579923,2,maisons,Palais de Monza
 Q1581882,3,cathedrales,Basilique Saint-André
-Q1582108,3,maisons,Villa Torlonia
+Q1582108,2,jardins,Villa Torlonia
 Q1585525,3,iles,San Giacomo in Paludo
 Q1585931,3,musees,Villa Medicea di Cerreto Guidi
 Q1590855,3,megalithes,Maison des Vettii
@@ -493,6 +492,7 @@ Q1774956,3,abbayes,Abbaye Santa Maria Arabona
 Q1775223,3,abbayes,Abbaye de Follina
 Q1775258,2,abbayes,Abbaye de Fossanova
 Q1775907,2,chateaux,Rocchetta Mattei
+Q1775911,3,abbayes,Abbaye de San Pastore
 Q1775991,3,abbayes,Abbaye Santo Stefano del Bosco
 Q177695,3,villages,Ronciglione
 Q17774,3,villages,Castagnole delle Lanze
@@ -687,7 +687,6 @@ Q2107814,3,megalithes,Pranu Muttedu
 Q21097741,3,sommets,Monte Antola
 Q211295,2,megalithes,Forum de Trajan
 Q21192696,2,plages,Capo San Vito
-Q21194396,3,monuments,Palazzo del Comune
 Q21194402,3,monuments,Palais Cusani
 Q21194420,3,monuments,Palais du Gouverneur de Parme
 Q21208502,3,megalithes,Criptoportico romano
@@ -1431,6 +1430,7 @@ Q3934723,3,villages,Ricetto de Candelo
 Q3936338,2,grottes,Grotte de Fumane
 Q3936711,3,lacs,Réserve naturelle des Salines de Margherita di Savoia
 Q3936798,2,cascades,Riserva naturale guidata Cascate del Verde
+Q3939381,3,chateaux,Rocca Borromeo
 Q3939447,3,chateaux,Rocca dei Rettori
 Q3940563,3,maisons,Galerie Internationale d'Art Moderne
 Q3940602,3,cathedrales,Sanctuaire de Notre-Dame du Mont Berico
@@ -1644,7 +1644,6 @@ Q52693,3,villages,Viggianello
 Q52861,3,cathedrales,Cathédrale Saint-Cyriaque d'Ancône
 Q52959,3,villages,Bagnara di Romagna
 Q52962,3,villages,Brisighella
-Q530591,3,megalithes,Trebula Mutuesca
 Q53129,3,villages,Gradisca d'Isonzo
 Q53166,3,villages,Cordovado
 Q53173,3,villages,Frisanco
@@ -1809,7 +1808,7 @@ Q657102,3,megalithes,Atella
 Q657847,3,monuments,Porta Nuova
 Q660633,3,sommets,Mont Arci
 Q662766,2,megalithes,Amphithéâtre de Pouzzoles
-Q670416,3,sommets,Campanile di Val Montanaia
+Q670416,2,sommets,Campanile di Val Montanaia
 Q671850,2,musees,Puits de Saint Patrick
 Q671933,3,cathedrales,Cathédrale Saint-Georges de Ferrare
 Q672495,3,lacs,Lago di Livigno
