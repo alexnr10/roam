@@ -1997,6 +1997,7 @@ def _build_un_pays(
         len(retained),
         len(orphelins),
     )
+    warn_no_collection(collections, kept, config)
     warn_orphans(orphelins, config)
     warn_crowded_tier1(collections, config)
     warn_surprising_promotions(retained, collections)
@@ -2089,6 +2090,39 @@ def warn_surprising_promotions(
             ", ".join(place.name for place in sorted(inutiles, key=lambda p: p.name)),
         )
     return [place for _nom, place in montes]
+
+
+def warn_no_collection(collections, kept, config) -> None:
+    """AUCUNE collection : le pays disparaît, et rien ne le disait.
+
+    Le cas est réservé aux petits pays, et c'est là qu'il fait mal. Saint-Marin
+    tient huit lieux pour un plancher de six : trois `drop` en revue suffisent à
+    passer dessous, et toutes ses collections tombent d'un coup — donc tous ses
+    lieux, « écartés faute de collection ».
+
+    Ce que la construction disait alors, en tout et pour tout :
+
+        Lieux retenus        : 0
+        Collections          : 0
+
+    Deux lignes à zéro au milieu de trente, et `export-app` enchaînait en
+    annonçant « 4 pays » sans écrire le catalogue de celui-ci — il n'avait rien
+    à écrire. Le fichier servi restait donc celui d'avant, l'application
+    continuait d'afficher un catalogue que la revue venait de vider, et le
+    curateur n'apprenait rien. Le silence était la panne.
+    """
+    if collections or not kept:
+        return
+    plancher = config.collections.min_places
+    LOG.warning(
+        "AUCUNE COLLECTION : les %s lieux de %s sont tous écartés, et le pays "
+        "n'a plus de catalogue. Le plancher est à %s lieux par collection ; "
+        "aucune ne l'atteint. `export-app` n'écrira rien et laissera le "
+        "fichier servi tel qu'il est — l'application montrerait donc un "
+        "catalogue périmé. Reviens sur des `drop` de la revue, ou abaisse "
+        "`collections.min_places` dans la configuration du pays.",
+        len(kept), config.country.name, plancher,
+    )
 
 
 def warn_orphans(orphelins: list[Place], config: Config) -> int:

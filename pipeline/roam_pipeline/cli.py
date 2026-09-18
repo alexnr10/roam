@@ -3660,6 +3660,41 @@ def cmd_export_app(args: argparse.Namespace, config: Config) -> int:
     # C'est arrivé : `export-app --pays-config it` a remplacé les 2 080 lieux
     # français par 2 203 italiens, en annonçant « Catalogue écrit » comme si de
     # rien n'était. La commande datait d'un catalogue à un seul pays.
+    # RIEN À SERVIR N'EST PAS UN EXPORT RÉUSSI.
+    #
+    # Sans lieu retenu, la boucle qui écrit un fichier par pays ne tourne pas :
+    # aucun catalogue n'est touché, et l'index — qui se COMPLÈTE au lieu de se
+    # remplacer — garde l'entrée d'avant. La commande affichait donc « 4 pays »
+    # et « relance l'application », en n'ayant rien écrit du tout.
+    #
+    # C'est le cas d'un petit pays dont la revue a fait tomber la dernière
+    # collection : trois `drop` sur les huit lieux de Saint-Marin suffisent. Le
+    # fichier servi restait celui d'avant, l'application continuait d'afficher
+    # le catalogue que la revue venait de vider, et rien ne le disait.
+    #
+    # On refuse, donc, et on ne touche même pas à l'index : mieux vaut un
+    # catalogue périmé qu'on sait périmé.
+    if not places:
+        servi = args.catalogues / f"{config.country.code.lower()}.json"
+        deja = 0
+        if servi.exists():
+            try:
+                deja = len(json.loads(servi.read_text(encoding="utf-8"))["places"])
+            except (json.JSONDecodeError, OSError, KeyError, TypeError):
+                deja = 0
+        print(
+            f"AUCUN LIEU RETENU pour {config.country.name} : rien n'est écrit, "
+            f"ni catalogue ni index.\n"
+            + (f"  {servi} garde ses {deja} lieux, qui ne sont plus ceux que la "
+               f"construction rend.\n" if deja else "")
+            + "  Le `build` dit pourquoi — le plus souvent, aucune collection "
+              "n'atteint son plancher.\n"
+              "  Reviens sur des `drop` de la revue, ou abaisse "
+              "`collections.min_places`.",
+            file=sys.stderr,
+        )
+        return 1
+
     embarque = _pays_embarque(args.to)
     if embarque and embarque != config.country.code:
         print(f"Catalogue embarqué laissé tel quel : il porte {embarque}, et "

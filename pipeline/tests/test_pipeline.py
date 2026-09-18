@@ -1133,6 +1133,35 @@ class TestStarvedThemes(unittest.TestCase):
         self.assertEqual([c.slug for c in built], [])
         self.assertIn("rochers 5", "\n".join(logs.output))
 
+    def test_aucune_collection_se_dit(self):
+        # LE SILENCE ÉTAIT LA PANNE. Saint-Marin tient huit lieux pour un
+        # plancher de six : trois `drop` en revue passent dessous, toutes ses
+        # collections tombent, tous ses lieux sont « écartés faute de
+        # collection » — et la construction n'affichait que deux lignes à zéro
+        # au milieu de trente. `export-app` enchaînait sans rien écrire, le
+        # fichier servi restait celui d'avant, et l'application montrait un
+        # catalogue que la revue venait de vider.
+        from roam_pipeline.collections import warn_no_collection
+
+        maigre = [
+            make_place(f"Tour {i}", theme_id="chateaux", wikidata_id=f"QT{i}")
+            for i in range(3)
+        ]
+        with self.assertLogs("roam_pipeline.collections", level="WARNING") as logs:
+            warn_no_collection([], maigre, CONFIG)
+        journal = "\n".join(logs.output)
+        self.assertIn("AUCUNE COLLECTION", journal)
+        self.assertIn("3 lieux", journal)
+        self.assertIn(str(CONFIG.collections.min_places), journal)
+
+    def test_une_collecte_vide_ne_previent_pas(self):
+        # Un pays qu'on n'a jamais collecté n'a rien perdu : l'avertissement
+        # dirait qu'un catalogue a disparu, alors qu'il n'a jamais existé.
+        from roam_pipeline.collections import warn_no_collection
+
+        with self.assertNoLogs("roam_pipeline.collections", level="WARNING"):
+            warn_no_collection([], [], CONFIG)
+
     def test_a_theme_with_enough_places_builds_quietly(self):
         from roam_pipeline.collections import build_theme_collections
 
