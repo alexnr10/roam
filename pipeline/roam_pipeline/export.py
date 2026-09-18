@@ -156,6 +156,31 @@ def _membership(
             review_tier[cp.place_id] = cp.tier
             naturels[cp.place_id] = cp.natural_tier
 
+    # AUCUNE COLLECTION DE THÈME : c'est la collection du PAYS qui range.
+    #
+    # Un thème n'a de collection qu'à partir du plancher. Le Vatican tient
+    # dix-neuf lieux et son thème le plus fourni en garde cinq ; Saint-Marin en
+    # tient huit. Ni l'un ni l'autre n'a donc de collection thématique — et tous
+    # leurs lieux tombaient dans le repli ci-dessous, « hors de la collection
+    # nationale, à relire en dernier ».
+    #
+    # Conséquence vue sur les deux revues : la feuille affichait NIVEAU 3 pour
+    # les dix-neuf lieux du Vatican et les huit de Saint-Marin, alors que la
+    # carte en montre dix au premier palier et huit au deuxième. La priorisation
+    # ne priorisait rien, et `tiers.csv` a photographié un état que le curateur
+    # n'a jamais vu.
+    #
+    # Le même repli que pour les étoiles, et pour la même raison : à cette
+    # échelle, « Le meilleur du Vatican » EST le classement. On ne s'en sert que
+    # faute de mieux — là où des collections de thème existent, rien ne change.
+    if not review_tier:
+        for collection in collections:
+            if collection.kind != "geo" or collection.geo_level != "country":
+                continue
+            for cp in collection.places:
+                review_tier[cp.place_id] = cp.tier
+                naturels[cp.place_id] = cp.natural_tier
+
     # Hors de la collection nationale de son thème : à relire en dernier. Mais
     # « niveau 3 » et « pas dans la collection » sont deux états différents, et
     # les confondre rend la revue interminable : sur les abbayes, 23 lieux sont

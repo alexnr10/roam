@@ -3582,6 +3582,56 @@ class TestCuratorAdjustments(unittest.TestCase):
             _retenus, collections = build_all(kept, CONFIG)
         return review_tiers(collections)
 
+    def test_sans_collection_de_theme_le_pays_range(self):
+        # LE MÊME ANGLE MORT QUE POUR LES ÉTOILES. Le niveau de revue se lit
+        # dans la collection nationale du THÈME ; un thème n'en a une qu'à
+        # partir du plancher. Le Vatican tient dix-neuf lieux et son thème le
+        # plus fourni en garde cinq, Saint-Marin en tient huit : ni l'un ni
+        # l'autre n'a de collection de thème.
+        #
+        # Tous leurs lieux tombaient donc dans le repli « hors de la collection
+        # nationale, à relire en dernier ». Vu sur les deux vraies revues : la
+        # feuille affichait NIVEAU 3 pour les dix-neuf lieux du Vatican, quand
+        # la carte en montre dix au premier palier — et `tiers.csv` a
+        # photographié un état que le curateur n'a jamais vu.
+        from roam_pipeline.models import Collection, CollectionPlace
+
+        pays = Collection(
+            slug="geo-country-va", name="Le meilleur du Vatican", kind="geo",
+            geo_level="country", geo_code="VA",
+            places=[
+                CollectionPlace("Q12512", 1, 1),
+                CollectionPlace("Q2943", 1, 2),
+                CollectionPlace("Q3585393", 2, 3),
+            ],
+        )
+        self.assertEqual(
+            review_tiers([pays]),
+            {"Q12512": 1, "Q2943": 1, "Q3585393": 2},
+        )
+
+    def test_une_collection_de_theme_garde_la_main(self):
+        # Le repli ne sert que faute de mieux : là où un thème a sa collection,
+        # c'est elle qui range, et la collection du pays ne s'en mêle pas —
+        # sinon les quatre-vingts lieux du « Meilleur de France » gagneraient un
+        # niveau que leur thème leur refuse.
+        from roam_pipeline.models import Collection, CollectionPlace
+
+        theme = Collection(
+            slug="theme-cathedrales", name="Cathédrales", kind="theme",
+            places=[CollectionPlace("Q12512", 3, 1)],
+        )
+        pays = Collection(
+            slug="geo-country-va", name="Le meilleur du Vatican", kind="geo",
+            geo_level="country", geo_code="VA",
+            places=[CollectionPlace("Q12512", 1, 1), CollectionPlace("Q2943", 1, 2)],
+        )
+        niveaux = review_tiers([theme, pays])
+        self.assertEqual(niveaux["Q12512"], 3)
+        # Hors de la collection nationale de son thème : à relire en dernier,
+        # et c'est le repli d'origine, qui ne change pas.
+        self.assertEqual(niveaux["Q2943"], 3)
+
     def test_a_demote_moves_exactly_one_tier(self):
         # L'intention du curateur est « descends-le d'un cran », pas « retire-lui
         # soixante points ». Le déplacement s'applique APRÈS le classement,
